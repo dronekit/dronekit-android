@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
           package="org.droidplanner.services.android"
           android:versionCode="1"
           android:versionName="0.0.0">
@@ -43,8 +42,7 @@
     <application
         android:name=".DroidPlannerServicesApp"
         android:allowBackup="true"
-        android:label="@string/app_title"
-        tools:replace="android:label">
+        android:label="@string/app_title">
 
         <meta-data
             android:name="com.google.android.gms.version"
