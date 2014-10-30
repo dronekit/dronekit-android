@@ -8,3 +8,4 @@ include ':Android'
 //Library projects
 include ':Libraries:usb-serial-for-android:UsbSerialLibrary'
 include ':Libraries:EllipsoidFit:EllipsoidFit'
+include ':Libraries:3DR-Services-Library:lib'
