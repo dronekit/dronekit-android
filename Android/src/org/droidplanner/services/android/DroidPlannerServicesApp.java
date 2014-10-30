@@ -1,57 +1,51 @@
 package org.droidplanner.services.android;
 
-import org.droidplanner.services.android.communication.service.MAVLinkClient;
-import org.droidplanner.services.android.communication.service.UploaderService;
-import org.droidplanner.services.android.location.FusedLocation;
-import org.droidplanner.services.notifications.NotificationHandler;
-import org.droidplanner.services.proxy.mission.MissionProxy;
-import org.droidplanner.services.android.utils.analytics.GAUtils;
-import org.droidplanner.services.android.utils.file.IO.ExceptionWriter;
-import org.droidplanner.services.android.utils.prefs.DroidPlannerPrefs;
-import org.droidplanner.core.MAVLink.MAVLinkStreams;
-import org.droidplanner.core.MAVLink.MavLinkMsgHandler;
-import org.droidplanner.core.drone.DroneImpl;
-import org.droidplanner.core.drone.DroneInterfaces;
-import org.droidplanner.core.drone.DroneInterfaces.Clock;
-import org.droidplanner.core.drone.DroneInterfaces.DroneEventsType;
-import org.droidplanner.core.drone.DroneInterfaces.Handler;
-import org.droidplanner.core.gcs.follow.Follow;
-import org.droidplanner.core.model.Drone;
-
 import android.app.Application;
 import android.content.Context;
 import android.os.SystemClock;
 
 import com.MAVLink.Messages.MAVLinkMessage;
 
-public class DroidPlannerServicesApp extends Application implements MAVLinkStreams.MavlinkInputStream,
-		DroneInterfaces.OnDroneListener {
+import org.droidplanner.core.MAVLink.MAVLinkStreams;
+import org.droidplanner.core.MAVLink.MavLinkMsgHandler;
+import org.droidplanner.core.drone.DroneImpl;
+import org.droidplanner.core.drone.DroneInterfaces.Clock;
+import org.droidplanner.core.drone.DroneInterfaces.DroneEventsType;
+import org.droidplanner.core.drone.DroneInterfaces.Handler;
+import org.droidplanner.core.gcs.follow.Follow;
+import org.droidplanner.core.model.Drone;
+import org.droidplanner.services.android.communication.service.MAVLinkClient;
+import org.droidplanner.services.android.communication.service.UploaderService;
+import org.droidplanner.services.android.location.FusedLocation;
+import org.droidplanner.services.android.utils.analytics.GAUtils;
+import org.droidplanner.services.android.utils.file.IO.ExceptionWriter;
+import org.droidplanner.services.android.utils.prefs.DroidPlannerPrefs;
+
+public class DroidPlannerServicesApp extends Application implements
+		MAVLinkStreams.MavlinkInputStream {
 
 	private Drone drone;
 	private Follow followMe;
-	private MissionProxy missionProxy;
 	private MavLinkMsgHandler mavLinkMsgHandler;
 	private DroidPlannerPrefs prefs;
 	/**
 	 * Handles dispatching of status bar, and audible notification.
 	 */
-	public NotificationHandler mNotificationHandler;
-    private Thread.UncaughtExceptionHandler exceptionHandler;
+	private Thread.UncaughtExceptionHandler exceptionHandler;
 
-    private Thread.UncaughtExceptionHandler handler = new Thread.UncaughtExceptionHandler() {
-        @Override
-        public void uncaughtException(Thread thread, Throwable ex) {
-            new ExceptionWriter(ex).saveStackTraceToSD();
-            exceptionHandler.uncaughtException(thread, ex);
-        }
-    };
+	private Thread.UncaughtExceptionHandler handler = new Thread.UncaughtExceptionHandler() {
+		@Override
+		public void uncaughtException(Thread thread, Throwable ex) {
+			new ExceptionWriter(ex).saveStackTraceToSD();
+			exceptionHandler.uncaughtException(thread, ex);
+		}
+	};
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        exceptionHandler = Thread.getDefaultUncaughtExceptionHandler();
-        Thread.setDefaultUncaughtExceptionHandler(handler);
-
+	@Override
+	public void onCreate() {
+		super.onCreate();
+		exceptionHandler = Thread.getDefaultUncaughtExceptionHandler();
+		Thread.setDefaultUncaughtExceptionHandler(handler);
 
 		final Context context = getApplicationContext();
 
@@ -70,23 +64,20 @@ public class DroidPlannerServicesApp extends Application implements MAVLinkStrea
 				handler.removeCallbacks(thread);
 			}
 
-            @Override
-            public void post(Runnable thread){
-                handler.post(thread);
-            }
+			@Override
+			public void post(Runnable thread) {
+				handler.post(thread);
+			}
 
 			@Override
 			public void postDelayed(Runnable thread, long timeout) {
 				handler.postDelayed(thread, timeout);
 			}
 		};
-		mNotificationHandler = new NotificationHandler(context);
 
 		prefs = new DroidPlannerPrefs(context);
 		drone = new DroneImpl(MAVClient, clock, handler, prefs);
-		getDrone().addDroneListener(this);
 
-		missionProxy = new MissionProxy(getDrone().getMission());
 		mavLinkMsgHandler = new org.droidplanner.core.MAVLink.MavLinkMsgHandler(getDrone());
 
 		followMe = new Follow(getDrone(), handler, new FusedLocation(context));
@@ -114,20 +105,6 @@ public class DroidPlannerServicesApp extends Application implements MAVLinkStrea
 		getDrone().notifyDroneEvent(DroneEventsType.DISCONNECTED);
 	}
 
-	@Override
-	public void onDroneEvent(DroneEventsType event, Drone drone) {
-		mNotificationHandler.onDroneEvent(event, drone);
-
-		switch (event) {
-		case MISSION_RECEIVED:
-			// Refresh the mission render state
-			missionProxy.refresh();
-			break;
-		default:
-			break;
-		}
-	}
-
 	public DroidPlannerPrefs getPreferences() {
 		return prefs;
 	}
@@ -136,11 +113,8 @@ public class DroidPlannerServicesApp extends Application implements MAVLinkStrea
 		return drone;
 	}
 
-    public Follow getFollowMe() {
-        return followMe;
-    }
+	public Follow getFollowMe() {
+		return followMe;
+	}
 
-    public MissionProxy getMissionProxy() {
-        return missionProxy;
-    }
 }
