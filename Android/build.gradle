@@ -7,38 +7,27 @@ repositories {
 dependencies {
     compile files('libs/droneapi-java.jar')
     compile 'com.google.android.gms:play-services:5.0.89'
-    compile 'com.sothree.slidinguppanel:library:2.0.2'
-
-    compile ('com.mapbox.mapboxsdk:mapbox-android-sdk:0.4.0@aar'){
-        transitive=true
-    }
-    compile ('com.cocoahero.android:geojson:1.0.0@aar'){
-        transitive=true
-    }
-
     compile 'com.android.support:support-v4:20.0.0'
 
     compile project(':Core')
     compile project(':Mavlink')
-    compile project(':Libraries:HorizontalVariableListView:HorizontalVariableListView')
 
-    compile files('libs/usbseriallibrary.jar')
     compile files('libs/j2xx.jar')
     compile files('libs/protobuf-java-2.5.0.jar')
     compile files('libs/jeromq-0.3.4.jar')
 
-    compile project(':Libraries:PebbleKit')
     compile project(':Libraries:usb-serial-for-android:UsbSerialLibrary')
 }
 
 android {
     compileSdkVersion 21
-    buildToolsVersion "21.0.1"
+    buildToolsVersion "21.0.2"
 
     defaultConfig {
-        applicationId 'org.droidplanner'
+        applicationId 'org.droidplanner.services.android'
         minSdkVersion 14
         targetSdkVersion 21
+        versionCode 1
         versionName getGitVersion()
     }
 
