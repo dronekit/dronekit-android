@@ -53,26 +53,6 @@
 
         <service android:name=".communication.service.UploaderService" />
 
-        <service
-            android:name=".api.DPReaderApiService"
-            android:enabled="true"
-            android:exported="true"
-            android:process=":remote">
-            <intent-filter>
-                <action android:name="com.three_dr.services.android.lib.model.IDroidPlannerReaderApi" />
-            </intent-filter>
-        </service>
-
-        <service
-            android:name=".api.DPWriterApiService"
-            android:enabled="true"
-            android:exported="true"
-            android:process=":remote">
-            <intent-filter>
-                <action android:name="com.three_dr.services.android.lib.model.IDroidPlannerWriterApi" />
-            </intent-filter>
-        </service>
-
         <receiver android:name=".communication.service.NetworkConnectivityReceiver"
             android:enabled="false">
             <intent-filter>
