@@ -7,7 +7,6 @@ import org.droidplanner.services.android.communication.connection.AndroidTcpConn
 import org.droidplanner.services.android.communication.connection.AndroidUdpConnection;
 import org.droidplanner.services.android.communication.connection.BluetoothConnection;
 import org.droidplanner.services.android.communication.connection.usb.UsbConnection;
-import org.droidplanner.services.maps.providers.DPMapProvider;
 import org.droidplanner.services.android.utils.prefs.DroidPlannerPrefs;
 import org.droidplanner.core.MAVLink.connection.MavLinkConnectionTypes;
 
@@ -72,35 +71,4 @@ public class Utils {
 		}
 	}
 
-	/**
-	 * Returns the map provider selected by the user.
-	 * 
-	 * @param context
-	 *            application context
-	 * @return selected map provider
-	 */
-	public static DPMapProvider getMapProvider(Context context) {
-		DroidPlannerPrefs prefs = new DroidPlannerPrefs(context);
-		final String mapProviderName = prefs.getMapProviderName();
-
-		return mapProviderName == null ? DPMapProvider.DEFAULT_MAP_PROVIDER : DPMapProvider
-				.getMapProvider(mapProviderName);
-	}
-
-	/**
-	 * Used to update the user interface language.
-	 * 
-	 * @param context
-	 *            Application context
-	 */
-	public static void updateUILanguage(Context context) {
-		DroidPlannerPrefs prefs = new DroidPlannerPrefs(context);
-		if (prefs.isEnglishDefaultLanguage()) {
-			Configuration config = new Configuration();
-			config.locale = Locale.ENGLISH;
-
-			final Resources res = context.getResources();
-			res.updateConfiguration(config, res.getDisplayMetrics());
-		}
-	}
 }

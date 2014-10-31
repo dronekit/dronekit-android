@@ -4,7 +4,6 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPacket;
 import com.MAVLink.Parser;
 
-import org.droidplanner.services.dialogs.openfile.OpenFileDialog;
 import org.droidplanner.services.android.utils.file.DirectoryPath;
 import org.droidplanner.services.android.utils.file.FileList;
 import org.droidplanner.services.android.utils.file.FileManager;
@@ -25,7 +24,7 @@ import java.util.List;
  * See http://qgroundcontrol.org/mavlink for details
  *
  */
-public class TLogReader implements OpenFileDialog.FileReader {
+public class TLogReader {
 
     public static final int MSGFILTER_NONE = -1;
 
@@ -114,17 +113,14 @@ public class TLogReader implements OpenFileDialog.FileReader {
         return true;
     }
 
-    @Override
     public String getPath() {
         return DirectoryPath.getTLogPath().getPath() + "/";
     }
 
-    @Override
     public String[] getFileList() {
         return FileList.getTLogFileList();
     }
 
-    @Override
     public boolean openFile(String file) {
         return openTLog(file);
     }

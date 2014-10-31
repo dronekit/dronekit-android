@@ -29,7 +29,7 @@ public class DroidPlannerPrefs implements org.droidplanner.core.drone.Preference
 	 * Default preference value
 	 */
 	public static final boolean DEFAULT_USAGE_STATISTICS = true;
-	public static final String DEFAULT_CONNECTION_TYPE = Utils.ConnectionType.USB.name();
+	public static final String DEFAULT_CONNECTION_TYPE = Utils.ConnectionType.UDP.name();
 	public static final boolean DEFAULT_PREF_UI_LANGUAGE = false;
 
 	// Public for legacy usage

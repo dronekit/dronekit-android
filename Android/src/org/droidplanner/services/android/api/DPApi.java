@@ -301,8 +301,118 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneInterfaces.OnDro
                     disconnectFromDrone();
                     break;
 
+                case GUIDEDPOINT:
+                    break;
+                case NAVIGATION:
+                    break;
+
+                case RADIO:
+                    callback.onDroneEvent(Event.EVENT_RADIO, emptyBundle);
+                    break;
+
+                case RC_IN:
+                    break;
+                case RC_OUT:
+                    break;
+
+                case ARMING:
+                    callback.onDroneEvent(Event.EVENT_ARMING, emptyBundle);
+                    break;
+
+                case AUTOPILOT_WARNING:
+                    callback.onDroneEvent(Event.EVENT_AUTOPILOT_FAILSAFE, emptyBundle);
+                    break;
+
+                case MODE:
+                    callback.onDroneEvent(Event.EVENT_VEHICLE_MODE, emptyBundle);
+                    break;
+
+                case ATTITUDE:
+                case ORIENTATION:
+                    callback.onDroneEvent(Event.EVENT_ATTITUDE, emptyBundle);
+                    break;
+
+                case SPEED:
+                    callback.onDroneEvent(Event.EVENT_SPEED, emptyBundle);
+                    break;
+
+                case BATTERY:
+                    callback.onDroneEvent(Event.EVENT_BATTERY, emptyBundle);
+                    break;
+
+                case STATE:
+                    callback.onDroneEvent(Event.EVENT_STATE, emptyBundle);
+                    break;
+
+                case MISSION_UPDATE:
+                    break;
+                case MISSION_RECEIVED:
+                    break;
                 case TYPE:
                     callback.onDroneEvent(Event.EVENT_TYPE_UPDATED, emptyBundle);
+                    break;
+
+                case HOME:
+                    callback.onDroneEvent(Event.EVENT_HOME, emptyBundle);
+                    break;
+
+                case GPS:
+                case GPS_FIX:
+                case GPS_COUNT:
+                    callback.onDroneEvent(Event.EVENT_GPS, emptyBundle);
+                    break;
+
+                case PARAMETER:
+                case PARAMETERS_DOWNLOADED:
+                    callback.onDroneEvent(Event.EVENT_PARAMETERS_RECEIVED, emptyBundle);
+                    break;
+
+                case CALIBRATION_IMU:
+                    callback.onDroneEvent(Event.EVENT_CALIBRATION_IMU, emptyBundle);
+                    break;
+
+                case CALIBRATION_TIMEOUT:
+                    callback.onDroneEvent(Event.EVENT_CALIBRATION_TIMEOUT, emptyBundle);
+                    break;
+
+                case HEARTBEAT_TIMEOUT:
+                    break;
+                case HEARTBEAT_FIRST:
+                    break;
+                case HEARTBEAT_RESTORED:
+                    break;
+
+                case CONNECTED:
+                    callback.onDroneEvent(Event.EVENT_CONNECTED, emptyBundle);
+                    break;
+
+                case MISSION_SENT:
+                    break;
+                case ARMING_STARTED:
+                    break;
+                case INVALID_POLYGON:
+                    break;
+                case MISSION_WP_UPDATE:
+                    break;
+                case FOLLOW_START:
+                    break;
+                case FOLLOW_STOP:
+                    break;
+                case FOLLOW_UPDATE:
+                    break;
+                case FOLLOW_CHANGE_TYPE:
+                    break;
+                case WARNING_400FT_EXCEEDED:
+                    break;
+                case WARNING_SIGNAL_WEAK:
+                    break;
+                case FIRMWARE:
+                    break;
+                case WARNING_NO_GPS:
+                    break;
+                case MAGNETOMETER:
+                    break;
+                case FOOTPRINT:
                     break;
             }
         }catch(RemoteException e){

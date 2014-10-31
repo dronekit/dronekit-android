@@ -7,7 +7,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.droidplanner.services.dialogs.openfile.OpenFileDialog;
 import org.droidplanner.services.android.utils.file.DirectoryPath;
 import org.droidplanner.services.android.utils.file.FileList;
 import org.droidplanner.services.android.utils.file.FileManager;
@@ -24,7 +23,7 @@ import com.MAVLink.Messages.ardupilotmega.msg_mission_item;
  * See http://qgroundcontrol.org/mavlink/waypoint_protocol for details
  * 
  */
-public class MissionReader implements OpenFileDialog.FileReader {
+public class MissionReader {
 
 	private List<msg_mission_item> msgMissionItems;
 
@@ -95,17 +94,14 @@ public class MissionReader implements OpenFileDialog.FileReader {
 		return reader.readLine().contains("QGC WPL 110");
 	}
 
-	@Override
 	public String getPath() {
 		return DirectoryPath.getWaypointsPath();
 	}
 
-	@Override
 	public String[] getFileList() {
 		return FileList.getWaypointFileList();
 	}
 
-	@Override
 	public boolean openFile(String file) {
 		return openMission(file);
 	}

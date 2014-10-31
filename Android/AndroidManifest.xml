@@ -42,16 +42,36 @@
     <application
         android:name=".DroidPlannerServicesApp"
         android:allowBackup="true"
+        android:theme="@style/AppTheme"
+        android:icon="@drawable/ic_launcher"
         android:label="@string/app_title">
 
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
+        <activity
+            android:name=".activity.MainActivity"
+            android:launchMode="singleTask">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
         <service android:name=".communication.service.MAVLinkService" >
         </service>
 
         <service android:name=".communication.service.UploaderService" />
+
+        <service android:name=".api.DroidPlannerService"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action
+                    android:name="com.three_dr.services.android.lib.model.IDroidPlannerServices" />
+            </intent-filter>
+        </service>
 
         <receiver android:name=".communication.service.NetworkConnectivityReceiver"
             android:enabled="false">

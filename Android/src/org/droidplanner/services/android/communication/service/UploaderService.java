@@ -3,7 +3,7 @@ package org.droidplanner.services.android.communication.service;
 import java.io.File;
 
 import org.apache.http.client.HttpResponseException;
-import org.droidplanner.R;
+import org.droidplanner.services.android.R;
 import org.droidplanner.services.android.utils.file.DirectoryPath;
 import org.droidplanner.services.android.utils.prefs.DroidPlannerPrefs;
 

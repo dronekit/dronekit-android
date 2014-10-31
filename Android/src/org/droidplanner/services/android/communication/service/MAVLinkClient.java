@@ -1,9 +1,9 @@
 package org.droidplanner.services.android.communication.service;
 
-import org.droidplanner.R;
 import org.droidplanner.core.MAVLink.MAVLinkStreams;
 import org.droidplanner.core.MAVLink.connection.MavLinkConnection;
 import org.droidplanner.core.MAVLink.connection.MavLinkConnectionListener;
+import org.droidplanner.services.android.R;
 
 import android.content.ComponentName;
 import android.content.Context;

@@ -12,15 +12,13 @@ import org.droidplanner.services.android.utils.file.FileList;
 import org.droidplanner.services.android.utils.file.FileManager;
 import org.droidplanner.core.parameters.Parameter;
 
-public class ParameterReader implements
-		org.droidplanner.services.dialogs.openfile.OpenFileDialog.FileReader {
+public class ParameterReader {
 	private List<Parameter> parameters;
 
 	public ParameterReader() {
 		this.parameters = new ArrayList<Parameter>();
 	}
 
-	@Override
 	public boolean openFile(String itemList) {
 		if (!FileManager.isExternalStorageAvailable()) {
 			return false;
@@ -85,12 +83,10 @@ public class ParameterReader implements
 		return parameters;
 	}
 
-	@Override
 	public String getPath() {
 		return DirectoryPath.getParametersPath();
 	}
 
-	@Override
 	public String[] getFileList() {
 		return FileList.getParametersFileList();
 	}
