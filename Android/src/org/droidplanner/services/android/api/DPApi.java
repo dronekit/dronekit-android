@@ -121,6 +121,23 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneInterfaces.OnDro
         return proxyState;
     }
 
+    @Override
+    public VehicleMode[] getAllVehicleModes() throws RemoteException {
+        final int droneType = getDrone().getType();
+        final Type proxyType = getDroneProxyType(droneType);
+
+        List<ApmModes> typeModes = ApmModes.getModeList(droneType);
+        final int modesCount = typeModes.size();
+        VehicleMode[] vehicleModes = new VehicleMode[modesCount];
+        for(int i = 0; i < modesCount; i++){
+            ApmModes mode = typeModes.get(i);
+            vehicleModes[i] = new VehicleMode(mode.getNumber(), proxyType.getDroneType(),
+                    mode.getName());
+        }
+
+        return vehicleModes;
+    }
+
     private static Type getDroneProxyType(int originalType){
         switch(originalType){
             case MAV_TYPE.MAV_TYPE_TRICOPTER:
@@ -215,9 +232,7 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneInterfaces.OnDro
     }
 
     @Override
-    public void changeVehicleMode(String newModeName) throws RemoteException {
-        VehicleMode newMode = VehicleMode.valueOf(newModeName);
-
+    public void changeVehicleMode(VehicleMode newMode) throws RemoteException {
         int mavType;
         switch(newMode.getDroneType()){
             default:
