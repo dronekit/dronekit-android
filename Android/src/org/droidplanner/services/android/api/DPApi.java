@@ -115,10 +115,17 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneInterfaces.OnDro
         org.droidplanner.core.drone.variables.State droneState = drone.getState();
         ApmModes droneMode = droneState.getMode();
 
-        State proxyState = new State(null, getDroneProxyType(drone.getType()), droneState.isArmed(),
-                droneState.isFlying(), droneState.getWarning());
+        State proxyState = new State(getProxyMode(droneMode), getDroneProxyType(drone.getType()),
+                droneState.isArmed(), droneState.isFlying(), droneState.getWarning());
 
         return proxyState;
+    }
+
+    private static VehicleMode getProxyMode(ApmModes mode){
+        final Type proxyType = getDroneProxyType(mode.getType());
+        if(proxyType == null) return null;
+
+        return new VehicleMode(mode.getNumber(), proxyType.getDroneType(), mode.getName());
     }
 
     @Override
