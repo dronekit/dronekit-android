@@ -69,7 +69,7 @@
             android:exported="true">
             <intent-filter>
                 <action
-                    android:name="com.three_dr.services.android.lib.model.IDroidPlannerServices" />
+                    android:name="com.ox3dr.services.android.lib.model.IDroidPlannerServices" />
             </intent-filter>
         </service>
 

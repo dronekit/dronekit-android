@@ -6,10 +6,10 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
 
-import com.three_dr.services.android.lib.drone.connection.ConnectionParameter;
-import com.three_dr.services.android.lib.model.IDroidPlannerApi;
-import com.three_dr.services.android.lib.model.IDroidPlannerApiCallback;
-import com.three_dr.services.android.lib.model.IDroidPlannerServices;
+import com.ox3dr.services.android.lib.drone.connection.ConnectionParameter;
+import com.ox3dr.services.android.lib.model.IDroidPlannerApi;
+import com.ox3dr.services.android.lib.model.IDroidPlannerApiCallback;
+import com.ox3dr.services.android.lib.model.IDroidPlannerServices;
 
 import org.droidplanner.core.model.Drone;
 import org.droidplanner.services.android.DroidPlannerServicesApp;

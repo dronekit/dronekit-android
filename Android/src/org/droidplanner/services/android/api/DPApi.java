@@ -7,21 +7,21 @@ import android.util.Log;
 
 import com.MAVLink.Messages.ApmModes;
 import com.MAVLink.Messages.enums.MAV_TYPE;
-import com.three_dr.services.android.lib.drone.event.Event;
-import com.three_dr.services.android.lib.drone.event.Extra;
-import com.three_dr.services.android.lib.drone.property.Altitude;
-import com.three_dr.services.android.lib.drone.property.Attitude;
-import com.three_dr.services.android.lib.drone.property.Battery;
-import com.three_dr.services.android.lib.drone.property.Gps;
-import com.three_dr.services.android.lib.drone.property.Home;
-import com.three_dr.services.android.lib.drone.property.Mission;
-import com.three_dr.services.android.lib.drone.property.Parameters;
-import com.three_dr.services.android.lib.drone.property.Speed;
-import com.three_dr.services.android.lib.drone.property.State;
-import com.three_dr.services.android.lib.drone.property.Type;
-import com.three_dr.services.android.lib.drone.property.VehicleMode;
-import com.three_dr.services.android.lib.model.IDroidPlannerApi;
-import com.three_dr.services.android.lib.model.IDroidPlannerApiCallback;
+import com.ox3dr.services.android.lib.drone.event.Event;
+import com.ox3dr.services.android.lib.drone.event.Extra;
+import com.ox3dr.services.android.lib.drone.property.Altitude;
+import com.ox3dr.services.android.lib.drone.property.Attitude;
+import com.ox3dr.services.android.lib.drone.property.Battery;
+import com.ox3dr.services.android.lib.drone.property.Gps;
+import com.ox3dr.services.android.lib.drone.property.Home;
+import com.ox3dr.services.android.lib.drone.property.Mission;
+import com.ox3dr.services.android.lib.drone.property.Speed;
+import com.ox3dr.services.android.lib.drone.property.State;
+import com.ox3dr.services.android.lib.drone.property.Type;
+import com.ox3dr.services.android.lib.drone.property.VehicleMode;
+import com.ox3dr.services.android.lib.drone.property.Parameters;
+import com.ox3dr.services.android.lib.model.IDroidPlannerApi;
+import com.ox3dr.services.android.lib.model.IDroidPlannerApiCallback;
 
 import org.droidplanner.core.drone.DroneInterfaces;
 import org.droidplanner.core.drone.variables.GPS;
@@ -169,13 +169,13 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneInterfaces.OnDro
     @Override
     public Parameters getParameters() throws RemoteException {
         final Drone drone = getDrone();
-        final Map<String, com.three_dr.services.android.lib.drone.property.Parameter> proxyParams =
-                new HashMap<String, com.three_dr.services.android.lib.drone.property.Parameter>();
+        final Map<String, com.ox3dr.services.android.lib.drone.property.Parameter> proxyParams =
+                new HashMap<String, com.ox3dr.services.android.lib.drone.property.Parameter>();
 
         List<Parameter> droneParameters = drone.getParameters().getParametersList();
         if(!droneParameters.isEmpty()){
             for(Parameter param : droneParameters){
-                proxyParams.put(param.name, new com.three_dr.services.android.lib.drone.property
+                proxyParams.put(param.name, new com.ox3dr.services.android.lib.drone.property
                         .Parameter(param.name, param.value, param.type));
             }
 
@@ -189,7 +189,7 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneInterfaces.OnDro
             }
         }
 
-        return new Parameters(new ArrayList<com.three_dr.services.android.lib.drone.property
+        return new Parameters(new ArrayList<com.ox3dr.services.android.lib.drone.property
                 .Parameter>(proxyParams.values()));
     }
 
@@ -273,14 +273,14 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneInterfaces.OnDro
     public void writeParameters(Parameters parameters) throws RemoteException {
         if(parameters == null) return;
 
-        List<com.three_dr.services.android.lib.drone.property.Parameter> parametersList = parameters
+        List<com.ox3dr.services.android.lib.drone.property.Parameter> parametersList = parameters
                 .getParameters();
         if(parametersList.isEmpty())
             return;
 
         final Drone drone = getDrone();
         org.droidplanner.core.drone.profiles.Parameters droneParams = drone.getParameters();
-        for(com.three_dr.services.android.lib.drone.property.Parameter proxyParam : parametersList){
+        for(com.ox3dr.services.android.lib.drone.property.Parameter proxyParam : parametersList){
             droneParams.sendParameter(new Parameter(proxyParam.getName(), proxyParam.getValue(),
                     proxyParam.getType()));
         }

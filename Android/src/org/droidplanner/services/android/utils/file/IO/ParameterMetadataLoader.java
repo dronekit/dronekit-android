@@ -3,7 +3,7 @@ package org.droidplanner.services.android.utils.file.IO;
 import android.content.Context;
 import android.util.Xml;
 
-import com.three_dr.services.android.lib.drone.property.Parameter;
+import com.ox3dr.services.android.lib.drone.property.Parameter;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
