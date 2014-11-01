@@ -26,8 +26,11 @@ public class BluetoothConnection extends AndroidMavLinkConnection {
 	private InputStream in;
 	private BluetoothSocket bluetoothSocket;
 
-	public BluetoothConnection(Context parentContext) {
+    private final String bluetoothAddress;
+
+	public BluetoothConnection(Context parentContext, String btAddress) {
 		super(parentContext);
+        this.bluetoothAddress = btAddress;
 
 		mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 		if (mBluetoothAdapter == null) {
@@ -44,18 +47,13 @@ public class BluetoothConnection extends AndroidMavLinkConnection {
 
 		// Retrieve the stored device
 		BluetoothDevice device = null;
-		final String addressName = prefs.getBluetoothDeviceAddress();
-
-		if (addressName != null) {
-			// strip name, use address part - stored as <address>;<name>
-			final String part[] = addressName.split(";");
-			try {
-				device = mBluetoothAdapter.getRemoteDevice(part[0]);
-			} catch (IllegalArgumentException ex) {
-				// invalid configuration (device may have been removed)
-				// NOP fall through to 'no device'
-			}
+		try {
+			device = mBluetoothAdapter.getRemoteDevice(bluetoothAddress);
+		} catch (IllegalArgumentException ex) {
+			// invalid configuration (device may have been removed)
+			// NOP fall through to 'no device'
 		}
+
 		// no device
 		if (device == null)
 			device = findSerialBluetoothBoard();
@@ -84,8 +82,7 @@ public class BluetoothConnection extends AndroidMavLinkConnection {
 		if (pairedDevices.size() > 0) {
 			// Loop through paired devices
 			for (BluetoothDevice device : pairedDevices) {
-				// Add the name and address to an array adapter to show in a
-				// ListView
+				// Add the name and address to an array adapter to show in a ListView
 				Log.d(BLUE, device.getName() + " #" + device.getAddress() + "#");
 
 				final ParcelUuid[] deviceUuids = device.getUuids();

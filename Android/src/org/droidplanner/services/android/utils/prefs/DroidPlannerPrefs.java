@@ -3,7 +3,6 @@ package org.droidplanner.services.android.utils.prefs;
 import java.util.UUID;
 
 import org.droidplanner.services.android.R;
-import org.droidplanner.services.android.utils.Utils;
 import org.droidplanner.services.android.utils.file.IO.VehicleProfileReader;
 import org.droidplanner.core.drone.profiles.VehicleProfile;
 import org.droidplanner.core.firmware.FirmwareType;
@@ -29,8 +28,6 @@ public class DroidPlannerPrefs implements org.droidplanner.core.drone.Preference
 	 * Default preference value
 	 */
 	public static final boolean DEFAULT_USAGE_STATISTICS = true;
-	public static final String DEFAULT_CONNECTION_TYPE = Utils.ConnectionType.UDP.name();
-	public static final boolean DEFAULT_PREF_UI_LANGUAGE = false;
 
 	// Public for legacy usage
 	public SharedPreferences prefs;
@@ -115,27 +112,6 @@ public class DroidPlannerPrefs implements org.droidplanner.core.drone.Preference
 	public boolean isUsageStatisticsEnabled() {
 		return prefs.getBoolean(context.getString(R.string.pref_usage_statistics_key),
 				DEFAULT_USAGE_STATISTICS);
-	}
-
-	/**
-	 * @return the selected mavlink connection type.
-	 */
-	public String getMavLinkConnectionType() {
-		return prefs.getString(context.getString(R.string.pref_connection_type_key),
-				DEFAULT_CONNECTION_TYPE);
-	}
-
-	public String getBluetoothDeviceAddress() {
-		return prefs.getString(context.getString(R.string.pref_bluetooth_device_address_key), null);
-	}
-
-	public boolean isEnglishDefaultLanguage() {
-		return prefs.getBoolean(context.getString(R.string.pref_ui_language_english_key),
-				DEFAULT_PREF_UI_LANGUAGE);
-	}
-
-	public String getMapProviderName() {
-		return prefs.getString(context.getString(R.string.pref_maps_providers_key), null);
 	}
 
 }

@@ -12,19 +12,23 @@ import android.content.SharedPreferences;
 public class AndroidTcpConnection extends AndroidMavLinkConnection {
 
 	private final TcpConnection mConnectionImpl;
+    private final String serverIp;
+    private final int serverPort;
 
-	public AndroidTcpConnection(Context context) {
+	public AndroidTcpConnection(Context context, String tcpServerIp, int tcpServerPort) {
 		super(context);
+        this.serverIp = tcpServerIp;
+        this.serverPort = tcpServerPort;
 
 		mConnectionImpl = new TcpConnection() {
 			@Override
 			protected int loadServerPort() {
-				return Integer.parseInt(prefs.prefs.getString("pref_server_port", "0"));
+				return serverPort;
 			}
 
 			@Override
 			protected String loadServerIP() {
-				return prefs.prefs.getString("pref_server_ip", "");
+				return serverIp;
 			}
 
 			@Override

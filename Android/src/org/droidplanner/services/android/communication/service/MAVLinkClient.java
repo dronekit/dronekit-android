@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPacket;
+import com.ox3dr.services.android.lib.drone.connection.ConnectionParameter;
 
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -115,16 +116,19 @@ public class MAVLinkClient implements MAVLinkStreams.MAVLinkOutputStream {
     };
 
 	private final Context parent;
+    private final ConnectionParameter connParams;
 	private final MAVLinkStreams.MavlinkInputStream listener;
     private final String mMavLinkErrorPrefix;
 
     private MAVLinkService.MavLinkServiceApi mService;
 	private boolean mIsBound;
 
-	public MAVLinkClient(Context context, MAVLinkStreams.MavlinkInputStream listener) {
+	public MAVLinkClient(Context context, MAVLinkStreams.MavlinkInputStream listener,
+                         ConnectionParameter connParams) {
 		parent = context;
 		this.listener = listener;
         mMavLinkErrorPrefix = context.getString(R.string.MAVLinkError);
+        this.connParams = connParams;
 	}
 
 	private void openConnection() {
@@ -139,12 +143,12 @@ public class MAVLinkClient implements MAVLinkStreams.MAVLinkOutputStream {
 
 	private void closeConnection() {
 		if (mIsBound) {
-            if(mService.getConnectionStatus() == MavLinkConnection.MAVLINK_CONNECTED){
+            if(mService.getConnectionStatus(this.connParams) == MavLinkConnection.MAVLINK_CONNECTED){
                 Toast.makeText(parent, R.string.status_disconnecting, Toast.LENGTH_SHORT).show();
-                mService.disconnectMavLink();
+                mService.disconnectMavLink(this.connParams);
             }
 
-            mService.removeMavLinkConnectionListener(TAG);
+            mService.removeMavLinkConnectionListener(this.connParams, TAG);
 
             // Unbinding the service.
             parent.unbindService(mConnection);
@@ -158,13 +162,13 @@ public class MAVLinkClient implements MAVLinkStreams.MAVLinkOutputStream {
 			return;
 		}
 
-        mService.sendData(pack);
+        mService.sendData(this.connParams, pack);
 	}
 
     private void connectMavLink(){
         Toast.makeText(parent, R.string.status_connecting, Toast.LENGTH_SHORT).show();
-        mService.connectMavLink();
-        mService.addMavLinkConnectionListener(TAG, mConnectionListener);
+        mService.connectMavLink(this.connParams);
+        mService.addMavLinkConnectionListener(this.connParams, TAG, mConnectionListener);
     }
 
 	private void onConnectedService() {
@@ -188,7 +192,7 @@ public class MAVLinkClient implements MAVLinkStreams.MAVLinkOutputStream {
 
 	@Override
 	public boolean isConnected() {
-		return mIsBound && mService.getConnectionStatus() == MavLinkConnection.MAVLINK_CONNECTED;
+		return mIsBound && mService.getConnectionStatus(this.connParams) == MavLinkConnection.MAVLINK_CONNECTED;
 	}
 
 	@Override

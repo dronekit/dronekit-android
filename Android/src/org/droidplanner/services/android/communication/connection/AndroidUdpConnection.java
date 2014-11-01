@@ -12,14 +12,16 @@ import android.content.SharedPreferences;
 public class AndroidUdpConnection extends AndroidMavLinkConnection {
 
 	private final UdpConnection mConnectionImpl;
+    private final int serverPort;
 
-	public AndroidUdpConnection(Context context) {
+	public AndroidUdpConnection(Context context, int udpServerPort) {
 		super(context);
+        this.serverPort = udpServerPort;
 
 		mConnectionImpl = new UdpConnection() {
 			@Override
 			protected int loadServerPort() {
-				return Integer.parseInt(prefs.prefs.getString("pref_udp_server_port", "14550"));
+				return serverPort;
 			}
 
 			@Override

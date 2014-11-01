@@ -29,17 +29,6 @@ public class GAUtils {
 	 * List the analytics categories used in the app.
 	 */
 	public static class Category {
-		/**
-		 * Category for analytics data related to the action buttons on the
-		 * flight data screen.
-		 */
-		public static final String FLIGHT = "Flight";
-
-        /**
-         * Category for analytics data related to the editor screen.
-         */
-        public static final String EDITOR = "Editor";
-
         /**
          * Category for measuring failsafe events.
          */
@@ -60,10 +49,6 @@ public class GAUtils {
          */
         public static final String MISSION_PLANNING = "Mission planning";
 
-        /**
-         * Category for analytics data related to the preference dialogs.
-         */
-        public static final String PREFERENCE_DIALOGS = "Preference Dialogs";
 	}
 
 	/**
@@ -111,7 +96,6 @@ public class GAUtils {
 
 	public static void startNewSession(Context context) {
 		final DroidPlannerPrefs prefs = new DroidPlannerPrefs(context);
-		final String connectionType = prefs.getMavLinkConnectionType();
 
 		final String login = prefs.getDroneshareLogin();
 		final String password = prefs.getDronesharePassword();
@@ -120,7 +104,6 @@ public class GAUtils {
 
 		sendHit(new HitBuilders.AppViewBuilder()
 				.setNewSession()
-				.setCustomDimension(CustomDimension.MAVLINK_CONNECTION_TYPE, connectionType)
 				.setCustomDimension(CustomDimension.DRONESHARE_ACTIVE,
 						String.valueOf(isDroneShareUser)).build());
 	}
