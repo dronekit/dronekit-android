@@ -1,12 +1,13 @@
 package org.droidplanner.services.android.api;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.util.Log;
 
 import com.MAVLink.Messages.ApmModes;
 import com.MAVLink.Messages.enums.MAV_TYPE;
+import com.ox3dr.services.android.lib.drone.connection.ConnectionParameter;
+import com.ox3dr.services.android.lib.drone.connection.ConnectionResult;
 import com.ox3dr.services.android.lib.drone.event.Event;
 import com.ox3dr.services.android.lib.drone.event.Extra;
 import com.ox3dr.services.android.lib.drone.property.Altitude;
@@ -28,10 +29,14 @@ import org.droidplanner.core.drone.variables.GPS;
 import org.droidplanner.core.drone.variables.Orientation;
 import org.droidplanner.core.model.Drone;
 import org.droidplanner.core.parameters.Parameter;
+import org.droidplanner.services.android.drone.DroneManager;
+import org.droidplanner.services.android.exception.ConnectionException;
+import org.droidplanner.services.android.interfaces.DroneEventsListener;
 import org.droidplanner.services.android.utils.file.IO.ParameterMetadataLoader;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,58 +45,46 @@ import java.util.Map;
 /**
 * Created by fhuya on 10/30/14.
 */
-final class DPApi extends IDroidPlannerApi.Stub implements DroneInterfaces.OnDroneListener, DroneInterfaces.OnParameterManagerListener {
+final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
 
     private final static String TAG = DPApi.class.getSimpleName();
 
     private final Bundle emptyBundle = new Bundle();
-    private final Context context;
+    private final WeakReference<DroidPlannerService> serviceRef;
 
     private IDroidPlannerApiCallback apiCallback;
-    private Drone drone;
+    private ConnectionParameter connParams;
+    private DroneManager droneMgr;
 
-    DPApi(Context context, Drone drone, IDroidPlannerApiCallback callback) throws RemoteException {
-        this.context = context;
+    DPApi(DroidPlannerService dpService, ConnectionParameter connParams,
+          IDroidPlannerApiCallback callback) throws RemoteException {
+        serviceRef = new WeakReference<DroidPlannerService>(dpService);
+
         this.apiCallback = callback;
-        this.drone = drone;
-        start();
+        this.connParams = connParams;
+
+        try {
+            this.droneMgr = dpService.getDroneForConnection(connParams);
+            start();
+        } catch (ConnectionException e) {
+            callback.onConnectionFailed(new ConnectionResult(0, e.getMessage()));
+            disconnectFromDrone();
+        }
     }
 
-    private void start() throws RemoteException {
-        final Drone drone = getDrone();
-        final IDroidPlannerApiCallback callback = getCallback();
+    private DroidPlannerService getService() {
+        final DroidPlannerService service = serviceRef.get();
+        if (service == null)
+            throw new IllegalStateException("Lost reference to parent service.");
 
-        drone.addDroneListener(this);
-
-        if(!drone.getMavClient().isConnected())
-            drone.getMavClient().toggleConnectionState();
-        else
-            callback.onDroneEvent(Event.EVENT_CONNECTED, emptyBundle);
-
-        drone.getParameters().setParameterListener(this);
+        return service;
     }
 
-    private void stop() throws RemoteException {
-        final Drone drone = getDrone();
-        final IDroidPlannerApiCallback callback = getCallback();
-
-        drone.removeDroneListener(this);
-        drone.getParameters().setParameterListener(null);
-
-        if(drone.getMavClient().isConnected())
-            drone.getMavClient().toggleConnectionState();
-
-        this.apiCallback = null;
-        this.drone = null;
-
-        callback.onDroneEvent(Event.EVENT_DISCONNECTED, emptyBundle);
-    }
-
-    private Drone getDrone(){
-        if(drone == null)
+    private DroneManager getDroneMgr(){
+        if(droneMgr == null)
             throw new IllegalStateException("Disconnected from drone");
 
-        return drone;
+        return droneMgr;
     }
 
     private IDroidPlannerApiCallback getCallback(){
@@ -101,9 +94,29 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneInterfaces.OnDro
         return apiCallback;
     }
 
+    private ConnectionParameter getConnectionParameter(){
+        if(connParams == null)
+            throw new IllegalStateException("Disconnected from drone");
+
+        return connParams;
+    }
+
+    private void start() throws RemoteException {
+        getDroneMgr().addDroneEventsListener(this);
+    }
+
+    @Override
+    public void disconnectFromDrone() throws RemoteException {
+        getDroneMgr().removeDroneEventsListener(this);
+        getService().disconnectFromApi(getConnectionParameter(), getCallback());
+        this.apiCallback = null;
+        this.connParams = null;
+        this.droneMgr = null;
+    }
+
     @Override
     public Gps getGps() throws RemoteException {
-        final GPS droneGps = getDrone().getGps();
+        final GPS droneGps = getDroneMgr().getDrone().getGps();
         return new Gps((float) droneGps.getPosition().getLat(), (float) droneGps.getPosition()
                 .getLng(), (float) droneGps.getGpsEPH(), droneGps.getSatCount(),
                 droneGps.getFixTypeNumeric());
@@ -111,7 +124,7 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneInterfaces.OnDro
 
     @Override
     public State getState() throws RemoteException {
-        final Drone drone = getDrone();
+        final Drone drone =getDroneMgr().getDrone();
         org.droidplanner.core.drone.variables.State droneState = drone.getState();
         ApmModes droneMode = droneState.getMode();
 
@@ -130,7 +143,7 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneInterfaces.OnDro
 
     @Override
     public VehicleMode[] getAllVehicleModes() throws RemoteException {
-        final int droneType = getDrone().getType();
+        final int droneType =getDroneMgr().getDrone().getType();
         final Type proxyType = getDroneProxyType(droneType);
 
         List<ApmModes> typeModes = ApmModes.getModeList(droneType);
@@ -168,7 +181,7 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneInterfaces.OnDro
 
     @Override
     public Parameters getParameters() throws RemoteException {
-        final Drone drone = getDrone();
+        final Drone drone =getDroneMgr().getDrone();
         final Map<String, com.ox3dr.services.android.lib.drone.property.Parameter> proxyParams =
                 new HashMap<String, com.ox3dr.services.android.lib.drone.property.Parameter>();
 
@@ -181,7 +194,7 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneInterfaces.OnDro
 
             try {
                 //TODO: implement drone metadata type
-                ParameterMetadataLoader.load(context, null, proxyParams);
+                ParameterMetadataLoader.load(getService().getApplicationContext(), null, proxyParams);
             } catch (IOException e) {
                 Log.e(TAG, e.getMessage(), e);
             } catch (XmlPullParserException e) {
@@ -195,7 +208,7 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneInterfaces.OnDro
 
     @Override
     public Speed getSpeed() throws RemoteException {
-        org.droidplanner.core.drone.variables.Speed droneSpeed = getDrone().getSpeed();
+        org.droidplanner.core.drone.variables.Speed droneSpeed =getDroneMgr().getDrone().getSpeed();
         return new Speed(droneSpeed.getVerticalSpeed().valueInMetersPerSecond(),
                 droneSpeed.getGroundSpeed().valueInMetersPerSecond(),
                 droneSpeed.getAirSpeed().valueInMetersPerSecond());
@@ -203,28 +216,28 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneInterfaces.OnDro
 
     @Override
     public Attitude getAttitude() throws RemoteException {
-        Orientation droneOrientation = getDrone().getOrientation();
+        Orientation droneOrientation =getDroneMgr().getDrone().getOrientation();
         return new Attitude(droneOrientation.getRoll(), droneOrientation.getPitch(),
                 droneOrientation.getYaw());
     }
 
     @Override
     public Home getHome() throws RemoteException {
-        org.droidplanner.core.drone.variables.Home droneHome = getDrone().getHome();
+        org.droidplanner.core.drone.variables.Home droneHome =getDroneMgr().getDrone().getHome();
         return new Home((float) droneHome.getCoord().getLat(), (float) droneHome.getCoord()
                 .getLng(), (float) droneHome.getAltitude().valueInMeters());
     }
 
     @Override
     public Battery getBattery() throws RemoteException {
-        org.droidplanner.core.drone.variables.Battery droneBattery = getDrone().getBattery();
+        org.droidplanner.core.drone.variables.Battery droneBattery =getDroneMgr().getDrone().getBattery();
         return new Battery(droneBattery.getBattVolt(), droneBattery.getBattRemain(),
                 droneBattery.getBattCurrent());
     }
 
     @Override
     public Altitude getAltitude() throws RemoteException {
-        org.droidplanner.core.drone.variables.Altitude droneAltitude = getDrone().getAltitude();
+        org.droidplanner.core.drone.variables.Altitude droneAltitude =getDroneMgr().getDrone().getAltitude();
         return new Altitude(droneAltitude.getAltitude(), droneAltitude.getTargetAltitude());
     }
 
@@ -235,7 +248,7 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneInterfaces.OnDro
 
     @Override
     public boolean isConnected() throws RemoteException {
-        return drone != null && drone.getMavClient().isConnected();
+        return getDroneMgr().isConnected();
     }
 
     @Override
@@ -256,17 +269,12 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneInterfaces.OnDro
                 break;
         }
 
-        getDrone().getState().changeFlightMode(ApmModes.getMode(newMode.getMode(), mavType));
-    }
-
-    @Override
-    public void disconnectFromDrone() throws RemoteException {
-        stop();
+       getDroneMgr().getDrone().getState().changeFlightMode(ApmModes.getMode(newMode.getMode(), mavType));
     }
 
     @Override
     public void refreshParameters() throws RemoteException {
-        getDrone().getParameters().refreshParameters();
+       getDroneMgr().getDrone().getParameters().refreshParameters();
     }
 
     @Override
@@ -278,7 +286,7 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneInterfaces.OnDro
         if(parametersList.isEmpty())
             return;
 
-        final Drone drone = getDrone();
+        final Drone drone =getDroneMgr().getDrone();
         org.droidplanner.core.drone.profiles.Parameters droneParams = drone.getParameters();
         for(com.ox3dr.services.android.lib.drone.property.Parameter proxyParam : parametersList){
             droneParams.sendParameter(new Parameter(proxyParam.getName(), proxyParam.getValue(),
