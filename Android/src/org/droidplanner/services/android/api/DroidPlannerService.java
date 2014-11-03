@@ -81,8 +81,9 @@ public class DroidPlannerService extends Service {
     boolean disconnectFromApi(final ConnectionParameter connParams,
                               IDroidPlannerApiCallback callback) {
         ConcurrentHashMap<IBinder, IDroidPlannerApi> binderApis = dpApisCache.get(connParams);
-        if (binderApis == null)
+        if (binderApis == null) {
             return false;
+        }
 
         boolean wasRemoved = binderApis.remove(callback.asBinder()) != null;
         if (binderApis.isEmpty()) {

@@ -460,9 +460,6 @@
     <string name="pref_ui_gps_hdop_summary">在訊息列上顯示衛星的 HDOP 值代替 FIX 值</string>
     <string name="pref_ui_gps_hdop_title">顯示衛星的 HDOP 值</string>
 
-    <string name="status_disconnecting">斷線中...</string>
-    <string name="status_connecting">連線中...</string>
-    
     <!-- Help -->
     <string name="help_item_description">如何設定和實際操作任務，請點我看影片</string>
     <string name="mission_item_title_takeoff">起飛</string>

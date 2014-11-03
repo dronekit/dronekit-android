@@ -9,15 +9,12 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.os.Handler;
 import android.os.IBinder;
-import android.widget.Toast;
+import android.util.Log;
 
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPacket;
 import com.ox3dr.services.android.lib.drone.connection.ConnectionParameter;
-
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Provide a common class for some ease of use functionality
@@ -27,8 +24,6 @@ public class MAVLinkClient implements MAVLinkStreams.MAVLinkOutputStream {
 	private static final String TAG = MAVLinkClient.class.getSimpleName();
 
     private final MavLinkConnectionListener mConnectionListener = new MavLinkConnectionListener() {
-
-        private Toast mErrToast;
 
         @Override
         public void onConnect() {
@@ -50,14 +45,7 @@ public class MAVLinkClient implements MAVLinkStreams.MAVLinkOutputStream {
         public void onComError(final String errMsg) {
             if(errMsg != null) {
                 final String toastMsg = mMavLinkErrorPrefix + " " + errMsg;
-                if(mErrToast == null){
-                    mErrToast = Toast.makeText(parent, toastMsg, Toast.LENGTH_LONG);
-                }
-                else{
-                    mErrToast.cancel();
-                    mErrToast.setText(toastMsg);
-                }
-                mErrToast.show();
+                Log.e(TAG, toastMsg);
             }
         }
     };
@@ -108,7 +96,6 @@ public class MAVLinkClient implements MAVLinkStreams.MAVLinkOutputStream {
 	private void closeConnection() {
 		if (mIsBound) {
             if(mService.getConnectionStatus(this.connParams) == MavLinkConnection.MAVLINK_CONNECTED){
-                Toast.makeText(parent, R.string.status_disconnecting, Toast.LENGTH_SHORT).show();
                 mService.disconnectMavLink(this.connParams);
             }
 
@@ -130,7 +117,6 @@ public class MAVLinkClient implements MAVLinkStreams.MAVLinkOutputStream {
 	}
 
     private void connectMavLink(){
-        Toast.makeText(parent, R.string.status_connecting, Toast.LENGTH_SHORT).show();
         mService.connectMavLink(this.connParams);
         mService.addMavLinkConnectionListener(this.connParams, TAG, mConnectionListener);
     }

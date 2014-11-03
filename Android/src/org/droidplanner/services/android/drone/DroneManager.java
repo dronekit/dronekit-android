@@ -85,6 +85,7 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream, DroneEve
     }
 
     public void destroy() {
+        Log.d(TAG, "Destroying drone manager.");
         drone.removeDroneListener(this);
         drone.getParameters().setParameterListener(null);
         drone.getMavClient().toggleConnectionState();
