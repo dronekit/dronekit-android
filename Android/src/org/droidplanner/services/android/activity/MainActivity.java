@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import org.droidplanner.services.android.R;
 import org.droidplanner.services.android.api.DroidPlannerService;
+import org.droidplanner.services.android.api.DroneAccess;
 import org.droidplanner.services.android.drone.DroneManager;
 
 import java.util.ArrayList;
@@ -49,7 +50,7 @@ public class MainActivity extends FragmentActivity {
     private final ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            droneAccess = (DroidPlannerService.DroneAccess) service;
+            droneAccess = (DroneAccess) service;
             refreshDroneList();
         }
 
@@ -60,7 +61,7 @@ public class MainActivity extends FragmentActivity {
     };
 
     private LocalBroadcastManager lbm;
-    private DroidPlannerService.DroneAccess droneAccess;
+    private DroneAccess droneAccess;
 
     private TextView titleView;
     private DroneInfoAdapter droneListAdapter;
@@ -122,9 +123,9 @@ public class MainActivity extends FragmentActivity {
         public void refreshDroneManagerList(List<DroneManager> list){
             droneMgrList.clear();
 
-            if(list == null || list.isEmpty()) return;
-
-            droneMgrList.addAll(list);
+            if(list != null && list.isEmpty()) {
+                droneMgrList.addAll(list);
+            }
             notifyDataSetChanged();
         }
 

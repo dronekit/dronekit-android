@@ -59,9 +59,6 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".communication.service.MAVLinkService" >
-        </service>
-
         <service android:name=".communication.service.UploaderService" />
 
         <service android:name=".api.DroidPlannerService"

@@ -2,25 +2,31 @@ package org.droidplanner.services.android.api;
 
 import android.app.Service;
 import android.content.Intent;
-import android.os.Binder;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.google.android.gms.analytics.HitBuilders;
 import com.ox3dr.services.android.lib.drone.connection.ConnectionParameter;
+import com.ox3dr.services.android.lib.drone.connection.ConnectionType;
 import com.ox3dr.services.android.lib.model.IDroidPlannerApi;
 import com.ox3dr.services.android.lib.model.IDroidPlannerApiCallback;
 import com.ox3dr.services.android.lib.model.IDroidPlannerServices;
 
+import org.droidplanner.core.MAVLink.connection.MavLinkConnection;
 import org.droidplanner.core.model.Drone;
+import org.droidplanner.services.android.communication.connection.AndroidMavLinkConnection;
+import org.droidplanner.services.android.communication.connection.AndroidTcpConnection;
+import org.droidplanner.services.android.communication.connection.AndroidUdpConnection;
+import org.droidplanner.services.android.communication.connection.BluetoothConnection;
+import org.droidplanner.services.android.communication.connection.usb.UsbConnection;
 import org.droidplanner.services.android.drone.DroneManager;
 import org.droidplanner.services.android.exception.ConnectionException;
+import org.droidplanner.services.android.utils.analytics.GAUtils;
 
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -39,16 +45,27 @@ public class DroidPlannerService extends Service {
     private LocalBroadcastManager lbm;
 
     /**
-     * Stores drone instances per connection type.
+     * Caches drone manager instances per connection type.
      */
-    private final ConcurrentHashMap<ConnectionParameter, DroneManager> dronePerConnection = new ConcurrentHashMap<ConnectionParameter, DroneManager>();
+    final ConcurrentHashMap<ConnectionParameter, DroneManager> dronePerConnection = new ConcurrentHashMap<ConnectionParameter, DroneManager>();
 
+    /**
+     * Caches droidplanner api instances per connection type and client.
+     */
     private final ConcurrentHashMap<ConnectionParameter, ConcurrentHashMap<IBinder,
             IDroidPlannerApi>> dpApisCache = new ConcurrentHashMap<ConnectionParameter,
             ConcurrentHashMap<IBinder, IDroidPlannerApi>>();
 
+    /**
+     * Caches mavlink connections per connection type.
+     */
+    final ConcurrentHashMap<ConnectionParameter, AndroidMavLinkConnection> mavConnections =
+            new ConcurrentHashMap<ConnectionParameter, AndroidMavLinkConnection>();
+
+
     private final DPServices dpServices = new DPServices(this);
     private final DroneAccess droneAccess = new DroneAccess(this);
+    private final MavLinkServiceApi mavlinkApi = new MavLinkServiceApi(this);
 
     IDroidPlannerApi connectToApi(ConnectionParameter connParams, IDroidPlannerApiCallback callback)
             throws RemoteException {
@@ -103,7 +120,7 @@ public class DroidPlannerService extends Service {
             ConnectionException {
         DroneManager droneMgr = dronePerConnection.get(params);
         if (droneMgr == null) {
-            droneMgr = new DroneManager(getApplicationContext(), handler, params);
+            droneMgr = new DroneManager(getApplicationContext(), handler, mavlinkApi, params);
             DroneManager previous = dronePerConnection.putIfAbsent(params, droneMgr);
             if (previous != null)
                 droneMgr = previous;
@@ -112,6 +129,74 @@ public class DroidPlannerService extends Service {
         }
 
         return droneMgr;
+    }
+
+    void connectMAVConnection(ConnectionParameter connParams){
+        AndroidMavLinkConnection conn = mavConnections.get(connParams);
+        if(conn == null){
+            //Create a new mavlink connection
+            final int connectionType = connParams.getConnectionType();
+            switch(connectionType){
+                case ConnectionType.TYPE_USB:
+                    conn = new UsbConnection(getApplicationContext());
+                    break;
+
+                case ConnectionType.TYPE_BLUETOOTH:
+                    //Retrieve the bluetooth address to connect to
+                    final String bluetoothAddress = connParams.getParamsBundle().getString
+                            (ConnectionType.EXTRA_BLUETOOTH_ADDRESS);
+                    conn = new BluetoothConnection(getApplicationContext(), bluetoothAddress);
+                    break;
+
+                case ConnectionType.TYPE_TCP:
+                    //Retrieve the server ip and port
+                    final Bundle paramsBundle = connParams.getParamsBundle();
+                    final String tcpServerIp = paramsBundle.getString(ConnectionType
+                            .EXTRA_TCP_SERVER_IP);
+                    final int tcpServerPort = paramsBundle.getInt(ConnectionType
+                            .EXTRA_TCP_SERVER_PORT, ConnectionType.DEFAULT_TCP_SERVER_PORT);
+                    conn = new AndroidTcpConnection(getApplicationContext(), tcpServerIp,
+                            tcpServerPort);
+                    break;
+
+                case ConnectionType.TYPE_UDP:
+                    final int udpServerPort = connParams.getParamsBundle().getInt(ConnectionType
+                            .EXTRA_UDP_SERVER_PORT, ConnectionType.DEFAULT_UPD_SERVER_PORT);
+                    conn = new AndroidUdpConnection(getApplicationContext(), udpServerPort);
+                    break;
+
+                default:
+                    Log.e(TAG, "Unrecognized connection type: " + connectionType);
+                    return;
+            }
+
+            mavConnections.put(connParams, conn);
+        }
+
+        if(conn.getConnectionStatus() == MavLinkConnection.MAVLINK_DISCONNECTED){
+            conn.connect();
+        }
+
+        // Record which connection type is used.
+        GAUtils.sendEvent(new HitBuilders.EventBuilder()
+                .setCategory(GAUtils.Category.MAVLINK_CONNECTION)
+                .setAction("MavLink connect")
+                .setLabel(connParams.toString()));
+    }
+
+    void disconnectMAVConnection(ConnectionParameter connParams) {
+        final AndroidMavLinkConnection conn = mavConnections.get(connParams);
+        if (conn == null)
+            return;
+
+        if (conn.getConnectionStatus() != MavLinkConnection.MAVLINK_DISCONNECTED) {
+            conn.disconnect();
+
+            GAUtils.sendEvent(new HitBuilders.EventBuilder()
+                    .setCategory(GAUtils.Category.MAVLINK_CONNECTION)
+                    .setAction("MavLink disconnect")
+                    .setLabel(connParams.toString()));
+        }
     }
 
     @Override
@@ -142,49 +227,12 @@ public class DroidPlannerService extends Service {
                 drone.getMavClient().toggleConnectionState();
             }
         }
+
+        for(ConnectionParameter connParams: mavConnections.keySet()){
+            disconnectMAVConnection(connParams);
+        }
+
+        mavConnections.clear();
     }
 
-    public static final class DroneAccess extends Binder {
-
-        private final WeakReference<DroidPlannerService> serviceRef;
-
-        private DroneAccess(DroidPlannerService service) {
-            serviceRef = new WeakReference<DroidPlannerService>(service);
-        }
-
-        private DroidPlannerService getService() {
-            final DroidPlannerService service = serviceRef.get();
-            if (service == null)
-                throw new IllegalStateException("Lost reference to parent service.");
-
-            return service;
-        }
-
-        public List<DroneManager> getDroneManagerList() {
-            return new ArrayList<DroneManager>(getService().dronePerConnection.values());
-        }
-    }
-
-    private final static class DPServices extends IDroidPlannerServices.Stub {
-
-        private final WeakReference<DroidPlannerService> serviceRef;
-
-        private DPServices(DroidPlannerService service) {
-            serviceRef = new WeakReference<DroidPlannerService>(service);
-        }
-
-        private DroidPlannerService getService() {
-            final DroidPlannerService service = serviceRef.get();
-            if (service == null)
-                throw new IllegalStateException("Lost reference to parent service.");
-
-            return service;
-        }
-
-        @Override
-        public IDroidPlannerApi connectToDrone(ConnectionParameter params,
-                                               IDroidPlannerApiCallback callback) throws RemoteException {
-            return getService().connectToApi(params, callback);
-        }
-    }
 }

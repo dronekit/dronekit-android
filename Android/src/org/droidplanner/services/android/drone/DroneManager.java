@@ -17,6 +17,7 @@ import org.droidplanner.core.drone.DroneInterfaces;
 import org.droidplanner.core.gcs.follow.Follow;
 import org.droidplanner.core.model.Drone;
 import org.droidplanner.core.parameters.Parameter;
+import org.droidplanner.services.android.api.MavLinkServiceApi;
 import org.droidplanner.services.android.communication.service.MAVLinkClient;
 import org.droidplanner.services.android.exception.ConnectionException;
 import org.droidplanner.services.android.interfaces.DroneEventsListener;
@@ -41,11 +42,12 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream, DroneEve
     private final ConnectionParameter connectionParams;
     private final MavLinkMsgHandler mavLinkMsgHandler;
 
-    public DroneManager(Context context, final Handler handler, ConnectionParameter connParams)
+    public DroneManager(Context context, final Handler handler,
+                        MavLinkServiceApi mavlinkApi, ConnectionParameter connParams)
             throws ConnectionException {
 
         this.connectionParams = connParams;
-        MAVLinkClient mavClient = new MAVLinkClient(context, this, connParams);
+        MAVLinkClient mavClient = new MAVLinkClient(this, mavlinkApi, connParams);
 
         DroneInterfaces.Clock clock = new DroneInterfaces.Clock() {
             @Override
