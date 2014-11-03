@@ -23,7 +23,7 @@
     <string name="screen_checklist">Checklist</string>
     <string name="screen_rc">Radio</string>
     <string name="screen_parameters">Parameters</string>
-    
+
     <!-- App Settings/Preferences -->
     <string name="pref_connection_type">Telemetry Connection Type</string>
     <string name="pref_connection_type_summary">Which link to use to connect to the drone</string>
@@ -296,7 +296,7 @@
     <string name="setup_imu_step">To start calibration, press Calibrate.</string>
     <string name="setup_imu_timeleft">Time left before next orientation:</string>
 
-    
+
     <!-- Flight Setup Resource Strings -->
     <string name="setup_fm_title">Flight Mode Configuration</string>
     <string name="setup_fm_side_title">Update Flight Mode</string>
@@ -358,7 +358,7 @@
     <string name="mission_control_takeoff">Takeoff</string>
     <string name="mission_control_pause">Pause</string>
     <string name="mission_control_auto">Auto</string>
-    <string name="mission_control_follow">Follow</string>    
+    <string name="mission_control_follow">Follow</string>
     <string name="mission_control_dronie">Dronie</string>
     <string name="mission_control_change_speed">Change Speed</string>
     <string name="telemetry_label">Telemetry</string>
@@ -465,7 +465,7 @@
     <string name="normal_waypoint_toggle">Normal</string>
     <string name="spline_waypoint_toggle">Spline</string>
     <string name="mavlink_version">Mavlink Version</string>
-    <string name="firmware_version">Firmware Version</string>    
+    <string name="firmware_version">Firmware Version</string>
     <string name="empty_content">--</string>
     <string name="usage_statistics">Usage Statistics</string>
     <string name="pref_usage_statistics_title">Send usage statistics</string>
@@ -486,7 +486,7 @@
 
     <!-- Help -->
     <string name="help_item_description">How to plan and fly a mission</string>
-    
+
     <string name="label_advaned">Advanced</string>
     <string name="label_steps_count">Number of Steps</string>
     <string name="label_altitude_step">Altitude Step</string>

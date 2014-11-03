@@ -42,9 +42,11 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream, DroneEve
 
     private final Drone drone;
     private final Follow followMe;
+    private final ConnectionParameter connectionParams;
     private final MavLinkMsgHandler mavLinkMsgHandler;
 
     public DroneManager(Context context, ConnectionParameter connParams) throws ConnectionException {
+        this.connectionParams = connParams;
         MAVLinkClient mavClient = new MAVLinkClient(context, this, connParams);
 
         DroneInterfaces.Clock clock = new DroneInterfaces.Clock() {
@@ -127,12 +129,20 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream, DroneEve
         this.mavLinkMsgHandler.receiveData(m);
     }
 
+    public ConnectionParameter getConnectionParameter(){
+        return this.connectionParams;
+    }
+
     public Drone getDrone(){
         return this.drone;
     }
 
     public Follow getFollowMe(){
         return followMe;
+    }
+
+    public int getListenersCount(){
+        return droneEventsListeners.size();
     }
 
     public boolean isConnected(){
