@@ -31,15 +31,15 @@ public class MainActivity extends FragmentActivity {
 
     private final static IntentFilter intentFilter = new IntentFilter();
     {
-        intentFilter.addAction(DroneManager.ACTION_DRONE_CREATED);
-        intentFilter.addAction(DroneManager.ACTION_DRONE_DESTROYED);
+        intentFilter.addAction(DroidPlannerService.ACTION_DRONE_CREATED);
+        intentFilter.addAction(DroidPlannerService.ACTION_DRONE_DESTROYED);
     }
 
     private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
-            if(DroneManager.ACTION_DRONE_CREATED.equals(action) || DroneManager
+            if(DroidPlannerService.ACTION_DRONE_CREATED.equals(action) || DroidPlannerService
                     .ACTION_DRONE_DESTROYED.equals(action)){
                 refreshDroneList();
             }
@@ -92,6 +92,12 @@ public class MainActivity extends FragmentActivity {
 
         lbm.unregisterReceiver(broadcastReceiver);
         unbindService(serviceConnection);
+    }
+
+    @Override
+    public void onStart(){
+        super.onStart();
+        refreshDroneList();
     }
 
     private void refreshDroneList(){

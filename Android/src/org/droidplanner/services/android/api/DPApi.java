@@ -82,21 +82,21 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
 
     private DroneManager getDroneMgr(){
         if(droneMgr == null)
-            throw new IllegalStateException("Disconnected from drone");
+            throw new IllegalStateException("Invalid state: drone manager is null");
 
         return droneMgr;
     }
 
     private IDroidPlannerApiCallback getCallback(){
         if(apiCallback == null)
-            throw new IllegalStateException("Disconnected from drone");
+            throw new IllegalStateException("Invalid state: api callback is null");
 
         return apiCallback;
     }
 
     private ConnectionParameter getConnectionParameter(){
         if(connParams == null)
-            throw new IllegalStateException("Disconnected from drone");
+            throw new IllegalStateException("Invalid state: connection parameter is null");
 
         return connParams;
     }
@@ -306,7 +306,7 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
         try {
             switch (event) {
                 case DISCONNECTED:
-                    disconnectFromDrone();
+                    callback.onDroneEvent(Event.EVENT_DISCONNECTED, emptyBundle);
                     break;
 
                 case GUIDEDPOINT:
@@ -384,6 +384,7 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
                     break;
 
                 case HEARTBEAT_TIMEOUT:
+                    callback.onDroneEvent(Event.EVENT_HEARTBEAT_TIMEOUT, emptyBundle);
                     break;
                 case HEARTBEAT_FIRST:
                     break;

@@ -8,6 +8,7 @@ import org.droidplanner.core.helpers.coordinates.Coord2D;
 
 import android.content.Context;
 import android.location.Location;
+import android.os.Handler;
 import android.util.Log;
 
 import com.google.android.gms.location.LocationRequest;
@@ -37,8 +38,8 @@ public class FusedLocation implements LocationFinder, com.google.android.gms.loc
     private float mTotalSpeed;
     private long mSpeedReadings;
 
-	public FusedLocation(Context context) {
-        gApiMgr = new GoogleApiClientManager(context, LocationServices.API);
+	public FusedLocation(Context context, Handler handler) {
+        gApiMgr = new GoogleApiClientManager(context, handler, LocationServices.API);
 
         requestLocationUpdate = gApiMgr.new GoogleApiClientTask() {
             @Override

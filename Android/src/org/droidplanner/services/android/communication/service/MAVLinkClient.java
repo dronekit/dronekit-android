@@ -26,75 +26,39 @@ public class MAVLinkClient implements MAVLinkStreams.MAVLinkOutputStream {
 
 	private static final String TAG = MAVLinkClient.class.getSimpleName();
 
-    /**
-     * Used to post updates to the main thread.
-     */
-    private final Handler mHandler = new Handler();
-
-    private final AtomicReference<String> mErrMsgRef = new AtomicReference<String>();
-
     private final MavLinkConnectionListener mConnectionListener = new MavLinkConnectionListener() {
-        private final Runnable mConnectedNotification = new Runnable() {
-            @Override
-            public void run() {
-                listener.notifyConnected();
-            }
-        };
 
-        private final Runnable mDisconnectedNotification = new Runnable() {
-            @Override
-            public void run() {
-                listener.notifyDisconnected();
-                closeConnection();
-            }
-        };
-
-        private final Runnable mErrorNotification = new Runnable() {
-
-            private Toast mErrToast;
-
-            @Override
-            public void run() {
-                mHandler.removeCallbacks(this);
-
-                final String errMsg = mErrMsgRef.get();
-                if(errMsg != null) {
-                    final String toastMsg = mMavLinkErrorPrefix + " " + errMsg;
-                    if(mErrToast == null){
-                        mErrToast = Toast.makeText(parent, toastMsg, Toast.LENGTH_LONG);
-                    }
-                    else{
-                        mErrToast.setText(toastMsg);
-                    }
-                    mErrToast.show();
-                }
-            }
-        };
+        private Toast mErrToast;
 
         @Override
         public void onConnect() {
-            mHandler.post(mConnectedNotification);
+            listener.notifyConnected();
         }
 
         @Override
         public void onReceiveMessage(final MAVLinkMessage msg) {
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    listener.notifyReceivedData(msg);
-                }
-            });
+            listener.notifyReceivedData(msg);
         }
 
         @Override
         public void onDisconnect() {
-            mHandler.post(mDisconnectedNotification);
+            listener.notifyDisconnected();
+            closeConnection();
         }
 
         @Override
         public void onComError(final String errMsg) {
-            mErrMsgRef.set(errMsg);
-            mHandler.post(mErrorNotification);
+            if(errMsg != null) {
+                final String toastMsg = mMavLinkErrorPrefix + " " + errMsg;
+                if(mErrToast == null){
+                    mErrToast = Toast.makeText(parent, toastMsg, Toast.LENGTH_LONG);
+                }
+                else{
+                    mErrToast.cancel();
+                    mErrToast.setText(toastMsg);
+                }
+                mErrToast.show();
+            }
         }
     };
 

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.ox3dr.services.android.lib.drone.connection.ConnectionParameter;
@@ -30,22 +31,19 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public class DroneManager implements MAVLinkStreams.MavlinkInputStream, DroneEventsListener {
 
-    private static final String CLAZZ_NAME = DroneManager.class.getName();
-    public static final String ACTION_DRONE_CREATED = CLAZZ_NAME + ".ACTION_DRONE_CREATED";
-    public static final String ACTION_DRONE_DESTROYED = CLAZZ_NAME + ".ACTION_DRONE_DESTROYED";
+    private static final String TAG = DroneManager.class.getSimpleName();
 
     private final ConcurrentLinkedQueue<DroneEventsListener> droneEventsListeners = new
             ConcurrentLinkedQueue<DroneEventsListener>();
-
-    private final Handler handler = new Handler();
-    private final LocalBroadcastManager lbm;
 
     private final Drone drone;
     private final Follow followMe;
     private final ConnectionParameter connectionParams;
     private final MavLinkMsgHandler mavLinkMsgHandler;
 
-    public DroneManager(Context context, ConnectionParameter connParams) throws ConnectionException {
+    public DroneManager(Context context, final Handler handler, ConnectionParameter connParams)
+            throws ConnectionException {
+
         this.connectionParams = connParams;
         MAVLinkClient mavClient = new MAVLinkClient(context, this, connParams);
 
@@ -78,10 +76,7 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream, DroneEve
 
         this.mavLinkMsgHandler = new MavLinkMsgHandler(this.drone);
 
-        this.followMe = new Follow(this.drone, dpHandler, new FusedLocation(context));
-
-        lbm = LocalBroadcastManager.getInstance(context);
-        lbm.sendBroadcast(new Intent(ACTION_DRONE_CREATED));
+        this.followMe = new Follow(this.drone, dpHandler, new FusedLocation(context, handler));
 
         //Connect to the drone.
         drone.addDroneListener(this);
@@ -94,8 +89,6 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream, DroneEve
         drone.getParameters().setParameterListener(null);
         drone.getMavClient().toggleConnectionState();
         droneEventsListeners.clear();
-
-        this.lbm.sendBroadcast(new Intent(ACTION_DRONE_DESTROYED));
     }
 
     public void addDroneEventsListener(DroneEventsListener listener){
@@ -110,8 +103,9 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream, DroneEve
     }
 
     public void removeDroneEventsListener(DroneEventsListener listener){
-        droneEventsListeners.remove(listener);
-        listener.onDroneEvent(DroneInterfaces.DroneEventsType.DISCONNECTED, drone);
+        if(droneEventsListeners.remove(listener)){
+            listener.onDroneEvent(DroneInterfaces.DroneEventsType.DISCONNECTED, drone);
+        }
     }
 
     @Override

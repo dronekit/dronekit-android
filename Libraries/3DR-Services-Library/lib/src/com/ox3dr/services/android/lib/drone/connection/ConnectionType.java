@@ -21,7 +21,7 @@ public class ConnectionType {
     /**
      * Default value for the upd server port.
      */
-    public static final int DEFAULT_UPD_SERVER_PORT = 14660;
+    public static final int DEFAULT_UPD_SERVER_PORT = 14550;
 
     /**
      * TCP connection type

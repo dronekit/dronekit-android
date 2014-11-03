@@ -82,10 +82,10 @@ public class GoogleApiClientManager {
     private final LinkedBlockingQueue<GoogleApiClientTask> mTaskQueue = new LinkedBlockingQueue
             <GoogleApiClientTask>();
 
-    public GoogleApiClientManager(Context context, Api<? extends Api.ApiOptions.NotRequiredOptions>
-            ... apis){
+    public GoogleApiClientManager(Context context, Handler handler, Api<? extends Api.ApiOptions
+            .NotRequiredOptions>... apis){
         mContext = context;
-        mMainHandler = new Handler();
+        mMainHandler = handler;
 
         final GoogleApiClient.Builder apiBuilder = new GoogleApiClient.Builder(context);
         for(Api api: apis){
