@@ -6,6 +6,7 @@ import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbEndpoint;
 import android.hardware.usb.UsbInterface;
 import android.util.Log;
+import android.util.SparseArray;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -216,9 +217,9 @@ public class CdcAcmSerialDriver extends CommonUsbSerialDriver {
         sendAcmControlMessage(SET_CONTROL_LINE_STATE, value, null);
     }
 
-    public static Map<Integer, int[]> getSupportedDevices() {
-        final Map<Integer, int[]> supportedDevices = new LinkedHashMap<Integer, int[]>();
-        supportedDevices.put(Integer.valueOf(UsbId.VENDOR_ARDUINO),
+    public static SparseArray<int[]> getSupportedDevices() {
+        final SparseArray<int[]> supportedDevices = new SparseArray<int[]>(6);
+        supportedDevices.put(UsbId.VENDOR_ARDUINO,
                 new int[] {
                         UsbId.ARDUINO_UNO,
                         UsbId.ARDUINO_UNO_R3,
@@ -230,19 +231,19 @@ public class CdcAcmSerialDriver extends CommonUsbSerialDriver {
                         UsbId.ARDUINO_MEGA_ADK_R3,
                         UsbId.ARDUINO_LEONARDO,
                 });
-        supportedDevices.put(Integer.valueOf(UsbId.VENDOR_VAN_OOIJEN_TECH),
+        supportedDevices.put(UsbId.VENDOR_VAN_OOIJEN_TECH,
                 new int[] {
                     UsbId.VAN_OOIJEN_TECH_TEENSYDUINO_SERIAL,
                 });
-        supportedDevices.put(Integer.valueOf(UsbId.VENDOR_ATMEL),
+        supportedDevices.put(UsbId.VENDOR_ATMEL,
                 new int[] {
                     UsbId.ATMEL_LUFA_CDC_DEMO_APP,
                 });
-        supportedDevices.put(Integer.valueOf(UsbId.VENDOR_LEAFLABS),
+        supportedDevices.put(UsbId.VENDOR_LEAFLABS,
                 new int[] {
                     UsbId.LEAFLABS_MAPLE,
                 });
-        supportedDevices.put(Integer.valueOf(UsbId.VENDOR_ARDUINO2),
+        supportedDevices.put(UsbId.VENDOR_ARDUINO2,
                 new int[] {
                         UsbId.VAN_OOIJEN_TECH_TEENSYDUINO_SERIAL,
                         UsbId.PIXHAWK,

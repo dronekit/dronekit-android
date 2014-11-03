@@ -6,6 +6,7 @@ import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbEndpoint;
 import android.hardware.usb.UsbInterface;
 import android.util.Log;
+import android.util.SparseArray;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -262,9 +263,9 @@ public class Cp2102SerialDriver extends CommonUsbSerialDriver {
     public void setRTS(boolean value) throws IOException {
     }
     
-    public static Map<Integer, int[]> getSupportedDevices() {
-        final Map<Integer, int[]> supportedDevices = new LinkedHashMap<Integer, int[]>();
-        supportedDevices.put(Integer.valueOf(UsbId.VENDOR_SILAB),
+    public static SparseArray<int[]> getSupportedDevices() {
+        final SparseArray<int[]> supportedDevices = new SparseArray<int[]>(1);
+        supportedDevices.put(UsbId.VENDOR_SILAB,
                 new int[] {
                         UsbId.SILAB_CP2102
                 });

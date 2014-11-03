@@ -13,7 +13,9 @@ public class MAVLinkStreams {
 
 		void toggleConnectionState();
 
-		void queryConnectionState();
+        void openConnection();
+
+        void closeConnection();
 
 	}
 

@@ -224,7 +224,7 @@ public class DroidPlannerService extends Service {
         for (DroneManager droneMgr : dronePerConnection.values()) {
             final Drone drone = droneMgr.getDrone();
             if (drone.getMavClient().isConnected()) {
-                drone.getMavClient().toggleConnectionState();
+                drone.getMavClient().closeConnection();
             }
         }
 

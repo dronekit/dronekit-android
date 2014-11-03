@@ -56,18 +56,23 @@ public class MAVLinkClient implements MAVLinkStreams.MAVLinkOutputStream {
         this.mavLinkApi = serviceApi;
     }
 
-    private void openConnection() {
-        mavLinkApi.connectMavLink(this.connParams);
-        mavLinkApi.addMavLinkConnectionListener(this.connParams, TAG, mConnectionListener);
+    @Override
+    public void openConnection() {
+        if(mavLinkApi.getConnectionStatus(this.connParams) == MavLinkConnection
+                .MAVLINK_DISCONNECTED) {
+            mavLinkApi.connectMavLink(this.connParams);
+            mavLinkApi.addMavLinkConnectionListener(this.connParams, TAG, mConnectionListener);
+        }
     }
 
-    private void closeConnection() {
+    @Override
+    public void closeConnection() {
         if (mavLinkApi.getConnectionStatus(this.connParams) == MavLinkConnection.MAVLINK_CONNECTED) {
             mavLinkApi.disconnectMavLink(this.connParams);
-        }
 
-        mavLinkApi.removeMavLinkConnectionListener(this.connParams, TAG);
-        listener.notifyDisconnected();
+            mavLinkApi.removeMavLinkConnectionListener(this.connParams, TAG);
+            listener.notifyDisconnected();
+        }
     }
 
     @Override
@@ -77,15 +82,6 @@ public class MAVLinkClient implements MAVLinkStreams.MAVLinkOutputStream {
         }
 
         mavLinkApi.sendData(this.connParams, pack);
-    }
-
-    @Override
-    public void queryConnectionState() {
-        if (isConnected()) {
-            listener.notifyConnected();
-        } else {
-            listener.notifyDisconnected();
-        }
     }
 
     @Override

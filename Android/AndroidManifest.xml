@@ -68,6 +68,15 @@
                 <action
                     android:name="com.ox3dr.services.android.lib.model.IDroidPlannerServices" />
             </intent-filter>
+
+            <!-- USB connection  intent -->
+            <intent-filter>
+                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"/>
+            </intent-filter>
+
+            <meta-data
+                android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
+                android:resource="@xml/device_filter"/>
         </service>
 
         <receiver android:name=".communication.service.NetworkConnectivityReceiver"

@@ -69,7 +69,7 @@ class UsbFTDIConnection extends UsbConnection.UsbConnectionImpl {
 
 	@Override
 	protected int readDataBlock(byte[] readData) throws IOException {
-		if (ftDev == null) {
+		if (ftDev == null || !ftDev.isOpen()) {
 			throw new IOException("Device is unavailable.");
 		}
 

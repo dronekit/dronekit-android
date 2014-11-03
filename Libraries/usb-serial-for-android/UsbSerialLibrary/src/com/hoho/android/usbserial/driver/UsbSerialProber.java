@@ -24,6 +24,8 @@ import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbManager;
 import android.util.Log;
+import android.util.SparseArray;
+import android.util.SparseIntArray;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -61,12 +63,19 @@ public enum UsbSerialProber {
             if (!testIfSupported(usbDevice, FtdiSerialDriver.getSupportedDevices())) {
                 return Collections.emptyList();
             }
-            final UsbDeviceConnection connection = manager.openDevice(usbDevice);
+            final UsbDeviceConnection connection = manager.hasPermission(usbDevice)
+                    ? manager.openDevice(usbDevice)
+                    : null;
             if (connection == null) {
                 return Collections.emptyList();
             }
             final UsbSerialDriver driver = new FtdiSerialDriver(usbDevice, connection);
             return Collections.singletonList(driver);
+        }
+
+        @Override
+        public SparseArray<int[]> getSupportedDevices(){
+            return FtdiSerialDriver.getSupportedDevices();
         }
     },
 
@@ -76,12 +85,19 @@ public enum UsbSerialProber {
             if (!testIfSupported(usbDevice, CdcAcmSerialDriver.getSupportedDevices())) {
                return Collections.emptyList();
             }
-            final UsbDeviceConnection connection = manager.openDevice(usbDevice);
+            final UsbDeviceConnection connection = manager.hasPermission(usbDevice)
+                    ? manager.openDevice(usbDevice)
+                    : null;
             if (connection == null) {
                 return Collections.emptyList();
             }
             final UsbSerialDriver driver = new CdcAcmSerialDriver(usbDevice, connection);
             return Collections.singletonList(driver);
+        }
+
+        @Override
+        public SparseArray<int[]> getSupportedDevices(){
+            return CdcAcmSerialDriver.getSupportedDevices();
         }
     },
 
@@ -91,12 +107,19 @@ public enum UsbSerialProber {
             if (!testIfSupported(usbDevice, Cp2102SerialDriver.getSupportedDevices())) {
                 return Collections.emptyList();
             }
-            final UsbDeviceConnection connection = manager.openDevice(usbDevice);
+            final UsbDeviceConnection connection = manager.hasPermission(usbDevice)
+                    ? manager.openDevice(usbDevice)
+                    : null;
             if (connection == null) {
                 return Collections.emptyList();
             }
             final UsbSerialDriver driver = new Cp2102SerialDriver(usbDevice, connection);
             return Collections.singletonList(driver);
+        }
+
+        @Override
+        public SparseArray<int[]> getSupportedDevices(){
+            return Cp2102SerialDriver.getSupportedDevices();
         }
     },
 
@@ -106,12 +129,19 @@ public enum UsbSerialProber {
             if (!testIfSupported(usbDevice, ProlificSerialDriver.getSupportedDevices())) {
                 return Collections.emptyList();
             }
-            final UsbDeviceConnection connection = manager.openDevice(usbDevice);
+            final UsbDeviceConnection connection = manager.hasPermission(usbDevice)
+                    ? manager.openDevice(usbDevice)
+                    : null;
             if (connection == null) {
                 return Collections.emptyList();
             }
             final UsbSerialDriver driver = new ProlificSerialDriver(usbDevice, connection);
             return Collections.singletonList(driver);
+        }
+
+        @Override
+        public SparseArray<int[]> getSupportedDevices(){
+            return ProlificSerialDriver.getSupportedDevices();
         }
     };
 
@@ -125,6 +155,8 @@ public enum UsbSerialProber {
      *         (never {@code null}).
      */
     protected abstract List<UsbSerialDriver> probe(final UsbManager manager, final UsbDevice usbDevice);
+
+    protected abstract SparseArray<int[]> getSupportedDevices();
 
     /**
      * Creates and returns a new {@link UsbSerialDriver} instance for the first
@@ -150,6 +182,32 @@ public enum UsbSerialProber {
             }
         }
         return null;
+    }
+
+    public static UsbSerialDriver openUsbDevice(final UsbManager usbManager,
+                                                final UsbDevice device){
+        for (final UsbSerialProber prober : values()) {
+            final List<UsbSerialDriver> probedDevices = prober.probe(usbManager, device);
+            if (!probedDevices.isEmpty()) {
+                return probedDevices.get(0);
+            }
+        }
+
+        return null;
+    }
+
+    public static List<UsbDevice> getAvailableSupportedDevices(final UsbManager usbManager){
+            List<UsbDevice> supportedDevices = new ArrayList<UsbDevice>();
+        for(UsbDevice usbDevice: usbManager.getDeviceList().values()){
+            for(UsbSerialProber prober: values()) {
+                if (testIfSupported(usbDevice, prober.getSupportedDevices())){
+                    supportedDevices.add(usbDevice);
+                    break;
+                }
+            }
+        }
+
+        return supportedDevices;
     }
 
     /**
@@ -229,9 +287,8 @@ public enum UsbSerialProber {
      * @return {@code true} if supported
      */
     private static boolean testIfSupported(final UsbDevice usbDevice,
-            final Map<Integer, int[]> supportedDevices) {
-        final int[] supportedProducts = supportedDevices.get(
-                Integer.valueOf(usbDevice.getVendorId()));
+            final SparseArray<int[]> supportedDevices) {
+        final int[] supportedProducts = supportedDevices.get(usbDevice.getVendorId());
         if (supportedProducts == null) {
             return false;
         }

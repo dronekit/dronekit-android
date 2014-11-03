@@ -36,6 +36,7 @@ import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbEndpoint;
 import android.hardware.usb.UsbInterface;
 import android.util.Log;
+import android.util.SparseArray;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -109,9 +110,9 @@ public class ProlificSerialDriver extends CommonUsbSerialDriver {
         super(device, connection);
     }
 
-    public static Map<Integer, int[]> getSupportedDevices() {
-        final Map<Integer, int[]> supportedDevices = new LinkedHashMap<Integer, int[]>();
-        supportedDevices.put(Integer.valueOf(UsbId.VENDOR_PROLIFIC),
+    public static SparseArray<int[]> getSupportedDevices() {
+        final SparseArray<int[]> supportedDevices = new SparseArray<int[]>(1);
+        supportedDevices.put(UsbId.VENDOR_PROLIFIC,
                 new int[] { UsbId.PROLIFIC_PL2303, });
         return supportedDevices;
     }

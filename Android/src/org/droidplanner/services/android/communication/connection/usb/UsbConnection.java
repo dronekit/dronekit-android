@@ -65,8 +65,7 @@ public class UsbConnection extends AndroidMavLinkConnection {
 			try {
 				tmp.openUsbConnection();
 
-				// If the call above is successful, 'mUsbConnection' will be
-				// set.
+				// If the call above is successful, 'mUsbConnection' will be set.
 				mUsbConnection = tmp;
 				Log.d(TAG, "Using FTDI usb connection.");
 			} catch (IOException e) {
@@ -79,8 +78,7 @@ public class UsbConnection extends AndroidMavLinkConnection {
 		if (mUsbConnection == null) {
 			final UsbConnectionImpl tmp = new UsbCDCConnection(mContext, mBaudRate);
 
-			// If an error happens here, let it propagate up the call chain
-			// since this is the
+			// If an error happens here, let it propagate up the call chain since this is the
 			// fallback.
 			tmp.openUsbConnection();
 			mUsbConnection = tmp;

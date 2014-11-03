@@ -123,7 +123,7 @@ public class MainActivity extends FragmentActivity {
         public void refreshDroneManagerList(List<DroneManager> list){
             droneMgrList.clear();
 
-            if(list != null && list.isEmpty()) {
+            if(list != null && !list.isEmpty()) {
                 droneMgrList.addAll(list);
             }
             notifyDataSetChanged();

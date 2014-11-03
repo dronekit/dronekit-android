@@ -26,6 +26,7 @@ import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbEndpoint;
 import android.hardware.usb.UsbRequest;
 import android.util.Log;
+import android.util.SparseArray;
 
 import com.hoho.android.usbserial.util.HexDump;
 
@@ -512,9 +513,9 @@ public class FtdiSerialDriver extends CommonUsbSerialDriver {
     public void setRTS(boolean value) throws IOException {
     }
 
-    public static Map<Integer, int[]> getSupportedDevices() {
-        final Map<Integer, int[]> supportedDevices = new LinkedHashMap<Integer, int[]>();
-        supportedDevices.put(Integer.valueOf(UsbId.VENDOR_FTDI),
+    public static SparseArray<int[]> getSupportedDevices() {
+        final SparseArray<int[]> supportedDevices = new SparseArray<int[]>(1);
+        supportedDevices.put(UsbId.VENDOR_FTDI,
                 new int[] {
                     UsbId.FTDI_FT232R,
                     UsbId.FTDI_FT231X,                    
