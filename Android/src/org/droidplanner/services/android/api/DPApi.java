@@ -24,6 +24,7 @@ import com.ox3dr.services.android.lib.drone.property.Parameters;
 import com.ox3dr.services.android.lib.model.IDroidPlannerApi;
 import com.ox3dr.services.android.lib.model.IDroidPlannerApiCallback;
 
+import org.droidplanner.core.MAVLink.MavLinkArm;
 import org.droidplanner.core.drone.DroneInterfaces;
 import org.droidplanner.core.drone.variables.GPS;
 import org.droidplanner.core.drone.variables.Orientation;
@@ -300,6 +301,11 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
     @Override
     public void sendMission(Mission mission) throws RemoteException {
         throw new UnsupportedOperationException("Method not implemented");
+    }
+
+    @Override
+    public void arm(boolean arm) throws RemoteException {
+        MavLinkArm.sendArmMessage(getDroneMgr().getDrone(), arm);
     }
 
     @Override
