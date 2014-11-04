@@ -14,8 +14,8 @@ import ellipsoidFit.ThreeSpacePoint;
  */
 public class MathUtil {
 
-    public static List<Point3D> threeSpacePointToPoint3D(List<ThreeSpacePoint> spacePoints){
-        final List<Point3D> pointsList = new ArrayList<Point3D>();
+    public static ArrayList<Point3D> threeSpacePointToPoint3D(List<ThreeSpacePoint> spacePoints){
+        final ArrayList<Point3D> pointsList = new ArrayList<Point3D>();
 
         if(spacePoints != null && !spacePoints.isEmpty()) {
             for (ThreeSpacePoint spacePoint : spacePoints) {
@@ -27,8 +27,8 @@ public class MathUtil {
         return pointsList;
     }
 
-    public static List<ThreeSpacePoint> point3DToThreeSpacePoint(List<Point3D> points){
-        final List<ThreeSpacePoint> spacePoints = new ArrayList<ThreeSpacePoint>();
+    public static ArrayList<ThreeSpacePoint> point3DToThreeSpacePoint(List<Point3D> points){
+        final ArrayList<ThreeSpacePoint> spacePoints = new ArrayList<ThreeSpacePoint>();
 
         if(points != null && !points.isEmpty()){
             for(Point3D point: points){

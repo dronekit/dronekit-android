@@ -327,6 +327,12 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener, 
     }
 
     @Override
+    public void stopMagnetometerCalibration() throws RemoteException {
+        if(magCalibration.isRunning())
+            magCalibration.stop();
+    }
+
+    @Override
     public void onDroneEvent(DroneInterfaces.DroneEventsType event, Drone drone) {
         final IDroidPlannerApiCallback callback = getCallback();
         Bundle extrasBundle;
@@ -500,7 +506,11 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener, 
         Bundle paramsBundle = new Bundle();
         paramsBundle.putParcelableArrayList(Extra.EXTRA_CALIBRATION_MAG_START_POINTS,
                 MathUtil.threeSpacePointToPoint3D(points));
-        getCallback().onDroneEvent(Event.EVENT_CALIBRATION_MAG_STARTED, paramsBundle);
+        try {
+            getCallback().onDroneEvent(Event.EVENT_CALIBRATION_MAG_STARTED, paramsBundle);
+        } catch (RemoteException e) {
+            Log.e(TAG, e.getMessage(), e);
+        }
     }
 
     @Override
@@ -515,7 +525,11 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener, 
         paramsBundle.putDoubleArray(Extra.EXTRA_CALIBRATION_MAG_FIT_CENTER, fitCenter);
         paramsBundle.putDoubleArray(Extra.EXTRA_CALIBRATION_MAG_FIT_RADII, fitRadii);
 
-        getCallback().onDroneEvent(Event.EVENT_CALIBRATION_MAG_ESTIMATION, paramsBundle);
+        try {
+            getCallback().onDroneEvent(Event.EVENT_CALIBRATION_MAG_ESTIMATION, paramsBundle);
+        } catch (RemoteException e) {
+            Log.e(TAG, e.getMessage(), e);
+        }
 
     }
 
