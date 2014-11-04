@@ -140,7 +140,7 @@ public class DroidPlannerService extends Service {
             switch(connectionType){
                 case ConnectionType.TYPE_USB:
                     final int baudRate = paramsBundle.getInt(ConnectionType.EXTRA_USB_BAUD_RATE,
-                            ConnectionType.DEFAULT_BAUD_RATE);
+                            ConnectionType.DEFAULT_USB_BAUD_RATE);
                     conn = new UsbConnection(getApplicationContext(), baudRate);
                     break;
 
