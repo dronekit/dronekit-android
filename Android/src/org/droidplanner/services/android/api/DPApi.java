@@ -128,54 +128,53 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
         org.droidplanner.core.drone.variables.State droneState = drone.getState();
         ApmModes droneMode = droneState.getMode();
 
-        State proxyState = new State(getProxyMode(droneMode), getDroneProxyType(drone.getType()),
-                droneState.isArmed(), droneState.isFlying(), droneState.getWarning());
+        State proxyState = new State(getProxyMode(droneMode), droneState.isArmed(),
+                droneState.isFlying(), droneState.getWarning());
 
         return proxyState;
     }
 
     private static VehicleMode getProxyMode(ApmModes mode){
-        final Type proxyType = getDroneProxyType(mode.getType());
-        if(proxyType == null) return null;
+        final int proxyType = getDroneProxyType(mode.getType());
+        if(proxyType == -1) return null;
 
-        return new VehicleMode(mode.getNumber(), proxyType.getDroneType(), mode.getName());
+        return new VehicleMode(mode.getNumber(), proxyType, mode.getName());
     }
 
     @Override
     public VehicleMode[] getAllVehicleModes() throws RemoteException {
-        final int droneType =getDroneMgr().getDrone().getType();
-        final Type proxyType = getDroneProxyType(droneType);
+        final int droneType = getDroneMgr().getDrone().getType();
+        final int proxyType = getDroneProxyType(droneType);
 
         List<ApmModes> typeModes = ApmModes.getModeList(droneType);
         final int modesCount = typeModes.size();
         VehicleMode[] vehicleModes = new VehicleMode[modesCount];
         for(int i = 0; i < modesCount; i++){
             ApmModes mode = typeModes.get(i);
-            vehicleModes[i] = new VehicleMode(mode.getNumber(), proxyType.getDroneType(),
-                    mode.getName());
+            vehicleModes[i] = new VehicleMode(mode.getNumber(), proxyType, mode.getName());
         }
 
         return vehicleModes;
     }
 
-    private static Type getDroneProxyType(int originalType){
+    private static int getDroneProxyType(int originalType){
         switch(originalType){
             case MAV_TYPE.MAV_TYPE_TRICOPTER:
             case MAV_TYPE.MAV_TYPE_QUADROTOR:
             case MAV_TYPE.MAV_TYPE_HEXAROTOR:
             case MAV_TYPE.MAV_TYPE_OCTOROTOR:
             case MAV_TYPE.MAV_TYPE_HELICOPTER:
-                return new Type(Type.TYPE_COPTER);
+                return Type.TYPE_COPTER;
 
             case MAV_TYPE.MAV_TYPE_FIXED_WING:
-                return new Type(Type.TYPE_PLANE);
+                return Type.TYPE_PLANE;
 
             case MAV_TYPE.MAV_TYPE_GROUND_ROVER:
             case MAV_TYPE.MAV_TYPE_SURFACE_BOAT:
-                return new Type(Type.TYPE_ROVER);
+                return Type.TYPE_ROVER;
 
             default:
-                return null;
+                return -1;
         }
     }
 
@@ -244,6 +243,12 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
     @Override
     public Mission getMission() throws RemoteException {
         throw new UnsupportedOperationException("Method not implemented");
+    }
+
+    @Override
+    public Type getType() throws RemoteException {
+        final Drone drone = getDroneMgr().getDrone();
+        return new Type(getDroneProxyType(drone.getType()), drone.getFirmwareVersion());
     }
 
     @Override
@@ -356,6 +361,8 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
                     break;
                 case MISSION_RECEIVED:
                     break;
+
+                case FIRMWARE:
                 case TYPE:
                     callback.onDroneEvent(Event.EVENT_TYPE_UPDATED, emptyBundle);
                     break;
@@ -386,9 +393,13 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
                 case HEARTBEAT_TIMEOUT:
                     callback.onDroneEvent(Event.EVENT_HEARTBEAT_TIMEOUT, emptyBundle);
                     break;
+
                 case HEARTBEAT_FIRST:
+                    callback.onDroneEvent(Event.EVENT_HEARTBEAT_FIRST, emptyBundle);
                     break;
+
                 case HEARTBEAT_RESTORED:
+                    callback.onDroneEvent(Event.EVENT_HEARTBEAT_RESTORED, emptyBundle);
                     break;
 
                 case CONNECTED:
@@ -414,8 +425,6 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
                 case WARNING_400FT_EXCEEDED:
                     break;
                 case WARNING_SIGNAL_WEAK:
-                    break;
-                case FIRMWARE:
                     break;
                 case WARNING_NO_GPS:
                     break;
