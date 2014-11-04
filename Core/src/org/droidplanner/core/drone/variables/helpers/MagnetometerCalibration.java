@@ -23,6 +23,7 @@ public class MagnetometerCalibration implements OnDroneListener {
     private static final int REFRESH_RATE = 50; //hz
 
     public interface OnMagCalibrationListener {
+        public void onStarted(List<ThreeSpacePoint> points);
         public void newEstimation(FitPoints fit, List<ThreeSpacePoint> points);
         public void finished(FitPoints fit);
     }
@@ -71,7 +72,7 @@ public class MagnetometerCalibration implements OnDroneListener {
         this.handler = handler;
 	}
 
-    public void start(List<? extends ThreeSpacePoint> newPoints){
+    public void start(List<ThreeSpacePoint> newPoints){
         this.points.clear();
         if(newPoints != null && !newPoints.isEmpty()){
             this.points.addAll(newPoints);
@@ -84,6 +85,10 @@ public class MagnetometerCalibration implements OnDroneListener {
         this.fitRunner = Executors.newSingleThreadExecutor();
         MavLinkStreamRates.setupStreamRates(drone.getMavClient(), 0, 0, 0, 0, 0, 0, REFRESH_RATE,
                 0);
+
+        if(this.listener != null)
+            this.listener.onStarted(newPoints);
+
         drone.addDroneListener(this);
     }
 
