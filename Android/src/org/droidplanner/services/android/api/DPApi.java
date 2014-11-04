@@ -128,10 +128,8 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
         org.droidplanner.core.drone.variables.State droneState = drone.getState();
         ApmModes droneMode = droneState.getMode();
 
-        State proxyState = new State(getProxyMode(droneMode), droneState.isArmed(),
-                droneState.isFlying(), droneState.getWarning());
-
-        return proxyState;
+        return new State(getProxyMode(droneMode), droneState.isArmed(),
+                droneState.isFlying(), droneState.getWarning(), drone.getMavlinkVersion());
     }
 
     private static VehicleMode getProxyMode(ApmModes mode){
@@ -307,6 +305,7 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
     @Override
     public void onDroneEvent(DroneInterfaces.DroneEventsType event, Drone drone) {
         final IDroidPlannerApiCallback callback = getCallback();
+        Bundle extrasBundle;
 
         try {
             switch (event) {
@@ -395,11 +394,15 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
                     break;
 
                 case HEARTBEAT_FIRST:
-                    callback.onDroneEvent(Event.EVENT_HEARTBEAT_FIRST, emptyBundle);
+                    extrasBundle = new Bundle();
+                    extrasBundle.putInt(Extra.EXTRA_MAVLINK_VERSION, drone.getMavlinkVersion());
+                    callback.onDroneEvent(Event.EVENT_HEARTBEAT_FIRST, extrasBundle);
                     break;
 
                 case HEARTBEAT_RESTORED:
-                    callback.onDroneEvent(Event.EVENT_HEARTBEAT_RESTORED, emptyBundle);
+                    extrasBundle = new Bundle();
+                    extrasBundle.putInt(Extra.EXTRA_MAVLINK_VERSION, drone.getMavlinkVersion());
+                    callback.onDroneEvent(Event.EVENT_HEARTBEAT_RESTORED, extrasBundle);
                     break;
 
                 case CONNECTED:
