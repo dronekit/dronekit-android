@@ -78,7 +78,7 @@ public class MagnetometerCalibration implements OnDroneListener {
             this.points.addAll(newPoints);
         }
 
-        if(this.fitRunner != null && !this.fitRunner.isShutdown()){
+        if(isRunning()){
             this.fitRunner.shutdownNow();
         }
 
@@ -92,11 +92,15 @@ public class MagnetometerCalibration implements OnDroneListener {
         drone.addDroneListener(this);
     }
 
+    public boolean isRunning(){
+        return this.fitRunner != null && !this.fitRunner.isShutdown();
+    }
+
     public void stop(){
         drone.removeDroneListener(this);
         drone.getStreamRates().setupStreamRatesFromPref();
 
-        if(this.fitRunner != null) {
+        if(isRunning()) {
             this.fitRunner.shutdownNow();
         }
     }
@@ -154,7 +158,7 @@ public class MagnetometerCalibration implements OnDroneListener {
 		}
 	}
 
-	public void sendOffsets() throws Exception {
+	public double[] sendOffsets() throws Exception {
 		Parameter offsetX = drone.getParameters().getParameter("COMPASS_OFS_X");
 		Parameter offsetY = drone.getParameters().getParameter("COMPASS_OFS_Y");
 		Parameter offsetZ = drone.getParameters().getParameter("COMPASS_OFS_Z");
@@ -162,13 +166,17 @@ public class MagnetometerCalibration implements OnDroneListener {
 		if (offsetX == null || offsetY == null || offsetZ == null) {
 			throw new Exception("Parameters have not been loaded");
 		}
-		
-		offsetX.value = -ellipsoidFit.center.getEntry(0);
-		offsetY.value = -ellipsoidFit.center.getEntry(1);
-		offsetZ.value = -ellipsoidFit.center.getEntry(2);
+
+        final double[] offsets = {-ellipsoidFit.center.getEntry(0), -ellipsoidFit.center.getEntry
+                (1), -ellipsoidFit.center.getEntry(2)};
+		offsetX.value = offsets[0];
+		offsetY.value = offsets[1];
+		offsetZ.value = offsets[2];
 				
 		drone.getParameters().sendParameter(offsetX); //TODO should probably do a check after sending the parameters
 		drone.getParameters().sendParameter(offsetY);
 		drone.getParameters().sendParameter(offsetZ);
+
+        return offsets;
 	}
 }

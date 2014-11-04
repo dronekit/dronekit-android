@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.MAVLink.Messages.ApmModes;
 import com.MAVLink.Messages.enums.MAV_TYPE;
+import com.ox3dr.services.android.lib.coordinate.Point3D;
 import com.ox3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.ox3dr.services.android.lib.drone.connection.ConnectionResult;
 import com.ox3dr.services.android.lib.drone.event.Event;
@@ -28,11 +29,13 @@ import org.droidplanner.core.MAVLink.MavLinkArm;
 import org.droidplanner.core.drone.DroneInterfaces;
 import org.droidplanner.core.drone.variables.GPS;
 import org.droidplanner.core.drone.variables.Orientation;
+import org.droidplanner.core.drone.variables.helpers.MagnetometerCalibration;
 import org.droidplanner.core.model.Drone;
 import org.droidplanner.core.parameters.Parameter;
 import org.droidplanner.services.android.drone.DroneManager;
 import org.droidplanner.services.android.exception.ConnectionException;
 import org.droidplanner.services.android.interfaces.DroneEventsListener;
+import org.droidplanner.services.android.utils.MathUtil;
 import org.droidplanner.services.android.utils.file.IO.ParameterMetadataLoader;
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -43,15 +46,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import ellipsoidFit.FitPoints;
+import ellipsoidFit.ThreeSpacePoint;
+
 /**
 * Created by fhuya on 10/30/14.
 */
-final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
+final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener, MagnetometerCalibration.OnMagCalibrationListener {
 
     private final static String TAG = DPApi.class.getSimpleName();
 
     private final Bundle emptyBundle = new Bundle();
     private final WeakReference<DroidPlannerService> serviceRef;
+    private MagnetometerCalibration magCalibration;
 
     private IDroidPlannerApiCallback apiCallback;
     private ConnectionParameter connParams;
@@ -66,6 +73,8 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
 
         try {
             this.droneMgr = dpService.getDroneForConnection(connParams);
+            this.magCalibration = new MagnetometerCalibration(this.droneMgr.getDrone(), this,
+                    this.droneMgr.getHandler());
             start();
         } catch (ConnectionException e) {
             callback.onConnectionFailed(new ConnectionResult(0, e.getMessage()));
@@ -309,6 +318,15 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
     }
 
     @Override
+    public void startMagnetometerCalibration(List<Point3D> startPoints) throws RemoteException {
+        if(magCalibration.isRunning()){
+            magCalibration.stop();
+        }
+
+        magCalibration.start(MathUtil.point3DToThreeSpacePoint(startPoints));
+    }
+
+    @Override
     public void onDroneEvent(DroneInterfaces.DroneEventsType event, Drone drone) {
         final IDroidPlannerApiCallback callback = getCallback();
         Bundle extrasBundle;
@@ -473,6 +491,46 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
         try{
             getCallback().onDroneEvent(Event.EVENT_PARAMETERS_REFRESH_ENDED, emptyBundle);
         } catch(RemoteException e){
+            Log.e(TAG, e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void onStarted(List<ThreeSpacePoint> points) {
+        Bundle paramsBundle = new Bundle();
+        paramsBundle.putParcelableArrayList(Extra.EXTRA_CALIBRATION_MAG_START_POINTS,
+                MathUtil.threeSpacePointToPoint3D(points));
+        getCallback().onDroneEvent(Event.EVENT_CALIBRATION_MAG_STARTED, paramsBundle);
+    }
+
+    @Override
+    public void newEstimation(FitPoints fit, List<ThreeSpacePoint> points) {
+        double fitness = fit.getFitness();
+        double[] fitCenter = {fit.center.getEntry(0), fit.center.getEntry(1),
+                fit.center.getEntry(2)};
+        double[] fitRadii = {fit.radii.getEntry(0), fit.radii.getEntry(1), fit.radii.getEntry(2)};
+
+        Bundle paramsBundle = new Bundle(3);
+        paramsBundle.putDouble(Extra.EXTRA_CALIBRATION_MAG_FITNESS, fitness);
+        paramsBundle.putDoubleArray(Extra.EXTRA_CALIBRATION_MAG_FIT_CENTER, fitCenter);
+        paramsBundle.putDoubleArray(Extra.EXTRA_CALIBRATION_MAG_FIT_RADII, fitRadii);
+
+        getCallback().onDroneEvent(Event.EVENT_CALIBRATION_MAG_ESTIMATION, paramsBundle);
+
+    }
+
+    @Override
+    public void finished(FitPoints fit) {
+        try {
+            double[] offsets = magCalibration.sendOffsets();
+            double fitness = fit.getFitness();
+
+            Bundle paramsBundle = new Bundle(2);
+            paramsBundle.putDouble(Extra.EXTRA_CALIBRATION_MAG_FITNESS, fitness);
+            paramsBundle.putDoubleArray(Extra.EXTRA_CALIBRATION_MAG_OFFSETS, offsets);
+
+            getCallback().onDroneEvent(Event.EVENT_CALIBRATION_MAG_COMPLETED, paramsBundle);
+        } catch (Exception e) {
             Log.e(TAG, e.getMessage(), e);
         }
     }

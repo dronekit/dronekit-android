@@ -39,6 +39,7 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream, DroneEve
 
     private final Drone drone;
     private final Follow followMe;
+    private final DroneInterfaces.Handler dpHandler;
     private final ConnectionParameter connectionParams;
     private final MavLinkMsgHandler mavLinkMsgHandler;
 
@@ -56,7 +57,7 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream, DroneEve
             }
         };
 
-        DroneInterfaces.Handler dpHandler = new DroneInterfaces.Handler() {
+        dpHandler = new DroneInterfaces.Handler() {
             @Override
             public void removeCallbacks(Runnable thread) {
                 handler.removeCallbacks(thread);
@@ -136,6 +137,10 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream, DroneEve
 
     public Follow getFollowMe(){
         return followMe;
+    }
+
+    public DroneInterfaces.Handler getHandler(){
+        return dpHandler;
     }
 
     public int getListenersCount(){
