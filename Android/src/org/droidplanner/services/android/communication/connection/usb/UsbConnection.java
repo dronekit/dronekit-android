@@ -21,12 +21,13 @@ public class UsbConnection extends AndroidMavLinkConnection {
 
 	private static final int FTDI_DEVICE_VENDOR_ID = 0x0403;
 
-	protected int mBaudRate = 57600;
+	protected final int mBaudRate;
 
 	private UsbConnectionImpl mUsbConnection;
 
-	public UsbConnection(Context parentContext) {
+	public UsbConnection(Context parentContext, int baudRate) {
 		super(parentContext);
+        mBaudRate = baudRate;
 	}
 
 	@Override
@@ -37,15 +38,7 @@ public class UsbConnection extends AndroidMavLinkConnection {
 	}
 
 	@Override
-	protected void loadPreferences(SharedPreferences prefs) {
-		String baud_type = prefs.getString("pref_baud_type", "57600");
-		if (baud_type.equals("38400"))
-			mBaudRate = 38400;
-		else if (baud_type.equals("57600"))
-			mBaudRate = 57600;
-		else
-			mBaudRate = 115200;
-	}
+	protected void loadPreferences(SharedPreferences prefs) {}
 
 	@Override
 	protected void openAndroidConnection() throws IOException {

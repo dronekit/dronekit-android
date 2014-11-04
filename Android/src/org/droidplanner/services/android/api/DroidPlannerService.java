@@ -136,23 +136,23 @@ public class DroidPlannerService extends Service {
         if(conn == null){
             //Create a new mavlink connection
             final int connectionType = connParams.getConnectionType();
+            final Bundle paramsBundle = connParams.getParamsBundle();
             switch(connectionType){
                 case ConnectionType.TYPE_USB:
-                    conn = new UsbConnection(getApplicationContext());
+                    final int baudRate = paramsBundle.getInt(ConnectionType.EXTRA_USB_BAUD_RATE,
+                            ConnectionType.DEFAULT_BAUD_RATE);
+                    conn = new UsbConnection(getApplicationContext(), baudRate);
                     break;
 
                 case ConnectionType.TYPE_BLUETOOTH:
                     //Retrieve the bluetooth address to connect to
-                    final String bluetoothAddress = connParams.getParamsBundle().getString
-                            (ConnectionType.EXTRA_BLUETOOTH_ADDRESS);
+                    final String bluetoothAddress = paramsBundle.getString(ConnectionType.EXTRA_BLUETOOTH_ADDRESS);
                     conn = new BluetoothConnection(getApplicationContext(), bluetoothAddress);
                     break;
 
                 case ConnectionType.TYPE_TCP:
                     //Retrieve the server ip and port
-                    final Bundle paramsBundle = connParams.getParamsBundle();
-                    final String tcpServerIp = paramsBundle.getString(ConnectionType
-                            .EXTRA_TCP_SERVER_IP);
+                    final String tcpServerIp = paramsBundle.getString(ConnectionType.EXTRA_TCP_SERVER_IP);
                     final int tcpServerPort = paramsBundle.getInt(ConnectionType
                             .EXTRA_TCP_SERVER_PORT, ConnectionType.DEFAULT_TCP_SERVER_PORT);
                     conn = new AndroidTcpConnection(getApplicationContext(), tcpServerIp,
@@ -160,7 +160,7 @@ public class DroidPlannerService extends Service {
                     break;
 
                 case ConnectionType.TYPE_UDP:
-                    final int udpServerPort = connParams.getParamsBundle().getInt(ConnectionType
+                    final int udpServerPort = paramsBundle.getInt(ConnectionType
                             .EXTRA_UDP_SERVER_PORT, ConnectionType.DEFAULT_UPD_SERVER_PORT);
                     conn = new AndroidUdpConnection(getApplicationContext(), udpServerPort);
                     break;
