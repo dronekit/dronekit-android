@@ -21,6 +21,7 @@ import com.ox3dr.services.android.lib.drone.property.Battery;
 import com.ox3dr.services.android.lib.drone.property.Gps;
 import com.ox3dr.services.android.lib.drone.property.Home;
 import com.ox3dr.services.android.lib.drone.property.Mission;
+import com.ox3dr.services.android.lib.drone.property.Signal;
 import com.ox3dr.services.android.lib.drone.property.Speed;
 import com.ox3dr.services.android.lib.drone.property.State;
 import com.ox3dr.services.android.lib.drone.property.Type;
@@ -34,6 +35,7 @@ import org.droidplanner.core.drone.DroneInterfaces;
 import org.droidplanner.core.drone.variables.Calibration;
 import org.droidplanner.core.drone.variables.GPS;
 import org.droidplanner.core.drone.variables.Orientation;
+import org.droidplanner.core.drone.variables.Radio;
 import org.droidplanner.core.drone.variables.helpers.MagnetometerCalibration;
 import org.droidplanner.core.model.Drone;
 import org.droidplanner.core.parameters.Parameter;
@@ -268,6 +270,14 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener, 
     @Override
     public Mission getMission() throws RemoteException {
         throw new UnsupportedOperationException("Method not implemented");
+    }
+
+    @Override
+    public Signal getSignal() throws RemoteException {
+        Radio droneRadio = getDroneMgr().getDrone().getRadio();
+        return new Signal(droneRadio.isValid(), droneRadio.getRxErrors(), droneRadio.getFixed(),
+                droneRadio.getTxBuf(), droneRadio.getRssi(), droneRadio.getRemRssi(),
+                droneRadio.getNoise(), droneRadio.getRemNoise());
     }
 
     @Override
