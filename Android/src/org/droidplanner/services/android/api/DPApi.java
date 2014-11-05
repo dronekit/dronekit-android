@@ -3,6 +3,7 @@ package org.droidplanner.services.android.api;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.RemoteException;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.MAVLink.Messages.ApmModes;
@@ -28,6 +29,7 @@ import com.ox3dr.services.android.lib.model.IDroidPlannerApiCallback;
 
 import org.droidplanner.core.MAVLink.MavLinkArm;
 import org.droidplanner.core.drone.DroneInterfaces;
+import org.droidplanner.core.drone.variables.Calibration;
 import org.droidplanner.core.drone.variables.GPS;
 import org.droidplanner.core.drone.variables.Orientation;
 import org.droidplanner.core.drone.variables.helpers.MagnetometerCalibration;
@@ -436,7 +438,24 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener, 
                     break;
 
                 case CALIBRATION_TIMEOUT:
-                    callback.onDroneEvent(Event.EVENT_CALIBRATION_IMU_TIMEOUT, emptyBundle);
+                    /*
+				 * here we will check if we are in calibration mode but if at
+				 * the same time 'msg' is empty - then it is actually not doing
+				 * calibration what we should do is to reset the calibration
+				 * flag and re-trigger the HEARBEAT_TIMEOUT this however should
+				 * not be happening
+				 */
+                    final Calibration calibration = getDroneMgr().getDrone().getCalibrationSetup();
+                    final String message = calibration.getMessage();
+                    if(calibration.isCalibrating() && TextUtils.isEmpty(message)){
+                        calibration.setCalibrating(false);
+                        callback.onDroneEvent(Event.EVENT_HEARTBEAT_TIMEOUT, emptyBundle);
+                    }
+                    else {
+                        extrasBundle = new Bundle(1);
+                        extrasBundle.putString(Extra.EXTRA_CALIBRATION_IMU_MESSAGE, message);
+                        callback.onDroneEvent(Event.EVENT_CALIBRATION_IMU_TIMEOUT, extrasBundle);
+                    }
                     break;
 
                 case HEARTBEAT_TIMEOUT:
