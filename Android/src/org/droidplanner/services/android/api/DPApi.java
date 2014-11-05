@@ -28,7 +28,7 @@ import com.ox3dr.services.android.lib.drone.property.State;
 import com.ox3dr.services.android.lib.drone.property.Type;
 import com.ox3dr.services.android.lib.drone.property.VehicleMode;
 import com.ox3dr.services.android.lib.drone.property.Parameters;
-import com.ox3dr.services.android.lib.gcs.follow.FollowMode;
+import com.ox3dr.services.android.lib.gcs.follow.FollowType;
 import com.ox3dr.services.android.lib.gcs.follow.FollowState;
 import com.ox3dr.services.android.lib.model.IDroidPlannerApi;
 import com.ox3dr.services.android.lib.model.IDroidPlannerApiCallback;
@@ -442,30 +442,30 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener, 
     }
 
     @Override
-    public void enableFollowMe(FollowMode followMode) throws RemoteException {
+    public void enableFollowMe(FollowType followType) throws RemoteException {
         final FollowAlgorithm.FollowModes selectedMode;
-        switch(followMode.getFollowType()){
-            case FollowMode.TYPE_ABOVE:
+        switch(followType.getFollowType()){
+            case FollowType.TYPE_ABOVE:
                 selectedMode = FollowAlgorithm.FollowModes.ABOVE;
                 break;
 
-            case FollowMode.TYPE_LEAD:
+            case FollowType.TYPE_LEAD:
                 selectedMode = FollowAlgorithm.FollowModes.LEAD;
                 break;
 
-            case FollowMode.TYPE_LEASH:
+            case FollowType.TYPE_LEASH:
                 selectedMode = FollowAlgorithm.FollowModes.LEASH;
                 break;
 
-            case FollowMode.TYPE_CIRCLE:
+            case FollowType.TYPE_CIRCLE:
                 selectedMode = FollowAlgorithm.FollowModes.CIRCLE;
                 break;
 
-            case FollowMode.TYPE_LEFT:
+            case FollowType.TYPE_LEFT:
                 selectedMode = FollowAlgorithm.FollowModes.LEFT;
                 break;
 
-            case FollowMode.TYPE_RIGHT:
+            case FollowType.TYPE_RIGHT:
                 selectedMode = FollowAlgorithm.FollowModes.RIGHT;
                 break;
 
@@ -517,37 +517,53 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener, 
                 break;
         }
 
-        final FollowMode followMode;
-        final FollowAlgorithm.FollowModes followType = followMe.getType();
-        final String followTypeLabel = followType.toString();
-        switch(followType){
+        return new FollowState(state, radius, followModeToType(followMe.getType()));
+    }
+
+    @Override
+    public FollowType[] getFollowModes() throws RemoteException {
+        final FollowAlgorithm.FollowModes[] followModes = FollowAlgorithm.FollowModes.values();
+        final int modesCount = followModes.length;
+        final FollowType[] followTypes = new FollowType[modesCount];
+        for(int i = 0; i < modesCount; i++){
+            followTypes[i] = followModeToType(followModes[i]);
+        }
+
+        return followTypes;
+    }
+
+    private static FollowType followModeToType(FollowAlgorithm.FollowModes followMode){
+        final FollowType followType;
+
+        final String followTypeLabel = followMode.toString();
+        switch(followMode){
             default:
             case LEASH:
-                followMode = new FollowMode(FollowMode.TYPE_LEASH, followTypeLabel);
+                followType = new FollowType(FollowType.TYPE_LEASH, followTypeLabel);
                 break;
 
             case LEAD:
-                followMode = new FollowMode(FollowMode.TYPE_LEAD, followTypeLabel);
+                followType = new FollowType(FollowType.TYPE_LEAD, followTypeLabel);
                 break;
 
             case RIGHT:
-                followMode = new FollowMode(FollowMode.TYPE_RIGHT, followTypeLabel);
+                followType = new FollowType(FollowType.TYPE_RIGHT, followTypeLabel);
                 break;
 
             case LEFT:
-                followMode = new FollowMode(FollowMode.TYPE_LEFT, followTypeLabel);
+                followType = new FollowType(FollowType.TYPE_LEFT, followTypeLabel);
                 break;
 
             case CIRCLE:
-                followMode = new FollowMode(FollowMode.TYPE_CIRCLE, followTypeLabel);
+                followType = new FollowType(FollowType.TYPE_CIRCLE, followTypeLabel);
                 break;
 
             case ABOVE:
-                followMode = new FollowMode(FollowMode.TYPE_ABOVE, followTypeLabel);
+                followType = new FollowType(FollowType.TYPE_ABOVE, followTypeLabel);
                 break;
         }
 
-        return new FollowState(state, radius, followMode);
+        return followType;
     }
 
     @Override
