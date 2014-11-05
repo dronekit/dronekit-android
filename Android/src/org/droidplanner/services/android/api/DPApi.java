@@ -413,19 +413,28 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener, 
     }
 
     @Override
-    public void sendGuidedPoint(LatLongAlt point, boolean force) throws RemoteException {
+    public void sendGuidedPoint(LatLong point, boolean force) throws RemoteException {
         GuidedPoint guidedPoint = getDroneMgr().getDrone().getGuidedPoint();
         if(guidedPoint.isInitialized()){
             guidedPoint.newGuidedCoord(MathUtil.latLongToCoord2D(point));
-            guidedPoint.changeGuidedAltitude(point.getAltitude());
         }
         else if(force){
             try {
-                guidedPoint.forcedGuidedCoordinate(MathUtil.latLongToCoord2D(point), point.getAltitude());
+                guidedPoint.forcedGuidedCoordinate(MathUtil.latLongToCoord2D(point));
             } catch (Exception e) {
                 Log.e(TAG, e.getMessage(), e);
             }
         }
+    }
+
+    @Override
+    public void setGuidedAltitude(double altitude) throws RemoteException {
+        getDroneMgr().getDrone().getGuidedPoint().changeGuidedAltitude(altitude);
+    }
+
+    @Override
+    public void setGuidedVelocity(double xVel, double yVel, double zVel) throws RemoteException {
+        getDroneMgr().getDrone().getGuidedPoint().newGuidedVelocity(xVel, yVel, zVel);
     }
 
     @Override
