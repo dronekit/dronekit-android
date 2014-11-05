@@ -256,7 +256,7 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener, 
     public Battery getBattery() throws RemoteException {
         org.droidplanner.core.drone.variables.Battery droneBattery =getDroneMgr().getDrone().getBattery();
         return new Battery(droneBattery.getBattVolt(), droneBattery.getBattRemain(),
-                droneBattery.getBattCurrent());
+                droneBattery.getBattCurrent(), droneBattery.getBattDischarge());
     }
 
     @Override
