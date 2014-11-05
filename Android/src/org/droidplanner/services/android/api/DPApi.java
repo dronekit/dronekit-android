@@ -504,7 +504,7 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener, 
     @Override
     public void onStarted(List<ThreeSpacePoint> points) {
         Bundle paramsBundle = new Bundle();
-        paramsBundle.putParcelableArrayList(Extra.EXTRA_CALIBRATION_MAG_START_POINTS,
+        paramsBundle.putParcelableArrayList(Extra.EXTRA_CALIBRATION_MAG_POINTS,
                 MathUtil.threeSpacePointToPoint3D(points));
         try {
             getCallback().onDroneEvent(Event.EVENT_CALIBRATION_MAG_STARTED, paramsBundle);
@@ -516,14 +516,19 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener, 
     @Override
     public void newEstimation(FitPoints fit, List<ThreeSpacePoint> points) {
         double fitness = fit.getFitness();
-        double[] fitCenter = {fit.center.getEntry(0), fit.center.getEntry(1),
-                fit.center.getEntry(2)};
-        double[] fitRadii = {fit.radii.getEntry(0), fit.radii.getEntry(1), fit.radii.getEntry(2)};
+        double[] fitCenter = fit.center.isNaN()
+                ? null
+                : new double[]{fit.center.getEntry(0), fit.center.getEntry(1), fit.center.getEntry(2)};
+        double[] fitRadii = fit.radii.isNaN()
+                ? null
+                : new double[]{fit.radii.getEntry(0), fit.radii.getEntry(1), fit.radii.getEntry(2)};
 
-        Bundle paramsBundle = new Bundle(3);
+        Bundle paramsBundle = new Bundle(4);
         paramsBundle.putDouble(Extra.EXTRA_CALIBRATION_MAG_FITNESS, fitness);
         paramsBundle.putDoubleArray(Extra.EXTRA_CALIBRATION_MAG_FIT_CENTER, fitCenter);
         paramsBundle.putDoubleArray(Extra.EXTRA_CALIBRATION_MAG_FIT_RADII, fitRadii);
+        paramsBundle.putParcelableArrayList(Extra.EXTRA_CALIBRATION_MAG_POINTS,
+                MathUtil.threeSpacePointToPoint3D(points));
 
         try {
             getCallback().onDroneEvent(Event.EVENT_CALIBRATION_MAG_ESTIMATION, paramsBundle);
