@@ -8,6 +8,8 @@ import android.util.Log;
 
 import com.MAVLink.Messages.ApmModes;
 import com.MAVLink.Messages.enums.MAV_TYPE;
+import com.ox3dr.services.android.lib.coordinate.LatLng;
+import com.ox3dr.services.android.lib.coordinate.LatLngAlt;
 import com.ox3dr.services.android.lib.coordinate.Point3D;
 import com.ox3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.ox3dr.services.android.lib.drone.connection.ConnectionResult;
@@ -134,8 +136,12 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener, 
     @Override
     public Gps getGps() throws RemoteException {
         final GPS droneGps = getDroneMgr().getDrone().getGps();
-        return new Gps((float) droneGps.getPosition().getLat(), (float) droneGps.getPosition()
-                .getLng(), (float) droneGps.getGpsEPH(), droneGps.getSatCount(),
+        LatLng dronePosition = droneGps.isPositionValid()
+                ? new LatLng((float) droneGps.getPosition().getLat(), (float) droneGps.getPosition()
+                .getLng())
+                : null;
+
+        return new Gps(dronePosition, (float) droneGps.getGpsEPH(), droneGps.getSatCount(),
                 droneGps.getFixTypeNumeric());
     }
 
@@ -238,8 +244,12 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener, 
     @Override
     public Home getHome() throws RemoteException {
         org.droidplanner.core.drone.variables.Home droneHome =getDroneMgr().getDrone().getHome();
-        return new Home((float) droneHome.getCoord().getLat(), (float) droneHome.getCoord()
-                .getLng(), (float) droneHome.getAltitude().valueInMeters());
+        LatLngAlt homePosition = droneHome.isValid()
+                ? new LatLngAlt((float) droneHome.getCoord().getLat(), (float) droneHome.getCoord()
+                .getLng(), (float) droneHome.getAltitude().valueInMeters())
+                : null;
+
+        return new Home(homePosition);
     }
 
     @Override
