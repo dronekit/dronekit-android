@@ -2,7 +2,10 @@ package org.droidplanner.services.android.utils;
 
 import android.graphics.Point;
 
+import com.ox3dr.services.android.lib.coordinate.LatLong;
 import com.ox3dr.services.android.lib.coordinate.Point3D;
+
+import org.droidplanner.core.helpers.coordinates.Coord2D;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,5 +41,13 @@ public class MathUtil {
         }
 
         return spacePoints;
+    }
+
+    public static Coord2D latLongToCoord2D(LatLong latLong){
+        return new Coord2D(latLong.getLatitude(), latLong.getLongitude());
+    }
+
+    public static LatLong coord2DToLatLong(Coord2D coord){
+        return new LatLong((float)coord.getLat(), (float)coord.getLng());
     }
 }

@@ -19,6 +19,7 @@ import com.ox3dr.services.android.lib.drone.property.Altitude;
 import com.ox3dr.services.android.lib.drone.property.Attitude;
 import com.ox3dr.services.android.lib.drone.property.Battery;
 import com.ox3dr.services.android.lib.drone.property.Gps;
+import com.ox3dr.services.android.lib.drone.property.GuidedState;
 import com.ox3dr.services.android.lib.drone.property.Home;
 import com.ox3dr.services.android.lib.drone.property.Mission;
 import com.ox3dr.services.android.lib.drone.property.Signal;
@@ -34,9 +35,11 @@ import org.droidplanner.core.MAVLink.MavLinkArm;
 import org.droidplanner.core.drone.DroneInterfaces;
 import org.droidplanner.core.drone.variables.Calibration;
 import org.droidplanner.core.drone.variables.GPS;
+import org.droidplanner.core.drone.variables.GuidedPoint;
 import org.droidplanner.core.drone.variables.Orientation;
 import org.droidplanner.core.drone.variables.Radio;
 import org.droidplanner.core.drone.variables.helpers.MagnetometerCalibration;
+import org.droidplanner.core.helpers.coordinates.Coord2D;
 import org.droidplanner.core.model.Drone;
 import org.droidplanner.core.parameters.Parameter;
 import org.droidplanner.services.android.R;
@@ -292,6 +295,35 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener, 
     }
 
     @Override
+    public GuidedState getGuidedState() throws RemoteException {
+        final GuidedPoint guidedPoint = getDroneMgr().getDrone().getGuidedPoint();
+        int guidedState;
+        switch(guidedPoint.getState()){
+            default:
+            case UNINITIALIZED:
+                guidedState = GuidedState.STATE_UNINITIALIZED;
+                break;
+
+            case ACTIVE:
+                guidedState = GuidedState.STATE_ACTIVE;
+                break;
+
+            case IDLE:
+                guidedState = GuidedState.STATE_IDLE;
+                break;
+        }
+
+        Coord2D guidedCoord = guidedPoint.getCoord() == null
+                ? new Coord2D(0, 0)
+                : guidedPoint.getCoord();
+        double guidedAlt = guidedPoint.getAltitude() == null
+                ? 0
+                : guidedPoint.getAltitude().valueInMeters();
+        return new GuidedState(guidedState, new LatLongAlt((float)guidedCoord.getLat(),
+                (float) guidedCoord.getLng(), (float) guidedAlt));
+    }
+
+    @Override
     public void changeVehicleMode(VehicleMode newMode) throws RemoteException {
         int mavType;
         switch(newMode.getDroneType()){
@@ -372,6 +404,28 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener, 
     @Override
     public void sendIMUCalibrationAck(int step) throws RemoteException {
         getDroneMgr().getDrone().getCalibrationSetup().sendAckk(step);
+    }
+
+    @Override
+    public void doGuidedTakeoff(double altitude) throws RemoteException {
+        getDroneMgr().getDrone().getGuidedPoint().doGuidedTakeoff(new org.droidplanner.core
+                .helpers.units.Altitude(altitude));
+    }
+
+    @Override
+    public void sendGuidedPoint(LatLongAlt point, boolean force) throws RemoteException {
+        GuidedPoint guidedPoint = getDroneMgr().getDrone().getGuidedPoint();
+        if(guidedPoint.isInitialized()){
+            guidedPoint.newGuidedCoord(MathUtil.latLongToCoord2D(point));
+            guidedPoint.changeGuidedAltitude(point.getAltitude());
+        }
+        else if(force){
+            try {
+                guidedPoint.forcedGuidedCoordinate(MathUtil.latLongToCoord2D(point), point.getAltitude());
+            } catch (Exception e) {
+                Log.e(TAG, e.getMessage(), e);
+            }
+        }
     }
 
     @Override

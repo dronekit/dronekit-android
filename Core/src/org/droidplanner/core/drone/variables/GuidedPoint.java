@@ -19,7 +19,7 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener {
 
     private Runnable mPostInitializationTask;
 
-	private enum GuidedStates {
+	public enum GuidedStates {
 		UNINITIALIZED, IDLE, ACTIVE
 	}
 
@@ -130,6 +130,28 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener {
         }
 	}
 
+    public void forcedGuidedCoordinate(final Coord2D coord, final double alt) throws Exception {
+        if ((myDrone.getGps().getFixTypeNumeric() != GPS.LOCK_3D)) {
+            throw new Exception("Bad GPS for guided");
+        }
+
+        if(isInitialized()) {
+            changeCoord(coord);
+            changeAlt(alt);
+        }
+        else{
+            mPostInitializationTask = new Runnable() {
+                @Override
+                public void run() {
+                    changeCoord(coord);
+                    changeAlt(alt);
+                }
+            };
+
+            changeToGuidedMode(myDrone);
+        }
+    }
+
 	private void initialize() {
 		if (state == GuidedStates.UNINITIALIZED) {
 			coord = myDrone.getGps().getPosition();
@@ -215,6 +237,10 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener {
 	public boolean isInitialized() {
 		return !(state == GuidedStates.UNINITIALIZED);
 	}
+
+    public GuidedStates getState(){
+        return state;
+    }
 
     public static float getMinAltitude(Drone drone){
         final int droneType = drone.getType();
