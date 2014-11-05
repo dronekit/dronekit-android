@@ -449,7 +449,9 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener, 
                     break;
 
                 case GUIDEDPOINT:
+                    callback.onDroneEvent(Event.EVENT_GUIDED_POINT, emptyBundle);
                     break;
+
                 case NAVIGATION:
                     break;
 
@@ -462,6 +464,7 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener, 
                 case RC_OUT:
                     break;
 
+                case ARMING_STARTED:
                 case ARMING:
                     callback.onDroneEvent(Event.EVENT_ARMING, emptyBundle);
                     break;
@@ -563,20 +566,24 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener, 
 
                 case MISSION_SENT:
                     break;
-                case ARMING_STARTED:
-                    break;
                 case INVALID_POLYGON:
                     break;
                 case MISSION_WP_UPDATE:
                     break;
+
                 case FOLLOW_START:
+                    callback.onDroneEvent(Event.EVENT_FOLLOW_START, emptyBundle);
                     break;
+
                 case FOLLOW_STOP:
+                    callback.onDroneEvent(Event.EVENT_FOLLOW_STOP, emptyBundle);
                     break;
+
                 case FOLLOW_UPDATE:
-                    break;
                 case FOLLOW_CHANGE_TYPE:
+                    callback.onDroneEvent(Event.EVENT_FOLLOW_UPDATE, emptyBundle);
                     break;
+
                 case WARNING_400FT_EXCEEDED:
                     break;
                 case WARNING_SIGNAL_WEAK:
