@@ -28,6 +28,8 @@ import com.ox3dr.services.android.lib.drone.property.State;
 import com.ox3dr.services.android.lib.drone.property.Type;
 import com.ox3dr.services.android.lib.drone.property.VehicleMode;
 import com.ox3dr.services.android.lib.drone.property.Parameters;
+import com.ox3dr.services.android.lib.gcs.follow.FollowMode;
+import com.ox3dr.services.android.lib.gcs.follow.FollowState;
 import com.ox3dr.services.android.lib.model.IDroidPlannerApi;
 import com.ox3dr.services.android.lib.model.IDroidPlannerApiCallback;
 
@@ -39,6 +41,8 @@ import org.droidplanner.core.drone.variables.GuidedPoint;
 import org.droidplanner.core.drone.variables.Orientation;
 import org.droidplanner.core.drone.variables.Radio;
 import org.droidplanner.core.drone.variables.helpers.MagnetometerCalibration;
+import org.droidplanner.core.gcs.follow.Follow;
+import org.droidplanner.core.gcs.follow.FollowAlgorithm;
 import org.droidplanner.core.helpers.coordinates.Coord2D;
 import org.droidplanner.core.model.Drone;
 import org.droidplanner.core.parameters.Parameter;
@@ -435,6 +439,127 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener, 
     @Override
     public void setGuidedVelocity(double xVel, double yVel, double zVel) throws RemoteException {
         getDroneMgr().getDrone().getGuidedPoint().newGuidedVelocity(xVel, yVel, zVel);
+    }
+
+    @Override
+    public void enableFollowMe(FollowMode followMode) throws RemoteException {
+        final FollowAlgorithm.FollowModes selectedMode;
+        switch(followMode.getFollowType()){
+            case FollowMode.TYPE_ABOVE:
+                selectedMode = FollowAlgorithm.FollowModes.ABOVE;
+                break;
+
+            case FollowMode.TYPE_LEAD:
+                selectedMode = FollowAlgorithm.FollowModes.LEAD;
+                break;
+
+            case FollowMode.TYPE_LEASH:
+                selectedMode = FollowAlgorithm.FollowModes.LEASH;
+                break;
+
+            case FollowMode.TYPE_CIRCLE:
+                selectedMode = FollowAlgorithm.FollowModes.CIRCLE;
+                break;
+
+            case FollowMode.TYPE_LEFT:
+                selectedMode = FollowAlgorithm.FollowModes.LEFT;
+                break;
+
+            case FollowMode.TYPE_RIGHT:
+                selectedMode = FollowAlgorithm.FollowModes.RIGHT;
+                break;
+
+            default:
+                selectedMode = null;
+                break;
+        }
+
+        if(selectedMode != null){
+            final Follow followMe = getDroneMgr().getFollowMe();
+            if(!followMe.isEnabled())
+                followMe.toggleFollowMeState();
+
+            followMe.setType(selectedMode);
+        }
+    }
+
+    @Override
+    public FollowState getFollowState() throws RemoteException {
+        final Follow followMe = getDroneMgr().getFollowMe();
+        final double radius = followMe.getRadius().valueInMeters();
+
+        final int state;
+        switch(followMe.getState()){
+
+            default:
+            case FOLLOW_INVALID_STATE:
+                state = FollowState.STATE_INVALID;
+                break;
+
+            case FOLLOW_DRONE_NOT_ARMED:
+                state = FollowState.STATE_DRONE_NOT_ARMED;
+                break;
+
+            case FOLLOW_DRONE_DISCONNECTED:
+                state = FollowState.STATE_DRONE_DISCONNECTED;
+                break;
+
+            case FOLLOW_START:
+                state = FollowState.STATE_START;
+                break;
+
+            case FOLLOW_RUNNING:
+                state = FollowState.STATE_RUNNING;
+                break;
+
+            case FOLLOW_END:
+                state = FollowState.STATE_END;
+                break;
+        }
+
+        final FollowMode followMode;
+        final FollowAlgorithm.FollowModes followType = followMe.getType();
+        final String followTypeLabel = followType.toString();
+        switch(followType){
+            default:
+            case LEASH:
+                followMode = new FollowMode(FollowMode.TYPE_LEASH, followTypeLabel);
+                break;
+
+            case LEAD:
+                followMode = new FollowMode(FollowMode.TYPE_LEAD, followTypeLabel);
+                break;
+
+            case RIGHT:
+                followMode = new FollowMode(FollowMode.TYPE_RIGHT, followTypeLabel);
+                break;
+
+            case LEFT:
+                followMode = new FollowMode(FollowMode.TYPE_LEFT, followTypeLabel);
+                break;
+
+            case CIRCLE:
+                followMode = new FollowMode(FollowMode.TYPE_CIRCLE, followTypeLabel);
+                break;
+
+            case ABOVE:
+                followMode = new FollowMode(FollowMode.TYPE_ABOVE, followTypeLabel);
+                break;
+        }
+
+        return new FollowState(state, radius, followMode);
+    }
+
+    @Override
+    public void setFollowMeRadius(double radius) throws RemoteException {
+        getDroneMgr().getFollowMe().changeRadius(radius);
+    }
+
+    @Override
+    public void disableFollowMe() throws RemoteException {
+        Follow follow = getDroneMgr().getFollowMe();
+        if(follow.isEnabled())
+            follow.toggleFollowMeState();
     }
 
     @Override
