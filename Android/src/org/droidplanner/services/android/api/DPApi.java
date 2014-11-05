@@ -1,5 +1,6 @@
 package org.droidplanner.services.android.api;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.util.Log;
@@ -32,6 +33,7 @@ import org.droidplanner.core.drone.variables.Orientation;
 import org.droidplanner.core.drone.variables.helpers.MagnetometerCalibration;
 import org.droidplanner.core.model.Drone;
 import org.droidplanner.core.parameters.Parameter;
+import org.droidplanner.services.android.R;
 import org.droidplanner.services.android.drone.DroneManager;
 import org.droidplanner.services.android.exception.ConnectionException;
 import org.droidplanner.services.android.interfaces.DroneEventsListener;
@@ -58,6 +60,8 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener, 
 
     private final Bundle emptyBundle = new Bundle();
     private final WeakReference<DroidPlannerService> serviceRef;
+    private final Context context;
+
     private MagnetometerCalibration magCalibration;
 
     private IDroidPlannerApiCallback apiCallback;
@@ -67,6 +71,7 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener, 
     DPApi(DroidPlannerService dpService, ConnectionParameter connParams,
           IDroidPlannerApiCallback callback) throws RemoteException {
         serviceRef = new WeakReference<DroidPlannerService>(dpService);
+        this.context = dpService.getApplicationContext();
 
         this.apiCallback = callback;
         this.connParams = connParams;
@@ -333,6 +338,21 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener, 
     }
 
     @Override
+    public void startIMUCalibration() throws RemoteException {
+        if(!getDroneMgr().getDrone().getCalibrationSetup().startCalibration()){
+            Bundle extrasBundle = new Bundle(1);
+            extrasBundle.putString(Extra.EXTRA_CALIBRATION_IMU_MESSAGE,
+                    context.getString(R.string.failed_start_calibration_message));
+            getCallback().onDroneEvent(Event.EVENT_CALIBRATION_IMU_ERROR, extrasBundle);
+        }
+    }
+
+    @Override
+    public void sendIMUCalibrationAck(int step) throws RemoteException {
+        getDroneMgr().getDrone().getCalibrationSetup().sendAckk(step);
+    }
+
+    @Override
     public void onDroneEvent(DroneInterfaces.DroneEventsType event, Drone drone) {
         final IDroidPlannerApiCallback callback = getCallback();
         Bundle extrasBundle;
@@ -416,7 +436,7 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener, 
                     break;
 
                 case CALIBRATION_TIMEOUT:
-                    callback.onDroneEvent(Event.EVENT_CALIBRATION_TIMEOUT, emptyBundle);
+                    callback.onDroneEvent(Event.EVENT_CALIBRATION_IMU_TIMEOUT, emptyBundle);
                     break;
 
                 case HEARTBEAT_TIMEOUT:
