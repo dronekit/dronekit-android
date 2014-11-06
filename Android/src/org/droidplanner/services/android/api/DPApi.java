@@ -160,31 +160,126 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener, 
         org.droidplanner.core.drone.variables.State droneState = drone.getState();
         ApmModes droneMode = droneState.getMode();
 
-        return new State(getProxyMode(droneMode), droneState.isArmed(),
+        return new State(getVehicleMode(droneMode), droneState.isArmed(),
                 droneState.isFlying(), droneState.getWarning(), drone.getMavlinkVersion());
-    }
-
-    private static VehicleMode getProxyMode(ApmModes mode){
-        final int proxyType = getDroneProxyType(mode.getType());
-        if(proxyType == -1) return null;
-
-        return new VehicleMode(mode.getNumber(), proxyType, mode.getName());
     }
 
     @Override
     public VehicleMode[] getAllVehicleModes() throws RemoteException {
         final int droneType = getDroneMgr().getDrone().getType();
-        final int proxyType = getDroneProxyType(droneType);
 
         List<ApmModes> typeModes = ApmModes.getModeList(droneType);
         final int modesCount = typeModes.size();
         VehicleMode[] vehicleModes = new VehicleMode[modesCount];
         for(int i = 0; i < modesCount; i++){
-            ApmModes mode = typeModes.get(i);
-            vehicleModes[i] = new VehicleMode(mode.getNumber(), proxyType, mode.getName());
+            vehicleModes[i] = getVehicleMode(typeModes.get(i));
         }
 
         return vehicleModes;
+    }
+
+    private static VehicleMode getVehicleMode(ApmModes mode){
+        switch(mode){
+            case FIXED_WING_MANUAL:
+                return VehicleMode.PLANE_MANUAL;
+            case FIXED_WING_CIRCLE:
+                return VehicleMode.PLANE_CIRCLE;
+                
+            case FIXED_WING_STABILIZE:
+                return VehicleMode.PLANE_STABILIZE;
+                
+            case FIXED_WING_TRAINING:
+                return VehicleMode.PLANE_TRAINING;
+                
+            case FIXED_WING_FLY_BY_WIRE_A:
+                return VehicleMode.PLANE_FLY_BY_WIRE_A;
+                
+            case FIXED_WING_FLY_BY_WIRE_B:
+                return VehicleMode.PLANE_FLY_BY_WIRE_B;
+                
+            case FIXED_WING_AUTO:
+                return VehicleMode.PLANE_AUTO;
+                
+            case FIXED_WING_RTL:
+                return VehicleMode.PLANE_RTL;
+                
+            case FIXED_WING_LOITER:
+                return VehicleMode.PLANE_LOITER;
+                
+            case FIXED_WING_GUIDED:
+                return VehicleMode.PLANE_GUIDED;
+                
+
+            case ROTOR_STABILIZE:
+                return VehicleMode.COPTER_STABILIZE;
+                
+            case ROTOR_ACRO:
+                return VehicleMode.COPTER_ACRO;
+                
+            case ROTOR_ALT_HOLD:
+                return VehicleMode.COPTER_ALT_HOLD;
+                
+            case ROTOR_AUTO:
+                return VehicleMode.COPTER_AUTO;
+                
+            case ROTOR_GUIDED:
+                return VehicleMode.COPTER_GUIDED;
+                
+            case ROTOR_LOITER:
+                return VehicleMode.COPTER_LOITER;
+                
+            case ROTOR_RTL:
+                return VehicleMode.COPTER_RTL;
+                
+            case ROTOR_CIRCLE:
+                return VehicleMode.COPTER_CIRCLE;
+                
+            case ROTOR_LAND:
+                return VehicleMode.COPTER_LAND;
+                
+            case ROTOR_TOY:
+                return VehicleMode.COPTER_DRIFT;
+                
+            case ROTOR_SPORT:
+                return VehicleMode.COPTER_SPORT;
+                
+            case ROTOR_AUTOTUNE:
+                return VehicleMode.COPTER_AUTOTUNE;
+                
+            case ROTOR_POSHOLD:
+                return VehicleMode.COPTER_POSHOLD;
+                
+
+            case ROVER_MANUAL:
+                return VehicleMode.ROVER_MANUAL;
+                
+            case ROVER_LEARNING:
+                return VehicleMode.ROVER_LEARNING;
+                
+            case ROVER_STEERING:
+                return VehicleMode.ROVER_STEERING;
+                
+            case ROVER_HOLD:
+                return VehicleMode.ROVER_HOLD;
+                
+            case ROVER_AUTO:
+                return VehicleMode.ROVER_AUTO;
+                
+            case ROVER_RTL:
+                return VehicleMode.ROVER_RTL;
+                
+            case ROVER_GUIDED:
+                return VehicleMode.ROVER_GUIDED;
+                
+            case ROVER_INITIALIZING:
+                return VehicleMode.ROVER_INITIALIZING;
+                
+
+            default:
+            case UNKNOWN:
+                return null;
+                
+        }
     }
 
     private static int getDroneProxyType(int originalType){
