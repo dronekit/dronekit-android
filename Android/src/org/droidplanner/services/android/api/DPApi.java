@@ -521,7 +521,7 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener, 
     }
 
     @Override
-    public FollowType[] getFollowModes() throws RemoteException {
+    public FollowType[] getFollowTypes() throws RemoteException {
         final FollowAlgorithm.FollowModes[] followModes = FollowAlgorithm.FollowModes.values();
         final int modesCount = followModes.length;
         final FollowType[] followTypes = new FollowType[modesCount];
