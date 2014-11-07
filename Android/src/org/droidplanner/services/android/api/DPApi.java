@@ -15,7 +15,7 @@ import com.ox3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.ox3dr.services.android.lib.drone.connection.ConnectionResult;
 import com.ox3dr.services.android.lib.drone.event.Event;
 import com.ox3dr.services.android.lib.drone.event.Extra;
-import com.ox3dr.services.android.lib.drone.mission.item.complex.CameraInfo;
+import com.ox3dr.services.android.lib.drone.mission.item.complex.CameraDetail;
 import com.ox3dr.services.android.lib.drone.property.Altitude;
 import com.ox3dr.services.android.lib.drone.property.Attitude;
 import com.ox3dr.services.android.lib.drone.property.Battery;
@@ -47,6 +47,7 @@ import org.droidplanner.core.gcs.follow.Follow;
 import org.droidplanner.core.gcs.follow.FollowAlgorithm;
 import org.droidplanner.core.helpers.coordinates.Coord2D;
 import org.droidplanner.core.model.Drone;
+import org.droidplanner.core.mission.survey.CameraInfo;
 import org.droidplanner.core.parameters.Parameter;
 import org.droidplanner.services.android.R;
 import org.droidplanner.services.android.drone.DroneManager;
@@ -636,11 +637,29 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener, 
     }
 
     @Override
-    public CameraInfo[] getCameraInfos() throws RemoteException {
+    public CameraDetail[] getCameraDetails() throws RemoteException {
         final CameraInfoLoader camInfoLoader = getDroneMgr().getCameraInfoLoader();
-        List<String> cameraInfoList = camInfoLoader.getCameraInfoList();
-        List<CameraInfo> cameraInfos = new ArrayList<CameraInfo>(cameraInfoList.size());
-        return new CameraInfo[0];
+        List<String> cameraInfoNames = camInfoLoader.getCameraInfoList();
+
+        List<CameraInfo> cameraInfos = new ArrayList<CameraInfo>(cameraInfoNames.size());
+        for(String infoName : cameraInfoNames){
+            try {
+                cameraInfos.add(camInfoLoader.openFile(infoName));
+            } catch (Exception e) {
+                Log.e(TAG, e.getMessage(), e);
+            }
+        }
+
+        final int infoCount = cameraInfos.size();
+        CameraDetail[] cameraDetails = new CameraDetail[infoCount];
+        for(int i = 0; i < infoCount; i++){
+            CameraInfo camInfo = cameraInfos.get(i);
+            cameraDetails[i] = new CameraDetail(camInfo.name, camInfo.sensorWidth,
+                    camInfo.sensorHeight, camInfo.sensorResolution, camInfo.focalLength,
+                    camInfo.overlap, camInfo.sidelap, camInfo.isInLandscapeOrientation);
+        }
+
+        return cameraDetails;
     }
 
     private static FollowType followModeToType(FollowAlgorithm.FollowModes followMode){
