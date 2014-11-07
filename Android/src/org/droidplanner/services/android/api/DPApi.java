@@ -15,6 +15,7 @@ import com.ox3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.ox3dr.services.android.lib.drone.connection.ConnectionResult;
 import com.ox3dr.services.android.lib.drone.event.Event;
 import com.ox3dr.services.android.lib.drone.event.Extra;
+import com.ox3dr.services.android.lib.drone.mission.item.complex.CameraInfo;
 import com.ox3dr.services.android.lib.drone.property.Altitude;
 import com.ox3dr.services.android.lib.drone.property.Attitude;
 import com.ox3dr.services.android.lib.drone.property.Battery;
@@ -34,6 +35,7 @@ import com.ox3dr.services.android.lib.model.IDroidPlannerApi;
 import com.ox3dr.services.android.lib.model.IDroidPlannerApiCallback;
 
 import org.droidplanner.core.MAVLink.MavLinkArm;
+import org.droidplanner.core.MAVLink.MavLinkROI;
 import org.droidplanner.core.drone.DroneInterfaces;
 import org.droidplanner.core.drone.variables.Calibration;
 import org.droidplanner.core.drone.variables.GPS;
@@ -52,6 +54,7 @@ import org.droidplanner.services.android.exception.ConnectionException;
 import org.droidplanner.services.android.interfaces.DroneEventsListener;
 import org.droidplanner.services.android.utils.MathUtil;
 import org.droidplanner.services.android.utils.file.IO.ParameterMetadataLoader;
+import org.droidplanner.services.android.utils.file.help.CameraInfoLoader;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
@@ -471,6 +474,11 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener, 
     }
 
     @Override
+    public void generateDronie() throws RemoteException {
+        getDroneMgr().getDrone().getMission().makeAndUploadDronie();
+    }
+
+    @Override
     public void arm(boolean arm) throws RemoteException {
         MavLinkArm.sendArmMessage(getDroneMgr().getDrone(), arm);
     }
@@ -537,30 +545,30 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener, 
     }
 
     @Override
-    public void enableFollowMe(int followType) throws RemoteException {
+    public void enableFollowMe(FollowType followType) throws RemoteException {
         final FollowAlgorithm.FollowModes selectedMode;
         switch(followType){
-            case FollowType.TYPE_ABOVE:
+            case ABOVE:
                 selectedMode = FollowAlgorithm.FollowModes.ABOVE;
                 break;
 
-            case FollowType.TYPE_LEAD:
+            case LEAD:
                 selectedMode = FollowAlgorithm.FollowModes.LEAD;
                 break;
 
-            case FollowType.TYPE_LEASH:
+            case LEASH:
                 selectedMode = FollowAlgorithm.FollowModes.LEASH;
                 break;
 
-            case FollowType.TYPE_CIRCLE:
+            case CIRCLE:
                 selectedMode = FollowAlgorithm.FollowModes.CIRCLE;
                 break;
 
-            case FollowType.TYPE_LEFT:
+            case LEFT:
                 selectedMode = FollowAlgorithm.FollowModes.LEFT;
                 break;
 
-            case FollowType.TYPE_RIGHT:
+            case RIGHT:
                 selectedMode = FollowAlgorithm.FollowModes.RIGHT;
                 break;
 
@@ -627,6 +635,14 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener, 
         return followTypes;
     }
 
+    @Override
+    public CameraInfo[] getCameraInfos() throws RemoteException {
+        final CameraInfoLoader camInfoLoader = getDroneMgr().getCameraInfoLoader();
+        List<String> cameraInfoList = camInfoLoader.getCameraInfoList();
+        List<CameraInfo> cameraInfos = new ArrayList<CameraInfo>(cameraInfoList.size());
+        return new CameraInfo[0];
+    }
+
     private static FollowType followModeToType(FollowAlgorithm.FollowModes followMode){
         final FollowType followType;
 
@@ -634,27 +650,27 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener, 
         switch(followMode){
             default:
             case LEASH:
-                followType = new FollowType(FollowType.TYPE_LEASH, followTypeLabel);
+                followType = FollowType.LEASH;
                 break;
 
             case LEAD:
-                followType = new FollowType(FollowType.TYPE_LEAD, followTypeLabel);
+                followType = FollowType.LEAD;
                 break;
 
             case RIGHT:
-                followType = new FollowType(FollowType.TYPE_RIGHT, followTypeLabel);
+                followType = FollowType.RIGHT;
                 break;
 
             case LEFT:
-                followType = new FollowType(FollowType.TYPE_LEFT, followTypeLabel);
+                followType = FollowType.LEFT;
                 break;
 
             case CIRCLE:
-                followType = new FollowType(FollowType.TYPE_CIRCLE, followTypeLabel);
+                followType = FollowType.CIRCLE;
                 break;
 
             case ABOVE:
-                followType = new FollowType(FollowType.TYPE_ABOVE, followTypeLabel);
+                followType = FollowType.ABOVE;
                 break;
         }
 
@@ -671,6 +687,26 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener, 
         Follow follow = getDroneMgr().getFollowMe();
         if(follow.isEnabled())
             follow.toggleFollowMeState();
+    }
+
+    @Override
+    public void enableDroneShare(String username, String password, boolean isEnabled) throws RemoteException {
+        //TODO: to be completed.
+    }
+
+    @Override
+    public void triggerCamera() throws RemoteException {
+        MavLinkROI.triggerCamera(getDroneMgr().getDrone());
+    }
+
+    @Override
+    public void epmCommand(boolean release) throws RemoteException {
+        MavLinkROI.empCommand(getDroneMgr().getDrone(), release);
+    }
+
+    @Override
+    public void loadWaypoints() throws RemoteException {
+        getDroneMgr().getDrone().getWaypointManager().getWaypoints();
     }
 
     @Override

@@ -22,6 +22,7 @@ import org.droidplanner.services.android.communication.service.MAVLinkClient;
 import org.droidplanner.services.android.exception.ConnectionException;
 import org.droidplanner.services.android.interfaces.DroneEventsListener;
 import org.droidplanner.services.android.location.FusedLocation;
+import org.droidplanner.services.android.utils.file.help.CameraInfoLoader;
 import org.droidplanner.services.android.utils.prefs.DroidPlannerPrefs;
 
 import java.util.List;
@@ -39,6 +40,7 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream, DroneEve
 
     private final Drone drone;
     private final Follow followMe;
+    private final CameraInfoLoader cameraInfoLoader;
     private final DroneInterfaces.Handler dpHandler;
     private final ConnectionParameter connectionParams;
     private final MavLinkMsgHandler mavLinkMsgHandler;
@@ -46,6 +48,8 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream, DroneEve
     public DroneManager(Context context, final Handler handler,
                         MavLinkServiceApi mavlinkApi, ConnectionParameter connParams)
             throws ConnectionException {
+
+        this.cameraInfoLoader = new CameraInfoLoader(context);
 
         this.connectionParams = connParams;
         MAVLinkClient mavClient = new MAVLinkClient(this, mavlinkApi, connParams);
@@ -149,6 +153,10 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream, DroneEve
 
     public boolean isConnected(){
         return drone.getMavClient().isConnected();
+    }
+
+    public CameraInfoLoader getCameraInfoLoader(){
+        return cameraInfoLoader;
     }
 
     @Override
