@@ -18,6 +18,7 @@ import com.ox3dr.services.android.lib.drone.property.GuidedState;
 import com.ox3dr.services.android.lib.coordinate.LatLong;
 import com.ox3dr.services.android.lib.gcs.follow.FollowState;
 import com.ox3dr.services.android.lib.gcs.follow.FollowType;
+import com.ox3dr.services.android.lib.drone.mission.item.complex.CameraInfo;
 
 /**
 * Interface used to access the drone properties.
@@ -111,6 +112,11 @@ interface IDroidPlannerApi {
         * Return a list of support follow modes on the connected drone.
         */
         FollowType[] getFollowTypes();
+
+        /**
+        * Return the set of camera information available for the connected drone.
+        */
+        CameraInfo[] getCameraInfos();
 
         /*** Oneway method calls ***/
 
@@ -207,7 +213,7 @@ interface IDroidPlannerApi {
         * Enables follow-me if disabled.
         * @param followMode follow-me mode to use.
         */
-        oneway void enableFollowMe(int followType);
+        oneway void enableFollowMe(in FollowType followType);
 
         /**
         * Sets the follow-me radius.
@@ -219,4 +225,15 @@ interface IDroidPlannerApi {
         * Disables follow me is enabled.
         */
         oneway void disableFollowMe();
+
+        /**
+        * Enables drone-share upload for the data of the connected drone.
+        */
+        oneway void enableDroneShare(String username, String password, boolean isEnabled);
+
+        oneway void triggerCamera();
+
+        oneway void epmCommand(boolean release);
+
+        oneway void loadWaypoints();
 }
