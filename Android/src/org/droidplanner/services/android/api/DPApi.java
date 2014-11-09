@@ -16,6 +16,9 @@ import com.ox3dr.services.android.lib.drone.connection.ConnectionResult;
 import com.ox3dr.services.android.lib.drone.event.Event;
 import com.ox3dr.services.android.lib.drone.event.Extra;
 import com.ox3dr.services.android.lib.drone.mission.item.complex.CameraDetail;
+import com.ox3dr.services.android.lib.drone.mission.item.complex.StructureScanner;
+import com.ox3dr.services.android.lib.drone.mission.item.complex.Survey;
+import com.ox3dr.services.android.lib.drone.mission.item.raw.MissionItemMessage;
 import com.ox3dr.services.android.lib.drone.property.Altitude;
 import com.ox3dr.services.android.lib.drone.property.Attitude;
 import com.ox3dr.services.android.lib.drone.property.Battery;
@@ -375,7 +378,16 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener, 
 
     @Override
     public Mission getMission() throws RemoteException {
-        throw new UnsupportedOperationException("Method not implemented");
+        //TODO: complete implementation
+        throw new UnsupportedOperationException("Method not yet implemented.");
+
+    }
+
+    @Override
+    public MissionItemMessage[] getRawMissionItems() throws RemoteException {
+        //TODO: complete implementation
+        throw new UnsupportedOperationException("Method not yet implemented.");
+//        return new MissionItemMessage[0];
     }
 
     @Override
@@ -470,8 +482,16 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener, 
     }
 
     @Override
-    public void sendMission(Mission mission) throws RemoteException {
-        throw new UnsupportedOperationException("Method not implemented");
+    public void setMission(Mission mission, boolean pushToDrone) throws RemoteException {
+        //TODO: complete implementation
+        throw new UnsupportedOperationException("Method not yet implemented.");
+
+    }
+
+    @Override
+    public void setRawMissionItems(MissionItemMessage[] missionItems, boolean pushToDrone) throws RemoteException {
+        //TODO: complete implementation
+        throw new UnsupportedOperationException("Method not yet implemented.");
     }
 
     @Override
@@ -662,6 +682,20 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener, 
         return cameraDetails;
     }
 
+    @Override
+    public Survey updateSurveyMissionItem(Survey survey) throws RemoteException {
+        //TODO: complete implementation
+        throw new UnsupportedOperationException("Method not yet implemented.");
+
+    }
+
+    @Override
+    public StructureScanner updateStructureScanner(StructureScanner item) throws RemoteException {
+        //TODO: complete implementation
+        throw new UnsupportedOperationException("Method not yet implemented.");
+
+    }
+
     private static FollowType followModeToType(FollowAlgorithm.FollowModes followMode){
         final FollowType followType;
 
@@ -710,7 +744,9 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener, 
 
     @Override
     public void enableDroneShare(String username, String password, boolean isEnabled) throws RemoteException {
-        //TODO: to be completed.
+        //TODO: complete implementation
+        throw new UnsupportedOperationException("Method not yet implemented.");
+
     }
 
     @Override

@@ -9,6 +9,7 @@ import com.ox3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.ox3dr.services.android.lib.model.IDroidPlannerApi;
 import com.ox3dr.services.android.lib.model.IDroidPlannerApiCallback;
 import com.ox3dr.services.android.lib.model.IDroidPlannerServices;
+import com.ox3dr.services.android.lib.model.ITLogApi;
 
 import java.lang.ref.WeakReference;
 
@@ -20,9 +21,11 @@ final class DPServices extends IDroidPlannerServices.Stub {
     private final static String TAG = DPServices.class.getSimpleName();
 
     private final WeakReference<DroidPlannerService> serviceRef;
+    private final TLogApi tlogApi;
 
     DPServices(DroidPlannerService service) {
         serviceRef = new WeakReference<DroidPlannerService>(service);
+        this.tlogApi = new TLogApi(service.getApplicationContext());
     }
 
     private DroidPlannerService getService() {
@@ -37,5 +40,10 @@ final class DPServices extends IDroidPlannerServices.Stub {
     public IDroidPlannerApi connectToDrone(ConnectionParameter params,
                                            IDroidPlannerApiCallback callback) throws RemoteException {
         return getService().connectToApi(params, callback);
+    }
+
+    @Override
+    public ITLogApi getTLogApi() throws RemoteException {
+        return tlogApi;
     }
 }
