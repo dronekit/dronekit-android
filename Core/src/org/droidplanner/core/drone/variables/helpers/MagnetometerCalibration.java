@@ -25,7 +25,7 @@ public class MagnetometerCalibration implements OnDroneListener {
     public interface OnMagCalibrationListener {
         public void onStarted(List<ThreeSpacePoint> points);
         public void newEstimation(FitPoints fit, List<ThreeSpacePoint> points);
-        public void finished(FitPoints fit);
+        public void finished(FitPoints fit, double[] offsets);
     }
 
     private final DroneInterfaces.Handler handler;
@@ -49,7 +49,7 @@ public class MagnetometerCalibration implements OnDroneListener {
         public void run() {
             handler.removeCallbacks(this);
             if(listener != null){
-                listener.finished(ellipsoidFit);
+                listener.finished(ellipsoidFit, getOffsets());
             }
         }
     };
@@ -157,6 +157,11 @@ public class MagnetometerCalibration implements OnDroneListener {
             this.handler.post(stopCalibration);
 		}
 	}
+
+    public double[] getOffsets(){
+        return new double[]{-ellipsoidFit.center.getEntry(0), -ellipsoidFit.center.getEntry
+                (1), -ellipsoidFit.center.getEntry(2)};
+    }
 
 	public double[] sendOffsets() throws Exception {
 		Parameter offsetX = drone.getParameters().getParameter("COMPASS_OFS_X");

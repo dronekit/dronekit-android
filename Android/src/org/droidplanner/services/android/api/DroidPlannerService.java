@@ -24,7 +24,6 @@ import org.droidplanner.services.android.communication.connection.AndroidUdpConn
 import org.droidplanner.services.android.communication.connection.BluetoothConnection;
 import org.droidplanner.services.android.communication.connection.usb.UsbConnection;
 import org.droidplanner.services.android.drone.DroneManager;
-import org.droidplanner.services.android.exception.ConnectionException;
 import org.droidplanner.services.android.utils.analytics.GAUtils;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -53,8 +52,8 @@ public class DroidPlannerService extends Service {
      * Caches droidplanner api instances per connection type and client.
      */
     private final ConcurrentHashMap<ConnectionParameter, ConcurrentHashMap<IBinder,
-            IDroidPlannerApi>> dpApisCache = new ConcurrentHashMap<ConnectionParameter,
-            ConcurrentHashMap<IBinder, IDroidPlannerApi>>();
+            DPApi>> dpApisCache = new ConcurrentHashMap<ConnectionParameter,
+            ConcurrentHashMap<IBinder, DPApi>>();
 
     /**
      * Caches mavlink connections per connection type.
@@ -70,11 +69,11 @@ public class DroidPlannerService extends Service {
     IDroidPlannerApi connectToApi(ConnectionParameter connParams, IDroidPlannerApiCallback callback)
             throws RemoteException {
 
-        ConcurrentHashMap<IBinder, IDroidPlannerApi> binderApis = dpApisCache.get(connParams);
+        ConcurrentHashMap<IBinder, DPApi> binderApis = dpApisCache.get(connParams);
         if (binderApis == null) {
-            binderApis = new ConcurrentHashMap<IBinder, IDroidPlannerApi>();
-            ConcurrentHashMap<IBinder, IDroidPlannerApi> previous = dpApisCache.putIfAbsent
-                    (connParams, binderApis);
+            binderApis = new ConcurrentHashMap<IBinder, DPApi>();
+            ConcurrentHashMap<IBinder, DPApi> previous = dpApisCache
+                    .putIfAbsent(connParams, binderApis);
 
             if (previous != null)
                 binderApis = previous;
@@ -82,12 +81,11 @@ public class DroidPlannerService extends Service {
 
         //Check if a droidplanner api was already generated for this binder.
         IBinder callbackBinder = callback.asBinder();
-        IDroidPlannerApi dpApi = binderApis.get(callbackBinder);
+        DPApi dpApi = binderApis.get(callbackBinder);
         if (dpApi == null) {
             dpApi = new DPApi(this, connParams, callback);
 
-            IDroidPlannerApi previous = binderApis.putIfAbsent(callbackBinder, dpApi);
-
+            DPApi previous = binderApis.putIfAbsent(callbackBinder, dpApi);
             if (previous != null)
                 dpApi = previous;
         }
@@ -97,12 +95,18 @@ public class DroidPlannerService extends Service {
 
     boolean disconnectFromApi(final ConnectionParameter connParams,
                               IDroidPlannerApiCallback callback) {
-        ConcurrentHashMap<IBinder, IDroidPlannerApi> binderApis = dpApisCache.get(connParams);
+        ConcurrentHashMap<IBinder, DPApi> binderApis = dpApisCache.get(connParams);
         if (binderApis == null) {
             return false;
         }
 
-        boolean wasRemoved = binderApis.remove(callback.asBinder()) != null;
+        boolean wasRemoved = false;
+        DPApi dpApi = binderApis.remove(callback.asBinder());
+        if(dpApi != null){
+            dpApi.destroy();
+            wasRemoved = true;
+        }
+
         if (binderApis.isEmpty()) {
             dpApisCache.remove(connParams);
 
@@ -116,8 +120,7 @@ public class DroidPlannerService extends Service {
         return wasRemoved;
     }
 
-    DroneManager getDroneForConnection(final ConnectionParameter params) throws
-            ConnectionException {
+    DroneManager getDroneForConnection(final ConnectionParameter params) {
         DroneManager droneMgr = dronePerConnection.get(params);
         if (droneMgr == null) {
             droneMgr = new DroneManager(getApplicationContext(), handler, mavlinkApi, params);

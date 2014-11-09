@@ -45,7 +45,6 @@ import org.droidplanner.core.drone.variables.GPS;
 import org.droidplanner.core.drone.variables.GuidedPoint;
 import org.droidplanner.core.drone.variables.Orientation;
 import org.droidplanner.core.drone.variables.Radio;
-import org.droidplanner.core.drone.variables.helpers.MagnetometerCalibration;
 import org.droidplanner.core.gcs.follow.Follow;
 import org.droidplanner.core.gcs.follow.FollowAlgorithm;
 import org.droidplanner.core.helpers.coordinates.Coord2D;
@@ -74,7 +73,7 @@ import ellipsoidFit.ThreeSpacePoint;
 /**
 * Created by fhuya on 10/30/14.
 */
-final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener, MagnetometerCalibration.OnMagCalibrationListener {
+final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
 
     private final static String TAG = DPApi.class.getSimpleName();
 
@@ -82,10 +81,7 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener, 
     private final WeakReference<DroidPlannerService> serviceRef;
     private final Context context;
 
-    private MagnetometerCalibration magCalibration;
-
     private IDroidPlannerApiCallback apiCallback;
-    private ConnectionParameter connParams;
     private DroneManager droneMgr;
 
     DPApi(DroidPlannerService dpService, ConnectionParameter connParams,
@@ -94,17 +90,10 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener, 
         this.context = dpService.getApplicationContext();
 
         this.apiCallback = callback;
-        this.connParams = connParams;
 
-        try {
-            this.droneMgr = dpService.getDroneForConnection(connParams);
-            this.magCalibration = new MagnetometerCalibration(this.droneMgr.getDrone(), this,
-                    this.droneMgr.getHandler());
-            start();
-        } catch (ConnectionException e) {
-            callback.onConnectionFailed(new ConnectionResult(0, e.getMessage()));
-            disconnectFromDrone();
-        }
+        this.droneMgr = dpService.getDroneForConnection(connParams);
+        this.droneMgr.addDroneEventsListener(this);
+
     }
 
     private DroidPlannerService getService() {
@@ -129,23 +118,10 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener, 
         return apiCallback;
     }
 
-    private ConnectionParameter getConnectionParameter(){
-        if(connParams == null)
-            throw new IllegalStateException("Invalid state: connection parameter is null");
-
-        return connParams;
-    }
-
-    private void start() throws RemoteException {
-        getDroneMgr().addDroneEventsListener(this);
-    }
-
-    @Override
-    public void disconnectFromDrone() throws RemoteException {
+    void destroy() {
         getDroneMgr().removeDroneEventsListener(this);
-        getService().disconnectFromApi(getConnectionParameter(), getCallback());
+        this.serviceRef.clear();
         this.apiCallback = null;
-        this.connParams = null;
         this.droneMgr = null;
     }
 
@@ -460,6 +436,24 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener, 
     }
 
     @Override
+    public void connect() throws RemoteException {
+        try {
+            getDroneMgr().connect();
+        } catch (ConnectionException e) {
+            getCallback().onConnectionFailed(new ConnectionResult(0, e.getMessage()));
+        }
+    }
+
+    @Override
+    public void disconnect() throws RemoteException {
+        try {
+            getDroneMgr().disconnect();
+        } catch (ConnectionException e) {
+            getCallback().onConnectionFailed(new ConnectionResult(0, e.getMessage()));
+        }
+    }
+
+    @Override
     public void refreshParameters() throws RemoteException {
        getDroneMgr().getDrone().getParameters().refreshParameters();
     }
@@ -506,17 +500,12 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener, 
 
     @Override
     public void startMagnetometerCalibration(List<Point3D> startPoints) throws RemoteException {
-        if(magCalibration.isRunning()){
-            magCalibration.stop();
-        }
-
-        magCalibration.start(MathUtil.point3DToThreeSpacePoint(startPoints));
+        getDroneMgr().startMagnetometerCalibration(MathUtil.point3DToThreeSpacePoint(startPoints));
     }
 
     @Override
     public void stopMagnetometerCalibration() throws RemoteException {
-        if(magCalibration.isRunning())
-            magCalibration.stop();
+        getDroneMgr().stopMagnetometerCalibration();
     }
 
     @Override
@@ -699,7 +688,6 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener, 
     private static FollowType followModeToType(FollowAlgorithm.FollowModes followMode){
         final FollowType followType;
 
-        final String followTypeLabel = followMode.toString();
         switch(followMode){
             default:
             case LEASH:
@@ -995,9 +983,8 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener, 
     }
 
     @Override
-    public void finished(FitPoints fit) {
+    public void finished(FitPoints fit, double[] offsets) {
         try {
-            double[] offsets = magCalibration.sendOffsets();
             double fitness = fit.getFitness();
 
             Bundle paramsBundle = new Bundle(2);

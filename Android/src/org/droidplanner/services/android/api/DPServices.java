@@ -37,9 +37,13 @@ final class DPServices extends IDroidPlannerServices.Stub {
     }
 
     @Override
-    public IDroidPlannerApi connectToDrone(ConnectionParameter params,
-                                           IDroidPlannerApiCallback callback) throws RemoteException {
+    public IDroidPlannerApi registerWithDrone(ConnectionParameter params, IDroidPlannerApiCallback callback) throws RemoteException {
         return getService().connectToApi(params, callback);
+    }
+
+    @Override
+    public void unregisterFromDrone(ConnectionParameter params, IDroidPlannerApiCallback callback) throws RemoteException {
+        getService().disconnectFromApi(params, callback);
     }
 
     @Override
