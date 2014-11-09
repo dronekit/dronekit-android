@@ -1,21 +1,37 @@
-package com.ox3dr.services.android.lib.drone.mission.item.spatial;
+package com.ox3dr.services.android.lib.drone.mission.item.complex;
 
 import android.os.Parcel;
 
+import com.ox3dr.services.android.lib.coordinate.LatLong;
+import com.ox3dr.services.android.lib.drone.mission.item.MissionItem;
 import com.ox3dr.services.android.lib.drone.mission.item.MissionItemType;
+import com.ox3dr.services.android.lib.drone.mission.item.spatial.BaseSpatialItem;
+
+import java.util.List;
 
 /**
- * TODO: not complete yet.
+ *
  */
-public class StructureScanner extends BaseSpatialItem {
+public class StructureScanner extends BaseSpatialItem implements MissionItem.ComplexItem {
 
     private double radius = 10;
     private double heightStep = 5;
     private int stepsCount = 2;
     private boolean crossHatch = false;
+    private SurveyDetail surveyDetail;
+    private List<LatLong> path;
 
     public StructureScanner(){
         super(MissionItemType.STRUCTURE_SCANNER);
+    }
+
+    public void copy(StructureScanner source){
+        this.radius = source.radius;
+        this.heightStep = source.heightStep;
+        this.stepsCount = source.stepsCount;
+        this.crossHatch = source.crossHatch;
+        this.surveyDetail = source.surveyDetail;
+        this.path = source.path;
     }
 
     public double getRadius() {
@@ -50,6 +66,14 @@ public class StructureScanner extends BaseSpatialItem {
         this.crossHatch = crossHatch;
     }
 
+    public SurveyDetail getSurveyDetail() {
+        return surveyDetail;
+    }
+
+    public void setSurveyDetail(SurveyDetail surveyDetail) {
+        this.surveyDetail = surveyDetail;
+    }
+
     public static final Creator<StructureScanner> CREATOR = new Creator<StructureScanner>() {
         @Override
         public StructureScanner createFromParcel(Parcel source) {
@@ -61,4 +85,12 @@ public class StructureScanner extends BaseSpatialItem {
             return new StructureScanner[size];
         }
     };
+
+    public List<LatLong> getPath() {
+        return path;
+    }
+
+    public void setPath(List<LatLong> points){
+        this.path = points;
+    }
 }

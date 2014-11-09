@@ -1,6 +1,5 @@
 package com.ox3dr.services.android.lib.coordinate;
 
-import android.graphics.PointF;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -46,6 +45,32 @@ public class LatLong implements Parcelable, Serializable {
 
     public void setLongitude(float longitude) {
         this.longitude = longitude;
+    }
+
+    public LatLong dot(float scalar) {
+        return new LatLong(latitude * scalar, longitude * scalar);
+    }
+
+    public LatLong negate() {
+        return new LatLong(latitude * -1, longitude * -1);
+    }
+
+    public LatLong subtract(LatLong coord) {
+        return new LatLong(latitude - coord.latitude, longitude - coord.longitude);
+    }
+
+    public LatLong sum(LatLong coord) {
+        return new LatLong(latitude + coord.latitude, longitude + coord.longitude);
+    }
+
+    public static LatLong sum(LatLong... toBeAdded) {
+        float latitude = 0;
+        float longitude = 0;
+        for (LatLong coord : toBeAdded) {
+            latitude += coord.latitude;
+            longitude += coord.longitude;
+        }
+        return new LatLong(latitude, longitude);
     }
 
     @Override

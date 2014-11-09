@@ -18,7 +18,11 @@ import com.ox3dr.services.android.lib.drone.property.GuidedState;
 import com.ox3dr.services.android.lib.coordinate.LatLong;
 import com.ox3dr.services.android.lib.gcs.follow.FollowState;
 import com.ox3dr.services.android.lib.gcs.follow.FollowType;
+import com.ox3dr.services.android.lib.drone.mission.item.MissionItem;
+import com.ox3dr.services.android.lib.drone.mission.item.raw.MissionItemMessage;
 import com.ox3dr.services.android.lib.drone.mission.item.complex.CameraDetail;
+import com.ox3dr.services.android.lib.drone.mission.item.complex.Survey;
+import com.ox3dr.services.android.lib.drone.mission.item.complex.StructureScanner;
 
 /**
 * Interface used to access the drone properties.
@@ -26,13 +30,11 @@ import com.ox3dr.services.android.lib.drone.mission.item.complex.CameraDetail;
 interface IDroidPlannerApi {
     /**
         * Retrieves the gps property of the connected drone.
-        * @param droneId id of the drone whose property to retrieve.
         */
         Gps getGps();
 
         /**
         * Retrieves the state property of the connected drone.
-        * @param droneId id of the drone whose property to retrieve.
         */
         State getState();
 
@@ -43,45 +45,43 @@ interface IDroidPlannerApi {
 
         /**
         * Retrieves the parameters property of the connected drone.
-        * @param droneId id of the drone whose property to retrieve.
         */
         Parameters getParameters();
 
         /**
         * Retrieves the speed property of the connected drone.
-        * @param droneId id of the drone whose property to retrieve.
         */
         Speed getSpeed();
 
         /**
         * Retrieves the attitude property of the connected drone.
-        * @param droneId id of the drone whose property to retrieve.
         */
         Attitude getAttitude();
 
         /**
         * Retrieves the home property of the connected drone.
-        * @param droneId id of the drone whose property to retrieve.
         */
         Home getHome();
 
         /**
         * Retrieves the battery property of the connected drone.
-        * @param droneId id of the drone whose property to retrieve.
         */
         Battery getBattery();
 
         /**
         * Retrieves the altitude property of the connected drone.
-        * @param droneId id of the drone whose property to retrieve.
         */
         Altitude getAltitude();
 
         /**
         * Retrieves the mission property of the connected drone.
-        * @param droneId id of the drone whose property to retrieve.
         */
         Mission getMission();
+
+        /**
+        * Retrieves the set of raw mission items.
+        */
+        MissionItemMessage[] getRawMissionItems();
 
         /**
         * Retrieves the signal level between the connected drone and the GCS.
@@ -118,6 +118,13 @@ interface IDroidPlannerApi {
         */
         CameraDetail[] getCameraDetails();
 
+        /**
+        * Retrieves an updated copy of the passed survey.
+        */
+        Survey updateSurveyMissionItem(in Survey survey);
+
+        StructureScanner updateStructureScanner(in StructureScanner item);
+
         /*** Oneway method calls ***/
 
         /**
@@ -145,10 +152,18 @@ interface IDroidPlannerApi {
         oneway void writeParameters(in Parameters parameters);
 
         /**
-        * Upload the given mission to the connected drone.
+        * Update the mission property for the drone model in memory.
         * @param mission mission to upload to the drone.
+        * @param pushToDrone if true, upload the mission to the connected device.
         */
-        oneway void sendMission(in Mission mission);
+        oneway void setMission(in Mission mission, boolean pushToDrone);
+
+        /**
+        * Update the mission items for the drone model in memory.
+        * @param missionItems Set of missionItemMessage
+        * @param pushToDrone if true, upload the mission to the connected device.
+        */
+        oneway void setRawMissionItems(in MissionItemMessage[] missionItems, boolean pushToDrone);
 
         /**
         * Create a dronie mission, and upload it to the connected drone.
