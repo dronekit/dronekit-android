@@ -63,9 +63,9 @@ public class DroidPlannerService extends Service {
             new ConcurrentHashMap<ConnectionParameter, AndroidMavLinkConnection>();
 
 
-    private final DPServices dpServices = new DPServices(this);
-    private final DroneAccess droneAccess = new DroneAccess(this);
-    private final MavLinkServiceApi mavlinkApi = new MavLinkServiceApi(this);
+    private DPServices dpServices;
+    private DroneAccess droneAccess;
+    private MavLinkServiceApi mavlinkApi;
 
     IDroidPlannerApi connectToApi(ConnectionParameter connParams, IDroidPlannerApiCallback callback)
             throws RemoteException {
@@ -214,6 +214,10 @@ public class DroidPlannerService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        mavlinkApi = new MavLinkServiceApi(this);
+        droneAccess = new DroneAccess(this);
+        dpServices = new DPServices(this);
         lbm = LocalBroadcastManager.getInstance(getApplicationContext());
     }
 

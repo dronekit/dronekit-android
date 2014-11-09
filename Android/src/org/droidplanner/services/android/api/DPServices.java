@@ -25,7 +25,7 @@ final class DPServices extends IDroidPlannerServices.Stub {
 
     DPServices(DroidPlannerService service) {
         serviceRef = new WeakReference<DroidPlannerService>(service);
-        this.tlogApi = new TLogApi(service.getApplicationContext());
+        this.tlogApi = new TLogApi(service);
     }
 
     private DroidPlannerService getService() {
