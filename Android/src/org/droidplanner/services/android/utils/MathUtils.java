@@ -8,6 +8,7 @@ import com.ox3dr.services.android.lib.coordinate.Point3D;
 
 import org.droidplanner.core.helpers.coordinates.Coord2D;
 import org.droidplanner.core.helpers.coordinates.Coord3D;
+import org.droidplanner.core.helpers.units.Altitude;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,6 +59,11 @@ public class MathUtils {
                 (float) coord.getAltitude().valueInMeters());
     }
 
+    public static Coord3D latLongAltToCoord3D(LatLongAlt position){
+        return new Coord3D(position.getLatitude(), position.getLongitude(),
+                new Altitude(position.getAltitude()));
+    }
+
     public static List<LatLong> coord2DToLatLong(List<Coord2D> coords){
         final List<LatLong> points = new ArrayList<LatLong>();
         if(coords != null && !coords.isEmpty()){
@@ -67,5 +73,16 @@ public class MathUtils {
         }
 
         return points;
+    }
+
+    public static List<Coord2D> latLongToCoord2D(List<LatLong> points){
+        final List<Coord2D> coords = new ArrayList<Coord2D>();
+        if(points != null && !points.isEmpty()){
+            for(LatLong point : points){
+                coords.add(latLongToCoord2D(point));
+            }
+        }
+
+        return coords;
     }
 }

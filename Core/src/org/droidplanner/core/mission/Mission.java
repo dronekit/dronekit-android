@@ -99,6 +99,11 @@ public class Mission extends DroneVariable {
 		notifyMissionUpdate();
 	}
 
+    public void clearMissionItems(){
+        items.clear();
+        notifyMissionUpdate();
+    }
+
 	/**
 	 * Add a waypoint to the mission's set of mission item.
 	 * 

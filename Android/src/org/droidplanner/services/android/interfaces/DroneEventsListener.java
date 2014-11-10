@@ -8,4 +8,6 @@ import org.droidplanner.core.drone.variables.helpers.MagnetometerCalibration;
 */
 public interface DroneEventsListener extends DroneInterfaces.OnDroneListener,
         DroneInterfaces.OnParameterManagerListener, MagnetometerCalibration
-                .OnMagCalibrationListener {}
+                .OnMagCalibrationListener {
+    void onConnectionFailed(String error);
+}

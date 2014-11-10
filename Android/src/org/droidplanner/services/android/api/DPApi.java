@@ -8,6 +8,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.MAVLink.Messages.ApmModes;
+import com.MAVLink.Messages.ardupilotmega.msg_mission_item;
 import com.MAVLink.Messages.enums.MAV_TYPE;
 import com.ox3dr.services.android.lib.coordinate.LatLong;
 import com.ox3dr.services.android.lib.coordinate.LatLongAlt;
@@ -16,6 +17,7 @@ import com.ox3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.ox3dr.services.android.lib.drone.connection.ConnectionResult;
 import com.ox3dr.services.android.lib.drone.event.Event;
 import com.ox3dr.services.android.lib.drone.event.Extra;
+import com.ox3dr.services.android.lib.drone.mission.item.MissionItem;
 import com.ox3dr.services.android.lib.drone.mission.item.complex.CameraDetail;
 import com.ox3dr.services.android.lib.drone.mission.item.complex.StructureScanner;
 import com.ox3dr.services.android.lib.drone.mission.item.complex.Survey;
@@ -377,9 +379,16 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
 
     @Override
     public MissionItemMessage[] getRawMissionItems() throws RemoteException {
-        //TODO: complete implementation
-        throw new UnsupportedOperationException("Method not yet implemented.");
-//        return new MissionItemMessage[0];
+        org.droidplanner.core.mission.Mission droneMission = getDroneMgr().getDrone().getMission();
+        List<msg_mission_item> msgItems = droneMission.getMsgMissionItems();
+        final int msgItemsCount = msgItems.size();
+
+        MissionItemMessage[] rawMissionItems = new MissionItemMessage[msgItemsCount];
+        for(int i = 0; i < msgItemsCount; i++){
+            rawMissionItems[i] = ProxyUtils.getRawMissionItem(msgItems.get(i));
+        }
+
+        return rawMissionItems;
     }
 
     @Override
@@ -501,15 +510,31 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
 
     @Override
     public void setMission(Mission mission, boolean pushToDrone) throws RemoteException {
-        //TODO: complete implementation
-        throw new UnsupportedOperationException("Method not yet implemented.");
+        org.droidplanner.core.mission.Mission droneMission = getDroneMgr().getDrone().getMission();
+        droneMission.clearMissionItems();
 
+        List<MissionItem> itemsList = mission.getMissionItems();
+        for(MissionItem item: itemsList){
+            droneMission.addMissionItem(ProxyUtils.getMissionItem(droneMission, item));
+        }
+
+        if(pushToDrone)
+            droneMission.sendMissionToAPM();
     }
 
     @Override
     public void setRawMissionItems(MissionItemMessage[] missionItems, boolean pushToDrone) throws RemoteException {
-        //TODO: complete implementation
-        throw new UnsupportedOperationException("Method not yet implemented.");
+        List<msg_mission_item> items = new ArrayList<msg_mission_item>();
+        if(missionItems != null && missionItems.length > 0){
+            for(MissionItemMessage message : missionItems){
+                items.add(ProxyUtils.getMsgMissionItem(message));
+            }
+        }
+
+        org.droidplanner.core.mission.Mission droneMission = getDroneMgr().getDrone().getMission();
+        droneMission.onMissionLoaded(items);
+        if(pushToDrone)
+            droneMission.sendMissionToAPM();
     }
 
     @Override
@@ -1049,6 +1074,17 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
                 handleDeadObjectException(e);
             }
         } catch (Exception e) {
+            Log.e(TAG, e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void onConnectionFailed(String error) {
+        try {
+            getCallback().onConnectionFailed(new ConnectionResult(0, error));
+        } catch (DeadObjectException e) {
+            handleDeadObjectException(e);
+        } catch (RemoteException e) {
             Log.e(TAG, e.getMessage(), e);
         }
     }

@@ -39,7 +39,7 @@ public class MAVLinkClient implements MAVLinkStreams.MAVLinkOutputStream {
         @Override
         public void onComError(final String errMsg) {
             if (errMsg != null) {
-                Log.e(TAG, "MAVLink Error: " + errMsg);
+                listener.onStreamError(errMsg);
             }
         }
     };

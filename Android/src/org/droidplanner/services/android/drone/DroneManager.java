@@ -175,6 +175,12 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream, DroneEve
         this.mavLinkMsgHandler.receiveData(m);
     }
 
+    @Override
+    public void onStreamError(String errorMsg) {
+        for(DroneEventsListener listener : droneEventsListeners)
+            listener.onConnectionFailed(errorMsg);
+    }
+
     public ConnectionParameter getConnectionParameter(){
         return this.connectionParams;
     }
@@ -253,5 +259,10 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream, DroneEve
 
         for(DroneEventsListener listener: droneEventsListeners)
             listener.finished(fit, offsets);
+    }
+
+    @Override
+    public void onConnectionFailed(String error) {
+
     }
 }
