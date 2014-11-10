@@ -43,6 +43,7 @@ import com.ox3dr.services.android.lib.model.IDroidPlannerApiCallback;
 import org.droidplanner.core.MAVLink.MavLinkArm;
 import org.droidplanner.core.MAVLink.MavLinkROI;
 import org.droidplanner.core.drone.DroneInterfaces;
+import org.droidplanner.core.drone.profiles.VehicleProfile;
 import org.droidplanner.core.drone.variables.Calibration;
 import org.droidplanner.core.drone.variables.GPS;
 import org.droidplanner.core.drone.variables.GuidedPoint;
@@ -311,7 +312,14 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
 
             try {
                 //TODO: implement drone metadata type
-                ParameterMetadataLoader.load(getService().getApplicationContext(), null, proxyParams);
+                final VehicleProfile profile = drone.getVehicleProfile();
+                if(profile != null) {
+                    String metadataType = profile.getParameterMetadataType();
+                    if(metadataType != null) {
+                        ParameterMetadataLoader.load(getService().getApplicationContext(),
+                                metadataType, proxyParams);
+                    }
+                }
             } catch (IOException e) {
                 Log.e(TAG, e.getMessage(), e);
             } catch (XmlPullParserException e) {
