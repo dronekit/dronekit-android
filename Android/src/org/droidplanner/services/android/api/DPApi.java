@@ -56,7 +56,8 @@ import org.droidplanner.services.android.R;
 import org.droidplanner.services.android.drone.DroneManager;
 import org.droidplanner.services.android.exception.ConnectionException;
 import org.droidplanner.services.android.interfaces.DroneEventsListener;
-import org.droidplanner.services.android.utils.MathUtil;
+import org.droidplanner.services.android.utils.MathUtils;
+import org.droidplanner.services.android.utils.ProxyUtils;
 import org.droidplanner.services.android.utils.file.IO.ParameterMetadataLoader;
 import org.droidplanner.services.android.utils.file.help.CameraInfoLoader;
 import org.xmlpull.v1.XmlPullParserException;
@@ -361,10 +362,17 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
 
     @Override
     public Mission getMission() throws RemoteException {
-        //TODO: complete implementation
         org.droidplanner.core.mission.Mission droneMission = getDroneMgr().getDrone().getMission();
-        throw new UnsupportedOperationException("Method not yet implemented.");
+        List<org.droidplanner.core.mission.MissionItem> droneMissionItems = droneMission.getItems();
 
+        Mission proxyMission = new Mission();
+        if(!droneMissionItems.isEmpty()){
+            for(org.droidplanner.core.mission.MissionItem item : droneMissionItems){
+                proxyMission.addMissionItem(ProxyUtils.getProxyMissionItem(item));
+            }
+        }
+
+        return proxyMission;
     }
 
     @Override
@@ -516,7 +524,7 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
 
     @Override
     public void startMagnetometerCalibration(List<Point3D> startPoints) throws RemoteException {
-        getDroneMgr().startMagnetometerCalibration(MathUtil.point3DToThreeSpacePoint(startPoints));
+        getDroneMgr().startMagnetometerCalibration(MathUtils.point3DToThreeSpacePoint(startPoints));
     }
 
     @Override
@@ -553,11 +561,11 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
     public void sendGuidedPoint(LatLong point, boolean force) throws RemoteException {
         GuidedPoint guidedPoint = getDroneMgr().getDrone().getGuidedPoint();
         if(guidedPoint.isInitialized()){
-            guidedPoint.newGuidedCoord(MathUtil.latLongToCoord2D(point));
+            guidedPoint.newGuidedCoord(MathUtils.latLongToCoord2D(point));
         }
         else if(force){
             try {
-                guidedPoint.forcedGuidedCoordinate(MathUtil.latLongToCoord2D(point));
+                guidedPoint.forcedGuidedCoordinate(MathUtils.latLongToCoord2D(point));
             } catch (Exception e) {
                 Log.e(TAG, e.getMessage(), e);
             }
@@ -987,7 +995,7 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
     public void onStarted(List<ThreeSpacePoint> points) {
         Bundle paramsBundle = new Bundle();
         paramsBundle.putParcelableArrayList(Extra.EXTRA_CALIBRATION_MAG_POINTS,
-                MathUtil.threeSpacePointToPoint3D(points));
+                MathUtils.threeSpacePointToPoint3D(points));
         try {
             getCallback().onDroneEvent(Event.EVENT_CALIBRATION_MAG_STARTED, paramsBundle);
         } catch(DeadObjectException e){
@@ -1012,7 +1020,7 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
         paramsBundle.putDoubleArray(Extra.EXTRA_CALIBRATION_MAG_FIT_CENTER, fitCenter);
         paramsBundle.putDoubleArray(Extra.EXTRA_CALIBRATION_MAG_FIT_RADII, fitRadii);
         paramsBundle.putParcelableArrayList(Extra.EXTRA_CALIBRATION_MAG_POINTS,
-                MathUtil.threeSpacePointToPoint3D(points));
+                MathUtils.threeSpacePointToPoint3D(points));
 
         try {
             getCallback().onDroneEvent(Event.EVENT_CALIBRATION_MAG_ESTIMATION, paramsBundle);

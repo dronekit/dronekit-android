@@ -52,6 +52,10 @@ public class SurveyData {
 		tryToLoadOverlapFromCamera();
 	}
 
+    public CameraInfo getCameraInfo(){
+        return this.camera;
+    }
+
 	private void tryToLoadOverlapFromCamera() {
 		if (camera.overlap != null) {
 			this.overlap = camera.overlap;

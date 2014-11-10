@@ -166,4 +166,8 @@ public class StructureScanner extends SpatialCoordItem {
 		return survey.getCameraName();
 	}
 
+    public SurveyData getSurveyData(){
+        return survey;
+    }
+
 }

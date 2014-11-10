@@ -3,9 +3,11 @@ package org.droidplanner.services.android.utils;
 import android.graphics.Point;
 
 import com.ox3dr.services.android.lib.coordinate.LatLong;
+import com.ox3dr.services.android.lib.coordinate.LatLongAlt;
 import com.ox3dr.services.android.lib.coordinate.Point3D;
 
 import org.droidplanner.core.helpers.coordinates.Coord2D;
+import org.droidplanner.core.helpers.coordinates.Coord3D;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +17,7 @@ import ellipsoidFit.ThreeSpacePoint;
 /**
  * Created by fhuya on 11/4/14.
  */
-public class MathUtil {
+public class MathUtils {
 
     public static ArrayList<Point3D> threeSpacePointToPoint3D(List<ThreeSpacePoint> spacePoints){
         final ArrayList<Point3D> pointsList = new ArrayList<Point3D>();
@@ -49,5 +51,21 @@ public class MathUtil {
 
     public static LatLong coord2DToLatLong(Coord2D coord){
         return new LatLong((float)coord.getLat(), (float)coord.getLng());
+    }
+
+    public static LatLongAlt coord3DToLatLongAlt(Coord3D coord){
+        return new LatLongAlt((float)coord.getLat(), (float) coord.getLng(),
+                (float) coord.getAltitude().valueInMeters());
+    }
+
+    public static List<LatLong> coord2DToLatLong(List<Coord2D> coords){
+        final List<LatLong> points = new ArrayList<LatLong>();
+        if(coords != null && !coords.isEmpty()){
+            for(Coord2D coord: coords){
+                points.add(coord2DToLatLong(coord));
+            }
+        }
+
+        return points;
     }
 }
