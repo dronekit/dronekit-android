@@ -294,7 +294,7 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
 
     @Override
     public Parameters getParameters() throws RemoteException {
-        final Drone drone =getDroneMgr().getDrone();
+        final Drone drone = getDroneMgr().getDrone();
         final Map<String, com.ox3dr.services.android.lib.drone.property.Parameter> proxyParams =
                 new HashMap<String, com.ox3dr.services.android.lib.drone.property.Parameter>();
 
@@ -804,8 +804,9 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
 
                 case AUTOPILOT_WARNING:
                     String warning = drone.getState().getWarning();
+                    extrasBundle = new Bundle();
                     extrasBundle.putString(Extra.EXTRA_AUTOPILOT_FAILSAFE_MESSAGE, warning);
-                    callback.onDroneEvent(Event.EVENT_AUTOPILOT_FAILSAFE, emptyBundle);
+                    callback.onDroneEvent(Event.EVENT_AUTOPILOT_FAILSAFE, extrasBundle);
                     break;
 
                 case MODE:
