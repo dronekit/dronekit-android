@@ -91,18 +91,18 @@ public class DroidPlannerPrefs implements org.droidplanner.core.drone.Preference
 		Rates rates = new Rates();
 
 		rates.extendedStatus = Integer.parseInt(prefs.getString(
-				"pref_mavlink_stream_rate_ext_stat", "0"));
-		rates.extra1 = Integer.parseInt(prefs.getString("pref_mavlink_stream_rate_extra1", "0"));
-		rates.extra2 = Integer.parseInt(prefs.getString("pref_mavlink_stream_rate_extra2", "0"));
-		rates.extra3 = Integer.parseInt(prefs.getString("pref_mavlink_stream_rate_extra3", "0"));
+				"pref_mavlink_stream_rate_ext_stat", "2"));
+		rates.extra1 = Integer.parseInt(prefs.getString("pref_mavlink_stream_rate_extra1", "10"));
+		rates.extra2 = Integer.parseInt(prefs.getString("pref_mavlink_stream_rate_extra2", "2"));
+		rates.extra3 = Integer.parseInt(prefs.getString("pref_mavlink_stream_rate_extra3", "2"));
 		rates.position = Integer
-				.parseInt(prefs.getString("pref_mavlink_stream_rate_position", "0"));
+				.parseInt(prefs.getString("pref_mavlink_stream_rate_position", "3"));
 		rates.rcChannels = Integer.parseInt(prefs.getString("pref_mavlink_stream_rate_rc_channels",
-				"0"));
+				"5"));
 		rates.rawSensors = Integer.parseInt(prefs.getString("pref_mavlink_stream_rate_raw_sensors",
-				"0"));
+				"2"));
 		rates.rawController = Integer.parseInt(prefs.getString(
-				"pref_mavlink_stream_rate_raw_controller", "0"));
+				"pref_mavlink_stream_rate_raw_controller", "3"));
 		return rates;
 	}
 
