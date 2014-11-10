@@ -49,7 +49,9 @@ public class ParameterMetadataLoader {
 
 	private static void parseMetadata(XmlPullParser parser, String metadataType,
 			Map<String, Parameter> parameters) throws XmlPullParserException, IOException {
+
 		boolean parsing = false;
+        Parameter parameter = null;
 
 		int eventType = parser.getEventType();
 		while (eventType != XmlPullParser.END_DOCUMENT) {
@@ -60,9 +62,12 @@ public class ParameterMetadataLoader {
 				if (metadataType.equals(name)) {
 					parsing = true;
 				} else if (parsing) {
-					Parameter parameter = parameters.get(name);
-					if (parameter != null)
-						addMetaDataProperty(parameter, name, parser.nextText());
+                    if(parameter == null) {
+                        parameter = parameters.get(name);
+                    }
+					else {
+                        addMetaDataProperty(parameter, name, parser.nextText());
+                    }
 				}
 				break;
 			}
@@ -72,7 +77,9 @@ public class ParameterMetadataLoader {
 				// name == metadataType: done
 				if (metadataType.equals(name)) {
 					return;
-				}
+				} else if(parameter != null){
+                    parameter = null;
+                }
 				break;
 			}
 			}
