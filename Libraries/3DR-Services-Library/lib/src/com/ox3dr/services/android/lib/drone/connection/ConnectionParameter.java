@@ -57,7 +57,7 @@ public class ConnectionParameter implements Parcelable {
             }
         }
 
-         toString += "]}";
+        toString += "]}";
         return toString;
     }
 
