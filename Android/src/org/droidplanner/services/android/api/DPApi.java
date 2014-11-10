@@ -150,7 +150,8 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
         ApmModes droneMode = droneState.getMode();
 
         return new State(getVehicleMode(droneMode), droneState.isArmed(),
-                droneState.isFlying(), droneState.getWarning(), drone.getMavlinkVersion());
+                droneState.isFlying(), droneState.getWarning(), drone.getMavlinkVersion(),
+                drone.getCalibrationSetup().getMessage());
     }
 
     @Override
@@ -361,6 +362,7 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
     @Override
     public Mission getMission() throws RemoteException {
         //TODO: complete implementation
+        org.droidplanner.core.mission.Mission droneMission = getDroneMgr().getDrone().getMission();
         throw new UnsupportedOperationException("Method not yet implemented.");
 
     }
@@ -859,7 +861,11 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
                     break;
 
                 case CALIBRATION_IMU:
-                    callback.onDroneEvent(Event.EVENT_CALIBRATION_IMU, emptyBundle);
+                    final String calIMUMessage = getDroneMgr().getDrone().getCalibrationSetup()
+                            .getMessage();
+                    extrasBundle = new Bundle();
+                    extrasBundle.putString(Extra.EXTRA_CALIBRATION_IMU_MESSAGE, calIMUMessage);
+                    callback.onDroneEvent(Event.EVENT_CALIBRATION_IMU, extrasBundle);
                     break;
 
                 case CALIBRATION_TIMEOUT:

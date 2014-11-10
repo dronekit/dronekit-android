@@ -209,7 +209,6 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream, DroneEve
 
     @Override
     public void onDroneEvent(DroneInterfaces.DroneEventsType event, Drone drone) {
-        Log.d(TAG, "Received event: " + event);
         for(DroneEventsListener listener: droneEventsListeners)
             listener.onDroneEvent(event, drone);
     }
