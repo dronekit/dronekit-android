@@ -846,7 +846,7 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
 
                 case AUTOPILOT_WARNING:
                     String warning = drone.getState().getWarning();
-                    extrasBundle = new Bundle();
+                    extrasBundle = new Bundle(1);
                     extrasBundle.putString(Extra.EXTRA_AUTOPILOT_FAILSAFE_MESSAGE, warning);
                     callback.onDroneEvent(Event.EVENT_AUTOPILOT_FAILSAFE, extrasBundle);
                     break;
@@ -907,7 +907,7 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
                 case CALIBRATION_IMU:
                     final String calIMUMessage = getDroneMgr().getDrone().getCalibrationSetup()
                             .getMessage();
-                    extrasBundle = new Bundle();
+                    extrasBundle = new Bundle(1);
                     extrasBundle.putString(Extra.EXTRA_CALIBRATION_IMU_MESSAGE, calIMUMessage);
                     callback.onDroneEvent(Event.EVENT_CALIBRATION_IMU, extrasBundle);
                     break;
@@ -938,13 +938,13 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
                     break;
 
                 case HEARTBEAT_FIRST:
-                    extrasBundle = new Bundle();
+                    extrasBundle = new Bundle(1);
                     extrasBundle.putInt(Extra.EXTRA_MAVLINK_VERSION, drone.getMavlinkVersion());
                     callback.onDroneEvent(Event.EVENT_HEARTBEAT_FIRST, extrasBundle);
                     break;
 
                 case HEARTBEAT_RESTORED:
-                    extrasBundle = new Bundle();
+                    extrasBundle = new Bundle(1);
                     extrasBundle.putInt(Extra.EXTRA_MAVLINK_VERSION, drone.getMavlinkVersion());
                     callback.onDroneEvent(Event.EVENT_HEARTBEAT_RESTORED, extrasBundle);
                     break;
@@ -963,7 +963,7 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
                 case MISSION_WP_UPDATE:
                     final int currentWaypoint = getDroneMgr().getDrone().getMissionStats()
                             .getCurrentWP();
-                    extrasBundle = new Bundle();
+                    extrasBundle = new Bundle(1);
                     extrasBundle.putInt(Extra.EXTRA_MISSION_CURRENT_WAYPOINT, currentWaypoint);
                     callback.onDroneEvent(Event.EVENT_MISSION_ITEM_UPDATE, extrasBundle);
                     break;
