@@ -311,7 +311,6 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
             }
 
             try {
-                //TODO: implement drone metadata type
                 final VehicleProfile profile = drone.getVehicleProfile();
                 if(profile != null) {
                     String metadataType = profile.getParameterMetadataType();
@@ -372,10 +371,12 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
 
     @Override
     public Mission getMission() throws RemoteException {
-        org.droidplanner.core.mission.Mission droneMission = getDroneMgr().getDrone().getMission();
+        final Drone drone = getDroneMgr().getDrone();
+        org.droidplanner.core.mission.Mission droneMission = drone.getMission();
         List<org.droidplanner.core.mission.MissionItem> droneMissionItems = droneMission.getItems();
 
         Mission proxyMission = new Mission();
+        proxyMission.setCurrentMissionItem((short) drone.getMissionStats().getCurrentWP());
         if(!droneMissionItems.isEmpty()){
             for(org.droidplanner.core.mission.MissionItem item : droneMissionItems){
                 proxyMission.addMissionItem(ProxyUtils.getProxyMissionItem(item));
@@ -547,7 +548,10 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
 
     @Override
     public void generateDronie() throws RemoteException {
-        getDroneMgr().getDrone().getMission().makeAndUploadDronie();
+        float bearing = (float) getDroneMgr().getDrone().getMission().makeAndUploadDronie();
+        Bundle bundle = new Bundle(1);
+        bundle.putFloat(Extra.EXTRA_MISSION_DRONIE_BEARING, bearing);
+        getCallback().onDroneEvent(Event.EVENT_MISSION_DRONIE_CREATED, bundle);
     }
 
     @Override
@@ -828,9 +832,6 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
                     callback.onDroneEvent(Event.EVENT_GUIDED_POINT, emptyBundle);
                     break;
 
-                case NAVIGATION:
-                    break;
-
                 case RADIO:
                     callback.onDroneEvent(Event.EVENT_RADIO, emptyBundle);
                     break;
@@ -856,6 +857,7 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
                     callback.onDroneEvent(Event.EVENT_VEHICLE_MODE, emptyBundle);
                     break;
 
+                case NAVIGATION:
                 case ATTITUDE:
                 case ORIENTATION:
                     callback.onDroneEvent(Event.EVENT_ATTITUDE, emptyBundle);
@@ -874,8 +876,11 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
                     break;
 
                 case MISSION_UPDATE:
+                    callback.onDroneEvent(Event.EVENT_MISSION_UPDATE, emptyBundle);
                     break;
+
                 case MISSION_RECEIVED:
+                    callback.onDroneEvent(Event.EVENT_MISSION_RECEIVED, emptyBundle);
                     break;
 
                 case FIRMWARE:
@@ -951,10 +956,18 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
                     break;
 
                 case MISSION_SENT:
+                    callback.onDroneEvent(Event.EVENT_MISSION_SENT, emptyBundle);
                     break;
+
                 case INVALID_POLYGON:
                     break;
+
                 case MISSION_WP_UPDATE:
+                    final int currentWaypoint = getDroneMgr().getDrone().getMissionStats()
+                            .getCurrentWP();
+                    extrasBundle = new Bundle();
+                    extrasBundle.putInt(Extra.EXTRA_MISSION_CURRENT_WAYPOINT, currentWaypoint);
+                    callback.onDroneEvent(Event.EVENT_MISSION_ITEM_UPDATE, extrasBundle);
                     break;
 
                 case FOLLOW_START:
@@ -971,11 +984,17 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
                     break;
 
                 case WARNING_400FT_EXCEEDED:
+                    callback.onDroneEvent(Event.EVENT_WARNING_400FT_EXCEEDED, emptyBundle);
                     break;
+
                 case WARNING_SIGNAL_WEAK:
+                    callback.onDroneEvent(Event.EVENT_WARNING_SIGNAL_WEAK, emptyBundle);
                     break;
+
                 case WARNING_NO_GPS:
+                    callback.onDroneEvent(Event.EVENT_WARNING_NO_GPS, emptyBundle);
                     break;
+
                 case MAGNETOMETER:
                     break;
                 case FOOTPRINT:
