@@ -51,12 +51,12 @@ public class MathUtils {
     }
 
     public static LatLong coord2DToLatLong(Coord2D coord){
-        return new LatLong((float)coord.getLat(), (float)coord.getLng());
+        return new LatLong(coord.getLat(), coord.getLng());
     }
 
     public static LatLongAlt coord3DToLatLongAlt(Coord3D coord){
-        return new LatLongAlt((float)coord.getLat(), (float) coord.getLng(),
-                (float) coord.getAltitude().valueInMeters());
+        return new LatLongAlt(coord.getLat(), coord.getLng(),
+                coord.getAltitude().valueInMeters());
     }
 
     public static Coord3D latLongAltToCoord3D(LatLongAlt position){

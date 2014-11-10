@@ -82,7 +82,6 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
 
     private final static String TAG = DPApi.class.getSimpleName();
 
-    private final Bundle emptyBundle = new Bundle();
     private final WeakReference<DroidPlannerService> serviceRef;
     private final Context context;
 
@@ -139,11 +138,10 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
     public Gps getGps() throws RemoteException {
         final GPS droneGps = getDroneMgr().getDrone().getGps();
         LatLong dronePosition = droneGps.isPositionValid()
-                ? new LatLong((float) droneGps.getPosition().getLat(), (float) droneGps.getPosition()
-                .getLng())
+                ? new LatLong(droneGps.getPosition().getLat(), droneGps.getPosition().getLng())
                 : null;
 
-        return new Gps(dronePosition, (float) droneGps.getGpsEPH(), droneGps.getSatCount(),
+        return new Gps(dronePosition, droneGps.getGpsEPH(), droneGps.getSatCount(),
                 droneGps.getFixTypeNumeric());
     }
 
@@ -349,8 +347,8 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
     public Home getHome() throws RemoteException {
         org.droidplanner.core.drone.variables.Home droneHome =getDroneMgr().getDrone().getHome();
         LatLongAlt homePosition = droneHome.isValid()
-                ? new LatLongAlt((float) droneHome.getCoord().getLat(), (float) droneHome.getCoord()
-                .getLng(), (float) droneHome.getAltitude().valueInMeters())
+                ? new LatLongAlt(droneHome.getCoord().getLat(), droneHome.getCoord().getLng(),
+                droneHome.getAltitude().valueInMeters())
                 : null;
 
         return new Home(homePosition);
@@ -444,8 +442,8 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
         double guidedAlt = guidedPoint.getAltitude() == null
                 ? 0
                 : guidedPoint.getAltitude().valueInMeters();
-        return new GuidedState(guidedState, new LatLongAlt((float)guidedCoord.getLat(),
-                (float) guidedCoord.getLng(), (float) guidedAlt));
+        return new GuidedState(guidedState, new LatLongAlt(guidedCoord.getLat(),
+                 guidedCoord.getLng(),  guidedAlt));
     }
 
     @Override
@@ -825,15 +823,15 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
         try {
             switch (event) {
                 case DISCONNECTED:
-                    callback.onDroneEvent(Event.EVENT_DISCONNECTED, emptyBundle);
+                    callback.onDroneEvent(Event.EVENT_DISCONNECTED, null);
                     break;
 
                 case GUIDEDPOINT:
-                    callback.onDroneEvent(Event.EVENT_GUIDED_POINT, emptyBundle);
+                    callback.onDroneEvent(Event.EVENT_GUIDED_POINT, null);
                     break;
 
                 case RADIO:
-                    callback.onDroneEvent(Event.EVENT_RADIO, emptyBundle);
+                    callback.onDroneEvent(Event.EVENT_RADIO, null);
                     break;
 
                 case RC_IN:
@@ -843,7 +841,7 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
 
                 case ARMING_STARTED:
                 case ARMING:
-                    callback.onDroneEvent(Event.EVENT_ARMING, emptyBundle);
+                    callback.onDroneEvent(Event.EVENT_ARMING, null);
                     break;
 
                 case AUTOPILOT_WARNING:
@@ -854,56 +852,56 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
                     break;
 
                 case MODE:
-                    callback.onDroneEvent(Event.EVENT_VEHICLE_MODE, emptyBundle);
+                    callback.onDroneEvent(Event.EVENT_VEHICLE_MODE, null);
                     break;
 
                 case NAVIGATION:
                 case ATTITUDE:
                 case ORIENTATION:
-                    callback.onDroneEvent(Event.EVENT_ATTITUDE, emptyBundle);
+                    callback.onDroneEvent(Event.EVENT_ATTITUDE, null);
                     break;
 
                 case SPEED:
-                    callback.onDroneEvent(Event.EVENT_SPEED, emptyBundle);
+                    callback.onDroneEvent(Event.EVENT_SPEED, null);
                     break;
 
                 case BATTERY:
-                    callback.onDroneEvent(Event.EVENT_BATTERY, emptyBundle);
+                    callback.onDroneEvent(Event.EVENT_BATTERY, null);
                     break;
 
                 case STATE:
-                    callback.onDroneEvent(Event.EVENT_STATE, emptyBundle);
+                    callback.onDroneEvent(Event.EVENT_STATE, null);
                     break;
 
                 case MISSION_UPDATE:
-                    callback.onDroneEvent(Event.EVENT_MISSION_UPDATE, emptyBundle);
+                    callback.onDroneEvent(Event.EVENT_MISSION_UPDATE, null);
                     break;
 
                 case MISSION_RECEIVED:
-                    callback.onDroneEvent(Event.EVENT_MISSION_RECEIVED, emptyBundle);
+                    callback.onDroneEvent(Event.EVENT_MISSION_RECEIVED, null);
                     break;
 
                 case FIRMWARE:
                 case TYPE:
-                    callback.onDroneEvent(Event.EVENT_TYPE_UPDATED, emptyBundle);
+                    callback.onDroneEvent(Event.EVENT_TYPE_UPDATED, null);
                     break;
 
                 case HOME:
-                    callback.onDroneEvent(Event.EVENT_HOME, emptyBundle);
+                    callback.onDroneEvent(Event.EVENT_HOME, null);
                     break;
 
                 case GPS:
-                    callback.onDroneEvent(Event.EVENT_GPS, emptyBundle);
+                    callback.onDroneEvent(Event.EVENT_GPS, null);
                     break;
 
                 case GPS_FIX:
                 case GPS_COUNT:
-                    callback.onDroneEvent(Event.EVENT_GPS_STATE, emptyBundle);
+                    callback.onDroneEvent(Event.EVENT_GPS_STATE, null);
                     break;
 
                 case PARAMETER:
                 case PARAMETERS_DOWNLOADED:
-                    callback.onDroneEvent(Event.EVENT_PARAMETERS_RECEIVED, emptyBundle);
+                    callback.onDroneEvent(Event.EVENT_PARAMETERS_RECEIVED, null);
                     break;
 
                 case CALIBRATION_IMU:
@@ -926,7 +924,7 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
                     final String message = calibration.getMessage();
                     if(calibration.isCalibrating() && TextUtils.isEmpty(message)){
                         calibration.setCalibrating(false);
-                        callback.onDroneEvent(Event.EVENT_HEARTBEAT_TIMEOUT, emptyBundle);
+                        callback.onDroneEvent(Event.EVENT_HEARTBEAT_TIMEOUT, null);
                     }
                     else {
                         extrasBundle = new Bundle(1);
@@ -936,7 +934,7 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
                     break;
 
                 case HEARTBEAT_TIMEOUT:
-                    callback.onDroneEvent(Event.EVENT_HEARTBEAT_TIMEOUT, emptyBundle);
+                    callback.onDroneEvent(Event.EVENT_HEARTBEAT_TIMEOUT, null);
                     break;
 
                 case HEARTBEAT_FIRST:
@@ -952,11 +950,11 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
                     break;
 
                 case CONNECTED:
-                    callback.onDroneEvent(Event.EVENT_CONNECTED, emptyBundle);
+                    callback.onDroneEvent(Event.EVENT_CONNECTED, null);
                     break;
 
                 case MISSION_SENT:
-                    callback.onDroneEvent(Event.EVENT_MISSION_SENT, emptyBundle);
+                    callback.onDroneEvent(Event.EVENT_MISSION_SENT, null);
                     break;
 
                 case INVALID_POLYGON:
@@ -971,28 +969,28 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
                     break;
 
                 case FOLLOW_START:
-                    callback.onDroneEvent(Event.EVENT_FOLLOW_START, emptyBundle);
+                    callback.onDroneEvent(Event.EVENT_FOLLOW_START, null);
                     break;
 
                 case FOLLOW_STOP:
-                    callback.onDroneEvent(Event.EVENT_FOLLOW_STOP, emptyBundle);
+                    callback.onDroneEvent(Event.EVENT_FOLLOW_STOP, null);
                     break;
 
                 case FOLLOW_UPDATE:
                 case FOLLOW_CHANGE_TYPE:
-                    callback.onDroneEvent(Event.EVENT_FOLLOW_UPDATE, emptyBundle);
+                    callback.onDroneEvent(Event.EVENT_FOLLOW_UPDATE, null);
                     break;
 
                 case WARNING_400FT_EXCEEDED:
-                    callback.onDroneEvent(Event.EVENT_WARNING_400FT_EXCEEDED, emptyBundle);
+                    callback.onDroneEvent(Event.EVENT_WARNING_400FT_EXCEEDED, null);
                     break;
 
                 case WARNING_SIGNAL_WEAK:
-                    callback.onDroneEvent(Event.EVENT_WARNING_SIGNAL_WEAK, emptyBundle);
+                    callback.onDroneEvent(Event.EVENT_WARNING_SIGNAL_WEAK, null);
                     break;
 
                 case WARNING_NO_GPS:
-                    callback.onDroneEvent(Event.EVENT_WARNING_NO_GPS, emptyBundle);
+                    callback.onDroneEvent(Event.EVENT_WARNING_NO_GPS, null);
                     break;
 
                 case MAGNETOMETER:
@@ -1010,7 +1008,7 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
     @Override
     public void onBeginReceivingParameters() {
         try {
-            getCallback().onDroneEvent(Event.EVENT_PARAMETERS_REFRESH_STARTED, emptyBundle);
+            getCallback().onDroneEvent(Event.EVENT_PARAMETERS_REFRESH_STARTED, null);
         }catch(DeadObjectException e){
             handleDeadObjectException(e);
         } catch (RemoteException e) {
@@ -1035,7 +1033,7 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
     @Override
     public void onEndReceivingParameters(List<Parameter> parameter) {
         try{
-            getCallback().onDroneEvent(Event.EVENT_PARAMETERS_REFRESH_ENDED, emptyBundle);
+            getCallback().onDroneEvent(Event.EVENT_PARAMETERS_REFRESH_ENDED, null);
         }catch(DeadObjectException e){
             handleDeadObjectException(e);
         } catch(RemoteException e){
