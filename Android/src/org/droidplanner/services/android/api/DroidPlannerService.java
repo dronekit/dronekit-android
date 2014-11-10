@@ -112,7 +112,8 @@ public class DroidPlannerService extends Service {
 
             //Remove the cached drone manager as well.
             DroneManager droneMgr = dronePerConnection.remove(connParams);
-            droneMgr.destroy();
+            if(droneMgr != null)
+                droneMgr.destroy();
 
             lbm.sendBroadcast(new Intent(ACTION_DRONE_DESTROYED));
         }

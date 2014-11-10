@@ -2,6 +2,7 @@ package org.droidplanner.services.android.api;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.DeadObjectException;
 import android.os.RemoteException;
 import android.text.TextUtils;
 import android.util.Log;
@@ -116,6 +117,11 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
             throw new IllegalStateException("Invalid state: api callback is null");
 
         return apiCallback;
+    }
+
+    private void handleDeadObjectException(DeadObjectException e){
+        Log.e(TAG, e.getMessage(), e);
+        getService().disconnectFromApi(getDroneMgr().getConnectionParameter(), getCallback());
     }
 
     void destroy() {
@@ -440,7 +446,11 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
         try {
             getDroneMgr().connect();
         } catch (ConnectionException e) {
-            getCallback().onConnectionFailed(new ConnectionResult(0, e.getMessage()));
+            try {
+                getCallback().onConnectionFailed(new ConnectionResult(0, e.getMessage()));
+            }catch(DeadObjectException d){
+                handleDeadObjectException(d);
+            }
         }
     }
 
@@ -449,7 +459,11 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
         try {
             getDroneMgr().disconnect();
         } catch (ConnectionException e) {
-            getCallback().onConnectionFailed(new ConnectionResult(0, e.getMessage()));
+            try {
+                getCallback().onConnectionFailed(new ConnectionResult(0, e.getMessage()));
+            }catch(DeadObjectException d){
+                handleDeadObjectException(d);
+            }
         }
     }
 
@@ -514,7 +528,11 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
             Bundle extrasBundle = new Bundle(1);
             extrasBundle.putString(Extra.EXTRA_CALIBRATION_IMU_MESSAGE,
                     context.getString(R.string.failed_start_calibration_message));
-            getCallback().onDroneEvent(Event.EVENT_CALIBRATION_IMU_ERROR, extrasBundle);
+            try {
+                getCallback().onDroneEvent(Event.EVENT_CALIBRATION_IMU_ERROR, extrasBundle);
+            }catch(DeadObjectException e){
+                handleDeadObjectException(e);
+            }
         }
     }
 
@@ -785,6 +803,8 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
                     break;
 
                 case AUTOPILOT_WARNING:
+                    String warning = drone.getState().getWarning();
+                    extrasBundle.putString(Extra.EXTRA_AUTOPILOT_FAILSAFE_MESSAGE, warning);
                     callback.onDroneEvent(Event.EVENT_AUTOPILOT_FAILSAFE, emptyBundle);
                     break;
 
@@ -910,6 +930,8 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
                 case FOOTPRINT:
                     break;
             }
+        }catch(DeadObjectException e){
+            handleDeadObjectException(e);
         }catch(RemoteException e){
             Log.e(TAG, e.getMessage(), e);
         }
@@ -919,6 +941,8 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
     public void onBeginReceivingParameters() {
         try {
             getCallback().onDroneEvent(Event.EVENT_PARAMETERS_REFRESH_STARTED, emptyBundle);
+        }catch(DeadObjectException e){
+            handleDeadObjectException(e);
         } catch (RemoteException e) {
             Log.e(TAG, e.getMessage(), e);
         }
@@ -931,7 +955,9 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
             paramsBundle.putInt(Extra.EXTRA_PARAMETER_INDEX, index);
             paramsBundle.putInt(Extra.EXTRA_PARAMETERS_COUNT, count);
             getCallback().onDroneEvent(Event.EVENT_PARAMETERS_RECEIVED, paramsBundle);
-        } catch(RemoteException e){
+        } catch(DeadObjectException e){
+            handleDeadObjectException(e);
+        }catch(RemoteException e){
             Log.e(TAG, e.getMessage(), e);
         }
     }
@@ -940,6 +966,8 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
     public void onEndReceivingParameters(List<Parameter> parameter) {
         try{
             getCallback().onDroneEvent(Event.EVENT_PARAMETERS_REFRESH_ENDED, emptyBundle);
+        }catch(DeadObjectException e){
+            handleDeadObjectException(e);
         } catch(RemoteException e){
             Log.e(TAG, e.getMessage(), e);
         }
@@ -952,7 +980,9 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
                 MathUtil.threeSpacePointToPoint3D(points));
         try {
             getCallback().onDroneEvent(Event.EVENT_CALIBRATION_MAG_STARTED, paramsBundle);
-        } catch (RemoteException e) {
+        } catch(DeadObjectException e){
+            handleDeadObjectException(e);
+        }catch (RemoteException e) {
             Log.e(TAG, e.getMessage(), e);
         }
     }
@@ -976,7 +1006,11 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
 
         try {
             getCallback().onDroneEvent(Event.EVENT_CALIBRATION_MAG_ESTIMATION, paramsBundle);
-        } catch (RemoteException e) {
+        }
+        catch(DeadObjectException e){
+            handleDeadObjectException(e);
+        }
+        catch (RemoteException e) {
             Log.e(TAG, e.getMessage(), e);
         }
 
@@ -991,7 +1025,11 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
             paramsBundle.putDouble(Extra.EXTRA_CALIBRATION_MAG_FITNESS, fitness);
             paramsBundle.putDoubleArray(Extra.EXTRA_CALIBRATION_MAG_OFFSETS, offsets);
 
-            getCallback().onDroneEvent(Event.EVENT_CALIBRATION_MAG_COMPLETED, paramsBundle);
+            try {
+                getCallback().onDroneEvent(Event.EVENT_CALIBRATION_MAG_COMPLETED, paramsBundle);
+            }catch(DeadObjectException e){
+                handleDeadObjectException(e);
+            }
         } catch (Exception e) {
             Log.e(TAG, e.getMessage(), e);
         }
