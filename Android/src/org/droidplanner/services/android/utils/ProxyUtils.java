@@ -350,8 +350,12 @@ public class ProxyUtils {
                 temp.setValid(isValid);
                 temp.setSurveyDetail(getSurveyDetail(source.surveyData));
                 temp.setPolygonPoints(MathUtils.coord2DToLatLong(source.polygon.getPoints()));
-                temp.setGridPoints(MathUtils.coord2DToLatLong(source.grid.gridPoints));
-                temp.setCameraLocations(MathUtils.coord2DToLatLong(source.grid.getCameraLocations()));
+
+                if(source.grid != null) {
+                    temp.setGridPoints(MathUtils.coord2DToLatLong(source.grid.gridPoints));
+                    temp.setCameraLocations(MathUtils.coord2DToLatLong(source.grid.getCameraLocations()));
+                }
+
                 temp.setPolygonArea(source.polygon.getArea().valueInSqMeters());
 
                 proxyMissionItem = temp;
