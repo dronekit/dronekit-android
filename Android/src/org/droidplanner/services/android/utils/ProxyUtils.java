@@ -217,9 +217,15 @@ public class ProxyUtils {
 
                 org.droidplanner.core.mission.survey.Survey temp = new org.droidplanner.core
                         .mission.survey.Survey(mission, polygonPoints);
-                temp.update(surveyDetail.getAngle(), new Altitude(surveyDetail.getAltitude()),
-                        surveyDetail.getOverlap(), surveyDetail.getSidelap());
-                temp.setCameraInfo(getCameraInfo(surveyDetail.getCameraDetail()));
+
+                if(surveyDetail != null) {
+                    temp.update(surveyDetail.getAngle(), new Altitude(surveyDetail.getAltitude()),
+                            surveyDetail.getOverlap(), surveyDetail.getSidelap());
+
+                    CameraDetail cameraDetail = surveyDetail.getCameraDetail();
+                    if(cameraDetail != null)
+                        temp.setCameraInfo(getCameraInfo(cameraDetail));
+                }
 
                 try {
                     temp.build();

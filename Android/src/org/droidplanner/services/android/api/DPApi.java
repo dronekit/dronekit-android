@@ -736,9 +736,12 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
 
     @Override
     public Survey updateSurveyMissionItem(Survey survey) throws RemoteException {
-        //TODO: complete implementation
-        throw new UnsupportedOperationException("Method not yet implemented.");
+        org.droidplanner.core.mission.Mission droneMission = getDroneMgr().getDrone().getMission();
+        org.droidplanner.core.mission.survey.Survey updatedSurvey = (org.droidplanner.core.mission.survey.Survey) ProxyUtils.getMissionItem
+                (droneMission, survey);
 
+        Survey proxySurvey = (Survey) ProxyUtils.getProxyMissionItem(updatedSurvey);
+        return proxySurvey;
     }
 
     @Override
