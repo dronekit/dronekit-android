@@ -387,17 +387,27 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
     }
 
     @Override
-    public MissionItemMessage[] getRawMissionItems() throws RemoteException {
+    public MissionItemMessage[] processMissionItems(MissionItem[] missionItems) throws
+            RemoteException {
         org.droidplanner.core.mission.Mission droneMission = getDroneMgr().getDrone().getMission();
-        List<msg_mission_item> msgItems = droneMission.getMsgMissionItems();
-        final int msgItemsCount = msgItems.size();
 
-        MissionItemMessage[] rawMissionItems = new MissionItemMessage[msgItemsCount];
-        for(int i = 0; i < msgItemsCount; i++){
-            rawMissionItems[i] = ProxyUtils.getRawMissionItem(msgItems.get(i));
+        final int itemsCount = missionItems.length;
+        List<msg_mission_item> rawMissionItems = new ArrayList<msg_mission_item>(itemsCount);
+
+        for(int i = 0; i < itemsCount; i++){
+            org.droidplanner.core.mission.MissionItem item = ProxyUtils.getMissionItem
+                    (droneMission, missionItems[i]);
+
+            rawMissionItems.addAll(item.packMissionItem());
         }
 
-        return rawMissionItems;
+        final int rawMsgsCount = rawMissionItems.size();
+        MissionItemMessage[] proxyMsgs = new MissionItemMessage[rawMsgsCount];
+        for(int i = 0; i < rawMsgsCount; i++){
+            proxyMsgs[i] = ProxyUtils.getRawMissionItem(rawMissionItems.get(i));
+        }
+
+        return proxyMsgs;
     }
 
     @Override
