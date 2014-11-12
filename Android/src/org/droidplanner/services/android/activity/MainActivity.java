@@ -70,8 +70,6 @@ public class MainActivity extends FragmentActivity {
     private TextView titleView;
     private DroneInfoAdapter droneListAdapter;
 
-    private boolean isResumed;
-
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -93,24 +91,6 @@ public class MainActivity extends FragmentActivity {
                 Context.BIND_AUTO_CREATE);
 
         Log.d(TAG, "On create called.");
-        handleIntent(getIntent());
-    }
-
-    @Override
-    public void onNewIntent(Intent intent){
-        super.onNewIntent(intent);
-        handleIntent(intent);
-    }
-
-    private void handleIntent(Intent intent){
-        final String action = intent.getAction();
-        Log.d(TAG, "Intent action: " + action);
-        if(UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action)){
-            if(!isResumed) {
-                //activity was started by plugging a usb device, so finish it.
-                finish();
-            }
-        }
     }
 
     @Override
@@ -123,14 +103,7 @@ public class MainActivity extends FragmentActivity {
     @Override
     public void onStart(){
         super.onStart();
-        isResumed = true;
         refreshDroneList();
-    }
-
-    @Override
-    public void onStop(){
-        super.onStop();
-        isResumed = false;
     }
 
     private void refreshDroneList(){
