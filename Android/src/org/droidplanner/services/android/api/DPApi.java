@@ -746,9 +746,12 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
 
     @Override
     public StructureScanner updateStructureScanner(StructureScanner item) throws RemoteException {
-        //TODO: complete implementation
-        throw new UnsupportedOperationException("Method not yet implemented.");
+        org.droidplanner.core.mission.Mission droneMission = getDroneMgr().getDrone().getMission();
+        org.droidplanner.core.mission.waypoints.StructureScanner updatedScan = (org.droidplanner.core.mission.waypoints.StructureScanner) ProxyUtils
+                .getMissionItem(droneMission, item);
 
+        StructureScanner proxyScanner = (StructureScanner) ProxyUtils.getProxyMissionItem(updatedScan);
+        return proxyScanner;
     }
 
     private static FollowType followModeToType(FollowAlgorithm.FollowModes followMode){

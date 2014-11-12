@@ -190,7 +190,10 @@ public class ProxyUtils {
                 temp.setNumberOfSteps(proxy.getStepsCount());
                 temp.setAltitudeStep((int) proxy.getHeightStep());
                 temp.enableCrossHatch(proxy.isCrossHatch());
-                temp.setCamera(getCameraInfo(proxy.getSurveyDetail().getCameraDetail()));
+
+                CameraDetail camDetail = proxy.getSurveyDetail().getCameraDetail();
+                if(camDetail != null)
+                    temp.setCamera(getCameraInfo(camDetail));
 
                 missionItem = temp;
                 break;
