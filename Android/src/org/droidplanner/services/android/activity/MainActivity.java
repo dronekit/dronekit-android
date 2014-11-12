@@ -6,10 +6,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +31,8 @@ import java.util.List;
  * Created by fhuya on 10/31/14.
  */
 public class MainActivity extends FragmentActivity {
+
+    private final static String TAG = MainActivity.class.getSimpleName();
 
     private final static IntentFilter intentFilter = new IntentFilter();
     {
@@ -66,6 +70,8 @@ public class MainActivity extends FragmentActivity {
     private TextView titleView;
     private DroneInfoAdapter droneListAdapter;
 
+    private boolean isResumed;
+
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -85,12 +91,31 @@ public class MainActivity extends FragmentActivity {
 
         bindService(new Intent(context, DroidPlannerService.class), serviceConnection,
                 Context.BIND_AUTO_CREATE);
+
+        Log.d(TAG, "On create called.");
+        handleIntent(getIntent());
+    }
+
+    @Override
+    public void onNewIntent(Intent intent){
+        super.onNewIntent(intent);
+        handleIntent(intent);
+    }
+
+    private void handleIntent(Intent intent){
+        final String action = intent.getAction();
+        Log.d(TAG, "Intent action: " + action);
+        if(UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action)){
+            if(!isResumed) {
+                //activity was started by plugging a usb device, so finish it.
+                finish();
+            }
+        }
     }
 
     @Override
     public void onDestroy(){
         super.onDestroy();
-
         lbm.unregisterReceiver(broadcastReceiver);
         unbindService(serviceConnection);
     }
@@ -98,7 +123,14 @@ public class MainActivity extends FragmentActivity {
     @Override
     public void onStart(){
         super.onStart();
+        isResumed = true;
         refreshDroneList();
+    }
+
+    @Override
+    public void onStop(){
+        super.onStop();
+        isResumed = false;
     }
 
     private void refreshDroneList(){

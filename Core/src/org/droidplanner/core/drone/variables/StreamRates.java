@@ -17,6 +17,7 @@ public class StreamRates extends DroneVariable implements OnDroneListener {
 	@Override
 	public void onDroneEvent(DroneEventsType event, Drone drone) {
 		switch (event) {
+        case CONNECTED:
 		case HEARTBEAT_FIRST:
 		case HEARTBEAT_RESTORED:
 			setupStreamRatesFromPref();

@@ -939,8 +939,11 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
                     break;
 
                 case GPS_FIX:
+                    callback.onDroneEvent(Event.EVENT_GPS_FIX, null);
+                    break;
+
                 case GPS_COUNT:
-                    callback.onDroneEvent(Event.EVENT_GPS_STATE, null);
+                    callback.onDroneEvent(Event.EVENT_GPS_COUNT, null);
                     break;
 
                 case PARAMETER:

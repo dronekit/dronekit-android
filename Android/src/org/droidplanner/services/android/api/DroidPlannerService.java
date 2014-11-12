@@ -40,7 +40,6 @@ public class DroidPlannerService extends Service {
     public static final String ACTION_DRONE_DESTROYED = CLAZZ_NAME + ".ACTION_DRONE_DESTROYED";
 
     private final Handler handler = new Handler();
-
     private LocalBroadcastManager lbm;
 
     /**
@@ -60,7 +59,6 @@ public class DroidPlannerService extends Service {
      */
     final ConcurrentHashMap<ConnectionParameter, AndroidMavLinkConnection> mavConnections =
             new ConcurrentHashMap<ConnectionParameter, AndroidMavLinkConnection>();
-
 
     private DPServices dpServices;
     private DroneAccess droneAccess;
@@ -138,20 +136,24 @@ public class DroidPlannerService extends Service {
     void connectMAVConnection(ConnectionParameter connParams){
         AndroidMavLinkConnection conn = mavConnections.get(connParams);
         if(conn == null){
+
             //Create a new mavlink connection
             final int connectionType = connParams.getConnectionType();
             final Bundle paramsBundle = connParams.getParamsBundle();
+
             switch(connectionType){
                 case ConnectionType.TYPE_USB:
                     final int baudRate = paramsBundle.getInt(ConnectionType.EXTRA_USB_BAUD_RATE,
                             ConnectionType.DEFAULT_USB_BAUD_RATE);
                     conn = new UsbConnection(getApplicationContext(), baudRate);
+                    Log.d(TAG, "Connecting over usb.");
                     break;
 
                 case ConnectionType.TYPE_BLUETOOTH:
                     //Retrieve the bluetooth address to connect to
                     final String bluetoothAddress = paramsBundle.getString(ConnectionType.EXTRA_BLUETOOTH_ADDRESS);
                     conn = new BluetoothConnection(getApplicationContext(), bluetoothAddress);
+                    Log.d(TAG, "Connecting over bluetooth.");
                     break;
 
                 case ConnectionType.TYPE_TCP:
@@ -161,12 +163,14 @@ public class DroidPlannerService extends Service {
                             .EXTRA_TCP_SERVER_PORT, ConnectionType.DEFAULT_TCP_SERVER_PORT);
                     conn = new AndroidTcpConnection(getApplicationContext(), tcpServerIp,
                             tcpServerPort);
+                    Log.d(TAG, "Connecting over tcp.");
                     break;
 
                 case ConnectionType.TYPE_UDP:
                     final int udpServerPort = paramsBundle.getInt(ConnectionType
                             .EXTRA_UDP_SERVER_PORT, ConnectionType.DEFAULT_UPD_SERVER_PORT);
                     conn = new AndroidUdpConnection(getApplicationContext(), udpServerPort);
+                    Log.d(TAG, "Connecting over udp.");
                     break;
 
                 default:
@@ -194,6 +198,7 @@ public class DroidPlannerService extends Service {
             return;
 
         if (conn.getConnectionStatus() != MavLinkConnection.MAVLINK_DISCONNECTED) {
+            Log.d(TAG, "Disconnecting...");
             conn.disconnect();
 
             GAUtils.sendEvent(new HitBuilders.EventBuilder()
