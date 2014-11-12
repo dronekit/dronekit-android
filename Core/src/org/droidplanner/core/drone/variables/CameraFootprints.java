@@ -25,6 +25,10 @@ public class CameraFootprints extends DroneVariable {
 		myDrone.notifyDroneEvent(DroneEventsType.FOOTPRINT);
 	}
 
+    public List<Footprint> getFootprints(){
+        return footprints;
+    }
+
 	public Footprint getLastFootprint() {
 		return footprints.get(footprints.size()-1);
 	}

@@ -25,6 +25,7 @@ import com.ox3dr.services.android.lib.drone.mission.item.raw.MissionItemMessage;
 import com.ox3dr.services.android.lib.drone.property.Altitude;
 import com.ox3dr.services.android.lib.drone.property.Attitude;
 import com.ox3dr.services.android.lib.drone.property.Battery;
+import com.ox3dr.services.android.lib.drone.property.FootPrint;
 import com.ox3dr.services.android.lib.drone.property.Gps;
 import com.ox3dr.services.android.lib.drone.property.GuidedState;
 import com.ox3dr.services.android.lib.drone.property.Home;
@@ -55,6 +56,7 @@ import org.droidplanner.core.helpers.coordinates.Coord2D;
 import org.droidplanner.core.model.Drone;
 import org.droidplanner.core.mission.survey.CameraInfo;
 import org.droidplanner.core.parameters.Parameter;
+import org.droidplanner.core.survey.Footprint;
 import org.droidplanner.services.android.R;
 import org.droidplanner.services.android.drone.DroneManager;
 import org.droidplanner.services.android.exception.ConnectionException;
@@ -735,6 +737,32 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
     }
 
     @Override
+    public FootPrint getLastCameraFootPrint() throws RemoteException {
+        Footprint lastFootprint = getDroneMgr().getDrone().getCameraFootprints().getLastFootprint();
+        return getProxyCameraFootPrint(lastFootprint);
+    }
+
+    @Override
+    public FootPrint[] getCameraFootPrints() throws RemoteException {
+        List<Footprint> footprints = getDroneMgr().getDrone().getCameraFootprints().getFootprints();
+        final int printsCount = footprints.size();
+
+        FootPrint[] proxyPrints = new FootPrint[printsCount];
+        for(int i = 0; i < printsCount; i++){
+            proxyPrints[i] = getProxyCameraFootPrint(footprints.get(i));
+        }
+
+        return proxyPrints;
+    }
+
+    private static FootPrint getProxyCameraFootPrint(Footprint footprint){
+        if(footprint == null) return null;
+
+        return new FootPrint(MathUtils.coord2DToLatLong(footprint.getCenter()),
+                MathUtils.coord2DToLatLong(footprint.getVertex()));
+    }
+
+    @Override
     public Survey buildSurvey(Survey survey) throws RemoteException {
         org.droidplanner.core.mission.Mission droneMission = getDroneMgr().getDrone().getMission();
         org.droidplanner.core.mission.survey.Survey updatedSurvey = (org.droidplanner.core.mission.survey.Survey) ProxyUtils.getMissionItem
@@ -1001,7 +1029,9 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
 
                 case MAGNETOMETER:
                     break;
+
                 case FOOTPRINT:
+                    callback.onDroneEvent(Event.EVENT_FOOTPRINT, null);
                     break;
             }
         }catch(DeadObjectException e){
