@@ -735,7 +735,7 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
     }
 
     @Override
-    public Survey updateSurveyMissionItem(Survey survey) throws RemoteException {
+    public Survey buildSurvey(Survey survey) throws RemoteException {
         org.droidplanner.core.mission.Mission droneMission = getDroneMgr().getDrone().getMission();
         org.droidplanner.core.mission.survey.Survey updatedSurvey = (org.droidplanner.core.mission.survey.Survey) ProxyUtils.getMissionItem
                 (droneMission, survey);
@@ -745,7 +745,7 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
     }
 
     @Override
-    public StructureScanner updateStructureScanner(StructureScanner item) throws RemoteException {
+    public StructureScanner buildStructureScanner(StructureScanner item) throws RemoteException {
         org.droidplanner.core.mission.Mission droneMission = getDroneMgr().getDrone().getMission();
         org.droidplanner.core.mission.waypoints.StructureScanner updatedScan = (org.droidplanner.core.mission.waypoints.StructureScanner) ProxyUtils
                 .getMissionItem(droneMission, item);
