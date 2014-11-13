@@ -93,7 +93,6 @@ public class FusedLocation implements LocationFinder, com.google.android.gms.loc
                     : 0f;
             final boolean isLocationAccurate = isLocationAccurate(androidLocation.getAccuracy(),
                     currentSpeed);
-            Log.d(TAG, "Is location accurate: " + isLocationAccurate);
 
 			org.droidplanner.core.gcs.location.Location location = new org.droidplanner.core.gcs.location.Location(
 					new Coord2D(androidLocation.getLatitude(), androidLocation.getLongitude()),
