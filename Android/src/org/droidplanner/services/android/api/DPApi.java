@@ -841,7 +841,6 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
     public void enableDroneShare(String username, String password, boolean isEnabled) throws RemoteException {
         //TODO: complete implementation
         throw new UnsupportedOperationException("Method not yet implemented.");
-
     }
 
     @Override
