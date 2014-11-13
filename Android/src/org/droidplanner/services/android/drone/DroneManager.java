@@ -8,13 +8,16 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.MAVLink.Messages.MAVLinkMessage;
+import com.google.android.gms.internal.ex;
 import com.ox3dr.services.android.lib.drone.connection.ConnectionParameter;
+import com.ox3dr.services.android.lib.drone.connection.StreamRates;
 
 import org.droidplanner.core.MAVLink.MAVLinkStreams;
 import org.droidplanner.core.MAVLink.MavLinkMsgHandler;
 import org.droidplanner.core.drone.DroneImpl;
 import org.droidplanner.core.drone.DroneInterfaces;
 import org.droidplanner.core.drone.variables.Magnetometer;
+import org.droidplanner.core.drone.variables.StreamRates.Rates;
 import org.droidplanner.core.drone.variables.helpers.MagnetometerCalibration;
 import org.droidplanner.core.gcs.follow.Follow;
 import org.droidplanner.core.model.Drone;
@@ -83,8 +86,19 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream, DroneEve
             }
         };
 
+        StreamRates connRates = connParams.getStreamRates();
+        Rates droneRates = new Rates();
+        droneRates.extendedStatus = connRates.getExtendedStatus();
+        droneRates.extra1 = connRates.getExtra1();
+        droneRates.extra2 = connRates.getExtra2();
+        droneRates.extra3 = connRates.getExtra3();
+        droneRates.position = connRates.getPosition();
+        droneRates.rcChannels = connRates.getRcChannels();
+        droneRates.rawSensors = connRates.getRawSensors();
+        droneRates.rawController = connRates.getRawController();
+
         DroidPlannerPrefs dpPrefs = new DroidPlannerPrefs(context);
-        this.drone = new DroneImpl(mavClient, clock, dpHandler, dpPrefs);
+        this.drone = new DroneImpl(mavClient, clock, dpHandler, dpPrefs, droneRates);
 
         this.mavLinkMsgHandler = new MavLinkMsgHandler(this.drone);
 

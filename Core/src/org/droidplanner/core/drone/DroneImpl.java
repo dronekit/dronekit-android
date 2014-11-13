@@ -59,7 +59,7 @@ public class DroneImpl implements Drone {
 	private final Preferences preferences;
 
 	public DroneImpl(MAVLinkStreams.MAVLinkOutputStream mavClient, DroneInterfaces.Clock clock,
-			DroneInterfaces.Handler handler, Preferences pref) {
+			DroneInterfaces.Handler handler, Preferences pref, StreamRates.Rates rates) {
 		this.MavClient = mavClient;
 		this.preferences = pref;
 
@@ -77,7 +77,7 @@ public class DroneImpl implements Drone {
         this.home = new Home(this);
         this.mission = new Mission(this);
         this.missionStats = new MissionStats(this);
-        this.streamRates = new StreamRates(this);
+        this.streamRates = new StreamRates(this, rates);
         this.altitude = new Altitude(this);
         this.orientation = new Orientation(this);
         this.navigation = new Navigation(this);
