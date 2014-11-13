@@ -37,6 +37,11 @@ final class DPServices extends IDroidPlannerServices.Stub {
     }
 
     @Override
+    public boolean ping() throws RemoteException {
+        return true;
+    }
+
+    @Override
     public IDroidPlannerApi registerWithDrone(ConnectionParameter params, IDroidPlannerApiCallback callback) throws RemoteException {
         return getService().connectToApi(params, callback);
     }
