@@ -24,6 +24,7 @@ public class Radio extends DroneVariable implements DroneInterfaces.OnDroneListe
 
 	public Radio(Drone myDrone) {
 		super(myDrone);
+        myDrone.addDroneListener(this);
 	}
 
 	public int getRxErrors() {

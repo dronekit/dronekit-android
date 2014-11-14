@@ -31,6 +31,8 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener {
 	@Override
 	public void onDroneEvent(DroneEventsType event, Drone drone) {
 		switch (event) {
+        case HEARTBEAT_FIRST:
+        case HEARTBEAT_RESTORED:
 		case MODE:
 			if (isGuidedMode(myDrone)) {
 				initialize();

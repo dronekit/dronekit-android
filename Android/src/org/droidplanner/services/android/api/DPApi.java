@@ -152,10 +152,12 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
         final Drone drone =getDroneMgr().getDrone();
         org.droidplanner.core.drone.variables.State droneState = drone.getState();
         ApmModes droneMode = droneState.getMode();
+        Calibration calibration = drone.getCalibrationSetup();
+        String calibrationMessage = calibration.isCalibrating() ? calibration.getMessage() : null;
 
         return new State(getVehicleMode(droneMode), droneState.isArmed(),
                 droneState.isFlying(), droneState.getWarning(), drone.getMavlinkVersion(),
-                drone.getCalibrationSetup().getMessage());
+                calibrationMessage);
     }
 
     @Override
