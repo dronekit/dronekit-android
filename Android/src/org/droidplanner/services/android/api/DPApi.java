@@ -769,6 +769,12 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
         return proxyPrints;
     }
 
+    @Override
+    public FootPrint getCurrentFieldOfView() throws RemoteException {
+        return getProxyCameraFootPrint(getDroneMgr().getDrone().getCamera().getCurrentFieldOfView
+                ());
+    }
+
     private static FootPrint getProxyCameraFootPrint(Footprint footprint){
         if(footprint == null) return null;
 
