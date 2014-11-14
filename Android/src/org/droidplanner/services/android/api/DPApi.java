@@ -54,7 +54,7 @@ import org.droidplanner.core.gcs.follow.Follow;
 import org.droidplanner.core.gcs.follow.FollowAlgorithm;
 import org.droidplanner.core.helpers.coordinates.Coord2D;
 import org.droidplanner.core.model.Drone;
-import org.droidplanner.core.mission.survey.CameraInfo;
+import org.droidplanner.core.survey.CameraInfo;
 import org.droidplanner.core.parameters.Parameter;
 import org.droidplanner.core.survey.Footprint;
 import org.droidplanner.services.android.R;
@@ -752,13 +752,13 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
 
     @Override
     public FootPrint getLastCameraFootPrint() throws RemoteException {
-        Footprint lastFootprint = getDroneMgr().getDrone().getCameraFootprints().getLastFootprint();
+        Footprint lastFootprint = getDroneMgr().getDrone().getCamera().getLastFootprint();
         return getProxyCameraFootPrint(lastFootprint);
     }
 
     @Override
     public FootPrint[] getCameraFootPrints() throws RemoteException {
-        List<Footprint> footprints = getDroneMgr().getDrone().getCameraFootprints().getFootprints();
+        List<Footprint> footprints = getDroneMgr().getDrone().getCamera().getFootprints();
         final int printsCount = footprints.size();
 
         FootPrint[] proxyPrints = new FootPrint[printsCount];
@@ -772,8 +772,8 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
     private static FootPrint getProxyCameraFootPrint(Footprint footprint){
         if(footprint == null) return null;
 
-        return new FootPrint(MathUtils.coord2DToLatLong(footprint.getCenter()),
-                MathUtils.coord2DToLatLong(footprint.getVertex()));
+        return new FootPrint(footprint.getGSD(),
+                MathUtils.coord2DToLatLong(footprint.getVertexInGlobalFrame()));
     }
 
     @Override

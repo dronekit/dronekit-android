@@ -12,7 +12,7 @@ import java.util.List;
 import org.droidplanner.services.android.utils.file.DirectoryPath;
 import org.droidplanner.services.android.utils.file.FileList;
 import org.droidplanner.services.android.utils.file.IO.CameraInfoReader;
-import org.droidplanner.core.mission.survey.CameraInfo;
+import org.droidplanner.core.survey.CameraInfo;
 
 import android.content.Context;
 

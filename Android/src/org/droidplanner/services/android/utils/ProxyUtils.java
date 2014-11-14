@@ -29,7 +29,7 @@ import org.droidplanner.core.helpers.units.Speed;
 import org.droidplanner.core.mission.Mission;
 import org.droidplanner.core.mission.commands.ConditionYaw;
 import org.droidplanner.core.mission.commands.ReturnToHome;
-import org.droidplanner.core.mission.survey.CameraInfo;
+import org.droidplanner.core.survey.CameraInfo;
 import org.droidplanner.core.mission.survey.SurveyData;
 
 import java.util.List;
