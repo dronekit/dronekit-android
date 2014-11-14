@@ -14,6 +14,7 @@ import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Logger;
 import com.google.android.gms.analytics.Tracker;
+import com.ox3dr.services.android.lib.drone.connection.DroneSharePrefs;
 
 /**
  * Components related to google analytics logic.
@@ -94,13 +95,8 @@ public class GAUtils {
 		}
 	}
 
-	public static void startNewSession(Context context) {
-		final DroidPlannerPrefs prefs = new DroidPlannerPrefs(context);
-
-		final String login = prefs.getDroneshareLogin();
-		final String password = prefs.getDronesharePassword();
-		final boolean isDroneShareUser = prefs.getLiveUploadEnabled() && !login.isEmpty()
-				&& !password.isEmpty();
+	public static void startNewSession(DroneSharePrefs prefs) {
+		final boolean isDroneShareUser = prefs != null && prefs.isEnabled() && prefs.areLoginCredentialsSet();
 
 		sendHit(new HitBuilders.AppViewBuilder()
 				.setNewSession()

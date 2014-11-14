@@ -133,7 +133,12 @@ public class MagnetometerCalibration implements OnDroneListener {
 	void addpoint(Drone drone) {
 		final Magnetometer mag = drone.getMagnetometer();
 		int[] offsets = mag.getOffsets();
-		ThreeSpacePoint point = new ThreeSpacePoint(mag.getX()-offsets[0], mag.getY()-offsets[1], mag.getZ()-offsets[2]);
+        ThreeSpacePoint point;
+        if(offsets == null)
+            point = new ThreeSpacePoint(mag.getX(), mag.getY(), mag.getZ());
+        else
+		    point = new ThreeSpacePoint(mag.getX()-offsets[0], mag.getY()-offsets[1], mag.getZ()-offsets[2]);
+
 		points.add(point);
 	}
 

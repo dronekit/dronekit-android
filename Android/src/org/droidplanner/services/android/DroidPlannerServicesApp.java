@@ -2,7 +2,6 @@ package org.droidplanner.services.android;
 
 import android.app.Application;
 
-import org.droidplanner.services.android.communication.service.UploaderService;
 import org.droidplanner.services.android.utils.analytics.GAUtils;
 import org.droidplanner.services.android.utils.file.IO.ExceptionWriter;
 
@@ -28,10 +27,6 @@ public class DroidPlannerServicesApp extends Application {
         Thread.setDefaultUncaughtExceptionHandler(handler);
 
         GAUtils.initGATracker(this);
-        GAUtils.startNewSession(getApplicationContext());
-
-        // Any time the application is started, do a quick scan to see if we
-        // need any uploads
-        startService(UploaderService.createIntent(this));
+        GAUtils.startNewSession(null);
     }
 }

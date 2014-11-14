@@ -1,10 +1,7 @@
 package org.droidplanner.services.android.utils;
 
-import android.graphics.Point;
-
 import com.ox3dr.services.android.lib.coordinate.LatLong;
 import com.ox3dr.services.android.lib.coordinate.LatLongAlt;
-import com.ox3dr.services.android.lib.coordinate.Point3D;
 
 import org.droidplanner.core.helpers.coordinates.Coord2D;
 import org.droidplanner.core.helpers.coordinates.Coord3D;
@@ -20,25 +17,30 @@ import ellipsoidFit.ThreeSpacePoint;
  */
 public class MathUtils {
 
-    public static ArrayList<Point3D> threeSpacePointToPoint3D(List<ThreeSpacePoint> spacePoints){
-        final ArrayList<Point3D> pointsList = new ArrayList<Point3D>();
+    public static double[][] threeSpacePointToPointsArray(List<ThreeSpacePoint> spacePoints){
+        final int pointsCount = spacePoints == null ? 0 : spacePoints.size();
+        final double[][] pointsArray = new double[3][pointsCount];
 
-        if(spacePoints != null && !spacePoints.isEmpty()) {
-            for (ThreeSpacePoint spacePoint : spacePoints) {
-                Point3D point = new Point3D(spacePoint.x, spacePoint.y, spacePoint.z);
-                pointsList.add(point);
+        if(pointsCount > 0) {
+            for (int i = 0; i < pointsCount; i++) {
+                ThreeSpacePoint point = spacePoints.get(i);
+                pointsArray[0][i] = point.x;
+                pointsArray[1][i] = point.y;
+                pointsArray[2][i] = point.z;
             }
         }
 
-        return pointsList;
+        return pointsArray;
     }
 
-    public static ArrayList<ThreeSpacePoint> point3DToThreeSpacePoint(List<Point3D> points){
-        final ArrayList<ThreeSpacePoint> spacePoints = new ArrayList<ThreeSpacePoint>();
+    public static ArrayList<ThreeSpacePoint> pointsArrayToThreeSpacePoint(double[][] points){
+        final int pointsCount = points == null ? 0 : points[0].length;
+        final ArrayList<ThreeSpacePoint> spacePoints = new ArrayList<ThreeSpacePoint>(pointsCount);
 
-        if(points != null && !points.isEmpty()){
-            for(Point3D point: points){
-                ThreeSpacePoint spacePoint = new ThreeSpacePoint(point.x, point.y, point.z);
+        if(pointsCount > 0){
+            for(int i = 0; i < pointsCount; i++){
+                ThreeSpacePoint spacePoint = new ThreeSpacePoint(points[0][i], points[1][i],
+                        points[2][i]);
                 spacePoints.add(spacePoint);
             }
         }

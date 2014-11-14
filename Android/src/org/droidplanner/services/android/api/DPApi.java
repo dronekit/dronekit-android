@@ -12,7 +12,6 @@ import com.MAVLink.Messages.ardupilotmega.msg_mission_item;
 import com.MAVLink.Messages.enums.MAV_TYPE;
 import com.ox3dr.services.android.lib.coordinate.LatLong;
 import com.ox3dr.services.android.lib.coordinate.LatLongAlt;
-import com.ox3dr.services.android.lib.coordinate.Point3D;
 import com.ox3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.ox3dr.services.android.lib.drone.connection.ConnectionResult;
 import com.ox3dr.services.android.lib.drone.event.Event;
@@ -574,8 +573,11 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
     }
 
     @Override
-    public void startMagnetometerCalibration(List<Point3D> startPoints) throws RemoteException {
-        getDroneMgr().startMagnetometerCalibration(MathUtils.point3DToThreeSpacePoint(startPoints));
+    public void startMagnetometerCalibration(double[] startPointsX,
+                                             double[] startPointsY,
+                                             double[] startPointsZ) throws RemoteException {
+        getDroneMgr().startMagnetometerCalibration(MathUtils.pointsArrayToThreeSpacePoint(new
+                double[][]{startPointsX, startPointsY, startPointsZ}));
     }
 
     @Override
@@ -848,12 +850,6 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
     }
 
     @Override
-    public void enableDroneShare(String username, String password, boolean isEnabled) throws RemoteException {
-        //TODO: complete implementation
-        throw new UnsupportedOperationException("Method not yet implemented.");
-    }
-
-    @Override
     public void triggerCamera() throws RemoteException {
         MavLinkROI.triggerCamera(getDroneMgr().getDrone());
     }
@@ -1102,8 +1098,11 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
     @Override
     public void onStarted(List<ThreeSpacePoint> points) {
         Bundle paramsBundle = new Bundle();
-        paramsBundle.putParcelableArrayList(Extra.EXTRA_CALIBRATION_MAG_POINTS,
-                MathUtils.threeSpacePointToPoint3D(points));
+        double[][] pointsArr = MathUtils.threeSpacePointToPointsArray(points);
+        paramsBundle.putSerializable(Extra.EXTRA_CALIBRATION_MAG_POINTS_X, pointsArr[0]);
+        paramsBundle.putSerializable(Extra.EXTRA_CALIBRATION_MAG_POINTS_Y, pointsArr[1]);
+        paramsBundle.putSerializable(Extra.EXTRA_CALIBRATION_MAG_POINTS_Z, pointsArr[2]);
+
         try {
             getCallback().onDroneEvent(Event.EVENT_CALIBRATION_MAG_STARTED, paramsBundle);
         } catch(DeadObjectException e){
@@ -1127,8 +1126,11 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
         paramsBundle.putDouble(Extra.EXTRA_CALIBRATION_MAG_FITNESS, fitness);
         paramsBundle.putDoubleArray(Extra.EXTRA_CALIBRATION_MAG_FIT_CENTER, fitCenter);
         paramsBundle.putDoubleArray(Extra.EXTRA_CALIBRATION_MAG_FIT_RADII, fitRadii);
-        paramsBundle.putParcelableArrayList(Extra.EXTRA_CALIBRATION_MAG_POINTS,
-                MathUtils.threeSpacePointToPoint3D(points));
+
+        double[][] pointsArr = MathUtils.threeSpacePointToPointsArray(points);
+        paramsBundle.putSerializable(Extra.EXTRA_CALIBRATION_MAG_POINTS_X, pointsArr[0]);
+        paramsBundle.putSerializable(Extra.EXTRA_CALIBRATION_MAG_POINTS_Y, pointsArr[1]);
+        paramsBundle.putSerializable(Extra.EXTRA_CALIBRATION_MAG_POINTS_Z, pointsArr[2]);
 
         try {
             getCallback().onDroneEvent(Event.EVENT_CALIBRATION_MAG_ESTIMATION, paramsBundle);

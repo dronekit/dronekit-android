@@ -15,6 +15,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.MAVLink.Messages.MAVLinkPacket;
+import com.ox3dr.services.android.lib.drone.connection.DroneSharePrefs;
 
 public abstract class AndroidMavLinkConnection extends MavLinkConnection {
 
@@ -28,12 +29,14 @@ public abstract class AndroidMavLinkConnection extends MavLinkConnection {
 
 	protected final Context mContext;
 	protected final DroidPlannerPrefs prefs;
+    private final DroneSharePrefs droneSharePrefs;
 
 	private DroneshareClient uploader;
 
-	public AndroidMavLinkConnection(Context applicationContext) {
+	public AndroidMavLinkConnection(Context applicationContext, DroneSharePrefs droneSharePrefs) {
 		this.mContext = applicationContext;
 		prefs = new DroidPlannerPrefs(applicationContext);
+        this.droneSharePrefs = droneSharePrefs;
 	}
 
 	@Override
@@ -59,17 +62,17 @@ public abstract class AndroidMavLinkConnection extends MavLinkConnection {
 		// Start a new ga analytics session. The new session will be tagged
 		// with the mavlink connection mechanism, as well as whether the user
 		// has an active droneshare account.
-		GAUtils.startNewSession(mContext);
+		GAUtils.startNewSession(this.droneSharePrefs);
 
-		String login = prefs.getDroneshareLogin();
-		String password = prefs.getDronesharePassword();
-		if (prefs.getLiveUploadEnabled() && !login.isEmpty() && !password.isEmpty()) {
-			mLogger.logInfo(TAG, "Starting live upload");
-			uploader = new DroneshareClient();
-			uploader.connect(login, password);
-		} else {
-			mLogger.logWarning(TAG, "Skipping live upload");
-		}
+        if(this.droneSharePrefs != null) {
+            if (droneSharePrefs.isLiveUploadEnabled() && droneSharePrefs.areLoginCredentialsSet()) {
+                mLogger.logInfo(TAG, "Starting live upload");
+                uploader = new DroneshareClient();
+                uploader.connect(droneSharePrefs.getUsername(), droneSharePrefs.getPassword());
+            } else {
+                mLogger.logWarning(TAG, "Skipping live upload");
+            }
+        }
 	}
 
 	@Override
@@ -78,7 +81,7 @@ public abstract class AndroidMavLinkConnection extends MavLinkConnection {
 			closeAndroidConnection();
 		} finally {
 			// See if we can at least do a delayed upload
-			mContext.startService(UploaderService.createIntent(mContext));
+            UploaderService.kickStart(mContext, this.droneSharePrefs);
 
 			if (uploader != null)
 				uploader.close();

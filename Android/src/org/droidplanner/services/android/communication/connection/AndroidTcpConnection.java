@@ -9,14 +9,16 @@ import org.droidplanner.core.model.Logger;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.ox3dr.services.android.lib.drone.connection.DroneSharePrefs;
+
 public class AndroidTcpConnection extends AndroidMavLinkConnection {
 
 	private final TcpConnection mConnectionImpl;
     private final String serverIp;
     private final int serverPort;
 
-	public AndroidTcpConnection(Context context, String tcpServerIp, int tcpServerPort) {
-		super(context);
+	public AndroidTcpConnection(Context context, DroneSharePrefs droneSharePrefs, String tcpServerIp, int tcpServerPort) {
+		super(context, droneSharePrefs);
         this.serverIp = tcpServerIp;
         this.serverPort = tcpServerPort;
 

@@ -38,27 +38,6 @@ public class DroidPlannerPrefs implements org.droidplanner.core.drone.Preference
 		prefs = PreferenceManager.getDefaultSharedPreferences(context);
 	}
 
-	public boolean getLiveUploadEnabled() {
-		// FIXME: Disabling live upload as it often causes the app to freeze on
-		// disconnect.
-		// return
-		// prefs.getBoolean(context.getString(R.string.pref_live_upload_enabled_key),
-		// false);
-		return false;
-	}
-
-	public String getDroneshareLogin() {
-		return prefs.getString(context.getString(R.string.pref_dshare_username_key), "").trim();
-	}
-
-	public String getDronesharePassword() {
-		return prefs.getString(context.getString(R.string.pref_dshare_password_key), "").trim();
-	}
-
-	public boolean getDroneshareEnabled() {
-		return prefs.getBoolean(context.getString(R.string.pref_dshare_enabled_key), true);
-	}
-
 	/**
 	 * Return a unique ID for the vehicle controlled by this tablet. FIXME,
 	 * someday let the users select multiple vehicles

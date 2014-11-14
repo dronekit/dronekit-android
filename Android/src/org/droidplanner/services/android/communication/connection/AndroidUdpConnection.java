@@ -9,13 +9,15 @@ import org.droidplanner.core.model.Logger;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.ox3dr.services.android.lib.drone.connection.DroneSharePrefs;
+
 public class AndroidUdpConnection extends AndroidMavLinkConnection {
 
 	private final UdpConnection mConnectionImpl;
     private final int serverPort;
 
-	public AndroidUdpConnection(Context context, int udpServerPort) {
-		super(context);
+	public AndroidUdpConnection(Context context, DroneSharePrefs droneSharePrefs, int udpServerPort) {
+		super(context, droneSharePrefs);
         this.serverPort = udpServerPort;
 
 		mConnectionImpl = new UdpConnection() {

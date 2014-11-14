@@ -19,10 +19,11 @@ import android.util.Log;
 
 import com.geeksville.apiproxy.DirectoryUploader;
 import com.geeksville.apiproxy.IUploadListener;
+import com.ox3dr.services.android.lib.drone.connection.DroneSharePrefs;
 
 /**
  * Provides delayed uploads to the DroneShare service.
- * 
+ *
  * If you send any intent to this service it will scan the tlog directory and
  * upload any complete tlogs it finds.
  */
@@ -33,8 +34,9 @@ public class UploaderService extends IntentService {
 
 	private static final int ONGOING_UPLOAD_NOTIFICATION_ID = 123;
 	private static final int UPLOAD_STATUS_NOTIFICATION_ID = 124;
+    private static final String EXTRA_DRONESHARE_PREFS = "extra_droneshare_prefs";
 
-	private DroidPlannerPrefs prefs;
+    private DroidPlannerPrefs dpPrefs;
 
 	private final IUploadListener callback = new IUploadListener() {
 
@@ -117,30 +119,30 @@ public class UploaderService extends IntentService {
 	public void onCreate() {
 		super.onCreate();
 
-		prefs = new DroidPlannerPrefs(this);
-		notifyManager = NotificationManagerCompat.from(getApplicationContext());
+        final Context context = getApplicationContext();
+		dpPrefs = new DroidPlannerPrefs(context);
+		notifyManager = NotificationManagerCompat.from(context);
 	}
 
 	@Override
 	protected void onHandleIntent(Intent intent) {
 		// Check if droneshare is enabled, and the login credentials set before
-		// trying to do
-		// anything.
-		if (prefs.getDroneshareEnabled() && areLoginCredentialsSet()) {
+		// trying to do anything.
+        DroneSharePrefs droneSharePrefs = intent.getParcelableExtra(EXTRA_DRONESHARE_PREFS);
+		if (droneSharePrefs != null && droneSharePrefs.isEnabled() && droneSharePrefs.areLoginCredentialsSet()) {
 
+            final Context context = getApplicationContext();
 			// Any time we receive an intent - rescan the directory
-			if (NetworkConnectivityReceiver.isNetworkAvailable(this)) {
+			if (NetworkConnectivityReceiver.isNetworkAvailable(context)) {
 				Log.i(TAG, "Scanning for new uploads");
-				doUploads();
+				doUploads(droneSharePrefs);
 			} else {
 				Log.v(TAG, "Not scanning - network offline");
 
 				// Activating the network connectivity receiver so we can be
-				// restarted when
-				// connectivity is restored.
+				// restarted when connectivity is restored.
 				Log.d(TAG, "Activating connectivity receiver");
-				NetworkConnectivityReceiver.enableConnectivityReceiver(getApplicationContext(),
-						true);
+				NetworkConnectivityReceiver.enableConnectivityReceiver(context,	true);
 			}
 		}
 	}
@@ -153,23 +155,20 @@ public class UploaderService extends IntentService {
 				.setAutoCancel(true).setPriority(NotificationCompat.PRIORITY_HIGH);
 	}
 
-	private boolean areLoginCredentialsSet() {
-		return !prefs.getDroneshareLogin().isEmpty() && !prefs.getDronesharePassword().isEmpty();
-	}
-
-	private void doUploads() {
+	private void doUploads(DroneSharePrefs prefs) {
 		File srcDir = DirectoryPath.getTLogPath();
 		File destDir = DirectoryPath.getSentPath();
 
-		String login = prefs.getDroneshareLogin();
-		String password = prefs.getDronesharePassword();
+		String login = prefs.getUsername();
+		String password = prefs.getPassword();
 
 		if (!login.isEmpty() && !password.isEmpty()) {
 			DirectoryUploader up = new DirectoryUploader(srcDir, destDir, callback, login,
-					password, prefs.getVehicleId(), apiKey, "DEFAULT");
+					password, dpPrefs.getVehicleId(), apiKey, "DEFAULT");
 
-			final Notification notification = generateNotificationBuilder().setContentText(
-					"Uploading log file").build();
+			final Notification notification = generateNotificationBuilder()
+                    .setContentText("Uploading log file")
+                    .build();
 			startForeground(ONGOING_UPLOAD_NOTIFICATION_ID, notification);
 			up.run();
 			stopForeground(true);
@@ -183,7 +182,15 @@ public class UploaderService extends IntentService {
 	/**
 	 * Create an Intent that will start this service
 	 */
-	static public Intent createIntent(Context context) {
-		return new Intent(context, UploaderService.class);
+	static public Intent createIntent(Context context, DroneSharePrefs droneSharePrefs) {
+		return new Intent(context, UploaderService.class).putExtra(EXTRA_DRONESHARE_PREFS,
+                droneSharePrefs);
 	}
+
+    public static void kickStart(Context context, DroneSharePrefs droneSharePrefs){
+        if(droneSharePrefs != null && droneSharePrefs.areLoginCredentialsSet() && droneSharePrefs
+                .isEnabled()) {
+            context.startService(UploaderService.createIntent(context, droneSharePrefs));
+        }
+    }
 }

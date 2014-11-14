@@ -18,6 +18,8 @@ import android.content.SharedPreferences;
 import android.os.ParcelUuid;
 import android.util.Log;
 
+import com.ox3dr.services.android.lib.drone.connection.DroneSharePrefs;
+
 public class BluetoothConnection extends AndroidMavLinkConnection {
 	private static final String BLUE = "BLUETOOTH";
 	private static final String UUID_SPP_DEVICE = "00001101-0000-1000-8000-00805F9B34FB";
@@ -28,8 +30,8 @@ public class BluetoothConnection extends AndroidMavLinkConnection {
 
     private final String bluetoothAddress;
 
-	public BluetoothConnection(Context parentContext, String btAddress) {
-		super(parentContext);
+	public BluetoothConnection(Context parentContext, DroneSharePrefs droneSharePrefs, String btAddress) {
+		super(parentContext, droneSharePrefs);
         this.bluetoothAddress = btAddress;
 
 		mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();

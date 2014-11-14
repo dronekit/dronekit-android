@@ -15,6 +15,8 @@ import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 import android.util.Log;
 
+import com.ox3dr.services.android.lib.drone.connection.DroneSharePrefs;
+
 public class UsbConnection extends AndroidMavLinkConnection {
 
 	private static final String TAG = UsbConnection.class.getSimpleName();
@@ -25,8 +27,8 @@ public class UsbConnection extends AndroidMavLinkConnection {
 
 	private UsbConnectionImpl mUsbConnection;
 
-	public UsbConnection(Context parentContext, int baudRate) {
-		super(parentContext);
+	public UsbConnection(Context parentContext, DroneSharePrefs droneSharePrefs, int baudRate) {
+		super(parentContext, droneSharePrefs);
         mBaudRate = baudRate;
 	}
 

@@ -9,6 +9,8 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
 
+import org.droidplanner.services.android.api.DroidPlannerService;
+
 /**
  * When the device's network connectivity is restored, check and see if there's
  * anymore data to upload.
@@ -26,14 +28,14 @@ public class NetworkConnectivityReceiver extends BroadcastReceiver {
 
 			if (noConnectivity) {
 				// No connectivity. Keep the receiver enabled to listen for
-				// possible connectivity
-				// changes in the future.
+				// possible connectivity changes in the future.
 				return;
 			}
 
 			// There is connectivity! Restart the droneshare uploader service,
 			// and disable this connectivity receiver.
-			context.startService(UploaderService.createIntent(context));
+            context.startService(new Intent(context, DroidPlannerService.class).setAction
+                    (DroidPlannerService.ACTION_KICK_START_DRONESHARE_UPLOADS));
 
 			Log.d(TAG, "Disabling connectivity receiver.");
 			enableConnectivityReceiver(context, false);
