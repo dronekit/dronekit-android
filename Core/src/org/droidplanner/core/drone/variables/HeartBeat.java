@@ -4,6 +4,7 @@ import org.droidplanner.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.core.drone.DroneInterfaces.Handler;
 import org.droidplanner.core.drone.DroneInterfaces.OnDroneListener;
 import org.droidplanner.core.drone.DroneVariable;
+import org.droidplanner.core.gcs.GCSHeartbeat;
 import org.droidplanner.core.model.Drone;
 
 import com.MAVLink.Messages.ardupilotmega.msg_heartbeat;
@@ -18,6 +19,7 @@ public class HeartBeat extends DroneVariable implements OnDroneListener {
 
 	public HeartbeatState heartbeatState = HeartbeatState.FIRST_HEARTBEAT;
 	public int droneID = 1;
+    private final GCSHeartbeat gcsHeartbeat;
 
 	/**
 	 * Stores the version of the mavlink protocol.
@@ -39,6 +41,7 @@ public class HeartBeat extends DroneVariable implements OnDroneListener {
 	public HeartBeat(Drone myDrone, Handler handler) {
 		super(myDrone);
 		this.watchdog = handler;
+        this.gcsHeartbeat = new GCSHeartbeat(myDrone, 1);
 		myDrone.addDroneListener(this);
 	}
 
@@ -80,10 +83,12 @@ public class HeartBeat extends DroneVariable implements OnDroneListener {
                 break;
 
             case CONNECTED:
+                gcsHeartbeat.setActive(true);
 			notifyConnected();
 			break;
 
 		case DISCONNECTED:
+            gcsHeartbeat.setActive(false);
 			notifyDisconnected();
 			break;
 

@@ -1,14 +1,11 @@
 package org.droidplanner.services.android.drone;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Handler;
 import android.os.SystemClock;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.MAVLink.Messages.MAVLinkMessage;
-import com.google.android.gms.internal.ex;
 import com.ox3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.ox3dr.services.android.lib.drone.connection.StreamRates;
 
@@ -16,7 +13,6 @@ import org.droidplanner.core.MAVLink.MAVLinkStreams;
 import org.droidplanner.core.MAVLink.MavLinkMsgHandler;
 import org.droidplanner.core.drone.DroneImpl;
 import org.droidplanner.core.drone.DroneInterfaces;
-import org.droidplanner.core.drone.variables.Magnetometer;
 import org.droidplanner.core.drone.variables.StreamRates.Rates;
 import org.droidplanner.core.drone.variables.helpers.MagnetometerCalibration;
 import org.droidplanner.core.gcs.follow.Follow;
@@ -124,40 +120,39 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream, DroneEve
 
         droneEventsListeners.clear();
 
-        if(magCalibration.isRunning())
+        if (magCalibration.isRunning())
             magCalibration.stop();
 
-        if(followMe.isEnabled())
+        if (followMe.isEnabled())
             followMe.toggleFollowMeState();
     }
 
-    public void addDroneEventsListener(DroneEventsListener listener){
+    public void addDroneEventsListener(DroneEventsListener listener) {
         droneEventsListeners.add(listener);
 
-        if(isConnected()){
+        if (isConnected()) {
             listener.onDroneEvent(DroneInterfaces.DroneEventsType.CONNECTED, drone);
-        }
-        else{
+        } else {
             listener.onDroneEvent(DroneInterfaces.DroneEventsType.DISCONNECTED, drone);
         }
     }
 
-    public void removeDroneEventsListener(DroneEventsListener listener){
-        if(droneEventsListeners.remove(listener)){
+    public void removeDroneEventsListener(DroneEventsListener listener) {
+        if (droneEventsListeners.remove(listener)) {
             listener.onDroneEvent(DroneInterfaces.DroneEventsType.DISCONNECTED, drone);
         }
     }
 
     public void connect() throws ConnectionException {
         MAVLinkClient mavClient = (MAVLinkClient) drone.getMavClient();
-        if(!mavClient.isConnected()){
+        if (!mavClient.isConnected()) {
             mavClient.openConnection();
         }
     }
 
     public void disconnect() throws ConnectionException {
         MAVLinkClient mavClient = (MAVLinkClient) drone.getMavClient();
-        if(mavClient.isConnected())
+        if (mavClient.isConnected())
             mavClient.closeConnection();
     }
 
@@ -171,16 +166,16 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream, DroneEve
         this.drone.notifyDroneEvent(DroneInterfaces.DroneEventsType.DISCONNECTED);
     }
 
-    public void startMagnetometerCalibration(List<ThreeSpacePoint> startPoints){
-        if(magCalibration.isRunning()){
+    public void startMagnetometerCalibration(List<ThreeSpacePoint> startPoints) {
+        if (magCalibration.isRunning()) {
             magCalibration.stop();
         }
 
         magCalibration.start(startPoints);
     }
 
-    public void stopMagnetometerCalibration(){
-        if(magCalibration.isRunning())
+    public void stopMagnetometerCalibration() {
+        if (magCalibration.isRunning())
             magCalibration.stop();
     }
 
@@ -191,75 +186,75 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream, DroneEve
 
     @Override
     public void onStreamError(String errorMsg) {
-        for(DroneEventsListener listener : droneEventsListeners)
+        for (DroneEventsListener listener : droneEventsListeners)
             listener.onConnectionFailed(errorMsg);
     }
 
-    public ConnectionParameter getConnectionParameter(){
+    public ConnectionParameter getConnectionParameter() {
         return this.connectionParams;
     }
 
-    public Drone getDrone(){
+    public Drone getDrone() {
         return this.drone;
     }
 
-    public Follow getFollowMe(){
+    public Follow getFollowMe() {
         return followMe;
     }
 
-    public DroneInterfaces.Handler getHandler(){
+    public DroneInterfaces.Handler getHandler() {
         return dpHandler;
     }
 
-    public int getListenersCount(){
+    public int getListenersCount() {
         return droneEventsListeners.size();
     }
 
-    public MagnetometerCalibration getMagCalibration(){
+    public MagnetometerCalibration getMagCalibration() {
         return magCalibration;
     }
 
-    public boolean isConnected(){
+    public boolean isConnected() {
         return drone.getMavClient().isConnected();
     }
 
-    public CameraInfoLoader getCameraInfoLoader(){
+    public CameraInfoLoader getCameraInfoLoader() {
         return cameraInfoLoader;
     }
 
     @Override
     public void onDroneEvent(DroneInterfaces.DroneEventsType event, Drone drone) {
-        for(DroneEventsListener listener: droneEventsListeners)
+        for (DroneEventsListener listener : droneEventsListeners)
             listener.onDroneEvent(event, drone);
     }
 
     @Override
     public void onBeginReceivingParameters() {
-        for(DroneEventsListener listener:droneEventsListeners)
+        for (DroneEventsListener listener : droneEventsListeners)
             listener.onBeginReceivingParameters();
     }
 
     @Override
     public void onParameterReceived(Parameter parameter, int index, int count) {
-        for(DroneEventsListener listener:droneEventsListeners)
+        for (DroneEventsListener listener : droneEventsListeners)
             listener.onParameterReceived(parameter, index, count);
     }
 
     @Override
     public void onEndReceivingParameters(List<Parameter> parameter) {
-        for(DroneEventsListener listener:droneEventsListeners)
+        for (DroneEventsListener listener : droneEventsListeners)
             listener.onEndReceivingParameters(parameter);
     }
 
     @Override
     public void onStarted(List<ThreeSpacePoint> points) {
-        for(DroneEventsListener listener: droneEventsListeners)
+        for (DroneEventsListener listener : droneEventsListeners)
             listener.onStarted(points);
     }
 
     @Override
     public void newEstimation(FitPoints fit, List<ThreeSpacePoint> points) {
-        for(DroneEventsListener listener: droneEventsListeners)
+        for (DroneEventsListener listener : droneEventsListeners)
             listener.newEstimation(fit, points);
     }
 
@@ -271,7 +266,7 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream, DroneEve
             Log.e(TAG, e.getMessage(), e);
         }
 
-        for(DroneEventsListener listener: droneEventsListeners)
+        for (DroneEventsListener listener : droneEventsListeners)
             listener.finished(fit, offsets);
     }
 
