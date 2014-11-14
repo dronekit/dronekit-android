@@ -306,8 +306,10 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
         List<Parameter> droneParameters = drone.getParameters().getParametersList();
         if(!droneParameters.isEmpty()){
             for(Parameter param : droneParameters){
-                proxyParams.put(param.name, new com.ox3dr.services.android.lib.drone.property
-                        .Parameter(param.name, param.value, param.type));
+                if(param.name != null) {
+                    proxyParams.put(param.name, new com.ox3dr.services.android.lib.drone.property
+                            .Parameter(param.name, param.value, param.type));
+                }
             }
 
             try {
