@@ -149,12 +149,17 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream, DroneEve
         if (!mavClient.isConnected()) {
             mavClient.openConnection();
         }
+        else{
+            onDroneEvent(DroneInterfaces.DroneEventsType.CONNECTED, drone);
+        }
     }
 
     public void disconnect() throws ConnectionException {
         MAVLinkClient mavClient = (MAVLinkClient) drone.getMavClient();
         if (mavClient.isConnected())
             mavClient.closeConnection();
+        else
+            onDroneEvent(DroneInterfaces.DroneEventsType.DISCONNECTED, drone);
     }
 
     @Override
