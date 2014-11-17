@@ -10,35 +10,34 @@ import android.util.Log;
 import com.MAVLink.Messages.ApmModes;
 import com.MAVLink.Messages.ardupilotmega.msg_mission_item;
 import com.MAVLink.Messages.enums.MAV_TYPE;
-import com.ox3dr.services.android.lib.coordinate.LatLong;
-import com.ox3dr.services.android.lib.coordinate.LatLongAlt;
-import com.ox3dr.services.android.lib.drone.connection.ConnectionParameter;
-import com.ox3dr.services.android.lib.drone.connection.ConnectionResult;
-import com.ox3dr.services.android.lib.drone.event.Event;
-import com.ox3dr.services.android.lib.drone.event.Extra;
-import com.ox3dr.services.android.lib.drone.mission.item.MissionItem;
-import com.ox3dr.services.android.lib.drone.mission.item.complex.CameraDetail;
-import com.ox3dr.services.android.lib.drone.mission.item.complex.StructureScanner;
-import com.ox3dr.services.android.lib.drone.mission.item.complex.Survey;
-import com.ox3dr.services.android.lib.drone.mission.item.raw.MissionItemMessage;
-import com.ox3dr.services.android.lib.drone.property.Altitude;
-import com.ox3dr.services.android.lib.drone.property.Attitude;
-import com.ox3dr.services.android.lib.drone.property.Battery;
-import com.ox3dr.services.android.lib.drone.property.FootPrint;
-import com.ox3dr.services.android.lib.drone.property.Gps;
-import com.ox3dr.services.android.lib.drone.property.GuidedState;
-import com.ox3dr.services.android.lib.drone.property.Home;
-import com.ox3dr.services.android.lib.drone.mission.Mission;
-import com.ox3dr.services.android.lib.drone.property.Signal;
-import com.ox3dr.services.android.lib.drone.property.Speed;
-import com.ox3dr.services.android.lib.drone.property.State;
-import com.ox3dr.services.android.lib.drone.property.Type;
-import com.ox3dr.services.android.lib.drone.property.VehicleMode;
-import com.ox3dr.services.android.lib.drone.property.Parameters;
-import com.ox3dr.services.android.lib.gcs.follow.FollowType;
-import com.ox3dr.services.android.lib.gcs.follow.FollowState;
-import com.ox3dr.services.android.lib.model.IDroidPlannerApi;
-import com.ox3dr.services.android.lib.model.IDroidPlannerApiCallback;
+import com.o3dr.services.android.lib.coordinate.LatLong;
+import com.o3dr.services.android.lib.coordinate.LatLongAlt;
+import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
+import com.o3dr.services.android.lib.drone.connection.ConnectionResult;
+import com.o3dr.services.android.lib.drone.event.Event;
+import com.o3dr.services.android.lib.drone.event.Extra;
+import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
+import com.o3dr.services.android.lib.drone.mission.item.complex.CameraDetail;
+import com.o3dr.services.android.lib.drone.mission.item.complex.StructureScanner;
+import com.o3dr.services.android.lib.drone.mission.item.complex.Survey;
+import com.o3dr.services.android.lib.drone.property.Altitude;
+import com.o3dr.services.android.lib.drone.property.Attitude;
+import com.o3dr.services.android.lib.drone.property.Battery;
+import com.o3dr.services.android.lib.drone.property.FootPrint;
+import com.o3dr.services.android.lib.drone.property.Gps;
+import com.o3dr.services.android.lib.drone.property.GuidedState;
+import com.o3dr.services.android.lib.drone.property.Home;
+import com.o3dr.services.android.lib.drone.mission.Mission;
+import com.o3dr.services.android.lib.drone.property.Signal;
+import com.o3dr.services.android.lib.drone.property.Speed;
+import com.o3dr.services.android.lib.drone.property.State;
+import com.o3dr.services.android.lib.drone.property.Type;
+import com.o3dr.services.android.lib.drone.property.VehicleMode;
+import com.o3dr.services.android.lib.drone.property.Parameters;
+import com.o3dr.services.android.lib.gcs.follow.FollowType;
+import com.o3dr.services.android.lib.gcs.follow.FollowState;
+import com.o3dr.services.android.lib.model.IDroidPlannerApi;
+import com.o3dr.services.android.lib.model.IDroidPlannerApiCallback;
 
 import org.droidplanner.core.MAVLink.MavLinkArm;
 import org.droidplanner.core.MAVLink.MavLinkROI;
@@ -89,16 +88,9 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
     private IDroidPlannerApiCallback apiCallback;
     private DroneManager droneMgr;
 
-    DPApi(DroidPlannerService dpService, ConnectionParameter connParams,
-          IDroidPlannerApiCallback callback) throws RemoteException {
+    DPApi(DroidPlannerService dpService) throws RemoteException {
         serviceRef = new WeakReference<DroidPlannerService>(dpService);
         this.context = dpService.getApplicationContext();
-
-        this.apiCallback = callback;
-
-        this.droneMgr = dpService.getDroneForConnection(connParams);
-        this.droneMgr.addDroneEventsListener(this);
-
     }
 
     private DroidPlannerService getService() {
@@ -125,14 +117,6 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
 
     private void handleDeadObjectException(DeadObjectException e){
         Log.e(TAG, e.getMessage(), e);
-        getService().disconnectFromApi(getDroneMgr().getConnectionParameter(), getCallback());
-    }
-
-    void destroy() {
-        getDroneMgr().removeDroneEventsListener(this);
-        this.serviceRef.clear();
-        this.apiCallback = null;
-        this.droneMgr = null;
     }
 
     @Override
@@ -301,14 +285,14 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
     @Override
     public Parameters getParameters() throws RemoteException {
         final Drone drone = getDroneMgr().getDrone();
-        final Map<String, com.ox3dr.services.android.lib.drone.property.Parameter> proxyParams =
-                new HashMap<String, com.ox3dr.services.android.lib.drone.property.Parameter>();
+        final Map<String, com.o3dr.services.android.lib.drone.property.Parameter> proxyParams =
+                new HashMap<String, com.o3dr.services.android.lib.drone.property.Parameter>();
 
         List<Parameter> droneParameters = drone.getParameters().getParametersList();
         if(!droneParameters.isEmpty()){
             for(Parameter param : droneParameters){
                 if(param.name != null) {
-                    proxyParams.put(param.name, new com.ox3dr.services.android.lib.drone.property
+                    proxyParams.put(param.name, new com.o3dr.services.android.lib.drone.property
                             .Parameter(param.name, param.value, param.type));
                 }
             }
@@ -329,7 +313,7 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
             }
         }
 
-        return new Parameters(new ArrayList<com.ox3dr.services.android.lib.drone.property
+        return new Parameters(new ArrayList<com.o3dr.services.android.lib.drone.property
                 .Parameter>(proxyParams.values()));
     }
 
@@ -390,30 +374,6 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
     }
 
     @Override
-    public MissionItemMessage[] processMissionItems(MissionItem[] missionItems) throws
-            RemoteException {
-        org.droidplanner.core.mission.Mission droneMission = getDroneMgr().getDrone().getMission();
-
-        final int itemsCount = missionItems.length;
-        List<msg_mission_item> rawMissionItems = new ArrayList<msg_mission_item>(itemsCount);
-
-        for(int i = 0; i < itemsCount; i++){
-            org.droidplanner.core.mission.MissionItem item = ProxyUtils.getMissionItem
-                    (droneMission, missionItems[i]);
-
-            rawMissionItems.addAll(item.packMissionItem());
-        }
-
-        final int rawMsgsCount = rawMissionItems.size();
-        MissionItemMessage[] proxyMsgs = new MissionItemMessage[rawMsgsCount];
-        for(int i = 0; i < rawMsgsCount; i++){
-            proxyMsgs[i] = ProxyUtils.getRawMissionItem(rawMissionItems.get(i));
-        }
-
-        return proxyMsgs;
-    }
-
-    @Override
     public Signal getSignal() throws RemoteException {
         Radio droneRadio = getDroneMgr().getDrone().getRadio();
         return new Signal(droneRadio.isValid(), droneRadio.getRxErrors(), droneRadio.getFixed(),
@@ -429,7 +389,7 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
 
     @Override
     public boolean isConnected() throws RemoteException {
-        return getDroneMgr().isConnected();
+        return droneMgr != null && droneMgr.isConnected();
     }
 
     @Override
@@ -483,29 +443,52 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
     }
 
     @Override
-    public void connect() throws RemoteException {
+    public void connect(ConnectionParameter connParams, IDroidPlannerApiCallback callback) throws
+            RemoteException {
+        boolean hasValidDroneMgr = droneMgr != null;
+        if(hasValidDroneMgr && !droneMgr.getConnectionParameter().equals(connParams)){
+            disconnect();
+            hasValidDroneMgr = false;
+        }
+
+        this.apiCallback = callback;
+
+        if(!hasValidDroneMgr) {
+            this.droneMgr = getService().getDroneForConnection(connParams, this);
+        }
+
         try {
-            getDroneMgr().connect();
+            this.droneMgr.connect();
         } catch (ConnectionException e) {
             try {
                 getCallback().onConnectionFailed(new ConnectionResult(0, e.getMessage()));
             }catch(DeadObjectException d){
                 handleDeadObjectException(d);
             }
+
+            disconnect();
         }
     }
 
     @Override
     public void disconnect() throws RemoteException {
-        try {
-            getDroneMgr().disconnect();
-        } catch (ConnectionException e) {
+        if(droneMgr != null) {
+
             try {
-                getCallback().onConnectionFailed(new ConnectionResult(0, e.getMessage()));
-            }catch(DeadObjectException d){
-                handleDeadObjectException(d);
+                droneMgr.disconnect();
+            } catch (ConnectionException e) {
+                try {
+                    getCallback().onConnectionFailed(new ConnectionResult(0, e.getMessage()));
+                } catch (DeadObjectException d) {
+                    handleDeadObjectException(d);
+                }
             }
+
+            getService().releaseDroneManager(droneMgr, this);
+            droneMgr = null;
         }
+
+        apiCallback = null;
     }
 
     @Override
@@ -517,14 +500,14 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
     public void writeParameters(Parameters parameters) throws RemoteException {
         if(parameters == null) return;
 
-        List<com.ox3dr.services.android.lib.drone.property.Parameter> parametersList = parameters
+        List<com.o3dr.services.android.lib.drone.property.Parameter> parametersList = parameters
                 .getParameters();
         if(parametersList.isEmpty())
             return;
 
         final Drone drone =getDroneMgr().getDrone();
         org.droidplanner.core.drone.profiles.Parameters droneParams = drone.getParameters();
-        for(com.ox3dr.services.android.lib.drone.property.Parameter proxyParam : parametersList){
+        for(com.o3dr.services.android.lib.drone.property.Parameter proxyParam : parametersList){
             droneParams.sendParameter(new Parameter(proxyParam.getName(), proxyParam.getValue(),
                     proxyParam.getType()));
         }
@@ -540,21 +523,6 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
             droneMission.addMissionItem(ProxyUtils.getMissionItem(droneMission, item));
         }
 
-        if(pushToDrone)
-            droneMission.sendMissionToAPM();
-    }
-
-    @Override
-    public void setRawMissionItems(MissionItemMessage[] missionItems, boolean pushToDrone) throws RemoteException {
-        List<msg_mission_item> items = new ArrayList<msg_mission_item>();
-        if(missionItems != null && missionItems.length > 0){
-            for(MissionItemMessage message : missionItems){
-                items.add(ProxyUtils.getMsgMissionItem(message));
-            }
-        }
-
-        org.droidplanner.core.mission.Mission droneMission = getDroneMgr().getDrone().getMission();
-        droneMission.onMissionLoaded(items);
         if(pushToDrone)
             droneMission.sendMissionToAPM();
     }

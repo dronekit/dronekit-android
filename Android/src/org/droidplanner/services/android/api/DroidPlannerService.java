@@ -11,12 +11,12 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.google.android.gms.analytics.HitBuilders;
-import com.ox3dr.services.android.lib.drone.connection.ConnectionParameter;
-import com.ox3dr.services.android.lib.drone.connection.ConnectionType;
-import com.ox3dr.services.android.lib.drone.connection.DroneSharePrefs;
-import com.ox3dr.services.android.lib.model.IDroidPlannerApi;
-import com.ox3dr.services.android.lib.model.IDroidPlannerApiCallback;
-import com.ox3dr.services.android.lib.model.IDroidPlannerServices;
+import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
+import com.o3dr.services.android.lib.drone.connection.ConnectionType;
+import com.o3dr.services.android.lib.drone.connection.DroneSharePrefs;
+import com.o3dr.services.android.lib.model.IDroidPlannerApi;
+import com.o3dr.services.android.lib.model.IDroidPlannerApiCallback;
+import com.o3dr.services.android.lib.model.IDroidPlannerServices;
 
 import org.droidplanner.core.MAVLink.connection.MavLinkConnection;
 import org.droidplanner.core.model.Drone;
@@ -27,6 +27,7 @@ import org.droidplanner.services.android.communication.connection.BluetoothConne
 import org.droidplanner.services.android.communication.connection.usb.UsbConnection;
 import org.droidplanner.services.android.communication.service.UploaderService;
 import org.droidplanner.services.android.drone.DroneManager;
+import org.droidplanner.services.android.interfaces.DroneEventsListener;
 import org.droidplanner.services.android.utils.analytics.GAUtils;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -52,13 +53,6 @@ public class DroidPlannerService extends Service {
     final ConcurrentHashMap<ConnectionParameter, DroneManager> dronePerConnection = new ConcurrentHashMap<ConnectionParameter, DroneManager>();
 
     /**
-     * Caches droidplanner api instances per connection type and client.
-     */
-    private final ConcurrentHashMap<ConnectionParameter, ConcurrentHashMap<IBinder,
-            DPApi>> dpApisCache = new ConcurrentHashMap<ConnectionParameter,
-            ConcurrentHashMap<IBinder, DPApi>>();
-
-    /**
      * Caches mavlink connections per connection type.
      */
     final ConcurrentHashMap<ConnectionParameter, AndroidMavLinkConnection> mavConnections =
@@ -68,62 +62,20 @@ public class DroidPlannerService extends Service {
     private DroneAccess droneAccess;
     private MavLinkServiceApi mavlinkApi;
 
-    IDroidPlannerApi connectToApi(ConnectionParameter connParams, IDroidPlannerApiCallback callback)
-            throws RemoteException {
+    void releaseDroneManager(DroneManager droneManager, DroneEventsListener listener){
+        if(droneManager == null)
+            return;
 
-        ConcurrentHashMap<IBinder, DPApi> binderApis = dpApisCache.get(connParams);
-        if (binderApis == null) {
-            binderApis = new ConcurrentHashMap<IBinder, DPApi>();
-            ConcurrentHashMap<IBinder, DPApi> previous = dpApisCache
-                    .putIfAbsent(connParams, binderApis);
-
-            if (previous != null)
-                binderApis = previous;
-        }
-
-        //Check if a droidplanner api was already generated for this binder.
-        IBinder callbackBinder = callback.asBinder();
-        DPApi dpApi = binderApis.get(callbackBinder);
-        if (dpApi == null) {
-            dpApi = new DPApi(this, connParams, callback);
-
-            DPApi previous = binderApis.putIfAbsent(callbackBinder, dpApi);
-            if (previous != null)
-                dpApi = previous;
-        }
-
-        return dpApi;
-    }
-
-    boolean disconnectFromApi(final ConnectionParameter connParams,
-                              IDroidPlannerApiCallback callback) {
-        ConcurrentHashMap<IBinder, DPApi> binderApis = dpApisCache.get(connParams);
-        if (binderApis == null) {
-            return false;
-        }
-
-        boolean wasRemoved = false;
-        DPApi dpApi = binderApis.remove(callback.asBinder());
-        if(dpApi != null){
-            dpApi.destroy();
-            wasRemoved = true;
-        }
-
-        if (binderApis.isEmpty()) {
-            dpApisCache.remove(connParams);
-
-            //Remove the cached drone manager as well.
-            DroneManager droneMgr = dronePerConnection.remove(connParams);
-            if(droneMgr != null)
-                droneMgr.destroy();
-
+        droneManager.removeDroneEventsListener(listener);
+        if(droneManager.getListenersCount() == 0) {
+            dronePerConnection.remove(droneManager.getConnectionParameter());
+            droneManager.destroy();
             lbm.sendBroadcast(new Intent(ACTION_DRONE_DESTROYED));
         }
-
-        return wasRemoved;
     }
 
-    DroneManager getDroneForConnection(final ConnectionParameter params) {
+    DroneManager getDroneForConnection(final ConnectionParameter params,
+                                       DroneEventsListener listener) {
         DroneManager droneMgr = dronePerConnection.get(params);
         if (droneMgr == null) {
             droneMgr = new DroneManager(getApplicationContext(), handler, mavlinkApi, params);
@@ -138,6 +90,8 @@ public class DroidPlannerService extends Service {
                 kickStartDroneShareUploader(params.getDroneSharePrefs());
             }
         }
+
+        droneMgr.addDroneEventsListener(listener);
 
         return droneMgr;
     }

@@ -18,7 +18,7 @@ import android.content.SharedPreferences;
 import android.os.ParcelUuid;
 import android.util.Log;
 
-import com.ox3dr.services.android.lib.drone.connection.DroneSharePrefs;
+import com.o3dr.services.android.lib.drone.connection.DroneSharePrefs;
 
 public class BluetoothConnection extends AndroidMavLinkConnection {
 	private static final String BLUE = "BLUETOOTH";

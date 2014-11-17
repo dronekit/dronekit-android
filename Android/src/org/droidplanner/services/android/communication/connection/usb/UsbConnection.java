@@ -15,7 +15,7 @@ import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 import android.util.Log;
 
-import com.ox3dr.services.android.lib.drone.connection.DroneSharePrefs;
+import com.o3dr.services.android.lib.drone.connection.DroneSharePrefs;
 
 public class UsbConnection extends AndroidMavLinkConnection {
 

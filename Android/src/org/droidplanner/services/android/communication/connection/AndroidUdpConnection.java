@@ -9,7 +9,7 @@ import org.droidplanner.core.model.Logger;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.ox3dr.services.android.lib.drone.connection.DroneSharePrefs;
+import com.o3dr.services.android.lib.drone.connection.DroneSharePrefs;
 
 public class AndroidUdpConnection extends AndroidMavLinkConnection {
 

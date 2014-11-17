@@ -3,7 +3,7 @@ package org.droidplanner.services.android.api;
 import android.os.Binder;
 
 import com.MAVLink.Messages.MAVLinkPacket;
-import com.ox3dr.services.android.lib.drone.connection.ConnectionParameter;
+import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 
 import org.droidplanner.core.MAVLink.connection.MavLinkConnection;
 import org.droidplanner.core.MAVLink.connection.MavLinkConnectionListener;

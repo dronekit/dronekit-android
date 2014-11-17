@@ -19,7 +19,7 @@ import android.util.Log;
 
 import com.geeksville.apiproxy.DirectoryUploader;
 import com.geeksville.apiproxy.IUploadListener;
-import com.ox3dr.services.android.lib.drone.connection.DroneSharePrefs;
+import com.o3dr.services.android.lib.drone.connection.DroneSharePrefs;
 
 /**
  * Provides delayed uploads to the DroneShare service.

@@ -3,24 +3,23 @@ package org.droidplanner.services.android.utils;
 import android.util.Log;
 
 import com.MAVLink.Messages.ardupilotmega.msg_mission_item;
-import com.ox3dr.services.android.lib.drone.mission.item.MissionItem;
-import com.ox3dr.services.android.lib.drone.mission.item.command.CameraTrigger;
-import com.ox3dr.services.android.lib.drone.mission.item.command.ChangeSpeed;
-import com.ox3dr.services.android.lib.drone.mission.item.command.EpmGripper;
-import com.ox3dr.services.android.lib.drone.mission.item.command.ReturnToLaunch;
-import com.ox3dr.services.android.lib.drone.mission.item.command.SetServo;
-import com.ox3dr.services.android.lib.drone.mission.item.command.Takeoff;
-import com.ox3dr.services.android.lib.drone.mission.item.command.YawCondition;
-import com.ox3dr.services.android.lib.drone.mission.item.complex.CameraDetail;
-import com.ox3dr.services.android.lib.drone.mission.item.complex.StructureScanner;
-import com.ox3dr.services.android.lib.drone.mission.item.complex.Survey;
-import com.ox3dr.services.android.lib.drone.mission.item.complex.SurveyDetail;
-import com.ox3dr.services.android.lib.drone.mission.item.raw.MissionItemMessage;
-import com.ox3dr.services.android.lib.drone.mission.item.spatial.Circle;
-import com.ox3dr.services.android.lib.drone.mission.item.spatial.Land;
-import com.ox3dr.services.android.lib.drone.mission.item.spatial.RegionOfInterest;
-import com.ox3dr.services.android.lib.drone.mission.item.spatial.SplineWaypoint;
-import com.ox3dr.services.android.lib.drone.mission.item.spatial.Waypoint;
+import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
+import com.o3dr.services.android.lib.drone.mission.item.command.CameraTrigger;
+import com.o3dr.services.android.lib.drone.mission.item.command.ChangeSpeed;
+import com.o3dr.services.android.lib.drone.mission.item.command.EpmGripper;
+import com.o3dr.services.android.lib.drone.mission.item.command.ReturnToLaunch;
+import com.o3dr.services.android.lib.drone.mission.item.command.SetServo;
+import com.o3dr.services.android.lib.drone.mission.item.command.Takeoff;
+import com.o3dr.services.android.lib.drone.mission.item.command.YawCondition;
+import com.o3dr.services.android.lib.drone.mission.item.complex.CameraDetail;
+import com.o3dr.services.android.lib.drone.mission.item.complex.StructureScanner;
+import com.o3dr.services.android.lib.drone.mission.item.complex.Survey;
+import com.o3dr.services.android.lib.drone.mission.item.complex.SurveyDetail;
+import com.o3dr.services.android.lib.drone.mission.item.spatial.Circle;
+import com.o3dr.services.android.lib.drone.mission.item.spatial.Land;
+import com.o3dr.services.android.lib.drone.mission.item.spatial.RegionOfInterest;
+import com.o3dr.services.android.lib.drone.mission.item.spatial.SplineWaypoint;
+import com.o3dr.services.android.lib.drone.mission.item.spatial.Waypoint;
 
 import org.droidplanner.core.helpers.coordinates.Coord2D;
 import org.droidplanner.core.helpers.units.Altitude;
@@ -439,53 +438,4 @@ public class ProxyUtils {
         return proxyMissionItem;
     }
 
-    public static MissionItemMessage getRawMissionItem(msg_mission_item missionItem) {
-        if (missionItem == null)
-            return null;
-
-        MissionItemMessage rawMissionItem = new MissionItemMessage();
-        rawMissionItem.setAutocontinue(missionItem.autocontinue);
-        rawMissionItem.setCommand(missionItem.command);
-        rawMissionItem.setCompId(missionItem.compid);
-        rawMissionItem.setCurrent(missionItem.current);
-        rawMissionItem.setFrame(missionItem.frame);
-        rawMissionItem.setParam1(missionItem.param1);
-        rawMissionItem.setParam2(missionItem.param2);
-        rawMissionItem.setParam3(missionItem.param3);
-        rawMissionItem.setParam4(missionItem.param4);
-        rawMissionItem.setSeq(missionItem.seq);
-        rawMissionItem.setSysId(missionItem.sysid);
-        rawMissionItem.setTarget_component(missionItem.target_component);
-        rawMissionItem.setTarget_system(missionItem.target_system);
-        rawMissionItem.setX(missionItem.x);
-        rawMissionItem.setY(missionItem.y);
-        rawMissionItem.setZ(missionItem.z);
-
-        return rawMissionItem;
-    }
-
-    public static msg_mission_item getMsgMissionItem(MissionItemMessage mim) {
-        if (mim == null)
-            return null;
-
-        msg_mission_item item = new msg_mission_item();
-        item.autocontinue = mim.getAutocontinue();
-        item.command = (short) mim.getCommand();
-        item.compid = mim.getCompId();
-        item.current = mim.getCurrent();
-        item.frame = mim.getFrame();
-        item.param1 = mim.getParam1();
-        item.param2 = mim.getParam2();
-        item.param3 = mim.getParam3();
-        item.param4 = mim.getParam4();
-        item.seq = (short) mim.getSeq();
-        item.sysid = mim.getSysId();
-        item.target_component = mim.getTarget_component();
-        item.target_system = mim.getTarget_system();
-        item.x = mim.getX();
-        item.y = mim.getY();
-        item.z = mim.getZ();
-
-        return item;
-    }
 }
