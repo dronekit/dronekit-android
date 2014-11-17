@@ -115,8 +115,13 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
         return apiCallback;
     }
 
-    private void handleDeadObjectException(DeadObjectException e){
+    private void handleDeadObjectException(DeadObjectException e) {
         Log.e(TAG, e.getMessage(), e);
+        try {
+            disconnect();
+        } catch (RemoteException e1) {
+            Log.e(TAG, e1.getMessage(), e1);
+        }
     }
 
     @Override
@@ -480,7 +485,7 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
                 try {
                     getCallback().onConnectionFailed(new ConnectionResult(0, e.getMessage()));
                 } catch (DeadObjectException d) {
-                    handleDeadObjectException(d);
+                    Log.e(TAG, e.getMessage(), e);
                 }
             }
 
