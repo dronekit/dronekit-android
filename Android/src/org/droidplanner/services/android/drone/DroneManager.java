@@ -20,7 +20,6 @@ import org.droidplanner.core.model.Drone;
 import org.droidplanner.core.parameters.Parameter;
 import org.droidplanner.services.android.api.MavLinkServiceApi;
 import org.droidplanner.services.android.communication.service.MAVLinkClient;
-import org.droidplanner.services.android.communication.service.UploaderService;
 import org.droidplanner.services.android.exception.ConnectionException;
 import org.droidplanner.services.android.interfaces.DroneEventsListener;
 import org.droidplanner.services.android.location.FusedLocation;
@@ -148,8 +147,7 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream, DroneEve
         MAVLinkClient mavClient = (MAVLinkClient) drone.getMavClient();
         if (!mavClient.isConnected()) {
             mavClient.openConnection();
-        }
-        else{
+        } else {
             onDroneEvent(DroneInterfaces.DroneEventsType.CONNECTED, drone);
         }
     }
