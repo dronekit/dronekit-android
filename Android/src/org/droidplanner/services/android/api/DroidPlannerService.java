@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.os.RemoteException;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -14,25 +13,21 @@ import com.google.android.gms.analytics.HitBuilders;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionType;
 import com.o3dr.services.android.lib.drone.connection.DroneSharePrefs;
-import com.o3dr.services.android.lib.model.IDroidPlannerApi;
-import com.o3dr.services.android.lib.model.IDroidPlannerApiCallback;
 import com.o3dr.services.android.lib.model.IDroidPlannerServices;
 
 import org.droidplanner.core.MAVLink.connection.MavLinkConnection;
-import org.droidplanner.core.model.Drone;
 import org.droidplanner.services.android.communication.connection.AndroidMavLinkConnection;
 import org.droidplanner.services.android.communication.connection.AndroidTcpConnection;
 import org.droidplanner.services.android.communication.connection.AndroidUdpConnection;
 import org.droidplanner.services.android.communication.connection.BluetoothConnection;
 import org.droidplanner.services.android.communication.connection.usb.UsbConnection;
 import org.droidplanner.services.android.communication.service.UploaderService;
-import org.droidplanner.services.android.drone.DroneManager;
-import org.droidplanner.services.android.interfaces.DroneEventsListener;
 import org.droidplanner.services.android.utils.analytics.GAUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Created by fhuya on 10/30/14.
@@ -49,7 +44,7 @@ public class DroidPlannerService extends Service {
     private final Handler handler = new Handler();
     private LocalBroadcastManager lbm;
 
-    final ConcurrentHashMap<IBinder, DPApi> dpApiStore = new ConcurrentHashMap<IBinder, DPApi>();
+    final ConcurrentLinkedQueue<DPApi> dpApiStore = new ConcurrentLinkedQueue<DPApi>();
 
     /**
      * Caches mavlink connections per connection type.
@@ -61,44 +56,39 @@ public class DroidPlannerService extends Service {
     private DroneAccess droneAccess;
     private MavLinkServiceApi mavlinkApi;
 
-    DPApi acquireDroidPlannerApi(IDroidPlannerApiCallback callback){
-        IBinder callbackBinder = callback.asBinder();
-        DPApi dpApi = dpApiStore.get(callbackBinder);
-        if(dpApi == null){
-            dpApi = new DPApi(this, callback, handler, mavlinkApi);
-            dpApiStore.put(callbackBinder, dpApi);
-
-            lbm.sendBroadcast(new Intent(ACTION_DRONE_CREATED));
-        }
-
+    DPApi acquireDroidPlannerApi() {
+        DPApi dpApi = new DPApi(this, handler, mavlinkApi);
+        dpApiStore.add(dpApi);
+        lbm.sendBroadcast(new Intent(ACTION_DRONE_CREATED));
         return dpApi;
     }
 
-    void releaseDroidPlannerApi(IDroidPlannerApiCallback callback){
-        DPApi dpApi = dpApiStore.remove(callback.asBinder());
-        if(dpApi != null){
-            dpApi.destroy();
-            lbm.sendBroadcast(new Intent(ACTION_DRONE_DESTROYED));
-        }
+    void releaseDroidPlannerApi(DPApi dpApi) {
+        if (dpApi == null)
+            return;
+
+        dpApiStore.remove(dpApi);
+        dpApi.destroy();
+        lbm.sendBroadcast(new Intent(ACTION_DRONE_DESTROYED));
     }
 
-    void kickStartDroneShareUploader(DroneSharePrefs... prefs){
+    void kickStartDroneShareUploader(DroneSharePrefs... prefs) {
         final Context context = getApplicationContext();
-        for(DroneSharePrefs pref: prefs){
+        for (DroneSharePrefs pref : prefs) {
             UploaderService.kickStart(context, pref);
         }
     }
 
-    void connectMAVConnection(ConnectionParameter connParams){
+    void connectMAVConnection(ConnectionParameter connParams) {
         AndroidMavLinkConnection conn = mavConnections.get(connParams);
-        if(conn == null){
+        if (conn == null) {
 
             //Create a new mavlink connection
             final int connectionType = connParams.getConnectionType();
             final Bundle paramsBundle = connParams.getParamsBundle();
             final DroneSharePrefs droneSharePrefs = connParams.getDroneSharePrefs();
 
-            switch(connectionType){
+            switch (connectionType) {
                 case ConnectionType.TYPE_USB:
                     final int baudRate = paramsBundle.getInt(ConnectionType.EXTRA_USB_BAUD_RATE,
                             ConnectionType.DEFAULT_USB_BAUD_RATE);
@@ -138,7 +128,7 @@ public class DroidPlannerService extends Service {
             mavConnections.put(connParams, conn);
         }
 
-        if(conn.getConnectionStatus() == MavLinkConnection.MAVLINK_DISCONNECTED){
+        if (conn.getConnectionStatus() == MavLinkConnection.MAVLINK_DISCONNECTED) {
             conn.connect();
         }
 
@@ -191,12 +181,12 @@ public class DroidPlannerService extends Service {
     public void onDestroy() {
         super.onDestroy();
 
-        for (DPApi dpApi : dpApiStore.values()) {
+        for (DPApi dpApi : dpApiStore) {
             dpApi.destroy();
         }
         dpApiStore.clear();
 
-        for(ConnectionParameter connParams: mavConnections.keySet()){
+        for (ConnectionParameter connParams : mavConnections.keySet()) {
             disconnectMAVConnection(connParams);
         }
 
@@ -204,15 +194,15 @@ public class DroidPlannerService extends Service {
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId){
-        if(intent != null){
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        if (intent != null) {
             final String action = intent.getAction();
-            if(ACTION_KICK_START_DRONESHARE_UPLOADS.equals(action)){
+            if (ACTION_KICK_START_DRONESHARE_UPLOADS.equals(action)) {
                 List<DroneSharePrefs> droneSharePrefsList = new ArrayList<DroneSharePrefs>
                         (mavConnections.size());
-                for(ConnectionParameter connParam : mavConnections.keySet()){
+                for (ConnectionParameter connParam : mavConnections.keySet()) {
                     DroneSharePrefs sharePrefs = connParam.getDroneSharePrefs();
-                    if(sharePrefs != null)
+                    if (sharePrefs != null)
                         droneSharePrefsList.add(sharePrefs);
                 }
 

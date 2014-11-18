@@ -35,13 +35,12 @@ final class DPServices extends IDroidPlannerServices.Stub {
     }
 
     @Override
-    public IDroidPlannerApi acquireDroidPlannerApi(IDroidPlannerApiCallback callback) throws
-            RemoteException {
-        return getService().acquireDroidPlannerApi(callback);
+    public IDroidPlannerApi acquireDroidPlannerApi() throws RemoteException {
+        return getService().acquireDroidPlannerApi();
     }
 
     @Override
-    public void releaseDroidPlannerApi(IDroidPlannerApiCallback callback) throws RemoteException {
-        getService().releaseDroidPlannerApi(callback);
+    public void releaseDroidPlannerApi(IDroidPlannerApi dpApi) throws RemoteException {
+        getService().releaseDroidPlannerApi((DPApi) dpApi);
     }
 }

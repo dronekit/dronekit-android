@@ -165,8 +165,7 @@ public class MainActivity extends FragmentActivity {
             }
 
             viewHolder.listenersCount.setText("Listeners count: " + droneMgr.getListenersCount());
-            viewHolder.infoPanel.setText("Connection parameters: " + droneMgr
-                    .getConnectionParameter().toString());
+            viewHolder.infoPanel.setText("Connection parameters: " + droneMgr.getConnectionParameter());
 
             return view;
         }
