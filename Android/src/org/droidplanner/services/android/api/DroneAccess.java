@@ -6,6 +6,7 @@ import org.droidplanner.services.android.drone.DroneManager;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -28,6 +29,12 @@ public final class DroneAccess extends Binder {
     }
 
     public List<DroneManager> getDroneManagerList() {
-        return new ArrayList<DroneManager>(getService().dronePerConnection.values());
+        Collection<DPApi> dpApis = getService().dpApiStore.values();
+        List<DroneManager> droneManagerList = new ArrayList<DroneManager>();
+        for(DPApi dpApi : dpApis){
+            droneManagerList.add(dpApi.getDroneMgr());
+        }
+
+        return droneManagerList;
     }
 }

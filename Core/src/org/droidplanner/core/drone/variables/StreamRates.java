@@ -10,9 +10,8 @@ public class StreamRates extends DroneVariable implements OnDroneListener {
 
     private Rates rates;
 
-	public StreamRates(Drone myDrone, Rates rates) {
+	public StreamRates(Drone myDrone) {
 		super(myDrone);
-        this.rates = rates;
 		myDrone.addDroneListener(this);
 	}
 

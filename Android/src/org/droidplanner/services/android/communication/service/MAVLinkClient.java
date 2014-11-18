@@ -44,20 +44,36 @@ public class MAVLinkClient implements MAVLinkStreams.MAVLinkOutputStream {
         }
     };
 
-    private final ConnectionParameter connParams;
+    private ConnectionParameter connParams;
     private final MAVLinkStreams.MavlinkInputStream listener;
 
     private final MavLinkServiceApi mavLinkApi;
 
-    public MAVLinkClient(MAVLinkStreams.MavlinkInputStream listener, MavLinkServiceApi serviceApi,
-                         ConnectionParameter connParams) {
+    public MAVLinkClient(MAVLinkStreams.MavlinkInputStream listener, MavLinkServiceApi serviceApi) {
         this.listener = listener;
-        this.connParams = connParams;
         this.mavLinkApi = serviceApi;
+    }
+
+    public ConnectionParameter getConnectionParameter() {
+        return connParams;
+    }
+
+    public void setConnectionParameter(ConnectionParameter connParams) {
+        boolean isConnected = isConnected();
+        if(isConnected)
+            closeConnection();
+
+        this.connParams = connParams;
+
+        if(isConnected)
+            openConnection();
     }
 
     @Override
     public void openConnection() {
+        if(this.connParams == null)
+            return;
+
         if(mavLinkApi.getConnectionStatus(this.connParams) == MavLinkConnection
                 .MAVLINK_DISCONNECTED) {
             mavLinkApi.connectMavLink(this.connParams);
@@ -67,6 +83,9 @@ public class MAVLinkClient implements MAVLinkStreams.MAVLinkOutputStream {
 
     @Override
     public void closeConnection() {
+        if(this.connParams == null)
+            return;
+
         if (mavLinkApi.getConnectionStatus(this.connParams) == MavLinkConnection.MAVLINK_CONNECTED) {
             mavLinkApi.disconnectMavLink(this.connParams);
 
@@ -86,7 +105,8 @@ public class MAVLinkClient implements MAVLinkStreams.MAVLinkOutputStream {
 
     @Override
     public boolean isConnected() {
-        return mavLinkApi.getConnectionStatus(this.connParams) == MavLinkConnection.MAVLINK_CONNECTED;
+        return this.connParams != null && mavLinkApi.getConnectionStatus(this.connParams) ==
+                MavLinkConnection.MAVLINK_CONNECTED;
     }
 
     @Override

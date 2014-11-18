@@ -3,6 +3,7 @@ package org.droidplanner.services.android.api;
 import android.os.RemoteException;
 
 import com.o3dr.services.android.lib.model.IDroidPlannerApi;
+import com.o3dr.services.android.lib.model.IDroidPlannerApiCallback;
 import com.o3dr.services.android.lib.model.IDroidPlannerServices;
 
 import java.lang.ref.WeakReference;
@@ -34,7 +35,13 @@ final class DPServices extends IDroidPlannerServices.Stub {
     }
 
     @Override
-    public IDroidPlannerApi getDroidPlannerApi(String tag) throws RemoteException {
-        return new DPApi(getService());
+    public IDroidPlannerApi acquireDroidPlannerApi(IDroidPlannerApiCallback callback) throws
+            RemoteException {
+        return getService().acquireDroidPlannerApi(callback);
+    }
+
+    @Override
+    public void releaseDroidPlannerApi(IDroidPlannerApiCallback callback) throws RemoteException {
+        getService().releaseDroidPlannerApi(callback);
     }
 }

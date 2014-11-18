@@ -3,12 +3,12 @@ package org.droidplanner.services.android.api;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.DeadObjectException;
+import android.os.Handler;
 import android.os.RemoteException;
 import android.text.TextUtils;
 import android.util.Log;
 
 import com.MAVLink.Messages.ApmModes;
-import com.MAVLink.Messages.ardupilotmega.msg_mission_item;
 import com.MAVLink.Messages.enums.MAV_TYPE;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
@@ -88,9 +88,24 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
     private IDroidPlannerApiCallback apiCallback;
     private DroneManager droneMgr;
 
-    DPApi(DroidPlannerService dpService) throws RemoteException {
-        serviceRef = new WeakReference<DroidPlannerService>(dpService);
+    DPApi(DroidPlannerService dpService, IDroidPlannerApiCallback callback, Handler handler,
+          MavLinkServiceApi mavlinkApi) {
         this.context = dpService.getApplicationContext();
+
+        serviceRef = new WeakReference<DroidPlannerService>(dpService);
+        this.apiCallback = callback;
+
+        this.droneMgr = new DroneManager(context, handler, mavlinkApi);
+        this.droneMgr.addDroneEventsListener(this);
+    }
+
+    void destroy(){
+        this.droneMgr.removeDroneEventsListener(this);
+        this.droneMgr.destroy();
+
+        this.serviceRef.clear();
+        this.apiCallback = null;
+        this.droneMgr = null;
     }
 
     private DroidPlannerService getService() {
@@ -101,7 +116,7 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
         return service;
     }
 
-    private DroneManager getDroneMgr(){
+    public DroneManager getDroneMgr(){
         if(droneMgr == null)
             throw new IllegalStateException("Invalid state: drone manager is null");
 
@@ -448,22 +463,16 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
     }
 
     @Override
-    public void connect(ConnectionParameter connParams, IDroidPlannerApiCallback callback) throws
-            RemoteException {
-        boolean hasValidDroneMgr = droneMgr != null;
-        if(hasValidDroneMgr && !droneMgr.getConnectionParameter().equals(connParams)){
-            disconnect();
-            hasValidDroneMgr = false;
-        }
-
-        this.apiCallback = callback;
-
-        if(!hasValidDroneMgr) {
-            this.droneMgr = getService().getDroneForConnection(connParams, this);
-        }
+    public void connect(ConnectionParameter connParams) throws RemoteException {
+        if(connParams == null || !connParams.equals(droneMgr.getConnectionParameter()))
+            droneMgr.setConnectionParameter(connParams);
 
         try {
-            this.droneMgr.connect();
+            // Do a quick scan to see if we need any droneshare uploads
+            if(connParams != null) {
+                this.droneMgr.connect();
+                getService().kickStartDroneShareUploader(connParams.getDroneSharePrefs());
+            }
         } catch (ConnectionException e) {
             try {
                 getCallback().onConnectionFailed(new ConnectionResult(0, e.getMessage()));
@@ -477,8 +486,6 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
 
     @Override
     public void disconnect() throws RemoteException {
-        if(droneMgr != null) {
-
             try {
                 droneMgr.disconnect();
             } catch (ConnectionException e) {
@@ -488,12 +495,6 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
                     Log.e(TAG, e.getMessage(), e);
                 }
             }
-
-            getService().releaseDroneManager(droneMgr, this);
-            droneMgr = null;
-        }
-
-        apiCallback = null;
     }
 
     @Override

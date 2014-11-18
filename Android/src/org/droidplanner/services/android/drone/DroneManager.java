@@ -46,17 +46,14 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream, DroneEve
     private final Follow followMe;
     private final CameraInfoLoader cameraInfoLoader;
     private final DroneInterfaces.Handler dpHandler;
-    private final ConnectionParameter connectionParams;
     private final MavLinkMsgHandler mavLinkMsgHandler;
     private MagnetometerCalibration magCalibration;
 
-    public DroneManager(Context context, final Handler handler,
-                        MavLinkServiceApi mavlinkApi, ConnectionParameter connParams) {
+    public DroneManager(Context context, final Handler handler, MavLinkServiceApi mavlinkApi) {
 
         this.cameraInfoLoader = new CameraInfoLoader(context);
 
-        this.connectionParams = connParams;
-        MAVLinkClient mavClient = new MAVLinkClient(this, mavlinkApi, connParams);
+        MAVLinkClient mavClient = new MAVLinkClient(this, mavlinkApi);
 
         DroneInterfaces.Clock clock = new DroneInterfaces.Clock() {
             @Override
@@ -82,19 +79,8 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream, DroneEve
             }
         };
 
-        StreamRates connRates = connParams.getStreamRates();
-        Rates droneRates = new Rates();
-        droneRates.extendedStatus = connRates.getExtendedStatus();
-        droneRates.extra1 = connRates.getExtra1();
-        droneRates.extra2 = connRates.getExtra2();
-        droneRates.extra3 = connRates.getExtra3();
-        droneRates.position = connRates.getPosition();
-        droneRates.rcChannels = connRates.getRcChannels();
-        droneRates.rawSensors = connRates.getRawSensors();
-        droneRates.rawController = connRates.getRawController();
-
         DroidPlannerPrefs dpPrefs = new DroidPlannerPrefs(context);
-        this.drone = new DroneImpl(mavClient, clock, dpHandler, dpPrefs, droneRates);
+        this.drone = new DroneImpl(mavClient, clock, dpHandler, dpPrefs);
 
         this.mavLinkMsgHandler = new MavLinkMsgHandler(this.drone);
 
@@ -195,7 +181,26 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream, DroneEve
     }
 
     public ConnectionParameter getConnectionParameter() {
-        return this.connectionParams;
+        return ((MAVLinkClient)this.drone.getMavClient()).getConnectionParameter();
+    }
+
+    public void setConnectionParameter(ConnectionParameter connParams){
+        if(connParams != null){
+            StreamRates connRates = connParams.getStreamRates();
+            Rates droneRates = new Rates();
+            droneRates.extendedStatus = connRates.getExtendedStatus();
+            droneRates.extra1 = connRates.getExtra1();
+            droneRates.extra2 = connRates.getExtra2();
+            droneRates.extra3 = connRates.getExtra3();
+            droneRates.position = connRates.getPosition();
+            droneRates.rcChannels = connRates.getRcChannels();
+            droneRates.rawSensors = connRates.getRawSensors();
+            droneRates.rawController = connRates.getRawController();
+
+            drone.getStreamRates().setRates(droneRates);
+        }
+
+        ((MAVLinkClient)drone.getMavClient()).setConnectionParameter(connParams);
     }
 
     public Drone getDrone() {
