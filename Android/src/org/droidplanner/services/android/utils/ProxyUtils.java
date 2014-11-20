@@ -2,7 +2,6 @@ package org.droidplanner.services.android.utils;
 
 import android.util.Log;
 
-import com.MAVLink.Messages.ardupilotmega.msg_mission_item;
 import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
 import com.o3dr.services.android.lib.drone.mission.item.command.CameraTrigger;
 import com.o3dr.services.android.lib.drone.mission.item.command.ChangeSpeed;
@@ -29,7 +28,7 @@ import org.droidplanner.core.mission.Mission;
 import org.droidplanner.core.mission.commands.ConditionYaw;
 import org.droidplanner.core.mission.commands.ReturnToHome;
 import org.droidplanner.core.survey.CameraInfo;
-import org.droidplanner.core.mission.survey.SurveyData;
+import org.droidplanner.core.survey.SurveyData;
 
 import java.util.List;
 

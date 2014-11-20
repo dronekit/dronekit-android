@@ -8,7 +8,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.MAVLink.Messages.ApmModes;
-import com.MAVLink.Messages.enums.MAV_TYPE;
+import com.MAVLink.enums.MAV_TYPE;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;

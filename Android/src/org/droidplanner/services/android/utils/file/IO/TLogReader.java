@@ -12,8 +12,6 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.droidplanner.android.dialogs.openfile.OpenFileDialog;
-
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Parser;
 import com.MAVLink.Messages.MAVLinkMessage;

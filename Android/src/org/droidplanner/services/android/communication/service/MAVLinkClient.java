@@ -2,8 +2,8 @@ package org.droidplanner.services.android.communication.service;
 
 import android.util.Log;
 
+import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
-import com.MAVLink.Messages.MAVLinkPacket;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 
 import org.droidplanner.core.MAVLink.MAVLinkStreams;
