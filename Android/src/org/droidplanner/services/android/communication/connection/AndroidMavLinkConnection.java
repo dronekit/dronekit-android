@@ -14,8 +14,8 @@ import org.droidplanner.core.model.Logger;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.MAVLink.Messages.MAVLinkPacket;
 import com.o3dr.services.android.lib.drone.connection.DroneSharePrefs;
+import com.MAVLink.MAVLinkPacket;
 
 public abstract class AndroidMavLinkConnection extends MavLinkConnection {
 

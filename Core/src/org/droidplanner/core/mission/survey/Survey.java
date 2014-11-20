@@ -10,14 +10,15 @@ import org.droidplanner.core.mission.Mission;
 import org.droidplanner.core.mission.MissionItem;
 import org.droidplanner.core.mission.MissionItemType;
 import org.droidplanner.core.mission.commands.CameraTrigger;
-import org.droidplanner.core.mission.survey.grid.Grid;
-import org.droidplanner.core.mission.survey.grid.GridBuilder;
 import org.droidplanner.core.polygon.Polygon;
 import org.droidplanner.core.survey.CameraInfo;
+import org.droidplanner.core.survey.SurveyData;
+import org.droidplanner.core.survey.grid.Grid;
+import org.droidplanner.core.survey.grid.GridBuilder;
 
-import com.MAVLink.Messages.ardupilotmega.msg_mission_item;
-import com.MAVLink.Messages.enums.MAV_CMD;
-import com.MAVLink.Messages.enums.MAV_FRAME;
+import com.MAVLink.common.msg_mission_item;
+import com.MAVLink.enums.MAV_CMD;
+import com.MAVLink.enums.MAV_FRAME;
 
 public class Survey extends MissionItem {
 

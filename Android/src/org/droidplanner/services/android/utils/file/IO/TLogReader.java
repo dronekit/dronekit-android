@@ -1,9 +1,5 @@
 package org.droidplanner.services.android.utils.file.IO;
 
-import com.MAVLink.Messages.MAVLinkMessage;
-import com.MAVLink.Messages.MAVLinkPacket;
-import com.MAVLink.Parser;
-
 import org.droidplanner.services.android.utils.file.DirectoryPath;
 import org.droidplanner.services.android.utils.file.FileList;
 import org.droidplanner.services.android.utils.file.FileManager;
@@ -15,6 +11,12 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+
+import org.droidplanner.android.dialogs.openfile.OpenFileDialog;
+
+import com.MAVLink.MAVLinkPacket;
+import com.MAVLink.Parser;
+import com.MAVLink.Messages.MAVLinkMessage;
 
 /**
  * Read tlog file w/ optional message filter
