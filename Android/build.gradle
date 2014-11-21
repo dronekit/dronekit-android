@@ -65,10 +65,10 @@ android {
 
     signingConfigs {
         release {
-            storeFile getKeystoreFile()
-            storePassword getKeystorePassword()
-            keyAlias getKeystoreAlias()
-            keyPassword getKeystorePassword()
+            storeFile getAppKeystoreFile()
+            storePassword getAppKeystorePassword()
+            keyAlias getAppKey()
+            keyPassword getAppKeyPassword()
         }
     }
 
@@ -81,8 +81,7 @@ android {
                     def file = output.outputFile
                     if (file != null && file.name.endsWith('.apk')) {
                         def versionCode = defaultConfig.versionCode
-                        output.outputFile = new File(file.parent, file.name.replace(".apk",
-                                "-${versionCode}.apk"))
+                        output.outputFile = new File(file.parent, "3dr_services.${versionCode}.apk")
                     }
                 }
             }
@@ -104,17 +103,22 @@ def getGitVersion() {
     }
 }
 
-def getKeystoreFile() {
+def getAppKeystoreFile() {
     def filePath = System.getenv("ANDROID_3DR_SERVICES_KEYSTORE")
     return filePath ? file(filePath) : null
 }
 
-def getKeystorePassword() {
+def getAppKeystorePassword(){
+    def password = System.getenv("ANDROID_3DR_SERVICES_KEYSTORE_PWD")
+    return password ?: ""
+}
+
+def getAppKeyPassword() {
     def password = System.getenv("ANDROID_3DR_SERVICES_KEY_PWD")
     return password ?: ""
 }
 
-def getKeystoreAlias() {
+def getAppKey() {
     def alias = System.getenv("ANDROID_3DR_SERVICES_KEYALIAS")
     return alias ?: ""
 }
