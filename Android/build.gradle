@@ -6,9 +6,9 @@ repositories {
 
 dependencies {
     compile files('libs/droneapi-java.jar')
-    compile 'com.google.android.gms:play-services:6.1.11'
-    compile 'com.android.support:support-v4:21.0.0'
-    compile 'com.android.support:appcompat-v7:21.0.0'
+    compile 'com.google.android.gms:play-services:6.1.71'
+    compile 'com.android.support:support-v4:21.0.2'
+    compile 'com.android.support:appcompat-v7:21.0.2'
     compile 'com.android.support:cardview-v7:21.0.0'
 
     compile project(':Core')
@@ -24,7 +24,7 @@ dependencies {
 
 android {
     compileSdkVersion 21
-    buildToolsVersion "21.0.2"
+    buildToolsVersion "21.1.1"
 
     defaultConfig {
         applicationId 'org.droidplanner.services.android'
@@ -63,18 +63,58 @@ android {
         abortOnError false
     }
 
+    signingConfigs {
+        release {
+            storeFile getKeystoreFile()
+            storePassword getKeystorePassword()
+            keyAlias getKeystoreAlias()
+            keyPassword getKeystorePassword()
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            signingConfig signingConfigs.release
+            applicationVariants.all { variant ->
+                variant.outputs.each { output ->
+                    def file = output.outputFile
+                    if (file != null && file.name.endsWith('.apk')) {
+                        def versionCode = defaultConfig.versionCode
+                        output.outputFile = new File(file.parent, file.name.replace(".apk",
+                                "-${versionCode}.apk"))
+                    }
+                }
+            }
+        }
+    }
 }
 
 /**
  * @return The most recent git tag to be used as version name for the app.
  */
-def getGitVersion(){
+def getGitVersion() {
     def cmd = "git describe --tag --dirty"
     try {
         def proc = cmd.execute()
         return proc.text.trim()
-    }catch(IOException e){
+    } catch (IOException e) {
         //Unable to find 'git'
         return "please update version name manually"
     }
+}
+
+def getKeystoreFile() {
+    def filePath = System.getenv("ANDROID_3DR_SERVICES_KEYSTORE")
+    return filePath ? file(filePath) : null
+}
+
+def getKeystorePassword() {
+    def password = System.getenv("ANDROID_3DR_SERVICES_KEY_PWD")
+    return password ?: ""
+}
+
+def getKeystoreAlias() {
+    def alias = System.getenv("ANDROID_3DR_SERVICES_KEYALIAS")
+    return alias ?: ""
 }
