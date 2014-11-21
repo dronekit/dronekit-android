@@ -72,19 +72,21 @@ android {
         }
     }
 
+    android.applicationVariants.all { variant ->
+        variant.outputs.each { output ->
+            def file = output.outputFile
+            if (file != null && file.name.endsWith('.apk')) {
+                def buildType = variant.buildType.getName()
+                def versionCode = defaultConfig.versionCode
+                output.outputFile = new File(file.parent,
+                        "3dr_services-${buildType}.${versionCode}.apk")
+            }
+        }
+    }
+
     buildTypes {
         release {
-            minifyEnabled true
             signingConfig signingConfigs.release
-            applicationVariants.all { variant ->
-                variant.outputs.each { output ->
-                    def file = output.outputFile
-                    if (file != null && file.name.endsWith('.apk')) {
-                        def versionCode = defaultConfig.versionCode
-                        output.outputFile = new File(file.parent, "3dr_services.${versionCode}.apk")
-                    }
-                }
-            }
         }
     }
 }
