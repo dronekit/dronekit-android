@@ -43,8 +43,8 @@ public class MissionReader {
 				in.close();
 				return false;
 			}
-			parseLines(reader);
 
+			parseLines(reader);
 			in.close();
 
 		} catch (Exception e) {
