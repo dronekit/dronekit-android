@@ -24,7 +24,7 @@ public class MAVLinkStreams {
 
 		public void notifyDisconnected();
 
-		public void notifyReceivedData(MAVLinkMessage m);
+		public void notifyReceivedData(MAVLinkPacket packet);
 
         public void onStreamError(String errorMsg);
 	}

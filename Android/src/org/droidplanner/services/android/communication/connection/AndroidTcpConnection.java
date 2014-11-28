@@ -17,8 +17,8 @@ public class AndroidTcpConnection extends AndroidMavLinkConnection {
     private final String serverIp;
     private final int serverPort;
 
-	public AndroidTcpConnection(Context context, DroneSharePrefs droneSharePrefs, String tcpServerIp, int tcpServerPort) {
-		super(context, droneSharePrefs);
+	public AndroidTcpConnection(Context context, String tcpServerIp, int tcpServerPort) {
+		super(context);
         this.serverIp = tcpServerIp;
         this.serverPort = tcpServerPort;
 
@@ -51,17 +51,17 @@ public class AndroidTcpConnection extends AndroidMavLinkConnection {
 	}
 
 	@Override
-	protected void closeAndroidConnection() throws IOException {
+	protected void closeConnection() throws IOException {
 		mConnectionImpl.closeConnection();
 	}
 
 	@Override
-	protected void loadPreferences(SharedPreferences prefs) {
+	protected void loadPreferences() {
 		mConnectionImpl.loadPreferences();
 	}
 
 	@Override
-	protected void openAndroidConnection() throws IOException {
+	protected void openConnection() throws IOException {
 		mConnectionImpl.openConnection();
 	}
 

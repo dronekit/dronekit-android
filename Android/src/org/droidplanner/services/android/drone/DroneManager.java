@@ -5,8 +5,10 @@ import android.os.Handler;
 import android.os.SystemClock;
 import android.util.Log;
 
+import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
+import com.o3dr.services.android.lib.drone.connection.DroneSharePrefs;
 import com.o3dr.services.android.lib.drone.connection.StreamRates;
 
 import org.droidplanner.core.MAVLink.MAVLinkStreams;
@@ -19,13 +21,17 @@ import org.droidplanner.core.gcs.follow.Follow;
 import org.droidplanner.core.model.Drone;
 import org.droidplanner.core.parameters.Parameter;
 import org.droidplanner.services.android.api.MavLinkServiceApi;
+import org.droidplanner.services.android.communication.connection.DroneshareClient;
 import org.droidplanner.services.android.communication.service.MAVLinkClient;
+import org.droidplanner.services.android.communication.service.UploaderService;
 import org.droidplanner.services.android.exception.ConnectionException;
 import org.droidplanner.services.android.interfaces.DroneEventsListener;
 import org.droidplanner.services.android.location.FusedLocation;
+import org.droidplanner.services.android.utils.analytics.GAUtils;
 import org.droidplanner.services.android.utils.file.help.CameraInfoLoader;
 import org.droidplanner.services.android.utils.prefs.DroidPlannerPrefs;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -42,6 +48,8 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream, DroneEve
     private final ConcurrentLinkedQueue<DroneEventsListener> droneEventsListeners = new
             ConcurrentLinkedQueue<DroneEventsListener>();
 
+    private final Context context;
+
     private final Drone drone;
     private final Follow followMe;
     private final CameraInfoLoader cameraInfoLoader;
@@ -49,8 +57,12 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream, DroneEve
     private final MavLinkMsgHandler mavLinkMsgHandler;
     private MagnetometerCalibration magCalibration;
 
+    private DroneshareClient uploader;
+    private ConnectionParameter connectionParams;
+
     public DroneManager(Context context, final Handler handler, MavLinkServiceApi mavlinkApi) {
 
+        this.context = context;
         this.cameraInfoLoader = new CameraInfoLoader(context);
 
         MAVLinkClient mavClient = new MAVLinkClient(this, mavlinkApi);
@@ -148,11 +160,45 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream, DroneEve
 
     @Override
     public void notifyConnected() {
+        if(this.connectionParams != null){
+            final DroneSharePrefs droneSharePrefs = connectionParams.getDroneSharePrefs();
+
+            // Start a new ga analytics session. The new session will be tagged
+            // with the mavlink connection mechanism, as well as whether the user
+            // has an active droneshare account.
+            GAUtils.startNewSession(droneSharePrefs);
+
+            if(droneSharePrefs != null && droneSharePrefs.isLiveUploadEnabled() &&
+                    droneSharePrefs.areLoginCredentialsSet()){
+                Log.i(TAG, "Starting live upload");
+                if(uploader == null)
+                    uploader = new DroneshareClient();
+
+                uploader.connect(droneSharePrefs.getUsername(), droneSharePrefs.getPassword());
+            }
+            else{
+                Log.i(TAG, "Skipping live upload");
+            }
+        }
+
         this.drone.notifyDroneEvent(DroneInterfaces.DroneEventsType.CONNECTED);
     }
 
     @Override
     public void notifyDisconnected() {
+        if (this.connectionParams != null) {
+            // See if we can at least do a delayed upload
+            UploaderService.kickStart(context, this.connectionParams.getDroneSharePrefs());
+        }
+
+        if (uploader != null) {
+            try {
+                uploader.close();
+            } catch (IOException e) {
+                Log.e(TAG, "Error while closing the drone share upload handler.", e);
+            }
+        }
+
         this.drone.notifyDroneEvent(DroneInterfaces.DroneEventsType.DISCONNECTED);
     }
 
@@ -170,8 +216,15 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream, DroneEve
     }
 
     @Override
-    public void notifyReceivedData(MAVLinkMessage m) {
-        this.mavLinkMsgHandler.receiveData(m);
+    public void notifyReceivedData(MAVLinkPacket packet) {
+        this.mavLinkMsgHandler.receiveData(packet.unpack());
+
+        if (uploader != null)
+            try {
+                uploader.filterMavlink(uploader.interfaceNum, packet.encodePacket());
+            } catch (IOException e) {
+                Log.e(TAG, e.getMessage(), e);
+            }
     }
 
     @Override
@@ -181,10 +234,12 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream, DroneEve
     }
 
     public ConnectionParameter getConnectionParameter() {
-        return ((MAVLinkClient)this.drone.getMavClient()).getConnectionParameter();
+        return this.connectionParams;
     }
 
     public void setConnectionParameter(ConnectionParameter connParams){
+        this.connectionParams = connParams;
+
         if(connParams != null){
             StreamRates connRates = connParams.getStreamRates();
             Rates droneRates = new Rates();

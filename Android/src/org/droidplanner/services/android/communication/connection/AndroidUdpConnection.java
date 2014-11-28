@@ -16,8 +16,8 @@ public class AndroidUdpConnection extends AndroidMavLinkConnection {
 	private final UdpConnection mConnectionImpl;
     private final int serverPort;
 
-	public AndroidUdpConnection(Context context, DroneSharePrefs droneSharePrefs, int udpServerPort) {
-		super(context, droneSharePrefs);
+	public AndroidUdpConnection(Context context, int udpServerPort) {
+		super(context);
         this.serverPort = udpServerPort;
 
 		mConnectionImpl = new UdpConnection() {
@@ -44,17 +44,17 @@ public class AndroidUdpConnection extends AndroidMavLinkConnection {
 	}
 
 	@Override
-	protected void closeAndroidConnection() throws IOException {
+	protected void closeConnection() throws IOException {
 		mConnectionImpl.closeConnection();
 	}
 
 	@Override
-	protected void loadPreferences(SharedPreferences prefs) {
+	protected void loadPreferences() {
 		mConnectionImpl.loadPreferences();
 	}
 
 	@Override
-	protected void openAndroidConnection() throws IOException {
+	protected void openConnection() throws IOException {
 		mConnectionImpl.openConnection();
 	}
 

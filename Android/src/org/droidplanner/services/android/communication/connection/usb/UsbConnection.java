@@ -27,23 +27,23 @@ public class UsbConnection extends AndroidMavLinkConnection {
 
 	private UsbConnectionImpl mUsbConnection;
 
-	public UsbConnection(Context parentContext, DroneSharePrefs droneSharePrefs, int baudRate) {
-		super(parentContext, droneSharePrefs);
+	public UsbConnection(Context parentContext, int baudRate) {
+		super(parentContext);
         mBaudRate = baudRate;
 	}
 
 	@Override
-	protected void closeAndroidConnection() throws IOException {
+	protected void closeConnection() throws IOException {
 		if (mUsbConnection != null) {
 			mUsbConnection.closeUsbConnection();
 		}
 	}
 
 	@Override
-	protected void loadPreferences(SharedPreferences prefs) {}
+	protected void loadPreferences() {}
 
 	@Override
-	protected void openAndroidConnection() throws IOException {
+	protected void openConnection() throws IOException {
 		if (mUsbConnection != null) {
 			try {
 				mUsbConnection.openUsbConnection();

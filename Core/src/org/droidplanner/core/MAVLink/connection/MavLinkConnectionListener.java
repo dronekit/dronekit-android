@@ -1,5 +1,6 @@
 package org.droidplanner.core.MAVLink.connection;
 
+import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 
 /**
@@ -15,10 +16,10 @@ public interface MavLinkConnectionListener {
 	/**
 	 * Called when data is received via the mavlink connection.
 	 * 
-	 * @param msg
+	 * @param packet
 	 *            received data
 	 */
-	public void onReceiveMessage(MAVLinkMessage msg);
+	public void onReceivePacket(MAVLinkPacket packet);
 
 	/**
 	 * Called when the mavlink connection is disconnected.

@@ -30,8 +30,8 @@ public class BluetoothConnection extends AndroidMavLinkConnection {
 
     private final String bluetoothAddress;
 
-	public BluetoothConnection(Context parentContext, DroneSharePrefs droneSharePrefs, String btAddress) {
-		super(parentContext, droneSharePrefs);
+	public BluetoothConnection(Context parentContext, String btAddress) {
+		super(parentContext);
         this.bluetoothAddress = btAddress;
 
 		mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -41,7 +41,7 @@ public class BluetoothConnection extends AndroidMavLinkConnection {
 	}
 
 	@Override
-	protected void openAndroidConnection() throws IOException {
+	protected void openConnection() throws IOException {
 		Log.d(BLUE, "Connect");
 
 		// Reset the bluetooth connection
@@ -124,7 +124,7 @@ public class BluetoothConnection extends AndroidMavLinkConnection {
 	}
 
 	@Override
-	protected void closeAndroidConnection() throws IOException {
+	protected void closeConnection() throws IOException {
 		resetConnection();
 		Log.d(BLUE, "## BT Closed ##");
 	}
@@ -148,7 +148,7 @@ public class BluetoothConnection extends AndroidMavLinkConnection {
 	}
 
 	@Override
-	protected void loadPreferences(SharedPreferences prefs) {
+	protected void loadPreferences() {
 		// TODO Auto-generated method stub
 	}
 }

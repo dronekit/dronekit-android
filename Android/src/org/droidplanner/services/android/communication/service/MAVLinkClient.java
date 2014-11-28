@@ -26,8 +26,8 @@ public class MAVLinkClient implements MAVLinkStreams.MAVLinkOutputStream {
         }
 
         @Override
-        public void onReceiveMessage(final MAVLinkMessage msg) {
-            listener.notifyReceivedData(msg);
+        public void onReceivePacket(final MAVLinkPacket packet) {
+            listener.notifyReceivedData(packet);
         }
 
         @Override

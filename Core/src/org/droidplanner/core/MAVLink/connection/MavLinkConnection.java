@@ -15,7 +15,6 @@ import org.droidplanner.core.model.Logger;
 
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Parser;
-import com.MAVLink.Messages.MAVLinkMessage;
 
 /**
  * Base for mavlink connection implementations.
@@ -123,8 +122,7 @@ public abstract class MavLinkConnection {
 			for (int i = 0; i < bufferSize; i++) {
 				MAVLinkPacket receivedPacket = parser.mavlink_parse_char(buffer[i] & 0x00ff);
 				if (receivedPacket != null) {
-					MAVLinkMessage msg = receivedPacket.unpack();
-					reportReceivedMessage(msg);
+					reportReceivedPacket(receivedPacket);
 					queueToLog(receivedPacket);
 				}
 			}
@@ -185,8 +183,6 @@ public abstract class MavLinkConnection {
 
 						logWriter.write(logBuffer.array());
 						logWriter.write(packet.encodePacket());
-
-						onLogSaved(packet);
 					}
 				} catch (InterruptedException e) {
 					mLogger.logVerbose(TAG, e.getMessage());
@@ -300,16 +296,6 @@ public abstract class MavLinkConnection {
 	 */
 	public abstract int getConnectionType();
 
-	/**
-	 * Overrides if interested in being notified when the log is written. Note:
-	 * Is called from a background thred.
-	 * 
-	 * @param packet
-	 *            MAVLinkPacket saved to log.
-	 */
-	protected void onLogSaved(MAVLinkPacket packet) throws IOException {
-	}
-
 	protected Logger getLogger() {
 		return mLogger;
 	}
@@ -366,15 +352,15 @@ public abstract class MavLinkConnection {
 	/**
 	 * Utility method to notify the mavlink listeners about received messages.
 	 * 
-	 * @param msg
-	 *            received mavlink message
+	 * @param packet
+	 *            received mavlink packet
 	 */
-	private void reportReceivedMessage(MAVLinkMessage msg) {
+	private void reportReceivedPacket(MAVLinkPacket packet) {
 		if (mListeners.isEmpty())
 			return;
 
 		for (MavLinkConnectionListener listener : mListeners.values()) {
-			listener.onReceiveMessage(msg);
+			listener.onReceivePacket(packet);
 		}
 	}
 

@@ -17,7 +17,7 @@ dependencies {
     compile files('libs/j2xx.jar')
     compile files('libs/protobuf-java-2.5.0.jar')
     compile files('libs/jeromq-0.3.4.jar')
-    compile files('libs/3dr_services_library.2.0.1.jar')
+    compile files('libs/3dr_services_library.2.0.2.jar')
 
     compile project(':Libraries:usb-serial-for-android:UsbSerialLibrary')
 }
