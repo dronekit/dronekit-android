@@ -751,8 +751,12 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
 
     @Override
     public void removeEventUpdates(IDroidPlannerApiCallback callback) throws RemoteException {
-        if (callback != null)
+        if (callback != null) {
             apiCallbacks.remove(callback);
+
+            if (apiCallbacks.isEmpty())
+                getService().releaseDroidPlannerApi(this);
+        }
     }
 
     private void notifyDroneEvent(String droneEvent, Bundle extrasBundle) {

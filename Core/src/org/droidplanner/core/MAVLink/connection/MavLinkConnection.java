@@ -265,6 +265,22 @@ public abstract class MavLinkConnection {
 		}
 	}
 
+    /**
+     * @return the count of connection listeners.
+     */
+    public int getMavLinkConnectionListenersCount(){
+        return mListeners.size();
+    }
+
+    /**
+     * Used to query the presence of a connection listener.
+     * @param tag connection listener tag
+     * @return true if the tag is present in the listeners list.
+     */
+    public boolean hasMavLinkConnectionListener(String tag){
+        return mListeners.containsKey(tag);
+    }
+
 	/**
 	 * Removes the specified listener.
 	 * 
@@ -274,6 +290,13 @@ public abstract class MavLinkConnection {
 	public void removeMavLinkConnectionListener(String tag) {
 		mListeners.remove(tag);
 	}
+
+    /**
+     * Removes all the connection listeners.
+     */
+    public void removeAllMavLinkConnectionListeners(){
+        mListeners.clear();
+    }
 
 	protected abstract Logger initLogger();
 

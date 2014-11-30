@@ -40,38 +40,22 @@ public class MavLinkServiceApi {
         }
     }
 
-    public int getConnectionStatus(ConnectionParameter connParams) {
+    public int getConnectionStatus(ConnectionParameter connParams, String tag) {
         final AndroidMavLinkConnection mavConnection = getService().mavConnections.get
                 (connParams);
-        if (mavConnection == null) {
+        if (mavConnection == null || !mavConnection.hasMavLinkConnectionListener(tag)) {
             return MavLinkConnection.MAVLINK_DISCONNECTED;
         }
 
         return mavConnection.getConnectionStatus();
     }
 
-    public void connectMavLink(ConnectionParameter connParams) {
-        getService().connectMAVConnection(connParams);
+    public void connectMavLink(ConnectionParameter connParams, String tag,
+                               MavLinkConnectionListener listener) {
+        getService().connectMAVConnection(connParams, tag, listener);
     }
 
-    public void disconnectMavLink(ConnectionParameter connParams) {
-        getService().disconnectMAVConnection(connParams);
-    }
-
-    public void addMavLinkConnectionListener(ConnectionParameter connParams, String tag,
-                                             MavLinkConnectionListener listener) {
-        final AndroidMavLinkConnection mavConnection = getService().mavConnections.get
-                (connParams);
-        if (mavConnection == null) return;
-
-        mavConnection.addMavLinkConnectionListener(tag, listener);
-    }
-
-    public void removeMavLinkConnectionListener(ConnectionParameter connParams, String tag) {
-        final AndroidMavLinkConnection mavConnection = getService().mavConnections.get
-                (connParams);
-        if (mavConnection == null) return;
-
-        mavConnection.removeMavLinkConnectionListener(tag);
+    public void disconnectMavLink(ConnectionParameter connParams, String tag) {
+        getService().disconnectMAVConnection(connParams, tag);
     }
 }

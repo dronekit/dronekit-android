@@ -16,6 +16,7 @@ import com.o3dr.services.android.lib.drone.connection.DroneSharePrefs;
 import com.o3dr.services.android.lib.model.IDroidPlannerServices;
 
 import org.droidplanner.core.MAVLink.connection.MavLinkConnection;
+import org.droidplanner.core.MAVLink.connection.MavLinkConnectionListener;
 import org.droidplanner.services.android.communication.connection.AndroidMavLinkConnection;
 import org.droidplanner.services.android.communication.connection.AndroidTcpConnection;
 import org.droidplanner.services.android.communication.connection.AndroidUdpConnection;
@@ -79,7 +80,8 @@ public class DroidPlannerService extends Service {
         }
     }
 
-    void connectMAVConnection(ConnectionParameter connParams) {
+    void connectMAVConnection(ConnectionParameter connParams, String listenerTag,
+                              MavLinkConnectionListener listener) {
         AndroidMavLinkConnection conn = mavConnections.get(connParams);
         if (conn == null) {
 
@@ -128,21 +130,26 @@ public class DroidPlannerService extends Service {
 
         if (conn.getConnectionStatus() == MavLinkConnection.MAVLINK_DISCONNECTED) {
             conn.connect();
+
+            // Record which connection type is used.
+            GAUtils.sendEvent(new HitBuilders.EventBuilder()
+                    .setCategory(GAUtils.Category.MAVLINK_CONNECTION)
+                    .setAction("MavLink connect")
+                    .setLabel(connParams.toString()));
         }
 
-        // Record which connection type is used.
-        GAUtils.sendEvent(new HitBuilders.EventBuilder()
-                .setCategory(GAUtils.Category.MAVLINK_CONNECTION)
-                .setAction("MavLink connect")
-                .setLabel(connParams.toString()));
+        conn.addMavLinkConnectionListener(listenerTag, listener);
     }
 
-    void disconnectMAVConnection(ConnectionParameter connParams) {
+    void disconnectMAVConnection(ConnectionParameter connParams, String listenerTag) {
         final AndroidMavLinkConnection conn = mavConnections.get(connParams);
         if (conn == null)
             return;
 
-        if (conn.getConnectionStatus() != MavLinkConnection.MAVLINK_DISCONNECTED) {
+        conn.removeMavLinkConnectionListener(listenerTag);
+
+        if (conn.getMavLinkConnectionListenersCount() == 0 && conn.getConnectionStatus() !=
+                MavLinkConnection.MAVLINK_DISCONNECTED) {
             Log.d(TAG, "Disconnecting...");
             conn.disconnect();
 
@@ -184,8 +191,9 @@ public class DroidPlannerService extends Service {
         }
         dpApiStore.clear();
 
-        for (ConnectionParameter connParams : mavConnections.keySet()) {
-            disconnectMAVConnection(connParams);
+        for (AndroidMavLinkConnection conn : mavConnections.values()) {
+            conn.disconnect();
+            conn.removeAllMavLinkConnectionListeners();
         }
 
         mavConnections.clear();
