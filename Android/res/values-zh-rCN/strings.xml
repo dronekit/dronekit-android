@@ -490,9 +490,6 @@
     <string name="pref_ui_gps_hdop_summary">在讯息列表上显示卫星的HDOP代替FIX值</string>
     <string name="pref_ui_gps_hdop_title">显示卫星的HDOP值</string>
 
-    <string name="status_disconnecting">断线中...</string>
-    <string name="status_connecting">连接中...</string>
-
     <!-- Help -->
     <string name="help_item_description">如何规划和执行飞行任务</string>
     

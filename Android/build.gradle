@@ -2,6 +2,10 @@ apply plugin: 'com.android.application'
 
 repositories {
     mavenCentral()
+
+    flatDir {
+        dirs 'libs'
+    }
 }
 
 dependencies {
@@ -11,13 +15,14 @@ dependencies {
     compile 'com.android.support:appcompat-v7:21.0.2'
     compile 'com.android.support:cardview-v7:21.0.0'
 
+    compile(name:'3dr_services_library-release.2.0.2', ext:'aar')
+
     compile project(':Core')
     compile project(':Mavlink')
 
     compile files('libs/j2xx.jar')
     compile files('libs/protobuf-java-2.5.0.jar')
     compile files('libs/jeromq-0.3.4.jar')
-    compile files('libs/3dr_services_library.2.0.2.jar')
 
     compile project(':Libraries:usb-serial-for-android:UsbSerialLibrary')
 }
@@ -56,11 +61,6 @@ android {
         // by a similar customization.
         debug.setRoot('build-types/debug')
         release.setRoot('build-types/release')
-    }
-
-    //FIXME: remove this after lint errors have been taken care of
-    lintOptions {
-        abortOnError false
     }
 
     signingConfigs {
