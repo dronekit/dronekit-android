@@ -3,6 +3,7 @@ package org.droidplanner.services.android.api;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Parcelable;
 import android.os.RemoteException;
 import android.text.TextUtils;
 import android.util.Log;
@@ -11,10 +12,11 @@ import com.MAVLink.Messages.ApmModes;
 import com.MAVLink.enums.MAV_TYPE;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
+import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
+import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
+import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionResult;
-import com.o3dr.services.android.lib.drone.event.Event;
-import com.o3dr.services.android.lib.drone.event.Extra;
 import com.o3dr.services.android.lib.drone.mission.Mission;
 import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
 import com.o3dr.services.android.lib.drone.mission.item.complex.CameraDetail;
@@ -23,6 +25,7 @@ import com.o3dr.services.android.lib.drone.mission.item.complex.Survey;
 import com.o3dr.services.android.lib.drone.property.Altitude;
 import com.o3dr.services.android.lib.drone.property.Attitude;
 import com.o3dr.services.android.lib.drone.property.Battery;
+import com.o3dr.services.android.lib.drone.property.CameraProxy;
 import com.o3dr.services.android.lib.drone.property.FootPrint;
 import com.o3dr.services.android.lib.drone.property.Gps;
 import com.o3dr.services.android.lib.drone.property.GuidedState;
@@ -35,14 +38,15 @@ import com.o3dr.services.android.lib.drone.property.Type;
 import com.o3dr.services.android.lib.drone.property.VehicleMode;
 import com.o3dr.services.android.lib.gcs.follow.FollowState;
 import com.o3dr.services.android.lib.gcs.follow.FollowType;
-import com.o3dr.services.android.lib.model.IDroidPlannerApi;
-import com.o3dr.services.android.lib.model.IDroidPlannerApiCallback;
+import com.o3dr.services.android.lib.model.IDroneApi;
+import com.o3dr.services.android.lib.model.IObserver;
 
 import org.droidplanner.core.MAVLink.MavLinkArm;
 import org.droidplanner.core.MAVLink.MavLinkROI;
 import org.droidplanner.core.drone.DroneInterfaces;
 import org.droidplanner.core.drone.profiles.VehicleProfile;
 import org.droidplanner.core.drone.variables.Calibration;
+import org.droidplanner.core.drone.variables.Camera;
 import org.droidplanner.core.drone.variables.GPS;
 import org.droidplanner.core.drone.variables.GuidedPoint;
 import org.droidplanner.core.drone.variables.Orientation;
@@ -78,21 +82,23 @@ import ellipsoidFit.ThreeSpacePoint;
 /**
  * Created by fhuya on 10/30/14.
  */
-final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
+final class DroneApi extends IDroneApi.Stub implements DroneEventsListener {
 
-    private final static String TAG = DPApi.class.getSimpleName();
+    private final static String TAG = DroneApi.class.getSimpleName();
 
     private final WeakReference<DroidPlannerService> serviceRef;
     private final Context context;
 
-    private final ConcurrentLinkedQueue<IDroidPlannerApiCallback> apiCallbacks;
+    private final ConcurrentLinkedQueue<IObserver> observersList;
     private DroneManager droneMgr;
 
-    DPApi(DroidPlannerService dpService, Handler handler, MavLinkServiceApi mavlinkApi) {
+    private List<CameraDetail> cachedCameraDetails;
+
+    DroneApi(DroidPlannerService dpService, Handler handler, MavLinkServiceApi mavlinkApi) {
         this.context = dpService.getApplicationContext();
 
         serviceRef = new WeakReference<DroidPlannerService>(dpService);
-        apiCallbacks = new ConcurrentLinkedQueue<IDroidPlannerApiCallback>();
+        observersList = new ConcurrentLinkedQueue<IObserver>();
 
         this.droneMgr = new DroneManager(context, handler, mavlinkApi);
         this.droneMgr.addDroneEventsListener(this);
@@ -103,7 +109,7 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
         this.droneMgr.destroy();
 
         this.serviceRef.clear();
-        this.apiCallbacks.clear();
+        this.observersList.clear();
     }
 
     public DroneManager getDroneManager(){
@@ -119,7 +125,71 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
     }
 
     @Override
-    public Gps getGps() throws RemoteException {
+    public Bundle getAttribute(String type) throws RemoteException {
+        Bundle carrier = new Bundle();
+        if (AttributeType.STATE.equals(type)) {
+            carrier.putParcelable(type, getState());
+        }
+        else if(AttributeType.GPS.equals(type)){
+            carrier.putParcelable(type, getGps());
+        }
+        else if(AttributeType.PARAMETERS.equals(type)){
+            carrier.putParcelable(type, getParameters());
+        }
+        else if(AttributeType.SPEED.equals(type)){
+            carrier.putParcelable(type, getSpeed());
+        }
+        else if(AttributeType.ATTITUDE.equals(type)){
+            carrier.putParcelable(type, getAttitude());
+        }
+        else if(AttributeType.HOME.equals(type)){
+            carrier.putParcelable(type, getHome());
+        }
+        else if(AttributeType.BATTERY.equals(type)){
+            carrier.putParcelable(type, getBattery());
+        }
+        else if(AttributeType.ALTITUDE.equals(type)){
+            carrier.putParcelable(type, getAltitude());
+        }
+        else if(AttributeType.MISSION.equals(type)){
+            carrier.putParcelable(type, getMission());
+        }
+        else if(AttributeType.SIGNAL.equals(type)){
+            carrier.putParcelable(type, getSignal());
+        }
+        else if(AttributeType.TYPE.equals(type)){
+            carrier.putParcelable(type, getType());
+        }
+        else if(AttributeType.GUIDED_STATE.equals(type)){
+            carrier.putParcelable(type, getGuidedState());
+        }
+        else if(AttributeType.FOLLOW_STATE.equals(type)){
+            carrier.putParcelable(type, getFollowState());
+        }
+        else if(AttributeType.CAMERA.equals(type)){
+            carrier.putParcelable(type, getCameraProxy());
+        }
+
+        return carrier;
+    }
+
+    private CameraProxy getCameraProxy() {
+        Camera droneCamera = droneMgr.getDrone().getCamera();
+
+        List<Footprint> footprints = droneCamera.getFootprints();
+        final int printsCount = footprints.size();
+
+        List<FootPrint> proxyPrints = new ArrayList<FootPrint>(footprints.size());
+        for (Footprint footprint : footprints) {
+            proxyPrints.add(getProxyCameraFootPrint(footprint));
+        }
+
+        return new CameraProxy(ProxyUtils.getCameraDetail(droneCamera.getCamera()),
+                getProxyCameraFootPrint(droneCamera.getCurrentFieldOfView()), proxyPrints,
+                getCameraDetails());
+    }
+
+    private Gps getGps() {
         final GPS droneGps = droneMgr.getDrone().getGps();
         LatLong dronePosition = droneGps.isPositionValid()
                 ? new LatLong(droneGps.getPosition().getLat(), droneGps.getPosition().getLng())
@@ -129,31 +199,16 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
                 droneGps.getFixTypeNumeric());
     }
 
-    @Override
-    public State getState() throws RemoteException {
+    private State getState()  {
         final Drone drone = this.droneMgr.getDrone();
         org.droidplanner.core.drone.variables.State droneState = drone.getState();
         ApmModes droneMode = droneState.getMode();
         Calibration calibration = drone.getCalibrationSetup();
         String calibrationMessage = calibration.isCalibrating() ? calibration.getMessage() : null;
 
-        return new State(getVehicleMode(droneMode), droneState.isArmed(),
+        return new State(isConnected(), getVehicleMode(droneMode), droneState.isArmed(),
                 droneState.isFlying(), droneState.getWarning(), drone.getMavlinkVersion(),
                 calibrationMessage);
-    }
-
-    @Override
-    public VehicleMode[] getAllVehicleModes() throws RemoteException {
-        final int droneType = this.droneMgr.getDrone().getType();
-
-        List<ApmModes> typeModes = ApmModes.getModeList(droneType);
-        final int modesCount = typeModes.size();
-        VehicleMode[] vehicleModes = new VehicleMode[modesCount];
-        for (int i = 0; i < modesCount; i++) {
-            vehicleModes[i] = getVehicleMode(typeModes.get(i));
-        }
-
-        return vehicleModes;
     }
 
     private static VehicleMode getVehicleMode(ApmModes mode) {
@@ -281,8 +336,7 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
         }
     }
 
-    @Override
-    public Parameters getParameters() throws RemoteException {
+    private Parameters getParameters()  {
         final Drone drone = this.droneMgr.getDrone();
         final Map<String, com.o3dr.services.android.lib.drone.property.Parameter> proxyParams =
                 new HashMap<String, com.o3dr.services.android.lib.drone.property.Parameter>();
@@ -316,23 +370,20 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
                 .Parameter>(proxyParams.values()));
     }
 
-    @Override
-    public Speed getSpeed() throws RemoteException {
+    private Speed getSpeed()  {
         org.droidplanner.core.drone.variables.Speed droneSpeed = this.droneMgr.getDrone().getSpeed();
         return new Speed(droneSpeed.getVerticalSpeed().valueInMetersPerSecond(),
                 droneSpeed.getGroundSpeed().valueInMetersPerSecond(),
                 droneSpeed.getAirSpeed().valueInMetersPerSecond());
     }
 
-    @Override
-    public Attitude getAttitude() throws RemoteException {
+    private Attitude getAttitude()  {
         Orientation droneOrientation = this.droneMgr.getDrone().getOrientation();
         return new Attitude(droneOrientation.getRoll(), droneOrientation.getPitch(),
                 droneOrientation.getYaw());
     }
 
-    @Override
-    public Home getHome() throws RemoteException {
+    private Home getHome()  {
         org.droidplanner.core.drone.variables.Home droneHome = this.droneMgr.getDrone().getHome();
         LatLongAlt homePosition = droneHome.isValid()
                 ? new LatLongAlt(droneHome.getCoord().getLat(), droneHome.getCoord().getLng(),
@@ -342,21 +393,18 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
         return new Home(homePosition);
     }
 
-    @Override
-    public Battery getBattery() throws RemoteException {
+    private Battery getBattery() {
         org.droidplanner.core.drone.variables.Battery droneBattery = this.droneMgr.getDrone().getBattery();
         return new Battery(droneBattery.getBattVolt(), droneBattery.getBattRemain(),
                 droneBattery.getBattCurrent(), droneBattery.getBattDischarge());
     }
 
-    @Override
-    public Altitude getAltitude() throws RemoteException {
+    private Altitude getAltitude() {
         org.droidplanner.core.drone.variables.Altitude droneAltitude = this.droneMgr.getDrone().getAltitude();
         return new Altitude(droneAltitude.getAltitude(), droneAltitude.getTargetAltitude());
     }
 
-    @Override
-    public Mission getMission() throws RemoteException {
+    private Mission getMission() {
         final Drone drone = this.droneMgr.getDrone();
         org.droidplanner.core.mission.Mission droneMission = drone.getMission();
         List<org.droidplanner.core.mission.MissionItem> droneMissionItems = droneMission.getItems();
@@ -372,27 +420,23 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
         return proxyMission;
     }
 
-    @Override
-    public Signal getSignal() throws RemoteException {
+    private Signal getSignal() {
         Radio droneRadio = this.droneMgr.getDrone().getRadio();
         return new Signal(droneRadio.isValid(), droneRadio.getRxErrors(), droneRadio.getFixed(),
                 droneRadio.getTxBuf(), droneRadio.getRssi(), droneRadio.getRemRssi(),
                 droneRadio.getNoise(), droneRadio.getRemNoise());
     }
 
-    @Override
-    public Type getType() throws RemoteException {
+    private Type getType() {
         final Drone drone = this.droneMgr.getDrone();
         return new Type(getDroneProxyType(drone.getType()), drone.getFirmwareVersion());
     }
 
-    @Override
-    public boolean isConnected() throws RemoteException {
+    private boolean isConnected() {
         return droneMgr != null && droneMgr.isConnected();
     }
 
-    @Override
-    public GuidedState getGuidedState() throws RemoteException {
+    private GuidedState getGuidedState()  {
         final GuidedPoint guidedPoint = this.droneMgr.getDrone().getGuidedPoint();
         int guidedState;
         switch (guidedPoint.getState()) {
@@ -507,8 +551,8 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
     public void generateDronie() throws RemoteException {
         float bearing = (float) this.droneMgr.getDrone().getMission().makeAndUploadDronie();
         Bundle bundle = new Bundle(1);
-        bundle.putFloat(Extra.EXTRA_MISSION_DRONIE_BEARING, bearing);
-        notifyDroneEvent(Event.EVENT_MISSION_DRONIE_CREATED, bundle);
+        bundle.putFloat(AttributeEventExtra.EXTRA_MISSION_DRONIE_BEARING, bearing);
+        notifyAttributeUpdate(AttributeEvent.MISSION_DRONIE_CREATED, bundle);
     }
 
     @Override
@@ -533,9 +577,9 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
     public void startIMUCalibration() throws RemoteException {
         if (!this.droneMgr.getDrone().getCalibrationSetup().startCalibration()) {
             Bundle extrasBundle = new Bundle(1);
-            extrasBundle.putString(Extra.EXTRA_CALIBRATION_IMU_MESSAGE,
+            extrasBundle.putString(AttributeEventExtra.EXTRA_CALIBRATION_IMU_MESSAGE,
                     context.getString(R.string.failed_start_calibration_message));
-            notifyDroneEvent(Event.EVENT_CALIBRATION_IMU_ERROR, extrasBundle);
+            notifyAttributeUpdate(AttributeEvent.CALIBRATION_IMU_ERROR, extrasBundle);
         }
     }
 
@@ -616,8 +660,7 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
         }
     }
 
-    @Override
-    public FollowState getFollowState() throws RemoteException {
+    private FollowState getFollowState() {
         final Follow followMe = this.droneMgr.getFollowMe();
         final double radius = followMe.getRadius().valueInMeters();
 
@@ -653,67 +696,36 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
         return new FollowState(state, radius, followModeToType(followMe.getType()));
     }
 
-    @Override
-    public FollowType[] getFollowTypes() throws RemoteException {
-        final FollowAlgorithm.FollowModes[] followModes = FollowAlgorithm.FollowModes.values();
-        final int modesCount = followModes.length;
-        final FollowType[] followTypes = new FollowType[modesCount];
-        for (int i = 0; i < modesCount; i++) {
-            followTypes[i] = followModeToType(followModes[i]);
-        }
+    private List<CameraDetail> getCameraDetails() {
+        if(cachedCameraDetails == null) {
+            final CameraInfoLoader camInfoLoader = this.droneMgr.getCameraInfoLoader();
+            List<String> cameraInfoNames = camInfoLoader.getCameraInfoList();
 
-        return followTypes;
-    }
-
-    @Override
-    public CameraDetail[] getCameraDetails() throws RemoteException {
-        final CameraInfoLoader camInfoLoader = this.droneMgr.getCameraInfoLoader();
-        List<String> cameraInfoNames = camInfoLoader.getCameraInfoList();
-
-        List<CameraInfo> cameraInfos = new ArrayList<CameraInfo>(cameraInfoNames.size());
-        for (String infoName : cameraInfoNames) {
-            try {
-                cameraInfos.add(camInfoLoader.openFile(infoName));
-            } catch (Exception e) {
-                Log.e(TAG, e.getMessage(), e);
+            List<CameraInfo> cameraInfos = new ArrayList<CameraInfo>(cameraInfoNames.size());
+            for (String infoName : cameraInfoNames) {
+                try {
+                    cameraInfos.add(camInfoLoader.openFile(infoName));
+                } catch (Exception e) {
+                    Log.e(TAG, e.getMessage(), e);
+                }
             }
+
+            List<CameraDetail> cameraDetails = new ArrayList<CameraDetail>(cameraInfos.size());
+            for (CameraInfo camInfo : cameraInfos) {
+                cameraDetails.add(new CameraDetail(camInfo.name, camInfo.sensorWidth,
+                        camInfo.sensorHeight, camInfo.sensorResolution, camInfo.focalLength,
+                        camInfo.overlap, camInfo.sidelap, camInfo.isInLandscapeOrientation));
+            }
+
+            cachedCameraDetails = cameraDetails;
         }
 
-        final int infoCount = cameraInfos.size();
-        CameraDetail[] cameraDetails = new CameraDetail[infoCount];
-        for (int i = 0; i < infoCount; i++) {
-            CameraInfo camInfo = cameraInfos.get(i);
-            cameraDetails[i] = new CameraDetail(camInfo.name, camInfo.sensorWidth,
-                    camInfo.sensorHeight, camInfo.sensorResolution, camInfo.focalLength,
-                    camInfo.overlap, camInfo.sidelap, camInfo.isInLandscapeOrientation);
-        }
-
-        return cameraDetails;
+        return cachedCameraDetails;
     }
 
-    @Override
-    public FootPrint getLastCameraFootPrint() throws RemoteException {
+    private FootPrint getLastCameraFootPrint() {
         Footprint lastFootprint = this.droneMgr.getDrone().getCamera().getLastFootprint();
         return getProxyCameraFootPrint(lastFootprint);
-    }
-
-    @Override
-    public FootPrint[] getCameraFootPrints() throws RemoteException {
-        List<Footprint> footprints = this.droneMgr.getDrone().getCamera().getFootprints();
-        final int printsCount = footprints.size();
-
-        FootPrint[] proxyPrints = new FootPrint[printsCount];
-        for (int i = 0; i < printsCount; i++) {
-            proxyPrints[i] = getProxyCameraFootPrint(footprints.get(i));
-        }
-
-        return proxyPrints;
-    }
-
-    @Override
-    public FootPrint getCurrentFieldOfView() throws RemoteException {
-        return getProxyCameraFootPrint(this.droneMgr.getDrone().getCamera().getCurrentFieldOfView
-                ());
     }
 
     private static FootPrint getProxyCameraFootPrint(Footprint footprint) {
@@ -744,33 +756,33 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
     }
 
     @Override
-    public void requestEventUpdates(IDroidPlannerApiCallback callback) throws RemoteException {
-        if (callback != null)
-            apiCallbacks.add(callback);
+    public void addAttributesObserver(IObserver observer) throws RemoteException {
+        if (observer != null)
+            observersList.add(observer);
     }
 
     @Override
-    public void removeEventUpdates(IDroidPlannerApiCallback callback) throws RemoteException {
-        if (callback != null) {
-            apiCallbacks.remove(callback);
+    public void removeAttributesObserver(IObserver observer) throws RemoteException {
+        if (observer != null) {
+            observersList.remove(observer);
 
-            if (apiCallbacks.isEmpty())
+            if (observersList.isEmpty())
                 getService().releaseDroidPlannerApi(this);
         }
     }
 
-    private void notifyDroneEvent(String droneEvent, Bundle extrasBundle) {
-        if (apiCallbacks.isEmpty())
+    private void notifyAttributeUpdate(String attributeEvent, Bundle extrasBundle) {
+        if (observersList.isEmpty())
             return;
 
-        if (droneEvent != null) {
-            for (IDroidPlannerApiCallback callback : apiCallbacks) {
+        if (attributeEvent != null) {
+            for (IObserver observer : observersList) {
                 try {
-                    callback.onDroneEvent(droneEvent, extrasBundle);
+                    observer.onAttributeUpdated(attributeEvent, extrasBundle);
                 } catch (RemoteException e) {
                     Log.e(TAG, e.getMessage(), e);
                     try {
-                        removeEventUpdates(callback);
+                        removeAttributesObserver(observer);
                     } catch (RemoteException e1) {
                         Log.e(TAG, e1.getMessage(), e1);
                     }
@@ -780,17 +792,17 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
     }
 
     private void notifyConnectionFailed(ConnectionResult result) {
-        if (apiCallbacks.isEmpty())
+        if (observersList.isEmpty())
             return;
 
         if (result != null) {
-            for (IDroidPlannerApiCallback callback : apiCallbacks) {
+            for (IObserver observer : observersList) {
                 try {
-                    callback.onConnectionFailed(result);
+                    observer.onConnectionFailed(result);
                 } catch (RemoteException e) {
                     Log.e(TAG, e.getMessage(), e);
                     try {
-                        removeEventUpdates(callback);
+                        removeAttributesObserver(observer);
                     } catch (RemoteException e1) {
                         Log.e(TAG, e1.getMessage(), e1);
                     }
@@ -866,15 +878,15 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
 
         switch (event) {
             case DISCONNECTED:
-                droneEvent = Event.EVENT_DISCONNECTED;
+                droneEvent = AttributeEvent.STATE_DISCONNECTED;
                 break;
 
             case GUIDEDPOINT:
-                droneEvent = Event.EVENT_GUIDED_POINT;
+                droneEvent = AttributeEvent.GUIDED_POINT_UPDATED;
                 break;
 
             case RADIO:
-                droneEvent = Event.EVENT_RADIO;
+                droneEvent = AttributeEvent.SIGNAL_UPDATED;
                 break;
 
             case RC_IN:
@@ -884,78 +896,78 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
 
             case ARMING_STARTED:
             case ARMING:
-                droneEvent = Event.EVENT_ARMING;
+                droneEvent = AttributeEvent.STATE_ARMING;
                 break;
 
             case AUTOPILOT_WARNING:
                 extrasBundle = new Bundle(1);
-                extrasBundle.putString(Extra.EXTRA_AUTOPILOT_FAILSAFE_MESSAGE,
+                extrasBundle.putString(AttributeEventExtra.EXTRA_AUTOPILOT_FAILSAFE_MESSAGE,
                         drone.getState().getWarning());
-                droneEvent = Event.EVENT_AUTOPILOT_FAILSAFE;
+                droneEvent = AttributeEvent.AUTOPILOT_FAILSAFE;
                 break;
 
             case MODE:
-                droneEvent = Event.EVENT_VEHICLE_MODE;
+                droneEvent = AttributeEvent.STATE_VEHICLE_MODE;
                 break;
 
             case NAVIGATION:
             case ATTITUDE:
             case ORIENTATION:
-                droneEvent = Event.EVENT_ATTITUDE;
+                droneEvent = AttributeEvent.ATTITUDE_UPDATED;
                 break;
 
             case SPEED:
-                droneEvent = Event.EVENT_SPEED;
+                droneEvent = AttributeEvent.SPEED_UPDATED;
                 break;
 
             case BATTERY:
-                droneEvent = Event.EVENT_BATTERY;
+                droneEvent = AttributeEvent.BATTERY_UPDATED;
                 break;
 
             case STATE:
-                droneEvent = Event.EVENT_STATE;
+                droneEvent = AttributeEvent.STATE_UPDATED;
                 break;
 
             case MISSION_UPDATE:
-                droneEvent = Event.EVENT_MISSION_UPDATE;
+                droneEvent = AttributeEvent.MISSION_UPDATED;
                 break;
 
             case MISSION_RECEIVED:
-                droneEvent = Event.EVENT_MISSION_RECEIVED;
+                droneEvent = AttributeEvent.MISSION_RECEIVED;
                 break;
 
             case FIRMWARE:
             case TYPE:
-                droneEvent = Event.EVENT_TYPE_UPDATED;
+                droneEvent = AttributeEvent.TYPE_UPDATED;
                 break;
 
             case HOME:
-                droneEvent = Event.EVENT_HOME;
+                droneEvent = AttributeEvent.HOME_UPDATED;
                 break;
 
             case GPS:
-                droneEvent = Event.EVENT_GPS;
+                droneEvent = AttributeEvent.GPS_POSITION;
                 break;
 
             case GPS_FIX:
-                droneEvent = Event.EVENT_GPS_FIX;
+                droneEvent = AttributeEvent.GPS_FIX;
                 break;
 
             case GPS_COUNT:
-                droneEvent = Event.EVENT_GPS_COUNT;
+                droneEvent = AttributeEvent.GPS_COUNT;
                 break;
 
             case PARAMETER:
             case PARAMETERS_DOWNLOADED:
-                droneEvent = Event.EVENT_PARAMETERS_RECEIVED;
+                droneEvent = AttributeEvent.PARAMETERS_RECEIVED;
                 break;
 
             case CALIBRATION_IMU:
                 final String calIMUMessage = this.droneMgr.getDrone().getCalibrationSetup()
                         .getMessage();
                 extrasBundle = new Bundle(1);
-                extrasBundle.putString(Extra.EXTRA_CALIBRATION_IMU_MESSAGE, calIMUMessage);
-                droneEvent = Event.EVENT_CALIBRATION_IMU;
+                extrasBundle.putString(AttributeEventExtra.EXTRA_CALIBRATION_IMU_MESSAGE, calIMUMessage);
+                droneEvent = AttributeEvent.CALIBRATION_IMU;
                 break;
 
             case CALIBRATION_TIMEOUT:
@@ -970,36 +982,36 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
                 final String message = calibration.getMessage();
                 if (calibration.isCalibrating() && TextUtils.isEmpty(message)) {
                     calibration.setCalibrating(false);
-                    droneEvent = Event.EVENT_HEARTBEAT_TIMEOUT;
+                    droneEvent = AttributeEvent.HEARTBEAT_TIMEOUT;
                 } else {
                     extrasBundle = new Bundle(1);
-                    extrasBundle.putString(Extra.EXTRA_CALIBRATION_IMU_MESSAGE, message);
-                    droneEvent = Event.EVENT_CALIBRATION_IMU_TIMEOUT;
+                    extrasBundle.putString(AttributeEventExtra.EXTRA_CALIBRATION_IMU_MESSAGE, message);
+                    droneEvent = AttributeEvent.CALIBRATION_IMU_TIMEOUT;
                 }
                 break;
 
             case HEARTBEAT_TIMEOUT:
-                droneEvent = Event.EVENT_HEARTBEAT_TIMEOUT;
+                droneEvent = AttributeEvent.HEARTBEAT_TIMEOUT;
                 break;
 
             case HEARTBEAT_FIRST:
                 extrasBundle = new Bundle(1);
-                extrasBundle.putInt(Extra.EXTRA_MAVLINK_VERSION, drone.getMavlinkVersion());
-                droneEvent = Event.EVENT_HEARTBEAT_FIRST;
+                extrasBundle.putInt(AttributeEventExtra.EXTRA_MAVLINK_VERSION, drone.getMavlinkVersion());
+                droneEvent = AttributeEvent.HEARTBEAT_FIRST;
                 break;
 
             case HEARTBEAT_RESTORED:
                 extrasBundle = new Bundle(1);
-                extrasBundle.putInt(Extra.EXTRA_MAVLINK_VERSION, drone.getMavlinkVersion());
-                droneEvent = Event.EVENT_HEARTBEAT_RESTORED;
+                extrasBundle.putInt(AttributeEventExtra.EXTRA_MAVLINK_VERSION, drone.getMavlinkVersion());
+                droneEvent = AttributeEvent.HEARTBEAT_RESTORED;
                 break;
 
             case CONNECTED:
-                droneEvent = Event.EVENT_CONNECTED;
+                droneEvent = AttributeEvent.STATE_CONNECTED;
                 break;
 
             case MISSION_SENT:
-                droneEvent = Event.EVENT_MISSION_SENT;
+                droneEvent = AttributeEvent.MISSION_SENT;
                 break;
 
             case INVALID_POLYGON:
@@ -1009,73 +1021,73 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
                 final int currentWaypoint = this.droneMgr.getDrone().getMissionStats()
                         .getCurrentWP();
                 extrasBundle = new Bundle(1);
-                extrasBundle.putInt(Extra.EXTRA_MISSION_CURRENT_WAYPOINT, currentWaypoint);
-                droneEvent = Event.EVENT_MISSION_ITEM_UPDATE;
+                extrasBundle.putInt(AttributeEventExtra.EXTRA_MISSION_CURRENT_WAYPOINT, currentWaypoint);
+                droneEvent = AttributeEvent.MISSION_ITEM_UPDATED;
                 break;
 
             case FOLLOW_START:
-                droneEvent = Event.EVENT_FOLLOW_START;
+                droneEvent = AttributeEvent.FOLLOW_START;
                 break;
 
             case FOLLOW_STOP:
-                droneEvent = Event.EVENT_FOLLOW_STOP;
+                droneEvent = AttributeEvent.FOLLOW_STOP;
                 break;
 
             case FOLLOW_UPDATE:
             case FOLLOW_CHANGE_TYPE:
-                droneEvent = Event.EVENT_FOLLOW_UPDATE;
+                droneEvent = AttributeEvent.FOLLOW_UPDATE;
                 break;
 
             case WARNING_400FT_EXCEEDED:
-                droneEvent = Event.EVENT_WARNING_400FT_EXCEEDED;
+                droneEvent = AttributeEvent.ALTITUDE_400FT_EXCEEDED;
                 break;
 
             case WARNING_SIGNAL_WEAK:
-                droneEvent = Event.EVENT_WARNING_SIGNAL_WEAK;
+                droneEvent = AttributeEvent.SIGNAL_WEAK;
                 break;
 
             case WARNING_NO_GPS:
-                droneEvent = Event.EVENT_WARNING_NO_GPS;
+                droneEvent = AttributeEvent.WARNING_NO_GPS;
                 break;
 
             case MAGNETOMETER:
                 break;
 
             case FOOTPRINT:
-                droneEvent = Event.EVENT_FOOTPRINT;
+                droneEvent = AttributeEvent.CAMERA_FOOTPRINTS_UPDATED;
                 break;
         }
 
-        notifyDroneEvent(droneEvent, extrasBundle);
+        notifyAttributeUpdate(droneEvent, extrasBundle);
     }
 
     @Override
     public void onBeginReceivingParameters() {
-        notifyDroneEvent(Event.EVENT_PARAMETERS_REFRESH_STARTED, null);
+        notifyAttributeUpdate(AttributeEvent.PARAMETERS_REFRESH_STARTED, null);
     }
 
     @Override
     public void onParameterReceived(Parameter parameter, int index, int count) {
         Bundle paramsBundle = new Bundle(2);
-        paramsBundle.putInt(Extra.EXTRA_PARAMETER_INDEX, index);
-        paramsBundle.putInt(Extra.EXTRA_PARAMETERS_COUNT, count);
-        notifyDroneEvent(Event.EVENT_PARAMETERS_RECEIVED, paramsBundle);
+        paramsBundle.putInt(AttributeEventExtra.EXTRA_PARAMETER_INDEX, index);
+        paramsBundle.putInt(AttributeEventExtra.EXTRA_PARAMETERS_COUNT, count);
+        notifyAttributeUpdate(AttributeEvent.PARAMETERS_RECEIVED, paramsBundle);
     }
 
     @Override
     public void onEndReceivingParameters(List<Parameter> parameter) {
-        notifyDroneEvent(Event.EVENT_PARAMETERS_REFRESH_ENDED, null);
+        notifyAttributeUpdate(AttributeEvent.PARAMETERS_REFRESH_ENDED, null);
     }
 
     @Override
     public void onStarted(List<ThreeSpacePoint> points) {
         Bundle paramsBundle = new Bundle();
         double[][] pointsArr = MathUtils.threeSpacePointToPointsArray(points);
-        paramsBundle.putSerializable(Extra.EXTRA_CALIBRATION_MAG_POINTS_X, pointsArr[0]);
-        paramsBundle.putSerializable(Extra.EXTRA_CALIBRATION_MAG_POINTS_Y, pointsArr[1]);
-        paramsBundle.putSerializable(Extra.EXTRA_CALIBRATION_MAG_POINTS_Z, pointsArr[2]);
+        paramsBundle.putSerializable(AttributeEventExtra.EXTRA_CALIBRATION_MAG_POINTS_X, pointsArr[0]);
+        paramsBundle.putSerializable(AttributeEventExtra.EXTRA_CALIBRATION_MAG_POINTS_Y, pointsArr[1]);
+        paramsBundle.putSerializable(AttributeEventExtra.EXTRA_CALIBRATION_MAG_POINTS_Z, pointsArr[2]);
 
-        notifyDroneEvent(Event.EVENT_CALIBRATION_MAG_STARTED, paramsBundle);
+        notifyAttributeUpdate(AttributeEvent.CALIBRATION_MAG_STARTED, paramsBundle);
     }
 
     @Override
@@ -1089,16 +1101,16 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
                 : new double[]{fit.radii.getEntry(0), fit.radii.getEntry(1), fit.radii.getEntry(2)};
 
         Bundle paramsBundle = new Bundle(4);
-        paramsBundle.putDouble(Extra.EXTRA_CALIBRATION_MAG_FITNESS, fitness);
-        paramsBundle.putDoubleArray(Extra.EXTRA_CALIBRATION_MAG_FIT_CENTER, fitCenter);
-        paramsBundle.putDoubleArray(Extra.EXTRA_CALIBRATION_MAG_FIT_RADII, fitRadii);
+        paramsBundle.putDouble(AttributeEventExtra.EXTRA_CALIBRATION_MAG_FITNESS, fitness);
+        paramsBundle.putDoubleArray(AttributeEventExtra.EXTRA_CALIBRATION_MAG_FIT_CENTER, fitCenter);
+        paramsBundle.putDoubleArray(AttributeEventExtra.EXTRA_CALIBRATION_MAG_FIT_RADII, fitRadii);
 
         double[][] pointsArr = MathUtils.threeSpacePointToPointsArray(points);
-        paramsBundle.putSerializable(Extra.EXTRA_CALIBRATION_MAG_POINTS_X, pointsArr[0]);
-        paramsBundle.putSerializable(Extra.EXTRA_CALIBRATION_MAG_POINTS_Y, pointsArr[1]);
-        paramsBundle.putSerializable(Extra.EXTRA_CALIBRATION_MAG_POINTS_Z, pointsArr[2]);
+        paramsBundle.putSerializable(AttributeEventExtra.EXTRA_CALIBRATION_MAG_POINTS_X, pointsArr[0]);
+        paramsBundle.putSerializable(AttributeEventExtra.EXTRA_CALIBRATION_MAG_POINTS_Y, pointsArr[1]);
+        paramsBundle.putSerializable(AttributeEventExtra.EXTRA_CALIBRATION_MAG_POINTS_Z, pointsArr[2]);
 
-        notifyDroneEvent(Event.EVENT_CALIBRATION_MAG_ESTIMATION, paramsBundle);
+        notifyAttributeUpdate(AttributeEvent.CALIBRATION_MAG_ESTIMATION, paramsBundle);
     }
 
     @Override
@@ -1106,10 +1118,10 @@ final class DPApi extends IDroidPlannerApi.Stub implements DroneEventsListener {
         double fitness = fit.getFitness();
 
         Bundle paramsBundle = new Bundle(2);
-        paramsBundle.putDouble(Extra.EXTRA_CALIBRATION_MAG_FITNESS, fitness);
-        paramsBundle.putDoubleArray(Extra.EXTRA_CALIBRATION_MAG_OFFSETS, offsets);
+        paramsBundle.putDouble(AttributeEventExtra.EXTRA_CALIBRATION_MAG_FITNESS, fitness);
+        paramsBundle.putDoubleArray(AttributeEventExtra.EXTRA_CALIBRATION_MAG_OFFSETS, offsets);
 
-        notifyDroneEvent(Event.EVENT_CALIBRATION_MAG_COMPLETED, paramsBundle);
+        notifyAttributeUpdate(AttributeEvent.CALIBRATION_MAG_COMPLETED, paramsBundle);
     }
 
     @Override

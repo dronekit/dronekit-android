@@ -45,7 +45,7 @@ public class DroidPlannerService extends Service {
     private final Handler handler = new Handler();
     private LocalBroadcastManager lbm;
 
-    final ConcurrentLinkedQueue<DPApi> dpApiStore = new ConcurrentLinkedQueue<DPApi>();
+    final ConcurrentLinkedQueue<DroneApi> droneApiStore = new ConcurrentLinkedQueue<DroneApi>();
 
     /**
      * Caches mavlink connections per connection type.
@@ -57,19 +57,19 @@ public class DroidPlannerService extends Service {
     private DroneAccess droneAccess;
     private MavLinkServiceApi mavlinkApi;
 
-    DPApi acquireDroidPlannerApi() {
-        DPApi dpApi = new DPApi(this, handler, mavlinkApi);
-        dpApiStore.add(dpApi);
+    DroneApi acquireDroidPlannerApi() {
+        DroneApi droneApi = new DroneApi(this, handler, mavlinkApi);
+        droneApiStore.add(droneApi);
         lbm.sendBroadcast(new Intent(ACTION_DRONE_CREATED));
-        return dpApi;
+        return droneApi;
     }
 
-    void releaseDroidPlannerApi(DPApi dpApi) {
-        if (dpApi == null)
+    void releaseDroidPlannerApi(DroneApi droneApi) {
+        if (droneApi == null)
             return;
 
-        dpApiStore.remove(dpApi);
-        dpApi.destroy();
+        droneApiStore.remove(droneApi);
+        droneApi.destroy();
         lbm.sendBroadcast(new Intent(ACTION_DRONE_DESTROYED));
     }
 
@@ -186,10 +186,10 @@ public class DroidPlannerService extends Service {
     public void onDestroy() {
         super.onDestroy();
 
-        for (DPApi dpApi : dpApiStore) {
-            dpApi.destroy();
+        for (DroneApi droneApi : droneApiStore) {
+            droneApi.destroy();
         }
-        dpApiStore.clear();
+        droneApiStore.clear();
 
         for (AndroidMavLinkConnection conn : mavConnections.values()) {
             conn.disconnect();

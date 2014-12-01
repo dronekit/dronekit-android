@@ -2,9 +2,8 @@ package org.droidplanner.services.android.api;
 
 import android.os.RemoteException;
 
-import com.o3dr.services.android.lib.model.IDroidPlannerApi;
-import com.o3dr.services.android.lib.model.IDroidPlannerApiCallback;
 import com.o3dr.services.android.lib.model.IDroidPlannerServices;
+import com.o3dr.services.android.lib.model.IDroneApi;
 
 import java.lang.ref.WeakReference;
 
@@ -35,12 +34,12 @@ final class DPServices extends IDroidPlannerServices.Stub {
     }
 
     @Override
-    public IDroidPlannerApi acquireDroidPlannerApi() throws RemoteException {
+    public IDroneApi acquireDroneApi() throws RemoteException {
         return getService().acquireDroidPlannerApi();
     }
 
     @Override
-    public void releaseDroidPlannerApi(IDroidPlannerApi dpApi) throws RemoteException {
-        getService().releaseDroidPlannerApi((DPApi) dpApi);
+    public void releaseDroneApi(IDroneApi dpApi) throws RemoteException {
+        getService().releaseDroidPlannerApi((DroneApi) dpApi);
     }
 }

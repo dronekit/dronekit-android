@@ -15,7 +15,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:21.0.2'
     compile 'com.android.support:cardview-v7:21.0.0'
 
-    compile(name:'3dr_services_library-release.2.0.2', ext:'aar')
+    compile(name:'3dr_services_library-debug.2.0.10', ext:'aar')
 
     compile project(':Core')
     compile project(':Mavlink')
