@@ -71,7 +71,7 @@ android {
             if (file != null && file.name.endsWith('.apk')) {
                 def buildType = variant.buildType.getName()
                 def versionName = defaultConfig.versionName
-                output.outputFile = new File("${rootDir}/outputs/${buildType}",
+                output.outputFile = new File(file.parent,
                         "3dr_services-${buildType}.${versionName}.apk")
             }
         }
