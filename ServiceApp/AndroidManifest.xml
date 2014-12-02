@@ -18,9 +18,6 @@
     <uses-permission android:name="android.permission.BLUETOOTH"/>
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
 
-    <uses-permission
-        android:name="com.o3dr.services.android.lib.permission.ACCESS_3DR_SERVICES_API"/>
-
     <!-- Support devices without Bluetooth since there are other connection types -->
     <uses-feature
         android:name="android.hardware.bluetooth"
@@ -82,7 +79,6 @@
         <service
             android:name=".api.DroidPlannerService"
             android:enabled="true"
-            android:permission="com.o3dr.services.android.lib.permission.ACCESS_3DR_SERVICES_API"
             android:exported="true">
             <intent-filter>
                 <action

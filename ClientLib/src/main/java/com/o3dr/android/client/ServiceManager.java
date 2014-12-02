@@ -7,6 +7,7 @@ import android.content.ServiceConnection;
 import android.content.pm.ResolveInfo;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.util.Log;
 
 import com.o3dr.android.client.interfaces.ServiceListener;
 import com.o3dr.android.client.utils.InstallServiceDialog;
@@ -88,7 +89,11 @@ public class ServiceManager {
 	public void disconnect() {
         serviceListener = null;
         o3drServices = null;
-        context.unbindService(o3drServicesConnection);
+        try {
+            context.unbindService(o3drServicesConnection);
+        }catch(Exception e){
+            Log.e(TAG, "Error occurred while unbinding from 3DR Services.", e);
+        }
 	}
 
     private boolean is3DRServicesInstalled(){
