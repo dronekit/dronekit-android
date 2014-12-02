@@ -1,10 +1,10 @@
-//Pure Java project
-include ':Core'
-include ':Mavlink'
-
 //Android projects
-include ':Android'
+include ':ServiceApp'
+include ':ClientLib'
+include ':AidlLib'
 
 //Library projects
-include ':Libraries:usb-serial-for-android:UsbSerialLibrary'
-include ':Libraries:EllipsoidFit:EllipsoidFit'
+include ':dependencyLibs:Core'
+include ':dependencyLibs:Mavlink'
+include ':dependencyLibs:usb-serial-for-android:UsbSerialLibrary'
+include ':dependencyLibs:EllipsoidFit:EllipsoidFit'
