@@ -28,8 +28,8 @@ android {
         applicationId 'org.droidplanner.services.android'
         minSdkVersion 14
         targetSdkVersion 21
-        versionCode 5
-        versionName getGitVersion()
+        versionCode 10100
+        versionName "1.1.0"
     }
 
     sourceSets {
@@ -70,9 +70,9 @@ android {
             def file = output.outputFile
             if (file != null && file.name.endsWith('.apk')) {
                 def buildType = variant.buildType.getName()
-                def versionCode = defaultConfig.versionCode
+                def versionName = defaultConfig.versionName
                 output.outputFile = new File("${rootDir}/outputs/${buildType}",
-                        "3dr_services-${buildType}.${versionCode}.apk")
+                        "3dr_services-${buildType}.${versionName}.apk")
             }
         }
     }
