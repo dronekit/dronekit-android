@@ -11,30 +11,30 @@ public class DirectoryPath {
 	 * 
 	 * @return Path to DroidPlanner/ folder in external storage
 	 */
-	static public String getDroidPlannerPath() {
+	static public String get3DRServicesPath() {
 		String root = Environment.getExternalStorageDirectory().getPath();
-		return (root + "/DroidPlanner/");
+		return (root + "/3DRServices/");
 	}
 
 	/**
 	 * Storage folder for Parameters
 	 */
 	static public String getParametersPath() {
-		return getDroidPlannerPath() + "/Parameters/";
+		return get3DRServicesPath() + "/Parameters/";
 	}
 
 	/**
 	 * Storage folder for mission files
 	 */
 	static public String getWaypointsPath() {
-		return getDroidPlannerPath() + "/Waypoints/";
+		return get3DRServicesPath() + "/Waypoints/";
 	}
 
 	/**
 	 * Folder where telemetry log files are stored
 	 */
 	static public File getTLogPath() {
-		File f = new File(getDroidPlannerPath() + "/Logs/");
+		File f = new File(get3DRServicesPath() + "/Logs/");
 		f.mkdirs();
 		return f;
 	}
@@ -52,28 +52,28 @@ public class DirectoryPath {
 	 * Storage folder for user map tiles
 	 */
 	static public String getMapsPath() {
-		return getDroidPlannerPath() + "/Maps/";
+		return get3DRServicesPath() + "/Maps/";
 	}
 
 	/**
 	 * Storage folder for user camera description files
 	 */
 	public static String getCameraInfoPath() {
-		return getDroidPlannerPath() + "/CameraInfo/";
+		return get3DRServicesPath() + "/CameraInfo/";
 	}
 
 	/**
 	 * Storage folder for stacktraces
 	 */
 	public static String getLogCatPath() {
-		return getDroidPlannerPath() + "/LogCat/";
+		return get3DRServicesPath() + "/LogCat/";
 	}
 
 	/**
 	 * Storage folder for SRTM data
 	 */
 	static public String getSrtmPath() {
-		return getDroidPlannerPath() + "/Srtm/";
+		return get3DRServicesPath() + "/Srtm/";
 	}
 
 }

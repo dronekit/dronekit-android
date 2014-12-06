@@ -8,8 +8,8 @@ android {
         applicationId "com.o3dr.android.client"
         minSdkVersion 14
         targetSdkVersion 20
-        versionCode 20104
-        versionName "2.1.4"
+        versionCode 20105
+        versionName "2.1.5"
     }
 
     android.libraryVariants.all { variant ->

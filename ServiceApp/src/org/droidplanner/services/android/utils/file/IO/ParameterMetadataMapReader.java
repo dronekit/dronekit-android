@@ -33,7 +33,7 @@ public class ParameterMetadataMapReader {
 		// use user supplied file in ~/Parameters if available, else fallback to
 		// asset from resources
 		final InputStream inputStream;
-		final File file = new File(DirectoryPath.getDroidPlannerPath() + PARAMETERMETADATA_PATH);
+		final File file = new File(DirectoryPath.get3DRServicesPath() + PARAMETERMETADATA_PATH);
 		if (file.exists()) {
 			inputStream = new FileInputStream(file);
 			return open(inputStream, metadataType);

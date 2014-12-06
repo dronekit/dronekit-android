@@ -15,14 +15,14 @@ interface IDroidPlannerServices {
 
     /**
     * Acquire an handle to the droidplanner api.
-    * @return IDroidPlannerApi object used to interact with the drone.
+    * @return IDroneApi object used to interact with the drone.
     */
     IDroneApi acquireDroneApi();
 
     /**
     * Release the handle to the droidplanner api.
     *
-    * @param callback callback used to receive droidplanner api events.
+    * @param callback callback used to receive drone api events.
     */
     void releaseDroneApi(IDroneApi droneApi);
 

@@ -201,8 +201,10 @@ public class Drone {
         T attribute = null;
         if (isStarted()) {
             Bundle carrier = getAttribute(type);
-            carrier.setClassLoader(classLoader);
-            attribute = carrier.getParcelable(type);
+            if(carrier != null) {
+                carrier.setClassLoader(classLoader);
+                attribute = carrier.getParcelable(type);
+            }
         }
 
         return attribute;
