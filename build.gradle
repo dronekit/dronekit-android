@@ -1,10 +1,23 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
+
+    ext {
+        PUBLISH_GROUP_ID = 'com.o3dr'
+        PUBLISH_FLAG = false
+    }
+
     repositories {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.14.4'
+        classpath 'com.android.tools.build:gradle:1.0.0-rc4'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:0.6'
+    }
+}
+
+allprojects {
+    repositories {
+        jcenter()
     }
 }

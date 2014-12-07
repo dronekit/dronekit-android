@@ -1,0 +1,29 @@
+apply plugin: 'com.android.library'
+
+ext {
+    PUBLISH_ARTIFACT_ID = '3dr-services-client'
+    PUBLISH_VERSION = '2.1.5'
+    PROJECT_DESCRIPTION = "3DR Services client library"
+    PROJECT_LABELS = ['3DR', '3DR Services', 'DroneAPI']
+    PROJECT_LICENSES = ['Apache-2.0']
+}
+
+android {
+    compileSdkVersion 21
+    buildToolsVersion "21.1.1"
+
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion 20
+        versionCode 20105
+        versionName PUBLISH_VERSION
+    }
+}
+
+dependencies {
+    compile 'com.android.support:support-v4:20.0.0'
+    compile files("libs/Mavlink.jar")
+    compile project(':AidlLib')
+}
+
+apply from: "${rootDir}/release_android_library.gradle"

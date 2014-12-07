@@ -1,9 +1,5 @@
 apply plugin: 'com.android.application'
 
-repositories {
-    jcenter()
-}
-
 dependencies {
     compile 'com.google.android.gms:play-services:6.1.71'
     compile 'com.android.support:support-v4:21.0.2'
@@ -18,6 +14,8 @@ dependencies {
     compile project(':AidlLib')
     compile project(':dependencyLibs:Core')
     compile project(':dependencyLibs:usb-serial-for-android:UsbSerialLibrary')
+
+    wearApp project(':ServiceApp')
 }
 
 android {

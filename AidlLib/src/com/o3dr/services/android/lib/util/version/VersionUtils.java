@@ -1,8 +1,7 @@
 package com.o3dr.services.android.lib.util.version;
 
 import android.content.Context;
-
-import com.o3dr.services.android.lib.R;
+import android.content.pm.PackageManager;
 
 /**
  * Created by fhuya on 11/12/14.
@@ -10,6 +9,10 @@ import com.o3dr.services.android.lib.R;
 public class VersionUtils {
 
     public static int getVersion(Context context){
-        return context.getResources().getInteger(R.integer.ox3dr_services_version);
+        try {
+            return context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionCode;
+        } catch (PackageManager.NameNotFoundException e) {
+            return -1;
+        }
     }
 }

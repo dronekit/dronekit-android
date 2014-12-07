@@ -162,6 +162,7 @@ public class DroidPlannerService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
+        Log.d(TAG, "Binding intent: " + intent);
         final String action = intent.getAction();
         if (IDroidPlannerServices.class.getName().equals(action)) {
             // Return binder to ipc client-server interaction.

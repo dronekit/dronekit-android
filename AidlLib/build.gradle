@@ -1,27 +1,22 @@
 apply plugin: 'com.android.library'
 
+ext {
+    PUBLISH_ARTIFACT_ID = '3dr-services-library'
+    PUBLISH_VERSION = '2.0.12'
+    PROJECT_DESCRIPTION = "3DR Services Library"
+    PROJECT_LABELS = ['3DR', '3DR Services', 'DroneAPI']
+    PROJECT_LICENSES = ['Apache-2.0']
+}
+
 android {
     compileSdkVersion 21
     buildToolsVersion "21.1.1"
 
     defaultConfig {
-        applicationId "com.o3dr.services.android.lib"
         minSdkVersion 14
         targetSdkVersion 21
         versionCode 200012
-        versionName "2.0.12"
-    }
-
-    android.libraryVariants.all { variant ->
-        variant.outputs.each { output ->
-            def file = output.outputFile
-            if (file != null && file.name.endsWith('.aar')) {
-                def buildType = variant.buildType.getName()
-                def versionName = defaultConfig.versionName
-                output.outputFile = new File("${rootDir}/outputs/${buildType}",
-                        "3dr_services_library-${buildType}.${versionName}.aar")
-            }
-        }
+        versionName PUBLISH_VERSION
     }
 
     sourceSets {
@@ -40,3 +35,5 @@ android {
         }
     }
 }
+
+apply from: "${rootDir}/release_android_library.gradle"

@@ -5,11 +5,10 @@ android {
     buildToolsVersion "21.1.1"
 
     defaultConfig {
-        applicationId "com.o3dr.android.client"
-        minSdkVersion 14
-        targetSdkVersion 20
-        versionCode 20105
-        versionName "2.1.5"
+        minSdkVersion 20
+        targetSdkVersion 21
+        versionCode 1
+        versionName "0.0.1"
     }
 
     android.libraryVariants.all { variant ->
@@ -19,14 +18,16 @@ android {
                 def buildType = variant.buildType.getName()
                 def versionName = defaultConfig.versionName
                 output.outputFile = new File("${rootDir}/outputs/${buildType}",
-                        "3dr_services_client-${buildType}.${versionName}.aar")
+                        "3dr_services_wear_client-${buildType}.${versionName}.aar")
             }
         }
     }
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:20.0.0'
+    compile 'com.google.android.support:wearable:1.0.0'
+    compile 'com.google.android.gms:play-services-wearable:6.1.71'
+
     compile files("libs/Mavlink.jar")
-    compile project(':AidlLib')
+    compile project(':ClientLib:mobile')
 }
