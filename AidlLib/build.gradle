@@ -2,9 +2,9 @@ apply plugin: 'com.android.library'
 
 ext {
     PUBLISH_ARTIFACT_ID = '3dr-services-library'
-    PUBLISH_VERSION = '2.0.12'
+    PUBLISH_VERSION = '2.0.13'
     PROJECT_DESCRIPTION = "3DR Services Library"
-    PROJECT_LABELS = ['3DR', '3DR Services', 'DroneAPI']
+    PROJECT_LABELS = ['3DR', '3DR Services', 'DroneAPI', 'Android']
     PROJECT_LICENSES = ['Apache-2.0']
 }
 
@@ -15,8 +15,18 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 21
-        versionCode 200012
+        versionCode 200013
         versionName PUBLISH_VERSION
+    }
+
+    android.libraryVariants.all { variant ->
+        variant.outputs.each { output ->
+            def file = output.outputFile
+            if (file != null && file.name.endsWith('.aar')) {
+                output.outputFile = new File(file.parent,
+                        "${PUBLISH_ARTIFACT_ID}.${PUBLISH_VERSION}.aar")
+            }
+        }
     }
 
     sourceSets {
@@ -34,6 +44,10 @@ android {
             java.srcDirs = ['androidTest']
         }
     }
+}
+
+dependencies {
+    compile 'com.o3dr:mavlink:0.0.1'
 }
 
 apply from: "${rootDir}/release_android_library.gradle"

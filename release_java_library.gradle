@@ -1,0 +1,29 @@
+apply plugin: 'maven-publish'
+
+def projectGroupId = project.PUBLISH_GROUP_ID
+def projectArtifactId = project.PUBLISH_ARTIFACT_ID
+def projectVersion = project.PUBLISH_VERSION
+
+task sourceJar(type: Jar){
+    from sourceSets.main.allJava
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc){
+    from javadoc.destinationDir
+}
+
+publishing {
+    publications {
+        mavenLibraryRelease(MavenPublication){
+            groupId projectGroupId
+            artifactId projectArtifactId
+            version projectVersion
+
+            artifact jar
+            artifact javadocJar {classifier = 'javadoc'}
+            artifact sourceJar {classifier = 'sources'}
+        }
+    }
+}
+
+apply from: "${rootDir}/bintray_upload.gradle"

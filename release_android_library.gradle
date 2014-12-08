@@ -1,13 +1,8 @@
 apply plugin: 'maven-publish'
-apply plugin: 'com.jfrog.bintray'
 
 def projectGroupId = project.PUBLISH_GROUP_ID
 def projectArtifactId = project.PUBLISH_ARTIFACT_ID
 def projectVersion = project.PUBLISH_VERSION
-def publishFlag = project.PUBLISH_FLAG
-def projectDescription = project.PROJECT_DESCRIPTION
-def projectLabels = project.PROJECT_LABELS
-def projectLicenses = project.PROJECT_LICENSES
 
 task androidJavadocs(type: Javadoc){
     source = android.sourceSets.main.java.srcDirs
@@ -37,7 +32,7 @@ publishing {
             artifactId projectArtifactId
             version projectVersion
 
-            artifact project.PACKAGE_LIB_TASK
+            artifact "build/outputs/aar/${PUBLISH_ARTIFACT_ID}.${PUBLISH_VERSION}.aar"
 
             artifact androidSourcesJar {
                 classifier 'sources'
@@ -50,25 +45,4 @@ publishing {
     }
 }
 
-bintray {
-    user = 'fredia'
-    key = '3889f8a1420d25de0c4e3766589fa46f6454c888'
-
-    publications = ['mavenLibraryRelease'] //When uploading Maven-based publication files
-    dryRun = false //Whether to run this as dry-run, without deploying
-    publish = publishFlag //If version should be auto published after an upload
-
-    pkg {
-        repo = 'maven'
-        name = projectArtifactId
-        desc = projectDescription
-        licenses = projectLicenses
-        labels = projectLabels
-        publicDownloadNumbers = true
-
-        //Optional version descriptor
-        version {
-            name = projectVersion //Bintray logical version name
-        }
-    }
-}
+apply from: "${rootDir}/bintray_upload.gradle"

@@ -1,9 +1,5 @@
 apply plugin: 'java'
 
-repositories {
-    jcenter()
-}
-
 sourceSets {
     main {
         java.srcDirs = ['src']
@@ -20,7 +16,7 @@ configurations {
 }
 
 dependencies {
-    compile project(':dependencyLibs:Mavlink')
+    compile 'com.o3dr:mavlink:0.0.1'
     compile project(':dependencyLibs:EllipsoidFit:EllipsoidFit')
 
     //FIXME: hackish implementation

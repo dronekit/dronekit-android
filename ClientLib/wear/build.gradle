@@ -1,5 +1,13 @@
 apply plugin: 'com.android.library'
 
+ext {
+    PUBLISH_ARTIFACT_ID = '3dr-services-wear-client'
+    PUBLISH_VERSION = '0.0.1'
+    PROJECT_DESCRIPTION = "3DR Services Wear client library"
+    PROJECT_LABELS = ['3DR', '3DR Services', 'DroneAPI', 'Android', 'Android Wear']
+    PROJECT_LICENSES = ['Apache-2.0']
+}
+
 android {
     compileSdkVersion 21
     buildToolsVersion "21.1.1"
@@ -8,17 +16,15 @@ android {
         minSdkVersion 20
         targetSdkVersion 21
         versionCode 1
-        versionName "0.0.1"
+        versionName PUBLISH_VERSION
     }
 
     android.libraryVariants.all { variant ->
         variant.outputs.each { output ->
             def file = output.outputFile
             if (file != null && file.name.endsWith('.aar')) {
-                def buildType = variant.buildType.getName()
-                def versionName = defaultConfig.versionName
-                output.outputFile = new File("${rootDir}/outputs/${buildType}",
-                        "3dr_services_wear_client-${buildType}.${versionName}.aar")
+                output.outputFile = new File(file.parent,
+                        "${PUBLISH_ARTIFACT_ID}.${PUBLISH_VERSION}.aar")
             }
         }
     }
@@ -27,7 +33,5 @@ android {
 dependencies {
     compile 'com.google.android.support:wearable:1.0.0'
     compile 'com.google.android.gms:play-services-wearable:6.1.71'
-
-    compile files("libs/Mavlink.jar")
-    compile project(':ClientLib:mobile')
+    compile 'com.o3dr:3dr-services-client:2.1.5'
 }

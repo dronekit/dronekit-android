@@ -1,5 +1,4 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
-
 buildscript {
 
     ext {
@@ -10,14 +9,56 @@ buildscript {
     repositories {
         jcenter()
     }
+
     dependencies {
         classpath 'com.android.tools.build:gradle:1.0.0-rc4'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:0.6'
     }
 }
 
+def getMavenUsername(){
+    return hasProperty('COM_O3DR_MAVEN_USERNAME') ? COM_O3DR_MAVEN_USERNAME : ''
+}
+
+def getMavenApiKey(){
+    return hasProperty('COM_O3DR_MAVEN_APIKEY') ? COM_O3DR_MAVEN_APIKEY : ''
+}
+
+def getMavenRepo(){
+    return hasProperty('COM_O3DR_MAVEN_REPO') ? COM_O3DR_MAVEN_REPO : ''
+}
+
+def getMavenRepoUrl(){
+    return hasProperty('COM_O3DR_MAVEN_REPO_URL') ? COM_O3DR_MAVEN_REPO_URL : ''
+}
+
+def getAppKeystoreFile() {
+    def filePath = hasProperty('COM_O3DR_SERVICES_KEYSTORE') ? COM_O3DR_SERVICES_KEYSTORE : null
+    return filePath ? file(filePath) : null
+}
+
+def getAppKeystorePassword(){
+    return hasProperty('COM_O3DR_SERVICES_KEYSTORE_PWD') ? COM_O3DR_SERVICES_KEYSTORE_PWD : ''
+}
+
+def getAppKeyPassword() {
+    return hasProperty('COM_O3DR_SERVICES_KEY_PWD') ? COM_O3DR_SERVICES_KEY_PWD : ''
+}
+
+def getAppKey() {
+    return hasProperty('COM_O3DR_SERVICES_KEY_ALIAS') ? COM_O3DR_SERVICES_KEY_ALIAS : ''
+}
+
 allprojects {
     repositories {
         jcenter()
+
+        maven {
+            url getMavenRepoUrl()
+            credentials {
+                username getMavenUsername()
+                password getMavenApiKey()
+            }
+        }
     }
 }

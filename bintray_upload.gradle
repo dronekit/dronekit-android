@@ -1,0 +1,33 @@
+apply plugin: 'com.jfrog.bintray'
+
+def projectArtifactId = project.PUBLISH_ARTIFACT_ID
+def projectVersion = project.PUBLISH_VERSION
+def publishFlag = project.PUBLISH_FLAG
+def projectDescription = project.PROJECT_DESCRIPTION
+def projectLabels = project.PROJECT_LABELS
+def projectLicenses = project.PROJECT_LICENSES
+
+bintray {
+    user = getMavenUsername()
+    key = getMavenApiKey()
+
+    publications = ['mavenLibraryRelease'] //When uploading Maven-based publication files
+    dryRun = false //Whether to run this as dry-run, without deploying
+    publish = publishFlag //If version should be auto published after an upload
+
+    pkg {
+        repo = getMavenRepo()
+        name = projectArtifactId
+        desc = projectDescription
+        licenses = projectLicenses
+        labels = projectLabels
+        publicDownloadNumbers = true
+
+        //Optional version descriptor
+        version {
+            name = projectVersion //Bintray logical version name
+        }
+    }
+}
+
+bintrayUpload.dependsOn(publishToMavenLocal)
