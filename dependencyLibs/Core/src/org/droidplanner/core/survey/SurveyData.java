@@ -32,6 +32,7 @@ public class SurveyData {
 
 	public void setCameraInfo(CameraInfo info) {
 		this.camera = info;
+        this.footprint = new Footprint(this.camera, this.altitude);
 		tryToLoadOverlapFromCamera();
 	}
 

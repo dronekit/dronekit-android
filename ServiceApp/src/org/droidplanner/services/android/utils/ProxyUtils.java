@@ -220,12 +220,12 @@ public class ProxyUtils {
                         .mission.survey.Survey(mission, polygonPoints);
 
                 if(surveyDetail != null) {
-                    temp.update(surveyDetail.getAngle(), new Altitude(surveyDetail.getAltitude()),
-                            surveyDetail.getOverlap(), surveyDetail.getSidelap());
-
                     CameraDetail cameraDetail = surveyDetail.getCameraDetail();
                     if(cameraDetail != null)
                         temp.setCameraInfo(getCameraInfo(cameraDetail));
+
+                    temp.update(surveyDetail.getAngle(), new Altitude(surveyDetail.getAltitude()),
+                            surveyDetail.getOverlap(), surveyDetail.getSidelap());
                 }
 
                 try {

@@ -187,7 +187,8 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     }
 
     private CameraProxy getCameraProxy() {
-        Camera droneCamera = droneMgr.getDrone().getCamera();
+        Drone drone = droneMgr.getDrone();
+        Camera droneCamera = drone.getCamera();
 
         List<Footprint> footprints = droneCamera.getFootprints();
         final int printsCount = footprints.size();
@@ -197,9 +198,13 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
             proxyPrints.add(getProxyCameraFootPrint(footprint));
         }
 
+        GPS droneGps = drone.getGps();
+        final FootPrint currentFieldOfView = droneGps.isPositionValid()
+                ? getProxyCameraFootPrint(droneCamera.getCurrentFieldOfView())
+                : new FootPrint();
+
         return new CameraProxy(ProxyUtils.getCameraDetail(droneCamera.getCamera()),
-                getProxyCameraFootPrint(droneCamera.getCurrentFieldOfView()), proxyPrints,
-                getCameraDetails());
+                currentFieldOfView, proxyPrints, getCameraDetails());
     }
 
     private Gps getGps() {
