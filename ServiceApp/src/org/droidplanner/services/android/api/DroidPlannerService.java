@@ -57,8 +57,8 @@ public class DroidPlannerService extends Service {
     private DroneAccess droneAccess;
     private MavLinkServiceApi mavlinkApi;
 
-    DroneApi acquireDroidPlannerApi() {
-        DroneApi droneApi = new DroneApi(this, handler, mavlinkApi);
+    DroneApi acquireDroidPlannerApi(String appId) {
+        DroneApi droneApi = new DroneApi(this, handler, mavlinkApi, appId);
         droneApiStore.add(droneApi);
         lbm.sendBroadcast(new Intent(ACTION_DRONE_CREATED));
         return droneApi;

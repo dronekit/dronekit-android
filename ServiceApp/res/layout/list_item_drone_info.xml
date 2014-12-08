@@ -16,7 +16,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/drone_info_listeners_count"
             android:padding="10dp"
-            tools:text="Listeners Count: "/>
+            tools:text="App Id: "/>
 
         <TextView
             android:layout_width="match_parent"

@@ -27,12 +27,7 @@ public final class DroneAccess extends Binder {
         return service;
     }
 
-    public List<DroneManager> getDroneManagerList() {
-        List<DroneManager> droneManagerList = new ArrayList<DroneManager>();
-        for(DroneApi droneApi : getService().droneApiStore){
-            droneManagerList.add(droneApi.getDroneManager());
-        }
-
-        return droneManagerList;
+    public List<DroneApi> getDroneApiList() {
+        return new ArrayList<DroneApi>(getService().droneApiStore);
     }
 }

@@ -6,12 +6,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +20,7 @@ import android.widget.TextView;
 import org.droidplanner.services.android.R;
 import org.droidplanner.services.android.api.DroidPlannerService;
 import org.droidplanner.services.android.api.DroneAccess;
-import org.droidplanner.services.android.drone.DroneManager;
+import org.droidplanner.services.android.api.DroneApi;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +33,7 @@ public class MainActivity extends FragmentActivity {
     private final static String TAG = MainActivity.class.getSimpleName();
 
     private final static IntentFilter intentFilter = new IntentFilter();
+
     {
         intentFilter.addAction(DroidPlannerService.ACTION_DRONE_CREATED);
         intentFilter.addAction(DroidPlannerService.ACTION_DRONE_DESTROYED);
@@ -44,8 +43,8 @@ public class MainActivity extends FragmentActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
-            if(DroidPlannerService.ACTION_DRONE_CREATED.equals(action) || DroidPlannerService
-                    .ACTION_DRONE_DESTROYED.equals(action)){
+            if (DroidPlannerService.ACTION_DRONE_CREATED.equals(action) || DroidPlannerService
+                    .ACTION_DRONE_DESTROYED.equals(action)) {
                 refreshDroneList();
             }
         }
@@ -71,7 +70,7 @@ public class MainActivity extends FragmentActivity {
     private DroneInfoAdapter droneListAdapter;
 
     @Override
-    public void onCreate(Bundle savedInstanceState){
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -79,7 +78,7 @@ public class MainActivity extends FragmentActivity {
         droneListAdapter = new DroneInfoAdapter(context);
 
         titleView = (TextView) findViewById(R.id.drone_infos_title);
-        titleView.setText("Connected drones ( 0 )");
+        titleView.setText("Connected Clients");
 
         final ListView droneListView = (ListView) findViewById(R.id.drone_info_list);
         droneListView.setAdapter(droneListAdapter);
@@ -89,72 +88,70 @@ public class MainActivity extends FragmentActivity {
 
         bindService(new Intent(context, DroidPlannerService.class), serviceConnection,
                 Context.BIND_AUTO_CREATE);
-
-        Log.d(TAG, "On create called.");
     }
 
     @Override
-    public void onDestroy(){
+    public void onDestroy() {
         super.onDestroy();
         lbm.unregisterReceiver(broadcastReceiver);
         unbindService(serviceConnection);
     }
 
     @Override
-    public void onStart(){
+    public void onStart() {
         super.onStart();
         refreshDroneList();
     }
 
-    private void refreshDroneList(){
-        if(droneAccess == null) return;
+    private void refreshDroneList() {
+        if (droneAccess == null) return;
 
-        List<DroneManager> dronesList = droneAccess.getDroneManagerList();
+        List<DroneApi> dronesList = droneAccess.getDroneApiList();
         droneListAdapter.refreshDroneManagerList(dronesList);
 
-        titleView.setText("Connected drones ( " + dronesList.size() + " )");
+        titleView.setText("Connected Clients");
     }
 
-    private static class DroneInfoAdapter extends ArrayAdapter<DroneManager> {
+    private static class DroneInfoAdapter extends ArrayAdapter<DroneApi> {
 
         private final LayoutInflater inflater;
-        private final List<DroneManager> droneMgrList = new ArrayList<DroneManager>();
+        private final List<DroneApi> droneApiList = new ArrayList<DroneApi>();
 
-        public DroneInfoAdapter(Context context){
+        public DroneInfoAdapter(Context context) {
             super(context, 0);
             inflater = LayoutInflater.from(context);
         }
 
-        public void refreshDroneManagerList(List<DroneManager> list){
-            droneMgrList.clear();
+        public void refreshDroneManagerList(List<DroneApi> list) {
+            droneApiList.clear();
 
-            if(list != null && !list.isEmpty()) {
-                droneMgrList.addAll(list);
+            if (list != null && !list.isEmpty()) {
+                droneApiList.addAll(list);
             }
             notifyDataSetChanged();
         }
 
         @Override
-        public int getCount(){
-            return droneMgrList.size();
+        public int getCount() {
+            return droneApiList.size();
         }
 
         @Override
-        public DroneManager getItem(int position){
-            return droneMgrList.get(position);
+        public DroneApi getItem(int position) {
+            return droneApiList.get(position);
         }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent){
-            final DroneManager droneMgr = getItem(position);
+        public View getView(int position, View convertView, ViewGroup parent) {
+            final DroneApi droneApi = getItem(position);
             View view;
-            if(convertView == null)
+            if (convertView == null)
                 view = inflater.inflate(R.layout.list_item_drone_info, parent, false);
             else
                 view = convertView;
 
             ViewHolder viewHolder = (ViewHolder) view.getTag();
-            if(viewHolder == null){
+            if (viewHolder == null) {
                 viewHolder = new ViewHolder();
                 viewHolder.listenersCount = (TextView) view.findViewById(R.id
                         .drone_info_listeners_count);
@@ -164,8 +161,9 @@ public class MainActivity extends FragmentActivity {
                 view.setTag(viewHolder);
             }
 
-            viewHolder.listenersCount.setText("Listeners count: " + droneMgr.getListenersCount());
-            viewHolder.infoPanel.setText("Connection parameters: " + droneMgr.getConnectionParameter());
+            viewHolder.listenersCount.setText("App Id: " + droneApi.getOwnerId());
+            viewHolder.infoPanel.setText("Connection parameters: " + droneApi.getDroneManager()
+                    .getConnectionParameter());
 
             return view;
         }
