@@ -7,6 +7,7 @@ import android.os.RemoteException;
 import android.os.SystemClock;
 import android.util.Log;
 
+import com.MAVLink.Messages.MAVLinkMessage;
 import com.o3dr.android.client.interfaces.DroneListener;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
@@ -34,6 +35,7 @@ import com.o3dr.services.android.lib.drone.property.Type;
 import com.o3dr.services.android.lib.drone.property.VehicleMode;
 import com.o3dr.services.android.lib.gcs.follow.FollowState;
 import com.o3dr.services.android.lib.gcs.follow.FollowType;
+import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
 import com.o3dr.services.android.lib.model.IDroneApi;
 import com.o3dr.services.android.lib.model.IObserver;
 
@@ -343,6 +345,26 @@ public class Drone {
         }
     }
 
+    public void addMavlinkObserver(MavlinkObserver observer){
+        if(isStarted()){
+            try {
+                droneApi.addMavlinkObserver(observer);
+            } catch (RemoteException e) {
+                handleRemoteException(e);
+            }
+        }
+    }
+
+    public void removeMavlinkObserver(MavlinkObserver observer){
+        if(isStarted()){
+            try {
+                droneApi.removeMavlinkObserver(observer);
+            } catch (RemoteException e) {
+                handleRemoteException(e);
+            }
+        }
+    }
+
     public void unregisterDroneListener(DroneListener listener) {
         if (listener == null)
             return;
@@ -480,6 +502,16 @@ public class Drone {
         if (isStarted()) {
             try {
                 droneApi.sendGuidedPoint(point, force);
+            } catch (RemoteException e) {
+                handleRemoteException(e);
+            }
+        }
+    }
+
+    public void sendMavlinkMessage(MavlinkMessageWrapper messageWrapper){
+        if(messageWrapper != null && isStarted()){
+            try {
+                droneApi.sendMavlinkMessage(messageWrapper);
             } catch (RemoteException e) {
                 handleRemoteException(e);
             }

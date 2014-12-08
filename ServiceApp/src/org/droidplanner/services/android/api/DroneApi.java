@@ -118,6 +118,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
         this.serviceRef.clear();
         this.observersList.clear();
+        this.mavlinkObserversList.clear();
     }
 
     public String getOwnerId(){
