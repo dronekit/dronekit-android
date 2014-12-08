@@ -6,13 +6,12 @@ dependencies {
     compile 'com.android.support:appcompat-v7:21.0.2'
     compile 'com.android.support:cardview-v7:21.0.0'
 
-    compile 'com.o3dr:3dr-services-library:2.0.12'
-
     compile files('libs/j2xx.jar')
     compile files('libs/jeromq-0.3.4.jar')
     compile files('libs/droneapi-java.jar')
     compile files('libs/protobuf-java-2.5.0.jar')
 
+    compile project(':AidlLib')
     compile project(':dependencyLibs:Core')
     compile project(':dependencyLibs:usb-serial-for-android:UsbSerialLibrary')
 
@@ -100,4 +99,21 @@ def getGitVersion() {
         //Unable to find 'git'
         return "please update version name manually"
     }
+}
+
+def getAppKeystoreFile() {
+    def filePath = hasProperty('COM_O3DR_SERVICES_KEYSTORE') ? COM_O3DR_SERVICES_KEYSTORE : null
+    return filePath ? file(filePath) : null
+}
+
+def getAppKeystorePassword(){
+    return hasProperty('COM_O3DR_SERVICES_KEYSTORE_PWD') ? COM_O3DR_SERVICES_KEYSTORE_PWD : ''
+}
+
+def getAppKeyPassword() {
+    return hasProperty('COM_O3DR_SERVICES_KEY_PWD') ? COM_O3DR_SERVICES_KEY_PWD : ''
+}
+
+def getAppKey() {
+    return hasProperty('COM_O3DR_SERVICES_KEY_ALIAS') ? COM_O3DR_SERVICES_KEY_ALIAS : ''
 }

@@ -14,6 +14,8 @@ import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionResult;
 import com.o3dr.services.android.lib.drone.mission.Mission;
+import com.o3dr.services.android.lib.drone.mission.MissionItemType;
+import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
 import com.o3dr.services.android.lib.drone.mission.item.complex.StructureScanner;
 import com.o3dr.services.android.lib.drone.mission.item.complex.Survey;
 import com.o3dr.services.android.lib.drone.property.Altitude;
@@ -85,7 +87,7 @@ public class Drone {
             return;
 
         try {
-            this.droneApi = serviceMgr.get3drServices().acquireDroneApi();
+            this.droneApi = serviceMgr.get3drServices().acquireDroneApi(serviceMgr.getApplicationId());
         } catch (RemoteException e) {
             throw new IllegalStateException("Unable to retrieve a valid drone handle.");
         }
@@ -306,30 +308,22 @@ public class Drone {
         return this.connectionParameter;
     }
 
-    public Survey buildSurvey(Survey survey) {
-        if (isStarted()) {
-            try {
-                Survey updated = droneApi.buildSurvey(survey);
-                if (updated != null)
-                    survey.copy(updated);
-            } catch (RemoteException e) {
-                handleRemoteException(e);
-            }
-        }
-        return survey;
-    }
+    public <T extends MissionItem> void buildComplexMissionItem(MissionItem.ComplexItem<T>
+                                                                        complexItem){
+        if(isStarted()){
+            try{
+                T missionItem = (T) complexItem;
+                Bundle payload = missionItem.getType().storeMissionItem(missionItem);
+                if(payload == null)
+                    return;
 
-    public StructureScanner buildStructureScanner(StructureScanner item) {
-        if (isStarted()) {
-            try {
-                StructureScanner updated = droneApi.buildStructureScanner(item);
-                if (updated != null)
-                    item.copy(updated);
+                droneApi.buildComplexMissionItem(payload);
+                T updatedItem = MissionItemType.restoreMissionItemFromBundle(payload);
+                complexItem.copy(updatedItem);
             } catch (RemoteException e) {
                 handleRemoteException(e);
             }
         }
-        return item;
     }
 
     public void registerDroneListener(DroneListener listener) {

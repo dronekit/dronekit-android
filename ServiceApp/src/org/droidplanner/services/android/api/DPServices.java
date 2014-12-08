@@ -1,6 +1,7 @@
 package org.droidplanner.services.android.api;
 
 import android.os.RemoteException;
+import android.util.Log;
 
 import com.o3dr.services.android.lib.model.IDroidPlannerServices;
 import com.o3dr.services.android.lib.model.IDroneApi;
@@ -40,6 +41,9 @@ final class DPServices extends IDroidPlannerServices.Stub {
 
     @Override
     public void releaseDroneApi(IDroneApi dpApi) throws RemoteException {
-        getService().releaseDroidPlannerApi((DroneApi) dpApi);
+        Log.d(TAG, "Releasing acquired drone api handle.");
+        if(dpApi instanceof DroneApi) {
+            getService().releaseDroidPlannerApi((DroneApi) dpApi);
+        }
     }
 }

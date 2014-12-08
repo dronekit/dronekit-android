@@ -21,7 +21,8 @@ public abstract class MissionItem implements Parcelable {
         void setCoordinate(LatLongAlt coordinate);
     }
 
-    public interface ComplexItem {
+    public interface ComplexItem<T extends MissionItem> {
+        void copy(T source);
     }
 
     private final MissionItemType type;

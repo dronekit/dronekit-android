@@ -1,8 +1,13 @@
 apply plugin: 'maven-publish'
+apply plugin: 'com.jfrog.bintray'
 
-def projectGroupId = project.PUBLISH_GROUP_ID
+def publishFlag = false
+def projectGroupId = 'com.o3dr'
 def projectArtifactId = project.PUBLISH_ARTIFACT_ID
 def projectVersion = project.PUBLISH_VERSION
+def projectDescription = project.PROJECT_DESCRIPTION
+def projectLabels = project.PROJECT_LABELS
+def projectLicenses = project.PROJECT_LICENSES
 
 task androidJavadocs(type: Javadoc){
     source = android.sourceSets.main.java.srcDirs
@@ -45,4 +50,39 @@ publishing {
     }
 }
 
-apply from: "${rootDir}/bintray_upload.gradle"
+bintray {
+    user = getMavenUsername()
+    key = getMavenApiKey()
+
+    publications = ['mavenLibraryRelease'] //When uploading Maven-based publication files
+    dryRun = false //Whether to run this as dry-run, without deploying
+    publish = publishFlag //If version should be auto published after an upload
+
+    pkg {
+        repo = getMavenRepo()
+        name = projectArtifactId
+        desc = projectDescription
+        licenses = projectLicenses
+        labels = projectLabels
+        publicDownloadNumbers = true
+
+        //Optional version descriptor
+        version {
+            name = projectVersion //Bintray logical version name
+        }
+    }
+}
+
+bintrayUpload.dependsOn(publishToMavenLocal)
+
+def getMavenUsername(){
+    return hasProperty('COM_O3DR_MAVEN_USERNAME') ? COM_O3DR_MAVEN_USERNAME : ''
+}
+
+def getMavenApiKey(){
+    return hasProperty('COM_O3DR_MAVEN_APIKEY') ? COM_O3DR_MAVEN_APIKEY : ''
+}
+
+def getMavenRepo(){
+    return hasProperty('COM_O3DR_MAVEN_REPO') ? COM_O3DR_MAVEN_REPO : ''
+}

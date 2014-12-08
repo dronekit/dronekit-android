@@ -15,9 +15,10 @@ interface IDroidPlannerServices {
 
     /**
     * Acquire an handle to the droidplanner api.
+    * @param appId application id for the application acquiring the drone api handle.
     * @return IDroneApi object used to interact with the drone.
     */
-    IDroneApi acquireDroneApi();
+    IDroneApi acquireDroneApi(String appId);
 
     /**
     * Release the handle to the droidplanner api.

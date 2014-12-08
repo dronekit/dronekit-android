@@ -96,6 +96,10 @@ public class ServiceManager {
         }
 	}
 
+    String getApplicationId(){
+        return context.getPackageName();
+    }
+
     private boolean is3DRServicesInstalled(){
         final ResolveInfo info = context.getPackageManager().resolveService(serviceIntent, 0);
         if(info == null)

@@ -211,7 +211,7 @@ public enum MissionItemType {
 
     public abstract MissionItem getNewItem();
 
-    final Bundle storeMissionItem(MissionItem item){
+    public final Bundle storeMissionItem(MissionItem item){
         Bundle bundle = new Bundle(2);
         bundle.putString(EXTRA_MISSION_ITEM_TYPE, name());
         bundle.putByteArray(EXTRA_MISSION_ITEM, ParcelableUtils.marshall(item));
@@ -220,7 +220,7 @@ public enum MissionItemType {
 
     protected abstract <T extends MissionItem> Creator<T> getMissionItemCreator();
 
-    static <T extends MissionItem> T restoreMissionItemFromBundle(Bundle bundle){
+    public static <T extends MissionItem> T restoreMissionItemFromBundle(Bundle bundle){
         if(bundle == null)
             return null;
 

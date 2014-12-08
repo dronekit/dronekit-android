@@ -13,7 +13,8 @@ import java.util.List;
 /**
  *
  */
-public class StructureScanner extends BaseSpatialItem implements MissionItem.ComplexItem, android.os.Parcelable {
+public class StructureScanner extends BaseSpatialItem implements MissionItem.ComplexItem<StructureScanner>,
+        android.os.Parcelable {
 
     private double radius = 10;
     private double heightStep = 5;

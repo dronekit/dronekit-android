@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 
 ext {
-    PUBLISH_ARTIFACT_ID = '3dr-services-wear-client'
+    PUBLISH_ARTIFACT_ID = '3dr-services-wear-lib'
     PUBLISH_VERSION = '0.0.1'
     PROJECT_DESCRIPTION = "3DR Services Wear client library"
     PROJECT_LABELS = ['3DR', '3DR Services', 'DroneAPI', 'Android', 'Android Wear']
@@ -33,5 +33,6 @@ android {
 dependencies {
     compile 'com.google.android.support:wearable:1.0.0'
     compile 'com.google.android.gms:play-services-wearable:6.1.71'
-    compile 'com.o3dr:3dr-services-client:2.1.5'
+
+    compile project(':ClientLib:mobile')
 }

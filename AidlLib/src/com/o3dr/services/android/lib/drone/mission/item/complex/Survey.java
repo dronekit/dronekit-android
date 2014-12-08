@@ -12,7 +12,8 @@ import java.util.List;
 
 /**
  */
-public class Survey extends MissionItem implements MissionItem.ComplexItem, android.os.Parcelable {
+public class Survey extends MissionItem implements MissionItem.ComplexItem<Survey>,
+        android.os.Parcelable {
 
     private SurveyDetail surveyDetail = new SurveyDetail();
     private double polygonArea;

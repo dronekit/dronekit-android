@@ -1,17 +1,7 @@
 apply plugin: 'java'
 
-ext {
-    PUBLISH_ARTIFACT_ID = 'mavlink'
-    PUBLISH_VERSION = '0.0.1'
-    PROJECT_DESCRIPTION = "Java MAVLink library"
-    PROJECT_LABELS = ['MAVLink']
-    PROJECT_LICENSES = ['LGPL-3.0']
-}
-
 sourceSets {
     main {
         java.srcDirs = ['src']
     }
 }
-
-apply from: "${rootDir}/release_java_library.gradle"

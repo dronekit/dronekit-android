@@ -10,8 +10,10 @@ import com.o3dr.services.android.lib.drone.mission.item.complex.Survey;
 import com.o3dr.services.android.lib.drone.mission.item.complex.StructureScanner;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.model.IObserver;
+import com.o3dr.services.android.lib.model.IMavlinkObserver;
 import com.o3dr.services.android.lib.drone.property.VehicleMode;
 import com.o3dr.services.android.lib.drone.property.Parameters;
+import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
 
 /**
 * Interface used to access the drone properties.
@@ -27,14 +29,10 @@ interface IDroneApi {
     Bundle getAttribute(String attributeType);
 
     /**
-    * Builds the given survey mission item.
+    * Build and return complex mission item.
+    * @param itemBundle bundle containing the complex mission item to update.
     */
-    Survey buildSurvey(in Survey survey);
-
-    /**
-    * Builds the given structure scanner mission item.
-    */
-    StructureScanner buildStructureScanner(in StructureScanner item);
+    void buildComplexMissionItem(inout Bundle itemBundle);
 
     /*** Oneway method calls ***/
 
@@ -49,6 +47,18 @@ interface IDroneApi {
     * @param observer the observer to remove.
     */
     oneway void removeAttributesObserver(IObserver observer);
+
+    /**
+    * Register a listener to receive mavlink messages.
+    * @param observer the observer to register.
+    */
+    oneway void addMavlinkObserver(IMavlinkObserver observer);
+
+    /**
+    * Removes a mavlink message listener.
+    * @param observer the observer to remove.
+    */
+    oneway void removeMavlinkObserver(IMavlinkObserver observer);
 
     /**
     * Change the vehicle mode for the connected drone.
@@ -120,6 +130,23 @@ interface IDroneApi {
     * @param altitude altitude in meters
     */
     oneway void doGuidedTakeoff(double altitude);
+
+    /**
+    * This is an advanced/low-level method to send raw mavlink to the vehicle.
+    *
+    * This method is included as an ‘escape hatch’ to allow developers to make progress if we’ve
+    * somehow missed providing some essentential operation in the rest of this API. Callers do
+    * not need to populate sysId/componentId/crc in the packet, this method will take care of that
+    * before sending.
+    *
+    * If you find yourself needing to use this mathod please contact the drone-platform google
+    * group and we’ll see if we can support the operation you needed in some future revision of
+    * the API.
+    *
+    * @param messageWrapper A MAVLinkMessage wrapper instance. No need to fill in
+    *                       sysId/compId/seqNum - the API will take care of that.
+    */
+    oneway void sendMavlinkMessage(in MavlinkMessageWrapper messageWrapper);
 
     /**
     * Send a guided point to the connected drone.

@@ -16,7 +16,7 @@ configurations {
 }
 
 dependencies {
-    compile 'com.o3dr:mavlink:0.0.1'
+    compile project(':dependencyLibs:Mavlink')
     compile project(':dependencyLibs:EllipsoidFit:EllipsoidFit')
 
     //FIXME: hackish implementation
