@@ -28,8 +28,8 @@ android {
         applicationId 'org.droidplanner.services.android'
         minSdkVersion 14
         targetSdkVersion 21
-        versionCode 10102
-        versionName "1.1.2"
+        versionCode 10103
+        versionName "1.1.3"
     }
 
     sourceSets {
