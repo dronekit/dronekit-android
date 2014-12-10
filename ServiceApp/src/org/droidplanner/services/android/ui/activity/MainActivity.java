@@ -1,4 +1,4 @@
-package org.droidplanner.services.android.activity;
+package org.droidplanner.services.android.ui.activity;
 
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -6,14 +6,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.LocalBroadcastManager;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.util.Log;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -21,8 +19,8 @@ import org.droidplanner.services.android.R;
 import org.droidplanner.services.android.api.DroidPlannerService;
 import org.droidplanner.services.android.api.DroneAccess;
 import org.droidplanner.services.android.api.DroneApi;
+import org.droidplanner.services.android.ui.adapter.DroneInfoAdapter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -77,6 +75,14 @@ public class MainActivity extends FragmentActivity {
         final Context context = getApplicationContext();
         droneListAdapter = new DroneInfoAdapter(context);
 
+        try {
+        final TextView versionInfo = (TextView) findViewById(R.id.version_info);
+            versionInfo.setText("Version " +
+                    getPackageManager().getPackageInfo(getPackageName(), 0).versionName);
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.e(TAG, "Unable to retrieve the application version.");
+        }
+
         titleView = (TextView) findViewById(R.id.drone_infos_title);
         titleView.setText("Connected Clients");
 
@@ -110,67 +116,5 @@ public class MainActivity extends FragmentActivity {
         droneListAdapter.refreshDroneManagerList(dronesList);
 
         titleView.setText("Connected Clients");
-    }
-
-    private static class DroneInfoAdapter extends ArrayAdapter<DroneApi> {
-
-        private final LayoutInflater inflater;
-        private final List<DroneApi> droneApiList = new ArrayList<DroneApi>();
-
-        public DroneInfoAdapter(Context context) {
-            super(context, 0);
-            inflater = LayoutInflater.from(context);
-        }
-
-        public void refreshDroneManagerList(List<DroneApi> list) {
-            droneApiList.clear();
-
-            if (list != null && !list.isEmpty()) {
-                droneApiList.addAll(list);
-            }
-            notifyDataSetChanged();
-        }
-
-        @Override
-        public int getCount() {
-            return droneApiList.size();
-        }
-
-        @Override
-        public DroneApi getItem(int position) {
-            return droneApiList.get(position);
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            final DroneApi droneApi = getItem(position);
-            View view;
-            if (convertView == null)
-                view = inflater.inflate(R.layout.list_item_drone_info, parent, false);
-            else
-                view = convertView;
-
-            ViewHolder viewHolder = (ViewHolder) view.getTag();
-            if (viewHolder == null) {
-                viewHolder = new ViewHolder();
-                viewHolder.listenersCount = (TextView) view.findViewById(R.id
-                        .drone_info_listeners_count);
-                viewHolder.infoPanel = (TextView) view.findViewById(R.id
-                        .drone_info_connection_params);
-
-                view.setTag(viewHolder);
-            }
-
-            viewHolder.listenersCount.setText("App Id: " + droneApi.getOwnerId());
-            viewHolder.infoPanel.setText("Connection parameters: " + droneApi.getDroneManager()
-                    .getConnectionParameter());
-
-            return view;
-        }
-    }
-
-    private static class ViewHolder {
-        TextView listenersCount;
-        TextView infoPanel;
     }
 }
