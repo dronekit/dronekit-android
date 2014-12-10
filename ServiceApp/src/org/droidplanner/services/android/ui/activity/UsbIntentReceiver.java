@@ -1,4 +1,4 @@
-package org.droidplanner.services.android.activity;
+package org.droidplanner.services.android.ui.activity;
 
 import android.content.Intent;
 import android.os.Bundle;

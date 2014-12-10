@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 
 ext {
     PUBLISH_ARTIFACT_ID = '3dr-services-lib'
-    PUBLISH_VERSION = '2.1.8'
+    PUBLISH_VERSION = '2.1.9'
     PROJECT_DESCRIPTION = "3DR Services client library"
     PROJECT_LABELS = ['3DR', '3DR Services', 'DroneAPI', 'Android']
     PROJECT_LICENSES = ['Apache-2.0']
@@ -14,8 +14,8 @@ android {
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 20
-        versionCode 20108
+        targetSdkVersion 21
+        versionCode 20109
         versionName PUBLISH_VERSION
     }
 
@@ -31,7 +31,7 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:20.0.0'
+    compile 'com.android.support:support-v4:21.0.2'
     compile project(':AidlLib')
     compile files('libs/AidlLib.jar')
 }

@@ -72,7 +72,6 @@ public class DroneSharePrefs implements Parcelable {
     public String toString() {
         return "DroneSharePrefs{" +
                 "username='" + username + '\'' +
-                ", password='" + password + '\'' +
                 ", isEnabled=" + isEnabled +
                 ", enableLiveUpload=" + enableLiveUpload +
                 '}';
