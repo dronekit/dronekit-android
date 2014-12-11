@@ -166,13 +166,20 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream,
             // has an active droneshare account.
             GAUtils.startNewSession(droneSharePrefs);
 
-            if (droneSharePrefs != null && droneSharePrefs.isLiveUploadEnabled() &&
+            //TODO: restore live upload functionality when issue
+            // 'https://github.com/diydrones/droneapi-java/issues/2' is fixed.
+            boolean isLiveUploadEnabled = false; //droneSharePrefs.isLiveUploadEnabled();
+            if (droneSharePrefs != null &&  isLiveUploadEnabled &&
                     droneSharePrefs.areLoginCredentialsSet()) {
                 Log.i(TAG, "Starting live upload");
-                if (uploader == null)
-                    uploader = new DroneshareClient();
+                try {
+                    if (uploader == null)
+                        uploader = new DroneshareClient();
 
-                uploader.connect(droneSharePrefs.getUsername(), droneSharePrefs.getPassword());
+                    uploader.connect(droneSharePrefs.getUsername(), droneSharePrefs.getPassword());
+                }catch(Exception e){
+                    Log.e(TAG, "DroneShare uploader error.", e);
+                }
             } else {
                 Log.i(TAG, "Skipping live upload");
             }
@@ -191,7 +198,7 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream,
         if (uploader != null) {
             try {
                 uploader.close();
-            } catch (IOException e) {
+            } catch (Exception e) {
                 Log.e(TAG, "Error while closing the drone share upload handler.", e);
             }
         }
@@ -224,7 +231,7 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream,
         if (uploader != null)
             try {
                 uploader.filterMavlink(uploader.interfaceNum, packet.encodePacket());
-            } catch (IOException e) {
+            } catch (Exception e) {
                 Log.e(TAG, e.getMessage(), e);
             }
     }
