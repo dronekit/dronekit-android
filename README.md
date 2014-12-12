@@ -3,7 +3,8 @@
 [![Issue Stats](http://issuestats.com/github/DroidPlanner/droidplanner/badge/issue)](http://issuestats.com/github/DroidPlanner/3DRServices)
 
 # 3DR Services
-**3DR Services** is the implementation of **DroneAPI** on Android.
+**3DR Services** is the implementation of [DroneAPI](https://developer.3drobotics.com/) on
+Android.
 
 3DR Services provide interfaces for Android applications to control 3DR-powered vehicles. We
 support planes, copters, multirotors, rovers built using the open-source ArduPilot flight control
