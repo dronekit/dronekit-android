@@ -1,32 +1,9 @@
-[![Build Status](https://travis-ci.org/DroidPlanner/droidplanner.svg?branch=master)](https://travis-ci.org/DroidPlanner/droidplanner)
-[![Issue Stats](http://issuestats.com/github/DroidPlanner/droidplanner/badge/pr)](http://issuestats.com/github/DroidPlanner/droidplanner)
-[![Issue Stats](http://issuestats.com/github/DroidPlanner/droidplanner/badge/issue)](http://issuestats.com/github/DroidPlanner/droidplanner)
+[![Build Status](https://travis-ci.org/DroidPlanner/droidplanner.svg?branch=master)](https://travis-ci.org/DroidPlanner/3DRServices)
+[![Issue Stats](http://issuestats.com/github/DroidPlanner/droidplanner/badge/pr)](http://issuestats.com/github/DroidPlanner/3DRServices)
+[![Issue Stats](http://issuestats.com/github/DroidPlanner/droidplanner/badge/issue)](http://issuestats.com/github/DroidPlanner/3DRServices)
 
-# DroidPlanner
-
-Droidplanner is a Ground Control Station (GCS) Android app for UAVs running Ardupilot software.
-
-[![Google Play Store](https://developer.android.com/images/brand/en_app_rgb_wo_45.png)](https://play.google.com/store/apps/details?id=org.droidplanner)
-
-### Usage Guide
-
-The [wiki](https://github.com/DroidPlanner/droidplanner/wiki) has some basic documentation (Help us by making it better!)
-
-For help, visit the [Droidplanner user forums](http://ardupilot.com/forum/viewforum.php?f=15).
-
-### Droidplanner v2 beta
-
-![Droidplanner 2.0 beta screenshot](http://api.ning.com/files/jF4-qtz-5QeFbLdQSyDzpe8jLYTd9ymmmGxqecMlK8ANxeKq1PTCk*wjca6GWxCSkCPf4byXhlbnJGVT3b4K259MJAFyycwI/Picture1.png?width=640)
-
-The next version of Droidplanner is under development, and we would love your help in beta testing the new version. To join the beta:
- 1. Join the [Droidplanner 2.0 beta Google+ community](https://plus.google.com/u/0/communities/109498440846585781402) (this is required to download the beta from the Google Play store)
- 2. [Become a beta tester](https://play.google.com/apps/testing/org.droidplanner)
- 3. [Download the app from the Play Store](https://play.google.com/store/apps/details?id=org.droidplanner&ah=5pMIJCcmYCEQRlfvqNQHBzcx3U0) (It may take 30+ minutes to show up after becoming a beta tester)
- 4. Send feedback: Post your feedback in the [Droidplanner Google+ community](https://plus.google.com/u/0/communities/109498440846585781402). We want to hear what you think!
-
-### Contributing
-
-Droidplanner v2 is in active development. If you would like to contribute to the project, see the [Build Setup wiki page](https://github.com/DroidPlanner/droidplanner/wiki).
-
-If you aren't a developer but want to help out, you can do so by improving the documentation in the Wiki or by writing user guides.
-
+# 3DR Services
+**3DR Services** is the implementation of the **DroneAPI** on Android, and is the result of spunning off the backend layer of DroidPlanner 2.
+Serving as the new engine for **DroidPlanner 3**, it has also been architectured to act as a platform and backend layer for **any other** Android Ground Control Station, and/or drone related applications.
+All the functionality offered by DroidPlanner 2 is now provided as a set of APIs, and easily accessible through a client library, allowing other Android applications to access and leverage the same set of features.
+**3DR Services** will be distributed as an apk through the Google Play store, supporting devices running Android 4.0 or higher, making easier for developers to leverage the latest added features through the Google Play store automatic update.

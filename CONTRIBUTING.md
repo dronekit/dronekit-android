@@ -4,15 +4,15 @@ We love pull requests. Here's a quick guide.
 
 Fork, then clone the repo:
 
-    git clone https://github.com/your-user-name/droidplanner.git
+    git clone https://github.com/your-user-name/3DRServices.git
 
 Make your change. Compile and test the results ([help?](https://github.com/Droidplanner/droidplanner/wiki/Build-Setup)):
 
-    ./gradlew
+    ./gradlew clean build
 
 Push to your fork and [submit a pull request][pr].
 
-[pr]: https://github.com/Droidplanner/droidplanner/compare/
+[pr]: https://github.com/Droidplanner/3DRServices/compare/
 
 We have an automated CI server running, which will try to compile your PR. Having that build sucessfuly complete is a good sign.
 
