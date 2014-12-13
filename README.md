@@ -7,8 +7,8 @@
 Android.
 
 3DR Services provide interfaces for Android applications to control 3DR-powered vehicles. We
-support planes, copters, multirotors, rovers built using the open-source ArduPilot flight control
- software.
+support planes, copters, multirotors, rovers built using the [open-source ArduPilot](https://github.com/diydrones/ardupilot) flight
+control software.
 
 3DR Services enable developers to quickly write new applications for UAVs that push the
 boundaries of autonomous flight.
