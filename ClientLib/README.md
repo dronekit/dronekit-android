@@ -1,13 +1,12 @@
 # 3DR Services Client library
-To develop an app using the 3DR Services APIs, you need to make use of the 3DR Services client
-library.
+To develop an app using the 3DR Services APIs, you need to use the 3DR Services client library.
 
-## Add 3DR Services Client library to your project
+### Add 3DR Services Client library to your project
 To make the 3DR Services client library available to your app:
-1. Open the **build.gradle** file inside your application module directory. Android Studio
+ 1. Open the **build.gradle** file inside your application module directory. Android Studio
 projects contain a top level **build.gradle** file and a **build.gradle** for each module. Make
 sure to edit the file for your application module.
-2. Add a new build rule under **dependencies** for the latest version of the **3DR Services
+ 2. Add a new build rule under **dependencies** for the latest version of the **3DR Services
 Client library**. For example:
 ```
 apply plugin: 'com.android.application'
