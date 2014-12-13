@@ -15,7 +15,7 @@ boundaries of autonomous flight.
 
 ### Usage Guide
 The **3DR Services** project is made of two modules:
-* [3DR Services layer](https://github.com/DroidPlanner/3DRServices/tree/master/ServiceApp):
+* [3DR Services App](https://github.com/DroidPlanner/3DRServices/tree/master/ServiceApp):
 Provided as an apk through the Google Play store, this is the layer performing direct
 communication with the 3DR-powered vehicles.
 
