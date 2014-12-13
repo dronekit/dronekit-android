@@ -10,8 +10,8 @@ Android.
 support planes, copters, multirotors, rovers built using the [open-source ArduPilot](https://github.com/diydrones/ardupilot) flight
 control software.
 
-3DR Services enable developers to quickly write new applications for UAVs that push the
-boundaries of autonomous flight.
+3DR Services enable developers to quickly write new applications for vehicles that push the
+boundaries of autonomous navigation.
 
 ### Usage Guide
 The **3DR Services** project is made of two modules:
