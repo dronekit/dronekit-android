@@ -22,3 +22,7 @@ communication with the 3DR-powered vehicles.
 * [3DR Services Client library](https://github.com/DroidPlanner/3DRServices/tree/master/ClientLib):
 Client library used by Android applications to leverage the functionality provided by the 3DR
 Services layer.
+
+### Examples
+List of applications using the 3DR Services APIs:
+* [DroidPlanner 3](https://github.com/DroidPlanner/droidplanner)
