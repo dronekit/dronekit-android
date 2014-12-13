@@ -17,7 +17,7 @@ repositories {
 }
 
 dependencies {
-    **compile 'com.o3dr:3dr-services-lib:2.1.+'**
+    compile 'com.o3dr:3dr-services-lib:2.1.+'
     ...
 }
 ```
