@@ -34,6 +34,7 @@ public class ServiceManager {
                 final int libVersionCode = o3drServices.getApiVersionCode();
                 if(libVersionCode < BuildConfig.VERSION_CODE){
                     //Prompt the user to update the 3DR Services app.
+                    o3drServices = null;
                     promptFor3DRServicesUpdate();
                     context.unbindService(o3drServicesConnection);
                 }

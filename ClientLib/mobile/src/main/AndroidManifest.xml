@@ -8,6 +8,13 @@
             android:noHistory="true"
             android:excludeFromRecents="true"
             android:launchMode="singleTask"/>
+
+        <activity
+            android:name=".utils.UpdateServiceDialog"
+            android:theme="@android:style/Theme.Holo.Light.Dialog.NoActionBar.MinWidth"
+            android:noHistory="true"
+            android:excludeFromRecents="true"
+            android:launchMode="singleTask"/>
     </application>
 
 </manifest>
