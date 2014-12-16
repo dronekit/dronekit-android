@@ -3,6 +3,7 @@ package org.droidplanner.services.android.api;
 import android.os.RemoteException;
 import android.util.Log;
 
+import com.o3dr.services.android.lib.BuildConfig;
 import com.o3dr.services.android.lib.model.IApiListener;
 import com.o3dr.services.android.lib.model.IDroidPlannerServices;
 import com.o3dr.services.android.lib.model.IDroneApi;
@@ -37,8 +38,7 @@ final class DPServices extends IDroidPlannerServices.Stub {
 
     @Override
     public int getApiVersionCode() throws RemoteException {
-        //TODO: return a valid version code
-        return 0;
+        return BuildConfig.VERSION_CODE;
     }
 
     @Override

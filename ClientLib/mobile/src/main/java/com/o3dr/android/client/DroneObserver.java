@@ -18,9 +18,7 @@ final class DroneObserver extends IObserver.Stub {
     }
 
     @Override
-    public void onConnectionFailed(ConnectionResult result) throws RemoteException {
-        drone.notifyDroneConnectionFailed(result);
-    }
+    public void onConnectionFailed(ConnectionResult result) throws RemoteException {}
 
     @Override
     public void onAttributeUpdated(String attributeEvent, Bundle eventExtras) throws

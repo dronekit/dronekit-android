@@ -17,4 +17,9 @@ interface IApiListener {
     * @param result Describe why the connection failed.
     */
     oneway void onConnectionFailed(in ConnectionResult result);
+
+    /**
+    * Retrieve the version code for the connected client.
+    */
+    int getClientVersionCode();
 }
