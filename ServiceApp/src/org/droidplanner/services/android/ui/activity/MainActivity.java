@@ -1,58 +1,39 @@
 package org.droidplanner.services.android.ui.activity;
 
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.util.Log;
-import android.widget.ListView;
+import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 
 import org.droidplanner.services.android.R;
 import org.droidplanner.services.android.api.DroidPlannerService;
 import org.droidplanner.services.android.api.DroneAccess;
-import org.droidplanner.services.android.api.DroneApi;
-import org.droidplanner.services.android.ui.adapter.DroneInfoAdapter;
-
-import java.util.List;
+import org.droidplanner.services.android.ui.fragment.AppConnectionsFragment;
 
 /**
  * Created by fhuya on 10/31/14.
  */
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends ActionBarActivity {
 
     private final static String TAG = MainActivity.class.getSimpleName();
-
-    private final static IntentFilter intentFilter = new IntentFilter();
-
-    {
-        intentFilter.addAction(DroidPlannerService.ACTION_DRONE_CREATED);
-        intentFilter.addAction(DroidPlannerService.ACTION_DRONE_DESTROYED);
-    }
-
-    private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            final String action = intent.getAction();
-            if (DroidPlannerService.ACTION_DRONE_CREATED.equals(action) || DroidPlannerService
-                    .ACTION_DRONE_DESTROYED.equals(action)) {
-                refreshDroneList();
-            }
-        }
-    };
 
     private final ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             droneAccess = (DroneAccess) service;
-            refreshDroneList();
+            showOrRefreshFragments();
         }
 
         @Override
@@ -61,11 +42,21 @@ public class MainActivity extends FragmentActivity {
         }
     };
 
-    private LocalBroadcastManager lbm;
+    private void showOrRefreshFragments() {
+        final FragmentManager fm = getSupportFragmentManager();
+        AppConnectionsFragment fragment = (AppConnectionsFragment) fm.findFragmentById(R.id.fragment_container);
+        if (fragment == null) {
+            fragment = new AppConnectionsFragment();
+            fm.beginTransaction().add(R.id.fragment_container, fragment).commit();
+        } else {
+            fragment.refreshDroneList();
+        }
+    }
+
     private DroneAccess droneAccess;
 
-    private TextView titleView;
-    private DroneInfoAdapter droneListAdapter;
+    private DrawerLayout drawerLayout;
+    private ActionBarDrawerToggle drawerToggle;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -73,24 +64,37 @@ public class MainActivity extends FragmentActivity {
         setContentView(R.layout.activity_main);
 
         final Context context = getApplicationContext();
-        droneListAdapter = new DroneInfoAdapter(context);
 
         try {
-        final TextView versionInfo = (TextView) findViewById(R.id.version_info);
-            versionInfo.setText("Version " +
-                    getPackageManager().getPackageInfo(getPackageName(), 0).versionName);
+            final TextView versionInfo = (TextView) findViewById(R.id.version_info);
+            versionInfo.setText(getPackageManager().getPackageInfo(getPackageName(), 0).versionName);
         } catch (PackageManager.NameNotFoundException e) {
-            Log.e(TAG, "Unable to retrieve the application version.");
+            Log.e(TAG, "Unable to retrieve the version name.", e);
         }
 
-        titleView = (TextView) findViewById(R.id.drone_infos_title);
-        titleView.setText("Connected Clients");
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.drawer_open,
+                R.string.drawer_close) {
 
-        final ListView droneListView = (ListView) findViewById(R.id.drone_info_list);
-        droneListView.setAdapter(droneListAdapter);
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                //TODO: Launch the selected fragment.
+            }
 
-        lbm = LocalBroadcastManager.getInstance(context);
-        lbm.registerReceiver(broadcastReceiver, intentFilter);
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                //TODO: update the app title
+            }
+        };
+
+        drawerLayout.setDrawerListener(drawerToggle);
+        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+
+//        ActionBar actionBar = getSupportActionBar();
+//        if(actionBar != null){
+//            actionBar.setDisplayHomeAsUpEnabled(true);
+//            actionBar.setHomeButtonEnabled(true);
+//        }
 
         bindService(new Intent(context, DroidPlannerService.class), serviceConnection,
                 Context.BIND_AUTO_CREATE);
@@ -99,22 +103,46 @@ public class MainActivity extends FragmentActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        lbm.unregisterReceiver(broadcastReceiver);
         unbindService(serviceConnection);
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        refreshDroneList();
+        if (droneAccess != null)
+            showOrRefreshFragments();
     }
 
-    private void refreshDroneList() {
-        if (droneAccess == null) return;
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
 
-        List<DroneApi> dronesList = droneAccess.getDroneApiList();
-        droneListAdapter.refreshDroneManagerList(dronesList);
+        if (drawerToggle != null)
+            drawerToggle.onConfigurationChanged(newConfig);
+    }
 
-        titleView.setText("Connected Clients");
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Pass the event to ActionBarDrawerToggle, if it returns
+        // true, then it has handled the app icon touch event
+        if (drawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+
+        if (drawerToggle != null) {
+            // Sync the toggle state after onRestoreInstanceState has occurred.
+            drawerToggle.syncState();
+        }
+    }
+
+    public DroneAccess getDroneAccess() {
+        return droneAccess;
     }
 }

@@ -1,52 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<android.support.v4.widget.DrawerLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <android.support.v7.widget.CardView
-        android:id="@+id/card_title"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        card_view:cardCornerRadius="4dp"
-        android:layout_margin="15dp"
-        android:layout_alignParentTop="true"
-        >
+        android:layout_height="match_parent">
+
+        <FrameLayout
+            android:layout_alignParentTop="true"
+            android:layout_above="@+id/divider_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/fragment_container"/>
+
+        <include
+            layout="@layout/divider_view"
+            android:id="@+id/divider_view"
+            android:layout_above="@+id/version_info"
+            android:layout_marginTop="@dimen/navigationSectionBottomMargin"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"/>
 
         <TextView
-            android:id="@+id/drone_infos_title"
+            android:id="@+id/version_info"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:padding="20dp"
-            tools:text="Connected Drones: "
-            android:textAppearance="@android:style/TextAppearance.DeviceDefault.Large"
-            />
+            tools:text="3DR Services v1.1.3"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:padding="5dp"
+            android:layout_alignParentBottom="true"/>
+    </RelativeLayout>
 
-    </android.support.v7.widget.CardView>
-
-    <ListView
-        android:id="@+id/drone_info_list"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/card_title"
-        android:layout_above="@+id/version_divider"/>
+        android:layout_marginRight="?attr/actionBarSize"
+        android:layout_marginEnd="?attr/actionBarSize"
+        android:layout_gravity="start"
+        android:background="@android:color/white"
+        android:id="@+id/navigation_drawer">
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@android:color/darker_gray"
-        android:id="@+id/version_divider"
-        android:layout_above="@+id/version_info"/>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            >
 
-    <TextView
-        android:id="@+id/version_info"
-        android:layout_height="wrap_content"
-        android:minHeight="48dp"
-        android:layout_width="match_parent"
-        android:gravity="center"
-        android:layout_alignParentBottom="true"/>
+            <TextView
+                android:id="@+id/navigation_connections"
+                style="@style/NavigationDrawer.Entry"
+                android:text="@string/navigation_connections_label"
+                android:layout_alignParentTop="true"
+                android:drawableLeft="@drawable/ic_settings_ethernet_black_24dp"
+                android:drawableStart="@drawable/ic_settings_ethernet_black_24dp"
+                />
 
-</RelativeLayout>
+            <TextView
+                android:id="@+id/navigation_account"
+                android:layout_below="@+id/navigation_connections"
+                style="@style/NavigationDrawer.Entry"
+                android:text="@string/navigation_account_label"
+                android:drawableLeft="@drawable/ic_person_black_24dp"
+                android:drawableStart="@drawable/ic_person_black_24dp"
+                />
+
+            <TextView
+                android:id="@+id/navigation_settings"
+                android:layout_below="@+id/navigation_account"
+                android:text="@string/navigation_settings_label"
+                style="@style/NavigationDrawer.Entry"
+                android:drawableLeft="@drawable/ic_settings_black_24dp"
+                android:drawableStart="@drawable/ic_settings_black_24dp"
+                android:layout_marginBottom="@dimen/navigationSectionBottomMargin"/>
+
+            <include
+                layout="@layout/divider_view"
+                android:id="@+id/divider_view"
+                android:layout_below="@+id/navigation_settings"
+                android:layout_marginBottom="@dimen/navigationSectionBottomMargin"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"/>
+
+            <TextView
+                android:id="@+id/navigation_developers"
+                android:layout_below="@+id/divider_view"
+                style="@style/NavigationDrawer.Entry"
+                android:text="@string/navigation_developers_label"
+                android:drawableLeft="@drawable/ic_android_black_24dp"
+                android:drawableStart="@drawable/ic_android_black_24dp"/>
+
+        </RelativeLayout>
+    </ScrollView>
+</android.support.v4.widget.DrawerLayout>

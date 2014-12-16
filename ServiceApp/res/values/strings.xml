@@ -530,5 +530,9 @@
     <string name="pref_dronie_creation_message">Please stand back 8m before starting the
         dronie.</string>
     <string name="failed_start_calibration_message">Unable to start calibration!</string>
+    <string name="navigation_connections_label">Connections</string>
+    <string name="navigation_developers_label">Developers</string>
+    <string name="navigation_settings_label">Settings</string>
+    <string name="navigation_account_label">Account</string>
 
 </resources>

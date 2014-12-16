@@ -12,31 +12,47 @@
         android:padding="15dp">
 
         <ImageView
-            android:layout_marginTop="5dp"
             android:layout_marginStart="5dp"
             android:layout_marginLeft="5dp"
-            android:layout_marginEnd="5dp"
-            android:layout_marginRight="5dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginRight="20dp"
             android:id="@+id/client_icon"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_alignParentTop="true"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
             android:layout_alignParentStart="true"
             android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            tools:src="@drawable/ic_android_black_24dp"
             android:scaleType="centerInside"/>
 
         <TextView
+            android:id="@+id/client_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_toRightOf="@+id/client_icon"
             android:layout_toEndOf="@+id/client_icon"
-            android:layout_alignTop="@+id/client_icon"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="10dp"
+            tools:text="DroidPlanner 3"
+            android:textAppearance="?android:textAppearanceMedium"
+            android:gravity="center_vertical"
+            android:textColor="@android:color/black"
+            android:textStyle="bold"
+            android:padding="2dp"
+            />
+
+        <TextView
+            android:layout_alignStart="@+id/client_name"
+            android:layout_alignLeft="@+id/client_name"
+            android:layout_below="@+id/client_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/client_id"
             android:gravity="center_vertical"
-            android:padding="7dp"
+            android:padding="2dp"
             android:textAppearance="?android:textAppearanceMedium"
             android:textColor="@android:color/black"
-            tools:text="App Id: "/>
+            tools:text="AppId: "/>
 
         <TextView
             android:layout_alignStart="@+id/client_id"
@@ -46,9 +62,9 @@
             android:layout_height="wrap_content"
             android:id="@+id/client_connection_info"
             android:gravity="center_vertical"
-            android:padding="7dp"
+            android:padding="2dp"
             android:textAppearance="?android:textAppearanceMedium"
             android:textColor="@android:color/black"
-            tools:text="Connection Parameters: "/>
+            tools:text="Status: "/>
     </RelativeLayout>
 </android.support.v7.widget.CardView>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="edgePadding">16dp</dimen>
+    <dimen name="contentWithIconLeftPadding">32dp</dimen>
+    <dimen name="navigationEntryHeight">48dp</dimen>
+    <dimen name="navigationSectionBottomMargin">8dp</dimen>
+
+    <integer name="connectionsColCount">1</integer>
+</resources>
