@@ -40,6 +40,7 @@ import com.o3dr.services.android.lib.drone.property.VehicleMode;
 import com.o3dr.services.android.lib.gcs.follow.FollowState;
 import com.o3dr.services.android.lib.gcs.follow.FollowType;
 import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
+import com.o3dr.services.android.lib.model.IApiListener;
 import com.o3dr.services.android.lib.model.IDroneApi;
 import com.o3dr.services.android.lib.model.IMavlinkObserver;
 import com.o3dr.services.android.lib.model.IObserver;
@@ -95,13 +96,15 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     private final ConcurrentLinkedQueue<IObserver> observersList;
     private final ConcurrentLinkedQueue<IMavlinkObserver> mavlinkObserversList;
     private final DroneManager droneMgr;
+    private final IApiListener apiListener;
     private final String ownerId;
 
     private List<CameraDetail> cachedCameraDetails;
 
-    DroneApi(DroidPlannerService dpService, Handler handler, MavLinkServiceApi mavlinkApi,
+    DroneApi(DroidPlannerService dpService, Handler handler, MavLinkServiceApi mavlinkApi, IApiListener listener,
              String ownerId) {
         this.context = dpService.getApplicationContext();
+        this.apiListener = listener;
         this.ownerId = ownerId;
 
         serviceRef = new WeakReference<DroidPlannerService>(dpService);
@@ -816,8 +819,9 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     }
 
     private void checkForSelfRelease(){
+        //TODO: update to check if the apiListener is still connected instead.
         if(observersList.isEmpty() && mavlinkObserversList.isEmpty())
-            getService().releaseDroidPlannerApi(this);
+            getService().releaseDroneApi(this);
     }
 
     @Override
@@ -874,6 +878,14 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
             return;
 
         if (result != null) {
+            if(apiListener != null){
+                try {
+                    apiListener.onConnectionFailed(result);
+                } catch (RemoteException e) {
+                    checkForSelfRelease();
+                }
+            }
+
             for (IObserver observer : observersList) {
                 try {
                     observer.onConnectionFailed(result);
