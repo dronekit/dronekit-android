@@ -7,7 +7,6 @@ import android.os.RemoteException;
 import android.os.SystemClock;
 import android.util.Log;
 
-import com.MAVLink.Messages.MAVLinkMessage;
 import com.o3dr.android.client.interfaces.DroneListener;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
@@ -17,8 +16,6 @@ import com.o3dr.services.android.lib.drone.connection.ConnectionResult;
 import com.o3dr.services.android.lib.drone.mission.Mission;
 import com.o3dr.services.android.lib.drone.mission.MissionItemType;
 import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
-import com.o3dr.services.android.lib.drone.mission.item.complex.StructureScanner;
-import com.o3dr.services.android.lib.drone.mission.item.complex.Survey;
 import com.o3dr.services.android.lib.drone.property.Altitude;
 import com.o3dr.services.android.lib.drone.property.Attitude;
 import com.o3dr.services.android.lib.drone.property.Battery;
@@ -65,6 +62,7 @@ public class Drone {
     private final Handler handler;
     private final ServiceManager serviceMgr;
     private final DroneObserver droneObserver;
+    private final DroneApiListener apiListener;
     private IDroneApi droneApi;
 
     private ConnectionParameter connectionParameter;
@@ -78,6 +76,7 @@ public class Drone {
     public Drone(ServiceManager serviceManager, Handler handler) {
         this.handler = handler;
         this.serviceMgr = serviceManager;
+        this.apiListener = new DroneApiListener(this);
         this.droneObserver = new DroneObserver(this);
     }
 
@@ -89,7 +88,8 @@ public class Drone {
             return;
 
         try {
-            this.droneApi = serviceMgr.get3drServices().acquireDroneApi(serviceMgr.getApplicationId());
+            this.droneApi = serviceMgr.get3drServices().registerDroneApi(this.apiListener,
+                    serviceMgr.getApplicationId());
         } catch (RemoteException e) {
             throw new IllegalStateException("Unable to retrieve a valid drone handle.");
         }
@@ -178,7 +178,7 @@ public class Drone {
     }
 
     public Gps getGps() {
-        Gps gps =  getAttribute(AttributeType.GPS, Gps.class.getClassLoader());
+        Gps gps = getAttribute(AttributeType.GPS, Gps.class.getClassLoader());
         return gps == null ? new Gps() : gps;
     }
 
@@ -205,7 +205,7 @@ public class Drone {
         T attribute = null;
         if (isStarted()) {
             Bundle carrier = getAttribute(type);
-            if(carrier != null) {
+            if (carrier != null) {
                 carrier.setClassLoader(classLoader);
                 attribute = carrier.getParcelable(type);
             }
@@ -311,12 +311,12 @@ public class Drone {
     }
 
     public <T extends MissionItem> void buildComplexMissionItem(MissionItem.ComplexItem<T>
-                                                                        complexItem){
-        if(isStarted()){
-            try{
+                                                                        complexItem) {
+        if (isStarted()) {
+            try {
                 T missionItem = (T) complexItem;
                 Bundle payload = missionItem.getType().storeMissionItem(missionItem);
-                if(payload == null)
+                if (payload == null)
                     return;
 
                 droneApi.buildComplexMissionItem(payload);
@@ -345,8 +345,8 @@ public class Drone {
         }
     }
 
-    public void addMavlinkObserver(MavlinkObserver observer){
-        if(isStarted()){
+    public void addMavlinkObserver(MavlinkObserver observer) {
+        if (isStarted()) {
             try {
                 droneApi.addMavlinkObserver(observer);
             } catch (RemoteException e) {
@@ -355,8 +355,8 @@ public class Drone {
         }
     }
 
-    public void removeMavlinkObserver(MavlinkObserver observer){
-        if(isStarted()){
+    public void removeMavlinkObserver(MavlinkObserver observer) {
+        if (isStarted()) {
             try {
                 droneApi.removeMavlinkObserver(observer);
             } catch (RemoteException e) {
@@ -508,8 +508,8 @@ public class Drone {
         }
     }
 
-    public void sendMavlinkMessage(MavlinkMessageWrapper messageWrapper){
-        if(messageWrapper != null && isStarted()){
+    public void sendMavlinkMessage(MavlinkMessageWrapper messageWrapper) {
+        if (messageWrapper != null && isStarted()) {
             try {
                 droneApi.sendMavlinkMessage(messageWrapper);
             } catch (RemoteException e) {

@@ -17,6 +17,7 @@ oneway interface IObserver {
     void onAttributeUpdated(String attributeEvent, in Bundle eventExtras);
 
     /**
+    * TODO: left now for backward compatibility. To be removed in next version.
     * Called when the connection attempt fails.
     * @param result Describe why the connection failed.
     */
