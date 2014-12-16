@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="NavigationDrawer"/>
+
+    <style name="NavigationDrawer.Entry">
+        <item name="android:paddingLeft">@dimen/edgePadding</item>
+        <item name="android:paddingStart">@dimen/edgePadding</item>
+        <item name="android:paddingEnd">@dimen/edgePadding</item>
+        <item name="android:paddingRight">@dimen/edgePadding</item>
+        <item name="android:gravity">center_vertical|start</item>
+        <item name="android:layout_alignParentLeft">true</item>
+        <item name="android:layout_alignParentStart">true</item>
+        <item name="android:layout_height">@dimen/navigationEntryHeight</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:drawablePadding">@dimen/contentWithIconLeftPadding</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+
+    <style name="NavigationDrawer.Banner" parent="NavigationDrawer.Entry">
+        <item name="android:layout_height">?attr/actionBarSize</item>
+        <item name="android:layout_marginBottom">@dimen/navigationSectionBottomMargin</item>
+    </style>
+
+</resources>
