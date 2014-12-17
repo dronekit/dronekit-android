@@ -27,6 +27,7 @@ import org.droidplanner.services.android.communication.service.UploaderService;
 import org.droidplanner.services.android.exception.ConnectionException;
 import org.droidplanner.services.android.interfaces.DroneEventsListener;
 import org.droidplanner.services.android.location.FusedLocation;
+import org.droidplanner.services.android.utils.AndroidApWarningParser;
 import org.droidplanner.services.android.utils.analytics.GAUtils;
 import org.droidplanner.services.android.utils.file.help.CameraInfoLoader;
 import org.droidplanner.services.android.utils.prefs.DroidPlannerPrefs;
@@ -90,7 +91,7 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream,
         };
 
         DroidPlannerPrefs dpPrefs = new DroidPlannerPrefs(context);
-        this.drone = new DroneImpl(mavClient, clock, dpHandler, dpPrefs);
+        this.drone = new DroneImpl(mavClient, clock, dpHandler, dpPrefs, new AndroidApWarningParser(context));
 
         this.mavLinkMsgHandler = new MavLinkMsgHandler(this.drone);
 

@@ -74,7 +74,7 @@ public class State extends DroneVariable {
 	}
 
 	public void setWarning(String newFailsafe) {
-        String parsedWarning = warningParser.parseWarning(newFailsafe);
+        String parsedWarning = warningParser.parseWarning(myDrone, newFailsafe);
 		if (!this.warning.equals(parsedWarning)) {
 			this.warning = parsedWarning;
 			myDrone.notifyDroneEvent(DroneEventsType.AUTOPILOT_WARNING);
