@@ -6,6 +6,7 @@ import org.droidplanner.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.core.drone.DroneInterfaces.Handler;
 import org.droidplanner.core.drone.DroneVariable;
 import org.droidplanner.core.helpers.units.Altitude;
+import org.droidplanner.core.model.AutopilotWarningParser;
 import org.droidplanner.core.model.Drone;
 
 import com.MAVLink.Messages.ApmModes;
@@ -16,6 +17,7 @@ public class State extends DroneVariable {
 	private boolean armed = false;
 	private boolean isFlying = false;
 	private ApmModes mode = ApmModes.UNKNOWN;
+    private final AutopilotWarningParser warningParser;
 
 	// flightTimer
 	// ----------------
@@ -31,10 +33,11 @@ public class State extends DroneVariable {
 		}
 	};
 
-	public State(Drone myDrone, Clock clock, Handler handler) {
+	public State(Drone myDrone, Clock clock, Handler handler, AutopilotWarningParser warningParser) {
 		super(myDrone);
 		this.clock = clock;
 		this.watchdog = handler;
+        this.warningParser = warningParser;
 		resetFlightTimer();
 	}
 
@@ -71,8 +74,9 @@ public class State extends DroneVariable {
 	}
 
 	public void setWarning(String newFailsafe) {
-		if (!this.warning.equals(newFailsafe)) {
-			this.warning = newFailsafe;
+        String parsedWarning = warningParser.parseWarning(newFailsafe);
+		if (!this.warning.equals(parsedWarning)) {
+			this.warning = parsedWarning;
 			myDrone.notifyDroneEvent(DroneEventsType.AUTOPILOT_WARNING);
 		}
 		watchdog.removeCallbacks(watchdogCallback);
