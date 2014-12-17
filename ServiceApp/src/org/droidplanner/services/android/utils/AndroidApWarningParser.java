@@ -36,16 +36,31 @@ public class AndroidApWarningParser implements AutopilotWarningParser {
 
     private String parseRoverWarning(String warning) {
         //TODO: complete mapping from ArduRover warnings to DP warnings.
-        return warning;
+
+        switch(warning){
+            default:
+                return warning;
+        }
     }
 
     private String parsePlaneWarning(String warning) {
         //TODO: complete mapping from ArduPlane warnings to DP warnings.
-        return warning;
+
+        switch(warning){
+            default:
+                return warning;
+        }
     }
 
     private String parseCopterWarning(String warning) {
         //TODO: complete mapping from ArduCopter warnings to DP warning
-        return warning;
+
+        switch(warning){
+            case "Arm: Thr below FS":
+                return "Arm: Throttle below Failsafe";
+
+            default:
+                return warning;
+        }
     }
 }
