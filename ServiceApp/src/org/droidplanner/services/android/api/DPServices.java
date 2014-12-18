@@ -42,11 +42,6 @@ final class DPServices extends IDroidPlannerServices.Stub {
     }
 
     @Override
-    public IDroneApi acquireDroneApi(String appId) throws RemoteException {
-        return getService().acquireDroidPlannerApi(appId);
-    }
-
-    @Override
     public IDroneApi registerDroneApi(IApiListener listener, String appId) throws RemoteException {
         return getService().registerDroneApi(listener, appId);
     }

@@ -90,8 +90,22 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
     private final static String TAG = DroneApi.class.getSimpleName();
 
+    private final static long CONNECTION_CHECK_PERIOD = 30000l; //ms
+
+    /**
+     * Used to check if the client is still connected.
+     */
+    private final Runnable clientConnectionChecker = new Runnable() {
+        @Override
+        public void run() {
+            checkForSelfRelease();
+            handler.postDelayed(this, CONNECTION_CHECK_PERIOD);
+        }
+    };
+
     private final WeakReference<DroidPlannerService> serviceRef;
     private final Context context;
+    private final Handler handler;
 
     private final ConcurrentLinkedQueue<IObserver> observersList;
     private final ConcurrentLinkedQueue<IMavlinkObserver> mavlinkObserversList;
@@ -104,6 +118,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     DroneApi(DroidPlannerService dpService, Handler handler, MavLinkServiceApi mavlinkApi, IApiListener listener,
              String ownerId) {
         this.context = dpService.getApplicationContext();
+        this.handler = handler;
         this.apiListener = listener;
         this.ownerId = ownerId;
 
@@ -113,9 +128,12 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
         this.droneMgr = new DroneManager(context, handler, mavlinkApi);
         this.droneMgr.setDroneEventsListener(this);
+
+        this.handler.post(clientConnectionChecker);
     }
 
     void destroy() {
+        this.handler.removeCallbacks(clientConnectionChecker);
         this.droneMgr.setDroneEventsListener(null);
         this.droneMgr.destroy();
 
@@ -124,11 +142,11 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
         this.mavlinkObserversList.clear();
     }
 
-    public String getOwnerId(){
+    public String getOwnerId() {
         return ownerId;
     }
 
-    public DroneManager getDroneManager(){
+    public DroneManager getDroneManager() {
         return this.droneMgr;
     }
 
@@ -145,44 +163,31 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
         Bundle carrier = new Bundle();
         if (AttributeType.STATE.equals(type)) {
             carrier.putParcelable(type, getState());
-        }
-        else if(AttributeType.GPS.equals(type)){
+        } else if (AttributeType.GPS.equals(type)) {
             carrier.putParcelable(type, getGps());
-        }
-        else if(AttributeType.PARAMETERS.equals(type)){
+        } else if (AttributeType.PARAMETERS.equals(type)) {
             carrier.putParcelable(type, getParameters());
-        }
-        else if(AttributeType.SPEED.equals(type)){
+        } else if (AttributeType.SPEED.equals(type)) {
             carrier.putParcelable(type, getSpeed());
-        }
-        else if(AttributeType.ATTITUDE.equals(type)){
+        } else if (AttributeType.ATTITUDE.equals(type)) {
             carrier.putParcelable(type, getAttitude());
-        }
-        else if(AttributeType.HOME.equals(type)){
+        } else if (AttributeType.HOME.equals(type)) {
             carrier.putParcelable(type, getHome());
-        }
-        else if(AttributeType.BATTERY.equals(type)){
+        } else if (AttributeType.BATTERY.equals(type)) {
             carrier.putParcelable(type, getBattery());
-        }
-        else if(AttributeType.ALTITUDE.equals(type)){
+        } else if (AttributeType.ALTITUDE.equals(type)) {
             carrier.putParcelable(type, getAltitude());
-        }
-        else if(AttributeType.MISSION.equals(type)){
+        } else if (AttributeType.MISSION.equals(type)) {
             carrier.putParcelable(type, getMission());
-        }
-        else if(AttributeType.SIGNAL.equals(type)){
+        } else if (AttributeType.SIGNAL.equals(type)) {
             carrier.putParcelable(type, getSignal());
-        }
-        else if(AttributeType.TYPE.equals(type)){
+        } else if (AttributeType.TYPE.equals(type)) {
             carrier.putParcelable(type, getType());
-        }
-        else if(AttributeType.GUIDED_STATE.equals(type)){
+        } else if (AttributeType.GUIDED_STATE.equals(type)) {
             carrier.putParcelable(type, getGuidedState());
-        }
-        else if(AttributeType.FOLLOW_STATE.equals(type)){
+        } else if (AttributeType.FOLLOW_STATE.equals(type)) {
             carrier.putParcelable(type, getFollowState());
-        }
-        else if(AttributeType.CAMERA.equals(type)){
+        } else if (AttributeType.CAMERA.equals(type)) {
             carrier.putParcelable(type, getCameraProxy());
         }
 
@@ -220,7 +225,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 droneGps.getFixTypeNumeric());
     }
 
-    private State getState()  {
+    private State getState() {
         final Drone drone = this.droneMgr.getDrone();
         org.droidplanner.core.drone.variables.State droneState = drone.getState();
         ApmModes droneMode = droneState.getMode();
@@ -357,7 +362,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
         }
     }
 
-    private Parameters getParameters()  {
+    private Parameters getParameters() {
         final Drone drone = this.droneMgr.getDrone();
         final Map<String, com.o3dr.services.android.lib.drone.property.Parameter> proxyParams =
                 new HashMap<String, com.o3dr.services.android.lib.drone.property.Parameter>();
@@ -391,20 +396,20 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 .Parameter>(proxyParams.values()));
     }
 
-    private Speed getSpeed()  {
+    private Speed getSpeed() {
         org.droidplanner.core.drone.variables.Speed droneSpeed = this.droneMgr.getDrone().getSpeed();
         return new Speed(droneSpeed.getVerticalSpeed().valueInMetersPerSecond(),
                 droneSpeed.getGroundSpeed().valueInMetersPerSecond(),
                 droneSpeed.getAirSpeed().valueInMetersPerSecond());
     }
 
-    private Attitude getAttitude()  {
+    private Attitude getAttitude() {
         Orientation droneOrientation = this.droneMgr.getDrone().getOrientation();
         return new Attitude(droneOrientation.getRoll(), droneOrientation.getPitch(),
                 droneOrientation.getYaw());
     }
 
-    private Home getHome()  {
+    private Home getHome() {
         org.droidplanner.core.drone.variables.Home droneHome = this.droneMgr.getDrone().getHome();
         LatLongAlt homePosition = droneHome.isValid()
                 ? new LatLongAlt(droneHome.getCoord().getLat(), droneHome.getCoord().getLng(),
@@ -457,7 +462,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
         return droneMgr != null && droneMgr.isConnected();
     }
 
-    private GuidedState getGuidedState()  {
+    private GuidedState getGuidedState() {
         final GuidedPoint guidedPoint = this.droneMgr.getDrone().getGuidedPoint();
         int guidedState;
         switch (guidedPoint.getState()) {
@@ -617,15 +622,15 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
     @Override
     public void sendMavlinkMessage(MavlinkMessageWrapper messageWrapper) throws RemoteException {
-        if(messageWrapper == null)
+        if (messageWrapper == null)
             return;
 
         MAVLinkMessage message = messageWrapper.getMavLinkMessage();
-        if(message == null)
+        if (message == null)
             return;
 
         Drone drone = getDroneManager().getDrone();
-        if(drone == null)
+        if (drone == null)
             return;
 
         message.compid = drone.getCompid();
@@ -736,7 +741,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     }
 
     private List<CameraDetail> getCameraDetails() {
-        if(cachedCameraDetails == null) {
+        if (cachedCameraDetails == null) {
             final CameraInfoLoader camInfoLoader = this.droneMgr.getCameraInfoLoader();
             List<String> cameraInfoNames = camInfoLoader.getCameraInfoList();
 
@@ -775,23 +780,23 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     }
 
     @Override
-    public void buildComplexMissionItem(Bundle itemBundle) throws RemoteException{
+    public void buildComplexMissionItem(Bundle itemBundle) throws RemoteException {
         MissionItem missionItem = MissionItemType.restoreMissionItemFromBundle(itemBundle);
-        if(missionItem == null || !(missionItem instanceof MissionItem.ComplexItem))
+        if (missionItem == null || !(missionItem instanceof MissionItem.ComplexItem))
             return;
 
         final MissionItemType itemType = missionItem.getType();
-        switch(itemType){
+        switch (itemType) {
             case SURVEY:
                 Survey updatedSurvey = buildSurvey((Survey) missionItem);
-                if(updatedSurvey != null)
+                if (updatedSurvey != null)
                     itemType.storeMissionItem(updatedSurvey, itemBundle);
                 break;
 
             case STRUCTURE_SCANNER:
                 StructureScanner updatedScanner = buildStructureScanner((StructureScanner)
                         missionItem);
-                if(updatedScanner != null)
+                if (updatedScanner != null)
                     itemType.storeMissionItem(updatedScanner, itemBundle);
                 break;
 
@@ -818,10 +823,18 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
         return proxyScanner;
     }
 
-    private void checkForSelfRelease(){
-        //TODO: update to check if the apiListener is still connected instead.
-        if(observersList.isEmpty() && mavlinkObserversList.isEmpty())
-            getService().releaseDroneApi(this);
+    private void checkForSelfRelease() {
+        //Check if the apiListener is still connected instead.
+        if (apiListener != null) {
+            try {
+                apiListener.ping();
+                return;
+            } catch (RemoteException e) {
+                Log.w(TAG, "Client is not longer available.", e);
+            }
+        }
+
+        getService().releaseDroneApi(this);
     }
 
     @Override
@@ -841,13 +854,13 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
     @Override
     public void addMavlinkObserver(IMavlinkObserver observer) throws RemoteException {
-        if(observer != null)
+        if (observer != null)
             mavlinkObserversList.add(observer);
     }
 
     @Override
     public void removeMavlinkObserver(IMavlinkObserver observer) throws RemoteException {
-        if(observer != null) {
+        if (observer != null) {
             mavlinkObserversList.remove(observer);
             checkForSelfRelease();
         }
@@ -874,46 +887,32 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     }
 
     private void notifyConnectionFailed(ConnectionResult result) {
-        if (observersList.isEmpty())
-            return;
-
         if (result != null) {
-            if(apiListener != null){
+            if (apiListener != null) {
                 try {
                     apiListener.onConnectionFailed(result);
+                    return;
                 } catch (RemoteException e) {
-                    checkForSelfRelease();
+                    Log.w(TAG, "Unable to forward connection fail to client.", e);
                 }
             }
-
-            for (IObserver observer : observersList) {
-                try {
-                    observer.onConnectionFailed(result);
-                } catch (RemoteException e) {
-                    Log.e(TAG, e.getMessage(), e);
-                    try {
-                        removeAttributesObserver(observer);
-                    } catch (RemoteException e1) {
-                        Log.e(TAG, e1.getMessage(), e1);
-                    }
-                }
-            }
+            checkForSelfRelease();
         }
     }
 
     @Override
     public void onReceivedMavLinkMessage(MAVLinkMessage msg) {
-        if(mavlinkObserversList.isEmpty())
+        if (mavlinkObserversList.isEmpty())
             return;
 
-        if(msg != null){
+        if (msg != null) {
             final MavlinkMessageWrapper msgWrapper = new MavlinkMessageWrapper(msg);
-            for(IMavlinkObserver observer: mavlinkObserversList){
+            for (IMavlinkObserver observer : mavlinkObserversList) {
                 try {
                     observer.onMavlinkMessageReceived(msgWrapper);
                 } catch (RemoteException e) {
                     Log.e(TAG, e.getMessage(), e);
-                    try{
+                    try {
                         removeMavlinkObserver(observer);
                     } catch (RemoteException e1) {
                         Log.e(TAG, e1.getMessage(), e1);
