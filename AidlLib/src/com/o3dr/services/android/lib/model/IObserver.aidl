@@ -1,8 +1,6 @@
 // IObserver.aidl
 package com.o3dr.services.android.lib.model;
 
-import com.o3dr.services.android.lib.drone.connection.ConnectionResult;
-
 /**
 * Asynchronous notification on change of vehicle state is available by registering observers for
 * attribute changes.
@@ -16,10 +14,4 @@ oneway interface IObserver {
     */
     void onAttributeUpdated(String attributeEvent, in Bundle eventExtras);
 
-    /**
-    * TODO: left now for backward compatibility. To be removed in next version.
-    * Called when the connection attempt fails.
-    * @param result Describe why the connection failed.
-    */
-    void onConnectionFailed(in ConnectionResult result);
 }

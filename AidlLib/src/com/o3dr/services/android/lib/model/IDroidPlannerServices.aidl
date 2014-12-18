@@ -15,15 +15,6 @@ interface IDroidPlannerServices {
     boolean ping();
 
     /**
-    * TODO: left now for backward compatibility. To be removed in next version.
-    * Acquire an handle to the droidplanner api.
-    * @param appId application id for the application acquiring the drone api handle.
-    * @return IDroneApi object used to interact with the drone.
-    * @deprecated use {@link #registerDroneApi(IApiListener listener, String appId)} instead.
-    */
-    IDroneApi acquireDroneApi(String appId);
-
-    /**
     * Release the handle to the droidplanner api.
     *
     * @param callback callback used to receive drone api events.
