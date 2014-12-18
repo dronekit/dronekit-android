@@ -22,4 +22,9 @@ interface IApiListener {
     * Retrieve the version code for the connected client.
     */
     int getClientVersionCode();
+
+    /**
+    * Retrieve the version code for the api.
+    */
+    int getApiVersionCode();
 }

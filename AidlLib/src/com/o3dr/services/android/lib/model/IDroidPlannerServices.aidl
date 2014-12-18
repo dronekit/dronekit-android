@@ -15,6 +15,11 @@ interface IDroidPlannerServices {
     boolean ping();
 
     /**
+    * Retrieve the version code for the 3DR Service implementation.
+    */
+    int getServiceVersionCode();
+
+    /**
     * Release the handle to the droidplanner api.
     *
     * @param callback callback used to receive drone api events.

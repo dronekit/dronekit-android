@@ -37,6 +37,8 @@ import com.o3dr.services.android.lib.model.IDroneApi;
 import com.o3dr.services.android.lib.model.IObserver;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -46,6 +48,16 @@ public class Drone {
 
     private static final String CLAZZ_NAME = Drone.class.getName();
     private static final String TAG = Drone.class.getSimpleName();
+
+    public interface OnAttributeRetrievedCallback<T extends Parcelable> {
+        void onRetrievalSucceed(T attribute);
+
+        void onRetrievalFailed();
+    }
+
+    public interface OnMissionItemBuiltCallback<T extends MissionItem> {
+        void onMissionItemBuilt(MissionItem.ComplexItem<T> complexItem);
+    }
 
     public static final int COLLISION_SECONDS_BEFORE_COLLISION = 2;
     public static final double COLLISION_DANGEROUS_SPEED_METERS_PER_SECOND = -3.0;
@@ -63,9 +75,10 @@ public class Drone {
     private final ServiceManager serviceMgr;
     private final DroneObserver droneObserver;
     private final DroneApiListener apiListener;
-    private IDroneApi droneApi;
 
+    private IDroneApi droneApi;
     private ConnectionParameter connectionParameter;
+    private ExecutorService asyncScheduler;
 
     // flightTimer
     // ----------------
@@ -94,6 +107,9 @@ public class Drone {
             throw new IllegalStateException("Unable to retrieve a valid drone handle.");
         }
 
+        if(asyncScheduler == null || asyncScheduler.isShutdown())
+            asyncScheduler = Executors.newFixedThreadPool(1);
+
         addAttributesObserver(this.droneObserver);
         resetFlightTimer();
     }
@@ -106,6 +122,11 @@ public class Drone {
                 serviceMgr.get3drServices().releaseDroneApi(this.droneApi);
         } catch (RemoteException e) {
             Log.e(TAG, e.getMessage(), e);
+        }
+
+        if(asyncScheduler != null){
+            asyncScheduler.shutdownNow();
+            asyncScheduler = null;
         }
 
         this.droneApi = null;
@@ -177,86 +198,209 @@ public class Drone {
         return elapsedFlightTime / 1000;
     }
 
+    /**
+     * @deprecated use {@link #blockingGetAttribute(String)} instead.
+     */
+    @Deprecated
     public Gps getGps() {
-        Gps gps = getAttribute(AttributeType.GPS, Gps.class.getClassLoader());
+        Gps gps = getAttribute(AttributeType.GPS);
         return gps == null ? new Gps() : gps;
     }
 
+    /**
+     * @deprecated use {@link #blockingGetAttribute(String)} instead.
+     */
+    @Deprecated
     public State getState() {
-        State state = getAttribute(AttributeType.STATE, State.class.getClassLoader());
+        State state = getAttribute(AttributeType.STATE);
         return state == null ? new State() : state;
     }
 
-    private Bundle getAttribute(String attributeType) {
-        if (attributeType != null) {
-            if (isStarted()) {
-                try {
-                    return droneApi.getAttribute(attributeType);
-                } catch (RemoteException e) {
-                    handleRemoteException(e);
-                }
-            }
-        }
-
-        return new Bundle();
-    }
-
-    private <T extends Parcelable> T getAttribute(String type, ClassLoader classLoader) {
+    private <T extends Parcelable> T getAttribute(String type) {
         T attribute = null;
-        if (isStarted()) {
-            Bundle carrier = getAttribute(type);
+        if (type != null && isStarted()) {
+
+            Bundle carrier = null;
+            try {
+                carrier = droneApi.getAttribute(type);
+            } catch (RemoteException e) {
+                handleRemoteException(e);
+            }
+
             if (carrier != null) {
-                carrier.setClassLoader(classLoader);
-                attribute = carrier.getParcelable(type);
+                ClassLoader classLoader = getAttributeClassLoader(type);
+                if(classLoader != null) {
+                    carrier.setClassLoader(classLoader);
+                    attribute = carrier.getParcelable(type);
+                }
             }
         }
 
         return attribute;
     }
 
+    public <T extends Parcelable> T blockingGetAttribute(final String attributeType){
+        if(attributeType == null)
+            return null;
+
+        return getAttribute(attributeType);
+    }
+
+    public <T extends Parcelable> void getAttributeAsync(final String attributeType,
+                                                         final OnAttributeRetrievedCallback<T> callback){
+        if(callback == null)
+            throw new IllegalArgumentException("Callback must be non-null.");
+
+        if(!isStarted()) {
+            callback.onRetrievalFailed();
+            return;
+        }
+
+        asyncScheduler.execute(new Runnable() {
+            @Override
+            public void run() {
+                final T attribute = blockingGetAttribute(attributeType);
+
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(attribute == null)
+                            callback.onRetrievalFailed();
+                        else
+                            callback.onRetrievalSucceed(attribute);
+                    }
+                });
+            }
+        });
+    }
+
+    private ClassLoader getAttributeClassLoader(String attributeType){
+        switch(attributeType){
+            case AttributeType.ALTITUDE:
+                return Altitude.class.getClassLoader();
+
+            case AttributeType.GPS:
+                return Gps.class.getClassLoader();
+
+            case AttributeType.STATE:
+                return State.class.getClassLoader();
+
+            case AttributeType.PARAMETERS:
+                return Parameters.class.getClassLoader();
+
+            case AttributeType.SPEED:
+                return Speed.class.getClassLoader();
+
+            case AttributeType.CAMERA:
+                return CameraProxy.class.getClassLoader();
+
+            case AttributeType.ATTITUDE:
+                return Attitude.class.getClassLoader();
+
+            case AttributeType.HOME:
+                return  Home.class.getClassLoader();
+
+            case AttributeType.BATTERY:
+                return Battery.class.getClassLoader();
+
+            case AttributeType.MISSION:
+                return Mission.class.getClassLoader();
+
+            case AttributeType.SIGNAL:
+                return Signal.class.getClassLoader();
+
+            case AttributeType.GUIDED_STATE:
+                return GuidedState.class.getClassLoader();
+
+            case AttributeType.TYPE:
+                return Type.class.getClassLoader();
+
+            case AttributeType.FOLLOW_STATE:
+                return FollowState.class.getClassLoader();
+
+            default:
+                return null;
+        }
+    }
+
+    /**
+     * @deprecated use {@link #blockingGetAttribute(String)} instead.
+     */
+    @Deprecated
     public Parameters getParameters() {
-        Parameters params = getAttribute(AttributeType.PARAMETERS, Parameters.class.getClassLoader
-                ());
+        Parameters params = getAttribute(AttributeType.PARAMETERS);
         return params == null ? new Parameters() : params;
     }
 
+    /**
+     * @deprecated use {@link #blockingGetAttribute(String)} instead.
+     */
+    @Deprecated
     public Speed getSpeed() {
-        Speed speed = getAttribute(AttributeType.SPEED, Speed.class.getClassLoader());
+        Speed speed = getAttribute(AttributeType.SPEED);
         return speed == null ? new Speed() : speed;
     }
 
+    /**
+     * @deprecated use {@link #blockingGetAttribute(String)} instead.
+     */
+    @Deprecated
     public Attitude getAttitude() {
-        Attitude attitude = getAttribute(AttributeType.ATTITUDE, Attitude.class.getClassLoader());
+        Attitude attitude = getAttribute(AttributeType.ATTITUDE);
         return attitude == null ? new Attitude() : attitude;
     }
 
+    /**
+     * @deprecated use {@link #blockingGetAttribute(String)} instead.
+     */
+    @Deprecated
     public Home getHome() {
-        Home home = getAttribute(AttributeType.HOME, Home.class.getClassLoader());
+        Home home = getAttribute(AttributeType.HOME);
         return home == null ? new Home() : home;
     }
 
+    /**
+     * @deprecated use {@link #blockingGetAttribute(String)} instead.
+     */
+    @Deprecated
     public Battery getBattery() {
-        Battery battery = getAttribute(AttributeType.BATTERY, Battery.class.getClassLoader());
+        Battery battery = getAttribute(AttributeType.BATTERY);
         return battery == null ? new Battery() : battery;
     }
 
+    /**
+     * @deprecated use {@link #blockingGetAttribute(String)} instead.
+     */
+    @Deprecated
     public Altitude getAltitude() {
-        Altitude altitude = getAttribute(AttributeType.ALTITUDE, Altitude.class.getClassLoader());
+        Altitude altitude = getAttribute(AttributeType.ALTITUDE);
         return altitude == null ? new Altitude() : altitude;
     }
 
+    /**
+     * @deprecated use {@link #blockingGetAttribute(String)} instead.
+     */
+    @Deprecated
     public Mission getMission() {
-        Mission mission = getAttribute(AttributeType.MISSION, Mission.class.getClassLoader());
+        Mission mission = getAttribute(AttributeType.MISSION);
         return mission == null ? new Mission() : mission;
     }
 
+    /**
+     * @deprecated use {@link #blockingGetAttribute(String)} instead.
+     */
+    @Deprecated
     public Signal getSignal() {
-        Signal signal = getAttribute(AttributeType.SIGNAL, Signal.class.getClassLoader());
+        Signal signal = getAttribute(AttributeType.SIGNAL);
         return signal == null ? new Signal() : signal;
     }
 
+    /**
+     * @deprecated use {@link #blockingGetAttribute(String)} instead.
+     */
+    @Deprecated
     public Type getType() {
-        Type type = getAttribute(AttributeType.TYPE, Type.class.getClassLoader());
+        Type type = getAttribute(AttributeType.TYPE);
         return type == null ? new Type() : type;
     }
 
@@ -290,42 +434,85 @@ public class Drone {
         return isStarted() && getState().isConnected();
     }
 
+    /**
+     * @deprecated use {@link #blockingGetAttribute(String)} instead.
+     */
+    @Deprecated
     public GuidedState getGuidedState() {
-        GuidedState guidedState = getAttribute(AttributeType.GUIDED_STATE,
-                GuidedState.class.getClassLoader());
+        GuidedState guidedState = getAttribute(AttributeType.GUIDED_STATE);
         return guidedState == null ? new GuidedState() : guidedState;
     }
 
+    /**
+     * @deprecated use {@link #blockingGetAttribute(String)} instead.
+     */
+    @Deprecated
     public FollowState getFollowState() {
-        FollowState followState = getAttribute(AttributeType.FOLLOW_STATE,
-                FollowState.class.getClassLoader());
+        FollowState followState = getAttribute(AttributeType.FOLLOW_STATE);
         return followState == null ? new FollowState() : followState;
     }
 
+    /**
+     * @deprecated use {@link #blockingGetAttribute(String)} instead.
+     */
+    @Deprecated
     public CameraProxy getCamera() {
-        return getAttribute(AttributeType.CAMERA, CameraProxy.class.getClassLoader());
+        return getAttribute(AttributeType.CAMERA);
     }
 
     public ConnectionParameter getConnectionParameter() {
         return this.connectionParameter;
     }
 
-    public <T extends MissionItem> void buildComplexMissionItem(MissionItem.ComplexItem<T>
-                                                                        complexItem) {
+    /**
+     * @deprecated use {@link #buildMissionItemAsync(com.o3dr.services.android.lib.drone.mission.item.MissionItem.ComplexItem, com.o3dr.android.client.Drone.OnMissionItemBuiltCallback)} instead.
+     */
+    @Deprecated
+    public <T extends MissionItem> void buildComplexMissionItem(MissionItem.ComplexItem<T> complexItem) {
+        buildMissionItem(complexItem);
+    }
+
+    private <T extends MissionItem> T buildMissionItem(MissionItem.ComplexItem<T> complexItem){
         if (isStarted()) {
             try {
                 T missionItem = (T) complexItem;
                 Bundle payload = missionItem.getType().storeMissionItem(missionItem);
                 if (payload == null)
-                    return;
+                    return null;
 
                 droneApi.buildComplexMissionItem(payload);
                 T updatedItem = MissionItemType.restoreMissionItemFromBundle(payload);
                 complexItem.copy(updatedItem);
-            } catch (RemoteException e) {
+                 return (T) complexItem;
+            }
+            catch (RemoteException e) {
                 handleRemoteException(e);
             }
         }
+
+        return null;
+    }
+
+    public <T extends MissionItem> void buildMissionItemAsync(final MissionItem.ComplexItem<T> missionItem,
+                                            final OnMissionItemBuiltCallback callback){
+        if(callback == null)
+            throw new IllegalArgumentException("Callback must be non-null.");
+
+        if(missionItem == null)
+            return;
+
+        asyncScheduler.execute(new Runnable() {
+            @Override
+            public void run() {
+                buildMissionItem(missionItem);
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        callback.onMissionItemBuilt(missionItem);
+                    }
+                });
+            }
+        });
     }
 
     public void registerDroneListener(DroneListener listener) {
