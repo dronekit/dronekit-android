@@ -1,5 +1,6 @@
 package com.o3dr.android.client;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
@@ -134,22 +135,34 @@ public class Drone {
     }
 
     private void checkForGroundCollision() {
-        Speed speed = blockingGetAttribute(AttributeType.SPEED);
-        Altitude altitude = blockingGetAttribute(AttributeType.ALTITUDE);
-        if (speed == null || altitude == null)
-            return;
+        new AsyncTask<Void, Void, Boolean>(){
 
-        double verticalSpeed = speed.getVerticalSpeed();
-        double altitudeValue = altitude.getAltitude();
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                Speed speed = blockingGetAttribute(AttributeType.SPEED);
+                Altitude altitude = blockingGetAttribute(AttributeType.ALTITUDE);
+                if (speed == null || altitude == null)
+                    return null;
 
-        boolean isCollisionImminent = altitudeValue
-                + (verticalSpeed * COLLISION_SECONDS_BEFORE_COLLISION) < 0
-                && verticalSpeed < COLLISION_DANGEROUS_SPEED_METERS_PER_SECOND
-                && altitudeValue > COLLISION_SAFE_ALTITUDE_METERS;
+                double verticalSpeed = speed.getVerticalSpeed();
+                double altitudeValue = altitude.getAltitude();
 
-        Bundle extrasBundle = new Bundle(1);
-        extrasBundle.putBoolean(EXTRA_IS_GROUND_COLLISION_IMMINENT, isCollisionImminent);
-        notifyAttributeUpdated(ACTION_GROUND_COLLISION_IMMINENT, extrasBundle);
+                boolean isCollisionImminent = altitudeValue
+                        + (verticalSpeed * COLLISION_SECONDS_BEFORE_COLLISION) < 0
+                        && verticalSpeed < COLLISION_DANGEROUS_SPEED_METERS_PER_SECOND
+                        && altitudeValue > COLLISION_SAFE_ALTITUDE_METERS;
+                return isCollisionImminent;
+            }
+
+            @Override
+            protected void onPostExecute(Boolean result){
+                if(result != null){
+                    Bundle extrasBundle = new Bundle(1);
+                    extrasBundle.putBoolean(EXTRA_IS_GROUND_COLLISION_IMMINENT, result);
+                    notifyAttributeUpdated(ACTION_GROUND_COLLISION_IMMINENT, extrasBundle);
+                }
+            }
+        }.execute();
     }
 
     private void handleRemoteException(RemoteException e) {
@@ -600,8 +613,17 @@ public class Drone {
     }
 
     public void pauseAtCurrentLocation() {
-        Gps gps = blockingGetAttribute(AttributeType.GPS);
-        sendGuidedPoint(gps.getPosition(), true);
+        getAttributeAsync(AttributeType.GPS, new OnAttributeRetrievedCallback<Gps>() {
+            @Override
+            public void onRetrievalSucceed(Gps gps) {
+                sendGuidedPoint(gps.getPosition(), true);
+            }
+
+            @Override
+            public void onRetrievalFailed() {
+
+            }
+        });
     }
 
     public void sendGuidedPoint(LatLong point, boolean force) {
@@ -721,11 +743,20 @@ public class Drone {
 
     void notifyAttributeUpdated(final String attributeEvent, final Bundle extras) {
         if (AttributeEvent.STATE_UPDATED.equals(attributeEvent)) {
-            State droneState = blockingGetAttribute(AttributeType.STATE);
-            if (droneState.isFlying())
-                startTimer();
-            else
-                stopTimer();
+            getAttributeAsync(AttributeType.STATE, new OnAttributeRetrievedCallback<State>() {
+                @Override
+                public void onRetrievalSucceed(State state) {
+                    if (state.isFlying())
+                        startTimer();
+                    else
+                        stopTimer();
+                }
+
+                @Override
+                public void onRetrievalFailed() {
+                    stopTimer();
+                }
+            });
         } else if (AttributeEvent.SPEED_UPDATED.equals(attributeEvent)) {
             checkForGroundCollision();
         }
