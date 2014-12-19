@@ -56,6 +56,15 @@ public class Drone {
         void onRetrievalFailed();
     }
 
+    public static class AttributeRetrievedListener<T extends Parcelable> implements OnAttributeRetrievedCallback<T> {
+
+        @Override
+        public void onRetrievalSucceed(T attribute) {}
+
+        @Override
+        public void onRetrievalFailed() {}
+    }
+
     public interface OnMissionItemsBuiltCallback<T extends MissionItem> {
         void onMissionItemsBuilt(MissionItem.ComplexItem<T>[] complexItems);
     }
@@ -613,15 +622,10 @@ public class Drone {
     }
 
     public void pauseAtCurrentLocation() {
-        getAttributeAsync(AttributeType.GPS, new OnAttributeRetrievedCallback<Gps>() {
+        getAttributeAsync(AttributeType.GPS, new AttributeRetrievedListener<Gps>() {
             @Override
             public void onRetrievalSucceed(Gps gps) {
                 sendGuidedPoint(gps.getPosition(), true);
-            }
-
-            @Override
-            public void onRetrievalFailed() {
-
             }
         });
     }
