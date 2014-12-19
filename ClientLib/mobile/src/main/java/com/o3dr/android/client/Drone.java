@@ -55,8 +55,8 @@ public class Drone {
         void onRetrievalFailed();
     }
 
-    public interface OnMissionItemBuiltCallback<T extends MissionItem> {
-        void onMissionItemBuilt(MissionItem.ComplexItem<T> complexItem);
+    public interface OnMissionItemsBuiltCallback<T extends MissionItem> {
+        void onMissionItemsBuilt(MissionItem.ComplexItem<T>[] complexItems);
     }
 
     public static final int COLLISION_SECONDS_BEFORE_COLLISION = 2;
@@ -134,8 +134,8 @@ public class Drone {
     }
 
     private void checkForGroundCollision() {
-        Speed speed = getSpeed();
-        Altitude altitude = getAltitude();
+        Speed speed = blockingGetAttribute(AttributeType.SPEED);
+        Altitude altitude = blockingGetAttribute(AttributeType.ALTITUDE);
         if (speed == null || altitude == null)
             return;
 
@@ -159,7 +159,7 @@ public class Drone {
     }
 
     public double getSpeedParameter() {
-        Parameters params = getParameters();
+        Parameters params = blockingGetAttribute(AttributeType.PARAMETERS);
         if (params != null) {
             Parameter speedParam = params.getParameter("WPNAV_SPEED");
             if (speedParam != null)
@@ -189,31 +189,13 @@ public class Drone {
     }
 
     public long getFlightTime() {
-        State droneState = getState();
+        State droneState = blockingGetAttribute(AttributeType.STATE);
         if (droneState != null && droneState.isFlying()) {
             // calc delta time since last checked
             elapsedFlightTime += SystemClock.elapsedRealtime() - startTime;
             startTime = SystemClock.elapsedRealtime();
         }
         return elapsedFlightTime / 1000;
-    }
-
-    /**
-     * @deprecated use {@link #blockingGetAttribute(String)} instead.
-     */
-    @Deprecated
-    public Gps getGps() {
-        Gps gps = getAttribute(AttributeType.GPS);
-        return gps == null ? new Gps() : gps;
-    }
-
-    /**
-     * @deprecated use {@link #blockingGetAttribute(String)} instead.
-     */
-    @Deprecated
-    public State getState() {
-        State state = getAttribute(AttributeType.STATE);
-        return state == null ? new State() : state;
     }
 
     private <T extends Parcelable> T getAttribute(String type) {
@@ -243,7 +225,8 @@ public class Drone {
         if(attributeType == null)
             return null;
 
-        return getAttribute(attributeType);
+        T attribute = getAttribute(attributeType);
+        return attribute == null ? this.<T>getAttributeDefaultValue(attributeType) : attribute;
     }
 
     public <T extends Parcelable> void getAttributeAsync(final String attributeType,
@@ -272,6 +255,53 @@ public class Drone {
                 });
             }
         });
+    }
+
+    private <T extends Parcelable> T getAttributeDefaultValue(String attributeType){
+        switch(attributeType){
+            case AttributeType.ALTITUDE:
+                return (T) new Altitude();
+
+            case AttributeType.GPS:
+                return (T) new Gps();
+
+            case AttributeType.STATE:
+                return (T) new State();
+
+            case AttributeType.PARAMETERS:
+                return (T) new Parameters();
+
+            case AttributeType.SPEED:
+                return (T) new Speed();
+
+            case AttributeType.ATTITUDE:
+                return (T) new Attitude();
+
+            case AttributeType.HOME:
+                return  (T) new Home();
+
+            case AttributeType.BATTERY:
+                return (T) new Battery();
+
+            case AttributeType.MISSION:
+                return (T) new Mission();
+
+            case AttributeType.SIGNAL:
+                return (T) new Signal();
+
+            case AttributeType.GUIDED_STATE:
+                return (T) new GuidedState();
+
+            case AttributeType.TYPE:
+                return (T) new Type();
+
+            case AttributeType.FOLLOW_STATE:
+                return (T) new FollowState();
+
+            case AttributeType.CAMERA:
+            default:
+                return null;
+        }
     }
 
     private ClassLoader getAttributeClassLoader(String attributeType){
@@ -323,87 +353,6 @@ public class Drone {
         }
     }
 
-    /**
-     * @deprecated use {@link #blockingGetAttribute(String)} instead.
-     */
-    @Deprecated
-    public Parameters getParameters() {
-        Parameters params = getAttribute(AttributeType.PARAMETERS);
-        return params == null ? new Parameters() : params;
-    }
-
-    /**
-     * @deprecated use {@link #blockingGetAttribute(String)} instead.
-     */
-    @Deprecated
-    public Speed getSpeed() {
-        Speed speed = getAttribute(AttributeType.SPEED);
-        return speed == null ? new Speed() : speed;
-    }
-
-    /**
-     * @deprecated use {@link #blockingGetAttribute(String)} instead.
-     */
-    @Deprecated
-    public Attitude getAttitude() {
-        Attitude attitude = getAttribute(AttributeType.ATTITUDE);
-        return attitude == null ? new Attitude() : attitude;
-    }
-
-    /**
-     * @deprecated use {@link #blockingGetAttribute(String)} instead.
-     */
-    @Deprecated
-    public Home getHome() {
-        Home home = getAttribute(AttributeType.HOME);
-        return home == null ? new Home() : home;
-    }
-
-    /**
-     * @deprecated use {@link #blockingGetAttribute(String)} instead.
-     */
-    @Deprecated
-    public Battery getBattery() {
-        Battery battery = getAttribute(AttributeType.BATTERY);
-        return battery == null ? new Battery() : battery;
-    }
-
-    /**
-     * @deprecated use {@link #blockingGetAttribute(String)} instead.
-     */
-    @Deprecated
-    public Altitude getAltitude() {
-        Altitude altitude = getAttribute(AttributeType.ALTITUDE);
-        return altitude == null ? new Altitude() : altitude;
-    }
-
-    /**
-     * @deprecated use {@link #blockingGetAttribute(String)} instead.
-     */
-    @Deprecated
-    public Mission getMission() {
-        Mission mission = getAttribute(AttributeType.MISSION);
-        return mission == null ? new Mission() : mission;
-    }
-
-    /**
-     * @deprecated use {@link #blockingGetAttribute(String)} instead.
-     */
-    @Deprecated
-    public Signal getSignal() {
-        Signal signal = getAttribute(AttributeType.SIGNAL);
-        return signal == null ? new Signal() : signal;
-    }
-
-    /**
-     * @deprecated use {@link #blockingGetAttribute(String)} instead.
-     */
-    @Deprecated
-    public Type getType() {
-        Type type = getAttribute(AttributeType.TYPE);
-        return type == null ? new Type() : type;
-    }
-
     public void connect(final ConnectionParameter connParams) {
         if (isStarted()) {
             try {
@@ -431,45 +380,12 @@ public class Drone {
     }
 
     public boolean isConnected() {
-        return isStarted() && getState().isConnected();
-    }
-
-    /**
-     * @deprecated use {@link #blockingGetAttribute(String)} instead.
-     */
-    @Deprecated
-    public GuidedState getGuidedState() {
-        GuidedState guidedState = getAttribute(AttributeType.GUIDED_STATE);
-        return guidedState == null ? new GuidedState() : guidedState;
-    }
-
-    /**
-     * @deprecated use {@link #blockingGetAttribute(String)} instead.
-     */
-    @Deprecated
-    public FollowState getFollowState() {
-        FollowState followState = getAttribute(AttributeType.FOLLOW_STATE);
-        return followState == null ? new FollowState() : followState;
-    }
-
-    /**
-     * @deprecated use {@link #blockingGetAttribute(String)} instead.
-     */
-    @Deprecated
-    public CameraProxy getCamera() {
-        return getAttribute(AttributeType.CAMERA);
+        State droneState = blockingGetAttribute(AttributeType.STATE);
+        return isStarted() && droneState.isConnected();
     }
 
     public ConnectionParameter getConnectionParameter() {
         return this.connectionParameter;
-    }
-
-    /**
-     * @deprecated use {@link #buildMissionItemAsync(com.o3dr.services.android.lib.drone.mission.item.MissionItem.ComplexItem, com.o3dr.android.client.Drone.OnMissionItemBuiltCallback)} instead.
-     */
-    @Deprecated
-    public <T extends MissionItem> void buildComplexMissionItem(MissionItem.ComplexItem<T> complexItem) {
-        buildMissionItem(complexItem);
     }
 
     private <T extends MissionItem> T buildMissionItem(MissionItem.ComplexItem<T> complexItem){
@@ -493,22 +409,24 @@ public class Drone {
         return null;
     }
 
-    public <T extends MissionItem> void buildMissionItemAsync(final MissionItem.ComplexItem<T> missionItem,
-                                            final OnMissionItemBuiltCallback callback){
+    public <T extends MissionItem> void buildMissionItemsAsync(final OnMissionItemsBuiltCallback<T> callback,
+                                                               final MissionItem.ComplexItem<T>... missionItems){
         if(callback == null)
             throw new IllegalArgumentException("Callback must be non-null.");
 
-        if(missionItem == null)
+        if(missionItems == null || missionItems.length == 0)
             return;
 
         asyncScheduler.execute(new Runnable() {
             @Override
             public void run() {
-                buildMissionItem(missionItem);
+                for(MissionItem.ComplexItem<T> missionItem : missionItems)
+                    buildMissionItem(missionItem);
+
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        callback.onMissionItemBuilt(missionItem);
+                        callback.onMissionItemsBuilt(missionItems);
                     }
                 });
             }
@@ -682,7 +600,8 @@ public class Drone {
     }
 
     public void pauseAtCurrentLocation() {
-        sendGuidedPoint(getGps().getPosition(), true);
+        Gps gps = blockingGetAttribute(AttributeType.GPS);
+        sendGuidedPoint(gps.getPosition(), true);
     }
 
     public void sendGuidedPoint(LatLong point, boolean force) {
@@ -802,7 +721,8 @@ public class Drone {
 
     void notifyAttributeUpdated(final String attributeEvent, final Bundle extras) {
         if (AttributeEvent.STATE_UPDATED.equals(attributeEvent)) {
-            if (getState().isFlying())
+            State droneState = blockingGetAttribute(AttributeType.STATE);
+            if (droneState.isFlying())
                 startTimer();
             else
                 stopTimer();
