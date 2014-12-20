@@ -118,7 +118,7 @@ public class Drone {
         }
 
         if(asyncScheduler == null || asyncScheduler.isShutdown())
-            asyncScheduler = Executors.newFixedThreadPool(1);
+            asyncScheduler = Executors.newFixedThreadPool(2);
 
         addAttributesObserver(this.droneObserver);
         resetFlightTimer();

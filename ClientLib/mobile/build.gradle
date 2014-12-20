@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 
 ext {
     PUBLISH_ARTIFACT_ID = '3dr-services-lib'
-    PUBLISH_VERSION = '2.1.20'
+    PUBLISH_VERSION = '2.1.21'
     PROJECT_DESCRIPTION = "3DR Services client library"
     PROJECT_LABELS = ['3DR', '3DR Services', 'DroneAPI', 'Android']
     PROJECT_LICENSES = ['Apache-2.0']
@@ -15,7 +15,7 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 21
-        versionCode 20120
+        versionCode 20121
         versionName PUBLISH_VERSION
     }
 
