@@ -1,6 +1,5 @@
 package com.o3dr.android.client;
 
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
@@ -59,10 +58,12 @@ public class Drone {
     public static class AttributeRetrievedListener<T extends Parcelable> implements OnAttributeRetrievedCallback<T> {
 
         @Override
-        public void onRetrievalSucceed(T attribute) {}
+        public void onRetrievalSucceed(T attribute) {
+        }
 
         @Override
-        public void onRetrievalFailed() {}
+        public void onRetrievalFailed() {
+        }
     }
 
     public interface OnMissionItemsBuiltCallback<T extends MissionItem> {
@@ -73,13 +74,10 @@ public class Drone {
     public static final double COLLISION_DANGEROUS_SPEED_METERS_PER_SECOND = -3.0;
     public static final double COLLISION_SAFE_ALTITUDE_METERS = 1.0;
 
-    public static final String ACTION_GROUND_COLLISION_IMMINENT = CLAZZ_NAME +
-            ".ACTION_GROUND_COLLISION_IMMINENT";
-    public static final String EXTRA_IS_GROUND_COLLISION_IMMINENT =
-            "extra_is_ground_collision_imminent";
+    public static final String ACTION_GROUND_COLLISION_IMMINENT = CLAZZ_NAME + ".ACTION_GROUND_COLLISION_IMMINENT";
+    public static final String EXTRA_IS_GROUND_COLLISION_IMMINENT = "extra_is_ground_collision_imminent";
 
-    private final ConcurrentLinkedQueue<DroneListener> droneListeners = new
-            ConcurrentLinkedQueue<DroneListener>();
+    private final ConcurrentLinkedQueue<DroneListener> droneListeners = new ConcurrentLinkedQueue<>();
 
     private final Handler handler;
     private final ServiceManager serviceMgr;
@@ -111,14 +109,13 @@ public class Drone {
             return;
 
         try {
-            this.droneApi = serviceMgr.get3drServices().registerDroneApi(this.apiListener,
-                    serviceMgr.getApplicationId());
+            this.droneApi = serviceMgr.get3drServices().registerDroneApi(this.apiListener, serviceMgr.getApplicationId());
         } catch (RemoteException e) {
             throw new IllegalStateException("Unable to retrieve a valid drone handle.");
         }
 
-        if(asyncScheduler == null || asyncScheduler.isShutdown())
-            asyncScheduler = Executors.newFixedThreadPool(2);
+        if (asyncScheduler == null || asyncScheduler.isShutdown())
+            asyncScheduler = Executors.newFixedThreadPool(1);
 
         addAttributesObserver(this.droneObserver);
         resetFlightTimer();
@@ -134,7 +131,7 @@ public class Drone {
             Log.e(TAG, e.getMessage(), e);
         }
 
-        if(asyncScheduler != null){
+        if (asyncScheduler != null) {
             asyncScheduler.shutdownNow();
             asyncScheduler = null;
         }
@@ -144,34 +141,22 @@ public class Drone {
     }
 
     private void checkForGroundCollision() {
-        new AsyncTask<Void, Void, Boolean>(){
+        Speed speed = getAttribute(AttributeType.SPEED);
+        Altitude altitude = getAttribute(AttributeType.ALTITUDE);
+        if (speed == null || altitude == null)
+            return;
 
-            @Override
-            protected Boolean doInBackground(Void... params) {
-                Speed speed = blockingGetAttribute(AttributeType.SPEED);
-                Altitude altitude = blockingGetAttribute(AttributeType.ALTITUDE);
-                if (speed == null || altitude == null)
-                    return null;
+        double verticalSpeed = speed.getVerticalSpeed();
+        double altitudeValue = altitude.getAltitude();
 
-                double verticalSpeed = speed.getVerticalSpeed();
-                double altitudeValue = altitude.getAltitude();
+        boolean isCollisionImminent = altitudeValue
+                + (verticalSpeed * COLLISION_SECONDS_BEFORE_COLLISION) < 0
+                && verticalSpeed < COLLISION_DANGEROUS_SPEED_METERS_PER_SECOND
+                && altitudeValue > COLLISION_SAFE_ALTITUDE_METERS;
 
-                boolean isCollisionImminent = altitudeValue
-                        + (verticalSpeed * COLLISION_SECONDS_BEFORE_COLLISION) < 0
-                        && verticalSpeed < COLLISION_DANGEROUS_SPEED_METERS_PER_SECOND
-                        && altitudeValue > COLLISION_SAFE_ALTITUDE_METERS;
-                return isCollisionImminent;
-            }
-
-            @Override
-            protected void onPostExecute(Boolean result){
-                if(result != null){
-                    Bundle extrasBundle = new Bundle(1);
-                    extrasBundle.putBoolean(EXTRA_IS_GROUND_COLLISION_IMMINENT, result);
-                    notifyAttributeUpdated(ACTION_GROUND_COLLISION_IMMINENT, extrasBundle);
-                }
-            }
-        }.execute();
+        Bundle extrasBundle = new Bundle(1);
+        extrasBundle.putBoolean(EXTRA_IS_GROUND_COLLISION_IMMINENT, isCollisionImminent);
+        notifyAttributeUpdated(ACTION_GROUND_COLLISION_IMMINENT, extrasBundle);
     }
 
     private void handleRemoteException(RemoteException e) {
@@ -181,7 +166,7 @@ public class Drone {
     }
 
     public double getSpeedParameter() {
-        Parameters params = blockingGetAttribute(AttributeType.PARAMETERS);
+        Parameters params = getAttribute(AttributeType.PARAMETERS);
         if (params != null) {
             Parameter speedParam = params.getParameter("WPNAV_SPEED");
             if (speedParam != null)
@@ -211,7 +196,7 @@ public class Drone {
     }
 
     public long getFlightTime() {
-        State droneState = blockingGetAttribute(AttributeType.STATE);
+        State droneState = getAttribute(AttributeType.STATE);
         if (droneState != null && droneState.isFlying()) {
             // calc delta time since last checked
             elapsedFlightTime += SystemClock.elapsedRealtime() - startTime;
@@ -220,43 +205,35 @@ public class Drone {
         return elapsedFlightTime / 1000;
     }
 
-    private <T extends Parcelable> T getAttribute(String type) {
+    public <T extends Parcelable> T getAttribute(String type) {
+        if (!isStarted() || type == null)
+            return null;
+
         T attribute = null;
-        if (type != null && isStarted()) {
+        Bundle carrier = null;
+        try {
+            carrier = droneApi.getAttribute(type);
+        } catch (RemoteException e) {
+            handleRemoteException(e);
+        }
 
-            Bundle carrier = null;
-            try {
-                carrier = droneApi.getAttribute(type);
-            } catch (RemoteException e) {
-                handleRemoteException(e);
-            }
-
-            if (carrier != null) {
-                ClassLoader classLoader = getAttributeClassLoader(type);
-                if(classLoader != null) {
-                    carrier.setClassLoader(classLoader);
-                    attribute = carrier.getParcelable(type);
-                }
+        if (carrier != null) {
+            ClassLoader classLoader = getAttributeClassLoader(type);
+            if (classLoader != null) {
+                carrier.setClassLoader(classLoader);
+                attribute = carrier.getParcelable(type);
             }
         }
 
-        return attribute;
-    }
-
-    public <T extends Parcelable> T blockingGetAttribute(final String attributeType){
-        if(attributeType == null)
-            return null;
-
-        T attribute = getAttribute(attributeType);
-        return attribute == null ? this.<T>getAttributeDefaultValue(attributeType) : attribute;
+        return attribute == null ? this.<T>getAttributeDefaultValue(type) : attribute;
     }
 
     public <T extends Parcelable> void getAttributeAsync(final String attributeType,
-                                                         final OnAttributeRetrievedCallback<T> callback){
-        if(callback == null)
+                                                         final OnAttributeRetrievedCallback<T> callback) {
+        if (callback == null)
             throw new IllegalArgumentException("Callback must be non-null.");
 
-        if(!isStarted()) {
+        if (!isStarted()) {
             callback.onRetrievalFailed();
             return;
         }
@@ -264,12 +241,12 @@ public class Drone {
         asyncScheduler.execute(new Runnable() {
             @Override
             public void run() {
-                final T attribute = blockingGetAttribute(attributeType);
+                final T attribute = getAttribute(attributeType);
 
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        if(attribute == null)
+                        if (attribute == null)
                             callback.onRetrievalFailed();
                         else
                             callback.onRetrievalSucceed(attribute);
@@ -279,8 +256,8 @@ public class Drone {
         });
     }
 
-    private <T extends Parcelable> T getAttributeDefaultValue(String attributeType){
-        switch(attributeType){
+    private <T extends Parcelable> T getAttributeDefaultValue(String attributeType) {
+        switch (attributeType) {
             case AttributeType.ALTITUDE:
                 return (T) new Altitude();
 
@@ -300,7 +277,7 @@ public class Drone {
                 return (T) new Attitude();
 
             case AttributeType.HOME:
-                return  (T) new Home();
+                return (T) new Home();
 
             case AttributeType.BATTERY:
                 return (T) new Battery();
@@ -326,8 +303,8 @@ public class Drone {
         }
     }
 
-    private ClassLoader getAttributeClassLoader(String attributeType){
-        switch(attributeType){
+    private ClassLoader getAttributeClassLoader(String attributeType) {
+        switch (attributeType) {
             case AttributeType.ALTITUDE:
                 return Altitude.class.getClassLoader();
 
@@ -350,7 +327,7 @@ public class Drone {
                 return Attitude.class.getClassLoader();
 
             case AttributeType.HOME:
-                return  Home.class.getClassLoader();
+                return Home.class.getClassLoader();
 
             case AttributeType.BATTERY:
                 return Battery.class.getClassLoader();
@@ -402,7 +379,7 @@ public class Drone {
     }
 
     public boolean isConnected() {
-        State droneState = blockingGetAttribute(AttributeType.STATE);
+        State droneState = getAttribute(AttributeType.STATE);
         return isStarted() && droneState.isConnected();
     }
 
@@ -410,7 +387,7 @@ public class Drone {
         return this.connectionParameter;
     }
 
-    private <T extends MissionItem> T buildMissionItem(MissionItem.ComplexItem<T> complexItem){
+    private <T extends MissionItem> T buildMissionItem(MissionItem.ComplexItem<T> complexItem) {
         if (isStarted()) {
             try {
                 T missionItem = (T) complexItem;
@@ -421,9 +398,8 @@ public class Drone {
                 droneApi.buildComplexMissionItem(payload);
                 T updatedItem = MissionItemType.restoreMissionItemFromBundle(payload);
                 complexItem.copy(updatedItem);
-                 return (T) complexItem;
-            }
-            catch (RemoteException e) {
+                return (T) complexItem;
+            } catch (RemoteException e) {
                 handleRemoteException(e);
             }
         }
@@ -432,17 +408,17 @@ public class Drone {
     }
 
     public <T extends MissionItem> void buildMissionItemsAsync(final OnMissionItemsBuiltCallback<T> callback,
-                                                               final MissionItem.ComplexItem<T>... missionItems){
-        if(callback == null)
+                                                               final MissionItem.ComplexItem<T>... missionItems) {
+        if (callback == null)
             throw new IllegalArgumentException("Callback must be non-null.");
 
-        if(missionItems == null || missionItems.length == 0)
+        if (missionItems == null || missionItems.length == 0)
             return;
 
         asyncScheduler.execute(new Runnable() {
             @Override
             public void run() {
-                for(MissionItem.ComplexItem<T> missionItem : missionItems)
+                for (MissionItem.ComplexItem<T> missionItem : missionItems)
                     buildMissionItem(missionItem);
 
                 handler.post(new Runnable() {
