@@ -19,7 +19,7 @@ import com.o3dr.services.android.lib.model.IDroidPlannerServices;
 /**
  * Created by fhuya on 11/12/14.
  */
-public class ServiceManager {
+public class ServiceManager implements IBinder.DeathRecipient {
 
     private static final String TAG = ServiceManager.class.getSimpleName();
 
@@ -39,6 +39,7 @@ public class ServiceManager {
                     context.unbindService(o3drServicesConnection);
                 }
                 else {
+                    o3drServices.asBinder().linkToDeath(ServiceManager.this, 0);
                     notifyServiceConnected();
                 }
             } catch (RemoteException e) {
@@ -65,11 +66,7 @@ public class ServiceManager {
     }
 
     public boolean isServiceConnected() {
-        try {
-            return o3drServices != null && o3drServices.ping();
-        } catch (RemoteException e) {
-            return false;
-        }
+        return o3drServices != null && o3drServices.asBinder().pingBinder();
     }
 
     public void notifyServiceConnected() {
@@ -103,8 +100,13 @@ public class ServiceManager {
     }
 
     public void disconnect() {
+        if(o3drServices != null){
+            o3drServices.asBinder().unlinkToDeath(this, 0);
+            o3drServices = null;
+        }
+
         serviceListener = null;
-        o3drServices = null;
+
         try {
             context.unbindService(o3drServicesConnection);
         } catch (Exception e) {
@@ -131,5 +133,10 @@ public class ServiceManager {
 
     private void promptFor3DRServicesUpdate(){
         context.startActivity(new Intent(context, UpdateServiceDialog.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+    }
+
+    @Override
+    public void binderDied() {
+        notifyServiceInterrupted();
     }
 }

@@ -7,12 +7,17 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 21
-        versionCode 200018
-        versionName '2.0.18'
+        versionCode 200020
+        versionName '2.0.20'
     }
 
     defaultPublishConfig "release"
     publishNonDefault false
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
 
     sourceSets {
         main {

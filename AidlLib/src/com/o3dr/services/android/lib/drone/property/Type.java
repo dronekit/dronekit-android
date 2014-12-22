@@ -29,7 +29,7 @@ public class Type implements Parcelable {
         }
     }
 
-    private int droneType;
+    private int droneType = TYPE_UNKNOWN;
     private String firmwareVersion;
     private Firmware firmware;
 
