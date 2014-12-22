@@ -2,6 +2,7 @@ package com.o3dr.android.client;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Parcelable;
 import android.os.RemoteException;
 import android.os.SystemClock;
@@ -44,7 +45,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Created by fhuya on 11/4/14.
  */
-public class Drone {
+public class Drone implements IBinder.DeathRecipient {
 
     private static final String CLAZZ_NAME = Drone.class.getName();
     private static final String TAG = Drone.class.getSimpleName();
@@ -110,6 +111,7 @@ public class Drone {
 
         try {
             this.droneApi = serviceMgr.get3drServices().registerDroneApi(this.apiListener, serviceMgr.getApplicationId());
+            this.droneApi.asBinder().linkToDeath(this, 0);
         } catch (RemoteException e) {
             throw new IllegalStateException("Unable to retrieve a valid drone handle.");
         }
@@ -125,8 +127,10 @@ public class Drone {
         removeAttributesObserver(this.droneObserver);
 
         try {
-            if (isStarted() && serviceMgr.isServiceConnected())
+            if (isStarted()) {
+                this.droneApi.asBinder().unlinkToDeath(this, 0);
                 serviceMgr.get3drServices().releaseDroneApi(this.droneApi);
+            }
         } catch (RemoteException e) {
             Log.e(TAG, e.getMessage(), e);
         }
@@ -160,9 +164,16 @@ public class Drone {
     }
 
     private void handleRemoteException(RemoteException e) {
-        final String errorMsg = e.getMessage();
-        Log.e(TAG, errorMsg, e);
-        notifyDroneServiceInterrupted(errorMsg);
+        if(droneApi != null && !droneApi.asBinder().pingBinder()) {
+            final String errorMsg = e.getMessage();
+            Log.e(TAG, errorMsg, e);
+            notifyDroneServiceInterrupted(errorMsg);
+        }
+    }
+
+    @Override
+    public void binderDied() {
+        notifyDroneServiceInterrupted("Lost access to the drone api.");
     }
 
     public double getSpeedParameter() {
@@ -375,7 +386,7 @@ public class Drone {
     }
 
     public boolean isStarted() {
-        return droneApi != null;
+        return droneApi != null && droneApi.asBinder().pingBinder();
     }
 
     public boolean isConnected() {

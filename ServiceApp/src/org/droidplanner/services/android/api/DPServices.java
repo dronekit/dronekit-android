@@ -33,11 +33,6 @@ final class DPServices extends IDroidPlannerServices.Stub {
     }
 
     @Override
-    public boolean ping() throws RemoteException {
-        return true;
-    }
-
-    @Override
     public int getServiceVersionCode() throws RemoteException {
         return BuildConfig.VERSION_CODE;
     }

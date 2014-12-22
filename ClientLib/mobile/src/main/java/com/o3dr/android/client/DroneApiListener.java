@@ -17,11 +17,6 @@ public class DroneApiListener extends IApiListener.Stub {
     }
 
     @Override
-    public boolean ping() throws RemoteException {
-        return true;
-    }
-
-    @Override
     public void onConnectionFailed(ConnectionResult connectionResult) throws RemoteException {
         drone.notifyDroneConnectionFailed(connectionResult);
     }

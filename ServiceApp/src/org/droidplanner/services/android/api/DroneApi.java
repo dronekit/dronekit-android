@@ -3,6 +3,7 @@ package org.droidplanner.services.android.api;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.RemoteException;
 import android.text.TextUtils;
 import android.util.Log;
@@ -86,26 +87,12 @@ import ellipsoidFit.ThreeSpacePoint;
 /**
  * Created by fhuya on 10/30/14.
  */
-public final class DroneApi extends IDroneApi.Stub implements DroneEventsListener {
+public final class DroneApi extends IDroneApi.Stub implements DroneEventsListener, IBinder.DeathRecipient {
 
     private final static String TAG = DroneApi.class.getSimpleName();
 
-    private final static long CONNECTION_CHECK_PERIOD = 30000l; //ms
-
-    /**
-     * Used to check if the client is still connected.
-     */
-    private final Runnable clientConnectionChecker = new Runnable() {
-        @Override
-        public void run() {
-            checkForSelfRelease();
-            handler.postDelayed(this, CONNECTION_CHECK_PERIOD);
-        }
-    };
-
     private final WeakReference<DroidPlannerService> serviceRef;
     private final Context context;
-    private final Handler handler;
 
     private final ConcurrentLinkedQueue<IObserver> observersList;
     private final ConcurrentLinkedQueue<IMavlinkObserver> mavlinkObserversList;
@@ -118,8 +105,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     DroneApi(DroidPlannerService dpService, Handler handler, MavLinkServiceApi mavlinkApi, IApiListener listener,
              String ownerId) {
         this.context = dpService.getApplicationContext();
-        this.handler = handler;
-        this.apiListener = listener;
+
         this.ownerId = ownerId;
 
         serviceRef = new WeakReference<DroidPlannerService>(dpService);
@@ -129,11 +115,18 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
         this.droneMgr = new DroneManager(context, handler, mavlinkApi);
         this.droneMgr.setDroneEventsListener(this);
 
-        this.handler.post(clientConnectionChecker);
+        this.apiListener = listener;
+        try {
+            this.apiListener.asBinder().linkToDeath(this, 0);
+            checkForSelfRelease();
+        } catch (RemoteException e) {
+            Log.e(TAG, e.getMessage(), e);
+            dpService.releaseDroneApi(this);
+        }
     }
 
     void destroy() {
-        this.handler.removeCallbacks(clientConnectionChecker);
+        this.apiListener.asBinder().unlinkToDeath(this, 0);
         this.droneMgr.setDroneEventsListener(null);
         this.droneMgr.destroy();
 
@@ -825,16 +818,10 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
     private void checkForSelfRelease() {
         //Check if the apiListener is still connected instead.
-        if (apiListener != null) {
-            try {
-                apiListener.ping();
-                return;
-            } catch (RemoteException e) {
-                Log.w(TAG, "Client is not longer available.", e);
-            }
+        if(!apiListener.asBinder().pingBinder()){
+            Log.w(TAG, "Client is not longer available.");
+            getService().releaseDroneApi(this);
         }
-
-        getService().releaseDroneApi(this);
     }
 
     @Override
@@ -888,13 +875,11 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
     private void notifyConnectionFailed(ConnectionResult result) {
         if (result != null) {
-            if (apiListener != null) {
-                try {
-                    apiListener.onConnectionFailed(result);
-                    return;
-                } catch (RemoteException e) {
-                    Log.w(TAG, "Unable to forward connection fail to client.", e);
-                }
+            try {
+                apiListener.onConnectionFailed(result);
+                return;
+            } catch (RemoteException e) {
+                Log.w(TAG, "Unable to forward connection fail to client.", e);
             }
             checkForSelfRelease();
         }
@@ -1238,5 +1223,10 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     @Override
     public void onConnectionFailed(String error) {
         notifyConnectionFailed(new ConnectionResult(0, error));
+    }
+
+    @Override
+    public void binderDied() {
+        checkForSelfRelease();
     }
 }

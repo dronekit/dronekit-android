@@ -10,11 +10,6 @@ import com.o3dr.services.android.lib.model.IApiListener;
 interface IDroidPlannerServices {
 
     /**
-    * Ping the 3DR Services to make sure it's still up and connected.
-    */
-    boolean ping();
-
-    /**
     * Retrieve the version code for the 3DR Service implementation.
     */
     int getServiceVersionCode();

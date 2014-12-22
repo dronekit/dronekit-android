@@ -8,9 +8,9 @@ import com.o3dr.services.android.lib.drone.connection.ConnectionResult;
 interface IApiListener {
 
     /**
-    * Ping the api listener to make sure it's still up and connected.
+    * Retrieve the version code for the api.
     */
-    boolean ping();
+    int getApiVersionCode();
 
     /**
     * Called when the connection attempt fails.
@@ -22,9 +22,4 @@ interface IApiListener {
     * Retrieve the version code for the connected client.
     */
     int getClientVersionCode();
-
-    /**
-    * Retrieve the version code for the api.
-    */
-    int getApiVersionCode();
 }
