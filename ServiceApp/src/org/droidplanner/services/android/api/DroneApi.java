@@ -126,13 +126,13 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     }
 
     void destroy() {
-        this.apiListener.asBinder().unlinkToDeath(this, 0);
-        this.droneMgr.setDroneEventsListener(null);
-        this.droneMgr.destroy();
-
         this.serviceRef.clear();
         this.observersList.clear();
         this.mavlinkObserversList.clear();
+
+        this.apiListener.asBinder().unlinkToDeath(this, 0);
+        this.droneMgr.setDroneEventsListener(null);
+        this.droneMgr.destroy();
     }
 
     public String getOwnerId() {
