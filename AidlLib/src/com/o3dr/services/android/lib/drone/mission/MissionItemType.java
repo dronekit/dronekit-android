@@ -209,6 +209,11 @@ public enum MissionItemType {
         return this.label;
     }
 
+    @Override
+    public String toString(){
+        return getLabel();
+    }
+
     public abstract MissionItem getNewItem();
 
     public final Bundle storeMissionItem(MissionItem item){

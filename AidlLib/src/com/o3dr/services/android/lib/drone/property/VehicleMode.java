@@ -75,6 +75,11 @@ public enum VehicleMode implements Parcelable {
     }
 
     @Override
+    public String toString(){
+        return getLabel();
+    }
+
+    @Override
     public int describeContents(){
         return 0;
     }
