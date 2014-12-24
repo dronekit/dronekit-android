@@ -1,0 +1,16 @@
+com.o3dr.android.client
+com.o3dr.android.client.interfaces
+com.o3dr.android.client.utils
+com.o3dr.services.android.lib.coordinate
+com.o3dr.services.android.lib.drone.attribute
+com.o3dr.services.android.lib.drone.connection
+com.o3dr.services.android.lib.drone.mission
+com.o3dr.services.android.lib.drone.mission.item
+com.o3dr.services.android.lib.drone.mission.item.command
+com.o3dr.services.android.lib.drone.mission.item.complex
+com.o3dr.services.android.lib.drone.mission.item.spatial
+com.o3dr.services.android.lib.drone.property
+com.o3dr.services.android.lib.gcs.follow
+com.o3dr.services.android.lib.mavlink
+com.o3dr.services.android.lib.util
+com.o3dr.services.android.lib.util.version
