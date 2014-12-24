@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ "$TRAVIS_REPO_SLUG" == "DroidPlanner/3DRServices" ] && [ "$TRAVIS_JDK_VERSION" == "oraclejdk7" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_BRANCH" == "master" ]; then
+if [ "$TRAVIS_REPO_SLUG" == "DroidPlanner/3DRServices" ] && [ "$TRAVIS_JDK_VERSION" == "oraclejdk7" ] && ["$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_BRANCH" == "version_1_1_6" ]; then
 
   echo -e "Publishing javadoc...\n"
 
