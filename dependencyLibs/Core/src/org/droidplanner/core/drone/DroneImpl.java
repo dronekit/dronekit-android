@@ -24,6 +24,7 @@ import org.droidplanner.core.drone.variables.StreamRates;
 import org.droidplanner.core.drone.variables.Type;
 import org.droidplanner.core.firmware.FirmwareType;
 import org.droidplanner.core.mission.Mission;
+import org.droidplanner.core.model.AutopilotWarningParser;
 import org.droidplanner.core.model.Drone;
 
 import com.MAVLink.common.msg_heartbeat;
@@ -59,12 +60,12 @@ public class DroneImpl implements Drone {
 	private final Preferences preferences;
 
 	public DroneImpl(MAVLinkStreams.MAVLinkOutputStream mavClient, DroneInterfaces.Clock clock,
-			DroneInterfaces.Handler handler, Preferences pref) {
+			DroneInterfaces.Handler handler, Preferences pref, AutopilotWarningParser warningParser) {
 		this.MavClient = mavClient;
 		this.preferences = pref;
 
         events = new DroneEvents(this, handler);
-		state = new State(this, clock, handler);
+		state = new State(this, clock, handler, warningParser);
 		heartbeat = new HeartBeat(this, handler);
 		parameters = new Parameters(this, handler);
 
