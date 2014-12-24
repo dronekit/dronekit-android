@@ -3,7 +3,7 @@ apply plugin: 'com.android.library'
 ext {
     PUBLISH_ARTIFACT_ID = '3dr-services-wear-lib'
     PUBLISH_VERSION = '0.0.1'
-    PROJECT_DESCRIPTION = "3DR Services Wear client library"
+    PROJECT_DESCRIPTION = "3DR Services Wear Client Library"
     PROJECT_LABELS = ['3DR', '3DR Services', 'DroneAPI', 'Android', 'Android Wear']
     PROJECT_LICENSES = ['Apache-2.0']
 }

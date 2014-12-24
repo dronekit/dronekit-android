@@ -40,22 +40,14 @@ dependencies {
     compile project(':dependencyLibs:Mavlink')
 }
 
-task androidJavadocs(type: Javadoc){
-    source = android.sourceSets.main.java.srcDirs
-    exclude '**/*.aidl'
-    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-}
-
 android.libraryVariants.all { variant ->
     def name = variant.buildType.getName()
     def task = project.tasks.create "jar${name.capitalize()}", Jar
 
     task.dependsOn variant.javaCompile
-    task.dependsOn(androidJavadocs)
     task.dependsOn variant.processJavaResources
 
     task.from variant.javaCompile.destinationDir
-    task.from androidJavadocs.destinationDir
     task.from variant.processJavaResources.destinationDir
     task.from android.sourceSets.main.java.srcDirs
 

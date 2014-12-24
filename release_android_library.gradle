@@ -23,6 +23,7 @@ task androidJavadocs(type: Javadoc) {
     }
 
     source = files
+    title = projectDescription
     exclude '**/*.aidl'
     classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
 }
