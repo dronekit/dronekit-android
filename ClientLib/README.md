@@ -25,4 +25,4 @@ dependencies {
 ### Usage guide
 Take a look at *[DroidPlannerApp.java](https://github.com/DroidPlanner/droidplanner/blob/a05aad78699a7fdecafa79f9606fc31f9a3e52ac/Android/src/org/droidplanner/android/DroidPlannerApp.java)* from the [DroidPlanner 3 project](https://github.com/DroidPlanner/droidplanner) for a sample use case.
 
-**Javadocs coming soon...**
+#### [Javadocs](https://github.com/DroidPlanner/3DRServices/blob/gh-pages/javadoc/index.html)
