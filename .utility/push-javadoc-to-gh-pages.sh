@@ -1,10 +1,6 @@
 #!/bin/bash
 
-echo -e "$TRAVIS_REPO_SLUG\n"
-echo -e "$TRAVIS_JDK_VERSION\n"
-echo -e "$TRAVIS_BRANCH\n"
-echo -e "$TRAVIS_PULL_REQUEST\n"
-if [ "$TRAVIS_REPO_SLUG" == "DroidPlanner/3DRServices" ] && [ "$TRAVIS_JDK_VERSION" == "oraclejdk7" ] && ["$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_BRANCH" == "version_1_1_6" ]; then
+if [ "$TRAVIS_REPO_SLUG" == "DroidPlanner/3DRServices" ] && [ "$TRAVIS_JDK_VERSION" == "oraclejdk7" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_BRANCH" == "version_1_1_6" ]; then
 
   echo -e "Publishing javadoc...\n"
 
