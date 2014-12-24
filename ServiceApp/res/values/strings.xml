@@ -535,4 +535,7 @@
     <string name="navigation_settings_label">Settings</string>
     <string name="navigation_account_label">Account</string>
 
+    <!-- 3DR Services warnings set -->
+    <string name="warning_arm_thr_below_fs">Arm: Throttle below failsafe</string>
+
 </resources>
