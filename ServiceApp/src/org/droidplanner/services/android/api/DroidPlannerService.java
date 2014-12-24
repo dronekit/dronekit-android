@@ -58,19 +58,6 @@ public class DroidPlannerService extends Service {
     private DroneAccess droneAccess;
     private MavLinkServiceApi mavlinkApi;
 
-    /**
-     * TODO: remove in next version.
-     * @param appId
-     * @return
-     */
-    @Deprecated
-    DroneApi acquireDroidPlannerApi(String appId) {
-        DroneApi droneApi = new DroneApi(this, handler, mavlinkApi, null, appId);
-        droneApiStore.add(droneApi);
-        lbm.sendBroadcast(new Intent(ACTION_DRONE_CREATED));
-        return droneApi;
-    }
-
     DroneApi registerDroneApi(IApiListener listener, String appId){
         if(listener == null)
             return null;

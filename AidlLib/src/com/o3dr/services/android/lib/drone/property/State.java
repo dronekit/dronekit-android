@@ -15,9 +15,9 @@ public class State implements Parcelable {
     private boolean armed;
     private boolean isFlying;
     private String calibrationStatus;
-    private VehicleMode vehicleMode;
+    private VehicleMode vehicleMode = VehicleMode.UNKNOWN;
     private String failsafeWarning;
-    private int mavlinkVersion;
+    private int mavlinkVersion = INVALID_MAVLINK_VERSION;
 
     public State(){}
 

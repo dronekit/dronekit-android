@@ -3,10 +3,11 @@ package org.droidplanner.services.android.api;
 import android.os.RemoteException;
 import android.util.Log;
 
-import com.o3dr.services.android.lib.BuildConfig;
 import com.o3dr.services.android.lib.model.IApiListener;
 import com.o3dr.services.android.lib.model.IDroidPlannerServices;
 import com.o3dr.services.android.lib.model.IDroneApi;
+
+import org.droidplanner.services.android.BuildConfig;
 
 import java.lang.ref.WeakReference;
 
@@ -32,18 +33,13 @@ final class DPServices extends IDroidPlannerServices.Stub {
     }
 
     @Override
-    public boolean ping() throws RemoteException {
-        return true;
-    }
-
-    @Override
-    public int getApiVersionCode() throws RemoteException {
+    public int getServiceVersionCode() throws RemoteException {
         return BuildConfig.VERSION_CODE;
     }
 
     @Override
-    public IDroneApi acquireDroneApi(String appId) throws RemoteException {
-        return getService().acquireDroidPlannerApi(appId);
+    public int getApiVersionCode() throws RemoteException {
+        return com.o3dr.services.android.lib.BuildConfig.VERSION_CODE;
     }
 
     @Override

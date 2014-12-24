@@ -8,6 +8,8 @@ import android.os.Parcelable;
  */
 public class StreamRates implements Parcelable {
 
+    private static final int DEFAULT_RATE = 2; //hz
+
     private int extendedStatus;
     private int extra1;
     private int extra2;
@@ -17,7 +19,20 @@ public class StreamRates implements Parcelable {
     private int rawSensors;
     private int rawController;
 
-    public StreamRates(){}
+    public StreamRates(){
+        this(DEFAULT_RATE);
+    }
+
+    public StreamRates(int defaultRate){
+        extendedStatus = defaultRate;
+        extra1 = defaultRate;
+        extra2 = defaultRate;
+        extra3  = defaultRate;
+        position = defaultRate;
+        rcChannels = defaultRate;
+        rawSensors = defaultRate;
+        rawController = defaultRate;
+    }
 
     public int getExtendedStatus() {
         return extendedStatus;
