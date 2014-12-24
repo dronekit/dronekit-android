@@ -4,7 +4,7 @@ jdk:
 
 env:
   global:
-    secure: N1sRQjwlExc51dA10dOvzdnkYMh9/X9WZmKwYqnWOguV+0dg3Jw2xXyBRxZLO1olIlIV0XGaI1HLAAO0OaFEYyWMO9BkZ60aJC8gePGnnwk1LSYR2moGAtlF6Y+aumfMZzXG4gU4QlVKbMd0uLvUWKu6eTqoMtVe+/C8GeJn6pk=
+    secure: OTmx8EZyUxB3LHYw9o8XaWmYo4UiZKIG97bgGMXEjkuXDnszcq6hy3o4q+tTbelkdv9NnEbRoIJ3pt2rG4QXPEXCCJkjN7nUq+JvmBXLylwAo5ngyqPqbYGYh7p4eyy473xDh/eLk/hk/WVg8SVS2FcKt3XSqOc66cazGgSBJSM=
 
 android:
   components:
