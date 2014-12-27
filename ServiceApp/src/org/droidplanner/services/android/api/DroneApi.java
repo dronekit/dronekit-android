@@ -225,9 +225,9 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
         Calibration calibration = drone.getCalibrationSetup();
         String calibrationMessage = calibration.isCalibrating() ? calibration.getMessage() : null;
 
-        return new State(isConnected(), getVehicleMode(droneMode), droneState.isArmed(),
-                droneState.isFlying(), droneState.getWarning(), drone.getMavlinkVersion(),
-                calibrationMessage);
+        return new State(isConnected(), getVehicleMode(droneMode), droneState.isArmed(), droneState.isFlying(),
+                droneState.getWarning(), drone.getMavlinkVersion(), calibrationMessage,
+                droneState.getFlightStartTime());
     }
 
     private static VehicleMode getVehicleMode(ApmModes mode) {
@@ -452,7 +452,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     }
 
     private boolean isConnected() {
-        return droneMgr != null && droneMgr.isConnected();
+        return droneMgr.isConnected();
     }
 
     private GuidedState getGuidedState() {

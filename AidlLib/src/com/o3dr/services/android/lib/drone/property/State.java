@@ -18,15 +18,17 @@ public class State implements Parcelable {
     private VehicleMode vehicleMode = VehicleMode.UNKNOWN;
     private String failsafeWarning;
     private int mavlinkVersion = INVALID_MAVLINK_VERSION;
+    private long flightStartTime;
 
     public State(){}
 
-    public State(boolean isConnected, VehicleMode mode, boolean armed, boolean flying,
-                 String failsafeWarning, int mavlinkVersion, String calibrationStatus){
+    public State(boolean isConnected, VehicleMode mode, boolean armed, boolean flying, String failsafeWarning,
+                 int mavlinkVersion, String calibrationStatus, long flightStartTime){
         this.isConnected = isConnected;
         this.vehicleMode = mode;
         this.armed = armed;
         this.isFlying = flying;
+        this.flightStartTime = flightStartTime;
         this.failsafeWarning = failsafeWarning;
         this.mavlinkVersion = mavlinkVersion;
         this.calibrationStatus = calibrationStatus;
@@ -100,6 +102,14 @@ public class State implements Parcelable {
         return mavlinkVersion;
     }
 
+    public long getFlightStartTime() {
+        return flightStartTime;
+    }
+
+    public void setFlightStartTime(long flightStartTime) {
+        this.flightStartTime = flightStartTime;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -114,6 +124,7 @@ public class State implements Parcelable {
         dest.writeParcelable(this.vehicleMode, 0);
         dest.writeString(this.failsafeWarning);
         dest.writeInt(this.mavlinkVersion);
+        dest.writeLong(this.flightStartTime);
     }
 
     private State(Parcel in) {
@@ -124,6 +135,7 @@ public class State implements Parcelable {
         this.vehicleMode = in.readParcelable(VehicleMode.class.getClassLoader());
         this.failsafeWarning = in.readString();
         this.mavlinkVersion = in.readInt();
+        this.flightStartTime = in.readLong();
     }
 
     public static final Creator<State> CREATOR = new Creator<State>() {

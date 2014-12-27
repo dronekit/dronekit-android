@@ -39,7 +39,9 @@ public class ServiceManager {
             o3drServices = IDroidPlannerServices.Stub.asInterface(service);
             try {
                 final int libVersionCode = o3drServices.getApiVersionCode();
-                if(libVersionCode < BuildConfig.VERSION_CODE){
+                //FIXME: Remove check for the 200010-200020 version range on stable release.
+                if((libVersionCode >= 200010 && libVersionCode < 200020) ||
+                        (libVersionCode < BuildConfig.VERSION_CODE)){
                     //Prompt the user to update the 3DR Services app.
                     o3drServices = null;
                     promptFor3DRServicesUpdate();

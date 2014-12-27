@@ -192,10 +192,6 @@ public class Drone {
         startTime = SystemClock.elapsedRealtime();
     }
 
-    public void startTimer() {
-        startTime = SystemClock.elapsedRealtime();
-    }
-
     public void stopTimer() {
         // lets calc the final elapsed timer
         elapsedFlightTime += SystemClock.elapsedRealtime() - startTime;
@@ -734,7 +730,7 @@ public class Drone {
                 @Override
                 public void onRetrievalSucceed(State state) {
                     if (state.isFlying())
-                        startTimer();
+                        resetFlightTimer();
                     else
                         stopTimer();
                 }
