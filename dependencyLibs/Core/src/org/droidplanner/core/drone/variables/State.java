@@ -22,7 +22,6 @@ public class State extends DroneVariable {
 	// flightTimer
 	// ----------------
 	private long startTime = 0;
-	private long elapsedFlightTime = 0;
 	private Clock clock;
 
 	public Handler watchdog;
@@ -38,7 +37,7 @@ public class State extends DroneVariable {
 		this.clock = clock;
 		this.watchdog = handler;
         this.warningParser = warningParser;
-		resetFlightTimer();
+		resetFlightStartTime();
 	}
 
 	public boolean isWarning() {
@@ -66,9 +65,7 @@ public class State extends DroneVariable {
 			isFlying = newState;
 			myDrone.notifyDroneEvent(DroneEventsType.STATE);
 			if (isFlying) {
-				startTimer();
-			} else {
-				stopTimer();
+				resetFlightStartTime();
 			}
 		}
 	}
@@ -121,28 +118,12 @@ public class State extends DroneVariable {
 	// flightTimer
 	// ----------------
 
-	public void resetFlightTimer() {
-		elapsedFlightTime = 0;
+	public void resetFlightStartTime() {
 		startTime = clock.elapsedRealtime();
 	}
 
-	public void startTimer() {
-		startTime = clock.elapsedRealtime();
-	}
-
-	public void stopTimer() {
-		// lets calc the final elapsed timer
-		elapsedFlightTime += clock.elapsedRealtime() - startTime;
-		startTime = clock.elapsedRealtime();
-	}
-
-	public long getFlightTime() {
-		if (isFlying) {
-			// calc delta time since last checked
-			elapsedFlightTime += clock.elapsedRealtime() - startTime;
-			startTime = clock.elapsedRealtime();
-		}
-		return elapsedFlightTime / 1000;
+	public long getFlightStartTime() {
+        return startTime;
 	}
 
 }
