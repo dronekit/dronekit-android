@@ -40,12 +40,11 @@ import com.o3dr.services.android.lib.model.IObserver;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by fhuya on 11/4/14.
  */
-public class Drone implements IBinder.DeathRecipient {
+public class Drone {
 
     private static final String CLAZZ_NAME = Drone.class.getName();
     private static final String TAG = Drone.class.getSimpleName();
@@ -78,6 +77,13 @@ public class Drone implements IBinder.DeathRecipient {
     public static final String ACTION_GROUND_COLLISION_IMMINENT = CLAZZ_NAME + ".ACTION_GROUND_COLLISION_IMMINENT";
     public static final String EXTRA_IS_GROUND_COLLISION_IMMINENT = "extra_is_ground_collision_imminent";
 
+    private final IBinder.DeathRecipient binderDeathRecipient = new IBinder.DeathRecipient() {
+        @Override
+        public void binderDied() {
+            notifyDroneServiceInterrupted("Lost access to the drone api.");
+        }
+    };
+
     private final ConcurrentLinkedQueue<DroneListener> droneListeners = new ConcurrentLinkedQueue<>();
 
     private final Handler handler;
@@ -93,7 +99,6 @@ public class Drone implements IBinder.DeathRecipient {
     // ----------------
     private long startTime = 0;
     private long elapsedFlightTime = 0;
-    private AtomicBoolean isTimerRunning = new AtomicBoolean(false);
 
     public Drone(ServiceManager serviceManager, Handler handler) {
         this.handler = handler;
@@ -111,7 +116,7 @@ public class Drone implements IBinder.DeathRecipient {
 
         try {
             this.droneApi = serviceMgr.get3drServices().registerDroneApi(this.apiListener, serviceMgr.getApplicationId());
-            this.droneApi.asBinder().linkToDeath(this, 0);
+            this.droneApi.asBinder().linkToDeath(binderDeathRecipient, 0);
         } catch (RemoteException e) {
             throw new IllegalStateException("Unable to retrieve a valid drone handle.");
         }
@@ -128,7 +133,7 @@ public class Drone implements IBinder.DeathRecipient {
 
         try {
             if (isStarted()) {
-                this.droneApi.asBinder().unlinkToDeath(this, 0);
+                this.droneApi.asBinder().unlinkToDeath(binderDeathRecipient, 0);
                 serviceMgr.get3drServices().releaseDroneApi(this.droneApi);
             }
         } catch (RemoteException e) {
@@ -164,16 +169,11 @@ public class Drone implements IBinder.DeathRecipient {
     }
 
     private void handleRemoteException(RemoteException e) {
-        if(droneApi != null && !droneApi.asBinder().pingBinder()) {
+        if (droneApi != null && !droneApi.asBinder().pingBinder()) {
             final String errorMsg = e.getMessage();
             Log.e(TAG, errorMsg, e);
             notifyDroneServiceInterrupted(errorMsg);
         }
-    }
-
-    @Override
-    public void binderDied() {
-        notifyDroneServiceInterrupted("Lost access to the drone api.");
     }
 
     public double getSpeedParameter() {
@@ -190,20 +190,16 @@ public class Drone implements IBinder.DeathRecipient {
     public void resetFlightTimer() {
         elapsedFlightTime = 0;
         startTime = SystemClock.elapsedRealtime();
-        isTimerRunning.set(true);
     }
 
     public void startTimer() {
-        if (isTimerRunning.compareAndSet(false, true))
-            startTime = SystemClock.elapsedRealtime();
+        startTime = SystemClock.elapsedRealtime();
     }
 
     public void stopTimer() {
-        if (isTimerRunning.compareAndSet(true, false)) {
-            // lets calc the final elapsed timer
-            elapsedFlightTime += SystemClock.elapsedRealtime() - startTime;
-            startTime = SystemClock.elapsedRealtime();
-        }
+        // lets calc the final elapsed timer
+        elapsedFlightTime += SystemClock.elapsedRealtime() - startTime;
+        startTime = SystemClock.elapsedRealtime();
     }
 
     public long getFlightTime() {
