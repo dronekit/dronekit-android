@@ -17,8 +17,6 @@ dependencies {
     compile project(':AidlLib')
     compile project(':dependencyLibs:Core')
     compile project(':dependencyLibs:usb-serial-for-android:UsbSerialLibrary')
-
-    wearApp project(':ServiceApp')
 }
 
 android {
