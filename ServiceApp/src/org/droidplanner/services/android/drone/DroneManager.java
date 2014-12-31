@@ -163,8 +163,7 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream,
             final DroneSharePrefs droneSharePrefs = connectionParams.getDroneSharePrefs();
 
             // Start a new ga analytics session. The new session will be tagged
-            // with the mavlink connection mechanism, as well as whether the user
-            // has an active droneshare account.
+            // with the mavlink connection mechanism, as well as whether the user has an active droneshare account.
             GAUtils.startNewSession(droneSharePrefs);
 
             //TODO: restore live upload functionality when issue

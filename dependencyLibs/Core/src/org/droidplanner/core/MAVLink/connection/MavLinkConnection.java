@@ -10,6 +10,7 @@ import java.nio.ByteOrder;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.droidplanner.core.model.Logger;
 
@@ -60,6 +61,7 @@ public abstract class MavLinkConnection {
 	private final LinkedBlockingQueue<MAVLinkPacket> mPacketsToSend = new LinkedBlockingQueue<MAVLinkPacket>();
 
 	private final AtomicInteger mConnectionStatus = new AtomicInteger(MAVLINK_DISCONNECTED);
+    private final AtomicLong mConnectionTime = new AtomicLong(-1);
 
 	/**
 	 * Listen for incoming data on the mavlink connection.
@@ -77,13 +79,14 @@ public abstract class MavLinkConnection {
 				// Open the connection
 				openConnection();
 				mConnectionStatus.set(MAVLINK_CONNECTED);
+                mConnectionTime.set(System.currentTimeMillis());
 				reportConnect();
 
 				// Launch the 'Sending', and 'Logging' threads
 				sendingThread = new Thread(mSendingTask, "MavLinkConnection-Sending Thread");
 				sendingThread.start();
 
-				loggingThread = new Thread(mLoggingTask, "MavLinkConnection-Logging Thread");
+				loggingThread = new Thread(getLoggingTask(), "MavLinkConnection-Logging Thread");
 				loggingThread.start();
 
 				final Parser parser = new Parser();
@@ -171,12 +174,14 @@ public abstract class MavLinkConnection {
 			final ByteBuffer logBuffer = ByteBuffer.allocate(Long.SIZE / Byte.SIZE);
 			logBuffer.order(ByteOrder.BIG_ENDIAN);
 
+            final Logger logger = getLogger();
+            final LinkedBlockingQueue<MAVLinkPacket> packetsToLog = getPacketsToLog();
+
 			try {
-				final BufferedOutputStream logWriter = new BufferedOutputStream(
-						new FileOutputStream(tmpLogFile));
+				final BufferedOutputStream logWriter = new BufferedOutputStream(new FileOutputStream(tmpLogFile));
 				try {
 					while (true) {
-						final MAVLinkPacket packet = mPacketsToLog.take();
+						final MAVLinkPacket packet = packetsToLog.take();
 
 						logBuffer.clear();
 						logBuffer.putLong(System.currentTimeMillis() * 1000);
@@ -193,10 +198,10 @@ public abstract class MavLinkConnection {
 					commitTempTLogFile(tmpLogFile);
 				}
 			} catch (FileNotFoundException e) {
-				mLogger.logErr(TAG, e);
+				logger.logErr(TAG, e);
 				reportComError(e.getMessage());
 			} catch (IOException e) {
-				mLogger.logErr(TAG, e);
+				logger.logErr(TAG, e);
 				reportComError(e.getMessage());
 			}
 		}
@@ -205,6 +210,14 @@ public abstract class MavLinkConnection {
 	protected final Logger mLogger = initLogger();
 
 	private Thread mTaskThread;
+
+    protected Runnable getLoggingTask(){
+        return mLoggingTask;
+    }
+
+    protected LinkedBlockingQueue<MAVLinkPacket> getPacketsToLog(){
+        return mPacketsToLog;
+    }
 
 	/**
 	 * Establish a mavlink connection. If the connection is successful, it will
@@ -228,6 +241,7 @@ public abstract class MavLinkConnection {
 
 		try {
 			mConnectionStatus.set(MAVLINK_DISCONNECTED);
+            mConnectionTime.set(-1);
 			if (mTaskThread.isAlive() && !mTaskThread.isInterrupted()) {
 				mTaskThread.interrupt();
 			}
@@ -243,6 +257,10 @@ public abstract class MavLinkConnection {
 	public int getConnectionStatus() {
 		return mConnectionStatus.get();
 	}
+
+    protected long getConnectionTime(){
+        return mConnectionTime.get();
+    }
 
 	public void sendMavPacket(MAVLinkPacket packet) {
 		if (!mPacketsToSend.offer(packet)) {
@@ -340,7 +358,7 @@ public abstract class MavLinkConnection {
 	 * 
 	 * @param errMsg
 	 */
-	private void reportComError(String errMsg) {
+	protected void reportComError(String errMsg) {
 		if (mListeners.isEmpty())
 			return;
 

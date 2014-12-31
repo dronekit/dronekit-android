@@ -70,8 +70,7 @@ public class MAVLinkClient implements MAVLinkStreams.MAVLinkOutputStream {
             return;
 
         final String tag = toString();
-        if(mavLinkApi.getConnectionStatus(this.connParams, tag) == MavLinkConnection
-                .MAVLINK_DISCONNECTED) {
+        if(mavLinkApi.getConnectionStatus(this.connParams, tag) == MavLinkConnection.MAVLINK_DISCONNECTED) {
             mavLinkApi.connectMavLink(this.connParams, tag, mConnectionListener);
         }
     }
