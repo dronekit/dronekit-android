@@ -2,6 +2,7 @@ package org.droidplanner.services.android.utils.file;
 
 import java.io.File;
 
+import android.content.Context;
 import android.os.Environment;
 
 public class DirectoryPath {
@@ -11,69 +12,52 @@ public class DirectoryPath {
 	 * 
 	 * @return Path to DroidPlanner/ folder in external storage
 	 */
-	static public String get3DRServicesPath() {
-		String root = Environment.getExternalStorageDirectory().getPath();
-		return (root + "/3DRServices/");
-	}
-
-	/**
-	 * Storage folder for Parameters
-	 */
-	static public String getParametersPath() {
-		return get3DRServicesPath() + "/Parameters/";
-	}
-
-	/**
-	 * Storage folder for mission files
-	 */
-	static public String getWaypointsPath() {
-		return get3DRServicesPath() + "/Waypoints/";
+	static public String get3DRServicesPath(Context context) {
+        File dataDir = context.getExternalFilesDir(null);
+        return dataDir.getAbsolutePath();
 	}
 
 	/**
 	 * Folder where telemetry log files are stored
 	 */
-	static public File getTLogPath() {
-		File f = new File(get3DRServicesPath() + "/Logs/");
-		f.mkdirs();
+	static public File getTLogPath(Context context) {
+		File f = new File(get3DRServicesPath(context) + "/logs/");
+        if(!f.exists()) {
+            f.mkdirs();
+        }
 		return f;
 	}
 
 	/**
 	 * After tlogs are uploaded they get moved to this directory
 	 */
-	static public File getSentPath() {
-		File f = new File(getTLogPath() + "/Sent/");
-		f.mkdirs();
+	static public File getSentPath(Context context) {
+		File f = new File(getTLogPath(context) + "/sent/");
+        if(!f.exists()) {
+            f.mkdirs();
+        }
 		return f;
-	}
-
-	/**
-	 * Storage folder for user map tiles
-	 */
-	static public String getMapsPath() {
-		return get3DRServicesPath() + "/Maps/";
 	}
 
 	/**
 	 * Storage folder for user camera description files
 	 */
-	public static String getCameraInfoPath() {
-		return get3DRServicesPath() + "/CameraInfo/";
+	public static String getCameraInfoPath(Context context) {
+		return get3DRServicesPath(context) + "/camera_info/";
 	}
 
 	/**
 	 * Storage folder for stacktraces
 	 */
-	public static String getLogCatPath() {
-		return get3DRServicesPath() + "/LogCat/";
+	public static String getLogCatPath(Context context) {
+		return get3DRServicesPath(context) + "/log_cat/";
 	}
 
 	/**
 	 * Storage folder for SRTM data
 	 */
-	static public String getSrtmPath() {
-		return get3DRServicesPath() + "/Srtm/";
+	static public String getSrtmPath(Context context) {
+		return get3DRServicesPath(context) + "/srtm/";
 	}
 
 }

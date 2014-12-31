@@ -18,7 +18,7 @@ public class SessionDB extends SQLiteOpenHelper {
     private static final String TAG = SessionDB.class.getSimpleName();
 
     public SessionDB(Context context) {
-        super(context, SessionContract.getDbPath(context), null, SessionContract.DB_VERSION);
+        super(context, SessionContract.DB_NAME, null, SessionContract.DB_VERSION);
     }
 
     @Override

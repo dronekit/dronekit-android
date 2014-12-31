@@ -33,10 +33,6 @@ public class AndroidUdpConnection extends AndroidMavLinkConnection {
 				return AndroidUdpConnection.this.getTempTLogFile();
 			}
 
-			@Override
-			protected void commitTempTLogFile(File tlogFile) {
-				AndroidUdpConnection.this.commitTempTLogFile(tlogFile);
-			}
 		};
 	}
 

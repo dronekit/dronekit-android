@@ -29,10 +29,9 @@ import org.droidplanner.services.android.interfaces.DroneEventsListener;
 import org.droidplanner.services.android.location.FusedLocation;
 import org.droidplanner.services.android.utils.AndroidApWarningParser;
 import org.droidplanner.services.android.utils.analytics.GAUtils;
-import org.droidplanner.services.android.utils.file.help.CameraInfoLoader;
+import org.droidplanner.services.android.utils.file.IO.CameraInfoLoader;
 import org.droidplanner.services.android.utils.prefs.DroidPlannerPrefs;
 
-import java.io.IOException;
 import java.util.List;
 
 import ellipsoidFit.FitPoints;

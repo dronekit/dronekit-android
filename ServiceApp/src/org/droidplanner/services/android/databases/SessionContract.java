@@ -10,19 +10,11 @@ import java.io.File;
  */
 public final class SessionContract {
 
-    private static final String DB_NAME = "session";
+    public static final String DB_NAME = "session";
     public static final int DB_VERSION = 1;
 
     //Private constructor to prevent instantiation.
     private SessionContract(){}
-
-    public static String getDbPath(Context context){
-        File externalDir = context.getExternalFilesDir(null);
-        if(externalDir == null)
-            return DB_NAME;
-
-        return externalDir.getAbsolutePath() + "/db/" + DB_NAME;
-    }
 
     public static String getSqlCreateEntries(){
         return SessionData.SQL_CREATE_ENTRIES;
