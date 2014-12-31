@@ -61,7 +61,6 @@ public abstract class MavLinkConnection {
 	private final LinkedBlockingQueue<MAVLinkPacket> mPacketsToSend = new LinkedBlockingQueue<MAVLinkPacket>();
 
 	private final AtomicInteger mConnectionStatus = new AtomicInteger(MAVLINK_DISCONNECTED);
-    private final AtomicLong mConnectionTime = new AtomicLong(-1);
 
 	/**
 	 * Listen for incoming data on the mavlink connection.
@@ -79,7 +78,6 @@ public abstract class MavLinkConnection {
 				// Open the connection
 				openConnection();
 				mConnectionStatus.set(MAVLINK_CONNECTED);
-                mConnectionTime.set(System.currentTimeMillis());
 				reportConnect();
 
 				// Launch the 'Sending', and 'Logging' threads
@@ -241,7 +239,6 @@ public abstract class MavLinkConnection {
 
 		try {
 			mConnectionStatus.set(MAVLINK_DISCONNECTED);
-            mConnectionTime.set(-1);
 			if (mTaskThread.isAlive() && !mTaskThread.isInterrupted()) {
 				mTaskThread.interrupt();
 			}
@@ -257,10 +254,6 @@ public abstract class MavLinkConnection {
 	public int getConnectionStatus() {
 		return mConnectionStatus.get();
 	}
-
-    protected long getConnectionTime(){
-        return mConnectionTime.get();
-    }
 
 	public void sendMavPacket(MAVLinkPacket packet) {
 		if (!mPacketsToSend.offer(packet)) {
@@ -371,7 +364,7 @@ public abstract class MavLinkConnection {
 	 * Utility method to notify the mavlink listeners about a successful
 	 * connection.
 	 */
-	private void reportConnect() {
+	protected void reportConnect() {
 		for (MavLinkConnectionListener listener : mListeners.values()) {
 			listener.onConnect();
 		}
@@ -381,7 +374,7 @@ public abstract class MavLinkConnection {
 	 * Utility method to notify the mavlink listeners about a connection
 	 * disconnect.
 	 */
-	private void reportDisconnect() {
+	protected void reportDisconnect() {
 		if (mListeners.isEmpty())
 			return;
 

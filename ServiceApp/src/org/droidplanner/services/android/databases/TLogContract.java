@@ -1,13 +1,19 @@
 package org.droidplanner.services.android.databases;
 
+import android.content.Context;
 import android.provider.BaseColumns;
+
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * Used to define the schema for the TLog database.
  */
 public final class TLogContract {
 
-    public static final String DB_NAME = "tlog_db";
+    private static final String DB_NAME = "tlog_db";
     public static final int DB_VERSION = 1;
 
     public static final String SQL_CREATE_ENTRIES = TLogData.SQL_CREATE_ENTRIES;
@@ -15,6 +21,18 @@ public final class TLogContract {
 
     //Private constructor to prevent instantiation.
     private TLogContract(){}
+
+    public static String getDbPath(Context context, Date connectionDate){
+        final SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH_mm", Locale.US);
+        final String timestamp = sdf.format(connectionDate);
+        final String dbName = DB_NAME + "_" + timestamp;
+
+        File externalDir = context.getExternalFilesDir(null);
+        if(externalDir == null)
+            return dbName;
+
+        return externalDir.getAbsolutePath() + "/db/" + dbName;
+    }
 
     /**
      * Defines the schema for the TLogData table.

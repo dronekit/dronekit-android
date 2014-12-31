@@ -25,6 +25,25 @@ public class MavLinkConnectionTypes {
 	 */
 	public static final int MAVLINK_CONNECTION_TCP = 3;
 
+    public static String getConnectionTypeLabel(int connectionType){
+        switch(connectionType){
+            case MavLinkConnectionTypes.MAVLINK_CONNECTION_BLUETOOTH:
+                return "bluetooth";
+
+            case MavLinkConnectionTypes.MAVLINK_CONNECTION_TCP:
+                return "tcp";
+
+            case MavLinkConnectionTypes.MAVLINK_CONNECTION_UDP:
+                return "udp";
+
+            case MavLinkConnectionTypes.MAVLINK_CONNECTION_USB:
+                return "usb";
+
+            default:
+                return null;
+        }
+    }
+
 	// Not instantiable
 	private MavLinkConnectionTypes() {
 	}
