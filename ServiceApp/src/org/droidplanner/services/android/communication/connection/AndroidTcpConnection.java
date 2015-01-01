@@ -36,8 +36,8 @@ public class AndroidTcpConnection extends AndroidMavLinkConnection {
 			}
 
 			@Override
-			protected File getTempTLogFile() {
-				return AndroidTcpConnection.this.getTempTLogFile();
+			protected File getTempTLogFile(long connectionTimestamp) {
+				return AndroidTcpConnection.this.getTempTLogFile(connectionTimestamp);
 			}
 		};
 	}

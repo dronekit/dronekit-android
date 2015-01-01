@@ -15,6 +15,7 @@ import java.nio.ByteOrder;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Base for mavlink connection implementations.
@@ -60,6 +61,7 @@ public abstract class MavLinkConnection {
     private final LinkedBlockingQueue<MAVLinkPacket> mPacketsToSend = new LinkedBlockingQueue<MAVLinkPacket>();
 
     private final AtomicInteger mConnectionStatus = new AtomicInteger(MAVLINK_DISCONNECTED);
+    private final AtomicLong mConnectionTime = new AtomicLong(-1);
 
     /**
      * Listen for incoming data on the mavlink connection.
@@ -77,6 +79,7 @@ public abstract class MavLinkConnection {
                 // Open the connection
                 openConnection();
                 mConnectionStatus.set(MAVLINK_CONNECTED);
+                mConnectionTime.set(System.currentTimeMillis());
                 reportConnect();
 
                 // Launch the 'Sending', and 'Logging' threads
@@ -167,7 +170,7 @@ public abstract class MavLinkConnection {
     private final Runnable mLoggingTask = new Runnable() {
         @Override
         public void run() {
-            final File tmpLogFile = getTempTLogFile();
+            final File tmpLogFile = getTempTLogFile(getConnectionTime());
             final ByteBuffer logBuffer = ByteBuffer.allocate(Long.SIZE / Byte.SIZE);
             logBuffer.order(ByteOrder.BIG_ENDIAN);
 
@@ -221,6 +224,7 @@ public abstract class MavLinkConnection {
 
         try {
             mConnectionStatus.set(MAVLINK_DISCONNECTED);
+            mConnectionTime.set(-1);
             if (mTaskThread.isAlive() && !mTaskThread.isInterrupted()) {
                 mTaskThread.interrupt();
             }
@@ -235,6 +239,10 @@ public abstract class MavLinkConnection {
 
     public int getConnectionStatus() {
         return mConnectionStatus.get();
+    }
+
+    protected long getConnectionTime(){
+        return mConnectionTime.get();
     }
 
     public void sendMavPacket(MAVLinkPacket packet) {
@@ -302,7 +310,7 @@ public abstract class MavLinkConnection {
 
     protected abstract void loadPreferences();
 
-    protected abstract File getTempTLogFile();
+    protected abstract File getTempTLogFile(long connectionTimestamp);
 
     /**
      * @return The type of this mavlink connection.

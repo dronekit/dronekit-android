@@ -21,7 +21,7 @@ public class DirectoryPath {
 	 * Folder where telemetry log files are stored
 	 */
 	static public File getTLogPath(Context context) {
-		File f = new File(get3DRServicesPath(context) + "/logs/");
+		File f = new File(get3DRServicesPath(context) + "/tlogs/");
         if(!f.exists()) {
             f.mkdirs();
         }

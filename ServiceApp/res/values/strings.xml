@@ -537,5 +537,7 @@
 
     <!-- 3DR Services warnings set -->
     <string name="warning_arm_thr_below_fs">Arm: Throttle below failsafe</string>
+    <string name="tlog_selector_label">Telemetry Logs File Selector</string>
+    <string name="label_tlog_title">Telemetry Log Files</string>
 
 </resources>

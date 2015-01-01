@@ -16,7 +16,7 @@ public class FileUtils {
 
     public static final String TLOG_FILENAME_EXT = ".tlog";
 
-	public static String[] getCameraInfoFileList(Context context) {
+	public static File[] getCameraInfoFileList(Context context) {
 		FilenameFilter filter = new FilenameFilter() {
 			@Override
 			public boolean accept(File dir, String filename) {
@@ -26,26 +26,20 @@ public class FileUtils {
 		return getFileList(DirectoryPath.getCameraInfoPath(context), filter);
 	}
 
-    public static String[] getTLogFileList(Context context) {
-        FilenameFilter filter = new FilenameFilter() {
+    public static File[] getTLogFileList(Context context) {
+        return getFileList(DirectoryPath.getTLogPath(context).getPath(), new FilenameFilter() {
             public boolean accept(File dir, String filename) {
                 return filename.contains(TLOG_FILENAME_EXT);
             }
-        };
-        return getFileList(DirectoryPath.getTLogPath(context).getPath(), filter);
+        });
     }
 
-	static public String[] getFileList(String path, FilenameFilter filter) {
+	static public File[] getFileList(String path, FilenameFilter filter) {
 		File mPath = new File(path);
-		try {
-			mPath.mkdirs();
-			if (mPath.exists()) {
-				return mPath.list(filter);
-			}
-		} catch (SecurityException e) {
-			e.printStackTrace();
-		}
-		return new String[0];
+        if(!mPath.exists())
+            return new File[0];
+
+        return mPath.listFiles(filter);
 	}
 
     public static FileOutputStream getExceptionFileStream(Context context) throws FileNotFoundException {
@@ -65,16 +59,20 @@ public class FileUtils {
      * @return
      * @throws java.io.FileNotFoundException
      */
-    static public File getTLogFile(Context context) {
+    static public File getTLogFile(Context context, long timestamp) {
         File myDir = DirectoryPath.getTLogPath(context);
-        return new File(myDir, getTimeStamp() + TLOG_FILENAME_EXT);
+        return new File(myDir, getTimeStamp(timestamp) + TLOG_FILENAME_EXT);
     }
 
     /**
      * Timestamp for logs in the Mission Planner Format
      */
-    static public String getTimeStamp() {
+    static public String getTimeStamp(long timestamp) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss", Locale.US);
-        return sdf.format(new Date());
+        return sdf.format(new Date(timestamp));
+    }
+
+    static public String getTimeStamp() {
+        return getTimeStamp(System.currentTimeMillis());
     }
 }

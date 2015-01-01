@@ -1,4 +1,4 @@
-package org.droidplanner.services.android.databases;
+package org.droidplanner.services.android.data;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -8,7 +8,7 @@ import android.util.Log;
 
 import java.util.Date;
 
-import org.droidplanner.services.android.databases.SessionContract.SessionData;
+import org.droidplanner.services.android.data.SessionContract.SessionData;
 
 /**
  * Created by fhuya on 12/30/14.

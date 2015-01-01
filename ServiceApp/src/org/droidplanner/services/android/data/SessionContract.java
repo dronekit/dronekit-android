@@ -1,9 +1,6 @@
-package org.droidplanner.services.android.databases;
+package org.droidplanner.services.android.data;
 
-import android.content.Context;
 import android.provider.BaseColumns;
-
-import java.io.File;
 
 /**
  * Defines the schema for the Session database.

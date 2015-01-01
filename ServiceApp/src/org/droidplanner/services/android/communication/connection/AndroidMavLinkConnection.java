@@ -5,7 +5,7 @@ import android.content.Context;
 import org.droidplanner.core.MAVLink.connection.MavLinkConnection;
 import org.droidplanner.core.MAVLink.connection.MavLinkConnectionTypes;
 import org.droidplanner.core.model.Logger;
-import org.droidplanner.services.android.databases.SessionDB;
+import org.droidplanner.services.android.data.SessionDB;
 import org.droidplanner.services.android.utils.AndroidLogger;
 import org.droidplanner.services.android.utils.file.FileUtils;
 
@@ -17,8 +17,6 @@ public abstract class AndroidMavLinkConnection extends MavLinkConnection {
     private static final String TAG = AndroidMavLinkConnection.class.getSimpleName();
 
     protected final Context mContext;
-
-    private Date connectionDate;
     private final SessionDB sessionDB;
 
     public AndroidMavLinkConnection(Context applicationContext) {
@@ -32,8 +30,8 @@ public abstract class AndroidMavLinkConnection extends MavLinkConnection {
     }
 
     @Override
-    protected final File getTempTLogFile() {
-        return FileUtils.getTLogFile(mContext);
+    protected final File getTempTLogFile(long connectionTimestamp) {
+        return FileUtils.getTLogFile(mContext, connectionTimestamp);
     }
 
     @Override
@@ -41,9 +39,8 @@ public abstract class AndroidMavLinkConnection extends MavLinkConnection {
         super.reportConnect();
 
         //log into the database the connection time.
-        this.connectionDate = new Date();
         final String connectionType = MavLinkConnectionTypes.getConnectionTypeLabel(getConnectionType());
-        this.sessionDB.startSession(connectionDate, connectionType);
+        this.sessionDB.startSession(new Date(getConnectionTime()), connectionType);
     }
 
     @Override
@@ -52,7 +49,6 @@ public abstract class AndroidMavLinkConnection extends MavLinkConnection {
 
         //log into the database the disconnection time.
         final String connectionType = MavLinkConnectionTypes.getConnectionTypeLabel(getConnectionType());
-        this.sessionDB.endSession(connectionDate, connectionType, new Date());
-        this.connectionDate = null;
+        this.sessionDB.endSession(new Date(getConnectionTime()), connectionType, new Date());
     }
 }

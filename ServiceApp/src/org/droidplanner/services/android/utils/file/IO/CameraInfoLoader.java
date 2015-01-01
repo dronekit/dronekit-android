@@ -7,6 +7,7 @@ import org.droidplanner.services.android.utils.file.DirectoryPath;
 import org.droidplanner.services.android.utils.file.FileUtils;
 import org.droidplanner.services.android.utils.file.IO.CameraInfoReader;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -77,12 +78,17 @@ public class CameraInfoLoader {
     }
 
     private List<String> getCameraInfoListFromStorage() {
-        List<String> list = Arrays.asList(FileUtils.getCameraInfoFileList(this.context));
+        List<String> filesName = new ArrayList<>();
         filesInSdCard.clear();
-        final String cameraInfoPath = DirectoryPath.getCameraInfoPath(this.context);
-        for (String string : list) {
-            filesInSdCard.put(string, cameraInfoPath + string);
+
+        File[] filesList = FileUtils.getCameraInfoFileList(this.context);
+        if(filesList != null && filesList.length > 0) {
+            for (File file : filesList) {
+                final String filename = file.getName();
+                filesName.add(filename);
+                filesInSdCard.put(filename, file.getAbsolutePath());
+            }
         }
-        return list;
+        return filesName;
     }
 }
