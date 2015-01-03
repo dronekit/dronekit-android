@@ -1,6 +1,6 @@
-[![Build Status](https://travis-ci.org/DroidPlanner/droidplanner.svg?branch=master)](https://travis-ci.org/DroidPlanner/3DRServices)
-[![Issue Stats](http://issuestats.com/github/DroidPlanner/droidplanner/badge/pr)](http://issuestats.com/github/DroidPlanner/3DRServices)
-[![Issue Stats](http://issuestats.com/github/DroidPlanner/droidplanner/badge/issue)](http://issuestats.com/github/DroidPlanner/3DRServices)
+[![Build Status](https://travis-ci.org/DroidPlanner/3DRServices.svg?branch=master)](https://travis-ci.org/DroidPlanner/3DRServices)
+[![Issue Stats](http://issuestats.com/github/DroidPlanner/3DRServices/badge/pr)](http://issuestats.com/github/DroidPlanner/3DRServices)
+[![Issue Stats](http://issuestats.com/github/DroidPlanner/3DRServices/badge/issue)](http://issuestats.com/github/DroidPlanner/3DRServices)
 
 # 3DR Services
 **3DR Services** is the implementation of [DroneAPI](https://developer.3drobotics.com/) on
