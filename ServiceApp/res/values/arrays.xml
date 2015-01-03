@@ -23,12 +23,6 @@
         <item name="UDP">UDP</item>
         <item name="BLUETOOTH">BLUETOOTH</item>
     </string-array>
-    <string-array name="MapTypes">
-        <item>@string/menu_map_type_satellite</item>
-        <item>@string/menu_map_type_hybrid</item>
-        <item>@string/menu_map_type_normal</item>
-        <item>@string/menu_map_type_terrain</item>
-    </string-array>
     <string-array name="TelemetryBaudTypes">
         <item name="38400">38400</item>
         <item name="57600">57600</item>
@@ -85,16 +79,6 @@
         <item>AutoTune</item>
         <item>Land</item>
         <item>EPM</item>
-    </string-array>
-    <string-array name="Setup_Radio_Menu">
-        <item>@string/setup_radio_title</item>
-        <item>@string/setup_fm_title</item>
-        <item>@string/setup_ch_title</item>
-        <item>@string/setup_sf_title</item>
-    </string-array>
-    <string-array name="Setup_Sensor_Menu">
-        <item>@string/setup_imu_title</item>
-        <item>@string/setup_mag_title</item>
     </string-array>
     <string-array name="VehicleType">
         <item>ArduCopter</item>
@@ -204,13 +188,6 @@
     </string-array>
 
     <!-- Selectable values for the period of the speech output. -->
-    <string-array name="tts_periodic_period">
-        <item>@string/pref_tts_off</item>
-        <item>15 sec.</item>
-        <item>30 sec.</item>
-        <item>45 sec.</item>
-        <item>60 sec.</item>
-    </string-array>
     <string-array name="tts_periodic_period_values">
         <item>0</item>
         <item>15</item>
@@ -221,12 +198,6 @@
     <!-- This string is just used to help in the layout editor -->
     <string-array name="ExampleCameraArray">
         <item>No cameras Available</item>
-    </string-array>
-
-    <string-array name="preference_dialog_entry">
-        <item>@string/pref_dialog_entry_always</item>
-        <item>@string/pref_dialog_entry_never</item>
-        <item>@string/pref_dialog_entry_ask</item>
     </string-array>
 
 </resources>

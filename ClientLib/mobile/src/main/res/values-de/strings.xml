@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="install_service_dialog_title">3DR Services installieren!</string>
+    <string name="update_service_dialog_message">Ihre Version von 3DR Services muss aktualisiert werden, um fortfahren zu können.</string>
+    <string name="update_service_dialog_title">3DR Services aktualisieren!</string>
+    <string name="update_service_dialog_update_button">Aktualisieren</string>
+    <string name="install_service_dialog_message">3DR Services muss auf diesem Gerät installiert sein, um diese App verwenden zu können.</string>
+    <string name="install_service_dialog_install_button">Installieren</string>
+</resources>

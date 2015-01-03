@@ -8,16 +8,15 @@ This file is used to store the preferences keys so that it's accessible and modi
  NOTE: NE TRANSLATER PAS LE CONTENU DANS CETTE FICHE!! (la seule translation permit est cette notification)
  -->
 <resources>
-    <string name="pref_connection_type_key">pref_connection_type</string>
-    <string name="pref_baud_type_key">pref_baud_type</string>
-    <string name="pref_server_ip_key">pref_server_ip</string>
-    <string name="pref_server_port_key">pref_server_port</string>
-    <string name="pref_udp_server_port_key">pref_udp_server_port</string>
-    <string name="pref_bluetooth_device_address_key">pref_bluetooth_device_address</string>
-    <string name="pref_vehicle_type_key">pref_vehicle_type</string>
-    <string name="pref_storage_key">pref_storage</string>
-    <string name="pref_usage_statistics_key">pref_usage_statistics</string>
-    <string name="pref_version_key">pref_version</string>
-    <string name="pref_permanent_notification_key">pref_permanent_notification</string>
-
+    <string name="pref_connection_type_key" translatable="false">pref_connection_type</string>
+    <string name="pref_baud_type_key" translatable="false">pref_baud_type</string>
+    <string name="pref_server_ip_key" translatable="false">pref_server_ip</string>
+    <string name="pref_server_port_key" translatable="false">pref_server_port</string>
+    <string name="pref_udp_server_port_key" translatable="false">pref_udp_server_port</string>
+    <string name="pref_bluetooth_device_address_key" translatable="false">pref_bluetooth_device_address</string>
+    <string name="pref_vehicle_type_key" translatable="false">pref_vehicle_type</string>
+    <string name="pref_storage_key" translatable="false">pref_storage</string>
+    <string name="pref_usage_statistics_key" translatable="false">pref_usage_statistics</string>
+    <string name="pref_version_key" translatable="false">pref_version</string>
+    <string name="pref_permanent_notification_key" translatable="false">pref_permanent_notification</string>
 </resources>
