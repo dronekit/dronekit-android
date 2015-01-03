@@ -3,6 +3,7 @@ package org.droidplanner.services.android.communication.connection;
 import java.io.File;
 import java.io.IOException;
 
+import org.droidplanner.core.MAVLink.connection.MavLinkConnectionTypes;
 import org.droidplanner.core.MAVLink.connection.TcpConnection;
 import org.droidplanner.core.model.Logger;
 

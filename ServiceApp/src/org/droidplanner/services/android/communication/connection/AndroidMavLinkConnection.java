@@ -16,6 +16,8 @@ public abstract class AndroidMavLinkConnection extends MavLinkConnection {
 
     private static final String TAG = AndroidMavLinkConnection.class.getSimpleName();
 
+    protected static final String TLOG_PREFIX = "log";
+
     protected final Context mContext;
     private final SessionDB sessionDB;
 
@@ -31,7 +33,11 @@ public abstract class AndroidMavLinkConnection extends MavLinkConnection {
 
     @Override
     protected final File getTempTLogFile(long connectionTimestamp) {
-        return FileUtils.getTLogFile(mContext, connectionTimestamp);
+        return FileUtils.getTLogFile(mContext, getTLogPrefix() + "_" + FileUtils.getTimeStamp(connectionTimestamp));
+    }
+
+    protected String getTLogPrefix() {
+        return TLOG_PREFIX + "_" + MavLinkConnectionTypes.getConnectionTypeLabel(getConnectionType());
     }
 
     @Override

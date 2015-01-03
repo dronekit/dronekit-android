@@ -59,9 +59,9 @@ public class FileUtils {
      * @return
      * @throws java.io.FileNotFoundException
      */
-    static public File getTLogFile(Context context, long timestamp) {
+    static public File getTLogFile(Context context, String tlogPrefix) {
         File myDir = DirectoryPath.getTLogPath(context);
-        return new File(myDir, getTimeStamp(timestamp) + TLOG_FILENAME_EXT);
+        return new File(myDir, tlogPrefix + TLOG_FILENAME_EXT);
     }
 
     /**
