@@ -1,20 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_gravity="center"
-    tools:context=".ui.activity.TLogFileSelectActivity">
-
-    <android.support.v7.widget.CardView
+    <LinearLayout
+        android:orientation="vertical"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:padding="5dp">
+        tools:context=".ui.activity.TLogFileSelectActivity"
+        android:layout_gravity="center"
+        >
 
-        <TextView android:layout_width="match_parent"
+        <TextView
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:minHeight="70dp"
             android:gravity="center_vertical"
@@ -23,11 +19,15 @@
             android:textAppearance="?android:attr/textAppearanceLarge"
             />
 
-        </android.support.v7.widget.CardView>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@android:color/holo_blue_dark"/>
 
-    <ListView
-        android:id="@+id/tlog_files_list"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:dividerHeight="1dp"/>
-</LinearLayout>
+        <ListView
+            android:id="@+id/tlog_files_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:dividerHeight="1dp"/>
+
+    </LinearLayout>
