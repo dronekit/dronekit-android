@@ -70,7 +70,7 @@ import org.droidplanner.services.android.interfaces.DroneEventsListener;
 import org.droidplanner.services.android.utils.MathUtils;
 import org.droidplanner.services.android.utils.ProxyUtils;
 import org.droidplanner.services.android.utils.file.IO.ParameterMetadataLoader;
-import org.droidplanner.services.android.utils.file.help.CameraInfoLoader;
+import org.droidplanner.services.android.utils.file.IO.CameraInfoLoader;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;

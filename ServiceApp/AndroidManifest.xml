@@ -68,6 +68,37 @@
                 android:resource="@xml/device_filter"/>
         </activity>
 
+        <activity
+            android:name=".ui.activity.TLogFileSelector"
+            android:label="@string/tlog_selector_label"
+            android:theme="@style/AppDialogTheme"
+            >
+            <intent-filter>
+                <action android:name="com.o3dr.services.android.provider.action.REQUEST_TLOG_FILE"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.OPENABLE"/>
+
+                <data android:mimeType="application/octet-stream"/>
+            </intent-filter>
+        </activity>
+
+        <provider
+            android:name=".data.provider.FileProvider"
+            android:authorities="com.o3dr.services.android.provider.fileprovider"
+            android:grantUriPermissions="true"
+            android:exported="false">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/filepaths"/>
+        </provider>
+
+        <provider
+            android:name=".data.provider.ServiceDataProvider"
+            android:authorities="com.o3dr.services.android.provider.dataprovider"
+            android:enabled="false"
+            android:exported="false"/>
+
         <service android:name=".communication.service.UploaderService"/>
 
         <service

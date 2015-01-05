@@ -3,6 +3,7 @@ package org.droidplanner.services.android.communication.connection;
 import java.io.File;
 import java.io.IOException;
 
+import org.droidplanner.core.MAVLink.connection.MavLinkConnectionTypes;
 import org.droidplanner.core.MAVLink.connection.TcpConnection;
 import org.droidplanner.core.model.Logger;
 
@@ -36,13 +37,8 @@ public class AndroidTcpConnection extends AndroidMavLinkConnection {
 			}
 
 			@Override
-			protected File getTempTLogFile() {
-				return AndroidTcpConnection.this.getTempTLogFile();
-			}
-
-			@Override
-			protected void commitTempTLogFile(File tlogFile) {
-				AndroidTcpConnection.this.commitTempTLogFile(tlogFile);
+			protected File getTempTLogFile(long connectionTimestamp) {
+				return AndroidTcpConnection.this.getTempTLogFile(connectionTimestamp);
 			}
 		};
 	}

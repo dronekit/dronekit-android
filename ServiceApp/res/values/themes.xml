@@ -8,4 +8,10 @@
         <item name="colorAccent">#AEEA00</item>
     </style>
 
+    <style name="AppDialogTheme" parent="Theme.AppCompat.Light.Dialog">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowTitleBackgroundStyle">@android:color/transparent</item>
+        <item name="windowActionBar">false</item>
+    </style>
+
 </resources>
