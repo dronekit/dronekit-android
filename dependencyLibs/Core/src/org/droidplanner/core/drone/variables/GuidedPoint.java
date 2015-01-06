@@ -6,6 +6,7 @@ import org.droidplanner.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.core.drone.DroneInterfaces.OnDroneListener;
 import org.droidplanner.core.drone.DroneVariable;
 import org.droidplanner.core.helpers.coordinates.Coord2D;
+import org.droidplanner.core.helpers.coordinates.Coord3D;
 import org.droidplanner.core.helpers.units.Altitude;
 import org.droidplanner.core.model.Drone;
 
@@ -262,5 +263,10 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener {
     public void newGuidedVelocity( double xVel, double yVel, double zVel){
 			MavLinkModes.sendGuidedVelocity(myDrone,xVel,yVel,zVel);
 	}
+
+    public void newGuidedPositionAndVelocity(Coord2D coord3d, double xVel, double yVel, double zVel){
+        MavLinkModes.sendGuidedPositionAndVelocity(myDrone, coord3d.getLat(), coord3d.getLng(),
+                altitude.valueInMeters(), xVel, yVel, zVel);
+    }
 
 }

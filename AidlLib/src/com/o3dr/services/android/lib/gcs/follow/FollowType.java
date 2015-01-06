@@ -13,7 +13,9 @@ public enum FollowType implements Parcelable {
     RIGHT("Right"),
     LEFT("Left"),
     CIRCLE("Circle"),
-    ABOVE("Above");
+    ABOVE("Above"),
+    SPLINE_LEASH("Spline Leash"),
+    SPLINE_ABOVE("Spline Above");
 
     private final String typeLabel;
 

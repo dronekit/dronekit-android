@@ -1,5 +1,7 @@
 package org.droidplanner.services.android.location;
 
+import org.droidplanner.core.helpers.coordinates.Coord3D;
+import org.droidplanner.core.helpers.units.Altitude;
 import org.droidplanner.services.android.utils.GoogleApiClientManager;
 import org.droidplanner.services.android.utils.GoogleApiClientManager.GoogleApiClientTask;
 import org.droidplanner.core.gcs.location.Location.LocationFinder;
@@ -103,8 +105,9 @@ public class FusedLocation implements LocationFinder, com.google.android.gms.loc
                     currentSpeed);
 
 			org.droidplanner.core.gcs.location.Location location = new org.droidplanner.core.gcs.location.Location(
-					new Coord2D(androidLocation.getLatitude(), androidLocation.getLongitude()),
-                    androidLocation.getBearing(), androidLocation.getSpeed(), isLocationAccurate);
+					new Coord3D(androidLocation.getLatitude(), androidLocation.getLongitude(),
+                            new Altitude(androidLocation.getAltitude())), androidLocation.getBearing(),
+                    androidLocation.getSpeed(), isLocationAccurate, androidLocation.getTime());
 
 			mLastLocation = androidLocation;
 			receiver.onLocationChanged(location);

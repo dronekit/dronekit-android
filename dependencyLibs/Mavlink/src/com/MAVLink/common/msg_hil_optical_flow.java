@@ -6,45 +6,61 @@ import com.MAVLink.Messages.MAVLinkPayload;
         //import android.util.Log;
         
         /**
-        * Simulated optical flow from a flow sensor (e.g. optical mouse sensor)
+        * Simulated optical flow from a flow sensor (e.g. PX4FLOW or optical mouse sensor)
         */
         public class msg_hil_optical_flow extends MAVLinkMessage{
         
         public static final int MAVLINK_MSG_ID_HIL_OPTICAL_FLOW = 114;
-        public static final int MAVLINK_MSG_LENGTH = 26;
+        public static final int MAVLINK_MSG_LENGTH = 44;
         private static final long serialVersionUID = MAVLINK_MSG_ID_HIL_OPTICAL_FLOW;
         
         
          	/**
-        * Timestamp (UNIX)
+        * Timestamp (microseconds, synced to UNIX time or since system boot)
         */
         public long time_usec;
          	/**
-        * Flow in meters in x-sensor direction, angular-speed compensated
+        * Integration time in microseconds. Divide integrated_x and integrated_y by the integration time to obtain average flow. The integration time also indicates the.
         */
-        public float flow_comp_m_x;
+        public int integration_time_us;
          	/**
-        * Flow in meters in y-sensor direction, angular-speed compensated
+        * Flow in radians around X axis (Sensor RH rotation about the X axis induces a positive flow. Sensor linear motion along the positive Y axis induces a negative flow.)
         */
-        public float flow_comp_m_y;
+        public float integrated_x;
          	/**
-        * Ground distance in meters. Positive value: distance known. Negative value: Unknown distance
+        * Flow in radians around Y axis (Sensor RH rotation about the Y axis induces a positive flow. Sensor linear motion along the positive X axis induces a positive flow.)
         */
-        public float ground_distance;
+        public float integrated_y;
          	/**
-        * Flow in pixels in x-sensor direction
+        * RH rotation around X axis (rad)
         */
-        public short flow_x;
+        public float integrated_xgyro;
          	/**
-        * Flow in pixels in y-sensor direction
+        * RH rotation around Y axis (rad)
         */
-        public short flow_y;
+        public float integrated_ygyro;
+         	/**
+        * RH rotation around Z axis (rad)
+        */
+        public float integrated_zgyro;
+         	/**
+        * Time in microseconds since the distance was sampled.
+        */
+        public int time_delta_distance_us;
+         	/**
+        * Distance to the center of the flow field in meters. Positive value (including zero): distance known. Negative value: Unknown distance.
+        */
+        public float distance;
+         	/**
+        * Temperature * 100 in centi-degrees Celsius
+        */
+        public short temperature;
          	/**
         * Sensor ID
         */
         public byte sensor_id;
          	/**
-        * Optical flow quality / confidence. 0: bad, 255: maximum quality
+        * Optical flow quality / confidence. 0: no valid flow, 255: maximum quality
         */
         public byte quality;
         
@@ -60,11 +76,15 @@ import com.MAVLink.Messages.MAVLinkPayload;
 		packet.compid = 190;
 		packet.msgid = MAVLINK_MSG_ID_HIL_OPTICAL_FLOW;
         		packet.payload.putLong(time_usec);
-        		packet.payload.putFloat(flow_comp_m_x);
-        		packet.payload.putFloat(flow_comp_m_y);
-        		packet.payload.putFloat(ground_distance);
-        		packet.payload.putShort(flow_x);
-        		packet.payload.putShort(flow_y);
+        		packet.payload.putInt(integration_time_us);
+        		packet.payload.putFloat(integrated_x);
+        		packet.payload.putFloat(integrated_y);
+        		packet.payload.putFloat(integrated_xgyro);
+        		packet.payload.putFloat(integrated_ygyro);
+        		packet.payload.putFloat(integrated_zgyro);
+        		packet.payload.putInt(time_delta_distance_us);
+        		packet.payload.putFloat(distance);
+        		packet.payload.putShort(temperature);
         		packet.payload.putByte(sensor_id);
         		packet.payload.putByte(quality);
         
@@ -79,11 +99,15 @@ import com.MAVLink.Messages.MAVLinkPayload;
         public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
         	    this.time_usec = payload.getLong();
-        	    this.flow_comp_m_x = payload.getFloat();
-        	    this.flow_comp_m_y = payload.getFloat();
-        	    this.ground_distance = payload.getFloat();
-        	    this.flow_x = payload.getShort();
-        	    this.flow_y = payload.getShort();
+        	    this.integration_time_us = payload.getInt();
+        	    this.integrated_x = payload.getFloat();
+        	    this.integrated_y = payload.getFloat();
+        	    this.integrated_xgyro = payload.getFloat();
+        	    this.integrated_ygyro = payload.getFloat();
+        	    this.integrated_zgyro = payload.getFloat();
+        	    this.time_delta_distance_us = payload.getInt();
+        	    this.distance = payload.getFloat();
+        	    this.temperature = payload.getShort();
         	    this.sensor_id = payload.getByte();
         	    this.quality = payload.getByte();
         
@@ -110,12 +134,12 @@ import com.MAVLink.Messages.MAVLinkPayload;
         //Log.d("MAVLINK_MSG_ID_HIL_OPTICAL_FLOW", toString());
         }
         
-                        
+                                
         /**
         * Returns a string with the MSG name and data
         */
         public String toString(){
-    	return "MAVLINK_MSG_ID_HIL_OPTICAL_FLOW -"+" time_usec:"+time_usec+" flow_comp_m_x:"+flow_comp_m_x+" flow_comp_m_y:"+flow_comp_m_y+" ground_distance:"+ground_distance+" flow_x:"+flow_x+" flow_y:"+flow_y+" sensor_id:"+sensor_id+" quality:"+quality+"";
+    	return "MAVLINK_MSG_ID_HIL_OPTICAL_FLOW -"+" time_usec:"+time_usec+" integration_time_us:"+integration_time_us+" integrated_x:"+integrated_x+" integrated_y:"+integrated_y+" integrated_xgyro:"+integrated_xgyro+" integrated_ygyro:"+integrated_ygyro+" integrated_zgyro:"+integrated_zgyro+" time_delta_distance_us:"+time_delta_distance_us+" distance:"+distance+" temperature:"+temperature+" sensor_id:"+sensor_id+" quality:"+quality+"";
         }
         }
         
