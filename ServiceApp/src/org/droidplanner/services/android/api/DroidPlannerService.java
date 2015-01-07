@@ -1,8 +1,11 @@
 package org.droidplanner.services.android.api;
 
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -18,12 +21,14 @@ import com.o3dr.services.android.lib.model.IDroidPlannerServices;
 
 import org.droidplanner.core.MAVLink.connection.MavLinkConnection;
 import org.droidplanner.core.MAVLink.connection.MavLinkConnectionListener;
+import org.droidplanner.services.android.R;
 import org.droidplanner.services.android.communication.connection.AndroidMavLinkConnection;
 import org.droidplanner.services.android.communication.connection.AndroidTcpConnection;
 import org.droidplanner.services.android.communication.connection.AndroidUdpConnection;
 import org.droidplanner.services.android.communication.connection.BluetoothConnection;
 import org.droidplanner.services.android.communication.connection.usb.UsbConnection;
 import org.droidplanner.services.android.communication.service.UploaderService;
+import org.droidplanner.services.android.ui.activity.MainActivity;
 import org.droidplanner.services.android.utils.analytics.GAUtils;
 
 import java.util.ArrayList;
@@ -38,6 +43,8 @@ public class DroidPlannerService extends Service {
 
     private static final String CLAZZ_NAME = DroidPlannerService.class.getName();
     private static final String TAG = DroidPlannerService.class.getSimpleName();
+
+    private static final int FOREGROUND_ID = 101;
 
     public static final String ACTION_DRONE_CREATED = CLAZZ_NAME + ".ACTION_DRONE_CREATED";
     public static final String ACTION_DRONE_DESTROYED = CLAZZ_NAME + ".ACTION_DRONE_DESTROYED";
@@ -180,16 +187,32 @@ public class DroidPlannerService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        Log.d(TAG, "Creating 3DR Services.");
+
+        final Context context = getApplicationContext();
 
         mavlinkApi = new MavLinkServiceApi(this);
         droneAccess = new DroneAccess(this);
         dpServices = new DPServices(this);
-        lbm = LocalBroadcastManager.getInstance(getApplicationContext());
+        lbm = LocalBroadcastManager.getInstance(context);
+
+        //Put the service in the foreground
+        final Notification.Builder notifBuilder = new Notification.Builder(context)
+                .setContentTitle("3DR Services")
+                .setSmallIcon(R.drawable.ic_launcher)
+                .setContentIntent(PendingIntent.getActivity(context, 0, new Intent(context,
+                        MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK), 0));
+
+        final Notification notification = Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN
+                ? notifBuilder.build()
+                : notifBuilder.getNotification();
+        startForeground(FOREGROUND_ID, notification);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        Log.d(TAG, "Destroying 3DR Services.");
 
         for (DroneApi droneApi : droneApiStore) {
             droneApi.destroy();
@@ -202,6 +225,8 @@ public class DroidPlannerService extends Service {
         }
 
         mavConnections.clear();
+
+        stopForeground(true);
     }
 
     @Override
@@ -222,7 +247,8 @@ public class DroidPlannerService extends Service {
             }
         }
 
-        return START_REDELIVER_INTENT;
+        stopSelf();
+        return START_NOT_STICKY;
     }
 
 }

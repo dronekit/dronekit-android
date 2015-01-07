@@ -1,31 +1,30 @@
 package org.droidplanner.services.android.location;
 
-import org.droidplanner.core.helpers.coordinates.Coord3D;
-import org.droidplanner.core.helpers.units.Altitude;
-import org.droidplanner.services.android.utils.GoogleApiClientManager;
-import org.droidplanner.services.android.utils.GoogleApiClientManager.GoogleApiClientTask;
-import org.droidplanner.core.gcs.location.Location.LocationFinder;
-import org.droidplanner.core.gcs.location.Location.LocationReceiver;
-import org.droidplanner.core.helpers.coordinates.Coord2D;
-
 import android.content.Context;
 import android.location.Location;
 import android.os.Handler;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
+import org.droidplanner.core.gcs.location.Location.LocationFinder;
+import org.droidplanner.core.gcs.location.Location.LocationReceiver;
+import org.droidplanner.core.helpers.coordinates.Coord3D;
+import org.droidplanner.core.helpers.units.Altitude;
+import org.droidplanner.services.android.utils.GoogleApiClientManager;
+import org.droidplanner.services.android.utils.GoogleApiClientManager.GoogleApiClientTask;
+
 /**
  * Feeds Location Data from Android's FusedLocation LocationProvider
- * 
  */
 public class FusedLocation implements LocationFinder, com.google.android.gms.location.LocationListener {
 
     private static final String TAG = FusedLocation.class.getSimpleName();
 
-	private static final long MIN_TIME_MS = 1000;
-	private static final float MIN_DISTANCE_M = 0.0f;
+    private static final long MIN_TIME_MS = 0;
+    private static final float MIN_DISTANCE_M = 0.0f;
     private static final float LOCATION_ACCURACY_THRESHOLD = 15.0f;
     private static final float JUMP_FACTOR = 4.0f;
 
@@ -33,14 +32,14 @@ public class FusedLocation implements LocationFinder, com.google.android.gms.loc
     private final GoogleApiClientTask requestLocationUpdate;
     private final GoogleApiClientTask removeLocationUpdate;
 
-	private LocationReceiver receiver;
+    private LocationReceiver receiver;
 
-	private Location mLastLocation;
+    private Location mLastLocation;
 
     private float mTotalSpeed;
     private long mSpeedReadings;
 
-	public FusedLocation(Context context, Handler handler) {
+    public FusedLocation(Context context, Handler handler) {
         gApiMgr = new GoogleApiClientManager(context, handler, LocationServices.API);
 
         requestLocationUpdate = gApiMgr.new GoogleApiClientTask() {
@@ -65,38 +64,38 @@ public class FusedLocation implements LocationFinder, com.google.android.gms.loc
         };
 
         gApiMgr.start();
-	}
+    }
 
-	@Override
-	public void enableLocationUpdates() {
+    @Override
+    public void enableLocationUpdates() {
         mSpeedReadings = 0;
         mTotalSpeed = 0f;
         try {
             gApiMgr.addTask(requestLocationUpdate);
-        }catch(IllegalStateException e){
+        } catch (IllegalStateException e) {
             Log.e(TAG, "Unable to request location updates.");
         }
-	}
+    }
 
-	@Override
-	public void disableLocationUpdates() {
+    @Override
+    public void disableLocationUpdates() {
         try {
             gApiMgr.addTask(removeLocationUpdate);
-        }catch(IllegalStateException e){
+        } catch (IllegalStateException e) {
             Log.e(TAG, "Unable to disable location updates.");
         }
-	}
+    }
 
-	@Override
-	public void onLocationChanged(Location androidLocation) {
-		if (receiver != null) {
-			float distanceToLast = -1.0f;
-			long timeSinceLast = -1L;
+    @Override
+    public void onLocationChanged(Location androidLocation) {
+        if (receiver != null) {
+            float distanceToLast = -1.0f;
+            long timeSinceLast = -1L;
 
-			if(mLastLocation != null) {
-				distanceToLast = androidLocation.distanceTo(mLastLocation);
-				timeSinceLast = (androidLocation.getTime() - mLastLocation.getTime()) / 1000;
-			}
+            if (mLastLocation != null) {
+                distanceToLast = androidLocation.distanceTo(mLastLocation);
+                timeSinceLast = (androidLocation.getTime() - mLastLocation.getTime()) / 1000;
+            }
 
             final float currentSpeed = distanceToLast > 0f && timeSinceLast > 0
                     ? (distanceToLast / timeSinceLast)
@@ -104,18 +103,18 @@ public class FusedLocation implements LocationFinder, com.google.android.gms.loc
             final boolean isLocationAccurate = isLocationAccurate(androidLocation.getAccuracy(),
                     currentSpeed);
 
-			org.droidplanner.core.gcs.location.Location location = new org.droidplanner.core.gcs.location.Location(
-					new Coord3D(androidLocation.getLatitude(), androidLocation.getLongitude(),
+            org.droidplanner.core.gcs.location.Location location = new org.droidplanner.core.gcs.location.Location(
+                    new Coord3D(androidLocation.getLatitude(), androidLocation.getLongitude(),
                             new Altitude(androidLocation.getAltitude())), androidLocation.getBearing(),
                     androidLocation.getSpeed(), isLocationAccurate, androidLocation.getTime());
 
-			mLastLocation = androidLocation;
-			receiver.onLocationChanged(location);
-		}
-	}
+            mLastLocation = androidLocation;
+            receiver.onLocationChanged(location);
+        }
+    }
 
-    private boolean isLocationAccurate(float accuracy, float currentSpeed){
-        if(accuracy >= LOCATION_ACCURACY_THRESHOLD){
+    private boolean isLocationAccurate(float accuracy, float currentSpeed) {
+        if (accuracy >= LOCATION_ACCURACY_THRESHOLD) {
             Log.d(TAG, "High accuracy: " + accuracy);
             return false;
         }
@@ -124,11 +123,11 @@ public class FusedLocation implements LocationFinder, com.google.android.gms.loc
         float avg = (mTotalSpeed / ++mSpeedReadings);
 
         //If moving:
-        if(currentSpeed > 0){
+        if (currentSpeed > 0) {
             //if average indicates some movement
-            if(avg >= 1.0){
+            if (avg >= 1.0) {
                 //Reject unreasonable updates.
-                if(currentSpeed >= (avg * JUMP_FACTOR)){
+                if (currentSpeed >= (avg * JUMP_FACTOR)) {
                     Log.d(TAG, "High current speed: " + currentSpeed);
                     return false;
                 }
@@ -138,8 +137,8 @@ public class FusedLocation implements LocationFinder, com.google.android.gms.loc
         return true;
     }
 
-	@Override
-	public void setLocationListener(LocationReceiver receiver) {
-		this.receiver = receiver;
-	}
+    @Override
+    public void setLocationListener(LocationReceiver receiver) {
+        this.receiver = receiver;
+    }
 }

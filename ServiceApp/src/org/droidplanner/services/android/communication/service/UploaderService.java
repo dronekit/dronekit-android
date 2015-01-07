@@ -189,8 +189,7 @@ public class UploaderService extends IntentService {
 	}
 
     public static void kickStart(Context context, DroneSharePrefs droneSharePrefs){
-        if(droneSharePrefs != null && droneSharePrefs.areLoginCredentialsSet() && droneSharePrefs
-                .isEnabled()) {
+        if(droneSharePrefs != null && droneSharePrefs.areLoginCredentialsSet() && droneSharePrefs.isEnabled()) {
             context.startService(UploaderService.createIntent(context, droneSharePrefs));
         }
     }
