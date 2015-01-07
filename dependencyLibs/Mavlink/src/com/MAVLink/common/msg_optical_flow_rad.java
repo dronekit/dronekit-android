@@ -1,4 +1,4 @@
-        // MESSAGE HIL_OPTICAL_FLOW PACKING
+        // MESSAGE OPTICAL_FLOW_RAD PACKING
 package com.MAVLink.common;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
@@ -6,13 +6,13 @@ import com.MAVLink.Messages.MAVLinkPayload;
         //import android.util.Log;
         
         /**
-        * Simulated optical flow from a flow sensor (e.g. PX4FLOW or optical mouse sensor)
+        * Optical flow from an angular rate flow sensor (e.g. PX4FLOW or mouse sensor)
         */
-        public class msg_hil_optical_flow extends MAVLinkMessage{
+        public class msg_optical_flow_rad extends MAVLinkMessage{
         
-        public static final int MAVLINK_MSG_ID_HIL_OPTICAL_FLOW = 114;
+        public static final int MAVLINK_MSG_ID_OPTICAL_FLOW_RAD = 106;
         public static final int MAVLINK_MSG_LENGTH = 44;
-        private static final long serialVersionUID = MAVLINK_MSG_ID_HIL_OPTICAL_FLOW;
+        private static final long serialVersionUID = MAVLINK_MSG_ID_OPTICAL_FLOW_RAD;
         
         
          	/**
@@ -74,7 +74,7 @@ import com.MAVLink.Messages.MAVLinkPayload;
 		packet.len = MAVLINK_MSG_LENGTH;
 		packet.sysid = 255;
 		packet.compid = 190;
-		packet.msgid = MAVLINK_MSG_ID_HIL_OPTICAL_FLOW;
+		packet.msgid = MAVLINK_MSG_ID_OPTICAL_FLOW_RAD;
         		packet.payload.putLong(time_usec);
         		packet.payload.putInt(integration_time_us);
         		packet.payload.putFloat(integrated_x);
@@ -92,7 +92,7 @@ import com.MAVLink.Messages.MAVLinkPayload;
         }
         
         /**
-        * Decode a hil_optical_flow message into this class fields
+        * Decode a optical_flow_rad message into this class fields
         *
         * @param payload The message to decode
         */
@@ -116,8 +116,8 @@ import com.MAVLink.Messages.MAVLinkPayload;
         /**
         * Constructor for a new message, just initializes the msgid
         */
-        public msg_hil_optical_flow(){
-    	msgid = MAVLINK_MSG_ID_HIL_OPTICAL_FLOW;
+        public msg_optical_flow_rad(){
+    	msgid = MAVLINK_MSG_ID_OPTICAL_FLOW_RAD;
         }
         
         /**
@@ -125,13 +125,13 @@ import com.MAVLink.Messages.MAVLinkPayload;
         * from a mavlink packet
         *
         */
-        public msg_hil_optical_flow(MAVLinkPacket mavLinkPacket){
+        public msg_optical_flow_rad(MAVLinkPacket mavLinkPacket){
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
-        this.msgid = MAVLINK_MSG_ID_HIL_OPTICAL_FLOW;
+        this.msgid = MAVLINK_MSG_ID_OPTICAL_FLOW_RAD;
         unpack(mavLinkPacket.payload);
-        //Log.d("MAVLink", "HIL_OPTICAL_FLOW");
-        //Log.d("MAVLINK_MSG_ID_HIL_OPTICAL_FLOW", toString());
+        //Log.d("MAVLink", "OPTICAL_FLOW_RAD");
+        //Log.d("MAVLINK_MSG_ID_OPTICAL_FLOW_RAD", toString());
         }
         
                                 
@@ -139,7 +139,7 @@ import com.MAVLink.Messages.MAVLinkPayload;
         * Returns a string with the MSG name and data
         */
         public String toString(){
-    	return "MAVLINK_MSG_ID_HIL_OPTICAL_FLOW -"+" time_usec:"+time_usec+" integration_time_us:"+integration_time_us+" integrated_x:"+integrated_x+" integrated_y:"+integrated_y+" integrated_xgyro:"+integrated_xgyro+" integrated_ygyro:"+integrated_ygyro+" integrated_zgyro:"+integrated_zgyro+" time_delta_distance_us:"+time_delta_distance_us+" distance:"+distance+" temperature:"+temperature+" sensor_id:"+sensor_id+" quality:"+quality+"";
+    	return "MAVLINK_MSG_ID_OPTICAL_FLOW_RAD -"+" time_usec:"+time_usec+" integration_time_us:"+integration_time_us+" integrated_x:"+integrated_x+" integrated_y:"+integrated_y+" integrated_xgyro:"+integrated_xgyro+" integrated_ygyro:"+integrated_ygyro+" integrated_zgyro:"+integrated_zgyro+" time_delta_distance_us:"+time_delta_distance_us+" distance:"+distance+" temperature:"+temperature+" sensor_id:"+sensor_id+" quality:"+quality+"";
         }
         }
         

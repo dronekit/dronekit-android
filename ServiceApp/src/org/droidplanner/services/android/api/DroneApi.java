@@ -657,36 +657,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
     @Override
     public void enableFollowMe(FollowType followType) throws RemoteException {
-        final FollowAlgorithm.FollowModes selectedMode;
-        switch (followType) {
-            case ABOVE:
-                selectedMode = FollowAlgorithm.FollowModes.ABOVE;
-                break;
-
-            case LEAD:
-                selectedMode = FollowAlgorithm.FollowModes.LEAD;
-                break;
-
-            case LEASH:
-                selectedMode = FollowAlgorithm.FollowModes.LEASH;
-                break;
-
-            case CIRCLE:
-                selectedMode = FollowAlgorithm.FollowModes.CIRCLE;
-                break;
-
-            case LEFT:
-                selectedMode = FollowAlgorithm.FollowModes.LEFT;
-                break;
-
-            case RIGHT:
-                selectedMode = FollowAlgorithm.FollowModes.RIGHT;
-                break;
-
-            default:
-                selectedMode = null;
-                break;
-        }
+        final FollowAlgorithm.FollowModes selectedMode = followTypeToMode(followType);
 
         if (selectedMode != null) {
             final Follow followMe = this.droneMgr.getFollowMe();
@@ -907,6 +878,46 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
         }
     }
 
+    private static FollowAlgorithm.FollowModes followTypeToMode(FollowType followType){
+        final FollowAlgorithm.FollowModes followMode;
+
+        switch (followType) {
+            case ABOVE:
+                followMode = FollowAlgorithm.FollowModes.ABOVE;
+                break;
+
+            case LEAD:
+                followMode = FollowAlgorithm.FollowModes.LEAD;
+                break;
+
+            default:
+            case LEASH:
+                followMode = FollowAlgorithm.FollowModes.LEASH;
+                break;
+
+            case CIRCLE:
+                followMode = FollowAlgorithm.FollowModes.CIRCLE;
+                break;
+
+            case LEFT:
+                followMode = FollowAlgorithm.FollowModes.LEFT;
+                break;
+
+            case RIGHT:
+                followMode = FollowAlgorithm.FollowModes.RIGHT;
+                break;
+
+            case SPLINE_LEASH:
+                followMode = FollowAlgorithm.FollowModes.SPLINE_LEASH;
+                break;
+
+            case SPLINE_ABOVE:
+                followMode = FollowAlgorithm.FollowModes.SPLINE_ABOVE;
+                break;
+        }
+        return followMode;
+    }
+
     private static FollowType followModeToType(FollowAlgorithm.FollowModes followMode) {
         final FollowType followType;
 
@@ -934,6 +945,14 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
             case ABOVE:
                 followType = FollowType.ABOVE;
+                break;
+
+            case SPLINE_LEASH:
+                followType = FollowType.SPLINE_LEASH;
+                break;
+
+            case SPLINE_ABOVE:
+                    followType = FollowType.SPLINE_ABOVE;
                 break;
         }
 

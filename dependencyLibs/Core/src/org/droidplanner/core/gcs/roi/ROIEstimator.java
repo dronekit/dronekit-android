@@ -61,8 +61,7 @@ public class ROIEstimator implements LocationReceiver {
 		Coord2D goCoord = GeoTools.newCoordFromBearingAndDistance(gcsCoord, bearing,
 				distanceTraveledSinceLastPoint);
 		if (distanceTraveledSinceLastPoint > 0.0) {
-			MavLinkROI.setROI(drone, new Coord3D(goCoord.getLat(), goCoord.getLng(), new Altitude(
-					1.0)));
+			MavLinkROI.setROI(drone, new Coord3D(goCoord.getLat(), goCoord.getLng(), new Altitude(1.0)));
 		}
 		watchdog.postDelayed(watchdogCallback, TIMEOUT);
 

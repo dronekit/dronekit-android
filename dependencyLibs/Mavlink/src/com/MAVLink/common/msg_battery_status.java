@@ -42,7 +42,7 @@ import com.MAVLink.Messages.MAVLinkPayload;
          	/**
         * Function of the battery
         */
-        public byte function;
+        public byte battery_function;
          	/**
         * Type (chemistry) of the battery
         */
@@ -71,7 +71,7 @@ import com.MAVLink.Messages.MAVLinkPayload;
                     }
         		packet.payload.putShort(current_battery);
         		packet.payload.putByte(id);
-        		packet.payload.putByte(function);
+        		packet.payload.putByte(battery_function);
         		packet.payload.putByte(type);
         		packet.payload.putByte(battery_remaining);
         
@@ -93,7 +93,7 @@ import com.MAVLink.Messages.MAVLinkPayload;
                     }
         	    this.current_battery = payload.getShort();
         	    this.id = payload.getByte();
-        	    this.function = payload.getByte();
+        	    this.battery_function = payload.getByte();
         	    this.type = payload.getByte();
         	    this.battery_remaining = payload.getByte();
         
@@ -125,7 +125,7 @@ import com.MAVLink.Messages.MAVLinkPayload;
         * Returns a string with the MSG name and data
         */
         public String toString(){
-    	return "MAVLINK_MSG_ID_BATTERY_STATUS -"+" current_consumed:"+current_consumed+" energy_consumed:"+energy_consumed+" temperature:"+temperature+" voltages:"+voltages+" current_battery:"+current_battery+" id:"+id+" function:"+function+" type:"+type+" battery_remaining:"+battery_remaining+"";
+    	return "MAVLINK_MSG_ID_BATTERY_STATUS -"+" current_consumed:"+current_consumed+" energy_consumed:"+energy_consumed+" temperature:"+temperature+" voltages:"+voltages+" current_battery:"+current_battery+" id:"+id+" battery_function:"+battery_function+" type:"+type+" battery_remaining:"+battery_remaining+"";
         }
         }
         

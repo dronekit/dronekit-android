@@ -28,10 +28,8 @@ public class FollowLeash extends FollowAlgorithm {
 
 		final double radiusInMeters = radius.valueInMeters();
 		if (GeoTools.getDistance(locationCoord, dronePosition).valueInMeters() > radiusInMeters) {
-			double headingGCStoDrone = GeoTools.getHeadingFromCoordinates(locationCoord,
-					dronePosition);
-			Coord2D goCoord = GeoTools.newCoordFromBearingAndDistance(locationCoord,
-					headingGCStoDrone, radiusInMeters);
+			double headingGCStoDrone = GeoTools.getHeadingFromCoordinates(locationCoord, dronePosition);
+			Coord2D goCoord = GeoTools.newCoordFromBearingAndDistance(locationCoord, headingGCStoDrone, radiusInMeters);
 			drone.getGuidedPoint().newGuidedCoord(goCoord);
 		}
 	}
