@@ -1,5 +1,6 @@
 package org.droidplanner.services.android.api;
 
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -184,6 +185,7 @@ public class DroidPlannerService extends Service {
         }
     }
 
+    @SuppressLint("NewApi")
     @Override
     public void onCreate() {
         super.onCreate();
