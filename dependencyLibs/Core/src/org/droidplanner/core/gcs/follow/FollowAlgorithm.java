@@ -23,8 +23,14 @@ public abstract class FollowAlgorithm {
 	}
 
 	public enum FollowModes {
-		LEASH("Leash"), LEAD("Lead"), RIGHT("Right"), LEFT("Left"), CIRCLE("Orbit"), ABOVE("Above"),
-        SPLINE_LEASH("Spline Leash"), SPLINE_ABOVE("Spline Above");
+        LEASH("Leash"),
+        LEAD("Lead"),
+        RIGHT("Right"),
+        LEFT("Left"),
+        CIRCLE("Orbit"),
+        ABOVE("Above"),
+        SPLINE_LEASH("Spline Leash"),
+        SPLINE_ABOVE("Spline Above");
 
 		private String name;
 
