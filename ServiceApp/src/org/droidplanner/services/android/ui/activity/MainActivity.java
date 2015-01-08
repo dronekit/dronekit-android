@@ -95,20 +95,20 @@ public class MainActivity extends ActionBarActivity {
 //            actionBar.setDisplayHomeAsUpEnabled(true);
 //            actionBar.setHomeButtonEnabled(true);
 //        }
-
-        bindService(new Intent(context, DroidPlannerService.class), serviceConnection,
-                Context.BIND_AUTO_CREATE);
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onStop() {
+        super.onStop();
         unbindService(serviceConnection);
     }
 
     @Override
     public void onStart() {
         super.onStart();
+        bindService(new Intent(getApplicationContext(), DroidPlannerService.class), serviceConnection,
+                Context.BIND_AUTO_CREATE);
+
         if (droneAccess != null)
             showOrRefreshFragments();
     }
