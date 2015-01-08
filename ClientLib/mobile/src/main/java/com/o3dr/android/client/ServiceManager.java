@@ -19,11 +19,18 @@ import com.o3dr.services.android.lib.model.IDroidPlannerServices;
 /**
  * Created by fhuya on 11/12/14.
  */
-public class ServiceManager implements IBinder.DeathRecipient {
+public class ServiceManager {
 
     private static final String TAG = ServiceManager.class.getSimpleName();
 
     private final Intent serviceIntent = new Intent(IDroidPlannerServices.class.getName());
+
+    private final IBinder.DeathRecipient binderDeathRecipient = new IBinder.DeathRecipient() {
+        @Override
+        public void binderDied() {
+            notifyServiceInterrupted();
+        }
+    };
 
     private final ServiceConnection o3drServicesConnection = new ServiceConnection() {
 
@@ -32,14 +39,16 @@ public class ServiceManager implements IBinder.DeathRecipient {
             o3drServices = IDroidPlannerServices.Stub.asInterface(service);
             try {
                 final int libVersionCode = o3drServices.getApiVersionCode();
-                if(libVersionCode < BuildConfig.VERSION_CODE){
+                //FIXME: Remove check for the 200010-200020 version range on stable release.
+                if((libVersionCode >= 200010 && libVersionCode < 200020) ||
+                        (libVersionCode < BuildConfig.VERSION_CODE)){
                     //Prompt the user to update the 3DR Services app.
                     o3drServices = null;
                     promptFor3DRServicesUpdate();
                     context.unbindService(o3drServicesConnection);
                 }
                 else {
-                    o3drServices.asBinder().linkToDeath(ServiceManager.this, 0);
+                    o3drServices.asBinder().linkToDeath(binderDeathRecipient, 0);
                     notifyServiceConnected();
                 }
             } catch (RemoteException e) {
@@ -101,7 +110,7 @@ public class ServiceManager implements IBinder.DeathRecipient {
 
     public void disconnect() {
         if(o3drServices != null){
-            o3drServices.asBinder().unlinkToDeath(this, 0);
+            o3drServices.asBinder().unlinkToDeath(binderDeathRecipient, 0);
             o3drServices = null;
         }
 
@@ -133,10 +142,5 @@ public class ServiceManager implements IBinder.DeathRecipient {
 
     private void promptFor3DRServicesUpdate(){
         context.startActivity(new Intent(context, UpdateServiceDialog.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-    }
-
-    @Override
-    public void binderDied() {
-        notifyServiceInterrupted();
     }
 }

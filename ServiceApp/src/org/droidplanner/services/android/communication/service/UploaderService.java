@@ -156,8 +156,9 @@ public class UploaderService extends IntentService {
 	}
 
 	private void doUploads(DroneSharePrefs prefs) {
-		File srcDir = DirectoryPath.getTLogPath();
-		File destDir = DirectoryPath.getSentPath();
+        final Context context = getApplicationContext();
+		File srcDir = DirectoryPath.getTLogPath(context);
+		File destDir = DirectoryPath.getSentPath(context);
 
 		String login = prefs.getUsername();
 		String password = prefs.getPassword();
@@ -188,8 +189,7 @@ public class UploaderService extends IntentService {
 	}
 
     public static void kickStart(Context context, DroneSharePrefs droneSharePrefs){
-        if(droneSharePrefs != null && droneSharePrefs.areLoginCredentialsSet() && droneSharePrefs
-                .isEnabled()) {
+        if(droneSharePrefs != null && droneSharePrefs.areLoginCredentialsSet() && droneSharePrefs.isEnabled()) {
             context.startService(UploaderService.createIntent(context, droneSharePrefs));
         }
     }

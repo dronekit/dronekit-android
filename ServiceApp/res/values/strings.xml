@@ -12,4 +12,7 @@
     <string name="uploader_success_message">Upload successful! Select to view…</string>
     <string name="uploader_fail_retry_message">Will try again later</string>
     <string name="uploader_notification_title">Droneshare upload</string>
+    <string name="tlog_selector_label">Telemetry Logs File Selector</string>
+    <string name="label_tlog_title">Telemetry Log Files</string>
+
 </resources>

@@ -333,8 +333,8 @@ package com.MAVLink;
 			return  new msg_vicon_position_estimate(this);
             		case msg_highres_imu.MAVLINK_MSG_ID_HIGHRES_IMU:
 			return  new msg_highres_imu(this);
-            		case msg_omnidirectional_flow.MAVLINK_MSG_ID_OMNIDIRECTIONAL_FLOW:
-			return  new msg_omnidirectional_flow(this);
+            		case msg_optical_flow_rad.MAVLINK_MSG_ID_OPTICAL_FLOW_RAD:
+			return  new msg_optical_flow_rad(this);
             		case msg_hil_sensor.MAVLINK_MSG_ID_HIL_SENSOR:
 			return  new msg_hil_sensor(this);
             		case msg_sim_state.MAVLINK_MSG_ID_SIM_STATE:
@@ -343,6 +343,8 @@ package com.MAVLink;
 			return  new msg_radio_status(this);
             		case msg_file_transfer_protocol.MAVLINK_MSG_ID_FILE_TRANSFER_PROTOCOL:
 			return  new msg_file_transfer_protocol(this);
+            		case msg_timesync.MAVLINK_MSG_ID_TIMESYNC:
+			return  new msg_timesync(this);
             		case msg_hil_gps.MAVLINK_MSG_ID_HIL_GPS:
 			return  new msg_hil_gps(this);
             		case msg_hil_optical_flow.MAVLINK_MSG_ID_HIL_OPTICAL_FLOW:

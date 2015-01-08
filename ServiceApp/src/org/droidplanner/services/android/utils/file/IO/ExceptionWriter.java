@@ -1,19 +1,24 @@
 package org.droidplanner.services.android.utils.file.IO;
 
+import android.content.Context;
+
 import java.io.PrintStream;
 
-import org.droidplanner.services.android.utils.file.FileStream;
+import org.droidplanner.services.android.utils.file.FileUtils;
 
 public class ExceptionWriter {
-	private Throwable exception;
+	private final Context context;
 
-	public ExceptionWriter(Throwable ex) {
-		this.exception = ex;
+	public ExceptionWriter(Context context) {
+		this.context = context;
 	}
 
-	public void saveStackTraceToSD() {
+	public void saveStackTraceToSD(Throwable exception) {
+        if(exception == null)
+            return;
+
 		try {
-			PrintStream out = new PrintStream(FileStream.getExceptionFileStream());
+			PrintStream out = new PrintStream(FileUtils.getExceptionFileStream(context));
 			exception.printStackTrace(out);
 			out.close();
 		} catch (Exception excep) {

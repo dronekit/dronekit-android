@@ -29,10 +29,9 @@ import org.droidplanner.services.android.interfaces.DroneEventsListener;
 import org.droidplanner.services.android.location.FusedLocation;
 import org.droidplanner.services.android.utils.AndroidApWarningParser;
 import org.droidplanner.services.android.utils.analytics.GAUtils;
-import org.droidplanner.services.android.utils.file.help.CameraInfoLoader;
+import org.droidplanner.services.android.utils.file.IO.CameraInfoLoader;
 import org.droidplanner.services.android.utils.prefs.DroidPlannerPrefs;
 
-import java.io.IOException;
 import java.util.List;
 
 import ellipsoidFit.FitPoints;
@@ -163,8 +162,7 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream,
             final DroneSharePrefs droneSharePrefs = connectionParams.getDroneSharePrefs();
 
             // Start a new ga analytics session. The new session will be tagged
-            // with the mavlink connection mechanism, as well as whether the user
-            // has an active droneshare account.
+            // with the mavlink connection mechanism, as well as whether the user has an active droneshare account.
             GAUtils.startNewSession(droneSharePrefs);
 
             //TODO: restore live upload functionality when issue

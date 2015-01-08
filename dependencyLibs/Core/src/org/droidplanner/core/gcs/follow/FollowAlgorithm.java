@@ -23,7 +23,14 @@ public abstract class FollowAlgorithm {
 	}
 
 	public enum FollowModes {
-		LEASH("Leash"), LEAD("Lead"), RIGHT("Right"), LEFT("Left"), CIRCLE("Orbit"), ABOVE("Above");
+        LEASH("Leash"),
+        LEAD("Lead"),
+        RIGHT("Right"),
+        LEFT("Left"),
+        CIRCLE("Orbit"),
+        ABOVE("Above"),
+        SPLINE_LEASH("Spline Leash"),
+        SPLINE_ABOVE("Spline Above");
 
 		private String name;
 
@@ -54,6 +61,10 @@ public abstract class FollowAlgorithm {
 				return new FollowCircle(drone, new Length(15.0), 10.0);
 			case ABOVE:
 				return new FollowAbove(drone, new Length(0.0));
+            case SPLINE_LEASH:
+                return new FollowSplineLeash(drone, new Length(8.0));
+                case SPLINE_ABOVE:
+                    return new FollowSplineAbove(drone, new Length(0.0));
 			}
 			return null; // Should never reach this
 		}

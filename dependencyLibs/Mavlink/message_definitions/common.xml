@@ -55,6 +55,9 @@
                <entry value="16" name="MAV_AUTOPILOT_AEROB">
                     <description>Aerob -- http://aerob.ru</description>
                </entry>
+               <entry value="17" name="MAV_AUTOPILOT_ASLUAV">
+                    <description>ASLUAV autopilot -- http://www.asl.ethz.ch</description>
+               </entry>
           </enum>
           <enum name="MAV_TYPE">
                <entry value="0" name="MAV_TYPE_GENERIC">
@@ -114,6 +117,13 @@
                <entry value="18" name="MAV_TYPE_ONBOARD_CONTROLLER">
                     <description>Onboard companion controller</description>
                </entry>
+               <entry value="19" name="MAV_TYPE_VTOL_DUOROTOR">
+                    <description>Two-rotor VTOL using control surfaces in vertical operation in addition. Tailsitter.</description>
+               </entry>
+               <entry value="20" name="MAV_TYPE_VTOL_QUADROTOR">
+                    <description>Quad-rotor VTOL using a V-shaped quad config in vertical operation. Tailsitter.</description>
+               </entry>
+               <!-- Entries up to 25 reserved for other VTOL airframes -->
           </enum>
           <!-- WARNING: MAV_ACTION Enum is no longer supported - has been removed. Please use MAV_CMD -->
           <enum name="MAV_MODE_FLAG">
@@ -416,6 +426,12 @@
                <entry value="4" name="MAV_FRAME_LOCAL_ENU">
                     <description>Local coordinate frame, Z-down (x: east, y: north, z: up)</description>
                </entry>
+               <entry value="5" name="MAV_FRAME_GLOBAL_INT">
+                   <description>Global coordinate frame, WGS84 coordinate system. First value / x: latitude in degrees*1.0e-7, second value / y: longitude in degrees*1.0e-7, third value / z: positive altitude over mean sea level (MSL)</description>
+               </entry>
+                <entry value="6" name="MAV_FRAME_GLOBAL_RELATIVE_ALT_INT">
+                    <description>Global coordinate frame, WGS84 coordinate system, relative altitude over ground with respect to the home position. First value / x: latitude in degrees*10e-7, second value / y: longitude in degrees*10e-7, third value / z: positive altitude with 0 being at the altitude of the home location.</description>
+               </entry>
                <entry value="7" name="MAV_FRAME_LOCAL_OFFSET_NED">
                    <description>Offset to the current local frame. Anything expressed in this frame should be added to the current local frame position.</description>
                </entry>
@@ -427,6 +443,9 @@
                </entry>
                <entry value="10" name="MAV_FRAME_GLOBAL_TERRAIN_ALT">
                    <description>Global coordinate frame with above terrain level altitude. WGS84 coordinate system, relative altitude over terrain with respect to the waypoint coordinate. First value / x: latitude in degrees, second value / y: longitude in degrees, third value / z: positive altitude in meters with 0 being at ground level in terrain model.</description>
+               </entry>
+                <entry value="11" name="MAV_FRAME_GLOBAL_TERRAIN_ALT_INT">
+                   <description>Global coordinate frame with above terrain level altitude. WGS84 coordinate system, relative altitude over terrain with respect to the waypoint coordinate. First value / x: latitude in degrees*10e-7, second value / y: longitude in degrees*10e-7, third value / z: positive altitude in meters with 0 being at ground level in terrain model.</description>
                </entry>
           </enum>
           <enum name="MAVLINK_DATA_STREAM_TYPE">
@@ -559,6 +578,16 @@
                     <param index="5">Latitude</param>
                     <param index="6">Longitude</param>
                     <param index="7">Altitude</param>
+                </entry>
+               <entry value="30" name="MAV_CMD_NAV_CONTINUE_AND_CHANGE_ALT">
+                   <description>Continue on the current course and climb/descend to specified altitude.  When the altitude is reached continue to the next command (i.e., don't proceed to the next command until the desired altitude is reached.</description>
+                    <param index="1">Empty</param>
+                    <param index="2">Empty</param>
+                    <param index="3">Empty</param>
+                    <param index="4">Empty</param>
+                    <param index="5">Empty</param>
+                    <param index="6">Empty</param>
+                    <param index="7">Desired altitude in meters</param>
                </entry>
                <entry value="80" name="MAV_CMD_NAV_ROI">
                     <description>Sets the region of interest (ROI) for a sensor set or the vehicle itself. This can then be used by the vehicles control system to control the vehicle attitude and the attitude of various sensors such as cameras.</description>
@@ -765,7 +794,17 @@
                     <param index="5">Empty</param>
                     <param index="6">Empty</param>
                     <param index="7">Empty</param>
-               </entry>
+                </entry>
+                <entry value="189" name="MAV_CMD_DO_LAND_START">
+                    <description>Mission command to perform a landing. This is used as a marker in a mission to tell the autopilot where a sequence of mission items that represents a landing starts. It may also be sent via a COMMAND_LONG to trigger a landing, in which case the nearest (geographically) landing sequence in the mission will be used. The Latitude/Longitude is optional, and may be set to 0/0 if not needed. If specified then it will be used to help find the closest landing sequence.</description>
+                    <param index="1">Empty</param>
+                    <param index="2">Empty</param>
+                    <param index="3">Empty</param>
+                    <param index="4">Empty</param>
+                    <param index="5">Latitude</param>
+                    <param index="6">Longitude</param>
+                    <param index="7">Empty</param>
+                </entry>                
                 <entry value="190" name="MAV_CMD_DO_RALLY_LAND">
                     <description>Mission command to perform a landing from a rally point.</description>
                     <param index="1">Break altitude (meters)</param>
@@ -1032,8 +1071,10 @@
 
               <entry value="2800" name="MAV_CMD_PANORAMA_CREATE">
                   <description>Create a panorama at the current position</description>
-                  <param index="1">Viewing angle horizontal of the panorama</param>
-                  <param index="2">Viewing angle vertical of panorama</param>
+                  <param index="1">Viewing angle horizontal of the panorama (in degrees, +- 0.5 the total angle)</param>
+                  <param index="2">Viewing angle vertical of panorama (in degrees)</param>
+                  <param index="3">Speed of the horizontal rotation (in degrees per second)</param>
+                  <param index="4">Speed of the vertical rotation (in degrees per second)</param>
               </entry>
 
               <!-- VALUES FROM 0-40000 are reserved for the common message set. Values from 40000 to UINT16_MAX are available for dialects -->
@@ -1454,7 +1495,7 @@
           <!-- FIXME to be removed / merged with SYSTEM_TIME -->
           <message id="4" name="PING">
                <description>A ping message either requesting or responding to a ping. This allows to measure the system latencies, including serial port, radio modem and UDP connections.</description>
-               <field type="uint64_t" name="time_usec">Unix timestamp in microseconds</field>
+               <field type="uint64_t" name="time_usec">Unix timestamp in microseconds or since system boot if smaller than MAVLink epoch (1.1.2009)</field>
                <field type="uint32_t" name="seq">PING sequence</field>
                <field type="uint8_t" name="target_system">0: request ping from all receiving systems, if greater than 0: message is a ping response and number is the system id of the requesting system</field>
                <field type="uint8_t" name="target_component">0: request ping from all receiving components, if greater than 0: message is a ping response and number is the system id of the requesting system</field>
@@ -1612,7 +1653,7 @@
                <field type="uint32_t" name="time_boot_ms">Timestamp (milliseconds since system boot)</field>
                <field type="int32_t" name="lat">Latitude, expressed as * 1E7</field>
                <field type="int32_t" name="lon">Longitude, expressed as * 1E7</field>
-               <field type="int32_t" name="alt">Altitude in meters, expressed as * 1000 (millimeters), above MSL</field>
+               <field type="int32_t" name="alt">Altitude in meters, expressed as * 1000 (millimeters), WGS84 (not AMSL)</field>
                <field type="int32_t" name="relative_alt">Altitude above ground in meters, expressed as * 1000 (millimeters)</field>
                <field type="int16_t" name="vx">Ground X Speed (Latitude), expressed as m/s * 100</field>
                <field type="int16_t" name="vy">Ground Y Speed (Longitude), expressed as m/s * 100</field>
@@ -1889,7 +1930,7 @@
               <field type="float" name="param3">PARAM3, see MAV_CMD enum</field>
               <field type="float" name="param4">PARAM4, see MAV_CMD enum</field>
               <field type="int32_t" name="x">PARAM5 / local: x position in meters * 1e4, global: latitude in degrees * 10^7</field>
-              <field type="int32_t" name="y">PARAM6 / y position: local: x position in meters * 1e4, global: longitude in degrees *10^7</field> 
+              <field type="int32_t" name="y">PARAM6 / y position: local: x position in meters * 1e4, global: longitude in degrees *10^7</field>
               <field type="float" name="z">PARAM7 / z position: global: altitude in meters (relative or absolute, depending on frame.</field>
           </message>
           <message id="74" name="VFR_HUD">
@@ -1974,7 +2015,7 @@
                <field type="uint8_t" name="target_system">System ID</field>
                <field type="uint8_t" name="target_component">Component ID</field>
                <field type="uint8_t" name="coordinate_frame" enum="MAV_FRAME">Valid options are: MAV_FRAME_LOCAL_NED = 1, MAV_FRAME_LOCAL_OFFSET_NED = 7, MAV_FRAME_BODY_NED = 8, MAV_FRAME_BODY_OFFSET_NED = 9</field>
-               <field type="uint16_t" name="type_mask">Bitmask to indicate which dimensions should be ignored by the vehicle: a value of 0b0000000000000000 or 0b0000001000000000 indicates that none of the setpoint dimensions should be ignored. If bit 10 is set the floats afx afy afz should be interpreted as force instead of acceleration. Mapping: bit 1: x, bit 2: y, bit 3: z, bit 4: vx, bit 5: vy, bit 6: vz, bit 7: ax, bit 8: ay, bit 9: az, bit 10: is force setpoint</field>
+               <field type="uint16_t" name="type_mask">Bitmask to indicate which dimensions should be ignored by the vehicle: a value of 0b0000000000000000 or 0b0000001000000000 indicates that none of the setpoint dimensions should be ignored. If bit 10 is set the floats afx afy afz should be interpreted as force instead of acceleration. Mapping: bit 1: x, bit 2: y, bit 3: z, bit 4: vx, bit 5: vy, bit 6: vz, bit 7: ax, bit 8: ay, bit 9: az, bit 10: is force setpoint, bit 11: yaw, bit 12: yaw rate</field>
                <field type="float" name="x">X Position in NED frame in meters</field>
                <field type="float" name="y">Y Position in NED frame in meters</field>
                <field type="float" name="z">Z Position in NED frame in meters (note, altitude is negative in NED)</field>
@@ -1984,12 +2025,14 @@
                <field type="float" name="afx">X acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N</field>
                <field type="float" name="afy">Y acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N</field>
                <field type="float" name="afz">Z acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N</field>
+               <field type="float" name="yaw">yaw setpoint in rad</field>
+               <field type="float" name="yaw_rate">yaw rate setpoint in rad/s</field>
           </message>
           <message id="85" name="POSITION_TARGET_LOCAL_NED">
                <description>Set vehicle position, velocity and acceleration setpoint in local frame.</description>
                <field type="uint32_t" name="time_boot_ms">Timestamp in milliseconds since system boot</field>
                <field type="uint8_t" name="coordinate_frame" enum="MAV_FRAME">Valid options are: MAV_FRAME_LOCAL_NED = 1, MAV_FRAME_LOCAL_OFFSET_NED = 7, MAV_FRAME_BODY_NED = 8, MAV_FRAME_BODY_OFFSET_NED = 9</field>
-               <field type="uint16_t" name="type_mask">Bitmask to indicate which dimensions should be ignored by the vehicle: a value of 0b0000000000000000 or 0b0000001000000000 indicates that none of the setpoint dimensions should be ignored. If bit 10 is set the floats afx afy afz should be interpreted as force instead of acceleration. Mapping: bit 1: x, bit 2: y, bit 3: z, bit 4: vx, bit 5: vy, bit 6: vz, bit 7: ax, bit 8: ay, bit 9: az, bit 10: is force setpoint</field>
+               <field type="uint16_t" name="type_mask">Bitmask to indicate which dimensions should be ignored by the vehicle: a value of 0b0000000000000000 or 0b0000001000000000 indicates that none of the setpoint dimensions should be ignored. If bit 10 is set the floats afx afy afz should be interpreted as force instead of acceleration. Mapping: bit 1: x, bit 2: y, bit 3: z, bit 4: vx, bit 5: vy, bit 6: vz, bit 7: ax, bit 8: ay, bit 9: az, bit 10: is force setpoint, bit 11: yaw, bit 12: yaw rate</field>
                <field type="float" name="x">X Position in NED frame in meters</field>
                <field type="float" name="y">Y Position in NED frame in meters</field>
                <field type="float" name="z">Z Position in NED frame in meters (note, altitude is negative in NED)</field>
@@ -1999,6 +2042,8 @@
                <field type="float" name="afx">X acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N</field>
                <field type="float" name="afy">Y acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N</field>
                <field type="float" name="afz">Z acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N</field>
+               <field type="float" name="yaw">yaw setpoint in rad</field>
+               <field type="float" name="yaw_rate">yaw rate setpoint in rad/s</field>
           </message>
           <message id="86" name="SET_POSITION_TARGET_GLOBAL_INT">
                <description>Set vehicle position, velocity and acceleration setpoint in the WGS84 coordinate system.</description>
@@ -2006,7 +2051,7 @@
                <field type="uint8_t" name="target_system">System ID</field>
                <field type="uint8_t" name="target_component">Component ID</field>
                <field type="uint8_t" name="coordinate_frame" enum="MAV_FRAME">Valid options are: MAV_FRAME_GLOBAL_INT = 5, MAV_FRAME_GLOBAL_RELATIVE_ALT_INT = 6, MAV_FRAME_GLOBAL_TERRAIN_ALT_INT = 11</field>
-               <field type="uint16_t" name="type_mask">Bitmask to indicate which dimensions should be ignored by the vehicle: a value of 0b0000000000000000 or 0b0000001000000000 indicates that none of the setpoint dimensions should be ignored. If bit 10 is set the floats afx afy afz should be interpreted as force instead of acceleration. Mapping: bit 1: x, bit 2: y, bit 3: z, bit 4: vx, bit 5: vy, bit 6: vz, bit 7: ax, bit 8: ay, bit 9: az, bit 10: is force setpoint</field>
+               <field type="uint16_t" name="type_mask">Bitmask to indicate which dimensions should be ignored by the vehicle: a value of 0b0000000000000000 or 0b0000001000000000 indicates that none of the setpoint dimensions should be ignored. If bit 10 is set the floats afx afy afz should be interpreted as force instead of acceleration. Mapping: bit 1: x, bit 2: y, bit 3: z, bit 4: vx, bit 5: vy, bit 6: vz, bit 7: ax, bit 8: ay, bit 9: az, bit 10: is force setpoint, bit 11: yaw, bit 12: yaw rate</field>
                <field type="int32_t" name="lat_int">X Position in WGS84 frame in 1e7 * meters</field>
                <field type="int32_t" name="lon_int">Y Position in WGS84 frame in 1e7 * meters</field>
                <field type="float" name="alt">Altitude in meters in WGS84 altitude, not AMSL if absolute or relative, above terrain if GLOBAL_TERRAIN_ALT_INT</field>
@@ -2016,12 +2061,14 @@
                <field type="float" name="afx">X acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N</field>
                <field type="float" name="afy">Y acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N</field>
                <field type="float" name="afz">Z acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N</field>
+               <field type="float" name="yaw">yaw setpoint in rad</field>
+               <field type="float" name="yaw_rate">yaw rate setpoint in rad/s</field>
           </message>
           <message id="87" name="POSITION_TARGET_GLOBAL_INT">
                <description>Set vehicle position, velocity and acceleration setpoint in the WGS84 coordinate system.</description>
                <field type="uint32_t" name="time_boot_ms">Timestamp in milliseconds since system boot. The rationale for the timestamp in the setpoint is to allow the system to compensate for the transport delay of the setpoint. This allows the system to compensate processing latency.</field>
                <field type="uint8_t" name="coordinate_frame" enum="MAV_FRAME">Valid options are: MAV_FRAME_GLOBAL_INT = 5, MAV_FRAME_GLOBAL_RELATIVE_ALT_INT = 6, MAV_FRAME_GLOBAL_TERRAIN_ALT_INT = 11</field>
-               <field type="uint16_t" name="type_mask">Bitmask to indicate which dimensions should be ignored by the vehicle: a value of 0b0000000000000000 or 0b0000001000000000 indicates that none of the setpoint dimensions should be ignored. If bit 10 is set the floats afx afy afz should be interpreted as force instead of acceleration. Mapping: bit 1: x, bit 2: y, bit 3: z, bit 4: vx, bit 5: vy, bit 6: vz, bit 7: ax, bit 8: ay, bit 9: az, bit 10: is force setpoint</field>
+               <field type="uint16_t" name="type_mask">Bitmask to indicate which dimensions should be ignored by the vehicle: a value of 0b0000000000000000 or 0b0000001000000000 indicates that none of the setpoint dimensions should be ignored. If bit 10 is set the floats afx afy afz should be interpreted as force instead of acceleration. Mapping: bit 1: x, bit 2: y, bit 3: z, bit 4: vx, bit 5: vy, bit 6: vz, bit 7: ax, bit 8: ay, bit 9: az, bit 10: is force setpoint, bit 11: yaw, bit 12: yaw rate</field>
                <field type="int32_t" name="lat_int">X Position in WGS84 frame in 1e7 * meters</field>
                <field type="int32_t" name="lon_int">Y Position in WGS84 frame in 1e7 * meters</field>
                <field type="float" name="alt">Altitude in meters in WGS84 altitude, not AMSL if absolute or relative, above terrain if GLOBAL_TERRAIN_ALT_INT</field>
@@ -2031,6 +2078,8 @@
                <field type="float" name="afx">X acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N</field>
                <field type="float" name="afy">Y acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N</field>
                <field type="float" name="afz">Z acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N</field>
+               <field type="float" name="yaw">yaw setpoint in rad</field>
+               <field type="float" name="yaw_rate">yaw rate setpoint in rad/s</field>
           </message>
           <message id="89" name="LOCAL_POSITION_NED_SYSTEM_GLOBAL_OFFSET">
                <description>The offset in X, Y, Z and yaw between the LOCAL_POSITION_NED messages of MAV X and the global coordinate frame in NED coordinates. Coordinate frame is right-handed, Z-axis down (aeronautical frame, NED / north-east-down convention)</description>
@@ -2154,14 +2203,20 @@
              <field type="float" name="temperature">Temperature in degrees celsius</field>
              <field type="uint16_t" name="fields_updated">Bitmask for fields that have updated since last message, bit 0 = xacc, bit 12: temperature</field>
          </message>
-         <message id="106" name="OMNIDIRECTIONAL_FLOW">
-             <description>Optical flow from an omnidirectional flow sensor (e.g. PX4FLOW with wide angle lens)</description>
+         <message id="106" name="OPTICAL_FLOW_RAD">
+             <description>Optical flow from an angular rate flow sensor (e.g. PX4FLOW or mouse sensor)</description>
              <field type="uint64_t" name="time_usec">Timestamp (microseconds, synced to UNIX time or since system boot)</field>
              <field type="uint8_t" name="sensor_id">Sensor ID</field>
-             <field type="int16_t[10]" name="left">Flow in deci pixels (1 = 0.1 pixel) on left hemisphere</field>
-             <field type="int16_t[10]" name="right">Flow in deci pixels (1 = 0.1 pixel) on right hemisphere</field>
-             <field type="uint8_t" name="quality">Optical flow quality / confidence. 0: bad, 255: maximum quality</field>
-             <field type="float" name="front_distance_m">Front distance in meters. Positive value (including zero): distance known. Negative value: Unknown distance</field>
+             <field type="uint32_t" name="integration_time_us">Integration time in microseconds. Divide integrated_x and integrated_y by the integration time to obtain average flow. The integration time also indicates the.</field>
+             <field type="float" name="integrated_x">Flow in radians around X axis (Sensor RH rotation about the X axis induces a positive flow. Sensor linear motion along the positive Y axis induces a negative flow.)</field>
+             <field type="float" name="integrated_y">Flow in radians around Y axis (Sensor RH rotation about the Y axis induces a positive flow. Sensor linear motion along the positive X axis induces a positive flow.)</field>
+             <field type="float" name="integrated_xgyro">RH rotation around X axis (rad)</field>
+             <field type="float" name="integrated_ygyro">RH rotation around Y axis (rad)</field>
+             <field type="float" name="integrated_zgyro">RH rotation around Z axis (rad)</field>
+             <field type="int16_t" name="temperature">Temperature * 100 in centi-degrees Celsius</field>
+             <field type="uint8_t" name="quality">Optical flow quality / confidence. 0: no valid flow, 255: maximum quality</field>
+             <field type="uint32_t" name="time_delta_distance_us">Time in microseconds since the distance was sampled.</field>
+             <field type="float" name="distance">Distance to the center of the flow field in meters. Positive value (including zero): distance known. Negative value: Unknown distance.</field>
          </message>
 
          <message id="107" name="HIL_SENSOR"> <description>The IMU readings in SI units in NED body frame</description>
@@ -2225,6 +2280,11 @@
             <field type="uint8_t" name="target_component">Component ID (0 for broadcast)</field>
             <field type="uint8_t[251]" name="payload">Variable length payload. The length is defined by the remaining message length when subtracting the header and other fields.  The entire content of this block is opaque unless you understand any the encoding message_type.  The particular encoding used can be extension specific and might not always be documented as part of the mavlink specification.</field>
         </message>
+        <message id="111" name="TIMESYNC">
+            <description>Time synchronization message.</description>
+            <field type="int64_t" name="tc1">Time sync timestamp 1</field>
+            <field type="int64_t" name="ts1">Time sync timestamp 2</field>
+        </message>
          <message id="113" name="HIL_GPS">
              <description>The global position, as returned by the Global Positioning System (GPS). This is
                  NOT the global position estimate of the sytem, but rather a RAW sensor value. See message GLOBAL_POSITION for the global position estimate. Coordinate frame is right-handed, Z-axis up (GPS frame).</description>
@@ -2243,15 +2303,19 @@
              <field type="uint8_t" name="satellites_visible">Number of satellites visible. If unknown, set to 255</field>
          </message>
          <message id="114" name="HIL_OPTICAL_FLOW">
-             <description>Simulated optical flow from a flow sensor (e.g. optical mouse sensor)</description>
-             <field type="uint64_t" name="time_usec">Timestamp (UNIX)</field>
+             <description>Simulated optical flow from a flow sensor (e.g. PX4FLOW or optical mouse sensor)</description>
+             <field type="uint64_t" name="time_usec">Timestamp (microseconds, synced to UNIX time or since system boot)</field>
              <field type="uint8_t" name="sensor_id">Sensor ID</field>
-             <field type="int16_t" name="flow_x">Flow in pixels in x-sensor direction</field>
-             <field type="int16_t" name="flow_y">Flow in pixels in y-sensor direction</field>
-             <field type="float" name="flow_comp_m_x">Flow in meters in x-sensor direction, angular-speed compensated</field>
-             <field type="float" name="flow_comp_m_y">Flow in meters in y-sensor direction, angular-speed compensated</field>
-             <field type="uint8_t" name="quality">Optical flow quality / confidence. 0: bad, 255: maximum quality</field>
-             <field type="float" name="ground_distance">Ground distance in meters. Positive value: distance known. Negative value: Unknown distance</field>
+             <field type="uint32_t" name="integration_time_us">Integration time in microseconds. Divide integrated_x and integrated_y by the integration time to obtain average flow. The integration time also indicates the.</field>
+             <field type="float" name="integrated_x">Flow in radians around X axis (Sensor RH rotation about the X axis induces a positive flow. Sensor linear motion along the positive Y axis induces a negative flow.)</field>
+             <field type="float" name="integrated_y">Flow in radians around Y axis (Sensor RH rotation about the Y axis induces a positive flow. Sensor linear motion along the positive X axis induces a positive flow.)</field>
+             <field type="float" name="integrated_xgyro">RH rotation around X axis (rad)</field>
+             <field type="float" name="integrated_ygyro">RH rotation around Y axis (rad)</field>
+             <field type="float" name="integrated_zgyro">RH rotation around Z axis (rad)</field>
+             <field type="int16_t" name="temperature">Temperature * 100 in centi-degrees Celsius</field>
+             <field type="uint8_t" name="quality">Optical flow quality / confidence. 0: no valid flow, 255: maximum quality</field>
+             <field type="uint32_t" name="time_delta_distance_us">Time in microseconds since the distance was sampled.</field>
+             <field type="float" name="distance">Distance to the center of the flow field in meters. Positive value (including zero): distance known. Negative value: Unknown distance.</field>
          </message>
          <message id="115" name="HIL_STATE_QUATERNION">
              <description>Sent from simulation to autopilot, avoids in contrast to HIL_STATE singularities. This packet is useful for high throughput applications such as hardware in the loop simulations.</description>
@@ -2450,7 +2514,7 @@
         <message id="147" name="BATTERY_STATUS">
             <description>Battery information</description>
             <field type="uint8_t" name="id">Battery ID</field>
-            <field type="uint8_t" name="function" enum="MAV_BATTERY_FUNCTION">Function of the battery</field>
+            <field type="uint8_t" name="battery_function" enum="MAV_BATTERY_FUNCTION">Function of the battery</field>
             <field type="uint8_t" name="type" enum="MAV_BATTERY_TYPE">Type (chemistry) of the battery</field>
             <field type="int16_t" name="temperature">Temperature of the battery in centi-degrees celsius. INT16_MAX for unknown temperature.</field>
             <field type="uint16_t[10]" name="voltages">Battery voltage of cells, in millivolts (1 = 1 millivolt)</field>
