@@ -2,6 +2,7 @@ com.o3dr.android.client
 com.o3dr.android.client.data.tlog
 com.o3dr.android.client.interfaces
 com.o3dr.android.client.utils
+com.o3dr.android.client.utils.unit
 com.o3dr.services.android.lib.coordinate
 com.o3dr.services.android.lib.data
 com.o3dr.services.android.lib.drone.attribute
