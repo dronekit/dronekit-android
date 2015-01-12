@@ -16,6 +16,8 @@ import com.o3dr.services.android.lib.*;
 import com.o3dr.services.android.lib.BuildConfig;
 import com.o3dr.services.android.lib.model.IDroidPlannerServices;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 /**
  * Created by fhuya on 11/12/14.
  */
@@ -36,12 +38,12 @@ public class ServiceManager {
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
+            isServiceConnecting.set(false);
+
             o3drServices = IDroidPlannerServices.Stub.asInterface(service);
             try {
                 final int libVersionCode = o3drServices.getApiVersionCode();
-                //FIXME: Remove check for the 200010-200020 version range on stable release.
-                if((libVersionCode >= 200010 && libVersionCode < 200020) ||
-                        (libVersionCode < BuildConfig.VERSION_CODE)){
+                if(libVersionCode < BuildConfig.VERSION_CODE){
                     //Prompt the user to update the 3DR Services app.
                     o3drServices = null;
                     promptFor3DRServicesUpdate();
@@ -58,9 +60,12 @@ public class ServiceManager {
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
+            isServiceConnecting.set(false);
             notifyServiceInterrupted();
         }
     };
+
+    private final AtomicBoolean isServiceConnecting = new AtomicBoolean(false);
 
     private final Context context;
     private ServiceListener serviceListener;
@@ -93,8 +98,8 @@ public class ServiceManager {
     }
 
     public void connect(ServiceListener listener) {
-        if (serviceListener != null && isServiceConnected())
-            throw new IllegalStateException("Service is already connected.");
+        if (serviceListener != null && (isServiceConnecting.get() || isServiceConnected()))
+            return;
 
         if (listener == null) {
             throw new IllegalArgumentException("ServiceListener argument cannot be null.");
@@ -102,10 +107,14 @@ public class ServiceManager {
 
         serviceListener = listener;
 
-        if (is3DRServicesInstalled())
-            context.bindService(serviceIntent, o3drServicesConnection, Context.BIND_AUTO_CREATE);
-        else
-            promptFor3DRServicesInstall();
+        if(!isServiceConnected() && !isServiceConnecting.get()) {
+            if (is3DRServicesInstalled()) {
+                isServiceConnecting.set(context.bindService(serviceIntent, o3drServicesConnection,
+                        Context.BIND_AUTO_CREATE));
+            }
+            else
+                promptFor3DRServicesInstall();
+        }
     }
 
     public void disconnect() {
