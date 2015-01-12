@@ -15,7 +15,6 @@ public class FollowSplineLeash extends FollowAlgorithm {
     @Override
     public void processNewLocation(Location location) {
         final Coord3D userLoc = location.getCoord();
-        final Altitude droneAlt = drone.getAltitude();
         final Coord2D droneLoc = drone.getGps().getPosition();
 
         if(userLoc == null || droneLoc == null)
@@ -31,7 +30,7 @@ public class FollowSplineLeash extends FollowAlgorithm {
             double bearingInRad = Math.toRadians(bearing);
             double xVel = speed * Math.cos(bearingInRad);
             double yVel = speed * Math.sin(bearingInRad);
-            drone.getGuidedPoint().newGuidedPositionAndVelocity(goCoord, xVel, yVel, 0);
+            drone.getGuidedPoint().newGuidedCoordAndVelocity(goCoord, xVel, yVel, 0);
         }
 
     }

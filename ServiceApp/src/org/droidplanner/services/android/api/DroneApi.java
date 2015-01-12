@@ -154,34 +154,49 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     @Override
     public Bundle getAttribute(String type) throws RemoteException {
         Bundle carrier = new Bundle();
-        if (AttributeType.STATE.equals(type)) {
-            carrier.putParcelable(type, getState());
-        } else if (AttributeType.GPS.equals(type)) {
-            carrier.putParcelable(type, getGps());
-        } else if (AttributeType.PARAMETERS.equals(type)) {
-            carrier.putParcelable(type, getParameters());
-        } else if (AttributeType.SPEED.equals(type)) {
-            carrier.putParcelable(type, getSpeed());
-        } else if (AttributeType.ATTITUDE.equals(type)) {
-            carrier.putParcelable(type, getAttitude());
-        } else if (AttributeType.HOME.equals(type)) {
-            carrier.putParcelable(type, getHome());
-        } else if (AttributeType.BATTERY.equals(type)) {
-            carrier.putParcelable(type, getBattery());
-        } else if (AttributeType.ALTITUDE.equals(type)) {
-            carrier.putParcelable(type, getAltitude());
-        } else if (AttributeType.MISSION.equals(type)) {
-            carrier.putParcelable(type, getMission());
-        } else if (AttributeType.SIGNAL.equals(type)) {
-            carrier.putParcelable(type, getSignal());
-        } else if (AttributeType.TYPE.equals(type)) {
-            carrier.putParcelable(type, getType());
-        } else if (AttributeType.GUIDED_STATE.equals(type)) {
-            carrier.putParcelable(type, getGuidedState());
-        } else if (AttributeType.FOLLOW_STATE.equals(type)) {
-            carrier.putParcelable(type, getFollowState());
-        } else if (AttributeType.CAMERA.equals(type)) {
-            carrier.putParcelable(type, getCameraProxy());
+        switch (type) {
+            case AttributeType.STATE:
+                carrier.putParcelable(type, getState());
+                break;
+            case AttributeType.GPS:
+                carrier.putParcelable(type, getGps());
+                break;
+            case AttributeType.PARAMETERS:
+                carrier.putParcelable(type, getParameters());
+                break;
+            case AttributeType.SPEED:
+                carrier.putParcelable(type, getSpeed());
+                break;
+            case AttributeType.ATTITUDE:
+                carrier.putParcelable(type, getAttitude());
+                break;
+            case AttributeType.HOME:
+                carrier.putParcelable(type, getHome());
+                break;
+            case AttributeType.BATTERY:
+                carrier.putParcelable(type, getBattery());
+                break;
+            case AttributeType.ALTITUDE:
+                carrier.putParcelable(type, getAltitude());
+                break;
+            case AttributeType.MISSION:
+                carrier.putParcelable(type, getMission());
+                break;
+            case AttributeType.SIGNAL:
+                carrier.putParcelable(type, getSignal());
+                break;
+            case AttributeType.TYPE:
+                carrier.putParcelable(type, getType());
+                break;
+            case AttributeType.GUIDED_STATE:
+                carrier.putParcelable(type, getGuidedState());
+                break;
+            case AttributeType.FOLLOW_STATE:
+                carrier.putParcelable(type, getFollowState());
+                break;
+            case AttributeType.CAMERA:
+                carrier.putParcelable(type, getCameraProxy());
+                break;
         }
 
         return carrier;
@@ -914,6 +929,10 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
             case SPLINE_ABOVE:
                 followMode = FollowAlgorithm.FollowModes.SPLINE_ABOVE;
                 break;
+
+            case GUIDED_SCAN:
+                followMode = FollowAlgorithm.FollowModes.GUIDED_SCAN;
+                break;
         }
         return followMode;
     }
@@ -953,6 +972,10 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
             case SPLINE_ABOVE:
                     followType = FollowType.SPLINE_ABOVE;
+                break;
+
+            case GUIDED_SCAN:
+                followType = FollowType.GUIDED_SCAN;
                 break;
         }
 

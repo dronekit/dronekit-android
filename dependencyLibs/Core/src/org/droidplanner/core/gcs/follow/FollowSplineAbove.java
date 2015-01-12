@@ -17,7 +17,7 @@ public class FollowSplineAbove extends FollowAlgorithm {
         double bearingInRad = Math.toRadians(bearing);
         double xVel = speed * Math.cos(bearingInRad);
         double yVel = speed * Math.sin(bearingInRad);
-        drone.getGuidedPoint().newGuidedPositionAndVelocity(gcsLoc, xVel, yVel, 0);
+        drone.getGuidedPoint().newGuidedCoordAndVelocity(gcsLoc, xVel, yVel, 0);
     }
 
     @Override

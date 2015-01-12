@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 
 ext {
     PUBLISH_ARTIFACT_ID = '3dr-services-lib'
-    PUBLISH_VERSION = '2.1.35'
+    PUBLISH_VERSION = '2.1.36'
     PROJECT_DESCRIPTION = "3DR Services Client Library"
     PROJECT_LABELS = ['3DR', '3DR Services', 'DroneAPI', 'Android']
     PROJECT_LICENSES = ['Apache-2.0']
@@ -15,7 +15,7 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 21
-        versionCode 20135
+        versionCode 20136
         versionName PUBLISH_VERSION
     }
 
@@ -28,8 +28,7 @@ android {
         variant.outputs.each { output ->
             def file = output.outputFile
             if (file != null && file.name.endsWith('.aar')) {
-                output.outputFile = new File(file.parent,
-                        "${PUBLISH_ARTIFACT_ID}.${PUBLISH_VERSION}.aar")
+                output.outputFile = new File(file.parent,  "${PUBLISH_ARTIFACT_ID}.${PUBLISH_VERSION}.aar")
             }
         }
     }
