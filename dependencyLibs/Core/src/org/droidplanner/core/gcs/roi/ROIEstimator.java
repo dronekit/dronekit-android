@@ -52,14 +52,12 @@ public class ROIEstimator implements LocationReceiver {
 		if (realLocation == null) {
 			return;
 		}
-		Coord2D gcsCoord = new Coord2D(realLocation.getCoord().getLat(), realLocation.getCoord()
-				.getLng());
+		Coord2D gcsCoord = new Coord2D(realLocation.getCoord().getLat(), realLocation.getCoord().getLng());
 
 		double bearing = realLocation.getBearing();
 		double distanceTraveledSinceLastPoint = realLocation.getSpeed()
 				* (System.currentTimeMillis() - timeOfLastLocation) / 1000f;
-		Coord2D goCoord = GeoTools.newCoordFromBearingAndDistance(gcsCoord, bearing,
-				distanceTraveledSinceLastPoint);
+		Coord2D goCoord = GeoTools.newCoordFromBearingAndDistance(gcsCoord, bearing, distanceTraveledSinceLastPoint);
 		if (distanceTraveledSinceLastPoint > 0.0) {
 			MavLinkROI.setROI(drone, new Coord3D(goCoord.getLat(), goCoord.getLng(), new Altitude(1.0)));
 		}

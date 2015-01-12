@@ -27,7 +27,7 @@ android {
         applicationId 'org.droidplanner.services.android'
         minSdkVersion 14
         targetSdkVersion 21
-        versionCode 10106
+        versionCode 10107
         versionName getGitVersion()
     }
 
@@ -75,8 +75,7 @@ android {
             if (file != null && file.name.endsWith('.apk')) {
                 def buildType = variant.buildType.getName()
                 def versionCode = defaultConfig.versionCode
-                output.outputFile = new File(file.parent,
-                        "3dr-services-${buildType}.${versionCode}.apk")
+                output.outputFile = new File(file.parent, "3dr-services-${buildType}.${versionCode}.apk")
             }
         }
     }

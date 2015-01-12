@@ -5,69 +5,72 @@ import org.droidplanner.core.helpers.units.Length;
 import org.droidplanner.core.model.Drone;
 
 public abstract class FollowAlgorithm {
-	public abstract void processNewLocation(Location location);
+    public abstract void processNewLocation(Location location);
 
-	public abstract FollowModes getType();
+    public abstract FollowModes getType();
 
-	protected Drone drone;
-	protected Length radius;
+    protected Drone drone;
+    protected Length radius;
 
-	public FollowAlgorithm(Drone drone, Length radius) {
-		super();
-		this.drone = drone;
-		this.radius = radius;
-	}
+    public FollowAlgorithm(Drone drone, Length radius) {
+        super();
+        this.drone = drone;
+        this.radius = radius;
+    }
 
-	public void changeRadius(Double radius) {
-		this.radius = new Length(Math.max(0, radius));
-	}
+    public void changeRadius(Double radius) {
+        this.radius = new Length(Math.max(0, radius));
+    }
 
-	public enum FollowModes {
+    public enum FollowModes {
         LEASH("Leash"),
         LEAD("Lead"),
         RIGHT("Right"),
         LEFT("Left"),
         CIRCLE("Orbit"),
         ABOVE("Above"),
-        SPLINE_LEASH("Spline Leash"),
-        SPLINE_ABOVE("Spline Above");
+        SPLINE_LEASH("Vector Leash"),
+        SPLINE_ABOVE("Vector Above"),
+        GUIDED_SCAN("Guided Scan");
 
-		private String name;
+        private String name;
 
-		FollowModes(String str) {
-			name = str;
-		}
+        FollowModes(String str) {
+            name = str;
+        }
 
-		@Override
-		public String toString() {
-			return name;
-		}
+        @Override
+        public String toString() {
+            return name;
+        }
 
-		public FollowModes next() {
-			return values()[(ordinal() + 1) % values().length];
-		}
+        public FollowModes next() {
+            return values()[(ordinal() + 1) % values().length];
+        }
 
-		public FollowAlgorithm getAlgorithmType(Drone drone) {
-			switch (this) {
-			case LEASH:
-				return new FollowLeash(drone, new Length(8.0));
-			case LEAD:
-				return new FollowLead(drone, new Length(15.0));
-			case RIGHT:
-				return new FollowRight(drone, new Length(10.0));
-			case LEFT:
-				return new FollowLeft(drone, new Length(10.0));
-			case CIRCLE:
-				return new FollowCircle(drone, new Length(15.0), 10.0);
-			case ABOVE:
-				return new FollowAbove(drone, new Length(0.0));
-            case SPLINE_LEASH:
-                return new FollowSplineLeash(drone, new Length(8.0));
+        public FollowAlgorithm getAlgorithmType(Drone drone) {
+            switch (this) {
+                case LEASH:
+                    return new FollowLeash(drone, new Length(8.0));
+                case LEAD:
+                    return new FollowLead(drone, new Length(15.0));
+                case RIGHT:
+                    return new FollowRight(drone, new Length(10.0));
+                case LEFT:
+                    return new FollowLeft(drone, new Length(10.0));
+                case CIRCLE:
+                    return new FollowCircle(drone, new Length(15.0), 10.0);
+                case ABOVE:
+                    return new FollowAbove(drone, new Length(0.0));
+                case SPLINE_LEASH:
+                    return new FollowSplineLeash(drone, new Length(8.0));
                 case SPLINE_ABOVE:
                     return new FollowSplineAbove(drone, new Length(0.0));
-			}
-			return null; // Should never reach this
-		}
-	}
+                case GUIDED_SCAN:
+                    return new FollowGuidedScan(drone, new Length(8.0));
+            }
+            return null; // Should never reach this
+        }
+    }
 
 }
