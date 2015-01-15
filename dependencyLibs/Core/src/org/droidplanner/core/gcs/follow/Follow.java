@@ -109,8 +109,8 @@ public class Follow implements OnDroneListener, LocationReceiver {
 	public void onLocationChanged(Location location) {
 		if (location.isAccurate()) {
 			state = FollowStates.FOLLOW_RUNNING;
-            followAlgorithm.processNewLocation(location);
             roiEstimator.onLocationChanged(location);
+            followAlgorithm.processNewLocation(location);
 		}
 		else {
 			state = FollowStates.FOLLOW_START;

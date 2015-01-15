@@ -1,4 +1,4 @@
-package org.droidplanner.services.android.ui.utils;
+package com.o3dr.services.android.lib.util;
 
 import android.graphics.Typeface;
 import android.text.Spannable;
