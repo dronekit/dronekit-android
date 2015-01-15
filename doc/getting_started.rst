@@ -17,6 +17,21 @@ Setting up SITL on Linux
 
 Please see `instructions here <http://dev.ardupilot.com/wiki/setting-up-sitl-on-linux/>`_ to set up SITL on Ubuntu.
 
+Once you have the simulated vehicle running, enter the following commands. (You only have to do this once)
+
+1. Load a default set of parameters
+
+::
+
+	STABILIZE>param load ../Tools/autotest/copter_params.parm
+
+2. Disable the arming check
+
+::
+
+	STABILIZE>param set ARMING_CHECK 0
+
+
 Setting up your Android Studio project
 --------------------------------------
 

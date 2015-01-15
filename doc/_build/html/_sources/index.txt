@@ -21,3 +21,5 @@ Contents:
 
    getting_started
    first_app
+   examples
+
