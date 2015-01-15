@@ -74,6 +74,7 @@ import org.droidplanner.services.android.utils.file.IO.CameraInfoLoader;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
+import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -91,7 +92,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
     private final static String TAG = DroneApi.class.getSimpleName();
 
-    private final WeakReference<DroidPlannerService> serviceRef;
+    private final SoftReference<DroidPlannerService> serviceRef;
     private final Context context;
 
     private final ConcurrentLinkedQueue<IObserver> observersList;
@@ -108,7 +109,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
         this.ownerId = ownerId;
 
-        serviceRef = new WeakReference<DroidPlannerService>(dpService);
+        serviceRef = new SoftReference<DroidPlannerService>(dpService);
         observersList = new ConcurrentLinkedQueue<IObserver>();
         mavlinkObserversList = new ConcurrentLinkedQueue<IMavlinkObserver>();
 

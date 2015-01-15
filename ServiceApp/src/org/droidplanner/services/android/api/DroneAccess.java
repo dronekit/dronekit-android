@@ -4,6 +4,7 @@ import android.os.Binder;
 
 import org.droidplanner.services.android.drone.DroneManager;
 
+import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,10 +14,10 @@ import java.util.List;
 */
 public final class DroneAccess extends Binder {
 
-    private final WeakReference<DroidPlannerService> serviceRef;
+    private final SoftReference<DroidPlannerService> serviceRef;
 
     DroneAccess(DroidPlannerService service) {
-        serviceRef = new WeakReference<DroidPlannerService>(service);
+        serviceRef = new SoftReference<DroidPlannerService>(service);
     }
 
     private DroidPlannerService getService() {

@@ -12,4 +12,6 @@ public interface UnitProvider {
     String distanceToString(double distanceInMeters);
 
     String speedToString(double speedInMetersPerSeconds);
+
+    String electricChargeToString(double chargeInmAh);
 }
