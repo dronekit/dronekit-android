@@ -1,0 +1,240 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Getting Started &mdash; DroneAPI Android 1.1.6beta documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="DroneAPI Android 1.1.6beta documentation" href="index.html"/>
+        <link rel="next" title="First App: Hello Drone" href="first_app.html"/>
+        <link rel="prev" title="Welcome to DroneAPI Android’s documentation!" href="index.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="index.html" class="fa fa-home"> DroneAPI Android</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#virtual-machine">Virtual Machine</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#setting-up-sitl-on-linux">Setting up SITL on Linux</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#setting-up-your-android-studio-project">Setting up your Android Studio project</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installing-3dr-services-on-your-mobile-device">Installing 3DR Services on your mobile device</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="first_app.html">First App: Hello Drone</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="first_app.html#project-setup">Project setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="first_app.html#adding-the-client-library">Adding the client library</a></li>
+<li class="toctree-l2"><a class="reference internal" href="first_app.html#connecting-to-3dr-services">Connecting to 3DR Services</a></li>
+<li class="toctree-l2"><a class="reference internal" href="first_app.html#connecting-to-a-drone-via-udp">Connecting to a drone via UDP</a></li>
+<li class="toctree-l2"><a class="reference internal" href="first_app.html#connecting-via-usb-3dr-telemetry-radio">Connecting via USB (3DR Telemetry Radio)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="first_app.html#getting-telemetry-from-your-drone">Getting telemetry from your drone</a></li>
+<li class="toctree-l2"><a class="reference internal" href="first_app.html#take-off">Take Off!</a></li>
+<li class="toctree-l2"><a class="reference internal" href="first_app.html#summary">Summary</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Open Sourced Apps Built on Drone API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#droidplanner">Droidplanner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#dp-wear">DP Wear</a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">DroneAPI Android</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>Getting Started</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="_sources/getting_started.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <div class="section" id="getting-started">
+<h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
+<p>The best way to prototype apps for drones is to use a virtual copter. Ardupilot provides a Software-In-The-Loop (SITL) environment, which simulates a copter or plane, in Linux.</p>
+<p>If you want to test your app in real life, you should also grab a ready to fly copter from the <a class="reference external" href="http://store.3drobotics.com">3D Robotics Store</a>.</p>
+<div class="section" id="virtual-machine">
+<h2>Virtual Machine<a class="headerlink" href="#virtual-machine" title="Permalink to this headline">¶</a></h2>
+<p>If you are using Mac OSX or Windows, you need to set up a virtual machine to run SITL. If you are planning to run SITL on your native OS, feel free to skip the next section.</p>
+<p>A popular virtual machine manager for running SITL is <a class="reference external" href="https://www.virtualbox.org/">Virtual Box</a>. A virtual machine running Ubuntu Linux 13.04 or later works great.</p>
+</div>
+<div class="section" id="setting-up-sitl-on-linux">
+<h2>Setting up SITL on Linux<a class="headerlink" href="#setting-up-sitl-on-linux" title="Permalink to this headline">¶</a></h2>
+<p>Please see <a class="reference external" href="http://dev.ardupilot.com/wiki/setting-up-sitl-on-linux/">instructions here</a> to set up SITL on Ubuntu.</p>
+<p>Once you have the simulated vehicle running, enter the following commands. (You only have to do this once)</p>
+<ol class="arabic simple">
+<li>Load a default set of parameters</li>
+</ol>
+<div class="highlight-python"><div class="highlight"><pre>STABILIZE&gt;param load ../Tools/autotest/copter_params.parm
+</pre></div>
+</div>
+<ol class="arabic simple" start="2">
+<li>Disable the arming check</li>
+</ol>
+<div class="highlight-python"><div class="highlight"><pre>STABILIZE&gt;param set ARMING_CHECK 0
+</pre></div>
+</div>
+</div>
+<div class="section" id="setting-up-your-android-studio-project">
+<h2>Setting up your Android Studio project<a class="headerlink" href="#setting-up-your-android-studio-project" title="Permalink to this headline">¶</a></h2>
+<p>For an existing app:</p>
+<ol class="arabic">
+<li><p class="first">Open the build.gradle file inside your application module directory. Android Studio projects contain a top level build.gradle file and a build.gradle for each module. Make sure to edit the file for your application module.</p>
+</li>
+<li><p class="first">Add a new build rule under dependencies for the latest version of the 3DR Services Client library. For example:</p>
+<div class="highlight-python"><div class="highlight"><pre>apply plugin: &#39;com.android.application&#39;
+...
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compile &#39;com.o3dr:3dr-services-lib:2.1.+&#39;
+    ...
+}
+</pre></div>
+</div>
+</li>
+</ol>
+<p>All the example code is provided as Android Studio projects and the tutorials assume you are working in Android Studio.</p>
+</div>
+<div class="section" id="installing-3dr-services-on-your-mobile-device">
+<h2>Installing 3DR Services on your mobile device<a class="headerlink" href="#installing-3dr-services-on-your-mobile-device" title="Permalink to this headline">¶</a></h2>
+<p><strong>Note:</strong> Because 3DR Services is still in beta, you&#8217;ll need to grab the latest APK from <a class="reference external" href="https://github.com/DroidPlanner/3DRServices/releases">here</a> and install it on your Android testing device.</p>
+<p>In production if you don&#8217;t have 3DR Services installed, the app will prompt you to install it from the Play Store.</p>
+</div>
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="first_app.html" class="btn btn-neutral float-right" title="First App: Hello Drone"/>Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="Welcome to DroneAPI Android’s documentation!"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, 3D Robotics.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'1.1.6beta',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
