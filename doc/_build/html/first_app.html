@@ -1,0 +1,349 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>First App: Hello Drone &mdash; DroneAPI Android 1.1.6beta documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="DroneAPI Android 1.1.6beta documentation" href="index.html"/>
+        <link rel="prev" title="Getting Started" href="getting_started.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="index.html" class="fa fa-home"> DroneAPI Android</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#virtual-machine">Virtual Machine</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#setting-up-sitl-on-linux">Setting up SITL on Linux</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#setting-up-your-android-studio-project">Setting up your Android Studio project</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#installing-3dr-services-on-your-mobile-device">Installing 3DR Services on your mobile device</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">First App: Hello Drone</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#project-setup">Project setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#adding-the-client-library">Adding the client library</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#connecting-to-3dr-services">Connecting to 3DR Services</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#connecting-to-a-drone">Connecting to a drone</a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">DroneAPI Android</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>First App: Hello Drone</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="_sources/first_app.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <div class="section" id="first-app-hello-drone">
+<h1>First App: Hello Drone<a class="headerlink" href="#first-app-hello-drone" title="Permalink to this headline">¶</a></h1>
+<p>In the first example, we&#8217;ll walk you through making an app that can connect to a drone, change Ardupilot modes, arm, take off and land the copter.</p>
+<div class="section" id="project-setup">
+<h2>Project setup<a class="headerlink" href="#project-setup" title="Permalink to this headline">¶</a></h2>
+<p><em>Let&#8217;s set up a basic Android Studio project</em></p>
+<img alt="_images/hellodrone_setup_1.png" src="_images/hellodrone_setup_1.png" />
+<p><em>Make sure to use API 15 (Ice Cream Sandwich) or later</em></p>
+<img alt="_images/hellodrone_setup_2.png" src="_images/hellodrone_setup_2.png" />
+<p><em>Let&#8217;s start with a blank activity</em></p>
+<img alt="_images/hellodrone_setup_3.png" src="_images/hellodrone_setup_3.png" />
+<p><em>Click finish to create our project</em></p>
+<img alt="_images/hellodrone_setup_4.png" src="_images/hellodrone_setup_4.png" />
+</div>
+<div class="section" id="adding-the-client-library">
+<h2>Adding the client library<a class="headerlink" href="#adding-the-client-library" title="Permalink to this headline">¶</a></h2>
+<p>Now open your <strong>build.gradle (Module:app)</strong> file and add:</p>
+<div class="highlight-python"><div class="highlight"><pre>compile &#39;com.o3dr:3dr-services-lib:2.1.+&#39;
+</pre></div>
+</div>
+<p>under the dependencies section.</p>
+<img alt="_images/hellodrone_setup_5.png" src="_images/hellodrone_setup_5.png" />
+<p>Then click <strong>Sync</strong> in the top right corner to re-sync the gradle.</p>
+</div>
+<div class="section" id="connecting-to-3dr-services">
+<h2>Connecting to 3DR Services<a class="headerlink" href="#connecting-to-3dr-services" title="Permalink to this headline">¶</a></h2>
+<p>Implement a ServiceListener on your MainActivity to listen for events sent from 3DR Services to your app.</p>
+<div class="highlight-python"><div class="highlight"><pre>public class MainActivity extends ActionBarActivity implements ServiceListener {
+
+    // 3DR Services Listener
+
+    @Override
+    public void onServiceConnected() {
+
+    }
+
+    @Override
+    public void onServiceInterrupted() {
+
+    }
+
+    ...
+}
+</pre></div>
+</div>
+<p>Add a ServiceManager instance to manage the connection.</p>
+<div class="highlight-python"><div class="highlight"><pre>public class MainActivity extends ActionBarActivity implements ServiceListener {
+
+    private ServiceManager serviceManager;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        // Initialize the service manager
+        this.serviceManager = new ServiceManager(getApplicationContext());
+
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        this.serviceManager.connect(this);
+
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        this.serviceManager.disconnect();
+    }
+
+    // 3DR Services Listener
+
+    @Override
+    public void onServiceConnected() {
+
+    }
+
+    @Override
+    public void onServiceInterrupted() {
+
+    }
+
+    ...
+}
+</pre></div>
+</div>
+<p>Great, now at the start of your Activity, you will initiate a connection to 3DR Services.</p>
+</div>
+<div class="section" id="connecting-to-a-drone">
+<h2>Connecting to a drone<a class="headerlink" href="#connecting-to-a-drone" title="Permalink to this headline">¶</a></h2>
+<p>Make sure you have your SITL instance running and power up a simulated drone with a UDP output to the IP of your Android device.</p>
+<p>For our example, we&#8217;ll simulate a drone in Berkeley, display the telemetry console and set our output IP to our Android testing device.</p>
+<p>In the Linux instance that has SITL installed, go to your terminal.</p>
+<p>Navigate to the folder where you cloned the ardupilot repo into.</p>
+<p>Enter the following in your console:</p>
+<div class="highlight-python"><div class="highlight"><pre>sim_vehicle.sh -L 3DRBerkeley --console  --out &lt;ANDROID_DEVICE_IP&gt;:14550
+</pre></div>
+</div>
+<p>Let&#8217;s some code in our app to connect to a drone.</p>
+<p>First, declare that your MainActivity can act as an interface for DroneListener and implement some methods to listen for drone events.</p>
+<div class="highlight-python"><div class="highlight"><pre>public class MainActivity extends ActionBarActivity implements DroneListener, ServiceListener {
+        @Override
+        public void onDroneEvent(String event, Bundle extras) {
+
+        }
+
+        @Override
+        public void onDroneConnectionFailed(ConnectionResult result) {
+
+        }
+
+        @Override
+        public void onDroneServiceInterrupted(String errorMsg) {
+
+        }
+
+        ...
+}
+</pre></div>
+</div>
+<p>Next, let&#8217;s add an instance variable to keep track of our drone instance.</p>
+<div class="highlight-python"><div class="highlight"><pre>public class MainActivity extends ActionBarActivity implements DroneListener, ServiceListener {
+
+        private Drone drone;
+        private int droneType = Type.TYPE_UNKNOWN;
+        private final Handler handler = new Handler();
+
+        @Override
+        protected void onCreate(Bundle savedInstanceState) {
+                super.onCreate(savedInstanceState);
+                setContentView(R.layout.activity_main);
+
+                this.serviceManager = new ServiceManager(getApplicationContext());
+                this.drone = new Drone(this.serviceManager, this.handler);
+        }
+
+        @Override
+        public void onStart() {
+                super.onStart();
+                this.serviceManager.connect(this);
+        }
+
+        @Override
+        public void onStop() {
+                super.onStop();
+                if (this.drone.isConnected()) {
+                        this.drone.disconnect();
+                }
+                this.drone.destroy();
+                this.serviceManager.disconnect();
+        }
+
+
+        @Override
+        public void onDroneEvent(String event, Bundle extras) {
+
+        }
+
+        @Override
+        public void onDroneConnectionFailed(ConnectionResult result) {
+
+        }
+
+        @Override
+        public void onDroneServiceInterrupted(String errorMsg) {
+
+        }
+
+        ...
+}
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="getting_started.html" class="btn btn-neutral" title="Getting Started"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, 3D Robotics.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'1.1.6beta',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
