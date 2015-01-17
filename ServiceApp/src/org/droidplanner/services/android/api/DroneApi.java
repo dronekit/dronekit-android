@@ -1,6 +1,7 @@
 package org.droidplanner.services.android.api;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -38,6 +39,7 @@ import com.o3dr.services.android.lib.drone.property.Speed;
 import com.o3dr.services.android.lib.drone.property.State;
 import com.o3dr.services.android.lib.drone.property.Type;
 import com.o3dr.services.android.lib.drone.property.VehicleMode;
+import com.o3dr.services.android.lib.gcs.event.GCSEvent;
 import com.o3dr.services.android.lib.gcs.follow.FollowState;
 import com.o3dr.services.android.lib.gcs.follow.FollowType;
 import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
@@ -69,13 +71,12 @@ import org.droidplanner.services.android.exception.ConnectionException;
 import org.droidplanner.services.android.interfaces.DroneEventsListener;
 import org.droidplanner.services.android.utils.MathUtils;
 import org.droidplanner.services.android.utils.ProxyUtils;
-import org.droidplanner.services.android.utils.file.IO.ParameterMetadataLoader;
 import org.droidplanner.services.android.utils.file.IO.CameraInfoLoader;
+import org.droidplanner.services.android.utils.file.IO.ParameterMetadataLoader;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.lang.ref.SoftReference;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -805,7 +806,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
     private void checkForSelfRelease() {
         //Check if the apiListener is still connected instead.
-        if(!apiListener.asBinder().pingBinder()){
+        if (!apiListener.asBinder().pingBinder()) {
             Log.w(TAG, "Client is not longer available.");
             getService().releaseDroneApi(this);
         }
@@ -894,7 +895,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
         }
     }
 
-    private static FollowAlgorithm.FollowModes followTypeToMode(FollowType followType){
+    private static FollowAlgorithm.FollowModes followTypeToMode(FollowType followType) {
         final FollowAlgorithm.FollowModes followMode;
 
         switch (followType) {
@@ -972,7 +973,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 break;
 
             case SPLINE_ABOVE:
-                    followType = FollowType.SPLINE_ABOVE;
+                followType = FollowType.SPLINE_ABOVE;
                 break;
 
             case GUIDED_SCAN:
@@ -1017,6 +1018,10 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
         switch (event) {
             case DISCONNECTED:
+                //Broadcast the disconnection with the vehicle.
+                context.sendBroadcast(new Intent(GCSEvent.ACTION_VEHICLE_DISCONNECTION)
+                        .putExtra(GCSEvent.EXTRA_APP_ID, ownerId));
+
                 droneEvent = AttributeEvent.STATE_DISCONNECTED;
                 break;
 
@@ -1142,7 +1147,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 break;
 
             case CONNECTED:
-                if(isConnected())
+                if (isConnected())
                     droneEvent = AttributeEvent.STATE_CONNECTED;
                 break;
 
@@ -1151,6 +1156,11 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 break;
 
             case HEARTBEAT_FIRST:
+                //Broadcast the vehicle connection.
+                context.sendBroadcast(new Intent(GCSEvent.ACTION_VEHICLE_CONNECTION)
+                        .putExtra(GCSEvent.EXTRA_APP_ID, ownerId)
+                        .putExtra(GCSEvent.EXTRA_VEHICLE_CONNECTION_PARAMETER, droneMgr.getConnectionParameter()));
+
                 onDroneEvent(DroneInterfaces.DroneEventsType.CONNECTED, drone);
 
                 extrasBundle = new Bundle(1);
