@@ -1039,7 +1039,8 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 break;
 
             case AUTOPILOT_WARNING:
-                extrasBundle = new Bundle(1);
+                extrasBundle = new Bundle(2);
+                extrasBundle.putInt(AttributeEventExtra.EXTRA_AUTOPILOT_FAILSAFE_MESSAGE_LEVEL, Log.ERROR);
                 extrasBundle.putString(AttributeEventExtra.EXTRA_AUTOPILOT_FAILSAFE_MESSAGE,
                         drone.getState().getWarning());
                 droneEvent = AttributeEvent.AUTOPILOT_FAILSAFE;
@@ -1133,7 +1134,25 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 droneEvent = AttributeEvent.HEARTBEAT_TIMEOUT;
                 break;
 
+            case CONNECTING:
+                extrasBundle = new Bundle(2);
+                extrasBundle.putInt(AttributeEventExtra.EXTRA_AUTOPILOT_FAILSAFE_MESSAGE_LEVEL, Log.INFO);
+                extrasBundle.putString(AttributeEventExtra.EXTRA_AUTOPILOT_FAILSAFE_MESSAGE, "Connecting...");
+                droneEvent = AttributeEvent.AUTOPILOT_FAILSAFE;
+                break;
+
+            case CONNECTED:
+                if(isConnected())
+                    droneEvent = AttributeEvent.STATE_CONNECTED;
+                break;
+
+            case CONNECTION_FAILED:
+                onConnectionFailed("");
+                break;
+
             case HEARTBEAT_FIRST:
+                onDroneEvent(DroneInterfaces.DroneEventsType.CONNECTED, drone);
+
                 extrasBundle = new Bundle(1);
                 extrasBundle.putInt(AttributeEventExtra.EXTRA_MAVLINK_VERSION, drone.getMavlinkVersion());
                 droneEvent = AttributeEvent.HEARTBEAT_FIRST;
@@ -1143,10 +1162,6 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 extrasBundle = new Bundle(1);
                 extrasBundle.putInt(AttributeEventExtra.EXTRA_MAVLINK_VERSION, drone.getMavlinkVersion());
                 droneEvent = AttributeEvent.HEARTBEAT_RESTORED;
-                break;
-
-            case CONNECTED:
-                droneEvent = AttributeEvent.STATE_CONNECTED;
                 break;
 
             case MISSION_SENT:

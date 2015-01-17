@@ -168,8 +168,7 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream,
             //TODO: restore live upload functionality when issue
             // 'https://github.com/diydrones/droneapi-java/issues/2' is fixed.
             boolean isLiveUploadEnabled = false; //droneSharePrefs.isLiveUploadEnabled();
-            if (droneSharePrefs != null &&  isLiveUploadEnabled &&
-                    droneSharePrefs.areLoginCredentialsSet()) {
+            if (droneSharePrefs != null &&  isLiveUploadEnabled && droneSharePrefs.areLoginCredentialsSet()) {
                 Log.i(TAG, "Starting live upload");
                 try {
                     if (uploader == null)
@@ -184,7 +183,7 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream,
             }
         }
 
-        this.drone.notifyDroneEvent(DroneInterfaces.DroneEventsType.CONNECTED);
+        this.drone.notifyDroneEvent(DroneInterfaces.DroneEventsType.CONNECTING);
     }
 
     @Override
@@ -276,7 +275,7 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream,
     }
 
     public boolean isConnected() {
-        return drone.getMavClient().isConnected();
+        return drone.isConnected();
     }
 
     public CameraInfoLoader getCameraInfoLoader() {

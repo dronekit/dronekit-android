@@ -8,11 +8,22 @@ public class AttributeEventExtra {
     private static final String PACKAGE_NAME = "com.o3dr.services.android.lib.attribute.event" +
             ".extra";
 
-    public static final String EXTRA_AUTOPILOT_FAILSAFE_MESSAGE = PACKAGE_NAME + "" +
-            ".AUTOPILOT_FAILSAFE_MESSAGE";
+    /**
+     * Used to access levels for the received autopilot failsafe messages.
+     * The message levels are based on the android Log api priority constants: https://developer.android.com/reference/android/util/Log.html
+     */
+    public static final String EXTRA_AUTOPILOT_FAILSAFE_MESSAGE_LEVEL = PACKAGE_NAME +
+            ".AUTOPILOT_FAILSAFE_MESSAGE_LEVEL";
 
-    public static final String EXTRA_CALIBRATION_IMU_MESSAGE = PACKAGE_NAME +
-            ".CALIBRATION_IMU_MESSAGE";
+    /**
+     * Used to access autopilot failsafe messages.
+     */
+    public static final String EXTRA_AUTOPILOT_FAILSAFE_MESSAGE = PACKAGE_NAME + ".AUTOPILOT_FAILSAFE_MESSAGE";
+
+    /**
+     * Used to access messages origination from the imu calibration process.
+     */
+    public static final String EXTRA_CALIBRATION_IMU_MESSAGE = PACKAGE_NAME + ".CALIBRATION_IMU_MESSAGE";
 
     /**
      * Used to access the points used to start the magnetometer calibration.
