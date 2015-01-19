@@ -20,8 +20,8 @@ public class DirectoryPath {
 	/**
 	 * Folder where telemetry log files are stored
 	 */
-	static public File getTLogPath(Context context) {
-		File f = new File(get3DRServicesPath(context) + "/tlogs/");
+	static public File getTLogPath(Context context, String appId) {
+		File f = new File(get3DRServicesPath(context) + "/tlogs/" + appId);
         if(!f.exists()) {
             f.mkdirs();
         }
@@ -31,8 +31,8 @@ public class DirectoryPath {
 	/**
 	 * After tlogs are uploaded they get moved to this directory
 	 */
-	static public File getSentPath(Context context) {
-		File f = new File(getTLogPath(context) + "/sent/");
+	static public File getTLogSentPath(Context context, String appId) {
+		File f = new File(getTLogPath(context, appId) + "/sent/");
         if(!f.exists()) {
             f.mkdirs();
         }

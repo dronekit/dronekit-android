@@ -37,13 +37,16 @@ public class TLogFileSelector extends ActionBarActivity {
 
         final Context context = getApplicationContext();
 
+        final Intent pickerIntent = getIntent();
+        final String appId = pickerIntent.getStringExtra(ServiceDataContract.EXTRA_REQUEST_TLOG_APP_ID);
+
         //Set up an intent to send back to apps that request a file.
         final Intent resultIntent = new Intent(ServiceDataContract.ACTION_RETURN_TLOG);
 
         //Set the activity's result to null to begin with
         setResult(Activity.RESULT_CANCELED, null);
 
-        final File[] tlogFiles = FileUtils.getTLogFileList(context);
+        final File[] tlogFiles = FileUtils.getTLogFileList(context, appId);
         final FileAdapter filesAdapter = new FileAdapter(context, tlogFiles);
 
         final ListView tlogListView = (ListView) findViewById(R.id.tlog_files_list);
