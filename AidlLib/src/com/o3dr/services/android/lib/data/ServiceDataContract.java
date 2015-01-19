@@ -1,12 +1,14 @@
 package com.o3dr.services.android.lib.data;
 
+import com.o3dr.services.android.lib.util.Utils;
+
 /**
  * The contract between the 3DR Services data provider, and applications. Contains definitions for the supported URIs
  * and columns.
  */
 public class ServiceDataContract {
 
-    private static final String PACKAGE_NAME = "com.o3dr.services.android.provider";
+    private static final String PACKAGE_NAME = Utils.PACKAGE_NAME + ".provider";
 
     /**
      * Authority for the service data provider.
