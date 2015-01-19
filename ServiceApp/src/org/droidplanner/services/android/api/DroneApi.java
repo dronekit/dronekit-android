@@ -114,7 +114,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
         observersList = new ConcurrentLinkedQueue<IObserver>();
         mavlinkObserversList = new ConcurrentLinkedQueue<IMavlinkObserver>();
 
-        this.droneMgr = new DroneManager(context, handler, mavlinkApi);
+        this.droneMgr = new DroneManager(context, this.ownerId, handler, mavlinkApi);
         this.droneMgr.setDroneEventsListener(this);
 
         this.apiListener = listener;
@@ -529,8 +529,8 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
         try {
             // Do a quick scan to see if we need any droneshare uploads
             if (connParams != null) {
+                this.droneMgr.kickStartDroneShareUpload();
                 this.droneMgr.connect();
-                getService().kickStartDroneShareUploader(connParams.getDroneSharePrefs());
             }
         } catch (ConnectionException e) {
             notifyConnectionFailed(new ConnectionResult(0, e.getMessage()));
@@ -1146,11 +1146,6 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 droneEvent = AttributeEvent.AUTOPILOT_FAILSAFE;
                 break;
 
-            case CONNECTED:
-                if (isConnected())
-                    droneEvent = AttributeEvent.STATE_CONNECTED;
-                break;
-
             case CONNECTION_FAILED:
                 onConnectionFailed("");
                 break;
@@ -1161,7 +1156,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                         .putExtra(GCSEvent.EXTRA_APP_ID, ownerId)
                         .putExtra(GCSEvent.EXTRA_VEHICLE_CONNECTION_PARAMETER, droneMgr.getConnectionParameter()));
 
-                onDroneEvent(DroneInterfaces.DroneEventsType.CONNECTED, drone);
+                notifyAttributeUpdate(AttributeEvent.STATE_CONNECTED, null);
 
                 extrasBundle = new Bundle(1);
                 extrasBundle.putInt(AttributeEventExtra.EXTRA_MAVLINK_VERSION, drone.getMavlinkVersion());

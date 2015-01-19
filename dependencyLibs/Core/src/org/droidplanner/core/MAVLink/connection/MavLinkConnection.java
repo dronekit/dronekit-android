@@ -5,13 +5,7 @@ import com.MAVLink.Parser;
 
 import org.droidplanner.core.model.Logger;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -37,22 +31,11 @@ public abstract class MavLinkConnection {
     private static final int READ_BUFFER_SIZE = 4096;
 
     /**
-     * Maximum possible sequence number for a packet.
-     */
-    private static final int MAX_PACKET_SEQUENCE = 255;
-
-    /**
      * Set of listeners subscribed to this mavlink connection. We're using a
      * ConcurrentSkipListSet because the object will be accessed from multiple
      * threads concurrently.
      */
     private final ConcurrentHashMap<String, MavLinkConnectionListener> mListeners = new ConcurrentHashMap<String, MavLinkConnectionListener>();
-
-    /**
-     * Queue the set of packets to log. A thread will be blocking on it until
-     * there's element(s) available for logging.
-     */
-    private final LinkedBlockingQueue<MAVLinkPacket> mPacketsToLog = new LinkedBlockingQueue<MAVLinkPacket>();
 
     /**
      * Queue the set of packets to send via the mavlink connection. A thread
@@ -70,7 +53,7 @@ public abstract class MavLinkConnection {
 
         @Override
         public void run() {
-            Thread sendingThread = null, loggingThread = null;
+            Thread sendingThread = null;
 
             // Load the connection specific preferences
             loadPreferences();
@@ -79,15 +62,14 @@ public abstract class MavLinkConnection {
                 // Open the connection
                 openConnection();
                 mConnectionStatus.set(MAVLINK_CONNECTED);
-                mConnectionTime.set(System.currentTimeMillis());
-                reportConnect();
 
-                // Launch the 'Sending', and 'Logging' threads
+                final long connectionTime = System.currentTimeMillis();
+                mConnectionTime.set(connectionTime);
+                reportConnect(connectionTime);
+
+                // Launch the 'Sending' threads
                 sendingThread = new Thread(mSendingTask, "MavLinkConnection-Sending Thread");
                 sendingThread.start();
-
-                loggingThread = new Thread(mLoggingTask, "MavLinkConnection-Logging Thread");
-                loggingThread.start();
 
                 final Parser parser = new Parser();
                 parser.stats.mavlinkResetStats();
@@ -105,10 +87,6 @@ public abstract class MavLinkConnection {
                     mLogger.logErr(TAG, e);
                 }
             } finally {
-                if (loggingThread != null && loggingThread.isAlive()) {
-                    loggingThread.interrupt();
-                }
-
                 if (sendingThread != null && sendingThread.isAlive()) {
                     sendingThread.interrupt();
                 }
@@ -126,7 +104,6 @@ public abstract class MavLinkConnection {
                 MAVLinkPacket receivedPacket = parser.mavlink_parse_char(buffer[i] & 0x00ff);
                 if (receivedPacket != null) {
                     reportReceivedPacket(receivedPacket);
-                    queueToLog(receivedPacket);
                 }
             }
         }
@@ -138,62 +115,22 @@ public abstract class MavLinkConnection {
     private final Runnable mSendingTask = new Runnable() {
         @Override
         public void run() {
-            int msgSeqNumber = 0;
-
             try {
                 while (mConnectionStatus.get() == MAVLINK_CONNECTED) {
                     final MAVLinkPacket packet = mPacketsToSend.take();
-                    packet.seq = msgSeqNumber;
                     byte[] buffer = packet.encodePacket();
 
                     try {
                         sendBuffer(buffer);
-                        queueToLog(packet);
                     } catch (IOException e) {
                         reportComError(e.getMessage());
                         mLogger.logErr(TAG, e);
                     }
-
-                    msgSeqNumber = (msgSeqNumber + 1) % (MAX_PACKET_SEQUENCE + 1);
                 }
             } catch (InterruptedException e) {
                 mLogger.logVerbose(TAG, e.getMessage());
             } finally {
                 disconnect();
-            }
-        }
-    };
-
-    /**
-     * Blocks until there's packets to log, then dispatch them.
-     */
-    private final Runnable mLoggingTask = new Runnable() {
-        @Override
-        public void run() {
-            final File tmpLogFile = getTempTLogFile(getConnectionTime());
-            final ByteBuffer logBuffer = ByteBuffer.allocate(Long.SIZE / Byte.SIZE);
-            logBuffer.order(ByteOrder.BIG_ENDIAN);
-
-            try {
-                final BufferedOutputStream logWriter = new BufferedOutputStream(new FileOutputStream(tmpLogFile));
-                try {
-                    while (mConnectionStatus.get() == MAVLINK_CONNECTED) {
-                        final MAVLinkPacket packet = mPacketsToLog.take();
-
-                        logBuffer.clear();
-                        logBuffer.putLong(System.currentTimeMillis() * 1000);
-
-                        logWriter.write(logBuffer.array());
-                        logWriter.write(packet.encodePacket());
-                    }
-                } catch (InterruptedException e) {
-                    mLogger.logVerbose(TAG, e.getMessage());
-                } finally {
-                    logWriter.close();
-                }
-            } catch (IOException e) {
-                mLogger.logErr(TAG, e);
-                reportComError(e.getMessage());
             }
         }
     };
@@ -223,6 +160,8 @@ public abstract class MavLinkConnection {
         }
 
         try {
+            final long disconnectTime = System.currentTimeMillis();
+
             mConnectionStatus.set(MAVLINK_DISCONNECTED);
             mConnectionTime.set(-1);
             if (mTaskThread.isAlive() && !mTaskThread.isInterrupted()) {
@@ -230,7 +169,7 @@ public abstract class MavLinkConnection {
             }
 
             closeConnection();
-            reportDisconnect();
+            reportDisconnect(disconnectTime);
         } catch (IOException e) {
             mLogger.logErr(TAG, e);
             reportComError(e.getMessage());
@@ -239,10 +178,6 @@ public abstract class MavLinkConnection {
 
     public int getConnectionStatus() {
         return mConnectionStatus.get();
-    }
-
-    protected long getConnectionTime(){
-        return mConnectionTime.get();
     }
 
     public void sendMavPacket(MAVLinkPacket packet) {
@@ -261,7 +196,7 @@ public abstract class MavLinkConnection {
         mListeners.put(tag, listener);
 
         if (getConnectionStatus() == MAVLINK_CONNECTED) {
-            listener.onConnect();
+            listener.onConnect(mConnectionTime.get());
         }
     }
 
@@ -310,8 +245,6 @@ public abstract class MavLinkConnection {
 
     protected abstract void loadPreferences();
 
-    protected abstract File getTempTLogFile(long connectionTimestamp);
-
     /**
      * @return The type of this mavlink connection.
      */
@@ -319,16 +252,6 @@ public abstract class MavLinkConnection {
 
     protected Logger getLogger() {
         return mLogger;
-    }
-
-    /**
-     * Queue a mavlink packet for logging.
-     *
-     * @param packet MAVLinkPacket packet
-     * @return true if the packet was queued successfully.
-     */
-    private boolean queueToLog(MAVLinkPacket packet) {
-        return mPacketsToLog.offer(packet);
     }
 
     /**
@@ -350,9 +273,9 @@ public abstract class MavLinkConnection {
      * Utility method to notify the mavlink listeners about a successful
      * connection.
      */
-    protected void reportConnect() {
+    protected void reportConnect(long connectionTime) {
         for (MavLinkConnectionListener listener : mListeners.values()) {
-            listener.onConnect();
+            listener.onConnect(connectionTime);
         }
     }
 
@@ -360,12 +283,12 @@ public abstract class MavLinkConnection {
      * Utility method to notify the mavlink listeners about a connection
      * disconnect.
      */
-    protected void reportDisconnect() {
+    protected void reportDisconnect(long disconnectTime) {
         if (mListeners.isEmpty())
             return;
 
         for (MavLinkConnectionListener listener : mListeners.values()) {
-            listener.onDisconnect();
+            listener.onDisconnect(disconnectTime);
         }
     }
 

@@ -26,8 +26,8 @@ public class FileUtils {
 		return getFileList(DirectoryPath.getCameraInfoPath(context), filter);
 	}
 
-    public static File[] getTLogFileList(Context context) {
-        return getFileList(DirectoryPath.getTLogPath(context).getPath(), new FilenameFilter() {
+    public static File[] getTLogFileList(Context context, String appId) {
+        return getFileList(DirectoryPath.getTLogPath(context, appId).getPath(), new FilenameFilter() {
             public boolean accept(File dir, String filename) {
                 return filename.contains(TLOG_FILENAME_EXT);
             }
@@ -51,17 +51,6 @@ public class FileUtils {
         if (file.exists())
             file.delete();
         return new FileOutputStream(file);
-    }
-
-    /**
-     * Return a filename that is suitable for a tlog
-     *
-     * @return
-     * @throws java.io.FileNotFoundException
-     */
-    static public File getTLogFile(Context context, String tlogPrefix) {
-        File myDir = DirectoryPath.getTLogPath(context);
-        return new File(myDir, tlogPrefix + TLOG_FILENAME_EXT);
     }
 
     /**
