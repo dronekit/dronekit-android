@@ -14,8 +14,7 @@ public class DroneSharePrefs implements Parcelable {
     private final boolean isEnabled;
     private final boolean enableLiveUpload;
 
-    public DroneSharePrefs(String username, String password, boolean isEnabled,
-                           boolean enableLiveUpload) {
+    public DroneSharePrefs(String username, String password, boolean isEnabled, boolean enableLiveUpload) {
         this.username = username;
         this.password = password;
         this.isEnabled = isEnabled;

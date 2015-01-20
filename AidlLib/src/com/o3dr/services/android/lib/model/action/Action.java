@@ -9,8 +9,8 @@ import android.os.Parcelable;
  */
 public class Action implements Parcelable {
 
-    public final String type;
-    public final Bundle data;
+    private String type;
+    private Bundle data;
 
     public Action(String actionType){
         this.type = actionType;
@@ -20,6 +20,14 @@ public class Action implements Parcelable {
     public Action(String actionType, Bundle actionData){
         this.type = actionType;
         this.data = actionData;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public Bundle getData() {
+        return data;
     }
 
     @Override
@@ -33,9 +41,13 @@ public class Action implements Parcelable {
         dest.writeBundle(data);
     }
 
+    public void readFromParcel(Parcel source){
+        this.type = source.readString();
+        data = source.readBundle();
+    }
+
     private Action(Parcel in) {
-        this.type = in.readString();
-        data = in.readBundle();
+        readFromParcel(in);
     }
 
     public static final Parcelable.Creator<Action> CREATOR = new Parcelable.Creator<Action>() {

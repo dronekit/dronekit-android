@@ -6,4 +6,16 @@
     <string name="drawer_open">打开导航抽屉</string>
     <string name="drawer_close">关闭导航抽屉</string>
     <string name="failed_start_calibration_message">无法启动校准！</string>
+
+    <string name="pref_mavlink_rates">流速</string>
+    <string name="pref_mavlink_rates_summary">接收无人机飞行数据的速率（以Hz为单位）</string>
+    <string name="pref_mavlink_stream_rate_ext_stat">航点、GPS原始数据、围栏数据、当前航点等</string>
+    <string name="pref_mavlink_stream_rate_extra1">姿态</string>
+    <string name="pref_mavlink_stream_rate_extra2">VFR_Hud数据</string>
+    <string name="pref_mavlink_stream_rate_extra3">航姿系统（AHRS），硬件状态，风速</string>
+    <string name="pref_mavlink_stream_rate_position">位置数据</string>
+    <string name="pref_mavlink_stream_rate_RC_override">遥控通道覆盖</string>
+    <string name="pref_mavlink_stream_rate_rc_channels">遥控通道数据</string>
+    <string name="pref_mavlink_stream_rate_raw_sensors">传感器原始数据</string>
+    <string name="pref_mavlink_stream_rate_raw_controller">控制器原始数据</string>
 </resources>

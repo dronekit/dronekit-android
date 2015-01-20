@@ -477,7 +477,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
         return new Type(getDroneProxyType(drone.getType()), drone.getFirmwareVersion());
     }
 
-    private boolean isConnected() {
+    boolean isConnected() {
         return droneMgr.isConnected();
     }
 
@@ -745,8 +745,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 MathUtils.coord2DToLatLong(footprint.getVertexInGlobalFrame()));
     }
 
-    @Override
-    public void buildComplexMissionItem(Bundle itemBundle) throws RemoteException {
+    public void buildComplexMissionItem(Bundle itemBundle) {
         MissionItem missionItem = MissionItemType.restoreMissionItemFromBundle(itemBundle);
         if (missionItem == null || !(missionItem instanceof MissionItem.ComplexItem))
             return;
@@ -828,11 +827,15 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
     @Override
     public void performAction(Action action) throws RemoteException {
-        if(action == null || action.type == null)
+        if(action == null)
             return;
 
-        Bundle data = action.data;
-        switch(action.type){
+        final String type = action.getType();
+        if(type == null)
+            return;
+
+        Bundle data = action.getData();
+        switch(type){
             // MISSION ACTIONS
             case MissionActions.ACTION_GENERATE_DRONIE:
                 generateDronie();
@@ -843,13 +846,19 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 break;
 
             case MissionActions.ACTION_SET_MISSION:
+                data.setClassLoader(Mission.class.getClassLoader());
                 Mission mission = data.getParcelable(MissionActions.EXTRA_MISSION);
                 boolean pushToDrone = data.getBoolean(MissionActions.EXTRA_PUSH_TO_DRONE);
                 setMission(mission, pushToDrone);
                 break;
 
+            case MissionActions.ACTION_BUILD_COMPLEX_MISSION_ITEM:
+                buildComplexMissionItem(data);
+                break;
+
             //CONNECTION ACTIONS
             case ConnectionActions.ACTION_CONNECT:
+                data.setClassLoader(ConnectionParameter.class.getClassLoader());
                 ConnectionParameter parameter = data.getParcelable(ConnectionActions.EXTRA_CONNECT_PARAMETER);
                 connect(parameter);
                 break;
@@ -869,6 +878,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 break;
 
             case ExperimentalActions.ACTION_SEND_MAVLINK_MESSAGE:
+                data.setClassLoader(MavlinkMessageWrapper.class.getClassLoader());
                 MavlinkMessageWrapper messageWrapper = data.getParcelable(ExperimentalActions.EXTRA_MAVLINK_MESSAGE);
                 sendMavlinkMessage(messageWrapper);
                 break;
@@ -880,6 +890,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 break;
 
             case GuidedActions.ACTION_SEND_GUIDED_POINT:
+                data.setClassLoader(LatLong.class.getClassLoader());
                 boolean force = data.getBoolean(GuidedActions.EXTRA_FORCE_GUIDED_POINT);
                 LatLong guidedPoint = data.getParcelable(GuidedActions.EXTRA_GUIDED_POINT);
                 sendGuidedPoint(guidedPoint, force);
@@ -896,6 +907,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 break;
 
             case ParameterActions.ACTION_WRITE_PARAMETERS:
+                data.setClassLoader(Parameters.class.getClassLoader());
                 Parameters parameters = data.getParcelable(ParameterActions.EXTRA_PARAMETERS);
                 writeParameters(parameters);
                 break;
@@ -907,6 +919,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 break;
 
             case StateActions.ACTION_SET_VEHICLE_MODE:
+                data.setClassLoader(VehicleMode.class.getClassLoader());
                 VehicleMode newMode = data.getParcelable(StateActions.EXTRA_VEHICLE_MODE);
                 changeVehicleMode(newMode);
                 break;
@@ -932,8 +945,9 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 stopMagnetometerCalibration();
                 break;
 
-            //FOLLOWME ACTIONS
+            //FOLLOW-ME ACTIONS
             case FollowMeActions.ACTION_ENABLE_FOLLOW_ME:
+                data.setClassLoader(FollowType.class.getClassLoader());
                 FollowType followType = data.getParcelable(FollowMeActions.EXTRA_FOLLOW_TYPE);
                 enableFollowMe(followType);
                 break;
@@ -947,6 +961,11 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 disableFollowMe();
                 break;
         }
+    }
+
+    @Override
+    public void performAsyncAction(Action action) throws RemoteException {
+        performAction(action);
     }
 
     private void notifyAttributeUpdate(String attributeEvent, Bundle extrasBundle) {
@@ -1255,9 +1274,13 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
             case HEARTBEAT_FIRST:
                 //Broadcast the vehicle connection.
+                final ConnectionParameter droneParams = droneMgr.getConnectionParameter();
+                final ConnectionParameter sanitizedParameter = new ConnectionParameter(droneParams.getConnectionType(),
+                        droneParams.getParamsBundle(), null);
+
                 context.sendBroadcast(new Intent(GCSEvent.ACTION_VEHICLE_CONNECTION)
                         .putExtra(GCSEvent.EXTRA_APP_ID, ownerId)
-                        .putExtra(GCSEvent.EXTRA_VEHICLE_CONNECTION_PARAMETER, droneMgr.getConnectionParameter()));
+                        .putExtra(GCSEvent.EXTRA_VEHICLE_CONNECTION_PARAMETER, sanitizedParameter));
 
                 notifyAttributeUpdate(AttributeEvent.STATE_CONNECTED, null);
 

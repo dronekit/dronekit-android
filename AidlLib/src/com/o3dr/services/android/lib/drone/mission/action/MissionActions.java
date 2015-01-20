@@ -1,9 +1,5 @@
 package com.o3dr.services.android.lib.drone.mission.action;
 
-import android.os.Bundle;
-
-import com.o3dr.services.android.lib.drone.mission.Mission;
-import com.o3dr.services.android.lib.model.action.Action;
 import com.o3dr.services.android.lib.util.Utils;
 
 /**
@@ -20,26 +16,6 @@ public class MissionActions {
 
     public static final String ACTION_LOAD_WAYPOINTS = Utils.PACKAGE_NAME + ".action.LOAD_WAYPOINTS";
 
-    /**
-     * Generate action to create a dronie mission, and upload it to the connected drone.
-     */
-    public static Action buildDronie(){
-        return new Action(ACTION_GENERATE_DRONIE);
-    }
-
-    /**
-     * Generate action to update the mission property for the drone model in memory.
-     * @param mission mission to upload to the drone.
-     * @param pushToDrone if true, upload the mission to the connected device.
-     */
-    public static Action buildMission(Mission mission, boolean pushToDrone){
-        Bundle params = new Bundle();
-        params.putParcelable(EXTRA_MISSION, mission);
-        params.putBoolean(EXTRA_PUSH_TO_DRONE, pushToDrone);
-        return new Action(ACTION_SET_MISSION, params);
-    }
-
-    public static Action buildWaypointsLoader(){
-        return new Action(ACTION_LOAD_WAYPOINTS);
-    }
+    public static final String ACTION_BUILD_COMPLEX_MISSION_ITEM = Utils.PACKAGE_NAME + ".action" +
+            ".BUILD_COMPLEX_MISSION_ITEM";
 }

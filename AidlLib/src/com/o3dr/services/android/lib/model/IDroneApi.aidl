@@ -19,12 +19,16 @@ interface IDroneApi {
     Bundle getAttribute(String attributeType);
 
     /**
-    * Build and return complex mission item.
-    * @param itemBundle bundle containing the complex mission item to update.
+    * Performs an action among the set exposed by the api.
     */
-    void buildComplexMissionItem(inout Bundle itemBundle);
+    void performAction(inout Action action);
 
     /*** Oneway method calls ***/
+
+    /**
+    * Performs asynchronously an action among the set exposed by the api.
+    */
+    oneway void performAsyncAction(in Action action);
 
     /**
     * Register a listener to receive drone events.
@@ -49,10 +53,5 @@ interface IDroneApi {
     * @param observer the observer to remove.
     */
     oneway void removeMavlinkObserver(IMavlinkObserver observer);
-
-    /**
-    * Performs an action among the set exposed by the api.
-    */
-    oneway void performAction(in Action action);
 
 }
