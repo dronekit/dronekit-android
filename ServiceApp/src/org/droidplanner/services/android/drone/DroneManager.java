@@ -9,13 +9,11 @@ import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.DroneSharePrefs;
-import com.o3dr.services.android.lib.drone.connection.StreamRates;
 
 import org.droidplanner.core.MAVLink.MAVLinkStreams;
 import org.droidplanner.core.MAVLink.MavLinkMsgHandler;
 import org.droidplanner.core.drone.DroneImpl;
 import org.droidplanner.core.drone.DroneInterfaces;
-import org.droidplanner.core.drone.variables.StreamRates.Rates;
 import org.droidplanner.core.drone.variables.helpers.MagnetometerCalibration;
 import org.droidplanner.core.gcs.follow.Follow;
 import org.droidplanner.core.model.Drone;
@@ -93,7 +91,9 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream,
         };
 
         DroidPlannerPrefs dpPrefs = new DroidPlannerPrefs(context);
+
         this.drone = new DroneImpl(mavClient, clock, dpHandler, dpPrefs, new AndroidApWarningParser(context));
+        this.drone.getStreamRates().setRates(dpPrefs.getRates());
 
         this.mavLinkMsgHandler = new MavLinkMsgHandler(this.drone);
 
@@ -259,22 +259,6 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream,
 
     public void setConnectionParameter(ConnectionParameter connParams) {
         this.connectionParams = connParams;
-
-        if (connParams != null) {
-            StreamRates connRates = connParams.getStreamRates();
-            Rates droneRates = new Rates();
-            droneRates.extendedStatus = connRates.getExtendedStatus();
-            droneRates.extra1 = connRates.getExtra1();
-            droneRates.extra2 = connRates.getExtra2();
-            droneRates.extra3 = connRates.getExtra3();
-            droneRates.position = connRates.getPosition();
-            droneRates.rcChannels = connRates.getRcChannels();
-            droneRates.rawSensors = connRates.getRawSensors();
-            droneRates.rawController = connRates.getRawController();
-
-            drone.getStreamRates().setRates(droneRates);
-        }
-
         ((MAVLinkClient) drone.getMavClient()).setConnectionParameter(connParams);
     }
 

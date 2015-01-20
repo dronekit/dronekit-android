@@ -1,0 +1,17 @@
+package com.o3dr.services.android.lib.drone.action;
+
+import com.o3dr.services.android.lib.util.Utils;
+
+/**
+ * Created by Fredia Huya-Kouadio on 1/19/15.
+ */
+public class ExperimentalActions {
+
+    public static final String ACTION_TRIGGER_CAMERA = Utils.PACKAGE_NAME + ".action.TRIGGER_CAMERA";
+
+    public static final String ACTION_EPM_COMMAND = Utils.PACKAGE_NAME + ".action.EPM_COMMAND";
+    public static final String EXTRA_EPM_RELEASE = Utils.PACKAGE_NAME + "extra_epm_release";
+
+    public static final String ACTION_SEND_MAVLINK_MESSAGE = Utils.PACKAGE_NAME + ".action.SEND_MAVLINK_MESSAGE";
+    public static final String EXTRA_MAVLINK_MESSAGE = "extra_mavlink_message";
+}
