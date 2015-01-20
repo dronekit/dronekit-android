@@ -28,11 +28,6 @@ public class AndroidUdpConnection extends AndroidMavLinkConnection {
 				return AndroidUdpConnection.this.initLogger();
 			}
 
-			@Override
-			protected File getTempTLogFile(long connectionTimestamp) {
-				return AndroidUdpConnection.this.getTempTLogFile(connectionTimestamp);
-			}
-
 		};
 	}
 

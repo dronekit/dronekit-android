@@ -10,7 +10,7 @@ public interface MavLinkConnectionListener {
 	/**
 	 * Called when the mavlink connection is established.
 	 */
-	public void onConnect();
+	public void onConnect(long connectionTime);
 
 	/**
 	 * Called when data is received via the mavlink connection.
@@ -23,7 +23,7 @@ public interface MavLinkConnectionListener {
 	/**
 	 * Called when the mavlink connection is disconnected.
 	 */
-	public void onDisconnect();
+	public void onDisconnect(long disconnectionTime);
 
 	/**
 	 * Provides information about communication error.

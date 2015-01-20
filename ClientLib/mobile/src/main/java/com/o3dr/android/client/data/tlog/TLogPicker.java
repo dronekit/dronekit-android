@@ -15,6 +15,7 @@ public class TLogPicker {
             return;
 
         final Intent requestIntent = new Intent(ServiceDataContract.ACTION_REQUEST_TLOG)
+                .putExtra(ServiceDataContract.EXTRA_REQUEST_TLOG_APP_ID, activity.getPackageName())
                 .setType(ServiceDataContract.TLOG_MIME_TYPE);
         activity.startActivityForResult(requestIntent, resultCode);
     }

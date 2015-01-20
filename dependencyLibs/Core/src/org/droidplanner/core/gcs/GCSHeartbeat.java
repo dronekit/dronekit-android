@@ -50,10 +50,11 @@ public class GCSHeartbeat {
 	 */
 	public void setActive(boolean active) {
 		if (active) {
-			heartbeatExecutor = Executors.newSingleThreadScheduledExecutor();
-			heartbeatExecutor
-					.scheduleWithFixedDelay(heartbeatRunnable, 0, period, TimeUnit.SECONDS);
-		} else if (heartbeatExecutor != null) {
+            if(heartbeatExecutor == null || heartbeatExecutor.isShutdown()) {
+                heartbeatExecutor = Executors.newSingleThreadScheduledExecutor();
+                heartbeatExecutor.scheduleWithFixedDelay(heartbeatRunnable, 0, period, TimeUnit.SECONDS);
+            }
+		} else if (heartbeatExecutor != null && !heartbeatExecutor.isShutdown()) {
 			heartbeatExecutor.shutdownNow();
 			heartbeatExecutor = null;
 		}

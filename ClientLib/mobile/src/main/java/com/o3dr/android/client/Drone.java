@@ -8,6 +8,14 @@ import android.os.RemoteException;
 import android.os.SystemClock;
 import android.util.Log;
 
+import com.o3dr.android.client.apis.drone.ConnectApi;
+import com.o3dr.android.client.apis.drone.DroneStateApi;
+import com.o3dr.android.client.apis.drone.ExperimentalApi;
+import com.o3dr.android.client.apis.drone.GuidedApi;
+import com.o3dr.android.client.apis.drone.ParameterApi;
+import com.o3dr.android.client.apis.gcs.CalibrationApi;
+import com.o3dr.android.client.apis.gcs.FollowApi;
+import com.o3dr.android.client.apis.mission.MissionApi;
 import com.o3dr.android.client.interfaces.DroneListener;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
@@ -15,7 +23,6 @@ import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionResult;
 import com.o3dr.services.android.lib.drone.mission.Mission;
-import com.o3dr.services.android.lib.drone.mission.MissionItemType;
 import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
 import com.o3dr.services.android.lib.drone.property.Altitude;
 import com.o3dr.services.android.lib.drone.property.Attitude;
@@ -36,6 +43,7 @@ import com.o3dr.services.android.lib.gcs.follow.FollowType;
 import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
 import com.o3dr.services.android.lib.model.IDroneApi;
 import com.o3dr.services.android.lib.model.IObserver;
+import com.o3dr.services.android.lib.model.action.Action;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
@@ -356,25 +364,39 @@ public class Drone {
     }
 
     public void connect(final ConnectionParameter connParams) {
-        if (isStarted()) {
-            try {
-                droneApi.connect(connParams);
-                this.connectionParameter = connParams;
-            } catch (RemoteException e) {
-                handleRemoteException(e);
-            }
-        }
+        if (ConnectApi.connect(this, connParams))
+            this.connectionParameter = connParams;
     }
 
     public void disconnect() {
+        if (ConnectApi.disconnect(this))
+            this.connectionParameter = null;
+    }
+
+    public boolean performAction(Action action) {
         if (isStarted()) {
             try {
-                droneApi.disconnect();
-                this.connectionParameter = null;
+                droneApi.performAction(action);
+                return true;
             } catch (RemoteException e) {
                 handleRemoteException(e);
             }
         }
+
+        return false;
+    }
+
+    public boolean performAsyncAction(Action action) {
+        if (isStarted()) {
+            try {
+                droneApi.performAsyncAction(action);
+                return true;
+            } catch (RemoteException e) {
+                handleRemoteException(e);
+            }
+        }
+
+        return false;
     }
 
     public boolean isStarted() {
@@ -390,26 +412,6 @@ public class Drone {
         return this.connectionParameter;
     }
 
-    private <T extends MissionItem> T buildMissionItem(MissionItem.ComplexItem<T> complexItem) {
-        if (isStarted()) {
-            try {
-                T missionItem = (T) complexItem;
-                Bundle payload = missionItem.getType().storeMissionItem(missionItem);
-                if (payload == null)
-                    return null;
-
-                droneApi.buildComplexMissionItem(payload);
-                T updatedItem = MissionItemType.restoreMissionItemFromBundle(payload);
-                complexItem.copy(updatedItem);
-                return (T) complexItem;
-            } catch (RemoteException e) {
-                handleRemoteException(e);
-            }
-        }
-
-        return null;
-    }
-
     public <T extends MissionItem> void buildMissionItemsAsync(final OnMissionItemsBuiltCallback<T> callback,
                                                                final MissionItem.ComplexItem<T>... missionItems) {
         if (callback == null)
@@ -422,7 +424,7 @@ public class Drone {
             @Override
             public void run() {
                 for (MissionItem.ComplexItem<T> missionItem : missionItems)
-                    buildMissionItem(missionItem);
+                    MissionApi.buildMissionItem(Drone.this, missionItem);
 
                 handler.post(new Runnable() {
                     @Override
@@ -489,226 +491,87 @@ public class Drone {
     }
 
     public void changeVehicleMode(VehicleMode newMode) {
-        if (isStarted()) {
-            try {
-                droneApi.changeVehicleMode(newMode);
-            } catch (RemoteException e) {
-                handleRemoteException(e);
-            }
-        }
+        DroneStateApi.setVehicleMode(this, newMode);
     }
 
     public void refreshParameters() {
-        if (isStarted()) {
-            try {
-                droneApi.refreshParameters();
-            } catch (RemoteException e) {
-                handleRemoteException(e);
-            }
-        }
+        ParameterApi.refreshParameters(this);
     }
 
     public void writeParameters(Parameters parameters) {
-        if (isStarted()) {
-            try {
-                droneApi.writeParameters(parameters);
-            } catch (RemoteException e) {
-                handleRemoteException(e);
-            }
-        }
+        ParameterApi.writeParameters(this, parameters);
     }
 
-
     public void setMission(Mission mission, boolean pushToDrone) {
-        if (isStarted()) {
-            try {
-                droneApi.setMission(mission, pushToDrone);
-            } catch (RemoteException e) {
-                handleRemoteException(e);
-            }
-        }
+        MissionApi.setMission(this, mission, pushToDrone);
     }
 
     public void generateDronie() {
-        if (isStarted()) {
-            try {
-                droneApi.generateDronie();
-            } catch (RemoteException e) {
-                handleRemoteException(e);
-            }
-        }
+        MissionApi.generateDronie(this);
     }
 
     public void arm(boolean arm) {
-        if (isStarted()) {
-            try {
-                droneApi.arm(arm);
-            } catch (RemoteException e) {
-                handleRemoteException(e);
-            }
-        }
+        DroneStateApi.arm(this, arm);
     }
 
-    public void startMagnetometerCalibration(double[] startPointsX, double[] startPointsY,
-                                             double[] startPointsZ) {
-        if (isStarted()) {
-            try {
-                droneApi.startMagnetometerCalibration(startPointsX, startPointsY, startPointsZ);
-            } catch (RemoteException e) {
-                handleRemoteException(e);
-            }
-        }
+    public void startMagnetometerCalibration(double[] startPointsX, double[] startPointsY, double[] startPointsZ) {
+        CalibrationApi.startMagnetometerCalibration(this, startPointsX, startPointsY, startPointsZ);
     }
 
     public void stopMagnetometerCalibration() {
-        if (isStarted()) {
-            try {
-                droneApi.stopMagnetometerCalibration();
-            } catch (RemoteException e) {
-                handleRemoteException(e);
-            }
-        }
+        CalibrationApi.stopMagnetometerCalibration(this);
     }
 
     public void startIMUCalibration() {
-        if (isStarted()) {
-            try {
-                droneApi.startIMUCalibration();
-            } catch (RemoteException e) {
-                handleRemoteException(e);
-            }
-        }
+        CalibrationApi.startIMUCalibration(this);
     }
 
     public void sendIMUCalibrationAck(int step) {
-        if (isStarted()) {
-            try {
-                droneApi.sendIMUCalibrationAck(step);
-            } catch (RemoteException e) {
-                handleRemoteException(e);
-            }
-        }
+        CalibrationApi.sendIMUAck(this, step);
     }
 
     public void doGuidedTakeoff(double altitude) {
-        if (isStarted()) {
-            try {
-                droneApi.doGuidedTakeoff(altitude);
-            } catch (RemoteException e) {
-                handleRemoteException(e);
-            }
-        }
+        GuidedApi.takeoff(this, altitude);
     }
 
     public void pauseAtCurrentLocation() {
-        getAttributeAsync(AttributeType.GPS, new AttributeRetrievedListener<Gps>() {
-            @Override
-            public void onRetrievalSucceed(Gps gps) {
-                sendGuidedPoint(gps.getPosition(), true);
-            }
-        });
+        GuidedApi.pauseAtCurrentLocation(this);
     }
 
     public void sendGuidedPoint(LatLong point, boolean force) {
-        if (isStarted()) {
-            try {
-                droneApi.sendGuidedPoint(point, force);
-            } catch (RemoteException e) {
-                handleRemoteException(e);
-            }
-        }
+        GuidedApi.sendGuidedPoint(this, point, force);
     }
 
     public void sendMavlinkMessage(MavlinkMessageWrapper messageWrapper) {
-        if (messageWrapper != null && isStarted()) {
-            try {
-                droneApi.sendMavlinkMessage(messageWrapper);
-            } catch (RemoteException e) {
-                handleRemoteException(e);
-            }
-        }
+        ExperimentalApi.sendMavlinkMessage(this, messageWrapper);
     }
 
     public void setGuidedAltitude(double altitude) {
-        if (isStarted()) {
-            try {
-                droneApi.setGuidedAltitude(altitude);
-            } catch (RemoteException e) {
-                handleRemoteException(e);
-            }
-        }
-    }
-
-    public void setGuidedVelocity(double xVel, double yVel, double zVel) {
-        if (isStarted()) {
-            try {
-                droneApi.setGuidedVelocity(xVel, yVel, zVel);
-            } catch (RemoteException e) {
-                handleRemoteException(e);
-            }
-        }
+        GuidedApi.setGuidedAltitude(this, altitude);
     }
 
     public void enableFollowMe(FollowType followType) {
-        if (isStarted()) {
-            try {
-                droneApi.enableFollowMe(followType);
-            } catch (RemoteException e) {
-                handleRemoteException(e);
-            }
-        }
+        FollowApi.enableFollowMe(this, followType);
     }
 
     public void setFollowMeRadius(double radius) {
-        if (isStarted()) {
-            try {
-                droneApi.setFollowMeRadius(radius);
-            } catch (RemoteException e) {
-                handleRemoteException(e);
-            }
-        }
+        FollowApi.updateFollowMeRadius(this, radius);
     }
-
 
     public void disableFollowMe() {
-        if (isStarted()) {
-            try {
-                droneApi.disableFollowMe();
-            } catch (RemoteException e) {
-                handleRemoteException(e);
-            }
-        }
+        FollowApi.disableFollowMe(this);
     }
 
-
     public void triggerCamera() {
-        if (isStarted()) {
-            try {
-                droneApi.triggerCamera();
-            } catch (RemoteException e) {
-                handleRemoteException(e);
-            }
-        }
+        ExperimentalApi.triggerCamera(this);
     }
 
     public void epmCommand(boolean release) {
-        if (isStarted()) {
-            try {
-                droneApi.epmCommand(release);
-            } catch (RemoteException e) {
-                handleRemoteException(e);
-            }
-        }
+        ExperimentalApi.epmCommand(this, release);
     }
 
     public void loadWaypoints() {
-        if (isStarted()) {
-            try {
-                droneApi.loadWaypoints();
-            } catch (RemoteException e) {
-                handleRemoteException(e);
-            }
-        }
+        MissionApi.loadWaypoints(this);
     }
 
     void notifyDroneConnectionFailed(final ConnectionResult result) {

@@ -1,12 +1,14 @@
 package com.o3dr.services.android.lib.data;
 
+import com.o3dr.services.android.lib.util.Utils;
+
 /**
  * The contract between the 3DR Services data provider, and applications. Contains definitions for the supported URIs
  * and columns.
  */
 public class ServiceDataContract {
 
-    private static final String PACKAGE_NAME = "com.o3dr.services.android.provider";
+    private static final String PACKAGE_NAME = Utils.PACKAGE_NAME + ".provider";
 
     /**
      * Authority for the service data provider.
@@ -22,6 +24,11 @@ public class ServiceDataContract {
      * Action used to request a tlog file.
      */
     public static final String ACTION_REQUEST_TLOG = PACKAGE_NAME + ".action.REQUEST_TLOG_FILE";
+
+    /**
+     * Key used to access the id of the app requesting the tlog data.
+     */
+    public static final String EXTRA_REQUEST_TLOG_APP_ID = PACKAGE_NAME + ".extra.REQUEST_TLOG_APP_ID";
 
     /**
      * Action used to notify of the availability of a tlog file.

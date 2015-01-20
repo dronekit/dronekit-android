@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.ResolveInfo;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
@@ -95,6 +96,18 @@ public class ServiceManager {
             return;
 
         serviceListener.onServiceInterrupted();
+    }
+
+    public Bundle[] getConnectedApps(){
+        if(isServiceConnected()) {
+            try {
+                return o3drServices.getConnectedApps(getApplicationId());
+            } catch (RemoteException e) {
+                Log.e(TAG, e.getMessage(), e);
+            }
+        }
+
+        return new Bundle[0];
     }
 
     public void connect(ServiceListener listener) {

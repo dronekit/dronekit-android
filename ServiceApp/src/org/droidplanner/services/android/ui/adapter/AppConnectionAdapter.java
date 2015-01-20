@@ -101,13 +101,12 @@ public class AppConnectionAdapter extends RecyclerView.Adapter<AppConnectionAdap
             }
         }
 
-        ConnectionParameter connParams = droneApi.getDroneManager().getConnectionParameter();
-        if (connParams == null) {
-            viewHolder.clientConnectionInfo.setText(SpannableUtils.normal("Status: ", SpannableUtils.color(Color.RED,
-                    "Disconnected")));
-        } else {
+        if (droneApi.getDroneManager().isConnected()) {
             viewHolder.clientConnectionInfo.setText(SpannableUtils.normal("Status: ", SpannableUtils.color(Color
                     .GREEN, "Connected")));
+        } else {
+            viewHolder.clientConnectionInfo.setText(SpannableUtils.normal("Status: ", SpannableUtils.color(Color.RED,
+                    "Disconnected")));
         }
     }
 }
