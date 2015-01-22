@@ -34,7 +34,7 @@ public class LatLongAlt extends LatLong {
         return mAltitude;
     }
 
-    public void setAltitude(float altitude) {
+    public void setAltitude(double altitude) {
         this.mAltitude = altitude;
     }
 
