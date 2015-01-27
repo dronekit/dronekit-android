@@ -94,10 +94,10 @@ public class Drone {
 
     private final ConcurrentLinkedQueue<DroneListener> droneListeners = new ConcurrentLinkedQueue<>();
 
-    private final Handler handler;
-    private final ServiceManager serviceMgr;
-    private final DroneObserver droneObserver;
-    private final DroneApiListener apiListener;
+    private Handler handler;
+    private ControlTower serviceMgr;
+    private DroneObserver droneObserver;
+    private DroneApiListener apiListener;
 
     private IDroneApi droneApi;
     private ConnectionParameter connectionParameter;
@@ -108,15 +108,17 @@ public class Drone {
     private long startTime = 0;
     private long elapsedFlightTime = 0;
 
-    public Drone(ServiceManager serviceManager, Handler handler) {
+    public Drone(){}
+
+    void init(ControlTower controlTower, Handler handler){
         this.handler = handler;
-        this.serviceMgr = serviceManager;
+        this.serviceMgr = controlTower;
         this.apiListener = new DroneApiListener(this);
         this.droneObserver = new DroneObserver(this);
     }
 
-    public void start() {
-        if (!serviceMgr.isServiceConnected())
+    void start() {
+        if (!serviceMgr.isTowerConnected())
             throw new IllegalStateException("Service manager must be connected.");
 
         if (isStarted())
@@ -136,7 +138,7 @@ public class Drone {
         resetFlightTimer();
     }
 
-    public void destroy() {
+    void destroy() {
         removeAttributesObserver(this.droneObserver);
 
         try {

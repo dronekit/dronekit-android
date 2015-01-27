@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 
@@ -27,11 +28,24 @@ public class FileUtils {
 	}
 
     public static File[] getTLogFileList(Context context, String appId) {
-        return getFileList(DirectoryPath.getTLogPath(context, appId).getPath(), new FilenameFilter() {
+        final FilenameFilter tlogFilter = new FilenameFilter() {
             public boolean accept(File dir, String filename) {
-                return filename.contains(TLOG_FILENAME_EXT);
+                return filename.endsWith(TLOG_FILENAME_EXT);
             }
-        });
+        };
+
+        File[] unsentFiles = getFileList(DirectoryPath.getTLogPath(context, appId).getPath(), tlogFilter);
+        File[] sentFiles = getFileList(DirectoryPath.getTLogSentPath(context, appId).getPath(), tlogFilter);
+        File[] tlogFiles = new File[unsentFiles.length + sentFiles.length];
+
+        int i = 0;
+        for(File file : unsentFiles)
+            tlogFiles[i++] = file;
+
+        for(File file : sentFiles)
+            tlogFiles[i++] = file;
+
+        return tlogFiles;
     }
 
 	static public File[] getFileList(String path, FilenameFilter filter) {

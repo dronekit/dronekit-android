@@ -6,14 +6,14 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.ResolveInfo;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
 
-import com.o3dr.android.client.interfaces.ServiceListener;
+import com.o3dr.android.client.interfaces.TowerListener;
 import com.o3dr.android.client.utils.InstallServiceDialog;
 import com.o3dr.android.client.utils.UpdateServiceDialog;
-import com.o3dr.services.android.lib.*;
 import com.o3dr.services.android.lib.BuildConfig;
 import com.o3dr.services.android.lib.model.IDroidPlannerServices;
 
@@ -22,16 +22,16 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Created by fhuya on 11/12/14.
  */
-public class ServiceManager {
+public class ControlTower {
 
-    private static final String TAG = ServiceManager.class.getSimpleName();
+    private static final String TAG = ControlTower.class.getSimpleName();
 
     private final Intent serviceIntent = new Intent(IDroidPlannerServices.class.getName());
 
     private final IBinder.DeathRecipient binderDeathRecipient = new IBinder.DeathRecipient() {
         @Override
         public void binderDied() {
-            notifyServiceInterrupted();
+            notifyTowerDisconnected();
         }
     };
 
@@ -44,35 +44,34 @@ public class ServiceManager {
             o3drServices = IDroidPlannerServices.Stub.asInterface(service);
             try {
                 final int libVersionCode = o3drServices.getApiVersionCode();
-                if(libVersionCode < BuildConfig.VERSION_CODE){
+                if (libVersionCode < BuildConfig.VERSION_CODE) {
                     //Prompt the user to update the 3DR Services app.
                     o3drServices = null;
                     promptFor3DRServicesUpdate();
                     context.unbindService(o3drServicesConnection);
-                }
-                else {
+                } else {
                     o3drServices.asBinder().linkToDeath(binderDeathRecipient, 0);
-                    notifyServiceConnected();
+                    notifyTowerConnected();
                 }
             } catch (RemoteException e) {
-                notifyServiceInterrupted();
+                notifyTowerDisconnected();
             }
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
             isServiceConnecting.set(false);
-            notifyServiceInterrupted();
+            notifyTowerDisconnected();
         }
     };
 
     private final AtomicBoolean isServiceConnecting = new AtomicBoolean(false);
 
     private final Context context;
-    private ServiceListener serviceListener;
+    private TowerListener towerListener;
     private IDroidPlannerServices o3drServices;
 
-    public ServiceManager(Context context) {
+    public ControlTower(Context context) {
         this.context = context;
     }
 
@@ -80,26 +79,26 @@ public class ServiceManager {
         return o3drServices;
     }
 
-    public boolean isServiceConnected() {
+    public boolean isTowerConnected() {
         return o3drServices != null && o3drServices.asBinder().pingBinder();
     }
 
-    public void notifyServiceConnected() {
-        if (serviceListener == null)
+    void notifyTowerConnected() {
+        if (towerListener == null)
             return;
 
-        serviceListener.onServiceConnected();
+        towerListener.onTowerConnected();
     }
 
-    public void notifyServiceInterrupted() {
-        if (serviceListener == null)
+    void notifyTowerDisconnected() {
+        if (towerListener == null)
             return;
 
-        serviceListener.onServiceInterrupted();
+        towerListener.onTowerDisconnected();
     }
 
-    public Bundle[] getConnectedApps(){
-        if(isServiceConnected()) {
+    public Bundle[] getConnectedApps() {
+        if (isTowerConnected()) {
             try {
                 return o3drServices.getConnectedApps(getApplicationId());
             } catch (RemoteException e) {
@@ -110,33 +109,48 @@ public class ServiceManager {
         return new Bundle[0];
     }
 
-    public void connect(ServiceListener listener) {
-        if (serviceListener != null && (isServiceConnecting.get() || isServiceConnected()))
+    public void registerDrone(Drone drone, Handler handler) {
+        if(drone == null)
+            return;
+
+        if (!isTowerConnected())
+            throw new IllegalStateException("Control Tower must be connected.");
+
+        drone.init(this, handler);
+        drone.start();
+    }
+
+    public void unregisterDrone(Drone drone) {
+        if (drone != null)
+            drone.destroy();
+    }
+
+    public void connect(TowerListener listener) {
+        if (towerListener != null && (isServiceConnecting.get() || isTowerConnected()))
             return;
 
         if (listener == null) {
             throw new IllegalArgumentException("ServiceListener argument cannot be null.");
         }
 
-        serviceListener = listener;
+        towerListener = listener;
 
-        if(!isServiceConnected() && !isServiceConnecting.get()) {
+        if (!isTowerConnected() && !isServiceConnecting.get()) {
             if (is3DRServicesInstalled()) {
                 isServiceConnecting.set(context.bindService(serviceIntent, o3drServicesConnection,
                         Context.BIND_AUTO_CREATE));
-            }
-            else
+            } else
                 promptFor3DRServicesInstall();
         }
     }
 
     public void disconnect() {
-        if(o3drServices != null){
+        if (o3drServices != null) {
             o3drServices.asBinder().unlinkToDeath(binderDeathRecipient, 0);
             o3drServices = null;
         }
 
-        serviceListener = null;
+        towerListener = null;
 
         try {
             context.unbindService(o3drServicesConnection);
@@ -162,7 +176,7 @@ public class ServiceManager {
         context.startActivity(new Intent(context, InstallServiceDialog.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
     }
 
-    private void promptFor3DRServicesUpdate(){
+    private void promptFor3DRServicesUpdate() {
         context.startActivity(new Intent(context, UpdateServiceDialog.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
     }
 }
