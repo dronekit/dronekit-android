@@ -48,8 +48,13 @@ public class MissionApi {
      * Build and return complex mission item.
      * @param itemBundle bundle containing the complex mission item to update.
      */
-    private static boolean buildComplexMissionItem(Drone drone, Bundle itemBundle) {
-        return drone.performAction(new Action(ACTION_BUILD_COMPLEX_MISSION_ITEM, itemBundle));
+    private static Action buildComplexMissionItem(Drone drone, Bundle itemBundle) {
+        Action payload = new Action(ACTION_BUILD_COMPLEX_MISSION_ITEM, itemBundle);
+        boolean result = drone.performAction(payload);
+        if(result)
+            return payload;
+        else
+            return null;
     }
 
     public static <T extends MissionItem> T buildMissionItem(Drone drone,
@@ -59,8 +64,9 @@ public class MissionApi {
         if (payload == null)
             return null;
 
-        if(buildComplexMissionItem(drone, payload)){
-            T updatedItem = MissionItemType.restoreMissionItemFromBundle(payload);
+        Action result = buildComplexMissionItem(drone, payload);
+        if(result != null){
+            T updatedItem = MissionItemType.restoreMissionItemFromBundle(result.getData());
             complexItem.copy(updatedItem);
             return (T) complexItem;
         }

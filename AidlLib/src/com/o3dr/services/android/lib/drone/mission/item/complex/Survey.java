@@ -15,6 +15,13 @@ import java.util.List;
 public class Survey extends MissionItem implements MissionItem.ComplexItem<Survey>, android.os.Parcelable {
 
     private SurveyDetail surveyDetail = new SurveyDetail();
+    {
+        surveyDetail.setAltitude(50);
+        surveyDetail.setAngle(0);
+        surveyDetail.setOverlap(50);
+        surveyDetail.setSidelap(60);
+    }
+
     private double polygonArea;
     private List<LatLong> polygonPoints = new ArrayList<LatLong>();
     private List<LatLong> gridPoints = new ArrayList<LatLong>();
