@@ -99,6 +99,14 @@ public class SurveyDetail implements Parcelable {
     public SurveyDetail() {
     }
 
+    public SurveyDetail(SurveyDetail copy){
+        this.altitude = copy.altitude;
+        this.angle = copy.angle;
+        this.overlap = copy.overlap;
+        this.sidelap = copy.sidelap;
+        this.cameraDetail = copy.cameraDetail == null ? null : new CameraDetail(copy.cameraDetail);
+    }
+
     private SurveyDetail(Parcel in) {
         this.altitude = in.readDouble();
         this.angle = in.readDouble();

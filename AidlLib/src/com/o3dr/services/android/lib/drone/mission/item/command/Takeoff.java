@@ -21,6 +21,11 @@ public class Takeoff extends MissionItem implements MissionItem.Command, android
         super(MissionItemType.TAKEOFF);
     }
 
+    public Takeoff(Takeoff copy){
+        this();
+        takeoffAltitude = copy.takeoffAltitude;
+    }
+
     public double getTakeoffAltitude() {
         return takeoffAltitude;
     }
@@ -38,6 +43,11 @@ public class Takeoff extends MissionItem implements MissionItem.Command, android
     private Takeoff(Parcel in) {
         super(in);
         this.takeoffAltitude = in.readDouble();
+    }
+
+    @Override
+    public MissionItem clone() {
+        return new Takeoff(this);
     }
 
     public static final Creator<Takeoff> CREATOR = new Creator<Takeoff>() {

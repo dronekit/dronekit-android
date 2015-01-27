@@ -12,8 +12,7 @@ import java.util.List;
 
 /**
  */
-public class Survey extends MissionItem implements MissionItem.ComplexItem<Survey>,
-        android.os.Parcelable {
+public class Survey extends MissionItem implements MissionItem.ComplexItem<Survey>, android.os.Parcelable {
 
     private SurveyDetail surveyDetail = new SurveyDetail();
     private double polygonArea;
@@ -26,13 +25,27 @@ public class Survey extends MissionItem implements MissionItem.ComplexItem<Surve
         super(MissionItemType.SURVEY);
     }
 
+    public Survey(Survey copy){
+        this();
+        copy(copy);
+    }
+
     public void copy(Survey source){
-        this.surveyDetail = source.surveyDetail;
+        this.surveyDetail = new SurveyDetail(source.surveyDetail);
         this.polygonArea = source.polygonArea;
-        this.polygonPoints = source.polygonPoints;
-        this.gridPoints = source.gridPoints;
-        this.cameraLocations = source.cameraLocations;
+        this.polygonPoints = copyPointsList(source.polygonPoints);
+        this.gridPoints = copyPointsList(source.gridPoints);
+        this.cameraLocations = copyPointsList(source.cameraLocations);
         this.isValid = source.isValid;
+    }
+
+    private List<LatLong> copyPointsList(List<LatLong> copy){
+        final List<LatLong> dest = new ArrayList<>();
+        for(LatLong itemCopy : copy){
+            dest.add(new LatLong(itemCopy));
+        }
+
+        return dest;
     }
 
     public SurveyDetail getSurveyDetail() {
@@ -114,6 +127,11 @@ public class Survey extends MissionItem implements MissionItem.ComplexItem<Surve
         in.readTypedList(gridPoints, LatLong.CREATOR);
         in.readTypedList(cameraLocations, LatLong.CREATOR);
         this.isValid = in.readByte() != 0;
+    }
+
+    @Override
+    public MissionItem clone() {
+        return new Survey(this);
     }
 
     public static final Creator<Survey> CREATOR = new Creator<Survey>() {

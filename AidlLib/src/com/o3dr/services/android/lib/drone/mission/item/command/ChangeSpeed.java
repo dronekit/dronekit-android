@@ -16,6 +16,11 @@ public class ChangeSpeed extends MissionItem implements MissionItem.Command, and
         super(MissionItemType.CHANGE_SPEED);
     }
 
+    public ChangeSpeed(ChangeSpeed copy){
+        super(MissionItemType.CHANGE_SPEED);
+        speed = copy.speed;
+    }
+
     public double getSpeed() {
         return speed;
     }
@@ -33,6 +38,11 @@ public class ChangeSpeed extends MissionItem implements MissionItem.Command, and
     private ChangeSpeed(Parcel in) {
         super(in);
         this.speed = in.readDouble();
+    }
+
+    @Override
+    public MissionItem clone() {
+        return new ChangeSpeed(this);
     }
 
     public static final Creator<ChangeSpeed> CREATOR = new Creator<ChangeSpeed>() {

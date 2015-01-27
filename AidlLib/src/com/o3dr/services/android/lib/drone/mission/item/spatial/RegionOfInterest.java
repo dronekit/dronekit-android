@@ -4,6 +4,7 @@ import android.os.Parcel;
 
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.mission.MissionItemType;
+import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
 
 /**
  * Created by fhuya on 11/6/14.
@@ -14,8 +15,17 @@ public class RegionOfInterest extends BaseSpatialItem implements android.os.Parc
         super(MissionItemType.REGION_OF_INTEREST);
     }
 
+    public RegionOfInterest(RegionOfInterest copy) {
+        super(copy);
+    }
+
     private RegionOfInterest(Parcel in) {
         super(in);
+    }
+
+    @Override
+    public MissionItem clone() {
+        return new RegionOfInterest(this);
     }
 
     public static final Creator<RegionOfInterest> CREATOR = new Creator<RegionOfInterest>() {

@@ -17,6 +17,12 @@ public class SetServo extends MissionItem implements MissionItem.Command, androi
         super(MissionItemType.SET_SERVO);
     }
 
+    public SetServo(SetServo copy){
+        this();
+        pwm = copy.pwm;
+        channel = copy.channel;
+    }
+
     public int getPwm() {
         return pwm;
     }
@@ -44,6 +50,11 @@ public class SetServo extends MissionItem implements MissionItem.Command, androi
         super(in);
         this.pwm = in.readInt();
         this.channel = in.readInt();
+    }
+
+    @Override
+    public MissionItem clone() {
+        return new SetServo(this);
     }
 
     public static final Creator<SetServo> CREATOR = new Creator<SetServo>() {
