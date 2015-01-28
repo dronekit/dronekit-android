@@ -8,8 +8,7 @@ import com.o3dr.services.android.lib.model.action.Action;
 
 import static com.o3dr.services.android.lib.gcs.action.FollowMeActions.ACTION_DISABLE_FOLLOW_ME;
 import static com.o3dr.services.android.lib.gcs.action.FollowMeActions.ACTION_ENABLE_FOLLOW_ME;
-import static com.o3dr.services.android.lib.gcs.action.FollowMeActions.ACTION_UPDATE_FOLLOW_ME_RADIUS;
-import static com.o3dr.services.android.lib.gcs.action.FollowMeActions.EXTRA_FOLLOW_ME_RADIUS;
+import static com.o3dr.services.android.lib.gcs.action.FollowMeActions.*;
 import static com.o3dr.services.android.lib.gcs.action.FollowMeActions.EXTRA_FOLLOW_TYPE;
 
 /**
@@ -28,15 +27,8 @@ public class FollowApi {
         drone.performAsyncAction(new Action(ACTION_ENABLE_FOLLOW_ME, params));
     }
 
-    /**
-     * Sets the follow-me radius.
-     *
-     * @param radius radius in meters.
-     */
-    public static void updateFollowMeRadius(Drone drone, double radius) {
-        Bundle params = new Bundle();
-        params.putDouble(EXTRA_FOLLOW_ME_RADIUS, radius);
-        drone.performAsyncAction(new Action(ACTION_UPDATE_FOLLOW_ME_RADIUS, params));
+    public static void updateFollowParams(Drone drone, Bundle params){
+        drone.performAsyncAction(new Action(ACTION_UPDATE_FOLLOW_PARAMS, params));
     }
 
     /**

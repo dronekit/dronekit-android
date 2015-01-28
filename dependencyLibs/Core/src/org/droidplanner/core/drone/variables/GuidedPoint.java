@@ -71,7 +71,7 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener {
     }
 
 	public void pauseAtCurrentLocation() {
-		if (state !=GuidedStates.ACTIVE) {
+		if (state == GuidedStates.UNINITIALIZED) {
 			changeToGuidedMode(myDrone);
 		}else{
 			newGuidedCoord(myDrone.getGps().getPosition());

@@ -156,6 +156,9 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream,
     }
 
     public void disconnect() throws ConnectionException {
+        if(followMe.isEnabled())
+            followMe.toggleFollowMeState();
+
         MAVLinkClient mavClient = (MAVLinkClient) drone.getMavClient();
         if (mavClient.isConnected())
             mavClient.closeConnection();

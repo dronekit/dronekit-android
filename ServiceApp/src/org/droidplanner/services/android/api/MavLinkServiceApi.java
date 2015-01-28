@@ -7,6 +7,7 @@ import org.droidplanner.core.MAVLink.connection.MavLinkConnection;
 import org.droidplanner.core.MAVLink.connection.MavLinkConnectionListener;
 import org.droidplanner.services.android.communication.connection.AndroidMavLinkConnection;
 
+import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
 
 /**
@@ -14,10 +15,10 @@ import java.lang.ref.WeakReference;
  */
 public class MavLinkServiceApi {
 
-    private final WeakReference<DroidPlannerService> mServiceRef;
+    private final SoftReference<DroidPlannerService> mServiceRef;
 
     public MavLinkServiceApi(DroidPlannerService service) {
-        mServiceRef = new WeakReference<DroidPlannerService>(service);
+        mServiceRef = new SoftReference<>(service);
     }
 
     private DroidPlannerService getService() {

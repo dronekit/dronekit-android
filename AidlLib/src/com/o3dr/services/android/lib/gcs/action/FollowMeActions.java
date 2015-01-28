@@ -10,8 +10,7 @@ public class FollowMeActions {
     public static final String ACTION_ENABLE_FOLLOW_ME = Utils.PACKAGE_NAME + ".action.ENABLE_FOLLOW_ME";
     public static final String EXTRA_FOLLOW_TYPE = "extra_follow_type";
 
-    public static final String ACTION_UPDATE_FOLLOW_ME_RADIUS = Utils.PACKAGE_NAME + ".action.UPDATE_FOLLOW_ME_RADIUS";
-    public static final String EXTRA_FOLLOW_ME_RADIUS = "extra_follow_me_radius";
+    public static final String ACTION_UPDATE_FOLLOW_PARAMS = Utils.PACKAGE_NAME + ".action.UPDATE_FOLLOW_PARAMS";
 
     public static final String ACTION_DISABLE_FOLLOW_ME = Utils.PACKAGE_NAME + ".action.DISABLE_FOLLOW_ME";
 

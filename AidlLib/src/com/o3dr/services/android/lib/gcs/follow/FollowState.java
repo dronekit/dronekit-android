@@ -1,5 +1,6 @@
 package com.o3dr.services.android.lib.gcs.follow;
 
+import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -16,14 +17,14 @@ public class FollowState implements Parcelable {
     public static final int STATE_END = 5;
 
     private int state;
-    private double radius;
+    private Bundle modeParams;
     private FollowType mode;
 
     public FollowState(){}
 
-    public FollowState(int state, double radius, FollowType mode) {
+    public FollowState(int state, FollowType mode, Bundle modeParams) {
         this.state = state;
-        this.radius = radius;
+        this.modeParams = modeParams;
         this.mode = mode;
     }
 
@@ -31,20 +32,16 @@ public class FollowState implements Parcelable {
         this.state = state;
     }
 
-    public void setRadius(double radius) {
-        this.radius = radius;
-    }
-
     public void setMode(FollowType mode) {
         this.mode = mode;
     }
 
-    public int getState() {
-        return state;
+    public Bundle getParams(){
+        return modeParams;
     }
 
-    public double getRadius() {
-        return radius;
+    public int getState() {
+        return state;
     }
 
     public FollowType getMode() {
@@ -63,14 +60,15 @@ public class FollowState implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(this.state);
-        dest.writeDouble(this.radius);
-        dest.writeParcelable(this.mode, 0);
+        dest.writeBundle(modeParams);
+        dest.writeInt(this.mode == null ? -1 : this.mode.ordinal());
     }
 
     private FollowState(Parcel in) {
         this.state = in.readInt();
-        this.radius = in.readDouble();
-        this.mode = in.readParcelable(FollowType.class.getClassLoader());
+        modeParams = in.readBundle();
+        int tmpMode = in.readInt();
+        this.mode = tmpMode == -1 ? null : FollowType.values()[tmpMode];
     }
 
     public static final Parcelable.Creator<FollowState> CREATOR = new Parcelable.Creator<FollowState>() {

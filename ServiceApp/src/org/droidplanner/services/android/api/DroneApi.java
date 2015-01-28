@@ -90,6 +90,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import ellipsoidFit.FitPoints;
@@ -104,6 +105,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
     private final SoftReference<DroidPlannerService> serviceRef;
     private final Context context;
+    private final DroneInterfaces.Handler droneHandler;
 
     private final ConcurrentLinkedQueue<IObserver> observersList;
     private final ConcurrentLinkedQueue<IMavlinkObserver> mavlinkObserversList;
@@ -113,9 +115,26 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
     private List<CameraDetail> cachedCameraDetails;
 
-    DroneApi(DroidPlannerService dpService, Handler handler, MavLinkServiceApi mavlinkApi, IApiListener listener,
+    DroneApi(DroidPlannerService dpService, final Handler handler, MavLinkServiceApi mavlinkApi, IApiListener listener,
              String ownerId) {
+
         this.context = dpService.getApplicationContext();
+        this.droneHandler =  new DroneInterfaces.Handler() {
+            @Override
+            public void removeCallbacks(Runnable thread) {
+                handler.removeCallbacks(thread);
+            }
+
+            @Override
+            public void post(Runnable thread) {
+                handler.post(thread);
+            }
+
+            @Override
+            public void postDelayed(Runnable thread, long timeout) {
+                handler.postDelayed(thread, timeout);
+            }
+        };
 
         this.ownerId = ownerId;
 
@@ -666,13 +685,15 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
             if (!followMe.isEnabled())
                 followMe.toggleFollowMeState();
 
-            followMe.setType(selectedMode);
+            FollowAlgorithm currentAlg = followMe.getFollowAlgorithm();
+            if(currentAlg.getType() != selectedMode) {
+                followMe.setAlgorithm(selectedMode.getAlgorithmType(droneMgr.getDrone(), droneHandler));
+            }
         }
     }
 
     private FollowState getFollowState() {
         final Follow followMe = this.droneMgr.getFollowMe();
-        final double radius = followMe.getRadius().valueInMeters();
 
         final int state;
         switch (followMe.getState()) {
@@ -703,7 +724,26 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 break;
         }
 
-        return new FollowState(state, radius, followModeToType(followMe.getType()));
+        final FollowAlgorithm currentAlg = followMe.getFollowAlgorithm();
+        Map<String, Object> modeParams = currentAlg.getParams();
+        Bundle params = new Bundle();
+        for(Map.Entry<String, Object> entry : modeParams.entrySet()){
+            switch(entry.getKey()){
+                case FollowType.EXTRA_FOLLOW_ROI_TARGET:
+                    Coord2D target = (Coord2D) entry.getValue();
+                    if(target != null){
+                        params.putParcelable(entry.getKey(), new LatLong(target.getLat(), target.getLng()));
+                    }
+                    break;
+
+                case FollowType.EXTRA_FOLLOW_RADIUS:
+                    Double radius = (Double) entry.getValue();
+                    if(radius != null)
+                        params.putDouble(entry.getKey(), radius);
+                    break;
+            }
+        }
+        return new FollowState(state, followModeToType(currentAlg.getType()), params);
     }
 
     private List<CameraDetail> getCameraDetails() {
@@ -952,9 +992,27 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 enableFollowMe(followType);
                 break;
 
-            case FollowMeActions.ACTION_UPDATE_FOLLOW_ME_RADIUS:
-                double radius = data.getDouble(FollowMeActions.EXTRA_FOLLOW_ME_RADIUS);
-                setFollowMeRadius(radius);
+            case FollowMeActions.ACTION_UPDATE_FOLLOW_PARAMS:
+                data.setClassLoader(LatLong.class.getClassLoader());
+
+                final FollowAlgorithm followAlgorithm = this.droneMgr.getFollowMe().getFollowAlgorithm();
+                if(followAlgorithm != null){
+                    Map<String, Object> paramsMap = new HashMap<>();
+                    Set<String> dataKeys = data.keySet();
+                    for(String key: dataKeys){
+                        if(FollowType.EXTRA_FOLLOW_ROI_TARGET.equals(key)){
+                            LatLong target = data.getParcelable(key);
+                            if(target != null) {
+                                Coord2D roiTarget = new Coord2D(target.getLatitude(), target.getLongitude());
+                                paramsMap.put(key, roiTarget);
+                            }
+                        }
+                        else
+                            paramsMap.put(key, data.get(key));
+                    }
+
+                    followAlgorithm.updateAlgorithmParams(paramsMap);
+                }
                 break;
 
             case FollowMeActions.ACTION_DISABLE_FOLLOW_ME:
@@ -1109,10 +1167,6 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
         }
 
         return followType;
-    }
-
-    public void setFollowMeRadius(double radius) {
-        this.droneMgr.getFollowMe().changeRadius(radius);
     }
 
     public void disableFollowMe() {
