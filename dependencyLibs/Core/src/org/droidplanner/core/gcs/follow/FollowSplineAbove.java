@@ -1,5 +1,6 @@
 package org.droidplanner.core.gcs.follow;
 
+import org.droidplanner.core.drone.DroneInterfaces;
 import org.droidplanner.core.gcs.location.Location;
 import org.droidplanner.core.helpers.coordinates.Coord2D;
 import org.droidplanner.core.helpers.units.Length;
@@ -25,7 +26,7 @@ public class FollowSplineAbove extends FollowAlgorithm {
         return FollowModes.SPLINE_ABOVE;
     }
 
-    public FollowSplineAbove(Drone drone, Length length) {
-        super(drone, length);
+    public FollowSplineAbove(Drone drone, DroneInterfaces.Handler handler) {
+        super(drone, handler);
     }
 }

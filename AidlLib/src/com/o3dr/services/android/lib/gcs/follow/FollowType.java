@@ -16,26 +16,52 @@ public enum FollowType implements Parcelable {
     RIGHT("Right"),
     LEFT("Left"),
     CIRCLE("Circle"),
-    ABOVE("Above", false),
+    ABOVE("Above"){
+        @Override
+        public boolean hasParam(String paramKey){
+            return false;
+        }
+    },
     SPLINE_LEASH("Vector Leash"),
-    SPLINE_ABOVE("Vector Above", false),
-    GUIDED_SCAN("Guided Scan", false);
+    SPLINE_ABOVE("Vector Above"){
+        @Override
+        public boolean hasParam(String paramKey){
+            return false;
+        }
+    },
+    GUIDED_SCAN("Guided Scan"){
+        @Override
+        public boolean hasParam(String paramKey){
+            switch(paramKey){
+                case EXTRA_FOLLOW_ROI_TARGET:
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+    };
+
+    public static final String EXTRA_FOLLOW_RADIUS = "extra_follow_radius";
+    public static final String EXTRA_FOLLOW_ROI_TARGET = "extra_follow_roi_target";
 
     private final String typeLabel;
-    private final boolean hasRadius;
 
     private FollowType(String typeLabel){
         this.typeLabel = typeLabel;
-        this.hasRadius = true;
     }
 
-    private FollowType(String typeLabel, boolean hasRadius) {
-        this.typeLabel = typeLabel;
-        this.hasRadius = hasRadius;
-    }
+    public boolean hasParam(String paramKey){
+        switch(paramKey){
+            case EXTRA_FOLLOW_RADIUS:
+                return true;
 
-    public boolean hasRadius() {
-        return hasRadius;
+            case EXTRA_FOLLOW_ROI_TARGET:
+                return false;
+
+            default:
+                return false;
+        }
     }
 
     public String getTypeLabel() {
@@ -65,11 +91,11 @@ public enum FollowType implements Parcelable {
         followTypes.add(LEFT);
         followTypes.add(CIRCLE);
         followTypes.add(ABOVE);
+        followTypes.add(GUIDED_SCAN);
 
         if(includeAdvanced){
             followTypes.add(SPLINE_LEASH);
             followTypes.add(SPLINE_ABOVE);
-            followTypes.add(GUIDED_SCAN);
         }
 
         return followTypes;

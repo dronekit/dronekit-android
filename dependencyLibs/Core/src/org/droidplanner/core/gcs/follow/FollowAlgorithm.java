@@ -1,25 +1,68 @@
 package org.droidplanner.core.gcs.follow;
 
+import org.droidplanner.core.drone.DroneInterfaces;
+import org.droidplanner.core.drone.variables.GuidedPoint;
 import org.droidplanner.core.gcs.location.Location;
-import org.droidplanner.core.helpers.units.Length;
+import org.droidplanner.core.gcs.roi.ROIEstimator;
 import org.droidplanner.core.model.Drone;
 
+import java.util.Collections;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 public abstract class FollowAlgorithm {
-    public abstract void processNewLocation(Location location);
+
+    protected final Drone drone;
+    private final ROIEstimator roiEstimator;
+    private final AtomicBoolean isFollowEnabled = new AtomicBoolean(false);
+
+    public FollowAlgorithm(Drone drone, DroneInterfaces.Handler handler) {
+        this.drone = drone;
+        this.roiEstimator = initROIEstimator(drone, handler);
+    }
+
+    protected boolean isFollowEnabled() {
+        return isFollowEnabled.get();
+    }
+
+    public void enableFollow() {
+        isFollowEnabled.set(true);
+        roiEstimator.enableFollow();
+    }
+
+    public void disableFollow() {
+        isFollowEnabled.set(false);
+        if (GuidedPoint.isGuidedMode(drone)) {
+            drone.getGuidedPoint().pauseAtCurrentLocation();
+        }
+
+        roiEstimator.disableFollow();
+    }
+
+    public void updateAlgorithmParams(Map<String, ?> paramsMap) {
+    }
+
+    protected ROIEstimator initROIEstimator(Drone drone, DroneInterfaces.Handler handler) {
+        return new ROIEstimator(drone, handler);
+    }
+
+    protected ROIEstimator getROIEstimator() {
+        return roiEstimator;
+    }
+
+    public final void onLocationReceived(Location location) {
+        if (isFollowEnabled.get()) {
+            roiEstimator.onLocationChanged(location);
+            processNewLocation(location);
+        }
+    }
+
+    protected abstract void processNewLocation(Location location);
 
     public abstract FollowModes getType();
 
-    protected Drone drone;
-    protected Length radius;
-
-    public FollowAlgorithm(Drone drone, Length radius) {
-        super();
-        this.drone = drone;
-        this.radius = radius;
-    }
-
-    public void changeRadius(Double radius) {
-        this.radius = new Length(Math.max(0, radius));
+    public Map<String, Object> getParams() {
+        return Collections.emptyMap();
     }
 
     public enum FollowModes {
@@ -48,28 +91,28 @@ public abstract class FollowAlgorithm {
             return values()[(ordinal() + 1) % values().length];
         }
 
-        public FollowAlgorithm getAlgorithmType(Drone drone) {
+        public FollowAlgorithm getAlgorithmType(Drone drone, DroneInterfaces.Handler handler) {
             switch (this) {
                 case LEASH:
-                    return new FollowLeash(drone, new Length(8.0));
+                default:
+                    return new FollowLeash(drone, handler, 8.0);
                 case LEAD:
-                    return new FollowLead(drone, new Length(15.0));
+                    return new FollowLead(drone, handler, 15.0);
                 case RIGHT:
-                    return new FollowRight(drone, new Length(10.0));
+                    return new FollowRight(drone, handler, 10.0);
                 case LEFT:
-                    return new FollowLeft(drone, new Length(10.0));
+                    return new FollowLeft(drone, handler, 10.0);
                 case CIRCLE:
-                    return new FollowCircle(drone, new Length(15.0), 10.0);
+                    return new FollowCircle(drone, handler, 15.0, 10.0);
                 case ABOVE:
-                    return new FollowAbove(drone, new Length(0.0));
+                    return new FollowAbove(drone, handler);
                 case SPLINE_LEASH:
-                    return new FollowSplineLeash(drone, new Length(8.0));
+                    return new FollowSplineLeash(drone, handler, 8.0);
                 case SPLINE_ABOVE:
-                    return new FollowSplineAbove(drone, new Length(0.0));
+                    return new FollowSplineAbove(drone, handler);
                 case GUIDED_SCAN:
-                    return new FollowGuidedScan(drone, new Length(8.0));
+                    return new FollowGuidedScan(drone, handler);
             }
-            return null; // Should never reach this
         }
     }
 

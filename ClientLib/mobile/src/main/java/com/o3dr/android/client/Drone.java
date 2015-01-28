@@ -556,10 +556,6 @@ public class Drone {
         FollowApi.enableFollowMe(this, followType);
     }
 
-    public void setFollowMeRadius(double radius) {
-        FollowApi.updateFollowMeRadius(this, radius);
-    }
-
     public void disableFollowMe() {
         FollowApi.disableFollowMe(this);
     }
