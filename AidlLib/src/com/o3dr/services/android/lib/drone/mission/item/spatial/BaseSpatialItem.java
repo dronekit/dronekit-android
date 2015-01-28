@@ -17,6 +17,11 @@ public abstract class BaseSpatialItem extends MissionItem implements MissionItem
         super(type);
     }
 
+    protected BaseSpatialItem(BaseSpatialItem copy){
+        this(copy.getType());
+        coordinate = new LatLongAlt(copy.coordinate);
+    }
+
     @Override
     public LatLongAlt getCoordinate() {
         return coordinate;

@@ -22,7 +22,7 @@ public class CoordBounds {
 	}
 
 	public void include(Coord2D point) {
-		if ((sw_3quadrant == null) | (ne_1quadrant == null)) {
+		if ((sw_3quadrant == null) || (ne_1quadrant == null)) {
 			ne_1quadrant = new Coord2D(point);
 			sw_3quadrant = new Coord2D(point);
 		} else {

@@ -16,6 +16,11 @@ public class CameraTrigger extends MissionItem implements MissionItem.Command, a
         super(MissionItemType.CAMERA_TRIGGER);
     }
 
+    public CameraTrigger(CameraTrigger copy){
+        super(MissionItemType.CAMERA_TRIGGER);
+        triggerDistance = copy.triggerDistance;
+    }
+
     public double getTriggerDistance() {
         return triggerDistance;
     }
@@ -33,6 +38,11 @@ public class CameraTrigger extends MissionItem implements MissionItem.Command, a
     private CameraTrigger(Parcel in) {
         super(in);
         this.triggerDistance = in.readDouble();
+    }
+
+    @Override
+    public MissionItem clone() {
+        return new CameraTrigger(this);
     }
 
     public static final Creator<CameraTrigger> CREATOR = new Creator<CameraTrigger>() {

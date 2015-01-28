@@ -4,6 +4,7 @@ import android.os.Parcel;
 
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.mission.MissionItemType;
+import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
 
 /**
  * Created by fhuya on 11/6/14.
@@ -15,6 +16,12 @@ public class Circle extends BaseSpatialItem implements android.os.Parcelable {
 
     public Circle() {
         super(MissionItemType.CIRCLE);
+    }
+
+    public Circle(Circle copy){
+        super(copy);
+        this.radius = copy.radius;
+        this.turns = copy.turns;
     }
 
     public double getRadius() {
@@ -44,6 +51,11 @@ public class Circle extends BaseSpatialItem implements android.os.Parcelable {
         super(in);
         this.radius = in.readDouble();
         this.turns = in.readInt();
+    }
+
+    @Override
+    public MissionItem clone() {
+        return new Circle(this);
     }
 
     public static final Creator<Circle> CREATOR = new Creator<Circle>() {

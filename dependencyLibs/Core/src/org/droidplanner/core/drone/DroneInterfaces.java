@@ -148,9 +148,19 @@ public class DroneInterfaces {
 		DISCONNECTED,
 
 		/**
-         *
+         * Successful connection event.
          */
 		CONNECTED,
+
+        /**
+         * Connection initiated event.
+         */
+        CONNECTING,
+
+        /**
+         * Connection failed event.
+         */
+        CONNECTION_FAILED,
 
 		/**
          *

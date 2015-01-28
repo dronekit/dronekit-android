@@ -9,7 +9,7 @@ import org.droidplanner.core.helpers.geoTools.GeoTools;
 import org.droidplanner.core.helpers.geoTools.LineCoord2D;
 
 public class CircumscribedGrid {
-	private static final int MAX_NUMBER_OF_LINES = 200;
+	private static final int MAX_NUMBER_OF_LINES = 300;
 	List<LineCoord2D> grid = new ArrayList<LineCoord2D>();
 	private Coord2D gridLowerLeft;
 	private double extrapolatedDiag;

@@ -16,6 +16,11 @@ public class EpmGripper extends MissionItem implements MissionItem.Command, andr
         super(MissionItemType.EPM_GRIPPER);
     }
 
+    public EpmGripper(EpmGripper copy){
+        this();
+        release = copy.release;
+    }
+
     public boolean isRelease() {
         return release;
     }
@@ -33,6 +38,11 @@ public class EpmGripper extends MissionItem implements MissionItem.Command, andr
     private EpmGripper(Parcel in) {
         super(in);
         this.release = in.readByte() != 0;
+    }
+
+    @Override
+    public MissionItem clone() {
+        return new EpmGripper(this);
     }
 
     public static final Creator<EpmGripper> CREATOR = new Creator<EpmGripper>() {

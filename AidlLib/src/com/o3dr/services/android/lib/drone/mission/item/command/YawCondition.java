@@ -18,6 +18,13 @@ public class YawCondition extends MissionItem implements MissionItem.Command, an
         super(MissionItemType.YAW_CONDITION);
     }
 
+    public YawCondition(YawCondition copy){
+        this();
+        angle = copy.angle;
+        angularSpeed = copy.angularSpeed;
+        isRelative = copy.isRelative;
+    }
+
     public double getAngle() {
         return angle;
     }
@@ -55,6 +62,11 @@ public class YawCondition extends MissionItem implements MissionItem.Command, an
         this.angle = in.readDouble();
         this.angularSpeed = in.readDouble();
         this.isRelative = in.readByte() != 0;
+    }
+
+    @Override
+    public MissionItem clone() {
+        return new YawCondition(this);
     }
 
     public static final Creator<YawCondition> CREATOR = new Creator<YawCondition>() {

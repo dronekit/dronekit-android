@@ -21,10 +21,9 @@ public class Trimmer {
 
 		ArrayList<Coord2D> crossings = new ArrayList<Coord2D>();
 		for (LineCoord2D polyLine : polygon) {
-			try {
-				crossings.add(LineTools.FindLineIntersection(polyLine, gridLine));
-			} catch (Exception e) {
-			}
+            Coord2D intersection = LineTools.FindLineIntersection(polyLine, gridLine);
+            if(intersection != null)
+                crossings.add(intersection);
 		}
 
 		return crossings;

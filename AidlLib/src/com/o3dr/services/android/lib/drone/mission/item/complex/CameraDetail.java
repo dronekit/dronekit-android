@@ -32,6 +32,11 @@ public class CameraDetail implements Parcelable {
         this.isInLandscapeOrientation = isInLandscapeOrientation;
     }
 
+    public CameraDetail(CameraDetail copy){
+        this(copy.name, copy.sensorWidth, copy.sensorHeight, copy.sensorResolution, copy.focalLength, copy.overlap,
+                copy.sidelap, copy.isInLandscapeOrientation);
+    }
+
     public String getName() {
         return name;
     }

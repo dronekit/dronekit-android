@@ -29,7 +29,8 @@ public class SessionDB extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
+        db.execSQL(SessionContract.getSqlDeleteEntries());
+        onCreate(db);
     }
 
     public void startSession(Date startDate, String connectionType){

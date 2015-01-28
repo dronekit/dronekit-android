@@ -4,6 +4,7 @@ import android.os.Parcel;
 
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.mission.MissionItemType;
+import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
 
 /**
  * Created by fhuya on 11/6/14.
@@ -18,6 +19,15 @@ public class Waypoint extends BaseSpatialItem implements android.os.Parcelable {
 
     public Waypoint(){
         super(MissionItemType.WAYPOINT);
+    }
+
+    public Waypoint(Waypoint copy){
+        super(copy);
+        delay = copy.delay;
+        acceptanceRadius = copy.acceptanceRadius;
+        yawAngle = copy.yawAngle;
+        orbitalRadius = copy.orbitalRadius;
+        orbitCCW = copy.orbitCCW;
     }
 
     public double getDelay() {
@@ -77,6 +87,11 @@ public class Waypoint extends BaseSpatialItem implements android.os.Parcelable {
         this.yawAngle = in.readDouble();
         this.orbitalRadius = in.readDouble();
         this.orbitCCW = in.readByte() != 0;
+    }
+
+    @Override
+    public MissionItem clone() {
+        return new Waypoint(this);
     }
 
     public static final Creator<Waypoint> CREATOR = new Creator<Waypoint>() {

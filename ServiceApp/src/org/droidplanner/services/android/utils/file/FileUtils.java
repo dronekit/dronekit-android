@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 
@@ -26,12 +27,25 @@ public class FileUtils {
 		return getFileList(DirectoryPath.getCameraInfoPath(context), filter);
 	}
 
-    public static File[] getTLogFileList(Context context) {
-        return getFileList(DirectoryPath.getTLogPath(context).getPath(), new FilenameFilter() {
+    public static File[] getTLogFileList(Context context, String appId) {
+        final FilenameFilter tlogFilter = new FilenameFilter() {
             public boolean accept(File dir, String filename) {
-                return filename.contains(TLOG_FILENAME_EXT);
+                return filename.endsWith(TLOG_FILENAME_EXT);
             }
-        });
+        };
+
+        File[] unsentFiles = getFileList(DirectoryPath.getTLogPath(context, appId).getPath(), tlogFilter);
+        File[] sentFiles = getFileList(DirectoryPath.getTLogSentPath(context, appId).getPath(), tlogFilter);
+        File[] tlogFiles = new File[unsentFiles.length + sentFiles.length];
+
+        int i = 0;
+        for(File file : unsentFiles)
+            tlogFiles[i++] = file;
+
+        for(File file : sentFiles)
+            tlogFiles[i++] = file;
+
+        return tlogFiles;
     }
 
 	static public File[] getFileList(String path, FilenameFilter filter) {
@@ -51,17 +65,6 @@ public class FileUtils {
         if (file.exists())
             file.delete();
         return new FileOutputStream(file);
-    }
-
-    /**
-     * Return a filename that is suitable for a tlog
-     *
-     * @return
-     * @throws java.io.FileNotFoundException
-     */
-    static public File getTLogFile(Context context, String tlogPrefix) {
-        File myDir = DirectoryPath.getTLogPath(context);
-        return new File(myDir, tlogPrefix + TLOG_FILENAME_EXT);
     }
 
     /**

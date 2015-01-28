@@ -34,7 +34,7 @@ public class LatLongAlt extends LatLong {
         return mAltitude;
     }
 
-    public void setAltitude(float altitude) {
+    public void setAltitude(double altitude) {
         this.mAltitude = altitude;
     }
 
@@ -62,8 +62,10 @@ public class LatLongAlt extends LatLong {
 
     @Override
     public String toString() {
+        final String superToString = super.toString();
         return "LatLongAlt{" +
-                "mAltitude=" + mAltitude +
+                superToString +
+                ", mAltitude=" + mAltitude +
                 '}';
     }
 

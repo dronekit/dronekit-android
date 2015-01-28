@@ -1,6 +1,7 @@
 package com.o3dr.services.android.lib.drone.mission.item.complex;
 
 import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
@@ -13,8 +14,7 @@ import java.util.List;
 /**
  *
  */
-public class StructureScanner extends BaseSpatialItem implements MissionItem.ComplexItem<StructureScanner>,
-        android.os.Parcelable {
+public class StructureScanner extends BaseSpatialItem implements MissionItem.ComplexItem<StructureScanner>, Parcelable {
 
     private double radius = 10;
     private double heightStep = 5;
@@ -27,13 +27,27 @@ public class StructureScanner extends BaseSpatialItem implements MissionItem.Com
         super(MissionItemType.STRUCTURE_SCANNER);
     }
 
+    public StructureScanner(StructureScanner copy){
+        super(copy);
+        copy(copy);
+    }
+
     public void copy(StructureScanner source){
         this.radius = source.radius;
         this.heightStep = source.heightStep;
         this.stepsCount = source.stepsCount;
         this.crossHatch = source.crossHatch;
-        this.surveyDetail = source.surveyDetail;
-        this.path = source.path;
+        this.surveyDetail = new SurveyDetail(source.surveyDetail);
+        this.path = copyPointsList(source.path);
+    }
+
+    private List<LatLong> copyPointsList(List<LatLong> copy){
+        final List<LatLong> dest = new ArrayList<>();
+        for(LatLong itemCopy : copy){
+            dest.add(new LatLong(itemCopy));
+        }
+
+        return dest;
     }
 
     public double getRadius() {
@@ -103,6 +117,11 @@ public class StructureScanner extends BaseSpatialItem implements MissionItem.Com
         this.crossHatch = in.readByte() != 0;
         this.surveyDetail = in.readParcelable(SurveyDetail.class.getClassLoader());
         in.readTypedList(path, LatLong.CREATOR);
+    }
+
+    @Override
+    public MissionItem clone() {
+        return new StructureScanner(this);
     }
 
     public static final Creator<StructureScanner> CREATOR = new Creator<StructureScanner>() {

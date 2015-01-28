@@ -16,15 +16,26 @@ public enum FollowType implements Parcelable {
     RIGHT("Right"),
     LEFT("Left"),
     CIRCLE("Circle"),
-    ABOVE("Above"),
+    ABOVE("Above", false),
     SPLINE_LEASH("Vector Leash"),
-    SPLINE_ABOVE("Vector Above"),
-    GUIDED_SCAN("Guided Scan");
+    SPLINE_ABOVE("Vector Above", false),
+    GUIDED_SCAN("Guided Scan", false);
 
     private final String typeLabel;
+    private final boolean hasRadius;
 
-    private FollowType(String typeLabel) {
+    private FollowType(String typeLabel){
         this.typeLabel = typeLabel;
+        this.hasRadius = true;
+    }
+
+    private FollowType(String typeLabel, boolean hasRadius) {
+        this.typeLabel = typeLabel;
+        this.hasRadius = hasRadius;
+    }
+
+    public boolean hasRadius() {
+        return hasRadius;
     }
 
     public String getTypeLabel() {

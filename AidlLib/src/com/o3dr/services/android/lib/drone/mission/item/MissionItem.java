@@ -11,7 +11,7 @@ import java.io.Serializable;
 /**
  * Created by fhuya on 11/5/14.
  */
-public abstract class MissionItem implements Parcelable {
+public abstract class MissionItem implements Cloneable, Parcelable {
 
     public interface Command {}
 
@@ -48,5 +48,8 @@ public abstract class MissionItem implements Parcelable {
     protected MissionItem(Parcel in){
         this.type = MissionItemType.values()[in.readInt()];
     }
+
+    @Override
+    public abstract MissionItem clone();
 
 }

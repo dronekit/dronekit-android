@@ -18,17 +18,16 @@ public class LineTools {
 	/**
 	 * Finds the intersection of two lines http://stackoverflow.com/questions/
 	 * 1119451/how-to-tell-if-a-line-intersects -a-polygon-in-c
-	 * 
-	 * @throws Exception
 	 */
-	public static Coord2D FindLineIntersection(LineCoord2D first, LineCoord2D second)
-			throws Exception {
+	public static Coord2D FindLineIntersection(LineCoord2D first, LineCoord2D second) {
 		double denom = ((first.getEnd().getX() - first.getStart().getX()) * (second.getEnd().getY() - second
 				.getStart().getY()))
 				- ((first.getEnd().getY() - first.getStart().getY()) * (second.getEnd().getX() - second
 						.getStart().getX()));
-		if (denom == 0)
-			throw new Exception("Parralel Lines");
+		if (denom == 0){
+            //Parallel lines
+            return null;
+        }
 		double numer = ((first.getStart().getY() - second.getStart().getY()) * (second.getEnd()
 				.getX() - second.getStart().getX()))
 				- ((first.getStart().getX() - second.getStart().getX()) * (second.getEnd().getY() - second
@@ -39,8 +38,10 @@ public class LineTools {
 				- ((first.getStart().getX() - second.getStart().getX()) * (first.getEnd().getY() - first
 						.getStart().getY()));
 		double s = numer2 / denom;
-		if ((r < 0 || r > 1) || (s < 0 || s > 1))
-			throw new Exception("No Intersection");
+		if ((r < 0 || r > 1) || (s < 0 || s > 1)){
+            //No intersection
+            return null;
+        }
 		// Find intersection point
 		double x = first.getStart().getX()
 				+ (r * (first.getEnd().getX() - first.getStart().getX()));

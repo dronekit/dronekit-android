@@ -33,4 +33,11 @@ interface IDroidPlannerServices {
     * @return IDroneApi object used to interact with the drone.
     */
     IDroneApi registerDroneApi(IApiListener listener, String appId);
+
+    /**
+    * Retrieve the list of all the connected apps.
+    * The bundles in the returned array contains the appId and connection parameter of the connected apps.
+    * @param requesterId id for the application requesting the information.
+    */
+    Bundle[] getConnectedApps(String requesterId);
 }

@@ -16,6 +16,11 @@ public class ReturnToLaunch extends MissionItem implements MissionItem.Command, 
         super(MissionItemType.RETURN_TO_LAUNCH);
     }
 
+    public ReturnToLaunch(ReturnToLaunch copy){
+        this();
+        returnAltitude = copy.returnAltitude;
+    }
+
     public double getReturnAltitude() {
         return returnAltitude;
     }
@@ -33,6 +38,11 @@ public class ReturnToLaunch extends MissionItem implements MissionItem.Command, 
     private ReturnToLaunch(Parcel in) {
         super(in);
         this.returnAltitude = in.readDouble();
+    }
+
+    @Override
+    public MissionItem clone() {
+        return new ReturnToLaunch(this);
     }
 
     public static final Creator<ReturnToLaunch> CREATOR = new Creator<ReturnToLaunch>() {

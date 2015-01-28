@@ -11,14 +11,11 @@ public class ConnectionParameter implements Parcelable {
 
     private final int connectionType;
     private final Bundle paramsBundle;
-    private final StreamRates streamRates;
     private final DroneSharePrefs droneSharePrefs;
 
-    public ConnectionParameter(int connectionType, Bundle paramsBundle, StreamRates streamRates,
-                               DroneSharePrefs droneSharePrefs){
+    public ConnectionParameter(int connectionType, Bundle paramsBundle, DroneSharePrefs droneSharePrefs){
         this.connectionType = connectionType;
         this.paramsBundle = paramsBundle;
-        this.streamRates = streamRates;
         this.droneSharePrefs = droneSharePrefs;
     }
 
@@ -28,10 +25,6 @@ public class ConnectionParameter implements Parcelable {
 
     public Bundle getParamsBundle() {
         return paramsBundle;
-    }
-
-    public StreamRates getStreamRates() {
-        return streamRates;
     }
 
     public DroneSharePrefs getDroneSharePrefs() {
@@ -83,14 +76,12 @@ public class ConnectionParameter implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(this.connectionType);
         dest.writeBundle(paramsBundle);
-        dest.writeParcelable(this.streamRates, 0);
         dest.writeParcelable(this.droneSharePrefs, 0);
     }
 
     private ConnectionParameter(Parcel in) {
         this.connectionType = in.readInt();
         paramsBundle = in.readBundle();
-        this.streamRates = in.readParcelable(StreamRates.class.getClassLoader());
         this.droneSharePrefs = in.readParcelable(DroneSharePrefs.class.getClassLoader());
     }
 
