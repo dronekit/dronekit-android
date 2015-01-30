@@ -23,8 +23,8 @@ public class ROIEstimator implements LocationReceiver {
     protected long timeOfLastLocation;
 
     protected final Drone drone;
-    private Handler watchdog;
-    public Runnable watchdogCallback = new Runnable() {
+    protected Handler watchdog;
+    protected Runnable watchdogCallback = new Runnable() {
         @Override
         public void run() {
             updateROI();
@@ -77,7 +77,7 @@ public class ROIEstimator implements LocationReceiver {
                 * (System.currentTimeMillis() - timeOfLastLocation) / 1000f;
         Coord2D goCoord = GeoTools.newCoordFromBearingAndDistance(gcsCoord, bearing, distanceTraveledSinceLastPoint);
         if (distanceTraveledSinceLastPoint > 0.0) {
-            MavLinkROI.setROI(drone, new Coord3D(goCoord.getLat(), goCoord.getLng(), new Altitude(1.0)));
+            MavLinkROI.setROI(drone, new Coord3D(goCoord.getLat(), goCoord.getLng(), new Altitude(0.0)));
         }
 
         watchdog.postDelayed(watchdogCallback, TIMEOUT);

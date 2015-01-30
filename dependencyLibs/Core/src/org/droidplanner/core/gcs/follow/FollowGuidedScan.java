@@ -17,6 +17,7 @@ import java.util.Map;
 public class FollowGuidedScan extends FollowAbove {
 
     private static final String TAG = FollowGuidedScan.class.getSimpleName();
+    private static final long TIMEOUT = 1000; //ms
 
     public static final String EXTRA_FOLLOW_ROI_TARGET = "extra_follow_roi_target";
 
@@ -91,6 +92,7 @@ public class FollowGuidedScan extends FollowAbove {
 
                 //Track the target until told otherwise.
                 MavLinkROI.setROI(drone, roiTarget);
+                watchdog.postDelayed(watchdogCallback, TIMEOUT);
             }
         }
     }
