@@ -16,7 +16,12 @@ import java.util.Map;
  */
 public class FollowGuidedScan extends FollowAbove {
 
+    private static final String TAG = FollowGuidedScan.class.getSimpleName();
+
     public static final String EXTRA_FOLLOW_ROI_TARGET = "extra_follow_roi_target";
+
+    public static final double DEFAULT_FOLLOW_ROI_ALTITUDE = 10; //meters
+    private static final Altitude sDefaultRoiAltitude = new Altitude(DEFAULT_FOLLOW_ROI_ALTITUDE);
 
     @Override
     public FollowModes getType() {
@@ -31,7 +36,16 @@ public class FollowGuidedScan extends FollowAbove {
     public void updateAlgorithmParams(Map<String, ?> params){
         super.updateAlgorithmParams(params);
 
-        Coord2D target = (Coord2D) params.get(EXTRA_FOLLOW_ROI_TARGET);
+        final Coord3D target;
+
+        Coord2D tempCoord = (Coord2D) params.get(EXTRA_FOLLOW_ROI_TARGET);
+        if(tempCoord == null || tempCoord instanceof Coord3D){
+            target = (Coord3D) tempCoord;
+        }
+        else{
+            target = new Coord3D(tempCoord, sDefaultRoiAltitude);
+        }
+
         getROIEstimator().updateROITarget(target);
     }
 
@@ -54,13 +68,13 @@ public class FollowGuidedScan extends FollowAbove {
 
     private static class GuidedROIEstimator extends ROIEstimator {
 
-        private Coord2D roiTarget;
+        private Coord3D roiTarget;
 
         public GuidedROIEstimator(Drone drone, DroneInterfaces.Handler handler) {
             super(drone, handler);
         }
 
-        void updateROITarget(Coord2D roiTarget){
+        void updateROITarget(Coord3D roiTarget){
             this.roiTarget = roiTarget;
             onLocationChanged(null);
         }
@@ -68,12 +82,15 @@ public class FollowGuidedScan extends FollowAbove {
         @Override
         protected void updateROI(){
             if(roiTarget == null){
+                System.out.println("Cancelling ROI lock.");
                 //Fallback to the default behavior
                 super.updateROI();
             }
             else{
+                System.out.println("ROI Target: " + roiTarget.toString());
+
                 //Track the target until told otherwise.
-                MavLinkROI.setROI(drone, new Coord3D(roiTarget, new Altitude(1.0)));
+                MavLinkROI.setROI(drone, roiTarget);
             }
         }
     }

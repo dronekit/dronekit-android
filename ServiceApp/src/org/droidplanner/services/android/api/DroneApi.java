@@ -70,6 +70,7 @@ import org.droidplanner.core.drone.variables.Radio;
 import org.droidplanner.core.gcs.follow.Follow;
 import org.droidplanner.core.gcs.follow.FollowAlgorithm;
 import org.droidplanner.core.helpers.coordinates.Coord2D;
+import org.droidplanner.core.helpers.coordinates.Coord3D;
 import org.droidplanner.core.model.Drone;
 import org.droidplanner.core.parameters.Parameter;
 import org.droidplanner.core.survey.CameraInfo;
@@ -730,9 +731,10 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
         for(Map.Entry<String, Object> entry : modeParams.entrySet()){
             switch(entry.getKey()){
                 case FollowType.EXTRA_FOLLOW_ROI_TARGET:
-                    Coord2D target = (Coord2D) entry.getValue();
+                    Coord3D target = (Coord3D) entry.getValue();
                     if(target != null){
-                        params.putParcelable(entry.getKey(), new LatLong(target.getLat(), target.getLng()));
+                        params.putParcelable(entry.getKey(), new LatLongAlt(target.getLat(), target.getLng(),
+                                target.getAltitude().valueInMeters()));
                     }
                     break;
 
@@ -999,11 +1001,20 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 if(followAlgorithm != null){
                     Map<String, Object> paramsMap = new HashMap<>();
                     Set<String> dataKeys = data.keySet();
+
                     for(String key: dataKeys){
                         if(FollowType.EXTRA_FOLLOW_ROI_TARGET.equals(key)){
                             LatLong target = data.getParcelable(key);
                             if(target != null) {
-                                Coord2D roiTarget = new Coord2D(target.getLatitude(), target.getLongitude());
+                                final Coord2D roiTarget;
+                                if(target instanceof LatLongAlt) {
+                                    roiTarget = new Coord3D(target.getLatitude(), target.getLongitude(),
+                                            new org.droidplanner.core.helpers.units.Altitude(((LatLongAlt) target)
+                                                    .getAltitude()));
+                                }
+                                else{
+                                    roiTarget = new Coord2D(target.getLatitude(), target.getLongitude());
+                                }
                                 paramsMap.put(key, roiTarget);
                             }
                         }
