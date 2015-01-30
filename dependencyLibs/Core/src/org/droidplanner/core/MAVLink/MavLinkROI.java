@@ -17,7 +17,7 @@ public class MavLinkROI {
 
 		msg.param5 = (float) coord.getX();
 		msg.param6 = (float) coord.getY();
-		msg.param7 = (float) 0.0;
+		msg.param7 = (float) coord.getAltitude().valueInMeters();
 
 		drone.getMavClient().sendMavPacket(msg.pack());
 	}
