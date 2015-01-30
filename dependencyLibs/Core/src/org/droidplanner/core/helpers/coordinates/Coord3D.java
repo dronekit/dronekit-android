@@ -26,4 +26,9 @@ public class Coord3D extends Coord2D {
 	public Altitude getAltitude() {
 		return alt;
 	}
+
+    @Override
+    public String toString() {
+        return "lat/lon/alt: " + getLat() + "/" + getLng() + "/" + alt.toString();
+    }
 }
