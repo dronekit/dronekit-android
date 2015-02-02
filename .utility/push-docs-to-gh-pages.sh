@@ -20,7 +20,6 @@ if [ "$TRAVIS_REPO_SLUG" == "DroidPlanner/3DRServices" ] && [ "$TRAVIS_JDK_VERSI
 
   ## Clean and update guide doc
   git rm -rf ./guide_doc
-  git rm -rf ./_guide_doc
   cp -Rf $HOME/guide-latest ./guide_doc
 
   git add -f .
