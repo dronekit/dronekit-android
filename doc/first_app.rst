@@ -27,7 +27,7 @@ Adding the client library
 
 Now open your **build.gradle (Module:app)** file and add: ::
 
-	compile 'com.o3dr:3dr-services-lib:2.1.+'
+	compile 'com.o3dr:3dr-services-lib:2.2.+'
 
 under the dependencies section.
 
@@ -38,7 +38,7 @@ Then click **Sync** in the top right corner to re-sync the gradle.
 Connecting to 3DR Services
 --------------------------
 
-Implement a ServiceListener on your MainActivity to listen for events sent from 3DR Services to your app.
+Implement a TowerListener on your MainActivity to listen for events sent from 3DR Services to your app.
 
 Result:
 
@@ -46,16 +46,16 @@ Result:
    :linenos:
    :emphasize-lines: 1,4-12
 
-	public class MainActivity extends ActionBarActivity implements ServiceListener {
+	public class MainActivity extends ActionBarActivity implements TowerListener {
 
 		// 3DR Services Listener
 		@Override
-		public void onServiceConnected() {
+		public void onTowerConnected() {
 			
 		}
 
 		@Override
-		public void onServiceInterrupted() {
+		public void onTowerDisconnected() {
 			
 		}
 
@@ -69,7 +69,7 @@ Result:
 
 Now we need to:
 
-1. Add a ServiceManager instance to manage the communication to 3DR Services.
+1. Add a ControlTower instance to manage the communication to 3DR Services.
 2. Connect to 3DR Services on start, disconnect on stop of the MainAcvitity
 
 Result:
@@ -78,9 +78,9 @@ Result:
    :linenos:
    :emphasize-lines: 3,11,18,25,28-36
 
-	public class MainActivity extends ActionBarActivity implements ServiceListener {
+	public class MainActivity extends ActionBarActivity implements TowerListener {
 
-		private ServiceManager serviceManager;
+		private ControlTower controlTower;
 
 		@Override
 		protected void onCreate(Bundle savedInstanceState) {
@@ -88,30 +88,30 @@ Result:
 			setContentView(R.layout.activity_main);
 
 			// Initialize the service manager
-			this.serviceManager = new ServiceManager(getApplicationContext());
+			this.controlTower = new ControlTower(getApplicationContext());
 
 		}
 
 		@Override
 		public void onStart() {
 			super.onStart();
-			this.serviceManager.connect(this);
+			this.controlTower.connect(this);
 
 		}
 
 		@Override
 		public void onStop() {
 			super.onStop();
-			this.serviceManager.disconnect();
+			this.controlTower.disconnect();
 		}
 
 		@Override
-		public void onServiceConnected() {
+		public void onTowerConnected() {
 
 		}
 
 		@Override
-		public void onServiceInterrupted() {
+		public void onTowerDisconnected() {
 			
 		}
 
@@ -144,7 +144,7 @@ Enter the following in your console:
 
 
 
-Let's some code in our app to connect to a drone.
+Let's add some code in our app to connect to a drone.
 
 First, declare that your MainActivity can act as an interface for DroneListener and implement some methods to listen for drone events.
 
@@ -152,7 +152,7 @@ First, declare that your MainActivity can act as an interface for DroneListener 
 	:linenos:
 	:emphasize-lines: 1-15
 
-	public class MainActivity extends ActionBarActivity implements DroneListener, ServiceListener {
+	public class MainActivity extends ActionBarActivity implements DroneListener, TowerListener {
 		@Override
 		public void onDroneEvent(String event, Bundle extras) {
 
@@ -177,18 +177,18 @@ Next, let's add an instance variable to keep track of our drone instance to the 
 	:linenos:
 	:emphasize-lines: 2-3
 
-	public class MainActivity extends ActionBarActivity implements DroneListener, ServiceListener {
+	public class MainActivity extends ActionBarActivity implements DroneListener, TowerListener {
 		private Drone drone;
 		private int droneType = Type.TYPE_UNKNOWN;
 
 
-The Drone constructor has two parameters, the service manager and a generic Android handler. Let's go ahead and add a handler right where we declare our iVars.
+The Drone instance will need a generic Android handler to register with the control tower. Let's go ahead and add a handler right where we declare our instance variables.
 
 .. code-block:: java
 	:linenos:
 	:emphasize-lines: 4
 
-	public class MainActivity extends ActionBarActivity implements DroneListener, ServiceListener {
+	public class MainActivity extends ActionBarActivity implements DroneListener, TowerListener {
 		private Drone drone;
 		private int droneType = Type.TYPE_UNKNOWN;
 		private final Handler handler = new Handler();
@@ -206,11 +206,11 @@ Let's now instantiate a new drone upon the creation of our MainActivity.
 		setContentView(R.layout.activity_main);
 
 		this.serviceManager = new ServiceManager(getApplicationContext());
-		this.drone = new Drone(this.serviceManager, this.handler);
+		this.drone = new Drone();
 	}
 
 
-Also, let's make sure that when the MainActivity is stopped, we disconnect from our drone. 
+Also, let's make sure that when the MainActivity is stopped, we unregister our drone from the control tower. 
 
 .. code-block:: java
 	:linenos:
@@ -223,8 +223,8 @@ Also, let's make sure that when the MainActivity is stopped, we disconnect from 
 			this.drone.disconnect();
 			updateConnectedButton(false);
 		}
-		this.drone.destroy();
-		this.serviceManager.disconnect();
+                this.controlTower.unregisterDrone(this.drone);
+                this.controlTower.disconnect();
 	}
 
 Now let's add a button in our activity_main.xml that will connect to a drone on press. Open your **activity_main.xml** file and add the following:
@@ -251,11 +251,10 @@ Open your **MainActivity** java source and add a method to handle the connect bu
 		if(this.drone.isConnected()) {
 			this.drone.disconnect();
 		} else {
-			final StreamRates streamRates = new StreamRates();
 			Bundle extraParams = new Bundle();
 			extraParams.putInt(ConnectionType.EXTRA_UDP_SERVER_PORT, 14550); // Set default port to 14550
 
-			ConnectionParameter connectionParams = new ConnectionParameter(ConnectionType.TYPE_UDP, extraParams, streamRates, null);
+			ConnectionParameter connectionParams = new ConnectionParameter(ConnectionType.TYPE_UDP, extraParams, null);
 			this.drone.connect(connectionParams);
 		}
 	}
@@ -265,10 +264,6 @@ Let's see what's going on in the above method.
 First if we are connected, then use this button to disconnect.
 
 If we are not connected, we need to build a set of connection parameters and connect.
-
-StreamRates allow us to define how often we would like to get telemetry values for different sensors and vehicle info. The vehicle will only stream telemetry values upon request and you can request things like position, RC, raw sensor values.
-
-You can learn more about the MAV_DATA_STREAM `here <https://pixhawk.ethz.ch/mavlink/>`_.
 
 Now let's add som UI to alert us when the drone is connected.
 
@@ -329,10 +324,9 @@ Example:
 .. code-block:: java
 	:linenos:
 
-	final StreamRates streamRates = new StreamRates();
 	Bundle extraParams = new Bundle();
 	extraParams.putInt(ConnectionType.EXTRA_USB_BAUD_RATE, 57600); // Set default baud rate to 57600
-	ConnectionParameter connectionParams = new ConnectionParameter(ConnectionType.TYPE_USB, extraParams, streamRates, null);
+	ConnectionParameter connectionParams = new ConnectionParameter(ConnectionType.TYPE_USB, extraParams, null);
 	this.drone.connect(connectionParams);
 
 Getting telemetry from your drone
@@ -516,7 +510,7 @@ Also add a class level Spinner variable in MainActivity so we can reference it t
 	:linenos:
 	:emphasize-lines: 5
 
-	public class MainActivity extends ActionBarActivity implements DroneListener, ServiceListener {
+	public class MainActivity extends ActionBarActivity implements DroneListener, TowerListener {
 		private Drone drone;
 		private int droneType = Type.TYPE_UNKNOWN;
 		private final Handler handler = new Handler();
@@ -534,8 +528,8 @@ And add to our **onCreate** method to reference the Spinner defined in the XML l
 		setContentView(R.layout.activity_main);
 
 		final Context context = getApplicationContext();
-		this.serviceManager = new ServiceManager(context);
-		this.drone = new Drone(this.serviceManager, this.handler);
+		this.controlTower = new ControlTower(context);
+		this.drone = new Drone();
 
 		this.modeSelector = (Spinner)findViewById(R.id.modeSelect);
 		this.modeSelector.setOnItemSelectedListener(new Spinner.OnItemSelectedListener() {
@@ -629,7 +623,7 @@ This changes the mode of the vehicle when the user changes the selection of the 
 
 	protected void updateVehicleModesForType(int droneType)
 
-This is triggered when the **onDroneEvent** tells us the type of vehicle we're dealing with. In the **onDroneEvent*, we get the type of vehicle and load the modes the the vehicle can have.
+This is triggered when the **onDroneEvent** tells us the type of vehicle we're dealing with. In the **onDroneEvent**, we get the type of vehicle and load the modes the the vehicle can have.
 
 ::
 
@@ -694,7 +688,7 @@ Add a method to our MainActivity to update our button's UI depending on the vehi
 		} else if (vehicleState.isArmed()) {
 			// Take off
 			armButton.setText("TAKE OFF");
-		} else if (vehicleState.isConnected() && !vehicleState.isArmed()){
+		} else if (vehicleState.isConnected()){
 			// Connected but not Armed
 			armButton.setText("ARM");
 		}
