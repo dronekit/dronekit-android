@@ -195,6 +195,7 @@ The Drone instance will need a generic Android handler to register with the cont
 
 
 Let's now instantiate a new drone upon the creation of our MainActivity.
+After creation, the new drone will need to be registered with the control tower to be active.
 
 .. code-block:: java
 	:linenos:
@@ -208,6 +209,12 @@ Let's now instantiate a new drone upon the creation of our MainActivity.
 		this.serviceManager = new ServiceManager(getApplicationContext());
 		this.drone = new Drone();
 	}
+
+        @Override
+        public void onTowerConnected() {
+                this.controlTower.registerDrone(this.drone, this.handler);
+                this.drone.registerDroneListener(this);
+        }
 
 
 Also, let's make sure that when the MainActivity is stopped, we unregister our drone from the control tower. 
