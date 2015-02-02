@@ -5,7 +5,7 @@ if [ "$TRAVIS_REPO_SLUG" == "DroidPlanner/3DRServices" ] && [ "$TRAVIS_JDK_VERSI
   echo -e "Publishing html docs...\n"
 
   cp -R ClientLib/mobile/build/docs/javadoc $HOME/javadoc-latest
-  cp -R doc/build $HOME/guide-latest
+  cp -R doc/_build $HOME/guide-latest
 
   cd $HOME
   git config --global user.email "travis@travis-ci.org"
@@ -20,6 +20,7 @@ if [ "$TRAVIS_REPO_SLUG" == "DroidPlanner/3DRServices" ] && [ "$TRAVIS_JDK_VERSI
 
   ## Clean and update guide doc
   git rm -rf ./guide_doc
+  git rm -rf ./_guide_doc
   cp -Rf $HOME/guide-latest ./guide_doc
 
   git add -f .
