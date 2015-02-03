@@ -23,5 +23,5 @@ before_script:
 
 script: ./gradlew clean build
 after_success:
-- chmod a+x .utility/push-javadoc-to-gh-pages.sh
-- .utility/push-javadoc-to-gh-pages.sh
+- chmod a+x .utility/push-docs-to-gh-pages.sh
+- .utility/push-docs-to-gh-pages.sh

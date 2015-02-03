@@ -2,9 +2,10 @@
 
 if [ "$TRAVIS_REPO_SLUG" == "DroidPlanner/3DRServices" ] && [ "$TRAVIS_JDK_VERSION" == "oraclejdk7" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_BRANCH" == "master" ]; then
 
-  echo -e "Publishing javadoc...\n"
+  echo -e "Publishing html docs...\n"
 
   cp -R ClientLib/mobile/build/docs/javadoc $HOME/javadoc-latest
+  cp -R doc/_build $HOME/guide-latest
 
   cd $HOME
   git config --global user.email "travis@travis-ci.org"
@@ -12,12 +13,19 @@ if [ "$TRAVIS_REPO_SLUG" == "DroidPlanner/3DRServices" ] && [ "$TRAVIS_JDK_VERSI
   git clone --quiet --branch=gh-pages https://${GH_TOKEN}@github.com/DroidPlanner/3DRServices gh-pages > /dev/null
 
   cd gh-pages
-  git rm -rf ./javadoc
+
+  ## Clean and update guide doc
+  git rm -rf .
+  touch ./.nojekyll
+  cp -Rf $HOME/guide-latest/html/* .
+
+  ## Update javadoc
   cp -Rf $HOME/javadoc-latest ./javadoc
+
   git add -f .
-  git commit -m "Lastest javadoc on successful travis build $TRAVIS_BUILD_NUMBER auto-pushed to gh-pages"
+  git commit -m "Lastest documentation on successful travis build $TRAVIS_BUILD_NUMBER auto-pushed to gh-pages"
   git push -fq origin gh-pages > /dev/null
 
-  echo -e "Published Javadoc to gh-pages.\n"
+  echo -e "Published documentation to gh-pages.\n"
   
 fi
