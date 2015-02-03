@@ -14,13 +14,13 @@ if [ "$TRAVIS_REPO_SLUG" == "DroidPlanner/3DRServices" ] && [ "$TRAVIS_JDK_VERSI
 
   cd gh-pages
 
-  ## Clean and update javadoc
-  git rm -rf ./javadoc
-  cp -Rf $HOME/javadoc-latest ./javadoc
-
   ## Clean and update guide doc
-  git rm -rf ./guide_doc
-  cp -Rf $HOME/guide-latest ./guide_doc
+  git rm -rf .
+  touch ./.nojekyll
+  cp -Rf $HOME/guide-latest/html/* .
+
+  ## Update javadoc
+  cp -Rf $HOME/javadoc-latest ./javadoc
 
   git add -f .
   git commit -m "Lastest documentation on successful travis build $TRAVIS_BUILD_NUMBER auto-pushed to gh-pages"
