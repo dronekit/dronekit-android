@@ -58,6 +58,4 @@ All the example code is provided as Android Studio projects and the tutorials as
 Installing 3DR Services on your mobile device
 ---------------------------------------------
 
-**Note:** Because 3DR Services is still in beta, you'll need to grab the latest APK from `here <https://github.com/DroidPlanner/3DRServices/releases>`_ and install it on your Android testing device.
-
-In production if you don't have 3DR Services installed, the app will prompt you to install it from the Play Store.
+You can install 3DR Services `here <https://play.google.com/store/apps/details?id=org.droidplanner.services.android>`_

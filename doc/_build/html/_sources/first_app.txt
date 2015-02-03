@@ -23,7 +23,7 @@ Project setup
 .. image:: _static/images/hellodrone_setup_4.png
 
 Adding the client library
---------------------------------------
+--------------------------
 
 Now open your **build.gradle (Module:app)** file and add: ::
 
