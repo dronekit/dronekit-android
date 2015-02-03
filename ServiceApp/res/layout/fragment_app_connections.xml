@@ -1,7 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.RecyclerView
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:id="@+id/app_connections_list"
-    android:fadeScrollbars="true"/>
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/default_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:textSize="22sp"
+        android:visibility="visible"
+        android:text="@string/app_connections_default_message"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="visible"
+        android:id="@+id/app_connections_list"
+        android:fadeScrollbars="true"/>
+</FrameLayout>

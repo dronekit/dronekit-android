@@ -13,6 +13,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import org.droidplanner.services.android.R;
 import org.droidplanner.services.android.api.DroidPlannerService;
@@ -49,10 +50,8 @@ public class AppConnectionsFragment extends Fragment {
     private MainActivity parent;
 
     private LocalBroadcastManager lbm;
-
+    private TextView defaultView;
     private AppConnectionAdapter appConnectionAdapter;
-
-    private RecyclerView recyclerView;
 
     @Override
     public void onAttach(Activity activity){
@@ -82,7 +81,8 @@ public class AppConnectionsFragment extends Fragment {
         final Context context = getActivity().getApplicationContext();
         lbm = LocalBroadcastManager.getInstance(context);
 
-        recyclerView = (RecyclerView) view.findViewById(R.id.app_connections_list);
+        defaultView = (TextView) view.findViewById(R.id.default_view);
+        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.app_connections_list);
 
         //Use this setting to improve performance if you know that changes in content do not change the layout side
         // of the RecyclerView
@@ -116,5 +116,8 @@ public class AppConnectionsFragment extends Fragment {
             List<DroneApi> dronesList = droneAccess.getDroneApiList();
             appConnectionAdapter.refreshDroneManagerList(dronesList);
         }
+
+        boolean isEmpty = appConnectionAdapter.getItemCount() <= 0;
+        defaultView.setVisibility(isEmpty ? View.VISIBLE : View.GONE);
     }
 }
