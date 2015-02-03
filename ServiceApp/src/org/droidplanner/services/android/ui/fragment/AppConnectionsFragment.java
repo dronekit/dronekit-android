@@ -53,7 +53,6 @@ public class AppConnectionsFragment extends Fragment {
     private AppConnectionAdapter appConnectionAdapter;
 
     private RecyclerView recyclerView;
-    private RecyclerView.Adapter recyclerAdapter;
 
     @Override
     public void onAttach(Activity activity){
