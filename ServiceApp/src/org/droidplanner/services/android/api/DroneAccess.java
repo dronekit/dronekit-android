@@ -14,21 +14,13 @@ import java.util.List;
 */
 public final class DroneAccess extends Binder {
 
-    private final SoftReference<DroidPlannerService> serviceRef;
+    private final DroidPlannerService serviceRef;
 
     DroneAccess(DroidPlannerService service) {
-        serviceRef = new SoftReference<DroidPlannerService>(service);
-    }
-
-    private DroidPlannerService getService() {
-        final DroidPlannerService service = serviceRef.get();
-        if (service == null)
-            throw new IllegalStateException("Lost reference to parent service.");
-
-        return service;
+        serviceRef = service;
     }
 
     public List<DroneApi> getDroneApiList() {
-        return new ArrayList<DroneApi>(getService().droneApiStore);
+        return new ArrayList<>(serviceRef.droneApiStore);
     }
 }

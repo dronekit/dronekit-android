@@ -1,0 +1,16 @@
+{
+    "apps": [
+        {
+            "applicationId": "org.droidplanner.android",
+            "appName": "Tower",
+            "appDescription" : "Tower is 3DR’s powerful and intuitive new flight control program. It provides everything you need to plan, fly and track any 3DR-powered drone.",
+            "appIconUrl" : "https://lh4.ggpht.com/ZQV3rylK6TBrTZLJuO8kozmVutM0Uyfgr9pFJ5a1rJkoiwkdjhIV8AqEWqQp-IP4IRw9=w300-rw"
+        },
+        {
+            "applicationId" : "com.o3dr.android.dp.wear",
+            "appName" : "Tower Wear",
+            "appDescription" : "Tower-Wear is a wear companion app for 3DR Tower.",
+            "appIconUrl" : "https://lh5.ggpht.com/8QedcF8g5boPkiq5SB23weUfBtKexIFz28KEvesWPIIIalszbHTLzu-4d7Ey-sbO_Q=w300-rw"
+        }
+    ]
+}
