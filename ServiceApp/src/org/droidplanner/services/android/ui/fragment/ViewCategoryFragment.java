@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import org.droidplanner.services.android.R;
+import org.droidplanner.services.android.ui.widget.TabPageIndicator;
 
 /**
  * Provide a view pager to toggle between the list of active apps, and the recommended list of apps to download.
@@ -37,6 +38,9 @@ public class ViewCategoryFragment extends Fragment {
         }
 
         viewPager.setCurrentItem(categoryIndex);
+
+        final TabPageIndicator tabIndicator = (TabPageIndicator) view.findViewById(R.id.pager_title_strip);
+        tabIndicator.setViewPager(viewPager);
     }
 
     @Override

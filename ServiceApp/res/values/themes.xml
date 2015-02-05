@@ -6,6 +6,8 @@
         <item name="colorPrimary">@android:color/black</item>
         <item name="colorPrimaryDark">@android:color/black</item>
         <item name="colorAccent">#AEEA00</item>
+
+        <item name="vpiTabPageIndicatorStyle">@style/Widget.TabPageIndicator</item>
     </style>
 
     <style name="AppDialogTheme" parent="Theme.AppCompat.Light.Dialog">
