@@ -1,6 +1,7 @@
 package org.droidplanner.services.android.ui.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -28,6 +29,7 @@ import java.util.List;
 public class AppConnectionAdapter extends RecyclerView.Adapter<AppConnectionAdapter.ViewHolder> {
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
+        final View containerView;
         final ImageView clientIcon;
         final TextView clientId;
         final TextView clientConnectionInfo;
@@ -36,6 +38,7 @@ public class AppConnectionAdapter extends RecyclerView.Adapter<AppConnectionAdap
         public ViewHolder(View container, ImageView clientIcon, TextView clientName, TextView clientId,
                           TextView clientConnectionState) {
             super(container);
+            this.containerView = container;
             this.clientIcon = clientIcon;
             this.clientId = clientId;
             this.clientConnectionInfo = clientConnectionState;
@@ -81,12 +84,22 @@ public class AppConnectionAdapter extends RecyclerView.Adapter<AppConnectionAdap
     public void onBindViewHolder(ViewHolder viewHolder, int position) {
         final DroneApi droneApi = droneApiList.get(position);
 
+        viewHolder.containerView.setOnClickListener(null);
         viewHolder.clientName.setText("UNKNOWN");
         viewHolder.clientId.setText("AppId: unknown");
 
         final String ownerId = droneApi.getOwnerId();
         if (!TextUtils.isEmpty(ownerId)) {
             viewHolder.clientId.setText("AppId: " + ownerId);
+
+            viewHolder.containerView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(ownerId);
+                    if(launchIntent != null)
+                        context.startActivity(launchIntent);
+                }
+            });
 
             try {
                 final PackageManager pm = context.getPackageManager();

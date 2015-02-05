@@ -19,4 +19,7 @@ public class TLogPicker {
                 .setType(ServiceDataContract.TLOG_MIME_TYPE);
         activity.startActivityForResult(requestIntent, resultCode);
     }
+
+    //Private constructor to prevent instantiation
+    private TLogPicker(){}
 }

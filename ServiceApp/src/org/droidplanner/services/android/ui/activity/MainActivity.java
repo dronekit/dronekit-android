@@ -5,35 +5,38 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.widget.DrawerLayout;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.TextView;
 
 import org.droidplanner.services.android.R;
 import org.droidplanner.services.android.api.DroidPlannerService;
 import org.droidplanner.services.android.api.DroneAccess;
-import org.droidplanner.services.android.ui.fragment.AppConnectionsFragment;
+import org.droidplanner.services.android.ui.fragment.ViewCategoryFragment;
+import org.droidplanner.services.android.utils.Utils;
 
 /**
- * Created by fhuya on 10/31/14.
+ * User interface for the 3DR Services app.
  */
 public class MainActivity extends ActionBarActivity {
 
     private final static String TAG = MainActivity.class.getSimpleName();
 
+    public static final String ACTION_SERVICE_CONNECTED = Utils.PACKAGE_NAME + ".action.SERVICE_CONNECTED";
+
     private final ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             droneAccess = (DroneAccess) service;
-            showOrRefreshFragments();
+            LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(new Intent
+                    (ACTION_SERVICE_CONNECTED));
         }
 
         @Override
@@ -42,28 +45,12 @@ public class MainActivity extends ActionBarActivity {
         }
     };
 
-    private void showOrRefreshFragments() {
-        final FragmentManager fm = getSupportFragmentManager();
-        AppConnectionsFragment fragment = (AppConnectionsFragment) fm.findFragmentById(R.id.fragment_container);
-        if (fragment == null) {
-            fragment = new AppConnectionsFragment();
-            fm.beginTransaction().add(R.id.fragment_container, fragment).commit();
-        } else {
-            fragment.refreshDroneList();
-        }
-    }
-
     private DroneAccess droneAccess;
-
-    private DrawerLayout drawerLayout;
-    private ActionBarDrawerToggle drawerToggle;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        final Context context = getApplicationContext();
 
         try {
             final TextView versionInfo = (TextView) findViewById(R.id.version_info);
@@ -72,29 +59,11 @@ public class MainActivity extends ActionBarActivity {
             Log.e(TAG, "Unable to retrieve the version name.", e);
         }
 
-        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.drawer_open,
-                R.string.drawer_close) {
-
-            @Override
-            public void onDrawerClosed(View drawerView) {
-                //TODO: Launch the selected fragment.
-            }
-
-            @Override
-            public void onDrawerOpened(View drawerView) {
-                //TODO: update the app title
-            }
-        };
-
-        drawerLayout.setDrawerListener(drawerToggle);
-        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-
-//        ActionBar actionBar = getSupportActionBar();
-//        if(actionBar != null){
-//            actionBar.setDisplayHomeAsUpEnabled(true);
-//            actionBar.setHomeButtonEnabled(true);
-//        }
+        if (savedInstanceState == null) {
+            final FragmentManager fm = getSupportFragmentManager();
+            ViewCategoryFragment categoryViewFragment = new ViewCategoryFragment();
+            fm.beginTransaction().add(R.id.fragment_container, categoryViewFragment).commit();
+        }
     }
 
     @Override
@@ -109,36 +78,27 @@ public class MainActivity extends ActionBarActivity {
         bindService(new Intent(getApplicationContext(), DroidPlannerService.class), serviceConnection,
                 Context.BIND_AUTO_CREATE);
 
-        if (droneAccess != null)
-            showOrRefreshFragments();
+        if (droneAccess != null) {
+            LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(new Intent
+                    (ACTION_SERVICE_CONNECTED));
+        }
     }
 
     @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-
-        if (drawerToggle != null)
-            drawerToggle.onConfigurationChanged(newConfig);
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.activity_main, menu);
+        return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Pass the event to ActionBarDrawerToggle, if it returns
-        // true, then it has handled the app icon touch event
-        if (drawerToggle.onOptionsItemSelected(item)) {
-            return true;
-        }
+        switch (item.getItemId()) {
+            case R.id.menu_learn_more:
+                startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse("https://droidplanner.github.io/3DRServices/")));
+                return true;
 
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-
-        if (drawerToggle != null) {
-            // Sync the toggle state after onRestoreInstanceState has occurred.
-            drawerToggle.syncState();
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 

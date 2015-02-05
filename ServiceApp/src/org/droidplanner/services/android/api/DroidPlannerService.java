@@ -28,6 +28,7 @@ import org.droidplanner.services.android.communication.connection.AndroidUdpConn
 import org.droidplanner.services.android.communication.connection.BluetoothConnection;
 import org.droidplanner.services.android.communication.connection.usb.UsbConnection;
 import org.droidplanner.services.android.ui.activity.MainActivity;
+import org.droidplanner.services.android.utils.Utils;
 import org.droidplanner.services.android.utils.analytics.GAUtils;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -38,14 +39,13 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public class DroidPlannerService extends Service {
 
-    private static final String CLAZZ_NAME = DroidPlannerService.class.getName();
     private static final String TAG = DroidPlannerService.class.getSimpleName();
 
     private static final int FOREGROUND_ID = 101;
 
-    public static final String ACTION_DRONE_CREATED = CLAZZ_NAME + ".ACTION_DRONE_CREATED";
-    public static final String ACTION_DRONE_DESTROYED = CLAZZ_NAME + ".ACTION_DRONE_DESTROYED";
-    public static final String ACTION_KICK_START_DRONESHARE_UPLOADS = CLAZZ_NAME + ".ACTION_KICK_START_DRONESHARE_UPLOADS";
+    public static final String ACTION_DRONE_CREATED = Utils.PACKAGE_NAME + ".ACTION_DRONE_CREATED";
+    public static final String ACTION_DRONE_DESTROYED = Utils.PACKAGE_NAME + ".ACTION_DRONE_DESTROYED";
+    public static final String ACTION_KICK_START_DRONESHARE_UPLOADS = Utils.PACKAGE_NAME + ".ACTION_KICK_START_DRONESHARE_UPLOADS";
 
     private final Handler handler = new Handler();
     private LocalBroadcastManager lbm;
