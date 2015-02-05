@@ -25,13 +25,14 @@ import org.droidplanner.services.android.ui.adapter.AppConnectionAdapter;
 import java.util.List;
 
 /**
- * Created by fhuya on 12/15/14.
+ * Provide the view for all the connected/active drone apps.
  */
 public class AppConnectionsFragment extends Fragment {
 
     private final static IntentFilter intentFilter = new IntentFilter();
 
     static {
+        intentFilter.addAction(MainActivity.ACTION_SERVICE_CONNECTED);
         intentFilter.addAction(DroidPlannerService.ACTION_DRONE_CREATED);
         intentFilter.addAction(DroidPlannerService.ACTION_DRONE_DESTROYED);
     }
@@ -40,9 +41,12 @@ public class AppConnectionsFragment extends Fragment {
         @Override
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
-            if (DroidPlannerService.ACTION_DRONE_CREATED.equals(action)
-                    || DroidPlannerService.ACTION_DRONE_DESTROYED.equals(action)) {
-                refreshDroneList();
+            switch (action) {
+                case MainActivity.ACTION_SERVICE_CONNECTED:
+                case DroidPlannerService.ACTION_DRONE_CREATED:
+                case DroidPlannerService.ACTION_DRONE_DESTROYED:
+                    refreshDroneList();
+                    break;
             }
         }
     };

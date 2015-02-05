@@ -1,6 +1,5 @@
 package org.droidplanner.services.android.ui.fragment;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -11,42 +10,29 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import org.droidplanner.services.android.R;
-import org.droidplanner.services.android.ui.activity.MainActivity;
 
 /**
- * Created by fhuya on 12/13/14.
+ * Provide a view pager to toggle between the list of active apps, and the recommended list of apps to download.
  */
-public class ConnectionCategoriesFragment extends Fragment {
+public class ViewCategoryFragment extends Fragment {
 
     private static final String EXTRA_SELECTED_CATEGORY_INDEX = "extra_selected_category_index";
 
-    private MainActivity parent;
     private ViewPager viewPager;
 
     @Override
-    public void onAttach(Activity activity){
-        super.onAttach(activity);
-        if(!(activity instanceof MainActivity)){
-            throw new IllegalStateException("Parent activity must be an instance of " +
-                    MainActivity.class.getName());
-        }
-
-        parent = (MainActivity) activity;
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState){
+    public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_connections, parent, false);
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState){
+    public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         viewPager = (ViewPager) view.findViewById(R.id.connections_view_pager);
         viewPager.setAdapter(new ConnectionCategoryAdapter(getChildFragmentManager()));
 
-        int categoryIndex = 0;
-        if(savedInstanceState != null){
+        int categoryIndex = 1;
+        if (savedInstanceState != null) {
             categoryIndex = savedInstanceState.getInt(EXTRA_SELECTED_CATEGORY_INDEX, categoryIndex);
         }
 
@@ -54,12 +40,12 @@ public class ConnectionCategoriesFragment extends Fragment {
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState){
+    public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(EXTRA_SELECTED_CATEGORY_INDEX, viewPager.getCurrentItem());
     }
 
-    private static class ConnectionCategoryAdapter extends FragmentPagerAdapter{
+    private static class ConnectionCategoryAdapter extends FragmentPagerAdapter {
 
         public ConnectionCategoryAdapter(FragmentManager fm) {
             super(fm);
@@ -67,12 +53,31 @@ public class ConnectionCategoriesFragment extends Fragment {
 
         @Override
         public Fragment getItem(int position) {
-            return null;
+            switch (position) {
+                case 0:
+                    return new AppConnectionsFragment();
+
+                case 1:
+                default:
+                    return new RecommendedAppsFragment();
+            }
         }
 
         @Override
         public int getCount() {
-            return 0;
+            return 2;
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position){
+            switch(position){
+                case 0:
+                    return "Active";
+
+                case 1:
+                default:
+                    return "Recommended";
+            }
         }
     }
 }

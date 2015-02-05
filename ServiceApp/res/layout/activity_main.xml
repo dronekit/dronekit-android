@@ -1,98 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.DrawerLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <FrameLayout
-            android:layout_alignParentTop="true"
-            android:layout_above="@+id/divider_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/fragment_container"/>
-
-        <include
-            layout="@layout/divider_view"
-            android:id="@+id/divider_view"
-            android:layout_above="@+id/version_info"
-            android:layout_marginTop="@dimen/navigationSectionBottomMargin"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"/>
-
-        <TextView
-            android:id="@+id/version_info"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            tools:text="3DR Services v1.1.3"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:padding="5dp"
-            android:layout_alignParentBottom="true"/>
-    </RelativeLayout>
-
-    <ScrollView
+    <FrameLayout
+        android:layout_alignParentTop="true"
+        android:layout_above="@+id/divider_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginRight="?attr/actionBarSize"
-        android:layout_marginEnd="?attr/actionBarSize"
-        android:layout_gravity="start"
-        android:background="@android:color/white"
-        android:id="@+id/navigation_drawer">
+        android:id="@+id/fragment_container"/>
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            >
+    <include
+        layout="@layout/divider_view"
+        android:id="@+id/divider_view"
+        android:layout_above="@+id/version_info"
+        android:layout_marginTop="@dimen/navigationSectionBottomMargin"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"/>
 
-            <TextView
-                android:id="@+id/navigation_connections"
-                style="@style/NavigationDrawer.Entry"
-                android:text="@string/navigation_connections_label"
-                android:layout_alignParentTop="true"
-                android:drawableLeft="@drawable/ic_settings_ethernet_black_24dp"
-                android:drawableStart="@drawable/ic_settings_ethernet_black_24dp"
-                />
-
-            <TextView
-                android:id="@+id/navigation_account"
-                android:layout_below="@+id/navigation_connections"
-                style="@style/NavigationDrawer.Entry"
-                android:text="@string/navigation_account_label"
-                android:drawableLeft="@drawable/ic_person_black_24dp"
-                android:drawableStart="@drawable/ic_person_black_24dp"
-                />
-
-            <TextView
-                android:id="@+id/navigation_settings"
-                android:layout_below="@+id/navigation_account"
-                android:text="@string/navigation_settings_label"
-                style="@style/NavigationDrawer.Entry"
-                android:drawableLeft="@drawable/ic_settings_black_24dp"
-                android:drawableStart="@drawable/ic_settings_black_24dp"
-                android:layout_marginBottom="@dimen/navigationSectionBottomMargin"/>
-
-            <include
-                layout="@layout/divider_view"
-                android:id="@+id/divider_view"
-                android:layout_below="@+id/navigation_settings"
-                android:layout_marginBottom="@dimen/navigationSectionBottomMargin"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"/>
-
-            <TextView
-                android:id="@+id/navigation_developers"
-                android:layout_below="@+id/divider_view"
-                style="@style/NavigationDrawer.Entry"
-                android:text="@string/navigation_developers_label"
-                android:drawableLeft="@drawable/ic_android_black_24dp"
-                android:drawableStart="@drawable/ic_android_black_24dp"/>
-
-        </RelativeLayout>
-    </ScrollView>
-</android.support.v4.widget.DrawerLayout>
+    <TextView
+        android:id="@+id/version_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        tools:text="3DR Services v1.1.3"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:padding="5dp"
+        android:layout_alignParentBottom="true"/>
+</RelativeLayout>

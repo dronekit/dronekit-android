@@ -6,4 +6,5 @@
     <dimen name="navigationSectionBottomMargin">8dp</dimen>
 
     <integer name="connectionsColCount">1</integer>
+    <integer name="recommendedAppsColCount">1</integer>
 </resources>
