@@ -30,5 +30,7 @@
     <string name="label_learn_more">Learn more</string>
     <string name="label_action_button_install">Install</string>
     <string name="label_action_button_open">Open</string>
+    <string name="label_view_category_active">Active</string>
+    <string name="label_view_category_recommended">Recommended</string>
 
 </resources>

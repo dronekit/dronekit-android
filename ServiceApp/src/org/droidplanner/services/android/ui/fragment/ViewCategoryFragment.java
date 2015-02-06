@@ -1,5 +1,6 @@
 package org.droidplanner.services.android.ui.fragment;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -30,7 +31,8 @@ public class ViewCategoryFragment extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         viewPager = (ViewPager) view.findViewById(R.id.connections_view_pager);
-        viewPager.setAdapter(new ConnectionCategoryAdapter(getChildFragmentManager()));
+        viewPager.setAdapter(new ConnectionCategoryAdapter(getActivity().getApplicationContext(),
+                getChildFragmentManager()));
 
         int categoryIndex = 1;
         if (savedInstanceState != null) {
@@ -51,8 +53,11 @@ public class ViewCategoryFragment extends Fragment {
 
     private static class ConnectionCategoryAdapter extends FragmentPagerAdapter {
 
-        public ConnectionCategoryAdapter(FragmentManager fm) {
+        private final Context context;
+
+        public ConnectionCategoryAdapter(Context context, FragmentManager fm) {
             super(fm);
+            this.context = context;
         }
 
         @Override
@@ -76,11 +81,11 @@ public class ViewCategoryFragment extends Fragment {
         public CharSequence getPageTitle(int position){
             switch(position){
                 case 0:
-                    return "Active";
+                    return context.getString(R.string.label_view_category_active);
 
                 case 1:
                 default:
-                    return "Recommended";
+                    return context.getString(R.string.label_view_category_recommended);
             }
         }
     }
