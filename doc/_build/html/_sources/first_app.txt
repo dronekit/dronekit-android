@@ -786,7 +786,7 @@ Now run the app and SITL and you should be able to connect, arm, and take off!
 Summary
 -------
 
-Congratulations! You've just made your first drone app. You can find the full source code for this example on `Github <https://github.com/3drobotics/Android-DroneAPI-starter>`_.
+Congratulations! You've just made your first drone app. You can find the full source code for this example on `Github <https://github.com/3drobotics/DroneKit-Android-Starter>`_.
 
 
 

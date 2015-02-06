@@ -58,4 +58,6 @@ All the example code is provided as Android Studio projects and the tutorials as
 Installing 3DR Services on your mobile device
 ---------------------------------------------
 
+For any DroneKit apps to work on Android, the app "3DR Services" must be installed. This app provides a communication layer to the drone and showcases apps built on DroneKit.
+
 You can install 3DR Services `here <https://play.google.com/store/apps/details?id=org.droidplanner.services.android>`_

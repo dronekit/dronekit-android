@@ -14,7 +14,7 @@ Hello Drone Android App
 
 The example from the first app tutorial.
 
-`Source <https://github.com/3drobotics/Android-DroneAPI-starter>`_
+`Source <https://github.com/3drobotics/DroneKit-Android-Starter>`_
 
 Tower (Droidplanner 3)
 ~~~~~~~~~~~~~~~~~~~~~~
