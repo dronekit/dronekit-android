@@ -70,6 +70,7 @@ public class HeartBeat extends DroneVariable implements OnDroneListener {
         switch (heartbeatState) {
             case FIRST_HEARTBEAT:
                 notifyConnected();
+                System.out.println("Received first heartbeat.");
                 myDrone.notifyDroneEvent(DroneEventsType.HEARTBEAT_FIRST);
                 break;
 
@@ -100,6 +101,7 @@ public class HeartBeat extends DroneVariable implements OnDroneListener {
                 break;
 
             case CONNECTING:
+                System.out.println("Received connecting event.");
                 gcsHeartbeat.setActive(true);
                 notifyConnecting();
                 break;
@@ -137,6 +139,7 @@ public class HeartBeat extends DroneVariable implements OnDroneListener {
                 break;
 
             case FIRST_HEARTBEAT:
+                System.out.println("First heartbeat timeout.");
                 myDrone.notifyDroneEvent(DroneEventsType.CONNECTION_FAILED);
                 break;
 

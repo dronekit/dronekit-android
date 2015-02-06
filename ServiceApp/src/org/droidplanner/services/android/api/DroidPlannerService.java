@@ -10,6 +10,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -47,7 +48,6 @@ public class DroidPlannerService extends Service {
     public static final String ACTION_DRONE_DESTROYED = Utils.PACKAGE_NAME + ".ACTION_DRONE_DESTROYED";
     public static final String ACTION_KICK_START_DRONESHARE_UPLOADS = Utils.PACKAGE_NAME + ".ACTION_KICK_START_DRONESHARE_UPLOADS";
 
-    private final Handler handler = new Handler();
     private LocalBroadcastManager lbm;
 
     final ConcurrentLinkedQueue<DroneApi> droneApiStore = new ConcurrentLinkedQueue<DroneApi>();
@@ -65,7 +65,7 @@ public class DroidPlannerService extends Service {
         if (listener == null)
             return null;
 
-        DroneApi droneApi = new DroneApi(this, handler, mavlinkApi, listener, appId);
+        DroneApi droneApi = new DroneApi(this, new Handler(Looper.getMainLooper()), mavlinkApi, listener, appId);
         droneApiStore.add(droneApi);
         lbm.sendBroadcast(new Intent(ACTION_DRONE_CREATED));
         return droneApi;

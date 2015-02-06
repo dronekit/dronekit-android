@@ -24,6 +24,7 @@
             android:layout_alignParentTop="true"
             android:layout_above="@+id/action_button_container"
             tools:src="@drawable/ic_android_black_24dp"
+            android:src="@drawable/ic_android_black_24dp"
             android:scaleType="centerInside"/>
 
         <TextView

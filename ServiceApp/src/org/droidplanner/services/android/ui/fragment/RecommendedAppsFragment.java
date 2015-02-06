@@ -1,8 +1,12 @@
 package org.droidplanner.services.android.ui.fragment;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -11,11 +15,31 @@ import android.view.ViewGroup;
 
 import org.droidplanner.services.android.R;
 import org.droidplanner.services.android.ui.adapter.RecommendedAppsAdapter;
+import org.droidplanner.services.android.utils.Utils;
 
 /**
  * Provide a view of recommended apps that are compatible with 3DR Services.
  */
 public class RecommendedAppsFragment extends Fragment {
+
+    public static final String ACTION_REFRESH_RECOMMENDED_APPS = Utils.PACKAGE_NAME + ".action" +
+            ".REFRESH_RECOMMENDED_APPS";
+
+    private static final IntentFilter intentFilter = new IntentFilter(ACTION_REFRESH_RECOMMENDED_APPS);
+
+    private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            switch(intent.getAction()){
+                case ACTION_REFRESH_RECOMMENDED_APPS:
+                    if(recommendedAppsAdapter != null)
+                        recommendedAppsAdapter.notifyDataSetChanged();
+                    break;
+            }
+        }
+    };
+    private RecommendedAppsAdapter recommendedAppsAdapter;
+    private LocalBroadcastManager lbm;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
@@ -28,6 +52,7 @@ public class RecommendedAppsFragment extends Fragment {
 
         final Context context = getActivity().getApplicationContext();
 
+        lbm = LocalBroadcastManager.getInstance(context);
         final RecyclerView recommendedList = (RecyclerView) view.findViewById(R.id.recommended_apps_list);
 
         //Use this setting to improve performance if you know that changes in content do not change the layout side
@@ -39,6 +64,20 @@ public class RecommendedAppsFragment extends Fragment {
         final RecyclerView.LayoutManager gridLayoutMgr = new GridLayoutManager(context, colCount);
         recommendedList.setLayoutManager(gridLayoutMgr);
 
-        recommendedList.setAdapter(new RecommendedAppsAdapter(context));
+        recommendedAppsAdapter = new RecommendedAppsAdapter(context);
+        recommendedList.setAdapter(recommendedAppsAdapter);
+    }
+
+    @Override
+    public void onStart(){
+        super.onStart();
+        recommendedAppsAdapter.notifyDataSetChanged();
+        lbm.registerReceiver(broadcastReceiver, intentFilter);
+    }
+
+    @Override
+    public void onStop(){
+        super.onStop();
+        lbm.unregisterReceiver(broadcastReceiver);
     }
 }

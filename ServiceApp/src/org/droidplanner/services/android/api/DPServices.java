@@ -54,7 +54,7 @@ final class DPServices extends IDroidPlannerServices.Stub {
 
     @Override
     public Bundle[] getConnectedApps(String requesterId) throws RemoteException {
-        Log.d(TAG, "List connected apps request from " + requesterId);
+        Log.d(TAG, "List of connected apps request from " + requesterId);
 
         List<Bundle> appsInfo = new ArrayList<>();
         for(DroneApi droneApi : getService().droneApiStore){
