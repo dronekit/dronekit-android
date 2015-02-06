@@ -7,8 +7,8 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 21
-        versionCode 20043
-        versionName '2.0.43'
+        versionCode 20044
+        versionName '2.0.44'
     }
 
     defaultPublishConfig "release"
