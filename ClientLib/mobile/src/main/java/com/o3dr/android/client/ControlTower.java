@@ -15,6 +15,7 @@ import com.o3dr.android.client.interfaces.TowerListener;
 import com.o3dr.android.client.utils.InstallServiceDialog;
 import com.o3dr.android.client.utils.UpdateServiceDialog;
 import com.o3dr.services.android.lib.BuildConfig;
+import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.model.IDroidPlannerServices;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -98,15 +99,21 @@ public class ControlTower {
     }
 
     public Bundle[] getConnectedApps() {
+        Bundle[] connectedApps = new Bundle[0];
         if (isTowerConnected()) {
             try {
-                return o3drServices.getConnectedApps(getApplicationId());
+                connectedApps = o3drServices.getConnectedApps(getApplicationId());
+                if(connectedApps != null){
+                    for(Bundle appInfo: connectedApps){
+                        appInfo.setClassLoader(ConnectionParameter.class.getClassLoader());
+                    }
+                }
             } catch (RemoteException e) {
                 Log.e(TAG, e.getMessage(), e);
             }
         }
 
-        return new Bundle[0];
+        return connectedApps;
     }
 
     public void registerDrone(Drone drone, Handler handler) {

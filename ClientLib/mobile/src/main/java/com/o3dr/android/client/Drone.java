@@ -442,7 +442,8 @@ public class Drone {
         if (listener == null)
             return;
 
-        droneListeners.add(listener);
+        if (!droneListeners.contains(listener))
+            droneListeners.add(listener);
     }
 
     private void addAttributesObserver(IObserver observer) {
