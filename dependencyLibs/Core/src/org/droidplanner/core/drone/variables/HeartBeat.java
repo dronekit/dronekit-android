@@ -100,7 +100,7 @@ public class HeartBeat extends DroneVariable implements OnDroneListener {
                 restartWatchdog(HEARTBEAT_IMU_CALIBRATION_TIMEOUT);
                 break;
 
-            case CONNECTING:
+            case CHECKING_VEHICLE_LINK:
                 System.out.println("Received connecting event.");
                 gcsHeartbeat.setActive(true);
                 notifyConnecting();

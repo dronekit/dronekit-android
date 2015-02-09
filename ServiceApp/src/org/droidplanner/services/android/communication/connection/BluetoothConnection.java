@@ -72,6 +72,8 @@ public class BluetoothConnection extends AndroidMavLinkConnection {
 		Log.d(BLUE, "## BT Connected ##");
 		out = bluetoothSocket.getOutputStream();
 		in = bluetoothSocket.getInputStream();
+
+        onConnectionOpened();
 	}
 
 	@SuppressLint("NewApi")

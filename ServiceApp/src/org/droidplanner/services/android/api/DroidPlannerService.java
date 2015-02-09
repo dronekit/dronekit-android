@@ -128,6 +128,7 @@ public class DroidPlannerService extends Service {
             mavConnections.put(connParams, conn);
         }
 
+        conn.addMavLinkConnectionListener(listenerTag, listener);
         if (conn.getConnectionStatus() == MavLinkConnection.MAVLINK_DISCONNECTED) {
             conn.connect();
 
@@ -137,8 +138,6 @@ public class DroidPlannerService extends Service {
                     .setAction("MavLink connect")
                     .setLabel(connParams.toString()));
         }
-
-        conn.addMavLinkConnectionListener(listenerTag, listener);
     }
 
     void disconnectMAVConnection(ConnectionParameter connParams, String listenerTag) {

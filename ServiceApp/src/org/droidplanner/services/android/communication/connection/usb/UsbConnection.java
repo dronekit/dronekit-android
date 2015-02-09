@@ -53,7 +53,7 @@ public class UsbConnection extends AndroidMavLinkConnection {
 		}
 
 		if (isFTDIdevice(mContext)) {
-			final UsbConnectionImpl tmp = new UsbFTDIConnection(mContext, mBaudRate);
+			final UsbConnectionImpl tmp = new UsbFTDIConnection(mContext, this, mBaudRate);
 			try {
 				tmp.openUsbConnection();
 
@@ -68,10 +68,9 @@ public class UsbConnection extends AndroidMavLinkConnection {
 
 		// Fallback
 		if (mUsbConnection == null) {
-			final UsbConnectionImpl tmp = new UsbCDCConnection(mContext, mBaudRate);
+			final UsbConnectionImpl tmp = new UsbCDCConnection(mContext, this, mBaudRate);
 
-			// If an error happens here, let it propagate up the call chain since this is the
-			// fallback.
+			// If an error happens here, let it propagate up the call chain since this is the fallback.
 			tmp.openUsbConnection();
 			mUsbConnection = tmp;
 			Log.d(TAG, "Using open-source usb connection.");
@@ -128,12 +127,22 @@ public class UsbConnection extends AndroidMavLinkConnection {
 	static abstract class UsbConnectionImpl {
 		protected final int mBaudRate;
 		protected final Context mContext;
+        private final UsbConnection parentConnection;
 		protected final Logger mLogger = AndroidLogger.getLogger();
 
-		protected UsbConnectionImpl(Context context, int baudRate) {
+		protected UsbConnectionImpl(Context context, UsbConnection parentConn, int baudRate) {
 			mContext = context;
+            this.parentConnection = parentConn;
 			mBaudRate = baudRate;
 		}
+
+        protected void onUsbConnectionOpened(){
+            parentConnection.onConnectionOpened();
+        }
+
+        protected void onUsbConnectionFailed(String errMsg){
+            parentConnection.onConnectionFailed(errMsg);
+        }
 
 		protected abstract void closeUsbConnection() throws IOException;
 
