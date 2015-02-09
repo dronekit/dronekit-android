@@ -6,7 +6,7 @@ import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
 import com.o3dr.services.android.lib.drone.mission.MissionItemType;
 
 /**
- * Created by fhuya on 11/6/14.
+ * Mission command used to move a servo to a particular pwm value.
  */
 public class SetServo extends MissionItem implements MissionItem.Command, android.os.Parcelable {
 
@@ -23,18 +23,31 @@ public class SetServo extends MissionItem implements MissionItem.Command, androi
         channel = copy.channel;
     }
 
+    /**
+     * @return PWM value to output to the servo
+     */
     public int getPwm() {
         return pwm;
     }
 
+    /**
+     * Set PWM value to output to the servo
+     * @param pwm value to output to the servo
+     */
     public void setPwm(int pwm) {
         this.pwm = pwm;
     }
 
+    /**
+     * @return the output channel the servo is attached to
+     */
     public int getChannel() {
         return channel;
     }
 
+    /**
+     * @param channel the output channel the servo is attached to
+     */
     public void setChannel(int channel) {
         this.channel = channel;
     }

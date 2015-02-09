@@ -167,6 +167,11 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream,
     }
 
     @Override
+    public void notifyStartingConnection() {
+        onDroneEvent(DroneInterfaces.DroneEventsType.CONNECTING, drone);
+    }
+
+    @Override
     public void notifyConnected() {
         if (this.connectionParams != null) {
             final DroneSharePrefs droneSharePrefs = connectionParams.getDroneSharePrefs();
@@ -193,7 +198,7 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream,
             }
         }
 
-        this.drone.notifyDroneEvent(DroneInterfaces.DroneEventsType.CONNECTING);
+        this.drone.notifyDroneEvent(DroneInterfaces.DroneEventsType.CHECKING_VEHICLE_LINK);
     }
 
     public void kickStartDroneShareUpload(){

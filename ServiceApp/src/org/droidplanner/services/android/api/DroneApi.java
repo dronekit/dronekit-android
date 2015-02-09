@@ -1329,7 +1329,16 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
             case CONNECTING:
                 extrasBundle = new Bundle(2);
                 extrasBundle.putInt(AttributeEventExtra.EXTRA_AUTOPILOT_FAILSAFE_MESSAGE_LEVEL, Log.INFO);
-                extrasBundle.putString(AttributeEventExtra.EXTRA_AUTOPILOT_FAILSAFE_MESSAGE, "Connecting...");
+                extrasBundle.putString(AttributeEventExtra.EXTRA_AUTOPILOT_FAILSAFE_MESSAGE,
+                        "Connecting...");
+                droneEvent = AttributeEvent.AUTOPILOT_FAILSAFE;
+                break;
+
+            case CHECKING_VEHICLE_LINK:
+                extrasBundle = new Bundle(2);
+                extrasBundle.putInt(AttributeEventExtra.EXTRA_AUTOPILOT_FAILSAFE_MESSAGE_LEVEL, Log.INFO);
+                extrasBundle.putString(AttributeEventExtra.EXTRA_AUTOPILOT_FAILSAFE_MESSAGE,
+                        "Checking vehicle link...");
                 droneEvent = AttributeEvent.AUTOPILOT_FAILSAFE;
                 break;
 

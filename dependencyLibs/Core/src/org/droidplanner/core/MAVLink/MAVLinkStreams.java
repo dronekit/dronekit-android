@@ -19,6 +19,8 @@ public class MAVLinkStreams {
 	}
 
 	public interface MavlinkInputStream {
+        public void notifyStartingConnection();
+
 		public void notifyConnected();
 
 		public void notifyDisconnected();

@@ -35,6 +35,16 @@ public class AndroidTcpConnection extends AndroidMavLinkConnection {
 			protected Logger initLogger() {
 				return AndroidTcpConnection.this.initLogger();
 			}
+
+            @Override
+            protected void onConnectionOpened(){
+                AndroidTcpConnection.this.onConnectionOpened();
+            }
+
+            @Override
+            protected void onConnectionFailed(String errMsg){
+                AndroidTcpConnection.this.onConnectionFailed(errMsg);
+            }
 		};
 	}
 

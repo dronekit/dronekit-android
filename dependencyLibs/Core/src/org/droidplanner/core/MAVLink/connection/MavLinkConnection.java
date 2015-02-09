@@ -47,27 +47,46 @@ public abstract class MavLinkConnection {
     private final AtomicLong mConnectionTime = new AtomicLong(-1);
 
     /**
-     * Listen for incoming data on the mavlink connection.
+     * Start the connection process.
      */
     private final Runnable mConnectingTask = new Runnable() {
+        @Override
+        public void run() {
+            // Load the connection specific preferences
+            loadPreferences();
+            // Open the connection
+            try {
+                openConnection();
+            } catch (IOException e) {
+                // Ignore errors while shutting down
+                if (mConnectionStatus.get() != MAVLINK_DISCONNECTED) {
+                    reportComError(e.getMessage());
+                    mLogger.logErr(TAG, e);
+                }
+
+                disconnect();
+            }
+
+            mLogger.logInfo(TAG, "Exiting connecting thread.");
+        }
+    };
+
+    /**
+     * Manages the receiving and sending of messages.
+     */
+    private final Runnable mManagerTask = new Runnable() {
 
         @Override
         public void run() {
             Thread sendingThread = null;
 
-            // Load the connection specific preferences
-            loadPreferences();
-
             try {
-                // Open the connection
-                openConnection();
-                mConnectionStatus.set(MAVLINK_CONNECTED);
-
                 final long connectionTime = System.currentTimeMillis();
                 mConnectionTime.set(connectionTime);
                 reportConnect(connectionTime);
 
                 // Launch the 'Sending' threads
+                mLogger.logInfo(TAG, "Starting sender thread.");
                 sendingThread = new Thread(mSendingTask, "MavLinkConnection-Sending Thread");
                 sendingThread.start();
 
@@ -92,6 +111,7 @@ public abstract class MavLinkConnection {
                 }
 
                 disconnect();
+                mLogger.logInfo(TAG, "Exiting manager thread.");
             }
         }
 
@@ -137,6 +157,7 @@ public abstract class MavLinkConnection {
 
     protected final Logger mLogger = initLogger();
 
+    private Thread mConnectThread;
     private Thread mTaskThread;
 
     /**
@@ -145,9 +166,25 @@ public abstract class MavLinkConnection {
      */
     public void connect() {
         if (mConnectionStatus.compareAndSet(MAVLINK_DISCONNECTED, MAVLINK_CONNECTING)) {
-            mTaskThread = new Thread(mConnectingTask, "MavLinkConnection-Connecting Thread");
+            mLogger.logInfo(TAG, "Starting connection thread.");
+            mConnectThread = new Thread(mConnectingTask, "MavLinkConnection-Connecting Thread");
+            mConnectThread.start();
+            reportConnecting();
+        }
+    }
+
+    protected void onConnectionOpened() {
+        if (mConnectionStatus.compareAndSet(MAVLINK_CONNECTING, MAVLINK_CONNECTED)) {
+            mLogger.logInfo(TAG, "Starting manager thread.");
+            mTaskThread = new Thread(mManagerTask, "MavLinkConnection-Manager Thread");
             mTaskThread.start();
         }
+    }
+
+    protected void onConnectionFailed(String errMsg) {
+        mLogger.logInfo(TAG, "Unable to establish connection: " + errMsg);
+        reportComError(errMsg);
+        disconnect();
     }
 
     /**
@@ -155,7 +192,7 @@ public abstract class MavLinkConnection {
      * be reported through the MavLinkConnectionListener interface.
      */
     public void disconnect() {
-        if (mConnectionStatus.get() == MAVLINK_DISCONNECTED || mTaskThread == null) {
+        if (mConnectionStatus.get() == MAVLINK_DISCONNECTED || (mConnectThread == null && mTaskThread == null)) {
             return;
         }
 
@@ -164,7 +201,12 @@ public abstract class MavLinkConnection {
 
             mConnectionStatus.set(MAVLINK_DISCONNECTED);
             mConnectionTime.set(-1);
-            if (mTaskThread.isAlive() && !mTaskThread.isInterrupted()) {
+
+            if (mConnectThread != null && mConnectThread.isAlive() && !mConnectThread.isInterrupted()) {
+                mConnectThread.interrupt();
+            }
+
+            if (mTaskThread != null && mTaskThread.isAlive() && !mTaskThread.isInterrupted()) {
                 mTaskThread.interrupt();
             }
 
@@ -266,6 +308,12 @@ public abstract class MavLinkConnection {
 
         for (MavLinkConnectionListener listener : mListeners.values()) {
             listener.onComError(errMsg);
+        }
+    }
+
+    protected void reportConnecting(){
+        for(MavLinkConnectionListener listener: mListeners.values()){
+            listener.onStartingConnection();
         }
     }
 

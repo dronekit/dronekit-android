@@ -28,6 +28,16 @@ public class AndroidUdpConnection extends AndroidMavLinkConnection {
 				return AndroidUdpConnection.this.initLogger();
 			}
 
+            @Override
+            protected void onConnectionOpened(){
+                AndroidUdpConnection.this.onConnectionOpened();
+            }
+
+            @Override
+            protected void onConnectionFailed(String errMsg){
+                AndroidUdpConnection.this.onConnectionFailed(errMsg);
+            }
+
 		};
 	}
 

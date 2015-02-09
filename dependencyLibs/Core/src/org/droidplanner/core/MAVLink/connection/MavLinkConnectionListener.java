@@ -7,6 +7,11 @@ import com.MAVLink.MAVLinkPacket;
  */
 public interface MavLinkConnectionListener {
 
+    /**
+     * Called when a connection is being established.
+     */
+    public void onStartingConnection();
+
 	/**
 	 * Called when the mavlink connection is established.
 	 */

@@ -16,8 +16,8 @@ class UsbFTDIConnection extends UsbConnection.UsbConnectionImpl {
 
 	private FT_Device ftDev;
 
-	protected UsbFTDIConnection(Context context, int baudRate) {
-		super(context, baudRate);
+	protected UsbFTDIConnection(Context context, UsbConnection parentConn, int baudRate) {
+		super(context, parentConn, baudRate);
 	}
 
 	@Override
@@ -65,6 +65,8 @@ class UsbFTDIConnection extends UsbConnection.UsbConnectionImpl {
 		} else {
 			Log.d("USB", "COM open");
 		}
+
+        onUsbConnectionOpened();
 	}
 
 	@Override

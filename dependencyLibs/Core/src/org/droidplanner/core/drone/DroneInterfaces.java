@@ -158,6 +158,11 @@ public class DroneInterfaces {
         CONNECTING,
 
         /**
+         * Vehicle link is being validated.
+         */
+        CHECKING_VEHICLE_LINK,
+
+        /**
          * Connection failed event.
          */
         CONNECTION_FAILED,

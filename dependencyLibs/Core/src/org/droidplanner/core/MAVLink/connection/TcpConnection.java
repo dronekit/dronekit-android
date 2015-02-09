@@ -24,6 +24,7 @@ public abstract class TcpConnection extends MavLinkConnection {
 	@Override
 	public final void openConnection() throws IOException {
 		getTCPStream();
+        onConnectionOpened();
 	}
 
 	@Override

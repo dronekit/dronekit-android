@@ -38,6 +38,11 @@ public class MAVLinkClient implements MAVLinkStreams.MAVLinkOutputStream {
     private final MavLinkConnectionListener mConnectionListener = new MavLinkConnectionListener() {
 
         @Override
+        public void onStartingConnection(){
+            listener.notifyStartingConnection();
+        }
+
+        @Override
         public void onConnect(long connectionTime) {
             startLoggingThread(connectionTime);
             listener.notifyConnected();
