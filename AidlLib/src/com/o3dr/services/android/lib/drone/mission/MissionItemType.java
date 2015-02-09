@@ -9,6 +9,7 @@ import com.o3dr.services.android.lib.drone.mission.item.command.CameraTrigger;
 import com.o3dr.services.android.lib.drone.mission.item.command.ChangeSpeed;
 import com.o3dr.services.android.lib.drone.mission.item.command.EpmGripper;
 import com.o3dr.services.android.lib.drone.mission.item.command.ReturnToLaunch;
+import com.o3dr.services.android.lib.drone.mission.item.command.SetRelay;
 import com.o3dr.services.android.lib.drone.mission.item.command.SetServo;
 import com.o3dr.services.android.lib.drone.mission.item.command.Takeoff;
 import com.o3dr.services.android.lib.drone.mission.item.command.YawCondition;
@@ -193,6 +194,18 @@ public enum MissionItemType {
         @Override
         protected Creator<SetServo> getMissionItemCreator() {
             return SetServo.CREATOR;
+        }
+    },
+
+    SET_RELAY("Set Relay") {
+        @Override
+        public MissionItem getNewItem() {
+            return new SetRelay();
+        }
+
+        @Override
+        protected Creator<SetRelay> getMissionItemCreator() {
+            return SetRelay.CREATOR;
         }
     };
 
