@@ -75,6 +75,7 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener {
 			changeToGuidedMode(myDrone);
 		}else{
 			newGuidedCoord(myDrone.getGps().getPosition());
+            state = GuidedStates.IDLE;
 		}
 	}
 

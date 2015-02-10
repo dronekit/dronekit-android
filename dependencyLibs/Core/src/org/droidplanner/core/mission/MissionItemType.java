@@ -1,13 +1,12 @@
 package org.droidplanner.core.mission;
 
-import java.util.Collections;
-
 import org.droidplanner.core.helpers.coordinates.Coord2D;
 import org.droidplanner.core.mission.commands.CameraTrigger;
 import org.droidplanner.core.mission.commands.ChangeSpeed;
 import org.droidplanner.core.mission.commands.ConditionYaw;
 import org.droidplanner.core.mission.commands.EpmGripper;
 import org.droidplanner.core.mission.commands.ReturnToHome;
+import org.droidplanner.core.mission.commands.SetRelayImpl;
 import org.droidplanner.core.mission.commands.SetServo;
 import org.droidplanner.core.mission.commands.Takeoff;
 import org.droidplanner.core.mission.survey.Survey;
@@ -18,54 +17,69 @@ import org.droidplanner.core.mission.waypoints.SplineWaypoint;
 import org.droidplanner.core.mission.waypoints.StructureScanner;
 import org.droidplanner.core.mission.waypoints.Waypoint;
 
+import java.util.Collections;
+
 public enum MissionItemType {
-	WAYPOINT("Waypoint"), SPLINE_WAYPOINT("Spline Waypoint"), TAKEOFF("Takeoff"), RTL(
-			"Return to Launch"), LAND("Land"), CIRCLE("Circle"), ROI("Region of Interest"), SURVEY(
-			"Survey"), CYLINDRICAL_SURVEY("Structure Scan"), CHANGE_SPEED("Change Speed"), CAMERA_TRIGGER("Camera Trigger"), EPM_GRIPPER("EPM"), SET_SERVO("Set Servo"), CONDITION_YAW("Set Yaw");
+    WAYPOINT("Waypoint"),
+    SPLINE_WAYPOINT("Spline Waypoint"),
+    TAKEOFF("Takeoff"),
+    RTL("Return to Launch"),
+    LAND("Land"),
+    CIRCLE("Circle"),
+    ROI("Region of Interest"),
+    SURVEY("Survey"),
+    CYLINDRICAL_SURVEY("Structure Scan"),
+    CHANGE_SPEED("Change Speed"),
+    CAMERA_TRIGGER("Camera Trigger"),
+    EPM_GRIPPER("EPM"),
+    SET_SERVO("Set Servo"),
+    CONDITION_YAW("Set Yaw"),
+    SET_RELAY("Set Relay");
 
-	private final String name;
+    private final String name;
 
-	private MissionItemType(String name) {
-		this.name = name;
-	}
+    private MissionItemType(String name) {
+        this.name = name;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public MissionItem getNewItem(MissionItem referenceItem) throws IllegalArgumentException {
-		switch (this) {
-		case WAYPOINT:
-			return new Waypoint(referenceItem);
-		case SPLINE_WAYPOINT:
-			return new SplineWaypoint(referenceItem);
-		case TAKEOFF:
-			return new Takeoff(referenceItem);
-		case CHANGE_SPEED:
-			return new ChangeSpeed(referenceItem);
-		case CAMERA_TRIGGER:
-			return new CameraTrigger(referenceItem);
-		case EPM_GRIPPER:
-			return new EpmGripper(referenceItem);
-		case RTL:
-			return new ReturnToHome(referenceItem);
-		case LAND:
-			return new Land(referenceItem);
-		case CIRCLE:
-			return new Circle(referenceItem);
-		case ROI:
-			return new RegionOfInterest(referenceItem);
-		case SURVEY:
-			return new Survey(referenceItem.getMission(), Collections.<Coord2D> emptyList());
-		case CYLINDRICAL_SURVEY:
-			return new StructureScanner(referenceItem);
-		case SET_SERVO:
-			return new SetServo(referenceItem);
-		case CONDITION_YAW:
-			return new ConditionYaw(referenceItem);
-		default:
-			throw new IllegalArgumentException("Unrecognized mission item type (" + name + ")"
-					+ "");
-		}
-	}
+    public MissionItem getNewItem(MissionItem referenceItem) throws IllegalArgumentException {
+        switch (this) {
+            case WAYPOINT:
+                return new Waypoint(referenceItem);
+            case SPLINE_WAYPOINT:
+                return new SplineWaypoint(referenceItem);
+            case TAKEOFF:
+                return new Takeoff(referenceItem);
+            case CHANGE_SPEED:
+                return new ChangeSpeed(referenceItem);
+            case CAMERA_TRIGGER:
+                return new CameraTrigger(referenceItem);
+            case EPM_GRIPPER:
+                return new EpmGripper(referenceItem);
+            case RTL:
+                return new ReturnToHome(referenceItem);
+            case LAND:
+                return new Land(referenceItem);
+            case CIRCLE:
+                return new Circle(referenceItem);
+            case ROI:
+                return new RegionOfInterest(referenceItem);
+            case SURVEY:
+                return new Survey(referenceItem.getMission(), Collections.<Coord2D>emptyList());
+            case CYLINDRICAL_SURVEY:
+                return new StructureScanner(referenceItem);
+            case SET_SERVO:
+                return new SetServo(referenceItem);
+            case CONDITION_YAW:
+                return new ConditionYaw(referenceItem);
+            case SET_RELAY:
+                return new SetRelayImpl(referenceItem);
+            default:
+                throw new IllegalArgumentException("Unrecognized mission item type (" + name + ")" + "");
+        }
+    }
 }

@@ -9,6 +9,7 @@ import com.o3dr.services.android.lib.drone.mission.item.command.CameraTrigger;
 import com.o3dr.services.android.lib.drone.mission.item.command.ChangeSpeed;
 import com.o3dr.services.android.lib.drone.mission.item.command.EpmGripper;
 import com.o3dr.services.android.lib.drone.mission.item.command.ReturnToLaunch;
+import com.o3dr.services.android.lib.drone.mission.item.command.SetRelay;
 import com.o3dr.services.android.lib.drone.mission.item.command.SetServo;
 import com.o3dr.services.android.lib.drone.mission.item.command.Takeoff;
 import com.o3dr.services.android.lib.drone.mission.item.command.YawCondition;
@@ -51,15 +52,27 @@ public enum MissionItemType {
         }
     },
 
-    TAKEOFF("Takeoff") {
+    CIRCLE("Circle") {
         @Override
         public MissionItem getNewItem() {
-            return new Takeoff();
+            return new Circle();
         }
 
         @Override
-        protected Parcelable.Creator<Takeoff> getMissionItemCreator() {
-            return Takeoff.CREATOR;
+        protected Creator<Circle> getMissionItemCreator() {
+            return Circle.CREATOR;
+        }
+    },
+
+    REGION_OF_INTEREST("Region of Interest") {
+        @Override
+        public MissionItem getNewItem() {
+            return new RegionOfInterest();
+        }
+
+        @Override
+        protected Creator<RegionOfInterest> getMissionItemCreator() {
+            return RegionOfInterest.CREATOR;
         }
     },
 
@@ -72,6 +85,66 @@ public enum MissionItemType {
         @Override
         protected Parcelable.Creator<ChangeSpeed> getMissionItemCreator(){
             return ChangeSpeed.CREATOR;
+        }
+    },
+
+    TAKEOFF("Takeoff") {
+        @Override
+        public MissionItem getNewItem() {
+            return new Takeoff();
+        }
+
+        @Override
+        protected Parcelable.Creator<Takeoff> getMissionItemCreator() {
+            return Takeoff.CREATOR;
+        }
+    },
+
+    LAND("Land") {
+        @Override
+        public MissionItem getNewItem() {
+            return new Land();
+        }
+
+        @Override
+        protected Creator<Land> getMissionItemCreator() {
+            return Land.CREATOR;
+        }
+    },
+
+    RETURN_TO_LAUNCH("Return to Launch") {
+        @Override
+        public MissionItem getNewItem() {
+            return new ReturnToLaunch();
+        }
+
+        @Override
+        protected Creator<ReturnToLaunch> getMissionItemCreator() {
+            return ReturnToLaunch.CREATOR;
+        }
+    },
+
+    SURVEY("Survey") {
+        @Override
+        public MissionItem getNewItem() {
+            return new Survey();
+        }
+
+        @Override
+        protected Creator<Survey> getMissionItemCreator() {
+            return Survey.CREATOR;
+        }
+    },
+
+    STRUCTURE_SCANNER("Structure Scanner") {
+        @Override
+        public MissionItem getNewItem() {
+            return new StructureScanner();
+        }
+
+        @Override
+        protected Creator<StructureScanner> getMissionItemCreator() {
+            return StructureScanner.CREATOR;
         }
     },
 
@@ -100,75 +173,15 @@ public enum MissionItemType {
 
     },
 
-    RETURN_TO_LAUNCH("Return to Launch") {
+    YAW_CONDITION("Set Yaw"){
         @Override
-        public MissionItem getNewItem() {
-            return new ReturnToLaunch();
+        public MissionItem getNewItem(){
+            return new YawCondition();
         }
 
         @Override
-        protected Creator<ReturnToLaunch> getMissionItemCreator() {
-            return ReturnToLaunch.CREATOR;
-        }
-    },
-
-    LAND("Land") {
-        @Override
-        public MissionItem getNewItem() {
-            return new Land();
-        }
-
-        @Override
-        protected Creator<Land> getMissionItemCreator() {
-            return Land.CREATOR;
-        }
-    },
-
-    CIRCLE("Circle") {
-        @Override
-        public MissionItem getNewItem() {
-            return new Circle();
-        }
-
-        @Override
-        protected Creator<Circle> getMissionItemCreator() {
-            return Circle.CREATOR;
-        }
-    },
-
-    REGION_OF_INTEREST("Region of Interest") {
-        @Override
-        public MissionItem getNewItem() {
-            return new RegionOfInterest();
-        }
-
-        @Override
-        protected Creator<RegionOfInterest> getMissionItemCreator() {
-            return RegionOfInterest.CREATOR;
-        }
-    },
-
-    SURVEY("Survey") {
-        @Override
-        public MissionItem getNewItem() {
-            return new Survey();
-        }
-
-        @Override
-        protected Creator<Survey> getMissionItemCreator() {
-            return Survey.CREATOR;
-        }
-    },
-
-    STRUCTURE_SCANNER("Structure Scanner") {
-        @Override
-        public MissionItem getNewItem() {
-            return new StructureScanner();
-        }
-
-        @Override
-        protected Creator<StructureScanner> getMissionItemCreator() {
-            return StructureScanner.CREATOR;
+        protected Creator<YawCondition> getMissionItemCreator() {
+            return YawCondition.CREATOR;
         }
     },
 
@@ -184,15 +197,15 @@ public enum MissionItemType {
         }
     },
 
-    YAW_CONDITION("Set Yaw"){
+    SET_RELAY("Set Relay") {
         @Override
-        public MissionItem getNewItem(){
-            return new YawCondition();
+        public MissionItem getNewItem() {
+            return new SetRelay();
         }
 
         @Override
-        protected Creator<YawCondition> getMissionItemCreator() {
-            return YawCondition.CREATOR;
+        protected Creator<SetRelay> getMissionItemCreator() {
+            return SetRelay.CREATOR;
         }
     };
 

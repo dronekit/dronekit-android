@@ -599,7 +599,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
         List<MissionItem> itemsList = mission.getMissionItems();
         for (MissionItem item : itemsList) {
-            droneMission.addMissionItem(ProxyUtils.getMissionItem(droneMission, item));
+            droneMission.addMissionItem(ProxyUtils.getMissionItemImpl(droneMission, item));
         }
 
         if (pushToDrone)
@@ -815,7 +815,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
     private Survey buildSurvey(Survey survey) {
         org.droidplanner.core.mission.Mission droneMission = this.droneMgr.getDrone().getMission();
-        org.droidplanner.core.mission.survey.Survey updatedSurvey = (org.droidplanner.core.mission.survey.Survey) ProxyUtils.getMissionItem
+        org.droidplanner.core.mission.survey.Survey updatedSurvey = (org.droidplanner.core.mission.survey.Survey) ProxyUtils.getMissionItemImpl
                 (droneMission, survey);
 
         return (Survey) ProxyUtils.getProxyMissionItem(updatedSurvey);
@@ -824,7 +824,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     private StructureScanner buildStructureScanner(StructureScanner item) {
         org.droidplanner.core.mission.Mission droneMission = this.droneMgr.getDrone().getMission();
         org.droidplanner.core.mission.waypoints.StructureScanner updatedScan = (org.droidplanner.core.mission.waypoints.StructureScanner) ProxyUtils
-                .getMissionItem(droneMission, item);
+                .getMissionItemImpl(droneMission, item);
 
         StructureScanner proxyScanner = (StructureScanner) ProxyUtils.getProxyMissionItem(updatedScan);
         return proxyScanner;
