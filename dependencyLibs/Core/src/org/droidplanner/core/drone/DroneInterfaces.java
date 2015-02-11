@@ -262,12 +262,6 @@ public class DroneInterfaces {
 		public void onEndWaypointEvent(WaypointManager.WaypointEvent_Type wpEvent);
 	}
 
-	public interface OnTimeout {
-
-		public void notifyTimeOut(int timeOutCount);
-
-	}
-
 	public interface Clock {
 
 		long elapsedRealtime();

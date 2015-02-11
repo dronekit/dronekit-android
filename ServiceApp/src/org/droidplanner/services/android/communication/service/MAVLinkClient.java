@@ -44,9 +44,6 @@ public class MAVLinkClient implements MAVLinkStreams.MAVLinkOutputStream {
         @Override
         public void onReceivePacket(final MAVLinkPacket packet) {
             listener.notifyReceivedData(packet);
-
-            if (mavLinkApi != null && connParams != null)
-                mavLinkApi.logData(connParams, packet, loggingFilePath);
         }
 
         @Override
@@ -124,16 +121,16 @@ public class MAVLinkClient implements MAVLinkStreams.MAVLinkOutputStream {
 
     @Override
     public void sendMavPacket(MAVLinkPacket pack) {
-        if (!isConnected()) {
+        if (this.connParams == null) {
             return;
         }
 
         pack.seq = packetSeqNumber;
 
-        mavLinkApi.sendData(this.connParams, pack);
-        mavLinkApi.logData(this.connParams, pack, this.loggingFilePath);
-
-        packetSeqNumber = (packetSeqNumber + 1) % (MAX_PACKET_SEQUENCE + 1);
+        if(mavLinkApi.sendData(this.connParams, pack)) {
+            mavLinkApi.logData(this.connParams, pack, this.loggingFilePath);
+            packetSeqNumber = (packetSeqNumber + 1) % (MAX_PACKET_SEQUENCE + 1);
+        }
     }
 
     @Override

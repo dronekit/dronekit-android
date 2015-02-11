@@ -37,6 +37,7 @@ public abstract class MavLinkConnection {
      * Size of the buffer used to read messages from the mavlink connection.
      */
     private static final int READ_BUFFER_SIZE = 4096;
+    private static final String ALL_LOGGING_FILES = "all_logging_files";
 
     /**
      * Set of listeners subscribed to this mavlink connection. We're using a
@@ -117,7 +118,9 @@ public abstract class MavLinkConnection {
 
                 while (mConnectionStatus.get() == MAVLINK_CONNECTED) {
                     int bufferSize = readDataBlock(readBuffer);
+                    long startTime = System.currentTimeMillis();
                     handleData(parser, bufferSize, readBuffer);
+                    mLogger.logInfo(TAG, "Took " + (System.currentTimeMillis() - startTime) + " ms");
                 }
             } catch (IOException e) {
                 // Ignore errors while shutting down
@@ -147,6 +150,7 @@ public abstract class MavLinkConnection {
             for (int i = 0; i < bufferSize; i++) {
                 MAVLinkPacket receivedPacket = parser.mavlink_parse_char(buffer[i] & 0x00ff);
                 if (receivedPacket != null) {
+                    logMavPacket(receivedPacket, ALL_LOGGING_FILES);
                     reportReceivedPacket(receivedPacket);
                 }
             }
@@ -187,6 +191,25 @@ public abstract class MavLinkConnection {
 
         private final Map<String, BufferedOutputStream> streamCache = new HashMap<>();
 
+        private void writeLog(String loggingFilePath, ByteBuffer logBuffer, byte[] packetData) {
+            try {
+
+                BufferedOutputStream logWriter = streamCache.get(loggingFilePath);
+                if (logWriter == null) {
+                    logWriter = new BufferedOutputStream(new FileOutputStream(loggingFilePath));
+                    streamCache.put(loggingFilePath, logWriter);
+                }
+
+
+                logWriter.write(logBuffer.array());
+                logWriter.write(packetData);
+            } catch (IOException e) {
+                final String errorMessage = e.getMessage();
+                if (errorMessage != null)
+                    mLogger.logErr(TAG, errorMessage, e);
+            }
+        }
+
         @Override
         public void run() {
             final ByteBuffer logBuffer = ByteBuffer.allocate(Long.SIZE / Byte.SIZE);
@@ -194,36 +217,30 @@ public abstract class MavLinkConnection {
 
             try {
                 while (mConnectionStatus.get() == MAVLINK_CONNECTED) {
-                    try {
-                        final Pair<String, byte[]> packetInfo = mPacketsToLog.take();
 
-                        final String loggingFilePath = packetInfo.first;
-                        final byte[] packetData = packetInfo.second;
+                    final Pair<String, byte[]> packetInfo = mPacketsToLog.take();
 
-                        BufferedOutputStream logWriter = streamCache.get(loggingFilePath);
-                        if (logWriter == null) {
-                            logWriter = new BufferedOutputStream(new FileOutputStream(loggingFilePath));
-                            streamCache.put(loggingFilePath, logWriter);
+                    final String loggingFilePath = packetInfo.first;
+                    final byte[] packetData = packetInfo.second;
+
+                    logBuffer.clear();
+                    logBuffer.putLong(System.currentTimeMillis() * 1000);
+
+
+                    if (ALL_LOGGING_FILES.equals(loggingFilePath)) {
+                        for (String cachedLogFile : streamCache.keySet()) {
+                            writeLog(cachedLogFile, logBuffer, packetData);
                         }
-
-                        logBuffer.clear();
-                        logBuffer.putLong(System.currentTimeMillis() * 1000);
-
-                        logWriter.write(logBuffer.array());
-                        logWriter.write(packetData);
-
-                    } catch (IOException e) {
-                        final String errorMessage = e.getMessage();
-                        if (errorMessage != null)
-                            mLogger.logErr(TAG, errorMessage, e);
+                    } else {
+                        writeLog(loggingFilePath, logBuffer, packetData);
                     }
                 }
-            }catch (InterruptedException e) {
+            } catch (InterruptedException e) {
                 final String errorMessage = e.getMessage();
                 if (errorMessage != null)
                     mLogger.logVerbose(TAG, errorMessage);
             } finally {
-                for(Map.Entry<String, BufferedOutputStream> entry: streamCache.entrySet()) {
+                for (Map.Entry<String, BufferedOutputStream> entry : streamCache.entrySet()) {
                     try {
                         entry.getValue().close();
                     } catch (IOException e) {
@@ -239,7 +256,7 @@ public abstract class MavLinkConnection {
             }
         }
 
-        private File getCompleteTLogFile(File tempFile){
+        private File getCompleteTLogFile(File tempFile) {
             return new File(tempFile.getParentFile(), tempFile.getName().replace(TEMP_TLOG_EXT, ""));
         }
     };
@@ -318,10 +335,10 @@ public abstract class MavLinkConnection {
         }
     }
 
-    public void logMavPacket(MAVLinkPacket packet, String loggingFilePath){
+    public void logMavPacket(MAVLinkPacket packet, String loggingFilePath) {
         final byte[] packetData = packet.encodePacket();
-        if(loggingFilePath != null && loggingFilePath.length() != 0){
-            if(!mPacketsToLog.offer(Pair.create(loggingFilePath, packetData))){
+        if (loggingFilePath != null && loggingFilePath.length() != 0) {
+            if (!mPacketsToLog.offer(Pair.create(loggingFilePath, packetData))) {
                 mLogger.logErr(TAG, "Unable to log mavlink packet. Queue is full!");
             }
         }
@@ -410,8 +427,8 @@ public abstract class MavLinkConnection {
         }
     }
 
-    protected void reportConnecting(){
-        for(MavLinkConnectionListener listener: mListeners.values()){
+    protected void reportConnecting() {
+        for (MavLinkConnectionListener listener : mListeners.values()) {
             listener.onStartingConnection();
         }
     }
