@@ -58,7 +58,7 @@ import com.o3dr.services.android.lib.model.IObserver;
 import com.o3dr.services.android.lib.model.action.Action;
 
 import org.droidplanner.core.MAVLink.MavLinkArm;
-import org.droidplanner.core.MAVLink.MavLinkROI;
+import org.droidplanner.core.MAVLink.command.doCmd.MavLinkDoCmds;
 import org.droidplanner.core.drone.DroneInterfaces;
 import org.droidplanner.core.drone.profiles.VehicleProfile;
 import org.droidplanner.core.drone.variables.Calibration;
@@ -925,6 +925,12 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 sendMavlinkMessage(messageWrapper);
                 break;
 
+            case ExperimentalActions.ACTION_SET_RELAY:
+                int relayNumber = data.getInt(ExperimentalActions.EXTRA_RELAY_NUMBER);
+                boolean isOn = data.getBoolean(ExperimentalActions.EXTRA_IS_RELAY_ON);
+                MavLinkDoCmds.setRelay(getDroneManager().getDrone(), relayNumber, isOn);
+                break;
+
             //GUIDED ACTIONS
             case GuidedActions.ACTION_DO_GUIDED_TAKEOFF:
                 double takeoffAltitude = data.getDouble(GuidedActions.EXTRA_ALTITUDE);
@@ -1187,11 +1193,11 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     }
 
     public void triggerCamera() throws RemoteException {
-        MavLinkROI.triggerCamera(this.droneMgr.getDrone());
+        MavLinkDoCmds.triggerCamera(this.droneMgr.getDrone());
     }
 
     public void epmCommand(boolean release) {
-        MavLinkROI.empCommand(this.droneMgr.getDrone(), release);
+        MavLinkDoCmds.empCommand(this.droneMgr.getDrone(), release);
     }
 
     public void loadWaypoints() {

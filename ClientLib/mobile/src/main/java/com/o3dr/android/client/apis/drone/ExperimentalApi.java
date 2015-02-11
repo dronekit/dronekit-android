@@ -6,14 +6,14 @@ import com.o3dr.android.client.Drone;
 import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
 import com.o3dr.services.android.lib.model.action.Action;
 
-import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.ACTION_EPM_COMMAND;
+import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.*;
 import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.ACTION_SEND_MAVLINK_MESSAGE;
 import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.ACTION_TRIGGER_CAMERA;
 import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.EXTRA_EPM_RELEASE;
 import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.EXTRA_MAVLINK_MESSAGE;
 
 /**
- * Created by Fredia Huya-Kouadio on 1/19/15.
+ * Contains drone commands with no defined interaction model yet.
  */
 public class ExperimentalApi {
 
@@ -47,5 +47,18 @@ public class ExperimentalApi {
         Bundle params = new Bundle();
         params.putParcelable(EXTRA_MAVLINK_MESSAGE, messageWrapper);
         drone.performAsyncAction(new Action(ACTION_SEND_MAVLINK_MESSAGE, params));
+    }
+
+    /**
+     * Set a Relay pin’s voltage high or low
+     * @param drone target vehicle
+     * @param relayNumber
+     * @param enabled true for relay to be on, false for relay to be off.
+     */
+    public static void setRelay(Drone drone, int relayNumber, boolean enabled){
+        Bundle params = new Bundle(2);
+        params.putInt(EXTRA_RELAY_NUMBER, relayNumber);
+        params.putBoolean(EXTRA_IS_RELAY_ON, enabled);
+        drone.performAsyncAction(new Action(ACTION_SET_RELAY, params));
     }
 }
