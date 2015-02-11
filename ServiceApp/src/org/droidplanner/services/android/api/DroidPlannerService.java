@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.support.v4.content.LocalBroadcastManager;
@@ -58,6 +59,8 @@ public class DroidPlannerService extends Service {
      */
     final ConcurrentHashMap<ConnectionParameter, AndroidMavLinkConnection> mavConnections = new ConcurrentHashMap<>();
 
+    private HandlerThread handlerThread;
+
     private DPServices dpServices;
     private DroneAccess droneAccess;
     private MavLinkServiceApi mavlinkApi;
@@ -66,7 +69,7 @@ public class DroidPlannerService extends Service {
         if (listener == null)
             return null;
 
-        DroneApi droneApi = new DroneApi(this, new Handler(Looper.getMainLooper()), mavlinkApi, listener, appId);
+        DroneApi droneApi = new DroneApi(this, handlerThread.getLooper(), mavlinkApi, listener, appId);
         droneApiStore.put(appId, droneApi);
         lbm.sendBroadcast(new Intent(ACTION_DRONE_CREATED));
         return droneApi;
@@ -184,6 +187,9 @@ public class DroidPlannerService extends Service {
 
         final Context context = getApplicationContext();
 
+        handlerThread = new HandlerThread("Connected apps looper");
+        handlerThread.start();
+
         mavlinkApi = new MavLinkServiceApi(this);
         droneAccess = new DroneAccess(this);
         dpServices = new DPServices(this);
@@ -218,8 +224,9 @@ public class DroidPlannerService extends Service {
         }
 
         mavConnections.clear();
-
         dpServices.destroy();
+        handlerThread.quit();
+
         stopForeground(true);
     }
 

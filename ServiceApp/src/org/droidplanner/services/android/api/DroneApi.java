@@ -4,7 +4,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.RemoteException;
 import android.text.TextUtils;
 import android.util.Log;
@@ -114,10 +116,13 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
     private List<CameraDetail> cachedCameraDetails;
 
-    DroneApi(DroidPlannerService dpService, final Handler handler, MavLinkServiceApi mavlinkApi, IApiListener listener,
+    DroneApi(DroidPlannerService dpService, Looper looper, MavLinkServiceApi mavlinkApi, IApiListener listener,
              String ownerId) {
 
         this.context = dpService.getApplicationContext();
+
+        final Handler handler = new Handler(looper);
+
         this.droneHandler =  new DroneInterfaces.Handler() {
             @Override
             public void removeCallbacks(Runnable thread) {

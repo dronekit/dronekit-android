@@ -4,8 +4,16 @@ import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Parser;
 
 import org.droidplanner.core.model.Logger;
+import org.droidplanner.core.util.Pair;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -41,7 +49,13 @@ public abstract class MavLinkConnection {
      * Queue the set of packets to send via the mavlink connection. A thread
      * will be blocking on it until there's element(s) available to send.
      */
-    private final LinkedBlockingQueue<MAVLinkPacket> mPacketsToSend = new LinkedBlockingQueue<MAVLinkPacket>();
+    private final LinkedBlockingQueue<byte[]> mPacketsToSend = new LinkedBlockingQueue<>();
+
+    /**
+     * Queue the set of packets to log. A thread will be blocking on it until
+     * there's element(s) available for logging.
+     */
+    private final LinkedBlockingQueue<Pair<String, byte[]>> mPacketsToLog = new LinkedBlockingQueue<>();
 
     private final AtomicInteger mConnectionStatus = new AtomicInteger(MAVLINK_DISCONNECTED);
     private final AtomicLong mConnectionTime = new AtomicLong(-1);
@@ -79,16 +93,22 @@ public abstract class MavLinkConnection {
         @Override
         public void run() {
             Thread sendingThread = null;
+            Thread loggingThread = null;
 
             try {
                 final long connectionTime = System.currentTimeMillis();
                 mConnectionTime.set(connectionTime);
                 reportConnect(connectionTime);
 
-                // Launch the 'Sending' threads
+                // Launch the 'Sending' thread
                 mLogger.logInfo(TAG, "Starting sender thread.");
                 sendingThread = new Thread(mSendingTask, "MavLinkConnection-Sending Thread");
                 sendingThread.start();
+
+                //Launch the 'Logging' thread
+                mLogger.logInfo(TAG, "Starting logging thread.");
+                loggingThread = new Thread(mLoggingTask, "MavLinkConnection-Logging Thread");
+                loggingThread.start();
 
                 final Parser parser = new Parser();
                 parser.stats.mavlinkResetStats();
@@ -108,6 +128,10 @@ public abstract class MavLinkConnection {
             } finally {
                 if (sendingThread != null && sendingThread.isAlive()) {
                     sendingThread.interrupt();
+                }
+
+                if (loggingThread != null && loggingThread.isAlive()) {
+                    loggingThread.interrupt();
                 }
 
                 disconnect();
@@ -137,8 +161,7 @@ public abstract class MavLinkConnection {
         public void run() {
             try {
                 while (mConnectionStatus.get() == MAVLINK_CONNECTED) {
-                    final MAVLinkPacket packet = mPacketsToSend.take();
-                    byte[] buffer = packet.encodePacket();
+                    byte[] buffer = mPacketsToSend.take();
 
                     try {
                         sendBuffer(buffer);
@@ -152,6 +175,72 @@ public abstract class MavLinkConnection {
             } finally {
                 disconnect();
             }
+        }
+    };
+
+    /**
+     * Blocks until there's packets to log, then dispatch them.
+     */
+    private final Runnable mLoggingTask = new Runnable() {
+
+        private static final String TEMP_TLOG_EXT = ".tmp";
+
+        private final Map<String, BufferedOutputStream> streamCache = new HashMap<>();
+
+        @Override
+        public void run() {
+            final ByteBuffer logBuffer = ByteBuffer.allocate(Long.SIZE / Byte.SIZE);
+            logBuffer.order(ByteOrder.BIG_ENDIAN);
+
+            try {
+                while (mConnectionStatus.get() == MAVLINK_CONNECTED) {
+                    try {
+                        final Pair<String, byte[]> packetInfo = mPacketsToLog.take();
+
+                        final String loggingFilePath = packetInfo.first;
+                        final byte[] packetData = packetInfo.second;
+
+                        BufferedOutputStream logWriter = streamCache.get(loggingFilePath);
+                        if (logWriter == null) {
+                            logWriter = new BufferedOutputStream(new FileOutputStream(loggingFilePath));
+                            streamCache.put(loggingFilePath, logWriter);
+                        }
+
+                        logBuffer.clear();
+                        logBuffer.putLong(System.currentTimeMillis() * 1000);
+
+                        logWriter.write(logBuffer.array());
+                        logWriter.write(packetData);
+
+                    } catch (IOException e) {
+                        final String errorMessage = e.getMessage();
+                        if (errorMessage != null)
+                            mLogger.logErr(TAG, errorMessage, e);
+                    }
+                }
+            }catch (InterruptedException e) {
+                final String errorMessage = e.getMessage();
+                if (errorMessage != null)
+                    mLogger.logVerbose(TAG, errorMessage);
+            } finally {
+                for(Map.Entry<String, BufferedOutputStream> entry: streamCache.entrySet()) {
+                    try {
+                        entry.getValue().close();
+                    } catch (IOException e) {
+                        final String errorMessage = e.getMessage();
+                        if (errorMessage != null)
+                            mLogger.logErr(TAG, errorMessage, e);
+                    }
+
+                    //Rename the file.
+                    final File logFile = new File(entry.getKey());
+                    logFile.renameTo(getCompleteTLogFile(logFile));
+                }
+            }
+        }
+
+        private File getCompleteTLogFile(File tempFile){
+            return new File(tempFile.getParentFile(), tempFile.getName().replace(TEMP_TLOG_EXT, ""));
         }
     };
 
@@ -223,8 +312,18 @@ public abstract class MavLinkConnection {
     }
 
     public void sendMavPacket(MAVLinkPacket packet) {
-        if (!mPacketsToSend.offer(packet)) {
+        final byte[] packetData = packet.encodePacket();
+        if (!mPacketsToSend.offer(packetData)) {
             mLogger.logErr(TAG, "Unable to send mavlink packet. Packet queue is full!");
+        }
+    }
+
+    public void logMavPacket(MAVLinkPacket packet, String loggingFilePath){
+        final byte[] packetData = packet.encodePacket();
+        if(loggingFilePath != null && loggingFilePath.length() != 0){
+            if(!mPacketsToLog.offer(Pair.create(loggingFilePath, packetData))){
+                mLogger.logErr(TAG, "Unable to log mavlink packet. Queue is full!");
+            }
         }
     }
 

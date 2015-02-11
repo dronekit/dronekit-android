@@ -31,6 +31,7 @@ public class FusedLocation implements LocationFinder, com.google.android.gms.loc
     private final GoogleApiClientManager gApiMgr;
     private final GoogleApiClientTask requestLocationUpdate;
     private final GoogleApiClientTask removeLocationUpdate;
+    private final GoogleApiClientTask stopgApiMgr;
 
     private LocationReceiver receiver;
 
@@ -63,11 +64,18 @@ public class FusedLocation implements LocationFinder, com.google.android.gms.loc
             }
         };
 
-        gApiMgr.start();
+        stopgApiMgr = gApiMgr.new GoogleApiClientTask() {
+            @Override
+            protected void doRun() {
+                gApiMgr.stop();
+            }
+        };
     }
 
     @Override
     public void enableLocationUpdates() {
+        gApiMgr.start();
+
         mSpeedReadings = 0;
         mTotalSpeed = 0f;
         try {
@@ -81,6 +89,7 @@ public class FusedLocation implements LocationFinder, com.google.android.gms.loc
     public void disableLocationUpdates() {
         try {
             gApiMgr.addTask(removeLocationUpdate);
+            gApiMgr.addTask(stopgApiMgr);
         } catch (IllegalStateException e) {
             Log.e(TAG, "Unable to disable location updates.");
         }
