@@ -251,7 +251,7 @@ public class DroneInterfaces {
 
 		public void onParameterReceived(Parameter parameter, int index, int count);
 
-		public void onEndReceivingParameters(List<Parameter> parameter);
+		public void onEndReceivingParameters();
 	}
 
 	public interface OnWaypointManagerListener {

@@ -308,9 +308,9 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream,
     }
 
     @Override
-    public void onEndReceivingParameters(List<Parameter> parameter) {
+    public void onEndReceivingParameters() {
         if (droneEventsListener != null) {
-            droneEventsListener.onEndReceivingParameters(parameter);
+            droneEventsListener.onEndReceivingParameters();
         }
     }
 

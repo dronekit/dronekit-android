@@ -86,7 +86,6 @@ import org.droidplanner.services.android.utils.file.IO.ParameterMetadataLoader;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
-import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -393,12 +392,11 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
     private Parameters getParameters() {
         final Drone drone = this.droneMgr.getDrone();
-        final Map<String, com.o3dr.services.android.lib.drone.property.Parameter> proxyParams =
-                new HashMap<String, com.o3dr.services.android.lib.drone.property.Parameter>();
+        final Map<String, com.o3dr.services.android.lib.drone.property.Parameter> proxyParams = new HashMap<>();
 
-        List<Parameter> droneParameters = drone.getParameters().getParametersList();
+        Map<String, Parameter> droneParameters = drone.getParameters().getParameters();
         if (!droneParameters.isEmpty()) {
-            for (Parameter param : droneParameters) {
+            for (Parameter param : droneParameters.values()) {
                 if (param.name != null) {
                     proxyParams.put(param.name, new com.o3dr.services.android.lib.drone.property
                             .Parameter(param.name, param.value, param.type));
@@ -413,15 +411,12 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                         ParameterMetadataLoader.load(this.context, metadataType, proxyParams);
                     }
                 }
-            } catch (IOException e) {
-                Log.e(TAG, e.getMessage(), e);
-            } catch (XmlPullParserException e) {
+            } catch (IOException | XmlPullParserException e) {
                 Log.e(TAG, e.getMessage(), e);
             }
         }
 
-        return new Parameters(new ArrayList<com.o3dr.services.android.lib.drone.property
-                .Parameter>(proxyParams.values()));
+        return new Parameters(new ArrayList<>(proxyParams.values()));
     }
 
     private Speed getSpeed() {
@@ -1431,7 +1426,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     }
 
     @Override
-    public void onEndReceivingParameters(List<Parameter> parameter) {
+    public void onEndReceivingParameters() {
         notifyAttributeUpdate(AttributeEvent.PARAMETERS_REFRESH_ENDED, null);
     }
 
