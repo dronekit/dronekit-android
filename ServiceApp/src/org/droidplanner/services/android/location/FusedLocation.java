@@ -81,7 +81,7 @@ public class FusedLocation implements LocationFinder, com.google.android.gms.loc
         try {
             gApiMgr.addTask(requestLocationUpdate);
         } catch (IllegalStateException e) {
-            Log.e(TAG, "Unable to request location updates.");
+            Log.e(TAG, "Unable to request location updates.", e);
         }
     }
 
@@ -91,7 +91,7 @@ public class FusedLocation implements LocationFinder, com.google.android.gms.loc
             gApiMgr.addTask(removeLocationUpdate);
             gApiMgr.addTask(stopgApiMgr);
         } catch (IllegalStateException e) {
-            Log.e(TAG, "Unable to disable location updates.");
+            Log.e(TAG, "Unable to disable location updates.", e);
         }
     }
 
