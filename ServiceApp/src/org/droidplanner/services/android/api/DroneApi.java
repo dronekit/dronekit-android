@@ -98,13 +98,12 @@ import ellipsoidFit.FitPoints;
 import ellipsoidFit.ThreeSpacePoint;
 
 /**
- * Created by fhuya on 10/30/14.
+ * Implementation for the IDroneApi interface.
  */
 public final class DroneApi extends IDroneApi.Stub implements DroneEventsListener, IBinder.DeathRecipient {
 
     private final static String TAG = DroneApi.class.getSimpleName();
 
-    private final SoftReference<DroidPlannerService> serviceRef;
     private final Context context;
     private final DroneInterfaces.Handler droneHandler;
 
@@ -139,9 +138,8 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
         this.ownerId = ownerId;
 
-        serviceRef = new SoftReference<DroidPlannerService>(dpService);
-        observersList = new ConcurrentLinkedQueue<IObserver>();
-        mavlinkObserversList = new ConcurrentLinkedQueue<IMavlinkObserver>();
+        observersList = new ConcurrentLinkedQueue<>();
+        mavlinkObserversList = new ConcurrentLinkedQueue<>();
 
         this.droneMgr = new DroneManager(context, this.ownerId, handler, mavlinkApi);
         this.droneMgr.setDroneEventsListener(this);
@@ -152,12 +150,12 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
             checkForSelfRelease();
         } catch (RemoteException e) {
             Log.e(TAG, e.getMessage(), e);
-            dpService.releaseDroneApi(this);
+            dpService.releaseDroneApi(this.ownerId);
         }
     }
 
     void destroy() {
-        this.serviceRef.clear();
+        Log.d(TAG, "Destroying drone api instance for " + this.ownerId);
         this.observersList.clear();
         this.mavlinkObserversList.clear();
 
@@ -172,14 +170,6 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
     public DroneManager getDroneManager() {
         return this.droneMgr;
-    }
-
-    private DroidPlannerService getService() {
-        final DroidPlannerService service = serviceRef.get();
-        if (service == null)
-            throw new IllegalStateException("Lost reference to parent service.");
-
-        return service;
     }
 
     @Override
@@ -420,8 +410,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 if (profile != null) {
                     String metadataType = profile.getParameterMetadataType();
                     if (metadataType != null) {
-                        ParameterMetadataLoader.load(getService().getApplicationContext(),
-                                metadataType, proxyParams);
+                        ParameterMetadataLoader.load(this.context, metadataType, proxyParams);
                     }
                 }
             } catch (IOException e) {
@@ -834,7 +823,9 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
         //Check if the apiListener is still connected instead.
         if (!apiListener.asBinder().pingBinder()) {
             Log.w(TAG, "Client is not longer available.");
-            getService().releaseDroneApi(this);
+            this.context.startService(new Intent(this.context, DroidPlannerService.class)
+                    .setAction(DroidPlannerService.ACTION_RELEASE_API_INSTANCE)
+                    .putExtra(DroidPlannerService.EXTRA_API_INSTANCE_APP_ID, this.ownerId));
         }
     }
 

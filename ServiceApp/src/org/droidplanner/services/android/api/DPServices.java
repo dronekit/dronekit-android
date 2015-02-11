@@ -23,18 +23,14 @@ final class DPServices extends IDroidPlannerServices.Stub {
 
     private final static String TAG = DPServices.class.getSimpleName();
 
-    private final WeakReference<DroidPlannerService> serviceRef;
+    private DroidPlannerService serviceRef;
 
     DPServices(DroidPlannerService service) {
-        serviceRef = new WeakReference<DroidPlannerService>(service);
+        serviceRef = service;
     }
 
-    private DroidPlannerService getService() {
-        final DroidPlannerService service = serviceRef.get();
-        if (service == null)
-            throw new IllegalStateException("Lost reference to parent service.");
-
-        return service;
+    void destroy(){
+        serviceRef = null;
     }
 
     @Override
@@ -49,7 +45,7 @@ final class DPServices extends IDroidPlannerServices.Stub {
 
     @Override
     public IDroneApi registerDroneApi(IApiListener listener, String appId) throws RemoteException {
-        return getService().registerDroneApi(listener, appId);
+        return serviceRef.registerDroneApi(listener, appId);
     }
 
     @Override
@@ -57,7 +53,7 @@ final class DPServices extends IDroidPlannerServices.Stub {
         Log.d(TAG, "List of connected apps request from " + requesterId);
 
         List<Bundle> appsInfo = new ArrayList<>();
-        for(DroneApi droneApi : getService().droneApiStore){
+        for(DroneApi droneApi : serviceRef.droneApiStore.values()){
             if(droneApi.isConnected()){
                 final ConnectionParameter droneParams = droneApi.getDroneManager().getConnectionParameter();
                 final ConnectionParameter sanitizedParams = new ConnectionParameter(droneParams.getConnectionType(),
@@ -78,7 +74,7 @@ final class DPServices extends IDroidPlannerServices.Stub {
     public void releaseDroneApi(IDroneApi dpApi) throws RemoteException {
         Log.d(TAG, "Releasing acquired drone api handle.");
         if(dpApi instanceof DroneApi) {
-            getService().releaseDroneApi((DroneApi) dpApi);
+            serviceRef.releaseDroneApi(((DroneApi) dpApi).getOwnerId());
         }
     }
 }

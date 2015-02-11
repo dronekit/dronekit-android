@@ -33,10 +33,9 @@ import org.droidplanner.services.android.utils.Utils;
 import org.droidplanner.services.android.utils.analytics.GAUtils;
 
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
- * Created by fhuya on 10/30/14.
+ * 3DR Services background service implementation.
  */
 public class DroidPlannerService extends Service {
 
@@ -47,10 +46,12 @@ public class DroidPlannerService extends Service {
     public static final String ACTION_DRONE_CREATED = Utils.PACKAGE_NAME + ".ACTION_DRONE_CREATED";
     public static final String ACTION_DRONE_DESTROYED = Utils.PACKAGE_NAME + ".ACTION_DRONE_DESTROYED";
     public static final String ACTION_KICK_START_DRONESHARE_UPLOADS = Utils.PACKAGE_NAME + ".ACTION_KICK_START_DRONESHARE_UPLOADS";
+    public static final String ACTION_RELEASE_API_INSTANCE = Utils.PACKAGE_NAME + ".action.RELEASE_API_INSTANCE";
+    public static final String EXTRA_API_INSTANCE_APP_ID = "extra_api_instance_app_id";
 
     private LocalBroadcastManager lbm;
 
-    final ConcurrentLinkedQueue<DroneApi> droneApiStore = new ConcurrentLinkedQueue<DroneApi>();
+    final ConcurrentHashMap<String, DroneApi> droneApiStore = new ConcurrentHashMap<>();
 
     /**
      * Caches mavlink connections per connection type.
@@ -66,18 +67,21 @@ public class DroidPlannerService extends Service {
             return null;
 
         DroneApi droneApi = new DroneApi(this, new Handler(Looper.getMainLooper()), mavlinkApi, listener, appId);
-        droneApiStore.add(droneApi);
+        droneApiStore.put(appId, droneApi);
         lbm.sendBroadcast(new Intent(ACTION_DRONE_CREATED));
         return droneApi;
     }
 
-    void releaseDroneApi(DroneApi droneApi) {
-        if (droneApi == null)
+    void releaseDroneApi(String appId) {
+        if (appId == null)
             return;
 
-        droneApiStore.remove(droneApi);
-        droneApi.destroy();
-        lbm.sendBroadcast(new Intent(ACTION_DRONE_DESTROYED));
+        DroneApi droneApi = droneApiStore.remove(appId);
+        if(droneApi != null) {
+            Log.d(TAG, "Releasing drone api instance for " + appId);
+            droneApi.destroy();
+            lbm.sendBroadcast(new Intent(ACTION_DRONE_DESTROYED));
+        }
     }
 
     void connectMAVConnection(ConnectionParameter connParams, String listenerTag,
@@ -203,7 +207,7 @@ public class DroidPlannerService extends Service {
         super.onDestroy();
         Log.d(TAG, "Destroying 3DR Services.");
 
-        for (DroneApi droneApi : droneApiStore) {
+        for (DroneApi droneApi : droneApiStore.values()) {
             droneApi.destroy();
         }
         droneApiStore.clear();
@@ -215,6 +219,7 @@ public class DroidPlannerService extends Service {
 
         mavConnections.clear();
 
+        dpServices.destroy();
         stopForeground(true);
     }
 
@@ -222,10 +227,17 @@ public class DroidPlannerService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null) {
             final String action = intent.getAction();
-            if (ACTION_KICK_START_DRONESHARE_UPLOADS.equals(action)) {
-                for (DroneApi droneApi : droneApiStore) {
-                    droneApi.getDroneManager().kickStartDroneShareUpload();
-                }
+            switch (action) {
+                case ACTION_KICK_START_DRONESHARE_UPLOADS:
+                    for (DroneApi droneApi : droneApiStore.values()) {
+                        droneApi.getDroneManager().kickStartDroneShareUpload();
+                    }
+                    break;
+
+                case ACTION_RELEASE_API_INSTANCE:
+                    final String appId = intent.getStringExtra(EXTRA_API_INSTANCE_APP_ID);
+                    releaseDroneApi(appId);
+                    break;
             }
         }
 
