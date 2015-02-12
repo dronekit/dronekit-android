@@ -11,6 +11,7 @@ import org.droidplanner.core.MAVLink.connection.MavLinkConnectionListener;
 import org.droidplanner.core.MAVLink.connection.MavLinkConnectionTypes;
 import org.droidplanner.services.android.api.MavLinkServiceApi;
 import org.droidplanner.services.android.data.SessionDB;
+import org.droidplanner.services.android.utils.file.DirectoryPath;
 import org.droidplanner.services.android.utils.file.FileUtils;
 
 import java.io.File;
@@ -22,6 +23,8 @@ import java.util.Date;
 public class MAVLinkClient implements MAVLinkStreams.MAVLinkOutputStream {
 
     private final static String TAG = MAVLinkClient.class.getSimpleName();
+
+    private static final String TLOG_PREFIX = "log";
 
     /**
      * Maximum possible sequence number for a packet.
@@ -60,39 +63,21 @@ public class MAVLinkClient implements MAVLinkStreams.MAVLinkOutputStream {
         }
     };
 
-    private static final String TLOG_PREFIX = "log";
-    private static final String TEMP_TLOG_EXT = ".tmp";
-
-    private final File loggingDir;
     private final MAVLinkStreams.MavlinkInputStream listener;
     private final MavLinkServiceApi mavLinkApi;
     private final SessionDB sessionDB;
+    private final Context context;
 
     private int packetSeqNumber = 0;
-    private ConnectionParameter connParams;
-    private String loggingFilePath;
+    private final ConnectionParameter connParams;
 
-    public MAVLinkClient(Context context, MAVLinkStreams.MavlinkInputStream listener, MavLinkServiceApi serviceApi,
-                         File logDir) {
+    public MAVLinkClient(Context context, MAVLinkStreams.MavlinkInputStream listener,
+                         ConnectionParameter connParams, MavLinkServiceApi serviceApi) {
+        this.context = context;
         this.listener = listener;
         this.mavLinkApi = serviceApi;
-        this.loggingDir = logDir;
-        this.sessionDB = new SessionDB(context);
-    }
-
-    public ConnectionParameter getConnectionParameter() {
-        return connParams;
-    }
-
-    public void setConnectionParameter(ConnectionParameter connParams) {
-        boolean isConnected = isConnected();
-        if (isConnected)
-            closeConnection();
-
         this.connParams = connParams;
-
-        if (isConnected)
-            openConnection();
+        this.sessionDB = new SessionDB(context);
     }
 
     @Override
@@ -128,7 +113,6 @@ public class MAVLinkClient implements MAVLinkStreams.MAVLinkOutputStream {
         pack.seq = packetSeqNumber;
 
         if(mavLinkApi.sendData(this.connParams, pack)) {
-            mavLinkApi.logData(this.connParams, pack, this.loggingFilePath);
             packetSeqNumber = (packetSeqNumber + 1) % (MAX_PACKET_SEQUENCE + 1);
         }
     }
@@ -137,6 +121,11 @@ public class MAVLinkClient implements MAVLinkStreams.MAVLinkOutputStream {
     public boolean isConnected() {
         return this.connParams != null
                 && mavLinkApi.getConnectionStatus(this.connParams, toString()) == MavLinkConnection.MAVLINK_CONNECTED;
+    }
+
+    public boolean isConnecting(){
+        return this.connParams != null && mavLinkApi.getConnectionStatus(this.connParams,
+                toString()) == MavLinkConnection.MAVLINK_CONNECTING;
     }
 
     @Override
@@ -148,29 +137,41 @@ public class MAVLinkClient implements MAVLinkStreams.MAVLinkOutputStream {
         }
     }
 
-    private File getTempTLogFile(long connectionTimestamp) {
-        return new File(loggingDir, getTLogFilename(connectionTimestamp));
+    private File getTLogDir(String appId) {
+        return DirectoryPath.getTLogPath(this.context, appId);
+    }
+
+    private File getTempTLogFile(String appId, long connectionTimestamp) {
+        return new File(getTLogDir(appId), getTLogFilename(connectionTimestamp));
     }
 
     private String getTLogFilename(long connectionTimestamp) {
-        return TLOG_PREFIX + "_" + MavLinkConnectionTypes.getConnectionTypeLabel(connParams.getConnectionType()) +
-                "_" + FileUtils.getTimeStamp(connectionTimestamp) + FileUtils.TLOG_FILENAME_EXT + TEMP_TLOG_EXT;
+        return TLOG_PREFIX + "_" + MavLinkConnectionTypes.getConnectionTypeLabel(this.connParams.getConnectionType()) +
+                "_" + FileUtils.getTimeStamp(connectionTimestamp) + FileUtils.TLOG_FILENAME_EXT;
+    }
+
+    public void addLoggingFile(String appId){
+        if(isConnecting() || isConnected()) {
+            final File logFile = getTempTLogFile(appId, System.currentTimeMillis());
+            mavLinkApi.addLoggingFile(this.connParams, appId, logFile.getAbsolutePath());
+        }
+    }
+
+    public void removeLoggingFile(String appId){
+        if(isConnecting() || isConnected()){
+            mavLinkApi.removeLoggingFile(this.connParams, appId);
+        }
     }
 
     private void startLoggingThread(long startTime) {
         //log into the database the connection time.
         final String connectionType = MavLinkConnectionTypes.getConnectionTypeLabel(connParams.getConnectionType());
         this.sessionDB.startSession(new Date(startTime), connectionType);
-
-        final File tmpLogFile = getTempTLogFile(startTime);
-        this.loggingFilePath = tmpLogFile.getAbsolutePath();
     }
 
     private void stopLoggingThread(long stopTime) {
         //log into the database the disconnection time.
         final String connectionType = MavLinkConnectionTypes.getConnectionTypeLabel(connParams.getConnectionType());
         this.sessionDB.endSession(new Date(stopTime), connectionType, new Date());
-
-        this.loggingFilePath = null;
     }
 }

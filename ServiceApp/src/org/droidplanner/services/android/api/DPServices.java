@@ -11,6 +11,7 @@ import com.o3dr.services.android.lib.model.IDroidPlannerServices;
 import com.o3dr.services.android.lib.model.IDroneApi;
 
 import org.droidplanner.services.android.BuildConfig;
+import org.droidplanner.services.android.drone.DroneManager;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -55,15 +56,18 @@ final class DPServices extends IDroidPlannerServices.Stub {
         List<Bundle> appsInfo = new ArrayList<>();
         for(DroneApi droneApi : serviceRef.droneApiStore.values()){
             if(droneApi.isConnected()){
-                final ConnectionParameter droneParams = droneApi.getDroneManager().getConnectionParameter();
-                final ConnectionParameter sanitizedParams = new ConnectionParameter(droneParams.getConnectionType(),
-                        droneParams.getParamsBundle(), null);
+                DroneManager droneManager = droneApi.getDroneManager();
+                if(droneManager != null) {
+                    final ConnectionParameter droneParams = droneApi.getDroneManager().getConnectionParameter();
+                    final ConnectionParameter sanitizedParams = new ConnectionParameter(droneParams.getConnectionType(),
+                            droneParams.getParamsBundle(), null);
 
-                Bundle info = new Bundle();
-                info.putString(GCSEvent.EXTRA_APP_ID, droneApi.getOwnerId());
-                info.putParcelable(GCSEvent.EXTRA_VEHICLE_CONNECTION_PARAMETER, sanitizedParams);
+                    Bundle info = new Bundle();
+                    info.putString(GCSEvent.EXTRA_APP_ID, droneApi.getOwnerId());
+                    info.putParcelable(GCSEvent.EXTRA_VEHICLE_CONNECTION_PARAMETER, sanitizedParams);
 
-                appsInfo.add(info);
+                    appsInfo.add(info);
+                }
             }
         }
 
