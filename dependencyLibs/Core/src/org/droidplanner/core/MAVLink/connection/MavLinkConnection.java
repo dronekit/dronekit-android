@@ -122,9 +122,7 @@ public abstract class MavLinkConnection {
 
                 while (mConnectionStatus.get() == MAVLINK_CONNECTED) {
                     int bufferSize = readDataBlock(readBuffer);
-                    long startTime = System.currentTimeMillis();
                     handleData(parser, bufferSize, readBuffer);
-                    mLogger.logInfo(TAG, "Took " + (System.currentTimeMillis() - startTime) + " ms");
                 }
             } catch (IOException e) {
                 // Ignore errors while shutting down

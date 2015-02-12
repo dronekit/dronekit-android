@@ -600,6 +600,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     public void disconnect() {
         try {
             service.disconnectDroneManager(this.droneMgr, this.ownerId);
+            this.droneMgr = null;
         } catch (ConnectionException e) {
             notifyConnectionFailed(new ConnectionResult(0, e.getMessage()));
         }
@@ -1117,11 +1118,11 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
         performAction(action);
     }
 
-    private void notifyAttributeUpdate(List<Pair<String, Bundle>> attributesInfo){
-        if(observersList.isEmpty() || attributesInfo == null || attributesInfo.isEmpty())
+    private void notifyAttributeUpdate(List<Pair<String, Bundle>> attributesInfo) {
+        if (observersList.isEmpty() || attributesInfo == null || attributesInfo.isEmpty())
             return;
 
-        for(Pair<String, Bundle> info: attributesInfo){
+        for (Pair<String, Bundle> info : attributesInfo) {
             notifyAttributeUpdate(info.first, info.second);
         }
     }
@@ -1395,12 +1396,9 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 break;
 
             case CALIBRATION_IMU:
-                if (droneMgr != null) {
-                    final String calIMUMessage = this.droneMgr.getDrone().getCalibrationSetup()
-                            .getMessage();
-                    extrasBundle = new Bundle(1);
-                    extrasBundle.putString(AttributeEventExtra.EXTRA_CALIBRATION_IMU_MESSAGE, calIMUMessage);
-                }
+                final String calIMUMessage = drone.getCalibrationSetup().getMessage();
+                extrasBundle = new Bundle(1);
+                extrasBundle.putString(AttributeEventExtra.EXTRA_CALIBRATION_IMU_MESSAGE, calIMUMessage);
                 droneEvent = AttributeEvent.CALIBRATION_IMU;
                 break;
 
@@ -1412,20 +1410,17 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 				 * flag and re-trigger the HEARBEAT_TIMEOUT this however should
 				 * not be happening
 				 */
-                if (droneMgr != null) {
-                    final Calibration calibration = this.droneMgr.getDrone().getCalibrationSetup();
-                    final String message = calibration.getMessage();
-                    if (calibration.isCalibrating() && TextUtils.isEmpty(message)) {
-                        calibration.setCalibrating(false);
-                        droneEvent = AttributeEvent.HEARTBEAT_TIMEOUT;
-                    } else {
-                        extrasBundle = new Bundle(1);
-                        extrasBundle.putString(AttributeEventExtra.EXTRA_CALIBRATION_IMU_MESSAGE, message);
-                        droneEvent = AttributeEvent.CALIBRATION_IMU_TIMEOUT;
-                    }
+                final Calibration calibration = drone.getCalibrationSetup();
+                final String message = calibration.getMessage();
+                if (calibration.isCalibrating() && TextUtils.isEmpty(message)) {
+                    calibration.setCalibrating(false);
+                    droneEvent = AttributeEvent.HEARTBEAT_TIMEOUT;
                 } else {
+                    extrasBundle = new Bundle(1);
+                    extrasBundle.putString(AttributeEventExtra.EXTRA_CALIBRATION_IMU_MESSAGE, message);
                     droneEvent = AttributeEvent.CALIBRATION_IMU_TIMEOUT;
                 }
+
                 break;
 
             case HEARTBEAT_TIMEOUT:
@@ -1453,24 +1448,20 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 break;
 
             case HEARTBEAT_FIRST:
-                if (droneMgr != null) {
-                    final Bundle heartBeatExtras = new Bundle(1);
-                    heartBeatExtras.putInt(AttributeEventExtra.EXTRA_MAVLINK_VERSION, drone.getMavlinkVersion());
-                    attributesInfo.add(Pair.create(AttributeEvent.HEARTBEAT_FIRST, heartBeatExtras));
-                }
+                final Bundle heartBeatExtras = new Bundle(1);
+                heartBeatExtras.putInt(AttributeEventExtra.EXTRA_MAVLINK_VERSION, drone.getMavlinkVersion());
+                attributesInfo.add(Pair.create(AttributeEvent.HEARTBEAT_FIRST, heartBeatExtras));
 
             case CONNECTED:
-                if(droneMgr != null){
-                    //Broadcast the vehicle connection.
-                    final ConnectionParameter sanitizedParameter = new ConnectionParameter(connectionParams
-                            .getConnectionType(), connectionParams.getParamsBundle(), null);
+                //Broadcast the vehicle connection.
+                final ConnectionParameter sanitizedParameter = new ConnectionParameter(connectionParams
+                        .getConnectionType(), connectionParams.getParamsBundle(), null);
 
-                    context.sendBroadcast(new Intent(GCSEvent.ACTION_VEHICLE_CONNECTION)
-                            .putExtra(GCSEvent.EXTRA_APP_ID, ownerId)
-                            .putExtra(GCSEvent.EXTRA_VEHICLE_CONNECTION_PARAMETER, sanitizedParameter));
+                context.sendBroadcast(new Intent(GCSEvent.ACTION_VEHICLE_CONNECTION)
+                        .putExtra(GCSEvent.EXTRA_APP_ID, ownerId)
+                        .putExtra(GCSEvent.EXTRA_VEHICLE_CONNECTION_PARAMETER, sanitizedParameter));
 
-                    attributesInfo.add(Pair.<String, Bundle>create(AttributeEvent.STATE_CONNECTED, null));
-                }
+                attributesInfo.add(Pair.<String, Bundle>create(AttributeEvent.STATE_CONNECTED, null));
                 break;
 
             case HEARTBEAT_RESTORED:
@@ -1487,13 +1478,10 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 break;
 
             case MISSION_WP_UPDATE:
-                if (droneMgr != null) {
-                    final int currentWaypoint = this.droneMgr.getDrone().getMissionStats()
-                            .getCurrentWP();
+                    final int currentWaypoint = drone.getMissionStats().getCurrentWP();
                     extrasBundle = new Bundle(1);
                     extrasBundle.putInt(AttributeEventExtra.EXTRA_MISSION_CURRENT_WAYPOINT, currentWaypoint);
                     droneEvent = AttributeEvent.MISSION_ITEM_UPDATED;
-                }
                 break;
 
             case FOLLOW_START:
@@ -1529,11 +1517,11 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 break;
         }
 
-        if(droneEvent != null) {
+        if (droneEvent != null) {
             notifyAttributeUpdate(droneEvent, extrasBundle);
         }
 
-        if(!attributesInfo.isEmpty()){
+        if (!attributesInfo.isEmpty()) {
             notifyAttributeUpdate(attributesInfo);
         }
     }
