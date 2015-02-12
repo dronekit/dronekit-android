@@ -40,6 +40,7 @@ public class ROIEstimator implements LocationReceiver {
     }
 
     public void enableFollow() {
+        MavLinkDoCmds.resetROI(drone);
         isFollowEnabled.set(true);
     }
 
