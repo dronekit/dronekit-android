@@ -114,7 +114,7 @@ public class AppConnectionAdapter extends RecyclerView.Adapter<AppConnectionAdap
             }
         }
 
-        if (droneApi.getDroneManager().isConnected()) {
+        if (droneApi.isConnected()) {
             viewHolder.clientConnectionInfo.setText(SpannableUtils.normal("Status: ", SpannableUtils.color(Color
                     .GREEN, "Connected")));
         } else {

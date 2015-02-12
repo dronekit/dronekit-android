@@ -141,7 +141,8 @@ public class GoogleApiClientManager {
      */
     public boolean addTask(GoogleApiClientTask task){
         if(!isStarted()){
-            throw new IllegalStateException("GoogleApiClientManager#start() was not called.");
+            Log.e(TAG, "GoogleApiClientManager#start() was not called.");
+            return false;
         }
 
         task.mRunOnBackgroundThread = false;
@@ -157,7 +158,8 @@ public class GoogleApiClientManager {
      */
     public boolean addTaskToBackground(GoogleApiClientTask task){
         if(!isStarted()){
-            throw new IllegalStateException("GoogleApiClientManager#start() was not called.");
+            Log.e(TAG, "GoogleApiClientManager#start() was not called.");
+            return false;
         }
 
         task.mRunOnBackgroundThread = true;
@@ -167,7 +169,7 @@ public class GoogleApiClientManager {
     /**
      * @return true the google api client manager was started.
      */
-    private boolean isStarted(){
+    public boolean isStarted(){
         return mDriverThread != null && mDriverThread.isAlive()
                 && mBgHandlerThread != null && mBgHandlerThread.isAlive()
                 && mBgHandler != null && mBgHandler.getLooper() != null;

@@ -14,4 +14,8 @@ public class ExperimentalActions {
 
     public static final String ACTION_SEND_MAVLINK_MESSAGE = Utils.PACKAGE_NAME + ".action.SEND_MAVLINK_MESSAGE";
     public static final String EXTRA_MAVLINK_MESSAGE = "extra_mavlink_message";
+
+    public static final String ACTION_SET_RELAY = Utils.PACKAGE_NAME + ".action.SET_RELAY";
+    public static final String EXTRA_RELAY_NUMBER = "extra_relay_number";
+    public static final String EXTRA_IS_RELAY_ON = "extra_is_relay_on";
 }

@@ -80,6 +80,14 @@ public class State extends DroneVariable {
 		this.watchdog.postDelayed(watchdogCallback, failsafeOnScreenTimeout);
 	}
 
+    public void repeatWarning(){
+        if(warning == null || warning.length() == 0)
+            return;
+
+        watchdog.removeCallbacks(watchdogCallback);
+        this.watchdog.postDelayed(watchdogCallback, failsafeOnScreenTimeout);
+    }
+
 	public void setArmed(boolean newState) {
 		if (this.armed != newState) {
 			this.armed = newState;

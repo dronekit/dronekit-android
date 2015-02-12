@@ -251,7 +251,7 @@ public class DroneInterfaces {
 
 		public void onParameterReceived(Parameter parameter, int index, int count);
 
-		public void onEndReceivingParameters(List<Parameter> parameter);
+		public void onEndReceivingParameters();
 	}
 
 	public interface OnWaypointManagerListener {
@@ -260,12 +260,6 @@ public class DroneInterfaces {
 		public void onWaypointEvent(WaypointManager.WaypointEvent_Type wpEvent, int index, int count);
 
 		public void onEndWaypointEvent(WaypointManager.WaypointEvent_Type wpEvent);
-	}
-
-	public interface OnTimeout {
-
-		public void notifyTimeOut(int timeOutCount);
-
 	}
 
 	public interface Clock {
