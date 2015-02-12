@@ -1,6 +1,6 @@
 package org.droidplanner.core.gcs.roi;
 
-import org.droidplanner.core.MAVLink.MavLinkROI;
+import org.droidplanner.core.MAVLink.command.doCmd.MavLinkDoCmds;
 import org.droidplanner.core.drone.DroneInterfaces.Handler;
 import org.droidplanner.core.gcs.location.Location;
 import org.droidplanner.core.gcs.location.Location.LocationReceiver;
@@ -40,13 +40,14 @@ public class ROIEstimator implements LocationReceiver {
     }
 
     public void enableFollow() {
+        MavLinkDoCmds.resetROI(drone);
         isFollowEnabled.set(true);
     }
 
     public void disableFollow() {
         disableWatchdog();
         isFollowEnabled.set(false);
-        MavLinkROI.resetROI(drone);
+        MavLinkDoCmds.resetROI(drone);
     }
 
     @Override
@@ -77,7 +78,7 @@ public class ROIEstimator implements LocationReceiver {
                 * (System.currentTimeMillis() - timeOfLastLocation) / 1000f;
         Coord2D goCoord = GeoTools.newCoordFromBearingAndDistance(gcsCoord, bearing, distanceTraveledSinceLastPoint);
         if (distanceTraveledSinceLastPoint > 0.0) {
-            MavLinkROI.setROI(drone, new Coord3D(goCoord.getLat(), goCoord.getLng(), new Altitude(0.0)));
+            MavLinkDoCmds.setROI(drone, new Coord3D(goCoord.getLat(), goCoord.getLng(), new Altitude(0.0)));
         }
 
         watchdog.postDelayed(watchdogCallback, TIMEOUT);

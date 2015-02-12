@@ -29,19 +29,20 @@ public class MavLinkServiceApi {
         return service;
     }
 
-    public void sendData(ConnectionParameter connParams, MAVLinkPacket packet) {
-        final AndroidMavLinkConnection mavConnection = getService().mavConnections.get
-                (connParams);
-        if (mavConnection == null) return;
+    public boolean sendData(ConnectionParameter connParams, MAVLinkPacket packet) {
+        final AndroidMavLinkConnection mavConnection = getService().mavConnections.get(connParams);
+        if (mavConnection == null) return false;
 
         if (mavConnection.getConnectionStatus() != MavLinkConnection.MAVLINK_DISCONNECTED) {
             mavConnection.sendMavPacket(packet);
+            return true;
         }
+
+        return false;
     }
 
     public int getConnectionStatus(ConnectionParameter connParams, String tag) {
-        final AndroidMavLinkConnection mavConnection = getService().mavConnections.get
-                (connParams);
+        final AndroidMavLinkConnection mavConnection = getService().mavConnections.get(connParams);
         if (mavConnection == null || !mavConnection.hasMavLinkConnectionListener(tag)) {
             return MavLinkConnection.MAVLINK_DISCONNECTED;
         }
@@ -52,6 +53,14 @@ public class MavLinkServiceApi {
     public void connectMavLink(ConnectionParameter connParams, String tag,
                                MavLinkConnectionListener listener) {
         getService().connectMAVConnection(connParams, tag, listener);
+    }
+
+    public void addLoggingFile(ConnectionParameter connParams, String tag, String loggingFilePath){
+        getService().addLoggingFile(connParams, tag, loggingFilePath);
+    }
+
+    public void removeLoggingFile(ConnectionParameter connParams, String tag){
+        getService().removeLoggingFile(connParams, tag);
     }
 
     public void disconnectMavLink(ConnectionParameter connParams, String tag) {

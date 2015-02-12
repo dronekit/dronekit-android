@@ -115,6 +115,9 @@ public class AppConnectionsFragment extends Fragment {
     }
 
     public void refreshDroneList(){
+        if(parent == null)
+            return;
+
         DroneAccess droneAccess = parent.getDroneAccess();
         if(droneAccess != null) {
             List<DroneApi> dronesList = droneAccess.getDroneApiList();

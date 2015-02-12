@@ -8,22 +8,22 @@ public class MavLinkConnectionTypes {
 	/**
 	 * Bluetooth mavlink connection.
 	 */
-	public static final int MAVLINK_CONNECTION_BLUETOOTH = 0;
+	public static final int MAVLINK_CONNECTION_BLUETOOTH = 3;
 
 	/**
 	 * USP mavlink connection.
 	 */
-	public static final int MAVLINK_CONNECTION_USB = 1;
+	public static final int MAVLINK_CONNECTION_USB = 0;
 
 	/**
 	 * UDP mavlink connection.
 	 */
-	public static final int MAVLINK_CONNECTION_UDP = 2;
+	public static final int MAVLINK_CONNECTION_UDP = 1;
 
 	/**
 	 * TCP mavlink connection.
 	 */
-	public static final int MAVLINK_CONNECTION_TCP = 3;
+	public static final int MAVLINK_CONNECTION_TCP = 2;
 
     public static String getConnectionTypeLabel(int connectionType){
         switch(connectionType){

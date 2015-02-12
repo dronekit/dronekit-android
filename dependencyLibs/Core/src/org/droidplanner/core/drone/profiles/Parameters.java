@@ -1,8 +1,9 @@
 package org.droidplanner.core.drone.profiles;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.droidplanner.core.MAVLink.MavLinkParameters;
 import org.droidplanner.core.drone.DroneInterfaces;
@@ -26,11 +27,12 @@ import com.MAVLink.common.msg_param_value;
  */
 public class Parameters extends DroneVariable implements OnDroneListener {
 
-	private static final int TIMEOUT = 1000;
+	private static final int TIMEOUT = 1000; //milliseconds
 
 	private int expectedParams;
 
-	private final HashMap<Integer, Parameter> parameters = new HashMap<Integer, Parameter>();
+    private final Map<Integer, Boolean> paramsRollCall = new HashMap<>();
+	private final ConcurrentHashMap<String, Parameter> parameters = new ConcurrentHashMap<>();
 
 	private DroneInterfaces.OnParameterManagerListener parameterListener;
 
@@ -42,8 +44,6 @@ public class Parameters extends DroneVariable implements OnDroneListener {
 		}
 	};
 
-	public final ArrayList<Parameter> parameterList = new ArrayList<Parameter>();
-
 	public Parameters(Drone myDrone, Handler handler) {
 		super(myDrone);
 		this.watchdog = handler;
@@ -52,16 +52,17 @@ public class Parameters extends DroneVariable implements OnDroneListener {
 
 	public void refreshParameters() {
 		parameters.clear();
-        parameterList.clear();
+        paramsRollCall.clear();
 
 		if (parameterListener != null)
 			parameterListener.onBeginReceivingParameters();
+
 		MavLinkParameters.requestParametersList(myDrone);
 		resetWatchdog();
 	}
 
-    public List<Parameter> getParametersList(){
-        return parameterList;
+    public Map<String, Parameter> getParameters(){
+        return parameters;
     }
 
 	/**
@@ -82,8 +83,9 @@ public class Parameters extends DroneVariable implements OnDroneListener {
 	private void processReceivedParam(msg_param_value m_value) {
 		// collect params in parameter list
 		Parameter param = new Parameter(m_value);
-		parameters.put((int) m_value.param_index, param);
 
+        paramsRollCall.put((int) m_value.param_index, true);
+		parameters.put(param.name.toLowerCase(Locale.US), param);
 		expectedParams = m_value.param_count;
 
 		// update listener
@@ -92,15 +94,11 @@ public class Parameters extends DroneVariable implements OnDroneListener {
 
 		// Are all parameters here? Notify the listener with the parameters
 		if (parameters.size() >= m_value.param_count) {
-            parameterList.clear();
-			for (int key : parameters.keySet()) {
-				parameterList.add(parameters.get(key));
-			}
 			killWatchdog();
 			myDrone.notifyDroneEvent(DroneEventsType.PARAMETERS_DOWNLOADED);
 
 			if (parameterListener != null) {
-				parameterListener.onEndReceivingParameters(parameterList);
+				parameterListener.onEndReceivingParameters();
 			}
 		} else {
 			resetWatchdog();
@@ -110,7 +108,8 @@ public class Parameters extends DroneVariable implements OnDroneListener {
 
 	private void reRequestMissingParams(int howManyParams) {
 		for (int i = 0; i < howManyParams; i++) {
-			if (!parameters.containsKey(i)) {
+            Boolean isPresent = paramsRollCall.get(i);
+			if (isPresent == null || !isPresent) {
 				MavLinkParameters.readParameter(myDrone, i);
 			}
 		}
@@ -120,23 +119,15 @@ public class Parameters extends DroneVariable implements OnDroneListener {
 		MavLinkParameters.sendParameter(myDrone, parameter);
 	}
 
-	public void ReadParameter(String name) {
+	public void readParameter(String name) {
 		MavLinkParameters.readParameter(myDrone, name);
 	}
 
 	public Parameter getParameter(String name) {
-		for (int key : parameters.keySet()) {
-			if (parameters.get(key).name.equalsIgnoreCase(name))
-				return parameters.get(key);
-		}
-		return null;
-	}
+        if(name == null || name.length() == 0)
+            return null;
 
-	public Parameter getLastParameter() {
-		if (parameters.size() > 0)
-			return parameters.get(parameters.size() - 1);
-
-		return null;
+        return parameters.get(name.toLowerCase(Locale.US));
 	}
 
 	private void onParameterStreamStopped() {
@@ -161,6 +152,7 @@ public class Parameters extends DroneVariable implements OnDroneListener {
 				refreshParameters();
 			}
 			break;
+
 		case DISCONNECTED:
 		case HEARTBEAT_TIMEOUT:
 			killWatchdog();
