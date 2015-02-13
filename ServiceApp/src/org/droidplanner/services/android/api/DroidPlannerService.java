@@ -80,6 +80,7 @@ public class DroidPlannerService extends Service {
         DroneApi droneApi = new DroneApi(this, handlerThread.getLooper(), mavlinkApi, listener, appId);
         droneApiStore.put(appId, droneApi);
         lbm.sendBroadcast(new Intent(ACTION_DRONE_CREATED));
+        updateForegroundNotification();
         return droneApi;
     }
 
@@ -92,6 +93,7 @@ public class DroidPlannerService extends Service {
             Log.d(TAG, "Releasing drone api instance for " + appId);
             droneApi.destroy();
             lbm.sendBroadcast(new Intent(ACTION_DRONE_DESTROYED));
+            updateForegroundNotification();
         }
     }
 
@@ -250,12 +252,28 @@ public class DroidPlannerService extends Service {
         dpServices = new DPServices(this);
         lbm = LocalBroadcastManager.getInstance(context);
 
+        updateForegroundNotification();
+    }
+
+    private void updateForegroundNotification() {
+        final Context context = getApplicationContext();
+
         //Put the service in the foreground
         final Notification.Builder notifBuilder = new Notification.Builder(context)
                 .setContentTitle("3DR Services")
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setContentIntent(PendingIntent.getActivity(context, 0, new Intent(context,
                         MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK), 0));
+
+        final int connectedCount = droneApiStore.size();
+        if(connectedCount > 0){
+            if(connectedCount == 1){
+                notifBuilder.setContentText("1 connected app");
+            }
+            else{
+                notifBuilder.setContentText(connectedCount + " connected apps");
+            }
+        }
 
         final Notification notification = Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN
                 ? notifBuilder.build()
