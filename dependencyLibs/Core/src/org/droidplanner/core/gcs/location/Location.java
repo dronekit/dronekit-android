@@ -5,7 +5,9 @@ import org.droidplanner.core.helpers.coordinates.Coord3D;
 public class Location {
 
     public interface LocationReceiver {
-        public void onLocationChanged(Location location);
+        public void onLocationUpdate(Location location);
+
+        public void onLocationUnavailable();
     }
 
     public interface LocationFinder {

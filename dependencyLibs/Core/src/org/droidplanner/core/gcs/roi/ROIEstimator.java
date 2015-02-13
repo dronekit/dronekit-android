@@ -51,7 +51,7 @@ public class ROIEstimator implements LocationReceiver {
     }
 
     @Override
-    public final void onLocationChanged(Location location) {
+    public final void onLocationUpdate(Location location) {
         if(!isFollowEnabled.get())
             return;
 
@@ -60,6 +60,11 @@ public class ROIEstimator implements LocationReceiver {
 
         disableWatchdog();
         updateROI();
+    }
+
+    @Override
+    public void onLocationUnavailable() {
+        disableWatchdog();
     }
 
     protected void disableWatchdog(){

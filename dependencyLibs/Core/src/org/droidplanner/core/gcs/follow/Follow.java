@@ -103,7 +103,7 @@ public class Follow implements OnDroneListener, LocationReceiver {
     }
 
     @Override
-    public void onLocationChanged(Location location) {
+    public void onLocationUpdate(Location location) {
         if (location.isAccurate()) {
             state = FollowStates.FOLLOW_RUNNING;
             lastLocation = location;
@@ -113,6 +113,11 @@ public class Follow implements OnDroneListener, LocationReceiver {
         }
 
         drone.notifyDroneEvent(DroneEventsType.FOLLOW_UPDATE);
+    }
+
+    @Override
+    public void onLocationUnavailable() {
+        disableFollowMe();
     }
 
     public void setAlgorithm(FollowAlgorithm algorithm) {
