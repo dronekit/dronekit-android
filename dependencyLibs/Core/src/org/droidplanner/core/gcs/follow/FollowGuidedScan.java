@@ -77,7 +77,7 @@ public class FollowGuidedScan extends FollowAbove {
 
         void updateROITarget(Coord3D roiTarget){
             this.roiTarget = roiTarget;
-            onLocationChanged(null);
+            onLocationUpdate(null);
         }
 
         @Override

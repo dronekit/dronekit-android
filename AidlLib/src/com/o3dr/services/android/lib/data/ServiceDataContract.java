@@ -31,6 +31,11 @@ public class ServiceDataContract {
     public static final String EXTRA_REQUEST_TLOG_APP_ID = PACKAGE_NAME + ".extra.REQUEST_TLOG_APP_ID";
 
     /**
+     * Key used to access the file path for the request tlog data.
+     */
+    public static final String EXTRA_TLOG_ABSOLUTE_PATH = "extra_tlog_absolute_path";
+
+    /**
      * Action used to notify of the availability of a tlog file.
      */
     public static final String ACTION_RETURN_TLOG = PACKAGE_NAME + ".action.RETURN_TLOG_FILE";
