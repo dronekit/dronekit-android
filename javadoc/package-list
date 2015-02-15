@@ -24,4 +24,5 @@ com.o3dr.services.android.lib.gcs.follow
 com.o3dr.services.android.lib.mavlink
 com.o3dr.services.android.lib.model.action
 com.o3dr.services.android.lib.util
+com.o3dr.services.android.lib.util.googleApi
 com.o3dr.services.android.lib.util.version
