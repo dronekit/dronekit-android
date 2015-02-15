@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 class UsbCDCConnection extends UsbConnection.UsbConnectionImpl {
     private static final String TAG = UsbCDCConnection.class.getSimpleName();
@@ -24,7 +25,7 @@ class UsbCDCConnection extends UsbConnection.UsbConnectionImpl {
 
     private static final IntentFilter intentFilter = new IntentFilter(ACTION_USB_PERMISSION);
 
-    private static UsbSerialDriver sDriver = null;
+    private final AtomicReference<UsbSerialDriver> serialDriverRef = new AtomicReference<>();
 
     private final PendingIntent usbPermissionIntent;
 
@@ -97,7 +98,7 @@ class UsbCDCConnection extends UsbConnection.UsbConnectionImpl {
         //Get the list of available devices
         List<UsbDevice> availableDevices = UsbSerialProber.getAvailableSupportedDevices(manager);
         if (availableDevices.isEmpty()) {
-            Log.d("USB", "No Devices found");
+            Log.d(TAG, "No Devices found");
             throw new IOException("No Devices found");
         }
 
@@ -120,39 +121,42 @@ class UsbCDCConnection extends UsbConnection.UsbConnectionImpl {
         UsbManager manager = (UsbManager) mContext.getSystemService(Context.USB_SERVICE);
 
         // Find the first available driver.
-        sDriver = UsbSerialProber.openUsbDevice(manager, device);
+        final UsbSerialDriver serialDriver = UsbSerialProber.openUsbDevice(manager, device);
 
-        if (sDriver == null) {
-            Log.d("USB", "No Devices found");
+        if (serialDriver == null) {
+            Log.d(TAG, "No Devices found");
             throw new IOException("No Devices found");
         } else {
-            Log.d("USB", "Opening using Baud rate " + mBaudRate);
+            Log.d(TAG, "Opening using Baud rate " + mBaudRate);
             try {
-                sDriver.open();
-                sDriver.setParameters(mBaudRate, 8, UsbSerialDriver.STOPBITS_1, UsbSerialDriver.PARITY_NONE);
+                serialDriver.open();
+                serialDriver.setParameters(mBaudRate, 8, UsbSerialDriver.STOPBITS_1, UsbSerialDriver.PARITY_NONE);
+
+                serialDriverRef.set(serialDriver);
 
                 onUsbConnectionOpened();
             } catch (IOException e) {
-                Log.e("USB", "Error setting up device: " + e.getMessage(), e);
+                Log.e(TAG, "Error setting up device: " + e.getMessage(), e);
                 try {
-                    sDriver.close();
+                    serialDriver.close();
                 } catch (IOException e2) {
                     // Ignore.
                 }
-                sDriver = null;
             }
         }
     }
 
     @Override
     protected int readDataBlock(byte[] readData) throws IOException {
-        // Read data from driver. This call will return upto readData.length
-        // bytes.
-        // If no data is received it will timeout after 200ms (as set by
-        // parameter 2)
+        // Read data from driver. This call will return up to readData.length bytes.
+        // If no data is received it will timeout after 200ms (as set by parameter 2)
+        final UsbSerialDriver serialDriver = serialDriverRef.get();
+        if(serialDriver == null)
+            throw new IOException("Device is unavailable.");
+
         int iavailable = 0;
         try {
-            iavailable = sDriver.read(readData, 200);
+            iavailable = serialDriver.read(readData, 200);
         } catch (NullPointerException e) {
             final String errorMsg = "Error Reading: " + e.getMessage()
                     + "\nAssuming inaccessible USB device.  Closing connection.";
@@ -170,11 +174,12 @@ class UsbCDCConnection extends UsbConnection.UsbConnectionImpl {
         // Write data to driver. This call should write buffer.length bytes
         // if data cant be sent , then it will timeout in 500ms (as set by
         // parameter 2)
-        if (sDriver != null) {
+        final UsbSerialDriver serialDriver = serialDriverRef.get();
+        if (serialDriver != null) {
             try {
-                sDriver.write(buffer, 500);
+                serialDriver.write(buffer, 500);
             } catch (IOException e) {
-                Log.e("USB", "Error Sending: " + e.getMessage(), e);
+                Log.e(TAG, "Error Sending: " + e.getMessage(), e);
             }
         }
     }
@@ -183,13 +188,13 @@ class UsbCDCConnection extends UsbConnection.UsbConnectionImpl {
     protected void closeUsbConnection() throws IOException {
         unregisterUsbPermissionBroadcastReceiver();
 
-        if (sDriver != null) {
+        final UsbSerialDriver serialDriver = serialDriverRef.getAndSet(null);
+        if (serialDriver != null) {
             try {
-                sDriver.close();
+                serialDriver.close();
             } catch (IOException e) {
-                // Ignore.
+                Log.e(TAG, e.getMessage(), e);
             }
-            sDriver = null;
         }
     }
 

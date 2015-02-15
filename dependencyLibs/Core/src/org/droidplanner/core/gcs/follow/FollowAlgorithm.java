@@ -52,7 +52,7 @@ public abstract class FollowAlgorithm {
 
     public final void onLocationReceived(Location location) {
         if (isFollowEnabled.get()) {
-            roiEstimator.onLocationChanged(location);
+            roiEstimator.onLocationUpdate(location);
             processNewLocation(location);
         }
     }

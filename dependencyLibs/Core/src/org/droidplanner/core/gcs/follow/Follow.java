@@ -12,6 +12,8 @@ import org.droidplanner.core.model.Drone;
 
 public class Follow implements OnDroneListener, LocationReceiver {
 
+    private Location lastLocation;
+
     /**
      * Set of return value for the 'toggleFollowMeState' method.
      */
@@ -59,8 +61,10 @@ public class Follow implements OnDroneListener, LocationReceiver {
     }
 
     private void enableFollowMe() {
-        followAlgorithm.enableFollow();
+        lastLocation = null;
+
         locationFinder.enableLocationUpdates();
+        followAlgorithm.enableFollow();
 
         state = FollowStates.FOLLOW_START;
         drone.notifyDroneEvent(DroneEventsType.FOLLOW_START);
@@ -69,6 +73,8 @@ public class Follow implements OnDroneListener, LocationReceiver {
     private void disableFollowMe() {
         followAlgorithm.disableFollow();
         locationFinder.disableLocationUpdates();
+
+        lastLocation = null;
 
         if (isEnabled()) {
             state = FollowStates.FOLLOW_END;
@@ -97,15 +103,21 @@ public class Follow implements OnDroneListener, LocationReceiver {
     }
 
     @Override
-    public void onLocationChanged(Location location) {
+    public void onLocationUpdate(Location location) {
         if (location.isAccurate()) {
             state = FollowStates.FOLLOW_RUNNING;
-            followAlgorithm.processNewLocation(location);
+            lastLocation = location;
+            followAlgorithm.onLocationReceived(location);
         } else {
             state = FollowStates.FOLLOW_START;
         }
 
         drone.notifyDroneEvent(DroneEventsType.FOLLOW_UPDATE);
+    }
+
+    @Override
+    public void onLocationUnavailable() {
+        disableFollowMe();
     }
 
     public void setAlgorithm(FollowAlgorithm algorithm) {
@@ -116,6 +128,9 @@ public class Follow implements OnDroneListener, LocationReceiver {
         followAlgorithm = algorithm;
         if(isEnabled()){
             followAlgorithm.enableFollow();
+
+            if(lastLocation != null)
+                followAlgorithm.onLocationReceived(lastLocation);
         }
         drone.notifyDroneEvent(DroneEventsType.FOLLOW_CHANGE_TYPE);
     }

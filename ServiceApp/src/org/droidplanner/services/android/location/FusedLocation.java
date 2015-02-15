@@ -4,22 +4,25 @@ import android.content.Context;
 import android.location.Location;
 import android.os.Handler;
 import android.util.Log;
-import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.api.Api;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.o3dr.services.android.lib.util.googleApi.GoogleApiClientManager;
+import com.o3dr.services.android.lib.util.googleApi.GoogleApiClientManager.GoogleApiClientTask;
 
 import org.droidplanner.core.gcs.location.Location.LocationFinder;
 import org.droidplanner.core.gcs.location.Location.LocationReceiver;
 import org.droidplanner.core.helpers.coordinates.Coord3D;
 import org.droidplanner.core.helpers.units.Altitude;
-import org.droidplanner.services.android.utils.GoogleApiClientManager;
-import org.droidplanner.services.android.utils.GoogleApiClientManager.GoogleApiClientTask;
 
 /**
  * Feeds Location Data from Android's FusedLocation LocationProvider
  */
-public class FusedLocation implements LocationFinder, com.google.android.gms.location.LocationListener {
+public class FusedLocation implements LocationFinder, com.google.android.gms.location.LocationListener,
+        GoogleApiClientManager.ManagerListener {
 
     private static final String TAG = FusedLocation.class.getSimpleName();
 
@@ -28,9 +31,29 @@ public class FusedLocation implements LocationFinder, com.google.android.gms.loc
     private static final float LOCATION_ACCURACY_THRESHOLD = 15.0f;
     private static final float JUMP_FACTOR = 4.0f;
 
+    private final static Api<? extends Api.ApiOptions.NotRequiredOptions>[] apisList = new Api[]{LocationServices.API};
+
     private final GoogleApiClientManager gApiMgr;
-    private final GoogleApiClientTask requestLocationUpdate;
-    private final GoogleApiClientTask removeLocationUpdate;
+    private final GoogleApiClientTask requestLocationUpdate = new GoogleApiClientTask() {
+        @Override
+        protected void doRun() {
+            final LocationRequest locationRequest = LocationRequest.create();
+            locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+            locationRequest.setInterval(MIN_TIME_MS);
+            locationRequest.setFastestInterval(MIN_TIME_MS);
+            locationRequest.setSmallestDisplacement(MIN_DISTANCE_M);
+            LocationServices.FusedLocationApi.requestLocationUpdates(getGoogleApiClient(),
+                    locationRequest, FusedLocation.this);
+        }
+    };
+
+    private final GoogleApiClientTask removeLocationUpdate = new GoogleApiClientTask() {
+        @Override
+        protected void doRun() {
+            LocationServices.FusedLocationApi.removeLocationUpdates(getGoogleApiClient(),
+                    FusedLocation.this);
+        }
+    };
 
     private LocationReceiver receiver;
 
@@ -39,51 +62,26 @@ public class FusedLocation implements LocationFinder, com.google.android.gms.loc
     private float mTotalSpeed;
     private long mSpeedReadings;
 
+    private final Context context;
+
     public FusedLocation(Context context, Handler handler) {
-        gApiMgr = new GoogleApiClientManager(context, handler, LocationServices.API);
-
-        requestLocationUpdate = gApiMgr.new GoogleApiClientTask() {
-            @Override
-            protected void doRun() {
-                final LocationRequest locationRequest = LocationRequest.create();
-                locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-                locationRequest.setInterval(MIN_TIME_MS);
-                locationRequest.setFastestInterval(MIN_TIME_MS);
-                locationRequest.setSmallestDisplacement(MIN_DISTANCE_M);
-                LocationServices.FusedLocationApi.requestLocationUpdates(getGoogleApiClient(),
-                        locationRequest, FusedLocation.this);
-            }
-        };
-
-        removeLocationUpdate = gApiMgr.new GoogleApiClientTask() {
-            @Override
-            protected void doRun() {
-                LocationServices.FusedLocationApi.removeLocationUpdates(getGoogleApiClient(),
-                        FusedLocation.this);
-            }
-        };
-
-        gApiMgr.start();
+        this.context = context;
+        gApiMgr = new GoogleApiClientManager(context, handler, apisList);
+        gApiMgr.setManagerListener(this);
     }
 
     @Override
     public void enableLocationUpdates() {
+        gApiMgr.start();
         mSpeedReadings = 0;
         mTotalSpeed = 0f;
-        try {
-            gApiMgr.addTask(requestLocationUpdate);
-        } catch (IllegalStateException e) {
-            Log.e(TAG, "Unable to request location updates.");
-        }
+        mLastLocation = null;
     }
 
     @Override
     public void disableLocationUpdates() {
-        try {
-            gApiMgr.addTask(removeLocationUpdate);
-        } catch (IllegalStateException e) {
-            Log.e(TAG, "Unable to disable location updates.");
-        }
+        gApiMgr.addTask(removeLocationUpdate);
+        gApiMgr.stopSafely();
     }
 
     @Override
@@ -100,8 +98,7 @@ public class FusedLocation implements LocationFinder, com.google.android.gms.loc
             final float currentSpeed = distanceToLast > 0f && timeSinceLast > 0
                     ? (distanceToLast / timeSinceLast)
                     : 0f;
-            final boolean isLocationAccurate = isLocationAccurate(androidLocation.getAccuracy(),
-                    currentSpeed);
+            final boolean isLocationAccurate = isLocationAccurate(androidLocation.getAccuracy(), currentSpeed);
 
             org.droidplanner.core.gcs.location.Location location = new org.droidplanner.core.gcs.location.Location(
                     new Coord3D(androidLocation.getLatitude(), androidLocation.getLongitude(),
@@ -109,7 +106,7 @@ public class FusedLocation implements LocationFinder, com.google.android.gms.loc
                     androidLocation.getSpeed(), isLocationAccurate, androidLocation.getTime());
 
             mLastLocation = androidLocation;
-            receiver.onLocationChanged(location);
+            receiver.onLocationUpdate(location);
         }
     }
 
@@ -141,4 +138,28 @@ public class FusedLocation implements LocationFinder, com.google.android.gms.loc
     public void setLocationListener(LocationReceiver receiver) {
         this.receiver = receiver;
     }
+
+    @Override
+    public void onGoogleApiConnectionError(ConnectionResult result) {
+        if(receiver != null)
+            receiver.onLocationUnavailable();
+
+        GooglePlayServicesUtil.showErrorNotification(result.getErrorCode(), this.context);
+    }
+
+    @Override
+    public void onUnavailableGooglePlayServices(int status) {
+        if(receiver != null)
+            receiver.onLocationUnavailable();
+
+        GooglePlayServicesUtil.showErrorNotification(status, this.context);
+    }
+
+    @Override
+    public void onManagerStarted() {
+        gApiMgr.addTask(requestLocationUpdate);
+    }
+
+    @Override
+    public void onManagerStopped() {}
 }

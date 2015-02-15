@@ -64,10 +64,11 @@ public class DroneImpl implements Drone {
 		this.MavClient = mavClient;
 		this.preferences = pref;
 
-        events = new DroneEvents(this, handler);
+        events = new DroneEvents(this);
 		state = new State(this, clock, handler, warningParser);
 		heartbeat = new HeartBeat(this, handler);
 		parameters = new Parameters(this, handler);
+        this.waypointManager = new WaypointManager(this, handler);
 
         RC = new RC(this);
         GPS = new GPS(this);
@@ -84,7 +85,6 @@ public class DroneImpl implements Drone {
         this.navigation = new Navigation(this);
         this.guidedPoint =  new GuidedPoint(this);
         this.calibrationSetup = new Calibration(this);
-        this.waypointManager = new WaypointManager(this);
         this.mag = new Magnetometer(this);
         this.footprints = new Camera(this);
 

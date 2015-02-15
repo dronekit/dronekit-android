@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 dependencies {
-    compile 'com.google.android.gms:play-services-base:6.5.87'
+
     compile 'com.google.android.gms:play-services-location:6.5.87'
 
     compile 'com.android.support:support-v4:21.0.3'
@@ -27,7 +27,7 @@ android {
         applicationId 'org.droidplanner.services.android'
         minSdkVersion 14
         targetSdkVersion 21
-        versionCode 10205
+        versionCode 10207
         versionName getGitVersion()
     }
 

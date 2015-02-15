@@ -26,6 +26,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -174,20 +175,29 @@ public class RecommendedAppsAdapter extends RecyclerView.Adapter<RecommendedApps
         }
 
         protected Bitmap doInBackground(String... urls) {
-            String urldisplay = urls[0];
+            String urlDisplay = urls[0];
+            if(urlDisplay == null)
+                return null;
+
             Bitmap mIcon11 = null;
             try {
-                InputStream in = new java.net.URL(urldisplay).openStream();
+                InputStream in = new URL(urlDisplay).openStream();
                 mIcon11 = BitmapFactory.decodeStream(in);
             } catch (Exception e) {
-                Log.e("Error", e.getMessage());
+                Log.e(TAG, e.getMessage(), e);
             }
+
             return mIcon11;
         }
 
         protected void onPostExecute(Bitmap result) {
-            bmImage.setImageBitmap(result);
-            cachedMap.put(appId, result);
+            if(result != null) {
+                if(bmImage != null)
+                    bmImage.setImageBitmap(result);
+
+                if(cachedMap != null && appId != null)
+                    cachedMap.put(appId, result);
+            }
         }
     }
 }

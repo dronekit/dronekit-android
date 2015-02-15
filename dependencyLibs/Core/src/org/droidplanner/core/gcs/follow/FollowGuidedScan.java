@@ -1,6 +1,6 @@
 package org.droidplanner.core.gcs.follow;
 
-import org.droidplanner.core.MAVLink.MavLinkROI;
+import org.droidplanner.core.MAVLink.command.doCmd.MavLinkDoCmds;
 import org.droidplanner.core.drone.DroneInterfaces;
 import org.droidplanner.core.gcs.roi.ROIEstimator;
 import org.droidplanner.core.helpers.coordinates.Coord2D;
@@ -77,7 +77,7 @@ public class FollowGuidedScan extends FollowAbove {
 
         void updateROITarget(Coord3D roiTarget){
             this.roiTarget = roiTarget;
-            onLocationChanged(null);
+            onLocationUpdate(null);
         }
 
         @Override
@@ -91,7 +91,7 @@ public class FollowGuidedScan extends FollowAbove {
                 System.out.println("ROI Target: " + roiTarget.toString());
 
                 //Track the target until told otherwise.
-                MavLinkROI.setROI(drone, roiTarget);
+                MavLinkDoCmds.setROI(drone, roiTarget);
                 watchdog.postDelayed(watchdogCallback, TIMEOUT);
             }
         }

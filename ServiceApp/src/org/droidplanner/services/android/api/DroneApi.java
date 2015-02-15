@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.RemoteException;
 import android.text.TextUtils;
 import android.util.Log;
@@ -24,6 +25,7 @@ import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionResult;
+import com.o3dr.services.android.lib.drone.connection.DroneSharePrefs;
 import com.o3dr.services.android.lib.drone.mission.Mission;
 import com.o3dr.services.android.lib.drone.mission.MissionItemType;
 import com.o3dr.services.android.lib.drone.mission.action.MissionActions;
@@ -58,7 +60,7 @@ import com.o3dr.services.android.lib.model.IObserver;
 import com.o3dr.services.android.lib.model.action.Action;
 
 import org.droidplanner.core.MAVLink.MavLinkArm;
-import org.droidplanner.core.MAVLink.MavLinkROI;
+import org.droidplanner.core.MAVLink.command.doCmd.MavLinkDoCmds;
 import org.droidplanner.core.drone.DroneInterfaces;
 import org.droidplanner.core.drone.profiles.VehicleProfile;
 import org.droidplanner.core.drone.variables.Calibration;
@@ -75,6 +77,7 @@ import org.droidplanner.core.model.Drone;
 import org.droidplanner.core.parameters.Parameter;
 import org.droidplanner.core.survey.CameraInfo;
 import org.droidplanner.core.survey.Footprint;
+import org.droidplanner.core.util.Pair;
 import org.droidplanner.services.android.R;
 import org.droidplanner.services.android.drone.DroneManager;
 import org.droidplanner.services.android.exception.ConnectionException;
@@ -86,8 +89,8 @@ import org.droidplanner.services.android.utils.file.IO.ParameterMetadataLoader;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
-import java.lang.ref.SoftReference;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -98,29 +101,34 @@ import ellipsoidFit.FitPoints;
 import ellipsoidFit.ThreeSpacePoint;
 
 /**
- * Created by fhuya on 10/30/14.
+ * Implementation for the IDroneApi interface.
  */
 public final class DroneApi extends IDroneApi.Stub implements DroneEventsListener, IBinder.DeathRecipient {
 
     private final static String TAG = DroneApi.class.getSimpleName();
 
-    private final SoftReference<DroidPlannerService> serviceRef;
     private final Context context;
     private final DroneInterfaces.Handler droneHandler;
 
     private final ConcurrentLinkedQueue<IObserver> observersList;
     private final ConcurrentLinkedQueue<IMavlinkObserver> mavlinkObserversList;
-    private final DroneManager droneMgr;
+    private DroneManager droneMgr;
     private final IApiListener apiListener;
     private final String ownerId;
+    private final DroidPlannerService service;
 
+    private ConnectionParameter connectionParams;
     private List<CameraDetail> cachedCameraDetails;
 
-    DroneApi(DroidPlannerService dpService, final Handler handler, MavLinkServiceApi mavlinkApi, IApiListener listener,
+    DroneApi(DroidPlannerService dpService, Looper looper, MavLinkServiceApi mavlinkApi, IApiListener listener,
              String ownerId) {
 
+        this.service = dpService;
         this.context = dpService.getApplicationContext();
-        this.droneHandler =  new DroneInterfaces.Handler() {
+
+        final Handler handler = new Handler(looper);
+
+        this.droneHandler = new DroneInterfaces.Handler() {
             @Override
             public void removeCallbacks(Runnable thread) {
                 handler.removeCallbacks(thread);
@@ -139,12 +147,8 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
         this.ownerId = ownerId;
 
-        serviceRef = new SoftReference<DroidPlannerService>(dpService);
-        observersList = new ConcurrentLinkedQueue<IObserver>();
-        mavlinkObserversList = new ConcurrentLinkedQueue<IMavlinkObserver>();
-
-        this.droneMgr = new DroneManager(context, this.ownerId, handler, mavlinkApi);
-        this.droneMgr.setDroneEventsListener(this);
+        observersList = new ConcurrentLinkedQueue<>();
+        mavlinkObserversList = new ConcurrentLinkedQueue<>();
 
         this.apiListener = listener;
         try {
@@ -152,18 +156,22 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
             checkForSelfRelease();
         } catch (RemoteException e) {
             Log.e(TAG, e.getMessage(), e);
-            dpService.releaseDroneApi(this);
+            dpService.releaseDroneApi(this.ownerId);
         }
     }
 
     void destroy() {
-        this.serviceRef.clear();
+        Log.d(TAG, "Destroying drone api instance for " + this.ownerId);
         this.observersList.clear();
         this.mavlinkObserversList.clear();
 
         this.apiListener.asBinder().unlinkToDeath(this, 0);
-        this.droneMgr.setDroneEventsListener(null);
-        this.droneMgr.destroy();
+
+        try {
+            this.service.disconnectDroneManager(this.droneMgr, this.ownerId);
+        } catch (ConnectionException e) {
+            Log.e(TAG, e.getMessage(), e);
+        }
     }
 
     public String getOwnerId() {
@@ -172,14 +180,6 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
     public DroneManager getDroneManager() {
         return this.droneMgr;
-    }
-
-    private DroidPlannerService getService() {
-        final DroidPlannerService service = serviceRef.get();
-        if (service == null)
-            throw new IllegalStateException("Lost reference to parent service.");
-
-        return service;
     }
 
     @Override
@@ -234,6 +234,9 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     }
 
     private CameraProxy getCameraProxy() {
+        if (droneMgr == null)
+            return null;
+
         Drone drone = droneMgr.getDrone();
         Camera droneCamera = drone.getCamera();
 
@@ -255,6 +258,9 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     }
 
     private Gps getGps() {
+        if (droneMgr == null)
+            return new Gps();
+
         final GPS droneGps = droneMgr.getDrone().getGps();
         LatLong dronePosition = droneGps.isPositionValid()
                 ? new LatLong(droneGps.getPosition().getLat(), droneGps.getPosition().getLng())
@@ -265,6 +271,9 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     }
 
     private State getState() {
+        if (droneMgr == null)
+            return new State();
+
         final Drone drone = this.droneMgr.getDrone();
         org.droidplanner.core.drone.variables.State droneState = drone.getState();
         ApmModes droneMode = droneState.getMode();
@@ -402,13 +411,15 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     }
 
     private Parameters getParameters() {
-        final Drone drone = this.droneMgr.getDrone();
-        final Map<String, com.o3dr.services.android.lib.drone.property.Parameter> proxyParams =
-                new HashMap<String, com.o3dr.services.android.lib.drone.property.Parameter>();
+        if (droneMgr == null)
+            return new Parameters();
 
-        List<Parameter> droneParameters = drone.getParameters().getParametersList();
+        final Drone drone = this.droneMgr.getDrone();
+        final Map<String, com.o3dr.services.android.lib.drone.property.Parameter> proxyParams = new HashMap<>();
+
+        Map<String, Parameter> droneParameters = drone.getParameters().getParameters();
         if (!droneParameters.isEmpty()) {
-            for (Parameter param : droneParameters) {
+            for (Parameter param : droneParameters.values()) {
                 if (param.name != null) {
                     proxyParams.put(param.name, new com.o3dr.services.android.lib.drone.property
                             .Parameter(param.name, param.value, param.type));
@@ -420,22 +431,21 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 if (profile != null) {
                     String metadataType = profile.getParameterMetadataType();
                     if (metadataType != null) {
-                        ParameterMetadataLoader.load(getService().getApplicationContext(),
-                                metadataType, proxyParams);
+                        ParameterMetadataLoader.load(this.context, metadataType, proxyParams);
                     }
                 }
-            } catch (IOException e) {
-                Log.e(TAG, e.getMessage(), e);
-            } catch (XmlPullParserException e) {
+            } catch (IOException | XmlPullParserException e) {
                 Log.e(TAG, e.getMessage(), e);
             }
         }
 
-        return new Parameters(new ArrayList<com.o3dr.services.android.lib.drone.property
-                .Parameter>(proxyParams.values()));
+        return new Parameters(new ArrayList<>(proxyParams.values()));
     }
 
     private Speed getSpeed() {
+        if (droneMgr == null)
+            return new Speed();
+
         org.droidplanner.core.drone.variables.Speed droneSpeed = this.droneMgr.getDrone().getSpeed();
         return new Speed(droneSpeed.getVerticalSpeed().valueInMetersPerSecond(),
                 droneSpeed.getGroundSpeed().valueInMetersPerSecond(),
@@ -443,12 +453,18 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     }
 
     private Attitude getAttitude() {
+        if (droneMgr == null)
+            return new Attitude();
+
         Orientation droneOrientation = this.droneMgr.getDrone().getOrientation();
         return new Attitude(droneOrientation.getRoll(), droneOrientation.getPitch(),
                 droneOrientation.getYaw());
     }
 
     private Home getHome() {
+        if (droneMgr == null)
+            return new Home();
+
         org.droidplanner.core.drone.variables.Home droneHome = this.droneMgr.getDrone().getHome();
         LatLongAlt homePosition = droneHome.isValid()
                 ? new LatLongAlt(droneHome.getCoord().getLat(), droneHome.getCoord().getLng(),
@@ -459,22 +475,32 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     }
 
     private Battery getBattery() {
+        if (droneMgr == null)
+            return new Battery();
+
         org.droidplanner.core.drone.variables.Battery droneBattery = this.droneMgr.getDrone().getBattery();
         return new Battery(droneBattery.getBattVolt(), droneBattery.getBattRemain(),
                 droneBattery.getBattCurrent(), droneBattery.getBattDischarge());
     }
 
     private Altitude getAltitude() {
+        if (droneMgr == null)
+            return new Altitude();
+
         org.droidplanner.core.drone.variables.Altitude droneAltitude = this.droneMgr.getDrone().getAltitude();
         return new Altitude(droneAltitude.getAltitude(), droneAltitude.getTargetAltitude());
     }
 
     private Mission getMission() {
+        Mission proxyMission = new Mission();
+        if (droneMgr == null)
+            return proxyMission;
+
         final Drone drone = this.droneMgr.getDrone();
         org.droidplanner.core.mission.Mission droneMission = drone.getMission();
         List<org.droidplanner.core.mission.MissionItem> droneMissionItems = droneMission.getItems();
 
-        Mission proxyMission = new Mission();
+
         proxyMission.setCurrentMissionItem((short) drone.getMissionStats().getCurrentWP());
         if (!droneMissionItems.isEmpty()) {
             for (org.droidplanner.core.mission.MissionItem item : droneMissionItems) {
@@ -486,6 +512,9 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     }
 
     private Signal getSignal() {
+        if (droneMgr == null)
+            return new Signal();
+
         Radio droneRadio = this.droneMgr.getDrone().getRadio();
         return new Signal(droneRadio.isValid(), droneRadio.getRxErrors(), droneRadio.getFixed(),
                 droneRadio.getTxBuf(), droneRadio.getRssi(), droneRadio.getRemRssi(),
@@ -493,15 +522,21 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     }
 
     private Type getType() {
+        if (droneMgr == null)
+            return new Type();
+
         final Drone drone = this.droneMgr.getDrone();
         return new Type(getDroneProxyType(drone.getType()), drone.getFirmwareVersion());
     }
 
-    boolean isConnected() {
-        return droneMgr.isConnected();
+    public boolean isConnected() {
+        return droneMgr != null && droneMgr.isConnected();
     }
 
     private GuidedState getGuidedState() {
+        if (droneMgr == null)
+            return new GuidedState();
+
         final GuidedPoint guidedPoint = this.droneMgr.getDrone().getGuidedPoint();
         int guidedState;
         switch (guidedPoint.getState()) {
@@ -530,6 +565,9 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     }
 
     public void changeVehicleMode(VehicleMode newMode) {
+        if (droneMgr == null)
+            return;
+
         int mavType;
         switch (newMode.getDroneType()) {
             default:
@@ -550,15 +588,9 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     }
 
     public void connect(ConnectionParameter connParams) {
-        if (connParams == null || !connParams.equals(droneMgr.getConnectionParameter()))
-            droneMgr.setConnectionParameter(connParams);
-
         try {
-            // Do a quick scan to see if we need any droneshare uploads
-            if (connParams != null) {
-                this.droneMgr.kickStartDroneShareUpload();
-                this.droneMgr.connect();
-            }
+            this.connectionParams = connParams;
+            this.droneMgr = service.connectDroneManager(connParams, ownerId, this);
         } catch (ConnectionException e) {
             notifyConnectionFailed(new ConnectionResult(0, e.getMessage()));
             disconnect();
@@ -567,33 +599,37 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
     public void disconnect() {
         try {
-            droneMgr.disconnect();
+            service.disconnectDroneManager(this.droneMgr, this.ownerId);
+            this.droneMgr = null;
         } catch (ConnectionException e) {
             notifyConnectionFailed(new ConnectionResult(0, e.getMessage()));
         }
     }
 
     public void refreshParameters() {
+        if (droneMgr == null)
+            return;
         this.droneMgr.getDrone().getParameters().refreshParameters();
     }
 
     public void writeParameters(Parameters parameters) {
-        if (parameters == null) return;
+        if (droneMgr == null || parameters == null) return;
 
-        List<com.o3dr.services.android.lib.drone.property.Parameter> parametersList = parameters
-                .getParameters();
+        List<com.o3dr.services.android.lib.drone.property.Parameter> parametersList = parameters.getParameters();
         if (parametersList.isEmpty())
             return;
 
         final Drone drone = this.droneMgr.getDrone();
         org.droidplanner.core.drone.profiles.Parameters droneParams = drone.getParameters();
         for (com.o3dr.services.android.lib.drone.property.Parameter proxyParam : parametersList) {
-            droneParams.sendParameter(new Parameter(proxyParam.getName(), proxyParam.getValue(),
-                    proxyParam.getType()));
+            droneParams.sendParameter(new Parameter(proxyParam.getName(), proxyParam.getValue(), proxyParam.getType()));
         }
     }
 
     public void setMission(Mission mission, boolean pushToDrone) {
+        if (droneMgr == null)
+            return;
+
         org.droidplanner.core.mission.Mission droneMission = this.droneMgr.getDrone().getMission();
         droneMission.clearMissionItems();
 
@@ -607,6 +643,9 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     }
 
     public void generateDronie() {
+        if (droneMgr == null)
+            return;
+
         float bearing = (float) this.droneMgr.getDrone().getMission().makeAndUploadDronie();
         Bundle bundle = new Bundle(1);
         bundle.putFloat(AttributeEventExtra.EXTRA_MISSION_DRONIE_BEARING, bearing);
@@ -614,19 +653,29 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     }
 
     public void arm(boolean arm) {
+        if (droneMgr == null)
+            return;
         MavLinkArm.sendArmMessage(this.droneMgr.getDrone(), arm);
     }
 
     public void startMagnetometerCalibration(double[] startPointsX, double[] startPointsY, double[] startPointsZ) {
+        if (droneMgr == null)
+            return;
+
         this.droneMgr.startMagnetometerCalibration(MathUtils.pointsArrayToThreeSpacePoint(new
                 double[][]{startPointsX, startPointsY, startPointsZ}));
     }
 
     public void stopMagnetometerCalibration() {
+        if (droneMgr == null)
+            return;
         this.droneMgr.stopMagnetometerCalibration();
     }
 
     public void startIMUCalibration() {
+        if (droneMgr == null)
+            return;
+
         if (!this.droneMgr.getDrone().getCalibrationSetup().startCalibration()) {
             Bundle extrasBundle = new Bundle(1);
             extrasBundle.putString(AttributeEventExtra.EXTRA_CALIBRATION_IMU_MESSAGE,
@@ -636,23 +685,29 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     }
 
     public void sendIMUCalibrationAck(int step) {
+        if (droneMgr == null)
+            return;
+
         this.droneMgr.getDrone().getCalibrationSetup().sendAckk(step);
     }
 
     public void doGuidedTakeoff(double altitude) {
+        if (droneMgr == null)
+            return;
+
         this.droneMgr.getDrone().getGuidedPoint().doGuidedTakeoff(new org.droidplanner.core
                 .helpers.units.Altitude(altitude));
     }
 
     public void sendMavlinkMessage(MavlinkMessageWrapper messageWrapper) {
-        if (messageWrapper == null)
+        if (droneMgr == null || messageWrapper == null)
             return;
 
         MAVLinkMessage message = messageWrapper.getMavLinkMessage();
         if (message == null)
             return;
 
-        Drone drone = getDroneManager().getDrone();
+        Drone drone = droneMgr.getDrone();
         if (drone == null)
             return;
 
@@ -662,6 +717,9 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     }
 
     public void sendGuidedPoint(LatLong point, boolean force) {
+        if (droneMgr == null)
+            return;
+
         GuidedPoint guidedPoint = this.droneMgr.getDrone().getGuidedPoint();
         if (guidedPoint.isInitialized()) {
             guidedPoint.newGuidedCoord(MathUtils.latLongToCoord2D(point));
@@ -675,10 +733,16 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     }
 
     public void setGuidedAltitude(double altitude) {
+        if (droneMgr == null)
+            return;
+
         this.droneMgr.getDrone().getGuidedPoint().changeGuidedAltitude(altitude);
     }
 
     public void enableFollowMe(FollowType followType) {
+        if (droneMgr == null)
+            return;
+
         final FollowAlgorithm.FollowModes selectedMode = followTypeToMode(followType);
 
         if (selectedMode != null) {
@@ -687,13 +751,16 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 followMe.toggleFollowMeState();
 
             FollowAlgorithm currentAlg = followMe.getFollowAlgorithm();
-            if(currentAlg.getType() != selectedMode) {
+            if (currentAlg.getType() != selectedMode) {
                 followMe.setAlgorithm(selectedMode.getAlgorithmType(droneMgr.getDrone(), droneHandler));
             }
         }
     }
 
     private FollowState getFollowState() {
+        if (droneMgr == null)
+            return new FollowState();
+
         final Follow followMe = this.droneMgr.getFollowMe();
 
         final int state;
@@ -728,11 +795,11 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
         final FollowAlgorithm currentAlg = followMe.getFollowAlgorithm();
         Map<String, Object> modeParams = currentAlg.getParams();
         Bundle params = new Bundle();
-        for(Map.Entry<String, Object> entry : modeParams.entrySet()){
-            switch(entry.getKey()){
+        for (Map.Entry<String, Object> entry : modeParams.entrySet()) {
+            switch (entry.getKey()) {
                 case FollowType.EXTRA_FOLLOW_ROI_TARGET:
                     Coord3D target = (Coord3D) entry.getValue();
-                    if(target != null){
+                    if (target != null) {
                         params.putParcelable(entry.getKey(), new LatLongAlt(target.getLat(), target.getLng(),
                                 target.getAltitude().valueInMeters()));
                     }
@@ -740,7 +807,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
                 case FollowType.EXTRA_FOLLOW_RADIUS:
                     Double radius = (Double) entry.getValue();
-                    if(radius != null)
+                    if (radius != null)
                         params.putDouble(entry.getKey(), radius);
                     break;
             }
@@ -749,6 +816,9 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     }
 
     private List<CameraDetail> getCameraDetails() {
+        if (droneMgr == null)
+            return Collections.emptyList();
+
         if (cachedCameraDetails == null) {
             final CameraInfoLoader camInfoLoader = this.droneMgr.getCameraInfoLoader();
             List<String> cameraInfoNames = camInfoLoader.getCameraInfoList();
@@ -773,11 +843,6 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
         }
 
         return cachedCameraDetails;
-    }
-
-    private FootPrint getLastCameraFootPrint() {
-        Footprint lastFootprint = this.droneMgr.getDrone().getCamera().getLastFootprint();
-        return getProxyCameraFootPrint(lastFootprint);
     }
 
     private static FootPrint getProxyCameraFootPrint(Footprint footprint) {
@@ -814,6 +879,9 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     }
 
     private Survey buildSurvey(Survey survey) {
+        if (droneMgr == null)
+            return survey;
+
         org.droidplanner.core.mission.Mission droneMission = this.droneMgr.getDrone().getMission();
         org.droidplanner.core.mission.survey.Survey updatedSurvey = (org.droidplanner.core.mission.survey.Survey) ProxyUtils.getMissionItemImpl
                 (droneMission, survey);
@@ -822,6 +890,9 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     }
 
     private StructureScanner buildStructureScanner(StructureScanner item) {
+        if (droneMgr == null)
+            return item;
+
         org.droidplanner.core.mission.Mission droneMission = this.droneMgr.getDrone().getMission();
         org.droidplanner.core.mission.waypoints.StructureScanner updatedScan = (org.droidplanner.core.mission.waypoints.StructureScanner) ProxyUtils
                 .getMissionItemImpl(droneMission, item);
@@ -834,7 +905,9 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
         //Check if the apiListener is still connected instead.
         if (!apiListener.asBinder().pingBinder()) {
             Log.w(TAG, "Client is not longer available.");
-            getService().releaseDroneApi(this);
+            this.context.startService(new Intent(this.context, DroidPlannerService.class)
+                    .setAction(DroidPlannerService.ACTION_RELEASE_API_INSTANCE)
+                    .putExtra(DroidPlannerService.EXTRA_API_INSTANCE_APP_ID, this.ownerId));
         }
     }
 
@@ -869,15 +942,15 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
     @Override
     public void performAction(Action action) throws RemoteException {
-        if(action == null)
+        if (action == null)
             return;
 
         final String type = action.getType();
-        if(type == null)
+        if (type == null)
             return;
 
         Bundle data = action.getData();
-        switch(type){
+        switch (type) {
             // MISSION ACTIONS
             case MissionActions.ACTION_GENERATE_DRONIE:
                 generateDronie();
@@ -923,6 +996,14 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 data.setClassLoader(MavlinkMessageWrapper.class.getClassLoader());
                 MavlinkMessageWrapper messageWrapper = data.getParcelable(ExperimentalActions.EXTRA_MAVLINK_MESSAGE);
                 sendMavlinkMessage(messageWrapper);
+                break;
+
+            case ExperimentalActions.ACTION_SET_RELAY:
+                if (droneMgr != null) {
+                    int relayNumber = data.getInt(ExperimentalActions.EXTRA_RELAY_NUMBER);
+                    boolean isOn = data.getBoolean(ExperimentalActions.EXTRA_IS_RELAY_ON);
+                    MavLinkDoCmds.setRelay(droneMgr.getDrone(), relayNumber, isOn);
+                }
                 break;
 
             //GUIDED ACTIONS
@@ -995,34 +1076,34 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 break;
 
             case FollowMeActions.ACTION_UPDATE_FOLLOW_PARAMS:
-                data.setClassLoader(LatLong.class.getClassLoader());
+                if (droneMgr != null) {
+                    data.setClassLoader(LatLong.class.getClassLoader());
 
-                final FollowAlgorithm followAlgorithm = this.droneMgr.getFollowMe().getFollowAlgorithm();
-                if(followAlgorithm != null){
-                    Map<String, Object> paramsMap = new HashMap<>();
-                    Set<String> dataKeys = data.keySet();
+                    final FollowAlgorithm followAlgorithm = this.droneMgr.getFollowMe().getFollowAlgorithm();
+                    if (followAlgorithm != null) {
+                        Map<String, Object> paramsMap = new HashMap<>();
+                        Set<String> dataKeys = data.keySet();
 
-                    for(String key: dataKeys){
-                        if(FollowType.EXTRA_FOLLOW_ROI_TARGET.equals(key)){
-                            LatLong target = data.getParcelable(key);
-                            if(target != null) {
-                                final Coord2D roiTarget;
-                                if(target instanceof LatLongAlt) {
-                                    roiTarget = new Coord3D(target.getLatitude(), target.getLongitude(),
-                                            new org.droidplanner.core.helpers.units.Altitude(((LatLongAlt) target)
-                                                    .getAltitude()));
+                        for (String key : dataKeys) {
+                            if (FollowType.EXTRA_FOLLOW_ROI_TARGET.equals(key)) {
+                                LatLong target = data.getParcelable(key);
+                                if (target != null) {
+                                    final Coord2D roiTarget;
+                                    if (target instanceof LatLongAlt) {
+                                        roiTarget = new Coord3D(target.getLatitude(), target.getLongitude(),
+                                                new org.droidplanner.core.helpers.units.Altitude(((LatLongAlt) target)
+                                                        .getAltitude()));
+                                    } else {
+                                        roiTarget = new Coord2D(target.getLatitude(), target.getLongitude());
+                                    }
+                                    paramsMap.put(key, roiTarget);
                                 }
-                                else{
-                                    roiTarget = new Coord2D(target.getLatitude(), target.getLongitude());
-                                }
-                                paramsMap.put(key, roiTarget);
-                            }
+                            } else
+                                paramsMap.put(key, data.get(key));
                         }
-                        else
-                            paramsMap.put(key, data.get(key));
-                    }
 
-                    followAlgorithm.updateAlgorithmParams(paramsMap);
+                        followAlgorithm.updateAlgorithmParams(paramsMap);
+                    }
                 }
                 break;
 
@@ -1035,6 +1116,15 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     @Override
     public void performAsyncAction(Action action) throws RemoteException {
         performAction(action);
+    }
+
+    private void notifyAttributeUpdate(List<Pair<String, Bundle>> attributesInfo) {
+        if (observersList.isEmpty() || attributesInfo == null || attributesInfo.isEmpty())
+            return;
+
+        for (Pair<String, Bundle> info : attributesInfo) {
+            notifyAttributeUpdate(info.first, info.second);
+        }
     }
 
     private void notifyAttributeUpdate(String attributeEvent, Bundle extrasBundle) {
@@ -1181,20 +1271,30 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     }
 
     public void disableFollowMe() {
+        if (droneMgr == null)
+            return;
+
         Follow follow = this.droneMgr.getFollowMe();
         if (follow.isEnabled())
             follow.toggleFollowMeState();
     }
 
     public void triggerCamera() throws RemoteException {
-        MavLinkROI.triggerCamera(this.droneMgr.getDrone());
+        if (droneMgr == null)
+            return;
+        MavLinkDoCmds.triggerCamera(this.droneMgr.getDrone());
     }
 
     public void epmCommand(boolean release) {
-        MavLinkROI.empCommand(this.droneMgr.getDrone(), release);
+        if (droneMgr == null)
+            return;
+
+        MavLinkDoCmds.empCommand(this.droneMgr.getDrone(), release);
     }
 
     public void loadWaypoints() {
+        if (droneMgr == null)
+            return;
         this.droneMgr.getDrone().getWaypointManager().getWaypoints();
     }
 
@@ -1202,6 +1302,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     public void onDroneEvent(DroneInterfaces.DroneEventsType event, Drone drone) {
         Bundle extrasBundle = null;
         String droneEvent = null;
+        final List<Pair<String, Bundle>> attributesInfo = new ArrayList<>();
 
         switch (event) {
             case DISCONNECTED:
@@ -1295,8 +1396,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 break;
 
             case CALIBRATION_IMU:
-                final String calIMUMessage = this.droneMgr.getDrone().getCalibrationSetup()
-                        .getMessage();
+                final String calIMUMessage = drone.getCalibrationSetup().getMessage();
                 extrasBundle = new Bundle(1);
                 extrasBundle.putString(AttributeEventExtra.EXTRA_CALIBRATION_IMU_MESSAGE, calIMUMessage);
                 droneEvent = AttributeEvent.CALIBRATION_IMU;
@@ -1310,7 +1410,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 				 * flag and re-trigger the HEARBEAT_TIMEOUT this however should
 				 * not be happening
 				 */
-                final Calibration calibration = this.droneMgr.getDrone().getCalibrationSetup();
+                final Calibration calibration = drone.getCalibrationSetup();
                 final String message = calibration.getMessage();
                 if (calibration.isCalibrating() && TextUtils.isEmpty(message)) {
                     calibration.setCalibrating(false);
@@ -1320,6 +1420,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                     extrasBundle.putString(AttributeEventExtra.EXTRA_CALIBRATION_IMU_MESSAGE, message);
                     droneEvent = AttributeEvent.CALIBRATION_IMU_TIMEOUT;
                 }
+
                 break;
 
             case HEARTBEAT_TIMEOUT:
@@ -1347,20 +1448,20 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 break;
 
             case HEARTBEAT_FIRST:
+                final Bundle heartBeatExtras = new Bundle(1);
+                heartBeatExtras.putInt(AttributeEventExtra.EXTRA_MAVLINK_VERSION, drone.getMavlinkVersion());
+                attributesInfo.add(Pair.create(AttributeEvent.HEARTBEAT_FIRST, heartBeatExtras));
+
+            case CONNECTED:
                 //Broadcast the vehicle connection.
-                final ConnectionParameter droneParams = droneMgr.getConnectionParameter();
-                final ConnectionParameter sanitizedParameter = new ConnectionParameter(droneParams.getConnectionType(),
-                        droneParams.getParamsBundle(), null);
+                final ConnectionParameter sanitizedParameter = new ConnectionParameter(connectionParams
+                        .getConnectionType(), connectionParams.getParamsBundle(), null);
 
                 context.sendBroadcast(new Intent(GCSEvent.ACTION_VEHICLE_CONNECTION)
                         .putExtra(GCSEvent.EXTRA_APP_ID, ownerId)
                         .putExtra(GCSEvent.EXTRA_VEHICLE_CONNECTION_PARAMETER, sanitizedParameter));
 
-                notifyAttributeUpdate(AttributeEvent.STATE_CONNECTED, null);
-
-                extrasBundle = new Bundle(1);
-                extrasBundle.putInt(AttributeEventExtra.EXTRA_MAVLINK_VERSION, drone.getMavlinkVersion());
-                droneEvent = AttributeEvent.HEARTBEAT_FIRST;
+                attributesInfo.add(Pair.<String, Bundle>create(AttributeEvent.STATE_CONNECTED, null));
                 break;
 
             case HEARTBEAT_RESTORED:
@@ -1377,11 +1478,10 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 break;
 
             case MISSION_WP_UPDATE:
-                final int currentWaypoint = this.droneMgr.getDrone().getMissionStats()
-                        .getCurrentWP();
-                extrasBundle = new Bundle(1);
-                extrasBundle.putInt(AttributeEventExtra.EXTRA_MISSION_CURRENT_WAYPOINT, currentWaypoint);
-                droneEvent = AttributeEvent.MISSION_ITEM_UPDATED;
+                    final int currentWaypoint = drone.getMissionStats().getCurrentWP();
+                    extrasBundle = new Bundle(1);
+                    extrasBundle.putInt(AttributeEventExtra.EXTRA_MISSION_CURRENT_WAYPOINT, currentWaypoint);
+                    droneEvent = AttributeEvent.MISSION_ITEM_UPDATED;
                 break;
 
             case FOLLOW_START:
@@ -1417,7 +1517,13 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 break;
         }
 
-        notifyAttributeUpdate(droneEvent, extrasBundle);
+        if (droneEvent != null) {
+            notifyAttributeUpdate(droneEvent, extrasBundle);
+        }
+
+        if (!attributesInfo.isEmpty()) {
+            notifyAttributeUpdate(attributesInfo);
+        }
     }
 
     @Override
@@ -1434,7 +1540,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     }
 
     @Override
-    public void onEndReceivingParameters(List<Parameter> parameter) {
+    public void onEndReceivingParameters() {
         notifyAttributeUpdate(AttributeEvent.PARAMETERS_REFRESH_ENDED, null);
     }
 
@@ -1481,6 +1587,14 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
         paramsBundle.putDoubleArray(AttributeEventExtra.EXTRA_CALIBRATION_MAG_OFFSETS, offsets);
 
         notifyAttributeUpdate(AttributeEvent.CALIBRATION_MAG_COMPLETED, paramsBundle);
+    }
+
+    @Override
+    public DroneSharePrefs getDroneSharePrefs() {
+        if (connectionParams == null)
+            return null;
+
+        return connectionParams.getDroneSharePrefs();
     }
 
     @Override

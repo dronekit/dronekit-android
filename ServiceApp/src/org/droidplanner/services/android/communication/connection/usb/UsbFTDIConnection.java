@@ -1,6 +1,7 @@
 package org.droidplanner.services.android.communication.connection.usb;
 
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicReference;
 
 import android.content.Context;
 import android.util.Log;
@@ -14,7 +15,7 @@ class UsbFTDIConnection extends UsbConnection.UsbConnectionImpl {
 
 	private static final byte LATENCY_TIMER = 32;
 
-	private FT_Device ftDev;
+	private final AtomicReference<FT_Device> ftDevRef = new AtomicReference<>();
 
 	protected UsbFTDIConnection(Context context, UsbConnection parentConn, int baudRate) {
 		super(context, parentConn, baudRate);
@@ -39,6 +40,7 @@ class UsbFTDIConnection extends UsbConnection.UsbConnectionImpl {
 			throw new IOException("No Devices found");
 		}
 
+        FT_Device ftDev = null;
 		try {
 			// FIXME: The NPE is coming from the library. Investigate if it's
 			// possible to fix there.
@@ -51,7 +53,7 @@ class UsbFTDIConnection extends UsbConnection.UsbConnectionImpl {
 			}
 		}
 
-		Log.d("USB", "Opening using Baud rate " + mBaudRate);
+		Log.d(TAG, "Opening using Baud rate " + mBaudRate);
 		ftDev.setBitMode((byte) 0, D2xxManager.FT_BITMODE_RESET);
 		ftDev.setBaudRate(mBaudRate);
 		ftDev.setDataCharacteristics(D2xxManager.FT_DATA_BITS_8, D2xxManager.FT_STOP_BITS_1,
@@ -61,16 +63,19 @@ class UsbFTDIConnection extends UsbConnection.UsbConnectionImpl {
 		ftDev.purge((byte) (D2xxManager.FT_PURGE_TX | D2xxManager.FT_PURGE_RX));
 
 		if (!ftDev.isOpen()) {
-			throw new IOException();
+			throw new IOException("Unable to open usb device connection.");
 		} else {
-			Log.d("USB", "COM open");
+			Log.d(TAG, "COM open");
 		}
+
+        ftDevRef.set(ftDev);
 
         onUsbConnectionOpened();
 	}
 
 	@Override
 	protected int readDataBlock(byte[] readData) throws IOException {
+        final FT_Device ftDev = ftDevRef.get();
 		if (ftDev == null || !ftDev.isOpen()) {
 			throw new IOException("Device is unavailable.");
 		}
@@ -98,24 +103,25 @@ class UsbFTDIConnection extends UsbConnection.UsbConnectionImpl {
 
 	@Override
 	protected void sendBuffer(byte[] buffer) {
-		if (ftDev != null) {
+        final FT_Device ftDev = ftDevRef.get();
+		if (ftDev != null && ftDev.isOpen()) {
 			try {
 				ftDev.write(buffer);
 			} catch (Exception e) {
-				Log.e("USB", "Error Sending: " + e.getMessage(), e);
+				Log.e(TAG, "Error Sending: " + e.getMessage(), e);
 			}
 		}
 	}
 
 	@Override
 	protected void closeUsbConnection() throws IOException {
+        final FT_Device ftDev = ftDevRef.getAndSet(null);
 		if (ftDev != null) {
 			try {
 				ftDev.close();
 			} catch (Exception e) {
-				// Ignore.
+				Log.e(TAG, e.getMessage(), e);
 			}
-			ftDev = null;
 		}
 	}
 

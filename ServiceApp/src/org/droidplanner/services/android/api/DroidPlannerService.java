@@ -9,9 +9,10 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.IBinder;
-import android.os.Looper;
 import android.support.v4.content.LocalBroadcastManager;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.android.gms.analytics.HitBuilders;
@@ -28,15 +29,17 @@ import org.droidplanner.services.android.communication.connection.AndroidTcpConn
 import org.droidplanner.services.android.communication.connection.AndroidUdpConnection;
 import org.droidplanner.services.android.communication.connection.BluetoothConnection;
 import org.droidplanner.services.android.communication.connection.usb.UsbConnection;
+import org.droidplanner.services.android.drone.DroneManager;
+import org.droidplanner.services.android.exception.ConnectionException;
+import org.droidplanner.services.android.interfaces.DroneEventsListener;
 import org.droidplanner.services.android.ui.activity.MainActivity;
 import org.droidplanner.services.android.utils.Utils;
 import org.droidplanner.services.android.utils.analytics.GAUtils;
 
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
- * Created by fhuya on 10/30/14.
+ * 3DR Services background service implementation.
  */
 public class DroidPlannerService extends Service {
 
@@ -47,15 +50,24 @@ public class DroidPlannerService extends Service {
     public static final String ACTION_DRONE_CREATED = Utils.PACKAGE_NAME + ".ACTION_DRONE_CREATED";
     public static final String ACTION_DRONE_DESTROYED = Utils.PACKAGE_NAME + ".ACTION_DRONE_DESTROYED";
     public static final String ACTION_KICK_START_DRONESHARE_UPLOADS = Utils.PACKAGE_NAME + ".ACTION_KICK_START_DRONESHARE_UPLOADS";
+    public static final String ACTION_RELEASE_API_INSTANCE = Utils.PACKAGE_NAME + ".action.RELEASE_API_INSTANCE";
+    public static final String EXTRA_API_INSTANCE_APP_ID = "extra_api_instance_app_id";
 
     private LocalBroadcastManager lbm;
 
-    final ConcurrentLinkedQueue<DroneApi> droneApiStore = new ConcurrentLinkedQueue<DroneApi>();
+    final ConcurrentHashMap<String, DroneApi> droneApiStore = new ConcurrentHashMap<>();
 
     /**
      * Caches mavlink connections per connection type.
      */
     final ConcurrentHashMap<ConnectionParameter, AndroidMavLinkConnection> mavConnections = new ConcurrentHashMap<>();
+
+    /**
+     * Caches drone managers per connection type.
+     */
+    final ConcurrentHashMap<ConnectionParameter, DroneManager> droneManagers = new ConcurrentHashMap<>();
+
+    private HandlerThread handlerThread;
 
     private DPServices dpServices;
     private DroneAccess droneAccess;
@@ -65,19 +77,55 @@ public class DroidPlannerService extends Service {
         if (listener == null)
             return null;
 
-        DroneApi droneApi = new DroneApi(this, new Handler(Looper.getMainLooper()), mavlinkApi, listener, appId);
-        droneApiStore.add(droneApi);
+        DroneApi droneApi = new DroneApi(this, handlerThread.getLooper(), mavlinkApi, listener, appId);
+        droneApiStore.put(appId, droneApi);
         lbm.sendBroadcast(new Intent(ACTION_DRONE_CREATED));
+        updateForegroundNotification();
         return droneApi;
     }
 
-    void releaseDroneApi(DroneApi droneApi) {
-        if (droneApi == null)
+    void releaseDroneApi(String appId) {
+        if (appId == null)
             return;
 
-        droneApiStore.remove(droneApi);
-        droneApi.destroy();
-        lbm.sendBroadcast(new Intent(ACTION_DRONE_DESTROYED));
+        DroneApi droneApi = droneApiStore.remove(appId);
+        if (droneApi != null) {
+            Log.d(TAG, "Releasing drone api instance for " + appId);
+            droneApi.destroy();
+            lbm.sendBroadcast(new Intent(ACTION_DRONE_DESTROYED));
+            updateForegroundNotification();
+        }
+    }
+
+    DroneManager connectDroneManager(ConnectionParameter connParams, String appId,
+                                     DroneEventsListener listener) throws ConnectionException {
+        if (connParams == null || TextUtils.isEmpty(appId) || listener == null)
+            return null;
+
+        DroneManager droneMgr = droneManagers.get(connParams);
+        if (droneMgr == null) {
+            Log.d(TAG, "Generating new drone manager.");
+            droneMgr = new DroneManager(getApplicationContext(), connParams, new Handler(handlerThread.getLooper()),
+                    mavlinkApi);
+            droneManagers.put(connParams, droneMgr);
+        }
+
+        Log.d(TAG, "Drone manager connection for " + appId);
+        droneMgr.connect(appId, listener);
+        return droneMgr;
+    }
+
+    void disconnectDroneManager(DroneManager droneMgr, String appId) throws ConnectionException {
+        if (droneMgr == null || TextUtils.isEmpty(appId))
+            return;
+
+        Log.d(TAG, "Drone manager disconnection for " + appId);
+        droneMgr.disconnect(appId);
+        if (droneMgr.getConnectedAppsCount() == 0) {
+            Log.d(TAG, "Destroying drone manager.");
+            droneMgr.destroy();
+            droneManagers.remove(droneMgr.getConnectionParameter());
+        }
     }
 
     void connectMAVConnection(ConnectionParameter connParams, String listenerTag,
@@ -140,6 +188,22 @@ public class DroidPlannerService extends Service {
         }
     }
 
+    void addLoggingFile(ConnectionParameter connParams, String tag, String loggingFilePath) {
+        AndroidMavLinkConnection conn = mavConnections.get(connParams);
+        if (conn == null)
+            return;
+
+        conn.addLoggingPath(tag, loggingFilePath);
+    }
+
+    void removeLoggingFile(ConnectionParameter connParams, String tag) {
+        AndroidMavLinkConnection conn = mavConnections.get(connParams);
+        if (conn == null)
+            return;
+
+        conn.removeLoggingPath(tag);
+    }
+
     void disconnectMAVConnection(ConnectionParameter connParams, String listenerTag) {
         final AndroidMavLinkConnection conn = mavConnections.get(connParams);
         if (conn == null)
@@ -180,10 +244,19 @@ public class DroidPlannerService extends Service {
 
         final Context context = getApplicationContext();
 
+        handlerThread = new HandlerThread("Connected apps looper");
+        handlerThread.start();
+
         mavlinkApi = new MavLinkServiceApi(this);
         droneAccess = new DroneAccess(this);
         dpServices = new DPServices(this);
         lbm = LocalBroadcastManager.getInstance(context);
+
+        updateForegroundNotification();
+    }
+
+    private void updateForegroundNotification() {
+        final Context context = getApplicationContext();
 
         //Put the service in the foreground
         final Notification.Builder notifBuilder = new Notification.Builder(context)
@@ -191,6 +264,16 @@ public class DroidPlannerService extends Service {
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setContentIntent(PendingIntent.getActivity(context, 0, new Intent(context,
                         MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK), 0));
+
+        final int connectedCount = droneApiStore.size();
+        if(connectedCount > 0){
+            if(connectedCount == 1){
+                notifBuilder.setContentText("1 connected app");
+            }
+            else{
+                notifBuilder.setContentText(connectedCount + " connected apps");
+            }
+        }
 
         final Notification notification = Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN
                 ? notifBuilder.build()
@@ -203,7 +286,7 @@ public class DroidPlannerService extends Service {
         super.onDestroy();
         Log.d(TAG, "Destroying 3DR Services.");
 
-        for (DroneApi droneApi : droneApiStore) {
+        for (DroneApi droneApi : droneApiStore.values()) {
             droneApi.destroy();
         }
         droneApiStore.clear();
@@ -214,6 +297,8 @@ public class DroidPlannerService extends Service {
         }
 
         mavConnections.clear();
+        dpServices.destroy();
+        handlerThread.quit();
 
         stopForeground(true);
     }
@@ -222,10 +307,17 @@ public class DroidPlannerService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null) {
             final String action = intent.getAction();
-            if (ACTION_KICK_START_DRONESHARE_UPLOADS.equals(action)) {
-                for (DroneApi droneApi : droneApiStore) {
-                    droneApi.getDroneManager().kickStartDroneShareUpload();
-                }
+            switch (action) {
+                case ACTION_KICK_START_DRONESHARE_UPLOADS:
+                    for (DroneManager droneMgr : droneManagers.values()) {
+                        droneMgr.kickStartDroneShareUpload();
+                    }
+                    break;
+
+                case ACTION_RELEASE_API_INSTANCE:
+                    final String appId = intent.getStringExtra(EXTRA_API_INSTANCE_APP_ID);
+                    releaseDroneApi(appId);
+                    break;
             }
         }
 
