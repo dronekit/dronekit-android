@@ -152,7 +152,7 @@ public class UploaderService extends IntentService {
 	private NotificationCompat.Builder generateNotificationBuilder() {
 		return new NotificationCompat.Builder(getApplicationContext())
 				.setContentTitle(getString(R.string.uploader_notification_title))
-				.setSmallIcon(R.drawable.ic_launcher)
+				.setSmallIcon(R.drawable.ic_stat_notify)
 				// .setProgress(fileSize, 0, false)
 				.setAutoCancel(true).setPriority(NotificationCompat.PRIORITY_HIGH);
 	}

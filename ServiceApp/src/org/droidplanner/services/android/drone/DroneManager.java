@@ -53,7 +53,6 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream,
     private final Context context;
     private final Drone drone;
     private final Follow followMe;
-    private final CameraInfoLoader cameraInfoLoader;
     private final MavLinkMsgHandler mavLinkMsgHandler;
     private MagnetometerCalibration magCalibration;
     private final ConnectionParameter connectionParameter;
@@ -61,7 +60,6 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream,
     public DroneManager(Context context, ConnectionParameter connParams, final Handler handler, MavLinkServiceApi mavlinkApi) {
         this.context = context;
         this.connectionParameter = connParams;
-        this.cameraInfoLoader = new CameraInfoLoader(context);
 
         MAVLinkClient mavClient = new MAVLinkClient(context, this, connParams, mavlinkApi);
 
@@ -322,10 +320,6 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream,
 
     public boolean isConnected() {
         return drone.isConnected();
-    }
-
-    public CameraInfoLoader getCameraInfoLoader() {
-        return cameraInfoLoader;
     }
 
     @Override
