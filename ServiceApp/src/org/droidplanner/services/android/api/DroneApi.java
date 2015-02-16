@@ -853,10 +853,8 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     }
 
     private Survey buildSurvey(Survey survey) {
-        if (droneMgr == null)
-            return survey;
-
-        org.droidplanner.core.mission.Mission droneMission = this.droneMgr.getDrone().getMission();
+        org.droidplanner.core.mission.Mission droneMission = droneMgr == null ? null
+                : this.droneMgr.getDrone().getMission();
         org.droidplanner.core.mission.survey.Survey updatedSurvey = (org.droidplanner.core.mission.survey.Survey) ProxyUtils.getMissionItemImpl
                 (droneMission, survey);
 
@@ -864,10 +862,8 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     }
 
     private StructureScanner buildStructureScanner(StructureScanner item) {
-        if (droneMgr == null)
-            return item;
-
-        org.droidplanner.core.mission.Mission droneMission = this.droneMgr.getDrone().getMission();
+        org.droidplanner.core.mission.Mission droneMission = droneMgr == null ? null
+        : this.droneMgr.getDrone().getMission();
         org.droidplanner.core.mission.waypoints.StructureScanner updatedScan = (org.droidplanner.core.mission.waypoints.StructureScanner) ProxyUtils
                 .getMissionItemImpl(droneMission, item);
 
