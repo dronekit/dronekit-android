@@ -18,11 +18,13 @@ import android.util.Log;
 import com.google.android.gms.analytics.HitBuilders;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionType;
+import com.o3dr.services.android.lib.drone.mission.item.complex.CameraDetail;
 import com.o3dr.services.android.lib.model.IApiListener;
 import com.o3dr.services.android.lib.model.IDroidPlannerServices;
 
 import org.droidplanner.core.MAVLink.connection.MavLinkConnection;
 import org.droidplanner.core.MAVLink.connection.MavLinkConnectionListener;
+import org.droidplanner.core.survey.CameraInfo;
 import org.droidplanner.services.android.R;
 import org.droidplanner.services.android.communication.connection.AndroidMavLinkConnection;
 import org.droidplanner.services.android.communication.connection.AndroidTcpConnection;
@@ -35,7 +37,11 @@ import org.droidplanner.services.android.interfaces.DroneEventsListener;
 import org.droidplanner.services.android.ui.activity.MainActivity;
 import org.droidplanner.services.android.utils.Utils;
 import org.droidplanner.services.android.utils.analytics.GAUtils;
+import org.droidplanner.services.android.utils.file.IO.CameraInfoLoader;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -72,6 +78,9 @@ public class DroidPlannerService extends Service {
     private DPServices dpServices;
     private DroneAccess droneAccess;
     private MavLinkServiceApi mavlinkApi;
+
+    private CameraInfoLoader cameraInfoLoader;
+    private List<CameraDetail> cachedCameraDetails;
 
     DroneApi registerDroneApi(IApiListener listener, String appId) {
         if (listener == null)
@@ -223,6 +232,32 @@ public class DroidPlannerService extends Service {
         }
     }
 
+    synchronized List<CameraDetail> getCameraDetails() {
+        if (cachedCameraDetails == null) {
+            List<String> cameraInfoNames = cameraInfoLoader.getCameraInfoList();
+
+            List<CameraInfo> cameraInfos = new ArrayList<>(cameraInfoNames.size());
+            for (String infoName : cameraInfoNames) {
+                try {
+                    cameraInfos.add(cameraInfoLoader.openFile(infoName));
+                } catch (Exception e) {
+                    Log.e(TAG, e.getMessage(), e);
+                }
+            }
+
+            List<CameraDetail> cameraDetails = new ArrayList<>(cameraInfos.size());
+            for (CameraInfo camInfo : cameraInfos) {
+                cameraDetails.add(new CameraDetail(camInfo.name, camInfo.sensorWidth,
+                        camInfo.sensorHeight, camInfo.sensorResolution, camInfo.focalLength,
+                        camInfo.overlap, camInfo.sidelap, camInfo.isInLandscapeOrientation));
+            }
+
+            cachedCameraDetails = cameraDetails;
+        }
+
+        return cachedCameraDetails;
+    }
+
     @Override
     public IBinder onBind(Intent intent) {
         Log.d(TAG, "Binding intent: " + intent);
@@ -251,6 +286,7 @@ public class DroidPlannerService extends Service {
         droneAccess = new DroneAccess(this);
         dpServices = new DPServices(this);
         lbm = LocalBroadcastManager.getInstance(context);
+        this.cameraInfoLoader = new CameraInfoLoader(context);
 
         updateForegroundNotification();
     }

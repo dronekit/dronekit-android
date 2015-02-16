@@ -118,7 +118,6 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     private final DroidPlannerService service;
 
     private ConnectionParameter connectionParams;
-    private List<CameraDetail> cachedCameraDetails;
 
     DroneApi(DroidPlannerService dpService, Looper looper, MavLinkServiceApi mavlinkApi, IApiListener listener,
              String ownerId) {
@@ -234,27 +233,32 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     }
 
     private CameraProxy getCameraProxy() {
-        if (droneMgr == null)
-            return null;
+        final CameraDetail camDetail;
+        final FootPrint currentFieldOfView;
+        final List<FootPrint> proxyPrints = new ArrayList<>();
 
-        Drone drone = droneMgr.getDrone();
-        Camera droneCamera = drone.getCamera();
+        if (droneMgr == null) {
+            camDetail = new CameraDetail();
+            currentFieldOfView = new FootPrint();
+        }
+        else{
+            Drone drone = droneMgr.getDrone();
+            Camera droneCamera = drone.getCamera();
 
-        List<Footprint> footprints = droneCamera.getFootprints();
-        final int printsCount = footprints.size();
+            camDetail = ProxyUtils.getCameraDetail(droneCamera.getCamera());
 
-        List<FootPrint> proxyPrints = new ArrayList<FootPrint>(footprints.size());
-        for (Footprint footprint : footprints) {
-            proxyPrints.add(getProxyCameraFootPrint(footprint));
+            List<Footprint> footprints = droneCamera.getFootprints();
+            for (Footprint footprint : footprints) {
+                proxyPrints.add(getProxyCameraFootPrint(footprint));
+            }
+
+            GPS droneGps = drone.getGps();
+            currentFieldOfView = droneGps.isPositionValid()
+                    ? getProxyCameraFootPrint(droneCamera.getCurrentFieldOfView())
+                    : new FootPrint();
         }
 
-        GPS droneGps = drone.getGps();
-        final FootPrint currentFieldOfView = droneGps.isPositionValid()
-                ? getProxyCameraFootPrint(droneCamera.getCurrentFieldOfView())
-                : new FootPrint();
-
-        return new CameraProxy(ProxyUtils.getCameraDetail(droneCamera.getCamera()),
-                currentFieldOfView, proxyPrints, getCameraDetails());
+        return new CameraProxy(camDetail, currentFieldOfView, proxyPrints, service.getCameraDetails());
     }
 
     private Gps getGps() {
@@ -813,36 +817,6 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
             }
         }
         return new FollowState(state, followModeToType(currentAlg.getType()), params);
-    }
-
-    private List<CameraDetail> getCameraDetails() {
-        if (droneMgr == null)
-            return Collections.emptyList();
-
-        if (cachedCameraDetails == null) {
-            final CameraInfoLoader camInfoLoader = this.droneMgr.getCameraInfoLoader();
-            List<String> cameraInfoNames = camInfoLoader.getCameraInfoList();
-
-            List<CameraInfo> cameraInfos = new ArrayList<CameraInfo>(cameraInfoNames.size());
-            for (String infoName : cameraInfoNames) {
-                try {
-                    cameraInfos.add(camInfoLoader.openFile(infoName));
-                } catch (Exception e) {
-                    Log.e(TAG, e.getMessage(), e);
-                }
-            }
-
-            List<CameraDetail> cameraDetails = new ArrayList<CameraDetail>(cameraInfos.size());
-            for (CameraInfo camInfo : cameraInfos) {
-                cameraDetails.add(new CameraDetail(camInfo.name, camInfo.sensorWidth,
-                        camInfo.sensorHeight, camInfo.sensorResolution, camInfo.focalLength,
-                        camInfo.overlap, camInfo.sidelap, camInfo.isInLandscapeOrientation));
-            }
-
-            cachedCameraDetails = cameraDetails;
-        }
-
-        return cachedCameraDetails;
     }
 
     private static FootPrint getProxyCameraFootPrint(Footprint footprint) {
