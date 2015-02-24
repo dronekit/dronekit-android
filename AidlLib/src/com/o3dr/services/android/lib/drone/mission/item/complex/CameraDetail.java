@@ -3,8 +3,6 @@ package com.o3dr.services.android.lib.drone.mission.item.complex;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.io.Serializable;
-
 /**
  * Created by fhuya on 11/6/14.
  */
@@ -19,6 +17,17 @@ public class CameraDetail implements Parcelable {
     private final double sidelap;
     private final boolean isInLandscapeOrientation;
 
+    public CameraDetail() {
+        name = "Canon SX260";
+        sensorWidth = 6.12;
+        sensorHeight = 4.22;
+        sensorResolution = 12.1;
+        focalLength = 5.0;
+        overlap = 50.0;
+        sidelap = 60.0;
+        isInLandscapeOrientation = true;
+    }
+
     public CameraDetail(String name, double sensorWidth, double sensorHeight, double sensorResolution,
                         double focalLength, double overlap, double sidelap,
                         boolean isInLandscapeOrientation) {
@@ -32,7 +41,7 @@ public class CameraDetail implements Parcelable {
         this.isInLandscapeOrientation = isInLandscapeOrientation;
     }
 
-    public CameraDetail(CameraDetail copy){
+    public CameraDetail(CameraDetail copy) {
         this(copy.name, copy.sensorWidth, copy.sensorHeight, copy.sensorResolution, copy.focalLength, copy.overlap,
                 copy.sidelap, copy.isInLandscapeOrientation);
     }
