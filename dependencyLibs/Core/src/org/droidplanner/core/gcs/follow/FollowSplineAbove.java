@@ -13,6 +13,8 @@ public class FollowSplineAbove extends FollowAlgorithm {
     @Override
     public void processNewLocation(Location location) {
         Coord2D gcsLoc = new Coord2D(location.getCoord().getLat(), location.getCoord().getLng());
+
+        //TODO: some device (nexus 6) do not report the speed (always 0).. figure out workaround.
         double speed = location.getSpeed();
         double bearing = location.getBearing();
         double bearingInRad = Math.toRadians(bearing);

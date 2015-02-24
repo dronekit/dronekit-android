@@ -90,9 +90,10 @@ public class FusedLocation implements LocationFinder, com.google.android.gms.loc
             float distanceToLast = -1.0f;
             long timeSinceLast = -1L;
 
+            final long androidLocationTime = androidLocation.getTime();
             if (mLastLocation != null) {
                 distanceToLast = androidLocation.distanceTo(mLastLocation);
-                timeSinceLast = (androidLocation.getTime() - mLastLocation.getTime()) / 1000;
+                timeSinceLast = (androidLocationTime - mLastLocation.getTime()) / 1000;
             }
 
             final float currentSpeed = distanceToLast > 0f && timeSinceLast > 0
@@ -101,9 +102,14 @@ public class FusedLocation implements LocationFinder, com.google.android.gms.loc
             final boolean isLocationAccurate = isLocationAccurate(androidLocation.getAccuracy(), currentSpeed);
 
             org.droidplanner.core.gcs.location.Location location = new org.droidplanner.core.gcs.location.Location(
-                    new Coord3D(androidLocation.getLatitude(), androidLocation.getLongitude(),
-                            new Altitude(androidLocation.getAltitude())), androidLocation.getBearing(),
-                    androidLocation.getSpeed(), isLocationAccurate, androidLocation.getTime());
+                    new Coord3D(
+                            androidLocation.getLatitude(),
+                            androidLocation.getLongitude(),
+                            new Altitude(androidLocation.getAltitude())),
+                    androidLocation.getBearing(),
+                    androidLocation.hasSpeed() ? androidLocation.getSpeed() : currentSpeed,
+                    isLocationAccurate,
+                    androidLocationTime);
 
             mLastLocation = androidLocation;
             receiver.onLocationUpdate(location);
@@ -141,7 +147,7 @@ public class FusedLocation implements LocationFinder, com.google.android.gms.loc
 
     @Override
     public void onGoogleApiConnectionError(ConnectionResult result) {
-        if(receiver != null)
+        if (receiver != null)
             receiver.onLocationUnavailable();
 
         GooglePlayServicesUtil.showErrorNotification(result.getErrorCode(), this.context);
@@ -149,7 +155,7 @@ public class FusedLocation implements LocationFinder, com.google.android.gms.loc
 
     @Override
     public void onUnavailableGooglePlayServices(int status) {
-        if(receiver != null)
+        if (receiver != null)
             receiver.onLocationUnavailable();
 
         GooglePlayServicesUtil.showErrorNotification(status, this.context);
@@ -161,5 +167,6 @@ public class FusedLocation implements LocationFinder, com.google.android.gms.loc
     }
 
     @Override
-    public void onManagerStopped() {}
+    public void onManagerStopped() {
+    }
 }
