@@ -26,7 +26,7 @@ public class FusedLocation implements LocationFinder, com.google.android.gms.loc
 
     private static final String TAG = FusedLocation.class.getSimpleName();
 
-    private static final long MIN_TIME_MS = 0;
+    private static final long MIN_TIME_MS = 16;
     private static final float MIN_DISTANCE_M = 0.0f;
     private static final float LOCATION_ACCURACY_THRESHOLD = 15.0f;
     private static final float JUMP_FACTOR = 4.0f;
