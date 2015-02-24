@@ -26,7 +26,7 @@ public class DirectoryPath {
      */
     public static String getPublicDataPath(Context context){
         final String root = Environment.getExternalStorageDirectory().getPath();
-        return root + "/" + context.getString(R.string.app_title) + "/";
+        return root + "/3DRServices/";
     }
 
 	/**
