@@ -5,23 +5,35 @@ import java.io.File;
 import android.content.Context;
 import android.os.Environment;
 
+import org.droidplanner.services.android.R;
+
 public class DirectoryPath {
 
 	/**
-	 * Main path used to store files related to the program
+	 * Main path used to store private data files related to the program
 	 * 
-	 * @return Path to DroidPlanner/ folder in external storage
+	 * @return Path to 3DR Services private data folder in external storage
 	 */
-	static public String get3DRServicesPath(Context context) {
+	static public String getPrivateDataPath(Context context) {
         File dataDir = context.getExternalFilesDir(null);
         return dataDir.getAbsolutePath();
 	}
+
+    /**
+     * Main path used to store public data files related to the app.
+     * @param context application context
+     * @return Path to 3DR Services public data directory.
+     */
+    public static String getPublicDataPath(Context context){
+        final String root = Environment.getExternalStorageDirectory().getPath();
+        return root + "/" + context.getString(R.string.app_title) + "/";
+    }
 
 	/**
 	 * Folder where telemetry log files are stored
 	 */
 	static public File getTLogPath(Context context, String appId) {
-		File f = new File(get3DRServicesPath(context) + "/tlogs/" + appId);
+		File f = new File(getPrivateDataPath(context) + "/tlogs/" + appId);
         if(!f.exists()) {
             f.mkdirs();
         }
@@ -43,21 +55,14 @@ public class DirectoryPath {
 	 * Storage folder for user camera description files
 	 */
 	public static String getCameraInfoPath(Context context) {
-		return get3DRServicesPath(context) + "/camera_info/";
+		return getPublicDataPath(context) + "/CameraInfo/";
 	}
 
 	/**
 	 * Storage folder for stacktraces
 	 */
 	public static String getLogCatPath(Context context) {
-		return get3DRServicesPath(context) + "/log_cat/";
-	}
-
-	/**
-	 * Storage folder for SRTM data
-	 */
-	static public String getSrtmPath(Context context) {
-		return get3DRServicesPath(context) + "/srtm/";
+		return getPrivateDataPath(context) + "/log_cat/";
 	}
 
 }
