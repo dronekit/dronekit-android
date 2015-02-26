@@ -1,4 +1,19 @@
+buildscript {
+    repositories {
+        maven { url 'https://maven.fabric.io/public' }
+    }
+
+    dependencies {
+        classpath 'io.fabric.tools:gradle:1.+'
+    }
+}
 apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
+
+repositories {
+    maven { url 'https://maven.fabric.io/public' }
+}
+
 
 dependencies {
 
@@ -17,6 +32,9 @@ dependencies {
     compile project(':AidlLib')
     compile project(':dependencyLibs:Core')
     compile project(':dependencyLibs:usb-serial-for-android:UsbSerialLibrary')
+    compile('com.crashlytics.sdk.android:crashlytics:2.2.1@aar') {
+        transitive = true;
+    }
 }
 
 android {
