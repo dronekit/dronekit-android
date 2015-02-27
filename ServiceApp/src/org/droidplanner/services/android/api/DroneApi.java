@@ -715,8 +715,8 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
         if (drone == null)
             return;
 
-        message.compid = drone.getCompid();
-        message.sysid = drone.getSysid();
+        message.target_system = drone.getCompid();
+        message.target_component = drone.getSysid();
         drone.getMavClient().sendMavPacket(message.pack());
     }
 
