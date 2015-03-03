@@ -41,7 +41,7 @@ public class VehicleProfileReader {
 		try {
 			VehicleProfile newProfile = new VehicleProfile();
 
-			File file = new File(DirectoryPath.get3DRServicesPath(context) + path);
+			File file = new File(DirectoryPath.getPublicDataPath(context) + path);
 			if (file.exists()) {
 				loadProfileFromFile(newProfile, file);
 			} else {

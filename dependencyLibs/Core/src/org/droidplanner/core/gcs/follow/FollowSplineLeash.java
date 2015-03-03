@@ -25,6 +25,7 @@ public class FollowSplineLeash extends FollowWithRadiusAlgorithm {
             double headingGCSToDrone = GeoTools.getHeadingFromCoordinates(userLoc, droneLoc);
             Coord2D goCoord = GeoTools.newCoordFromBearingAndDistance(userLoc, headingGCSToDrone, radius);
 
+            //TODO: some device (nexus 6) do not report the speed (always 0).. figure out workaround.
             double speed = location.getSpeed();
             double bearing = location.getBearing();
             double bearingInRad = Math.toRadians(bearing);

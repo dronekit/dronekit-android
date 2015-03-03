@@ -54,8 +54,7 @@ public class GeoTools {
 	 *            distance to be added
 	 * @return New point with the added distance
 	 */
-	public static Coord2D newCoordFromBearingAndDistance(Coord2D origin, double bearing,
-			double distance) {
+	public static Coord2D newCoordFromBearingAndDistance(Coord2D origin, double bearing, double distance) {
 
 		double lat = origin.getLat();
 		double lon = origin.getLng();
