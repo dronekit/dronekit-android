@@ -725,8 +725,8 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
             Field target_system = tempMessage.getDeclaredField("target_system");
             Field target_component = tempMessage.getDeclaredField("target_component");
 
-            target_system.setByte(message, (byte) message.compid);
-            target_component.setByte(message, (byte) message.sysid);
+            target_system.setByte(message, (byte) message.sysid);
+            target_component.setByte(message, (byte) message.compid);
         }
         catch (NoSuchFieldException | SecurityException | IllegalAccessException | IllegalArgumentException | ExceptionInInitializerError e) {
             Log.e(TAG, e.getMessage(), e);
