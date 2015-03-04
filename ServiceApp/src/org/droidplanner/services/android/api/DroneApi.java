@@ -96,6 +96,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.lang.reflect.Field;
 
 import ellipsoidFit.FitPoints;
 import ellipsoidFit.ThreeSpacePoint;
@@ -240,8 +241,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
         if (droneMgr == null) {
             camDetail = new CameraDetail();
             currentFieldOfView = new FootPrint();
-        }
-        else{
+        } else {
             Drone drone = droneMgr.getDrone();
             Camera droneCamera = drone.getCamera();
 
@@ -717,6 +717,21 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
         message.compid = drone.getCompid();
         message.sysid = drone.getSysid();
+
+        //Set the target system and target component for MAVLink messages that support those
+        //attributes.
+        try {
+            Class<?> tempMessage = message.getClass();
+            Field target_system = tempMessage.getDeclaredField("target_system");
+            Field target_component = tempMessage.getDeclaredField("target_component");
+
+            target_system.setByte(message, (byte) message.sysid);
+            target_component.setByte(message, (byte) message.compid);
+        }
+        catch (NoSuchFieldException | SecurityException | IllegalAccessException | IllegalArgumentException | ExceptionInInitializerError e) {
+            Log.e(TAG, e.getMessage(), e);
+        }
+
         drone.getMavClient().sendMavPacket(message.pack());
     }
 
@@ -863,7 +878,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
     private StructureScanner buildStructureScanner(StructureScanner item) {
         org.droidplanner.core.mission.Mission droneMission = droneMgr == null ? null
-        : this.droneMgr.getDrone().getMission();
+                : this.droneMgr.getDrone().getMission();
         org.droidplanner.core.mission.waypoints.StructureScanner updatedScan = (org.droidplanner.core.mission.waypoints.StructureScanner) ProxyUtils
                 .getMissionItemImpl(droneMission, item);
 
@@ -1448,10 +1463,10 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 break;
 
             case MISSION_WP_UPDATE:
-                    final int currentWaypoint = drone.getMissionStats().getCurrentWP();
-                    extrasBundle = new Bundle(1);
-                    extrasBundle.putInt(AttributeEventExtra.EXTRA_MISSION_CURRENT_WAYPOINT, currentWaypoint);
-                    droneEvent = AttributeEvent.MISSION_ITEM_UPDATED;
+                final int currentWaypoint = drone.getMissionStats().getCurrentWP();
+                extrasBundle = new Bundle(1);
+                extrasBundle.putInt(AttributeEventExtra.EXTRA_MISSION_CURRENT_WAYPOINT, currentWaypoint);
+                droneEvent = AttributeEvent.MISSION_ITEM_UPDATED;
                 break;
 
             case FOLLOW_START:
