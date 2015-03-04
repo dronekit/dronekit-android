@@ -2,10 +2,8 @@ package org.droidplanner.services.android.ui.adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
@@ -56,7 +54,7 @@ public class RecommendedAppsAdapter extends RecyclerView.Adapter<RecommendedApps
 
     private static final String TAG = RecommendedAppsAdapter.class.getSimpleName();
 
-    private static final String RECOMMENDED_APPS_DATA_PATH = "recommended_apps/recommended_apps.json";
+    private static final String RECOMMENDED_APPS_DATA_PATH = "AppStore/recommendedApps.json";
 
     /* JSON Attributes */
     private static final String APPS_DATA_ATTRIBUTE = "apps";

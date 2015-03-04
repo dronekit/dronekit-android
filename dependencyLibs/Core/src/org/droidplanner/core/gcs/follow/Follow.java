@@ -62,11 +62,11 @@ public class Follow implements OnDroneListener, LocationReceiver {
 
     private void enableFollowMe() {
         lastLocation = null;
+        state = FollowStates.FOLLOW_START;
 
         locationFinder.enableLocationUpdates();
         followAlgorithm.enableFollow();
 
-        state = FollowStates.FOLLOW_START;
         drone.notifyDroneEvent(DroneEventsType.FOLLOW_START);
     }
 
@@ -90,14 +90,16 @@ public class Follow implements OnDroneListener, LocationReceiver {
     public void onDroneEvent(DroneEventsType event, Drone drone) {
         switch (event) {
             case MODE:
-                if (!GuidedPoint.isGuidedMode(drone)) {
+                if (isEnabled() && !GuidedPoint.isGuidedMode(drone)) {
                     disableFollowMe();
                 }
                 break;
 
             case HEARTBEAT_TIMEOUT:
             case DISCONNECTED:
-                disableFollowMe();
+                if(isEnabled()) {
+                    disableFollowMe();
+                }
                 break;
         }
     }

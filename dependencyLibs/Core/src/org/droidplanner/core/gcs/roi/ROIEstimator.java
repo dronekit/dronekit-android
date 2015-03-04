@@ -45,14 +45,16 @@ public class ROIEstimator implements LocationReceiver {
     }
 
     public void disableFollow() {
-        disableWatchdog();
-        isFollowEnabled.set(false);
-        MavLinkDoCmds.resetROI(drone);
+        if(isFollowEnabled.compareAndSet(true, false)){
+            realLocation = null;
+            MavLinkDoCmds.resetROI(drone);
+            disableWatchdog();
+        }
     }
 
     @Override
     public final void onLocationUpdate(Location location) {
-        if(!isFollowEnabled.get())
+        if (!isFollowEnabled.get())
             return;
 
         realLocation = location;
@@ -67,7 +69,7 @@ public class ROIEstimator implements LocationReceiver {
         disableWatchdog();
     }
 
-    protected void disableWatchdog(){
+    protected void disableWatchdog() {
         watchdog.removeCallbacks(watchdogCallback);
     }
 
@@ -76,17 +78,17 @@ public class ROIEstimator implements LocationReceiver {
             return;
         }
 
-        Coord2D gcsCoord = new Coord2D(realLocation.getCoord().getLat(), realLocation.getCoord().getLng());
+        Coord2D gcsCoord = realLocation.getCoord();
 
         double bearing = realLocation.getBearing();
         double distanceTraveledSinceLastPoint = realLocation.getSpeed()
                 * (System.currentTimeMillis() - timeOfLastLocation) / 1000f;
         Coord2D goCoord = GeoTools.newCoordFromBearingAndDistance(gcsCoord, bearing, distanceTraveledSinceLastPoint);
-        if (distanceTraveledSinceLastPoint > 0.0) {
-            MavLinkDoCmds.setROI(drone, new Coord3D(goCoord.getLat(), goCoord.getLng(), new Altitude(0.0)));
-        }
 
-        watchdog.postDelayed(watchdogCallback, TIMEOUT);
+        MavLinkDoCmds.setROI(drone, new Coord3D(goCoord.getLat(), goCoord.getLng(), new Altitude(0.0)));
+
+        if (realLocation.getSpeed() > 0)
+            watchdog.postDelayed(watchdogCallback, TIMEOUT);
     }
 
     public boolean isFollowEnabled() {

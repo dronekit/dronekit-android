@@ -31,12 +31,13 @@ public abstract class FollowAlgorithm {
     }
 
     public void disableFollow() {
-        isFollowEnabled.set(false);
-        if (GuidedPoint.isGuidedMode(drone)) {
-            drone.getGuidedPoint().pauseAtCurrentLocation();
-        }
+        if(isFollowEnabled.compareAndSet(true, false)) {
+            if (GuidedPoint.isGuidedMode(drone)) {
+                drone.getGuidedPoint().pauseAtCurrentLocation();
+            }
 
-        roiEstimator.disableFollow();
+            roiEstimator.disableFollow();
+        }
     }
 
     public void updateAlgorithmParams(Map<String, ?> paramsMap) {
