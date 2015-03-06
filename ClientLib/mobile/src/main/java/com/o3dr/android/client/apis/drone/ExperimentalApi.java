@@ -35,11 +35,11 @@ public class ExperimentalApi {
      * This is an advanced/low-level method to send raw mavlink to the vehicle.
      * <p/>
      * This method is included as an ‘escape hatch’ to allow developers to make progress if we’ve
-     * somehow missed providing some essentential operation in the rest of this API. Callers do
+     * somehow missed providing some essential operation in the rest of this API. Callers do
      * not need to populate sysId/componentId/crc in the packet, this method will take care of that
      * before sending.
      * <p/>
-     * If you find yourself needing to use this mathod please contact the drone-platform google
+     * If you find yourself needing to use this method please contact the drone-platform google
      * group and we’ll see if we can support the operation you needed in some future revision of
      * the API.
      *
