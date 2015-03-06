@@ -6,11 +6,11 @@
 Welcome to DroneKit Android's documentation!
 ============================================
 
-DroneKit Android provide interfaces for Android applications to control 3DR-powered vehicles. We support planes, copters, multirotors, rovers built using the open-source ArduPilot flight control software. It enables developers to quickly write new applications for vehicles that push the boundaries of autonomous navigation.
+DroneKit Android provides interfaces for Android applications to control 3DR-powered vehicles. We support planes and copters built using the open-source ArduPilot flight control software. DroneKit enables developers to write new applications quickly and easily that push the boundaries of autonomous vehicle navigation.
 
-3DR Services, the guide to drone apps built with DroneKit, is available on the Google Play store.
+`3DR Services <https://play.google.com/store/apps/details?id=org.droidplanner.services.android&hl=en>`_, the guide to drone apps built with DroneKit, is available on the Google Play store.
 
-DroneKit is compatible with all ArduCopter and ArduPlane vehicles, which is part of the APM flight controller that powers all 3D Robotics vehicles. `Learn more about Ardupilot <http://ardupilot.com>`_.
+DroneKit is compatible with all vehicles running ArduCopter or ArduPlane flight code (also known as APM:Copter and APM:Plane). The ArduPilot suite of flight control software powers all 3DR vehicles. `Learn more about ArduPilot here <http://ardupilot.com>`_.
 
 Contents:
 ---------
