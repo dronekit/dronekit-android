@@ -64,7 +64,7 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener {
         }
 
         if(Type.isRover(droneType)){
-            return droneMode == ApmModes.ROVER_GUIDED;
+            return droneMode == ApmModes.ROVER_GUIDED || droneMode == ApmModes.ROVER_HOLD;
         }
 
         return false;
