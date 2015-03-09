@@ -18,7 +18,7 @@ dependencies {
     compile project(':AidlLib')
     compile project(':dependencyLibs:Core')
     compile project(':dependencyLibs:usb-serial-for-android:UsbSerialLibrary')
-    compile('com.crashlytics.sdk.android:crashlytics:2.2.1@aar') {
+    compile('com.crashlytics.sdk.android:crashlytics:2.2.2@aar') {
         transitive = true;
     }
 }
