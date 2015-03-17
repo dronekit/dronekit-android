@@ -11,6 +11,12 @@
             "appName" : "Tower Wear",
             "appDescription" : "Tower-Wear is a wear companion app for 3DR Tower.",
             "appIconUrl" : "https://lh5.ggpht.com/8QedcF8g5boPkiq5SB23weUfBtKexIFz28KEvesWPIIIalszbHTLzu-4d7Ey-sbO_Q=w300-rw"
+        },
+        {
+            "applicationId" : "org.droidplanner.pebble",
+            "appName" : "Tower Pebble",
+            "appDescription" : "Tower-Pebble is a pebble companion app for 3DR Tower.",
+            "appIconUrl" : "https://lh3.ggpht.com/1hlm3CaEh9FbLk3QFxDPj7D_sR4E2ex60kGFUOk5H6O5JQfhGgXOFw0RbHIR_P9GgtfO=h80"
         }
     ]
 }
