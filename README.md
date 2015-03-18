@@ -26,3 +26,4 @@ Services layer.
 List of applications using the 3DR Services APIs:
 * [Tower](https://github.com/DroidPlanner/droidplanner)
 * [Tower-Wear](https://github.com/DroidPlanner/tower-wear)
+* [Tower-Pebble](https://github.com/DroidPlanner/dp-pebble)
