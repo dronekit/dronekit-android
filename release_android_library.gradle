@@ -75,9 +75,9 @@ bintray {
         repo = getMavenRepo()
         name = projectArtifactId
         desc = projectDescription
-        websiteUrl = 'https://github.com/DroidPlanner/3DRServices'
-        issueTrackerUrl = 'https://github.com/DroidPlanner/3DRServices/issues'
-        vcsUrl = 'https://github.com/DroidPlanner/3DRServices.git'
+        websiteUrl = 'https://github.com/DroidPlanner/DroneKit-Android'
+        issueTrackerUrl = 'https://github.com/DroidPlanner/DroneKit-Android/issues'
+        vcsUrl = 'https://github.com/DroidPlanner/DroneKit-Android.git'
         licenses = projectLicenses
         labels = projectLabels
         publicDownloadNumbers = true

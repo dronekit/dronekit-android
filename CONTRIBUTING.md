@@ -4,19 +4,21 @@ We love pull requests. Here's a quick guide.
 
 Fork, then clone the repo:
 
-    git clone https://github.com/your-user-name/3DRServices.git
+    git clone https://github.com/your-user-name/DroneKit-Android.git
 
-Make your change. Compile and test the results ([help?](https://github.com/Droidplanner/droidplanner/wiki/Build-Setup)):
+Make your change. Compile and test the results ([help?](https://github.com/Droidplanner/Tower/wiki/Build-Setup)):
 
     ./gradlew clean build
 
 Push to your fork and [submit a pull request][pr].
 
-[pr]: https://github.com/Droidplanner/3DRServices/compare/
+[pr]: https://github.com/Droidplanner/DroneKit-Android/compare/
 
-We have an automated CI server running, which will try to compile your PR. Having that build sucessfuly complete is a good sign.
+We have an automated CI server running, which will try to compile your PR. Having that build successfully complete is a good sign.
 
 Now you just need to get some reply from us. We like to review PRs, and make comments if something needs to be changed to match our project syle.
 
-For further commits you might want to consider using a branching model as described in: https://guides.github.com/introduction/flow/
+## Branching model
+
+Our branching model follows the one described here: http://nvie.com/posts/a-successful-git-branching-model/
 
