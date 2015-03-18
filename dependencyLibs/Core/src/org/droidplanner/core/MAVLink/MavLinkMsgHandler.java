@@ -63,10 +63,12 @@ public class MavLinkMsgHandler {
                 drone.getNavigation().setNavPitchRollYaw(m_nav.nav_pitch, m_nav.nav_roll,
                         m_nav.nav_bearing);
                 break;
+
             case msg_raw_imu.MAVLINK_MSG_ID_RAW_IMU:
                 msg_raw_imu msg_imu = (msg_raw_imu) msg;
                 drone.getMagnetometer().newData(msg_imu);
                 break;
+
             case msg_heartbeat.MAVLINK_MSG_ID_HEARTBEAT:
                 msg_heartbeat msg_heart = (msg_heartbeat) msg;
                 drone.setType(msg_heart.type);
@@ -76,6 +78,7 @@ public class MavLinkMsgHandler {
                 drone.getState().setMode(newMode);
                 drone.onHeartbeat(msg_heart);
                 break;
+
             case msg_global_position_int.MAVLINK_MSG_ID_GLOBAL_POSITION_INT:
                 drone.getGps().setPosition(
                         new Coord2D(((msg_global_position_int) msg).lat / 1E7,
