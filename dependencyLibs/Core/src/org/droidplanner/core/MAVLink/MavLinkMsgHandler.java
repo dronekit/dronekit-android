@@ -14,6 +14,7 @@ import com.MAVLink.common.msg_gps_raw_int;
 import com.MAVLink.common.msg_heartbeat;
 import com.MAVLink.common.msg_mission_current;
 import com.MAVLink.common.msg_nav_controller_output;
+import com.MAVLink.common.msg_radio_status;
 import com.MAVLink.common.msg_raw_imu;
 import com.MAVLink.common.msg_rc_channels_raw;
 import com.MAVLink.common.msg_servo_output_raw;
@@ -93,6 +94,11 @@ public class MavLinkMsgHandler {
 			drone.getRadio().setRadioState(m_radio.rxerrors, m_radio.fixed, m_radio.rssi,
 					m_radio.remrssi, m_radio.txbuf, m_radio.noise, m_radio.remnoise);
 			break;
+        case msg_radio_status.MAVLINK_MSG_ID_RADIO_STATUS:
+             msg_radio_status m_radio_status = (msg_radio_status) msg;
+             drone.getRadio().setRadioState(m_radio_status.rxerrors, m_radio_status.fixed, m_radio_status.rssi,
+                    m_radio_status.remrssi, m_radio_status.txbuf, m_radio_status.noise, m_radio_status.remnoise);
+            break;
 		case msg_gps_raw_int.MAVLINK_MSG_ID_GPS_RAW_INT:
 			drone.getGps().setGpsState(((msg_gps_raw_int) msg).fix_type,
 					((msg_gps_raw_int) msg).satellites_visible, ((msg_gps_raw_int) msg).eph);
