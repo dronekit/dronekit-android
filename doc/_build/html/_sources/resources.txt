@@ -28,11 +28,11 @@ Tower Wear
 
 Control a drone from your Android Wear device!
 
-`Source <https://github.com/ne0fhyk/DP-Wear>`_ | Play Store coming soon!
+`Source <https://github.com/ne0fhyk/DP-Wear>`_ | `Play Store <https://play.google.com/store/apps/details?id=com.o3dr.android.dp.wear>`_
 
 Questions
 -------------
 
 `StackOverflow <http://stackoverflow.com/questions/tagged/dronekit>`_
 
-`Email <mailto:droidplanner@googlegroups.com>`_
+`Email <mailto:droneapi@3drobotics.com>`_

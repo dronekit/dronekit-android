@@ -43,7 +43,7 @@ For an existing app:
 	}
 
 	dependencies {
-	    compile 'com.o3dr:3dr-services-lib:2.2.+'
+	    compile 'com.o3dr:droneKit-android:2.2.+'
 	    ...
 	}
 
