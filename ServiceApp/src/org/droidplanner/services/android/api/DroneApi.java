@@ -989,6 +989,12 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                     boolean isOn = data.getBoolean(ExperimentalActions.EXTRA_IS_RELAY_ON);
                     MavLinkDoCmds.setRelay(droneMgr.getDrone(), relayNumber, isOn);
                 }
+            case ExperimentalActions.ACTION_SET_SERVO:
+                if (droneMgr != null) {
+                    int channel = data.getInt(ExperimentalActions.EXTRA_SERVO_CHANNEL);
+                    int pwm =data.getInt(ExperimentalActions.EXTRA_SERVO_PWM);
+                    MavLinkDoCmds.setServo(droneMgr.getDrone(),channel,pwm);
+                }
                 break;
 
             //GUIDED ACTIONS

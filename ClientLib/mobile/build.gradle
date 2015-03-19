@@ -7,7 +7,9 @@ ext {
     PROJECT_LABELS = ['3DR', '3DR Services', 'DroneAPI', 'Android', 'DroneKit']
     PROJECT_LICENSES = ['Apache-2.0']
 }
-
+/* Every time something is changed in the client library the versionCode and
+ PUBLISH_VERSION must be incremented.
+ */
 android {
     compileSdkVersion 21
     buildToolsVersion "21.1.2"

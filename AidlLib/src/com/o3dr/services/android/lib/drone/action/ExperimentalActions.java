@@ -18,4 +18,9 @@ public class ExperimentalActions {
     public static final String ACTION_SET_RELAY = Utils.PACKAGE_NAME + ".action.SET_RELAY";
     public static final String EXTRA_RELAY_NUMBER = "extra_relay_number";
     public static final String EXTRA_IS_RELAY_ON = "extra_is_relay_on";
+
+    public static final String ACTION_SET_SERVO = Utils.PACKAGE_NAME + ".action.SET_SERVO";
+    public static final String EXTRA_SERVO_CHANNEL = "extra_servo_channel";
+    public static final String EXTRA_SERVO_PWM = "extra_servo_PWM";
+
 }
