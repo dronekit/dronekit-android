@@ -1,4 +1,4 @@
-# 3DR Services Client library
+# DroneKit-Android Client library
 
-#### [Getting started](https://droidplanner.github.io/3DRServices/)
-#### [Javadocs](https://droidplanner.github.io/3DRServices/javadoc/)
+#### [Getting started](https://droidplanner.github.io/DroneKit-Android/)
+#### [Javadocs](https://droidplanner.github.io/DroneKit-Android/javadoc/)

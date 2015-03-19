@@ -3,14 +3,15 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to DroneKit Android's documentation!
+Welcome to DroneKit-Android's documentation!
 ============================================
 
-DroneKit Android provides interfaces for Android applications to control 3DR-powered vehicles. We support planes and copters built using the open-source ArduPilot flight control software. DroneKit enables developers to write new applications quickly and easily that push the boundaries of autonomous vehicle navigation.
+DroneKit-Android provides interfaces for Android applications to control 3DR-powered vehicles. We support planes and copters built using the open-source ArduPilot flight control software. DroneKit enables developers to write new applications quickly and easily that push the boundaries of autonomous vehicle navigation.
 
-`3DR Services <https://play.google.com/store/apps/details?id=org.droidplanner.services.android&hl=en>`_, the guide to drone apps built with DroneKit, is available on the Google Play store.
+The guide to apps built with DroneKit can be found on the Google Play Store under the name: `3DR Services <https://play.google.com/store/apps/details?id=org.droidplanner.services.android&hl=en>`_.
 
-DroneKit is compatible with all vehicles running ArduCopter or ArduPlane flight code (also known as APM:Copter and APM:Plane). The ArduPilot suite of flight control software powers all 3DR vehicles. `Learn more about ArduPilot here <http://ardupilot.com>`_.
+DroneKit is compatible with all vehicles using the `MAVLink protocol <http://qgroundcontrol.org/mavlink/start>`_. This includes most vehicles made by 3DR and other members of the `DroneCode foundation <https://www.dronecode.org/about/project-members>`_.
+
 
 Contents:
 ---------
