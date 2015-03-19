@@ -1,30 +1,34 @@
-package org.droidplanner.services.test.resource;
+package org.droidplanner.services.android.mock;
 
 import com.MAVLink.MAVLinkPacket;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 
 
+import org.droidplanner.core.MAVLink.connection.MavLinkConnection;
 import org.droidplanner.core.MAVLink.connection.MavLinkConnectionListener;
 import android.app.Service;
+
+import org.droidplanner.services.android.api.DroidPlannerService;
 import org.droidplanner.services.android.api.MavLinkServiceApi;
 
 
 /**
  * Created by djmedina on 3/5/15.
  */
-public class FakeMavLinkServiceAPI extends MavLinkServiceApi{
+public class MockMavLinkServiceAPI extends MavLinkServiceApi{
 
     private MAVLinkPacket data;
 
-    public FakeMavLinkServiceAPI(Service service) {
-
+    public MockMavLinkServiceAPI(){
         super(null);
-        data = new MAVLinkPacket();
+    }
+
+    public MockMavLinkServiceAPI(DroidPlannerService service) {
+        super(service);
     }
 
     @Override
     public boolean sendData(ConnectionParameter connParams, MAVLinkPacket packet) {
-
         data = packet;
         return true;
     }
@@ -42,8 +46,7 @@ public class FakeMavLinkServiceAPI extends MavLinkServiceApi{
 
     @Override
     public int getConnectionStatus(ConnectionParameter connParams, String tag) {
-
-        return 0;
+        return MavLinkConnection.MAVLINK_CONNECTED;
     }
     @Override
     public void connectMavLink(ConnectionParameter connParams, String tag,
