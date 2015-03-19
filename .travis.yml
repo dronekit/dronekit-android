@@ -25,3 +25,4 @@ script: ./gradlew clean build
 after_success:
 - chmod a+x .utility/push-docs-to-gh-pages.sh
 - .utility/push-docs-to-gh-pages.sh
+- curl -H "X-CI-Build: $DK_CI_Key" http://dronekit.io/ci?build=android&branch=master
