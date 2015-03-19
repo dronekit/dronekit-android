@@ -4,11 +4,14 @@ android {
     compileSdkVersion 21
     buildToolsVersion "21.1.2"
 
+    /* Every time something is changed in the library the versionCode and
+     versionName must be incremented.
+     */
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 21
-        versionCode 20053
-        versionName '2.0.53'
+        versionCode 20054
+        versionName '2.0.54'
     }
 
     defaultPublishConfig "release"
