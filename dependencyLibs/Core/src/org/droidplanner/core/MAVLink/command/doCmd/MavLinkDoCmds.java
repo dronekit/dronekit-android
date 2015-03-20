@@ -76,5 +76,25 @@ public class MavLinkDoCmds {
 
         drone.getMavClient().sendMavPacket(msg.pack());
     }
+
+    /**
+     *  Move a servo to a particular pwm value
+     * @param drone target vehicle
+     * @param channel he output channel the servo is attached to
+     * @param pwm PWM value to output to the servo. Servo’s generally accept pwm values between 1000 and 2000
+     */
+    public static void setServo(Drone drone, int channel, int pwm){
+        if(drone == null)
+            return;
+
+        msg_command_long msg = new msg_command_long();
+        msg.target_system = drone.getSysid();
+        msg.target_component = drone.getCompid();
+        msg.command = MAV_CMD.MAV_CMD_DO_SET_SERVO;
+        msg.param1 = channel;
+        msg.param2 = pwm;
+
+        drone.getMavClient().sendMavPacket(msg.pack());
+    }
 	
 }

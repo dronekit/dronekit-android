@@ -1,4 +1,4 @@
-3DR-Services-Library
-====================
+DroneKit-Android common library
+===============================
 
-Stores common data structures used by the 3DR-Services and 3DR-Services-Client projects.
+Stores common data structures used by the 3DR Services app and the DroneKit-Android client library.

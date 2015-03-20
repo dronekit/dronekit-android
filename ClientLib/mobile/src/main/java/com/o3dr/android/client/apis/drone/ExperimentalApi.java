@@ -14,6 +14,10 @@ import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.EXT
 import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.EXTRA_IS_RELAY_ON;
 import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.EXTRA_MAVLINK_MESSAGE;
 import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.EXTRA_RELAY_NUMBER;
+import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.ACTION_SET_SERVO;
+import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.EXTRA_SERVO_CHANNEL;
+import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.EXTRA_SERVO_PWM;
+
 
 /**
  * Contains drone commands with no defined interaction model yet.
@@ -64,5 +68,19 @@ public class ExperimentalApi {
         params.putInt(EXTRA_RELAY_NUMBER, relayNumber);
         params.putBoolean(EXTRA_IS_RELAY_ON, enabled);
         drone.performAsyncAction(new Action(ACTION_SET_RELAY, params));
+    }
+
+    /**
+     * Move a servo to a particular pwm value
+     *
+     * @param drone       target vehicle
+     * @param channel     the output channel the servo is attached to
+     * @param pwm         PWM value to output to the servo. Servo’s generally accept pwm values between 1000 and 2000
+     */
+    public static void setServo(Drone drone, int channel, int pwm) {
+        Bundle params = new Bundle(2);
+        params.putInt(EXTRA_SERVO_CHANNEL, channel);
+        params.putInt(EXTRA_SERVO_PWM, pwm);
+        drone.performAsyncAction(new Action(ACTION_SET_SERVO, params));
     }
 }

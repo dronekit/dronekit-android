@@ -7,7 +7,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Welcome to DroneKit Android’s documentation! &mdash; 3DR Services 1.1.7beta documentation</title>
+  <title>Welcome to DroneKit-Android’s documentation! &mdash; 3DR Services 1.1.7beta documentation</title>
   
 
   
@@ -58,19 +58,18 @@
         
             <ul>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="getting_started.html#virtual-machine">Virtual Machine</a></li>
 <li class="toctree-l2"><a class="reference internal" href="getting_started.html#setting-up-sitl-on-linux">Setting up SITL on Linux</a></li>
-<li class="toctree-l2"><a class="reference internal" href="getting_started.html#setting-up-your-android-studio-project">Setting up your Android Studio project</a></li>
-<li class="toctree-l2"><a class="reference internal" href="getting_started.html#installing-3dr-services-on-your-mobile-device">Installing 3DR Services on your mobile device</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#setting-up-your-android-studio-project">Setting up your Android Studio Project</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#installing-3dr-services-on-your-mobile-device">Installing 3DR Services on your Mobile Device</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="first_app.html">First App: Hello Drone</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="first_app.html#project-setup">Project setup</a></li>
-<li class="toctree-l2"><a class="reference internal" href="first_app.html#adding-the-client-library">Adding the client library</a></li>
+<li class="toctree-l2"><a class="reference internal" href="first_app.html#project-setup">Project Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="first_app.html#adding-the-client-library">Adding the Client Library</a></li>
 <li class="toctree-l2"><a class="reference internal" href="first_app.html#connecting-to-3dr-services">Connecting to 3DR Services</a></li>
-<li class="toctree-l2"><a class="reference internal" href="first_app.html#connecting-to-a-drone-via-udp">Connecting to a drone via UDP</a></li>
+<li class="toctree-l2"><a class="reference internal" href="first_app.html#connecting-to-a-drone-via-udp">Connecting to a Drone via UDP</a></li>
 <li class="toctree-l2"><a class="reference internal" href="first_app.html#connecting-via-usb-3dr-telemetry-radio">Connecting via USB (3DR Telemetry Radio)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="first_app.html#getting-telemetry-from-your-drone">Getting telemetry from your drone</a></li>
+<li class="toctree-l2"><a class="reference internal" href="first_app.html#getting-telemetry-from-the-drone">Getting Telemetry from the Drone</a></li>
 <li class="toctree-l2"><a class="reference internal" href="first_app.html#take-off">Take Off!</a></li>
 <li class="toctree-l2"><a class="reference internal" href="first_app.html#summary">Summary</a></li>
 </ul>
@@ -104,7 +103,7 @@
   <ul class="wy-breadcrumbs">
     <li><a href="#">Docs</a> &raquo;</li>
       
-    <li>Welcome to DroneKit Android&#8217;s documentation!</li>
+    <li>Welcome to DroneKit-Android&#8217;s documentation!</li>
       <li class="wy-breadcrumbs-aside">
         
           <a href="_sources/index.txt" rel="nofollow"> View page source</a>
@@ -116,28 +115,27 @@
           <div role="main">
             
   <div class="section" id="welcome-to-dronekit-android-s-documentation">
-<h1>Welcome to DroneKit Android&#8217;s documentation!<a class="headerlink" href="#welcome-to-dronekit-android-s-documentation" title="Permalink to this headline">¶</a></h1>
-<p>DroneKit Android provide interfaces for Android applications to control 3DR-powered vehicles. We support planes, copters, multirotors, rovers built using the open-source ArduPilot flight control software. It enables developers to quickly write new applications for vehicles that push the boundaries of autonomous navigation.</p>
-<p>3DR Services, the guide to drone apps built with DroneKit, is available on the Google Play store.</p>
-<p>DroneKit is compatible with all ArduCopter and ArduPlane vehicles, which is part of the APM flight controller that powers all 3D Robotics vehicles. <a class="reference external" href="http://ardupilot.com">Learn more about Ardupilot</a>.</p>
+<h1>Welcome to DroneKit-Android&#8217;s documentation!<a class="headerlink" href="#welcome-to-dronekit-android-s-documentation" title="Permalink to this headline">¶</a></h1>
+<p>DroneKit-Android provides interfaces for Android applications to control 3DR-powered vehicles. We support planes and copters built using the open-source ArduPilot flight control software. DroneKit enables developers to write new applications quickly and easily that push the boundaries of autonomous vehicle navigation.</p>
+<p>The guide to apps built with DroneKit can be found on the Google Play Store under the name: <a class="reference external" href="https://play.google.com/store/apps/details?id=org.droidplanner.services.android&amp;hl=en">3DR Services</a>.</p>
+<p>DroneKit is compatible with all vehicles using the <a class="reference external" href="http://qgroundcontrol.org/mavlink/start">MAVLink protocol</a>. This includes most vehicles made by 3DR and other members of the <a class="reference external" href="https://www.dronecode.org/about/project-members">DroneCode foundation</a>.</p>
 <div class="section" id="contents">
 <h2>Contents:<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="getting_started.html#virtual-machine">Virtual Machine</a></li>
 <li class="toctree-l2"><a class="reference internal" href="getting_started.html#setting-up-sitl-on-linux">Setting up SITL on Linux</a></li>
-<li class="toctree-l2"><a class="reference internal" href="getting_started.html#setting-up-your-android-studio-project">Setting up your Android Studio project</a></li>
-<li class="toctree-l2"><a class="reference internal" href="getting_started.html#installing-3dr-services-on-your-mobile-device">Installing 3DR Services on your mobile device</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#setting-up-your-android-studio-project">Setting up your Android Studio Project</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#installing-3dr-services-on-your-mobile-device">Installing 3DR Services on your Mobile Device</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="first_app.html">First App: Hello Drone</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="first_app.html#project-setup">Project setup</a></li>
-<li class="toctree-l2"><a class="reference internal" href="first_app.html#adding-the-client-library">Adding the client library</a></li>
+<li class="toctree-l2"><a class="reference internal" href="first_app.html#project-setup">Project Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="first_app.html#adding-the-client-library">Adding the Client Library</a></li>
 <li class="toctree-l2"><a class="reference internal" href="first_app.html#connecting-to-3dr-services">Connecting to 3DR Services</a></li>
-<li class="toctree-l2"><a class="reference internal" href="first_app.html#connecting-to-a-drone-via-udp">Connecting to a drone via UDP</a></li>
+<li class="toctree-l2"><a class="reference internal" href="first_app.html#connecting-to-a-drone-via-udp">Connecting to a Drone via UDP</a></li>
 <li class="toctree-l2"><a class="reference internal" href="first_app.html#connecting-via-usb-3dr-telemetry-radio">Connecting via USB (3DR Telemetry Radio)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="first_app.html#getting-telemetry-from-your-drone">Getting telemetry from your drone</a></li>
+<li class="toctree-l2"><a class="reference internal" href="first_app.html#getting-telemetry-from-the-drone">Getting Telemetry from the Drone</a></li>
 <li class="toctree-l2"><a class="reference internal" href="first_app.html#take-off">Take Off!</a></li>
 <li class="toctree-l2"><a class="reference internal" href="first_app.html#summary">Summary</a></li>
 </ul>

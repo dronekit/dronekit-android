@@ -1,13 +1,15 @@
 apply plugin: 'com.android.library'
 
 ext {
-    PUBLISH_ARTIFACT_ID = '3dr-services-lib'
-    PUBLISH_VERSION = '2.2.17'
-    PROJECT_DESCRIPTION = "3DR Services Client Library"
-    PROJECT_LABELS = ['3DR', '3DR Services', 'DroneAPI', 'Android']
+    PUBLISH_ARTIFACT_ID = 'dronekit-android'
+    PUBLISH_VERSION = '2.2.18'
+    PROJECT_DESCRIPTION = "DroneKit-Android Client Library"
+    PROJECT_LABELS = ['3DR', '3DR Services', 'DroneAPI', 'Android', 'DroneKit']
     PROJECT_LICENSES = ['Apache-2.0']
 }
-
+/* Every time something is changed in the client library the versionCode and
+ PUBLISH_VERSION must be incremented.
+ */
 android {
     compileSdkVersion 21
     buildToolsVersion "21.1.2"
@@ -15,7 +17,7 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 21
-        versionCode 20217
+        versionCode 20218
         versionName PUBLISH_VERSION
     }
 

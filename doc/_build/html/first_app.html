@@ -59,19 +59,18 @@
         
             <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="getting_started.html#virtual-machine">Virtual Machine</a></li>
 <li class="toctree-l2"><a class="reference internal" href="getting_started.html#setting-up-sitl-on-linux">Setting up SITL on Linux</a></li>
-<li class="toctree-l2"><a class="reference internal" href="getting_started.html#setting-up-your-android-studio-project">Setting up your Android Studio project</a></li>
-<li class="toctree-l2"><a class="reference internal" href="getting_started.html#installing-3dr-services-on-your-mobile-device">Installing 3DR Services on your mobile device</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#setting-up-your-android-studio-project">Setting up your Android Studio Project</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#installing-3dr-services-on-your-mobile-device">Installing 3DR Services on your Mobile Device</a></li>
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="current reference internal" href="">First App: Hello Drone</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#project-setup">Project setup</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#adding-the-client-library">Adding the client library</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#project-setup">Project Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#adding-the-client-library">Adding the Client Library</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#connecting-to-3dr-services">Connecting to 3DR Services</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#connecting-to-a-drone-via-udp">Connecting to a drone via UDP</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#connecting-to-a-drone-via-udp">Connecting to a Drone via UDP</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#connecting-via-usb-3dr-telemetry-radio">Connecting via USB (3DR Telemetry Radio)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#getting-telemetry-from-your-drone">Getting telemetry from your drone</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#getting-telemetry-from-the-drone">Getting Telemetry from the Drone</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#take-off">Take Off!</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#summary">Summary</a></li>
 </ul>
@@ -118,32 +117,31 @@
             
   <div class="section" id="first-app-hello-drone">
 <h1>First App: Hello Drone<a class="headerlink" href="#first-app-hello-drone" title="Permalink to this headline">¶</a></h1>
-<p>In the first example, we&#8217;ll walk you through making an app that can connect to a drone, change Ardupilot modes, arm, take off and land the copter.</p>
+<p>In the first example, we’ll walk through making an app that connects to a copter and executes basic commands, including changing ArduPilot flight modes, arming, taking off and landing.</p>
 <div class="section" id="project-setup">
-<h2>Project setup<a class="headerlink" href="#project-setup" title="Permalink to this headline">¶</a></h2>
-<p><em>Let&#8217;s set up a basic Android Studio project</em></p>
+<h2>Project Setup<a class="headerlink" href="#project-setup" title="Permalink to this headline">¶</a></h2>
+<p>First, let&#8217;s set up a basic Android Studio project.</p>
 <img alt="_images/hellodrone_setup_1.png" src="_images/hellodrone_setup_1.png" />
-<p><em>Make sure to use API 15 (Ice Cream Sandwich) or later</em></p>
+<p>Make sure to use API 15 (Ice Cream Sandwich) or later.</p>
 <img alt="_images/hellodrone_setup_2.png" src="_images/hellodrone_setup_2.png" />
-<p><em>Let&#8217;s start with a blank activity</em></p>
+<p>Let&#8217;s start with a blank activity.</p>
 <img alt="_images/hellodrone_setup_3.png" src="_images/hellodrone_setup_3.png" />
-<p><em>Click finish to create our project</em></p>
+<p>Click <strong>Finish</strong> to create your project.</p>
 <img alt="_images/hellodrone_setup_4.png" src="_images/hellodrone_setup_4.png" />
 </div>
 <div class="section" id="adding-the-client-library">
-<h2>Adding the client library<a class="headerlink" href="#adding-the-client-library" title="Permalink to this headline">¶</a></h2>
-<p>Now open your <strong>build.gradle (Module:app)</strong> file and add:</p>
-<div class="highlight-python"><div class="highlight"><pre>compile &#39;com.o3dr:3dr-services-lib:2.2.+&#39;
+<h2>Adding the Client Library<a class="headerlink" href="#adding-the-client-library" title="Permalink to this headline">¶</a></h2>
+<p>To add the 3DR Services library to your project, open <strong>build.gradle (Module:app)</strong> and add:</p>
+<div class="highlight-python"><div class="highlight"><pre>compile &#39;com.o3dr:dronekit-android:2.2.+&#39;
 </pre></div>
 </div>
 <p>under the dependencies section.</p>
 <img alt="_images/hellodrone_setup_5.png" src="_images/hellodrone_setup_5.png" />
-<p>Then click <strong>Sync</strong> in the top right corner to re-sync the gradle.</p>
+<p>Click <strong>Sync</strong> in the top-right corner to re-sync the gradle.</p>
 </div>
 <div class="section" id="connecting-to-3dr-services">
 <h2>Connecting to 3DR Services<a class="headerlink" href="#connecting-to-3dr-services" title="Permalink to this headline">¶</a></h2>
 <p>Implement a TowerListener on your MainActivity to listen for events sent from 3DR Services to your app.</p>
-<p>Result:</p>
 <div class="highlight-java"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
@@ -183,12 +181,11 @@
      <span class="o">}</span>
 </pre></div>
 </td></tr></table></div>
-<p>Now we need to:</p>
+<p>Now you&#8217;ll need to:</p>
 <ol class="arabic simple">
 <li>Add a ControlTower instance to manage the communication to 3DR Services.</li>
-<li>Connect to 3DR Services on start, disconnect on stop of the MainAcvitity</li>
+<li>Connect to 3DR Services on start of the Main Activity and disconnect on its stop.</li>
 </ol>
-<p>Result:</p>
 <div class="highlight-java"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
@@ -280,17 +277,14 @@
 </td></tr></table></div>
 </div>
 <div class="section" id="connecting-to-a-drone-via-udp">
-<h2>Connecting to a drone via UDP<a class="headerlink" href="#connecting-to-a-drone-via-udp" title="Permalink to this headline">¶</a></h2>
-<p>Make sure you have your SITL instance running and power up a simulated drone with a UDP output to the IP of your Android device.</p>
-<p>For our example, we&#8217;ll simulate a drone in Berkeley, display the telemetry console and set our output IP to our Android testing device.</p>
-<p>You can find the IP for your Android device in Settings &gt; Wi-Fi. Tap on the connection to get information about it.</p>
-<p>In the Linux instance that has SITL installed, go to your terminal.</p>
-<p>Navigate to the folder where you cloned the ardupilot repo into.</p>
-<p>Enter the following in your console:</p>
+<h2>Connecting to a Drone via UDP<a class="headerlink" href="#connecting-to-a-drone-via-udp" title="Permalink to this headline">¶</a></h2>
+<p>Make sure you have your SITL instance running. Power up a simulated drone with a UDP output to the IP of your Android device.</p>
+<p>For this example, you’ll simulate a drone in Berkeley, CA, display the telemetry console and set the output IP to your Android testing device. (You can find the IP for your Android device in Settings &gt; Wi-Fi. Tap on the connection to get information about it.)</p>
+<p>In your terminal, navigate to the folder with the cloned ardupilot repo and enter the following:</p>
 <div class="highlight-python"><div class="highlight"><pre>sim_vehicle.sh -L 3DRBerkeley --console  --out &lt;ANDROID_DEVICE_IP&gt;:14550
 </pre></div>
 </div>
-<p>Let&#8217;s add some code in our app to connect to a drone.</p>
+<p>Now that you have a virtual drone, let’s add the ability to connect to it.</p>
 <p>First, declare that your MainActivity can act as an interface for DroneListener and implement some methods to listen for drone events.</p>
 <div class="highlight-java"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
@@ -329,7 +323,7 @@
 <span class="o">}</span>
 </pre></div>
 </td></tr></table></div>
-<p>Next, let&#8217;s add an instance variable to keep track of our drone instance to the top of our MainActivity.</p>
+<p>Next, add an instance variable to the top of your MainActivity to keep track of the drone instance.</p>
 <div class="highlight-java"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
 2
 3</pre></div></td><td class="code"><div class="highlight"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MainActivity</span> <span class="kd">extends</span> <span class="n">ActionBarActivity</span> <span class="kd">implements</span> <span class="n">DroneListener</span><span class="o">,</span> <span class="n">TowerListener</span> <span class="o">{</span>
@@ -337,7 +331,7 @@
 </span><span class="hll">        <span class="kd">private</span> <span class="kt">int</span> <span class="n">droneType</span> <span class="o">=</span> <span class="n">Type</span><span class="o">.</span><span class="na">TYPE_UNKNOWN</span><span class="o">;</span>
 </span></pre></div>
 </td></tr></table></div>
-<p>The Drone instance will need a generic Android handler to register with the control tower. Let&#8217;s go ahead and add a handler right where we declare our instance variables.</p>
+<p>In order to register with the control tower, the drone instance needs a generic Android handler. Go ahead and add a handler where you declare your instance variables.</p>
 <div class="highlight-java"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
 2
 3
@@ -347,8 +341,7 @@
 <span class="hll">        <span class="kd">private</span> <span class="kd">final</span> <span class="n">Handler</span> <span class="n">handler</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Handler</span><span class="o">();</span>
 </span></pre></div>
 </td></tr></table></div>
-<p>Let&#8217;s now instantiate a new drone upon the creation of our MainActivity.
-After creation, the new drone will need to be registered with the control tower to be active.</p>
+<p>Add an instantiation of the new drone upon the creation of your MainActivity. After creation, the new drone will need to be registered with the control tower to be active.</p>
 <div class="highlight-java"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
@@ -378,7 +371,7 @@ After creation, the new drone will need to be registered with the control tower 
 <span class="o">}</span>
 </pre></div>
 </td></tr></table></div>
-<p>Also, let&#8217;s make sure that when the MainActivity is stopped, we unregister our drone from the control tower.</p>
+<p>Make sure that when the MainActivity is stopped, the drone is unregistered from the control tower.</p>
 <div class="highlight-java"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
@@ -400,7 +393,7 @@ After creation, the new drone will need to be registered with the control tower 
 <span class="o">}</span>
 </pre></div>
 </td></tr></table></div>
-<p>Now let&#8217;s add a button in our activity_main.xml that will connect to a drone on press. Open your <strong>activity_main.xml</strong> file and add the following:</p>
+<p>Now let&#8217;s add a button in <strong>activity_main.xml</strong> that will connect to the drone on press. Open <strong>activity_main.xml</strong> and add the following:</p>
 <div class="highlight-xml"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
 2
 3
@@ -418,7 +411,11 @@ After creation, the new drone will need to be registered with the control tower 
         <span class="na">android:layout_alignParentEnd=</span><span class="s">&quot;true&quot;</span> <span class="nt">/&gt;</span>
 </pre></div>
 </td></tr></table></div>
-<p>Open your <strong>MainActivity</strong> java source and add a method to handle the connect button press:</p>
+<p>Add a method to your MainActivity to handle the connect button press so that:</p>
+<ol class="arabic simple">
+<li>If the drone is connected, use this button to disconnect.</li>
+<li>If the drone isn’t connected, build a set of connection parameters and connect.</li>
+</ol>
 <div class="highlight-java"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
@@ -442,11 +439,7 @@ After creation, the new drone will need to be registered with the control tower 
 </span><span class="hll"><span class="o">}</span>
 </span></pre></div>
 </td></tr></table></div>
-<p>Let&#8217;s see what&#8217;s going on in the above method.</p>
-<p>First if we are connected, then use this button to disconnect.</p>
-<p>If we are not connected, we need to build a set of connection parameters and connect.</p>
-<p>Now let&#8217;s add som UI to alert us when the drone is connected.</p>
-<p>Add the following UI helper method to the bottom of your MainActivity file.</p>
+<p>Now add some UI elements to alert you when the drone is connected. Add the following UI helper method to the bottom of your MainActivity file.</p>
 <div class="highlight-java"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
@@ -472,8 +465,7 @@ After creation, the new drone will need to be registered with the control tower 
 </span><span class="hll"><span class="o">}</span>
 </span></pre></div>
 </td></tr></table></div>
-<p>Let&#8217;s revisit the <strong>onDroneEvent</strong> method to alert the user when the drone is connected.</p>
-<p>Add the following to your <strong>onDroneEvent</strong> method:</p>
+<p>Let’s revisit the <strong>onDroneEvent</strong> method. Add the following to your <strong>onDroneEvent</strong> method to alert the user when the drone is connected:</p>
 <div class="highlight-java"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
@@ -509,12 +501,11 @@ After creation, the new drone will need to be registered with the control tower 
 </span><span class="o">}</span>
 </pre></div>
 </td></tr></table></div>
-<p>Now if you run the app and the SITL environment, you should be able to connect to your drone!</p>
+<p>Now if you run the app and the SITL environment, you&#8217;ll be able to connect to your drone!</p>
 </div>
 <div class="section" id="connecting-via-usb-3dr-telemetry-radio">
 <h2>Connecting via USB (3DR Telemetry Radio)<a class="headerlink" href="#connecting-via-usb-3dr-telemetry-radio" title="Permalink to this headline">¶</a></h2>
-<p>For USB connections, you need to define an extra param for the baud rate.</p>
-<p>Example:</p>
+<p>For USB connections, you&#8217;ll need to define an extra param for the baud rate.</p>
 <div class="highlight-java"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
 2
 3
@@ -525,10 +516,9 @@ After creation, the new drone will need to be registered with the control tower 
 </pre></div>
 </td></tr></table></div>
 </div>
-<div class="section" id="getting-telemetry-from-your-drone">
-<h2>Getting telemetry from your drone<a class="headerlink" href="#getting-telemetry-from-your-drone" title="Permalink to this headline">¶</a></h2>
-<p>In order to get telemetry updates from the drone, we need to add cases for different drone events returned in <strong>onDroneEvent</strong>.</p>
-<p>Update your <strong>onDroneEvent</strong> to look like the following:</p>
+<div class="section" id="getting-telemetry-from-the-drone">
+<h2>Getting Telemetry from the Drone<a class="headerlink" href="#getting-telemetry-from-the-drone" title="Permalink to this headline">¶</a></h2>
+<p>In order to get telemetry updates from the drone, you&#8217;ll need to add cases for different drone events returned in <strong>onDroneEvent</strong>.</p>
 <div class="highlight-java"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
@@ -608,7 +598,7 @@ After creation, the new drone will need to be registered with the control tower 
 <span class="o">}</span>
 </pre></div>
 </td></tr></table></div>
-<p>Let&#8217;s add some TextViews to our UI in order to output telemetry values. In your <strong>activity_main.xml</strong> add the following:</p>
+<p>Add some TextViews to your UI to output telemetry values. In <strong>activity_main.xml</strong>, add a table with TextViews and a Spinner Dropdown view that will let you change the vehicle’s modes.</p>
 <div class="highlight-xml"><div class="highlight"><pre><span class="nt">&lt;TableLayout</span>
         <span class="na">android:layout_width=</span><span class="s">&quot;fill_parent&quot;</span>
         <span class="na">android:layout_height=</span><span class="s">&quot;200dp&quot;</span>
@@ -728,8 +718,7 @@ After creation, the new drone will need to be registered with the control tower 
 <span class="nt">&lt;/TableLayout&gt;</span>
 </pre></div>
 </div>
-<p>In the above layout code, we are adding a table with TextViews and a Spinner Dropdown view that will let us change our vehicle&#8217;s modes.</p>
-<p>Also add a class level Spinner variable in MainActivity so we can reference it throughout the code.</p>
+<p>Add a class-level Spinner variable in MainActivity so you can reference the table throughout the code.</p>
 <div class="highlight-java"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
 2
 3
@@ -741,7 +730,7 @@ After creation, the new drone will need to be registered with the control tower 
 <span class="hll">        <span class="n">Spinner</span> <span class="n">modeSelector</span><span class="o">;</span>
 </span></pre></div>
 </td></tr></table></div>
-<p>And add to our <strong>onCreate</strong> method to reference the Spinner defined in the XML layout:</p>
+<p>Add a reference to the Spinner defined in the XML layout to the <strong>onCreate</strong> method.</p>
 <div class="highlight-java"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
@@ -785,7 +774,7 @@ After creation, the new drone will need to be registered with the control tower 
 </span><span class="o">}</span>
 </pre></div>
 </td></tr></table></div>
-<p>Now let&#8217;s implement some of the methods in our <strong>onDroneEvent</strong> in order to update our UI. Add the following methods to your MainActivity.</p>
+<p>Now implement some of the methods in <strong>onDroneEvent</strong> in order to update the UI. Add the following methods to your MainActivity.</p>
 <div class="highlight-java"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
@@ -907,15 +896,15 @@ After creation, the new drone will need to be registered with the control tower 
 </span><span class="hll"><span class="o">}</span>
 </span></pre></div>
 </td></tr></table></div>
-<p>Whoa! A lot of stuff! Let&#8217;s go through it together:</p>
+<p>Whoa, that&#8217;s a lot of stuff. Let&#8217;s go through it:</p>
 <div class="highlight-python"><div class="highlight"><pre>public void onFlightModeSelected(View view)
 </pre></div>
 </div>
-<p>This changes the mode of the vehicle when the user changes the selection of the mode selector.</p>
+<p>This changes the drone&#8217;s flight mode when the user changes the mode selector.</p>
 <div class="highlight-python"><div class="highlight"><pre>protected void updateVehicleModesForType(int droneType)
 </pre></div>
 </div>
-<p>This is triggered when the <strong>onDroneEvent</strong> tells us the type of vehicle we&#8217;re dealing with. In the <strong>onDroneEvent</strong>, we get the type of vehicle and load the modes the the vehicle can have.</p>
+<p>This is triggered when the <strong>onDroneEvent</strong> tells us the type of vehicle we&#8217;re dealing with. In the <strong>onDroneEvent</strong>, we get the type of vehicle and the modes the vehicle can have.</p>
 <div class="highlight-python"><div class="highlight"><pre>// Fired when the vehicle mode changes on the drone.
 protected void updateVehicleMode()
 </pre></div>
@@ -935,7 +924,7 @@ protected double distanceBetweenPoints(LatLongAlt pointA, LatLongAlt pointB)
 </div>
 <div class="section" id="take-off">
 <h2>Take Off!<a class="headerlink" href="#take-off" title="Permalink to this headline">¶</a></h2>
-<p>Let&#8217;s add a button to our app that will allow us to arm, take off and land the vehicle.</p>
+<p>Add a button to your app that will allow you to arm, take off and land the drone.</p>
 <div class="highlight-xml"><div class="highlight"><pre><span class="nt">&lt;Button</span>
         <span class="na">android:layout_width=</span><span class="s">&quot;120dp&quot;</span>
         <span class="na">android:layout_height=</span><span class="s">&quot;wrap_content&quot;</span>
@@ -947,7 +936,7 @@ protected double distanceBetweenPoints(LatLongAlt pointA, LatLongAlt pointB)
         <span class="na">android:onClick=</span><span class="s">&quot;onArmButtonTap&quot;</span> <span class="nt">/&gt;</span>
 </pre></div>
 </div>
-<p>Add a method to our MainActivity to update our button&#8217;s UI depending on the vehicle state:</p>
+<p>Add a method to your MainActivity to update the button&#8217;s UI depending on the vehicle state:</p>
 <div class="highlight-java"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
@@ -991,7 +980,7 @@ protected double distanceBetweenPoints(LatLongAlt pointA, LatLongAlt pointB)
 </span><span class="hll"><span class="o">}</span>
 </span></pre></div>
 </td></tr></table></div>
-<p>Add a method to our MainActivity to handle the arm button press:</p>
+<p>Add a method to your MainActivity to handle the arm button press:</p>
 <div class="highlight-java"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
@@ -1029,7 +1018,7 @@ protected double distanceBetweenPoints(LatLongAlt pointA, LatLongAlt pointB)
 </span><span class="hll"><span class="o">}</span>
 </span></pre></div>
 </td></tr></table></div>
-<p>Let&#8217;s go back to our good old <strong>onDroneEvent</strong> to link updating our arm button UI to the drone events:</p>
+<p>Finally, go back to your good old <strong>onDroneEvent</strong> to link updating the arm button UI to the drone events:</p>
 <div class="highlight-java"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
@@ -1127,7 +1116,7 @@ protected double distanceBetweenPoints(LatLongAlt pointA, LatLongAlt pointB)
 <span class="o">}</span>
 </pre></div>
 </td></tr></table></div>
-<p>Now run the app and SITL and you should be able to connect, arm, and take off!</p>
+<p>Run your app and SITL; you&#8217;ll be able to connect, arm and take off!</p>
 </div>
 <div class="section" id="summary">
 <h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
