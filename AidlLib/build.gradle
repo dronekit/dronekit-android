@@ -37,7 +37,7 @@ android {
 }
 
 dependencies {
-    provided 'com.google.android.gms:play-services-base:6.5.87'
+    compile 'com.google.android.gms:play-services-base:6.5.87'
     compile project(':dependencyLibs:Mavlink')
 }
 
