@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
+apply plugin: 'org.robolectric'
 
 dependencies {
 
@@ -21,6 +22,9 @@ dependencies {
     compile('com.crashlytics.sdk.android:crashlytics:2.2.2@aar') {
         transitive = true;
     }
+
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.robolectric:robolectric:2.4'
 }
 
 android {
@@ -52,8 +56,8 @@ android {
         }
 
         // Move the tests to tests/java, tests/res, etc...
-        androidTest {
-            java.srcDirs = ['tests']
+        test {
+            java.srcDirs = ['test/java']
         }
 
         // Move the build types to build-types/<type>
