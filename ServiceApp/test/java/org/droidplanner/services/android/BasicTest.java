@@ -11,8 +11,6 @@ import com.MAVLink.common.msg_command_long;
 import com.MAVLink.enums.MAV_CMD;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 
-import junit.framework.Assert;
-
 import org.droidplanner.core.MAVLink.MAVLinkStreams;
 import org.droidplanner.core.MAVLink.MavLinkArm;
 import org.droidplanner.core.drone.DroneImpl;
@@ -22,6 +20,7 @@ import org.droidplanner.services.android.communication.service.MAVLinkClient;
 import org.droidplanner.services.android.mock.MockMavLinkServiceAPI;
 import org.droidplanner.services.android.utils.AndroidApWarningParser;
 import org.droidplanner.services.android.utils.prefs.DroidPlannerPrefs;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -124,6 +123,6 @@ public class BasicTest {
 
         //Validate the message
         Assert.assertEquals(MAV_CMD.MAV_CMD_COMPONENT_ARM_DISARM, longMsg.command);
-        Assert.assertEquals(1f, longMsg.param1);
+        Assert.assertEquals(1f, longMsg.param1, 0.001);
     }
 }
