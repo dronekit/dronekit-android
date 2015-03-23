@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ "$TRAVIS_REPO_SLUG" == "DroidPlanner/DroneKit-Android" ] && [ "$TRAVIS_JDK_VERSION" == "oraclejdk7" ] && ["$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_BRANCH" == "develop" ]; then
+if [ "$TRAVIS_REPO_SLUG" == "DroidPlanner/DroneKit-Android" ] && [ "$TRAVIS_JDK_VERSION" == "oraclejdk7" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_BRANCH" == "develop" ]; then
 
   echo -e "Publishing html docs...\n"
 
