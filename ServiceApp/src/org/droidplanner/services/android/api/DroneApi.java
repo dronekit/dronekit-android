@@ -120,8 +120,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
     private ConnectionParameter connectionParams;
 
-    DroneApi(DroidPlannerService dpService, Looper looper, MavLinkServiceApi mavlinkApi, IApiListener listener,
-             String ownerId) {
+    DroneApi(DroidPlannerService dpService, Looper looper, IApiListener listener, String ownerId) {
 
         this.service = dpService;
         this.context = dpService.getApplicationContext();
