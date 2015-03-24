@@ -107,4 +107,6 @@ public interface Drone {
 	public void setFirmwareVersion(String message);
 
 	public Camera getCamera();
+
+    public void logMessage(int mavSeverity, String message);
 }
