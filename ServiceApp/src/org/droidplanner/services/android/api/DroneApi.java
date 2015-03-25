@@ -534,7 +534,10 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
     @Override
     public void onMessageLogged(int logLevel, String message) {
-        //TODO: complete.
+        final Bundle args = new Bundle(2);
+        args.putInt(AttributeEventExtra.EXTRA_AUTOPILOT_MESSAGE_LEVEL, logLevel);
+        args.putString(AttributeEventExtra.EXTRA_AUTOPILOT_MESSAGE, message);
+        notifyAttributeUpdate(AttributeEvent.AUTOPILOT_MESSAGE, args);
     }
 
     @Override
