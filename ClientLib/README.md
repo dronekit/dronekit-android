@@ -1,4 +1,4 @@
 # DroneKit-Android Client library
 
-#### [Getting started](https://droidplanner.github.io/DroneKit-Android/)
-#### [Javadocs](https://droidplanner.github.io/DroneKit-Android/javadoc/)
+#### [Getting started](http://android.dronekit.io/)
+#### [Javadocs](http://android.dronekit.io/javadoc/)
