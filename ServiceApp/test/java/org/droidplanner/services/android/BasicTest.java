@@ -15,6 +15,7 @@ import org.droidplanner.core.MAVLink.MAVLinkStreams;
 import org.droidplanner.core.MAVLink.MavLinkArm;
 import org.droidplanner.core.drone.DroneImpl;
 import org.droidplanner.core.drone.DroneInterfaces;
+import org.droidplanner.core.drone.LogMessageListener;
 import org.droidplanner.core.model.Drone;
 import org.droidplanner.services.android.communication.service.MAVLinkClient;
 import org.droidplanner.services.android.mock.MockMavLinkServiceAPI;
@@ -95,7 +96,12 @@ public class BasicTest {
         DroidPlannerPrefs dpPrefs = new DroidPlannerPrefs(context);
         MAVLinkClient mavClient = new MAVLinkClient(context, inputStreamListener, connParams, mavlinkApi);
 
-        drone = new DroneImpl(mavClient, clock, dpHandler, dpPrefs, new AndroidApWarningParser(context));
+        drone = new DroneImpl(mavClient, clock, dpHandler, dpPrefs, new AndroidApWarningParser(context), new LogMessageListener() {
+            @Override
+            public void onMessageLogged(int mavSeverity, String message) {
+
+            }
+        });
     }
 
     /**

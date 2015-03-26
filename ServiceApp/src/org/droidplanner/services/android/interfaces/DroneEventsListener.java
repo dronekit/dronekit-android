@@ -17,4 +17,6 @@ public interface DroneEventsListener extends DroneInterfaces.OnDroneListener,
     void onConnectionFailed(String error);
 
     void onReceivedMavLinkMessage(MAVLinkMessage msg);
+
+    void onMessageLogged(int logLevel, String message);
 }

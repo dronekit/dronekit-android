@@ -117,18 +117,7 @@ public class MavLinkMsgHandler {
 			// also less important things like "erasing logs" and
 			// "calibrating barometer"
 			msg_statustext msg_statustext = (msg_statustext) msg;
-			String message = msg_statustext.getText();
-
-			if (msg_statustext.severity == SEVERITY_HIGH || msg_statustext.severity == SEVERITY_CRITICAL) {
-				drone.getState().setWarning(message);
-				break;
-			} else if (message.equals("Low Battery!")) {
-				drone.getState().setWarning(message);
-				break;
-			} else if (message.contains("ArduCopter")) {
-				drone.setFirmwareVersion(message);
-				break;
-			}
+            processStatusText(msg_statustext);
 			break;
 		case msg_camera_feedback.MAVLINK_MSG_ID_CAMERA_FEEDBACK:
 			drone.getCamera().newImageLocation((msg_camera_feedback) msg);
@@ -170,4 +159,29 @@ public class MavLinkMsgHandler {
 		drone.getState().setArmed(
 						(msg_heart.base_mode & (byte) MAV_MODE_FLAG.MAV_MODE_FLAG_SAFETY_ARMED) == (byte) MAV_MODE_FLAG.MAV_MODE_FLAG_SAFETY_ARMED);
 	}
+
+    private void processStatusText(msg_statustext statusText){
+        String message = statusText.getText();
+
+        if (statusText.severity == SEVERITY_HIGH || statusText.severity == SEVERITY_CRITICAL) {
+            drone.getState().setWarning(message);
+        } else{
+            switch(message){
+                case "Low Battery!":
+                    drone.getState().setWarning(message);
+                    break;
+
+                case "ArduCopter":
+                case "ArduPlane":
+                case "ArduRover":
+                    drone.setFirmwareVersion(message);
+                    break;
+
+                default:
+                    //Relay to the connected client.
+                    drone.logMessage(statusText.severity, message);
+                    break;
+            }
+        }
+    }
 }

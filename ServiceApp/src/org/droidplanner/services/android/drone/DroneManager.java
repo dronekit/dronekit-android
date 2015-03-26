@@ -8,6 +8,7 @@ import android.util.Log;
 
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
+import com.MAVLink.enums.MAV_SEVERITY;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.DroneSharePrefs;
 
@@ -15,6 +16,7 @@ import org.droidplanner.core.MAVLink.MAVLinkStreams;
 import org.droidplanner.core.MAVLink.MavLinkMsgHandler;
 import org.droidplanner.core.drone.DroneImpl;
 import org.droidplanner.core.drone.DroneInterfaces;
+import org.droidplanner.core.drone.LogMessageListener;
 import org.droidplanner.core.drone.variables.helpers.MagnetometerCalibration;
 import org.droidplanner.core.gcs.follow.Follow;
 import org.droidplanner.core.model.Drone;
@@ -43,7 +45,7 @@ import ellipsoidFit.ThreeSpacePoint;
  */
 public class DroneManager implements MAVLinkStreams.MavlinkInputStream,
         MagnetometerCalibration.OnMagCalibrationListener, DroneInterfaces.OnDroneListener,
-        DroneInterfaces.OnParameterManagerListener {
+        DroneInterfaces.OnParameterManagerListener, LogMessageListener {
 
     private static final String TAG = DroneManager.class.getSimpleName();
 
@@ -89,7 +91,7 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream,
 
         DroidPlannerPrefs dpPrefs = new DroidPlannerPrefs(context);
 
-        this.drone = new DroneImpl(mavClient, clock, dpHandler, dpPrefs, new AndroidApWarningParser(context));
+        this.drone = new DroneImpl(mavClient, clock, dpHandler, dpPrefs, new AndroidApWarningParser(context), this);
         this.drone.getStreamRates().setRates(dpPrefs.getRates());
 
         this.mavLinkMsgHandler = new MavLinkMsgHandler(this.drone);
@@ -400,5 +402,42 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream,
 
     public ConnectionParameter getConnectionParameter() {
         return connectionParameter;
+    }
+
+    @Override
+    public void onMessageLogged(int mavSeverity, String message) {
+        if(connectedApps.isEmpty())
+            return;
+
+        final int logLevel;
+        switch(mavSeverity){
+            case MAV_SEVERITY.MAV_SEVERITY_ALERT:
+            case MAV_SEVERITY.MAV_SEVERITY_CRITICAL:
+            case MAV_SEVERITY.MAV_SEVERITY_EMERGENCY:
+            case MAV_SEVERITY.MAV_SEVERITY_ERROR:
+                logLevel = Log.ERROR;
+                break;
+
+            case MAV_SEVERITY.MAV_SEVERITY_WARNING:
+                logLevel = Log.WARN;
+                break;
+
+            case MAV_SEVERITY.MAV_SEVERITY_NOTICE:
+                logLevel = Log.INFO;
+                break;
+
+            default:
+            case MAV_SEVERITY.MAV_SEVERITY_INFO:
+                logLevel = Log.VERBOSE;
+                break;
+
+            case MAV_SEVERITY.MAV_SEVERITY_DEBUG:
+                logLevel = Log.DEBUG;
+                break;
+        }
+
+        for(DroneEventsListener listener: connectedApps.values()){
+            listener.onMessageLogged(logLevel, message);
+        }
     }
 }
