@@ -241,6 +241,10 @@ public class DroneApiUtils {
             case GUIDED_SCAN:
                 followMode = FollowAlgorithm.FollowModes.GUIDED_SCAN;
                 break;
+
+            case LOOK_AT_ME:
+                followMode = FollowAlgorithm.FollowModes.LOOK_AT_ME;
+                break;
         }
         return followMode;
     }
@@ -284,6 +288,10 @@ public class DroneApiUtils {
 
             case GUIDED_SCAN:
                 followType = FollowType.GUIDED_SCAN;
+                break;
+
+            case LOOK_AT_ME:
+                followType = FollowType.LOOK_AT_ME;
                 break;
         }
 
