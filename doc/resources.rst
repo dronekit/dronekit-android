@@ -4,7 +4,7 @@ Additional Resources
 Full Java Doc
 -------------
 
-`Java Documentation <https://droidplanner.github.com/3DRServices/javadoc>`_
+`Java Documentation <http://android.dronekit.io/javadoc/>`_
 
 Example Apps
 ------------
@@ -21,14 +21,14 @@ Tower (Droidplanner 3)
 
 The most used Android ground control station for drones.
 
-`Source <https://github.com/DroidPlanner/droidplanner>`_ | `Play Store <https://play.google.com/store/apps/details?id=org.droidplanner>`_
+`Source <https://github.com/DroidPlanner/Tower>`_ | `Play Store <https://play.google.com/store/apps/details?id=org.droidplanner.android>`_
 
 Tower Wear
 ~~~~~~~~~~
 
 Control a drone from your Android Wear device!
 
-`Source <https://github.com/ne0fhyk/DP-Wear>`_ | `Play Store <https://play.google.com/store/apps/details?id=com.o3dr.android.dp.wear>`_
+`Source <https://github.com/DroidPlanner/tower-wear>`_ | `Play Store <https://play.google.com/store/apps/details?id=com.o3dr.android.dp.wear>`_
 
 Questions
 -------------
