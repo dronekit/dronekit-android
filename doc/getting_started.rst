@@ -1,3 +1,4 @@
+===============
 Getting Started
 ===============
 
@@ -7,8 +8,9 @@ To start prototyping your app, you'll need to set up a virtual drone. ArduPilot 
 
 Note: You can also run SITL in a virtual machine using a VM manager like `Virtual Box <https://www.virtualbox.org/>`_. 
 
+
 Setting up SITL on Linux
-------------------------
+========================
 
 See the `instructions here <http://dev.ardupilot.com/wiki/setting-up-sitl-on-linux/>`_ to set up SITL on Ubuntu.
 
@@ -26,8 +28,9 @@ Once you have the simulated vehicle running, enter the following commands. (You 
 
 	STABILIZE>param set ARMING_CHECK 0
 
+
 Setting up your Android Studio Project
---------------------------------------
+======================================
 
 For an existing app:
 
@@ -48,7 +51,8 @@ For an existing app:
 	}
 
 Installing 3DR Services on your Mobile Device
----------------------------------------------
+=============================================
+
 
 For any DroneKit apps to work on Android, the 3DR Services app must be installed. This app provides a communication layer to the drone and showcases apps built on DroneKit.
 

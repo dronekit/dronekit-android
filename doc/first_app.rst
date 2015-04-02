@@ -1,10 +1,12 @@
+======================
 First App: Hello Drone
 ======================
 
 In the first example, we’ll walk through making an app that connects to a copter and executes basic commands, including changing ArduPilot flight modes, arming, taking off and landing.
 
+
 Project Setup
--------------
+=============
 
 First, let's set up a basic Android Studio project.
 
@@ -22,8 +24,9 @@ Click **Finish** to create your project.
 
 .. image:: _static/images/hellodrone_setup_4.png
 
+
 Adding the Client Library
---------------------------
+=========================
 
 To add the 3DR Services library to your project, open **build.gradle (Module:app)** and add: 
 
@@ -37,8 +40,9 @@ under the dependencies section.
 
 Click **Sync** in the top-right corner to re-sync the gradle.
 
+
 Connecting to 3DR Services
---------------------------
+==========================
 
 Implement a TowerListener on your MainActivity to listen for events sent from 3DR Services to your app.
 
@@ -121,8 +125,9 @@ Now you'll need to:
 		}
 	}
 
+
 Connecting to a Drone via UDP
------------------------------
+=============================
 
 Make sure you have your SITL instance running. Power up a simulated drone with a UDP output to the IP of your Android device.
 
@@ -260,6 +265,7 @@ Add a method to your MainActivity to handle the connect button press so that:
 		}
 	}
 
+
 Now add some UI elements to alert you when the drone is connected. Add the following UI helper method to the bottom of your MainActivity file.
 
 .. code-block:: java
@@ -305,8 +311,9 @@ Let’s revisit the **onDroneEvent** method. Add the following to your **onDrone
 
 Now if you run the app and the SITL environment, you'll be able to connect to your drone!
 
+
 Connecting via USB (3DR Telemetry Radio)
-----------------------------------------
+========================================
 
 For USB connections, you'll need to define an extra param for the baud rate.
 
@@ -318,8 +325,9 @@ For USB connections, you'll need to define an extra param for the baud rate.
 	ConnectionParameter connectionParams = new ConnectionParameter(ConnectionType.TYPE_USB, extraParams, null);
 	this.drone.connect(connectionParams);
 
+
 Getting Telemetry from the Drone
----------------------------------
+================================
 
 In order to get telemetry updates from the drone, you'll need to add cases for different drone events returned in **onDroneEvent**.
 
@@ -635,7 +643,7 @@ This is triggered when the **onDroneEvent** tells us the type of vehicle we're d
 
 
 Take Off!
----------
+=========
 
 Add a button to your app that will allow you to arm, take off and land the drone.
 
@@ -762,7 +770,7 @@ Finally, go back to your good old **onDroneEvent** to link updating the arm butt
 Run your app and SITL; you'll be able to connect, arm and take off!
 
 Summary
--------
+=======
 
 Congratulations! You've just made your first drone app. You can find the full source code for this example on `Github <https://github.com/3drobotics/DroneKit-Android-Starter>`_.
 

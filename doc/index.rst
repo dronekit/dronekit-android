@@ -3,6 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+============================================
 Welcome to DroneKit-Android's documentation!
 ============================================
 
@@ -14,7 +15,7 @@ A catalog of android apps built with DroneKit can be found in `3DR Services <htt
 
 
 Contents:
----------
+=========
 
 .. toctree::
    :maxdepth: 2
