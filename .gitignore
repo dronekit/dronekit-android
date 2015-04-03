@@ -2,6 +2,9 @@
 *.apk
 *.ap_
 
+# Built doc files
+doc/_build/
+
 # Files for the Dalvik VM
 *.dex
 
@@ -35,3 +38,6 @@ crashlytics.properties
 
 # Mac OSX files
 .DS_Store
+
+# Temporary files on Linxu
+*~
