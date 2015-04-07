@@ -4,11 +4,14 @@ android {
     compileSdkVersion 21
     buildToolsVersion "21.1.2"
 
+    /* Every time something is changed in the library the versionCode and
+     versionName must be incremented.
+     */
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 21
-        versionCode 20053
-        versionName '2.0.53'
+        versionCode 20055
+        versionName '2.0.55'
     }
 
     defaultPublishConfig "release"
@@ -37,7 +40,7 @@ android {
 }
 
 dependencies {
-    provided 'com.google.android.gms:play-services-base:6.5.87'
+    compile 'com.google.android.gms:play-services-base:6.5.87'
     compile project(':dependencyLibs:Mavlink')
 }
 

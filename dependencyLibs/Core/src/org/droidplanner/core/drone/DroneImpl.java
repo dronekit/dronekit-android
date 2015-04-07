@@ -59,10 +59,14 @@ public class DroneImpl implements Drone {
 	private final MAVLinkStreams.MAVLinkOutputStream MavClient;
 	private final Preferences preferences;
 
+    private final LogMessageListener logListener;
+
 	public DroneImpl(MAVLinkStreams.MAVLinkOutputStream mavClient, DroneInterfaces.Clock clock,
-			DroneInterfaces.Handler handler, Preferences pref, AutopilotWarningParser warningParser) {
+			DroneInterfaces.Handler handler, Preferences pref, AutopilotWarningParser warningParser,
+            LogMessageListener logListener) {
 		this.MavClient = mavClient;
 		this.preferences = pref;
+        this.logListener = logListener;
 
         events = new DroneEvents(this);
 		state = new State(this, clock, handler, warningParser);
@@ -290,4 +294,10 @@ public class DroneImpl implements Drone {
 	public Camera getCamera() {
 		return footprints;
 	}
+
+    @Override
+    public void logMessage(int mavSeverity, String message) {
+        if(logListener != null)
+            logListener.onMessageLogged(mavSeverity, message);
+    }
 }

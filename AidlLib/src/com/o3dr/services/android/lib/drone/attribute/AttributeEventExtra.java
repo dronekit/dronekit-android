@@ -21,6 +21,14 @@ public class AttributeEventExtra {
     public static final String EXTRA_AUTOPILOT_FAILSAFE_MESSAGE = PACKAGE_NAME + ".AUTOPILOT_FAILSAFE_MESSAGE";
 
     /**
+     * Used to access autopilot messages.
+     * @see {@link com.o3dr.services.android.lib.drone.attribute.AttributeEvent#AUTOPILOT_MESSAGE}
+     */
+    public static final String EXTRA_AUTOPILOT_MESSAGE = PACKAGE_NAME + ".AUTOPILOT_MESSAGE";
+
+    public static final String EXTRA_AUTOPILOT_MESSAGE_LEVEL = PACKAGE_NAME + ".AUTOPILOT_MESSAGE_LEVEL";
+
+    /**
      * Used to access messages origination from the imu calibration process.
      */
     public static final String EXTRA_CALIBRATION_IMU_MESSAGE = PACKAGE_NAME + ".CALIBRATION_IMU_MESSAGE";

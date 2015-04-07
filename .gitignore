@@ -28,6 +28,7 @@ proguard/
 #Android Studio files
 *.iml
 .idea/
+crashlytics.properties
 
 # Eclipse files
 .metadata

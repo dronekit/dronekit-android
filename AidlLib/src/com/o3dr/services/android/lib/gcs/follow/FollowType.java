@@ -16,29 +16,36 @@ public enum FollowType implements Parcelable {
     RIGHT("Right"),
     LEFT("Left"),
     CIRCLE("Circle"),
-    ABOVE("Above"){
+    ABOVE("Above") {
         @Override
-        public boolean hasParam(String paramKey){
+        public boolean hasParam(String paramKey) {
             return false;
         }
     },
     SPLINE_LEASH("Vector Leash"),
-    SPLINE_ABOVE("Vector Above"){
+    SPLINE_ABOVE("Vector Above") {
         @Override
-        public boolean hasParam(String paramKey){
+        public boolean hasParam(String paramKey) {
             return false;
         }
     },
-    GUIDED_SCAN("Guided Scan"){
+    GUIDED_SCAN("Guided Scan") {
         @Override
-        public boolean hasParam(String paramKey){
-            switch(paramKey){
+        public boolean hasParam(String paramKey) {
+            switch (paramKey) {
                 case EXTRA_FOLLOW_ROI_TARGET:
                     return true;
 
                 default:
                     return false;
             }
+        }
+    },
+
+    LOOK_AT_ME("Look At Me") {
+        @Override
+        public boolean hasParam(String paramKey) {
+            return false;
         }
     };
 
@@ -47,12 +54,12 @@ public enum FollowType implements Parcelable {
 
     private final String typeLabel;
 
-    private FollowType(String typeLabel){
+    private FollowType(String typeLabel) {
         this.typeLabel = typeLabel;
     }
 
-    public boolean hasParam(String paramKey){
-        switch(paramKey){
+    public boolean hasParam(String paramKey) {
+        switch (paramKey) {
             case EXTRA_FOLLOW_RADIUS:
                 return true;
 
@@ -69,7 +76,7 @@ public enum FollowType implements Parcelable {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return getTypeLabel();
     }
 
@@ -83,7 +90,7 @@ public enum FollowType implements Parcelable {
         dest.writeString(name());
     }
 
-    public static List<FollowType> getFollowTypes(boolean includeAdvanced){
+    public static List<FollowType> getFollowTypes(boolean includeAdvanced) {
         List<FollowType> followTypes = new ArrayList<>();
         followTypes.add(LEASH);
         followTypes.add(LEAD);
@@ -92,8 +99,9 @@ public enum FollowType implements Parcelable {
         followTypes.add(CIRCLE);
         followTypes.add(ABOVE);
         followTypes.add(GUIDED_SCAN);
+        followTypes.add(LOOK_AT_ME);
 
-        if(includeAdvanced){
+        if (includeAdvanced) {
             followTypes.add(SPLINE_LEASH);
             followTypes.add(SPLINE_ABOVE);
         }

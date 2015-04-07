@@ -75,7 +75,8 @@ public abstract class FollowAlgorithm {
         ABOVE("Above"),
         SPLINE_LEASH("Vector Leash"),
         SPLINE_ABOVE("Vector Above"),
-        GUIDED_SCAN("Guided Scan");
+        GUIDED_SCAN("Guided Scan"),
+        LOOK_AT_ME("Look At Me");
 
         private String name;
 
@@ -113,6 +114,8 @@ public abstract class FollowAlgorithm {
                     return new FollowSplineAbove(drone, handler);
                 case GUIDED_SCAN:
                     return new FollowGuidedScan(drone, handler);
+                case LOOK_AT_ME:
+                    return new FollowLookAtMe(drone, handler);
             }
         }
     }

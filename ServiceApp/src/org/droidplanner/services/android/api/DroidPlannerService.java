@@ -9,8 +9,8 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.HandlerThread;
 import android.os.IBinder;
+import android.os.Looper;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Log;
@@ -40,7 +40,6 @@ import org.droidplanner.services.android.utils.analytics.GAUtils;
 import org.droidplanner.services.android.utils.file.IO.CameraInfoLoader;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -73,7 +72,7 @@ public class DroidPlannerService extends Service {
      */
     final ConcurrentHashMap<ConnectionParameter, DroneManager> droneManagers = new ConcurrentHashMap<>();
 
-    private HandlerThread handlerThread;
+//    private HandlerThread handlerThread;
 
     private DPServices dpServices;
     private DroneAccess droneAccess;
@@ -86,7 +85,7 @@ public class DroidPlannerService extends Service {
         if (listener == null)
             return null;
 
-        DroneApi droneApi = new DroneApi(this, handlerThread.getLooper(), mavlinkApi, listener, appId);
+        DroneApi droneApi = new DroneApi(this, Looper.getMainLooper(), listener, appId);
         droneApiStore.put(appId, droneApi);
         lbm.sendBroadcast(new Intent(ACTION_DRONE_CREATED));
         updateForegroundNotification();
@@ -106,15 +105,14 @@ public class DroidPlannerService extends Service {
         }
     }
 
-    DroneManager connectDroneManager(ConnectionParameter connParams, String appId,
-                                     DroneEventsListener listener) throws ConnectionException {
+    DroneManager connectDroneManager(ConnectionParameter connParams, String appId, DroneEventsListener listener) throws ConnectionException {
         if (connParams == null || TextUtils.isEmpty(appId) || listener == null)
             return null;
 
         DroneManager droneMgr = droneManagers.get(connParams);
         if (droneMgr == null) {
             Log.d(TAG, "Generating new drone manager.");
-            droneMgr = new DroneManager(getApplicationContext(), connParams, new Handler(handlerThread.getLooper()),
+            droneMgr = new DroneManager(getApplicationContext(), connParams, new Handler(Looper.getMainLooper()),
                     mavlinkApi);
             droneManagers.put(connParams, droneMgr);
         }
@@ -279,8 +277,8 @@ public class DroidPlannerService extends Service {
 
         final Context context = getApplicationContext();
 
-        handlerThread = new HandlerThread("Connected apps looper");
-        handlerThread.start();
+//        handlerThread = new HandlerThread("Connected apps looper");
+//        handlerThread.start();
 
         mavlinkApi = new MavLinkServiceApi(this);
         droneAccess = new DroneAccess(this);
@@ -302,11 +300,10 @@ public class DroidPlannerService extends Service {
                         MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK), 0));
 
         final int connectedCount = droneApiStore.size();
-        if(connectedCount > 0){
-            if(connectedCount == 1){
+        if (connectedCount > 0) {
+            if (connectedCount == 1) {
                 notifBuilder.setContentText("1 connected app");
-            }
-            else{
+            } else {
                 notifBuilder.setContentText(connectedCount + " connected apps");
             }
         }
@@ -334,7 +331,7 @@ public class DroidPlannerService extends Service {
 
         mavConnections.clear();
         dpServices.destroy();
-        handlerThread.quit();
+//        handlerThread.quit();
 
         stopForeground(true);
     }

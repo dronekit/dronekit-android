@@ -15,6 +15,13 @@ public class AttributeEvent {
     public static final String AUTOPILOT_FAILSAFE = PACKAGE_NAME + ".AUTOPILOT_FAILSAFE";
 
     /**
+     * Event describing a message received from the autopilot.
+     * The message content can be retrieved using the {@link com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra#EXTRA_AUTOPILOT_MESSAGE} key.
+     * The message level can be retrieved using the {@link com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra#EXTRA_AUTOPILOT_MESSAGE_LEVEL} key.
+     */
+    public static final String AUTOPILOT_MESSAGE = PACKAGE_NAME + ".AUTOPILOT_MESSAGE";
+
+    /**
      * Signals the start of magnetometer calibration.
      */
     public static final String CALIBRATION_MAG_STARTED = PACKAGE_NAME +

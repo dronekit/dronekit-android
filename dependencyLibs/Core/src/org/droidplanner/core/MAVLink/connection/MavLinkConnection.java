@@ -7,7 +7,6 @@ import org.droidplanner.core.model.Logger;
 import org.droidplanner.core.util.Pair;
 
 import java.io.BufferedOutputStream;
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -229,7 +228,8 @@ public abstract class MavLinkConnection {
                 for (Pair<String, BufferedOutputStream> entry : loggingOutStreams.values()) {
                     final String loggingFilePath = entry.first;
                     try {
-                        entry.second.close();
+                        if (entry.second != null)
+                            entry.second.close();
                     } catch (IOException e) {
                         mLogger.logErr(TAG, "IO Exception while closing " + loggingFilePath, e);
                     }
