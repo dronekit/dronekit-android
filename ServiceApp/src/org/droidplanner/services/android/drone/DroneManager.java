@@ -30,7 +30,6 @@ import org.droidplanner.services.android.interfaces.DroneEventsListener;
 import org.droidplanner.services.android.location.FusedLocation;
 import org.droidplanner.services.android.utils.AndroidApWarningParser;
 import org.droidplanner.services.android.utils.analytics.GAUtils;
-import org.droidplanner.services.android.utils.file.IO.CameraInfoLoader;
 import org.droidplanner.services.android.utils.prefs.DroidPlannerPrefs;
 
 import java.util.List;
@@ -134,6 +133,13 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream,
             mavClient.openConnection();
         } else {
             listener.onDroneEvent(DroneInterfaces.DroneEventsType.CONNECTED, drone);
+
+            if (drone.isConnectionAlive())
+                listener.onDroneEvent(DroneInterfaces.DroneEventsType.HEARTBEAT_FIRST, drone);
+            else
+                listener.onDroneEvent(DroneInterfaces.DroneEventsType.HEARTBEAT_TIMEOUT, drone);
+
+
             notifyConnected(appId, listener);
         }
 
@@ -152,7 +158,7 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream,
         }
     }
 
-    public int getConnectedAppsCount(){
+    public int getConnectedAppsCount() {
         return connectedApps.size();
     }
 
@@ -406,11 +412,11 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream,
 
     @Override
     public void onMessageLogged(int mavSeverity, String message) {
-        if(connectedApps.isEmpty())
+        if (connectedApps.isEmpty())
             return;
 
         final int logLevel;
-        switch(mavSeverity){
+        switch (mavSeverity) {
             case MAV_SEVERITY.MAV_SEVERITY_ALERT:
             case MAV_SEVERITY.MAV_SEVERITY_CRITICAL:
             case MAV_SEVERITY.MAV_SEVERITY_EMERGENCY:
@@ -436,7 +442,7 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream,
                 break;
         }
 
-        for(DroneEventsListener listener: connectedApps.values()){
+        for (DroneEventsListener listener : connectedApps.values()) {
             listener.onMessageLogged(logLevel, message);
         }
     }
