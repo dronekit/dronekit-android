@@ -97,8 +97,7 @@ public interface Drone {
 	
 	public Magnetometer getMagnetometer();
 
-	public void setAltitudeGroundAndAirSpeeds(double altitude, double groundSpeed, double airSpeed,
-			double climb);
+	public void setAltitudeGroundAndAirSpeeds(double altitude, double groundSpeed, double airSpeed, double climb);
 
 	public void setDisttowpAndSpeedAltErrors(double disttowp, double alt_error, double aspd_error);
 

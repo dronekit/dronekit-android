@@ -24,6 +24,9 @@ import com.MAVLink.enums.MAV_STATE;
 import org.droidplanner.core.helpers.coordinates.Coord2D;
 import org.droidplanner.core.model.Drone;
 
+/**
+ * Parse the received mavlink messages, and update the drone state appropriately.
+ */
 public class MavLinkMsgHandler {
 
     private static final byte SEVERITY_HIGH = 3;
@@ -49,14 +52,17 @@ public class MavLinkMsgHandler {
                 drone.getOrientation().setRollPitchYaw(m_att.roll * 180.0 / Math.PI,
                         m_att.pitch * 180.0 / Math.PI, m_att.yaw * 180.0 / Math.PI);
                 break;
+
             case msg_vfr_hud.MAVLINK_MSG_ID_VFR_HUD:
                 msg_vfr_hud m_hud = (msg_vfr_hud) msg;
                 drone.setAltitudeGroundAndAirSpeeds(m_hud.alt, m_hud.groundspeed, m_hud.airspeed,
                         m_hud.climb);
                 break;
+
             case msg_mission_current.MAVLINK_MSG_ID_MISSION_CURRENT:
                 drone.getMissionStats().setWpno(((msg_mission_current) msg).seq);
                 break;
+
             case msg_nav_controller_output.MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT:
                 msg_nav_controller_output m_nav = (msg_nav_controller_output) msg;
                 drone.setDisttowpAndSpeedAltErrors(m_nav.wp_dist, m_nav.alt_error, m_nav.aspd_error);
@@ -84,31 +90,38 @@ public class MavLinkMsgHandler {
                         new Coord2D(((msg_global_position_int) msg).lat / 1E7,
                                 ((msg_global_position_int) msg).lon / 1E7));
                 break;
+
             case msg_sys_status.MAVLINK_MSG_ID_SYS_STATUS:
                 msg_sys_status m_sys = (msg_sys_status) msg;
                 drone.getBattery().setBatteryState(m_sys.voltage_battery / 1000.0,
                         m_sys.battery_remaining, m_sys.current_battery / 100.0);
                 break;
+
             case msg_radio.MAVLINK_MSG_ID_RADIO:
                 msg_radio m_radio = (msg_radio) msg;
                 drone.getRadio().setRadioState(m_radio.rxerrors, m_radio.fixed, m_radio.rssi,
                         m_radio.remrssi, m_radio.txbuf, m_radio.noise, m_radio.remnoise);
                 break;
+
             case msg_radio_status.MAVLINK_MSG_ID_RADIO_STATUS:
                 msg_radio_status m_radio_status = (msg_radio_status) msg;
                 drone.getRadio().setRadioState(m_radio_status.rxerrors, m_radio_status.fixed, m_radio_status.rssi,
                         m_radio_status.remrssi, m_radio_status.txbuf, m_radio_status.noise, m_radio_status.remnoise);
                 break;
+
             case msg_gps_raw_int.MAVLINK_MSG_ID_GPS_RAW_INT:
                 drone.getGps().setGpsState(((msg_gps_raw_int) msg).fix_type,
                         ((msg_gps_raw_int) msg).satellites_visible, ((msg_gps_raw_int) msg).eph);
                 break;
+
             case msg_rc_channels_raw.MAVLINK_MSG_ID_RC_CHANNELS_RAW:
                 drone.getRC().setRcInputValues((msg_rc_channels_raw) msg);
                 break;
+
             case msg_servo_output_raw.MAVLINK_MSG_ID_SERVO_OUTPUT_RAW:
                 drone.getRC().setRcOutputValues((msg_servo_output_raw) msg);
                 break;
+
             case msg_statustext.MAVLINK_MSG_ID_STATUSTEXT:
                 // These are any warnings sent from APM:Copter with
                 // gcs_send_text_P()
@@ -119,12 +132,17 @@ public class MavLinkMsgHandler {
                 msg_statustext msg_statustext = (msg_statustext) msg;
                 processStatusText(msg_statustext);
                 break;
+
             case msg_camera_feedback.MAVLINK_MSG_ID_CAMERA_FEEDBACK:
                 drone.getCamera().newImageLocation((msg_camera_feedback) msg);
                 break;
+
             case msg_mount_status.MAVLINK_MSG_ID_MOUNT_STATUS:
                 drone.getCamera().updateMountOrientation(((msg_mount_status) msg));
                 break;
+
+
+
             default:
                 break;
         }
@@ -141,7 +159,7 @@ public class MavLinkMsgHandler {
         drone.getState().setIsFlying(isFlying);
     }
 
-    public void processState(msg_heartbeat msg_heart) {
+    private void processState(msg_heartbeat msg_heart) {
         checkArmState(msg_heart);
         checkFailsafe(msg_heart);
     }
