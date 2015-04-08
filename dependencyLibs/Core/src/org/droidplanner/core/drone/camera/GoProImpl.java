@@ -1,6 +1,5 @@
 package org.droidplanner.core.drone.camera;
 
-import android.util.SparseArray;
 
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.ardupilotmega.msg_gopro_get_request;
@@ -16,10 +15,12 @@ import org.droidplanner.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.core.drone.DroneInterfaces.Handler;
 import org.droidplanner.core.model.Drone;
 
+import java.util.HashMap;
+
 /**
  * Created by Fredia Huya-Kouadio on 4/7/15.
  */
-public class GoPro implements DroneInterfaces.OnDroneListener {
+public class GoProImpl implements DroneInterfaces.OnDroneListener {
 
     private static final long HEARTBEAT_TIMEOUT = 5000l; //ms
 
@@ -32,8 +33,8 @@ public class GoPro implements DroneInterfaces.OnDroneListener {
         }
     };
 
-    private final SparseArray<GetResponseHandler> getResponsesFutures = new SparseArray<>();
-    private final SparseArray<SetResponseHandler> setResponsesFutures = new SparseArray<>();
+    private final HashMap<Integer, GetResponseHandler> getResponsesFutures = new HashMap<>();
+    private final HashMap<Integer, SetResponseHandler> setResponsesFutures = new HashMap<>();
 
     private final msg_gopro_get_request scratchGetRequest = new msg_gopro_get_request();
     private final msg_gopro_set_request scratchSetRequest = new msg_gopro_set_request();
@@ -41,7 +42,7 @@ public class GoPro implements DroneInterfaces.OnDroneListener {
     private final Drone drone;
     private final Handler watchdog;
 
-    public GoPro(Drone drone, Handler handler) {
+    public GoProImpl(Drone drone, Handler handler) {
         this.drone = drone;
         this.watchdog = handler;
 
@@ -72,9 +73,8 @@ public class GoPro implements DroneInterfaces.OnDroneListener {
         if (response == null)
             return;
 
-        final SetResponseHandler responseHandler = setResponsesFutures.get(response.cmd_id);
+        final SetResponseHandler responseHandler = setResponsesFutures.remove((int) response.cmd_id);
         if (responseHandler != null) {
-            setResponsesFutures.delete(response.cmd_id);
             responseHandler.onResponse(response.cmd_id, response.result == 1);
         }
     }
@@ -88,9 +88,8 @@ public class GoPro implements DroneInterfaces.OnDroneListener {
         if (response == null)
             return;
 
-        final GetResponseHandler responseHandler = getResponsesFutures.get(response.cmd_id);
+        final GetResponseHandler responseHandler = getResponsesFutures.remove((int) response.cmd_id);
         if (responseHandler != null) {
-            getResponsesFutures.delete(response.cmd_id);
             responseHandler.onResponse(response.cmd_id, response.value);
         }
     }
@@ -159,14 +158,14 @@ public class GoPro implements DroneInterfaces.OnDroneListener {
     }
 
     private void sendSetRequest(int commandId, int value, SetResponseHandler future) {
-        setResponsesFutures.append(commandId, future);
+        setResponsesFutures.put(commandId, future);
         scratchSetRequest.cmd_id = (byte) commandId;
         scratchSetRequest.value = (byte) value;
         sendMavlinkPacket(scratchSetRequest.pack());
     }
 
     private void sendGetRequest(int commandId, GetResponseHandler future) {
-        getResponsesFutures.append(commandId, future);
+        getResponsesFutures.put(commandId, future);
         scratchGetRequest.cmd_id = (byte) commandId;
         sendMavlinkPacket(scratchGetRequest.pack());
     }

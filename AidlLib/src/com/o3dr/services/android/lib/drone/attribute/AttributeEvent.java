@@ -121,7 +121,12 @@ public class AttributeEvent {
     /**
      * Altitude's attribute events.
      */
-    public static final String ALTITUDE_400FT_EXCEEDED = PACKAGE_NAME +
-            ".ALTITUDE_400FT_EXCEEDED";
+    public static final String ALTITUDE_400FT_EXCEEDED = PACKAGE_NAME + ".ALTITUDE_400FT_EXCEEDED";
+
+    /**
+     * Broadcasts updates to the GoPro state.
+     * @see {@link com.o3dr.services.android.lib.drone.camera.GoPro}
+     */
+    public static final String GOPRO_STATE_UPDATED = PACKAGE_NAME + ".GOPRO_STATE_UPDATED";
 
 }

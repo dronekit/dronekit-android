@@ -146,15 +146,15 @@ public class MavLinkMsgHandler {
 
             //*************** GoPro messages handling **************//
             case msg_gopro_heartbeat.MAVLINK_MSG_ID_GOPRO_HEARTBEAT:
-                drone.getGoPro().onHeartBeat((msg_gopro_heartbeat) msg);
+                drone.getGoProImpl().onHeartBeat((msg_gopro_heartbeat) msg);
                 break;
 
             case msg_gopro_set_response.MAVLINK_MSG_ID_GOPRO_SET_RESPONSE:
-                drone.getGoPro().onResponseReceived((msg_gopro_set_response) msg);
+                drone.getGoProImpl().onResponseReceived((msg_gopro_set_response) msg);
                 break;
 
             case msg_gopro_get_response.MAVLINK_MSG_ID_GOPRO_GET_RESPONSE:
-                drone.getGoPro().onResponseReceived((msg_gopro_get_response)msg);
+                drone.getGoProImpl().onResponseReceived((msg_gopro_get_response)msg);
                 break;
 
             default:

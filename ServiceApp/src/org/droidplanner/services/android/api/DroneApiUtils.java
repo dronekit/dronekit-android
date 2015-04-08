@@ -10,6 +10,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.enums.MAV_TYPE;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
+import com.o3dr.services.android.lib.drone.camera.GoPro;
 import com.o3dr.services.android.lib.drone.mission.Mission;
 import com.o3dr.services.android.lib.drone.mission.MissionItemType;
 import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
@@ -38,6 +39,7 @@ import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
 import org.droidplanner.core.MAVLink.MavLinkArm;
 import org.droidplanner.core.MAVLink.command.doCmd.MavLinkDoCmds;
 import org.droidplanner.core.drone.DroneInterfaces;
+import org.droidplanner.core.drone.camera.GoProImpl;
 import org.droidplanner.core.drone.profiles.VehicleProfile;
 import org.droidplanner.core.drone.variables.Calibration;
 import org.droidplanner.core.drone.variables.Camera;
@@ -413,6 +415,14 @@ public class DroneApiUtils {
                 : null;
 
         return new Home(homePosition);
+    }
+
+    static GoPro getGoPro(Drone drone){
+        if(drone == null)
+            return new GoPro();
+
+        GoProImpl impl = drone.getGoProImpl();
+        return new GoPro(impl.isConnected(), impl.isRecording());
     }
 
     static Battery getBattery(Drone drone) {
@@ -797,5 +807,19 @@ public class DroneApiUtils {
 
         StructureScanner proxyScanner = (StructureScanner) ProxyUtils.getProxyMissionItem(updatedScan);
         return proxyScanner;
+    }
+
+    static void startVideoRecording(Drone drone) {
+        if(drone == null)
+            return;
+
+        drone.getGoProImpl().startRecording();
+    }
+
+    static void stopVideoRecording(Drone drone){
+        if(drone == null)
+            return;
+
+        drone.getGoProImpl().stopRecording();
     }
 }

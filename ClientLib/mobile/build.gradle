@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 
 ext {
     PUBLISH_ARTIFACT_ID = 'dronekit-android'
-    PUBLISH_VERSION = '2.2.19'
+    PUBLISH_VERSION = '2.2.20'
     PROJECT_DESCRIPTION = "DroneKit-Android Client Library"
     PROJECT_LABELS = ['3DR', '3DR Services', 'DroneAPI', 'Android', 'DroneKit']
     PROJECT_LICENSES = ['Apache-2.0']
@@ -17,7 +17,7 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 21
-        versionCode 20219
+        versionCode 20220
         versionName PUBLISH_VERSION
     }
 

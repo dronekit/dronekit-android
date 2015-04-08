@@ -21,6 +21,7 @@ import com.o3dr.services.android.lib.drone.action.StateActions;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
+import com.o3dr.services.android.lib.drone.camera.action.CameraActions;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionResult;
 import com.o3dr.services.android.lib.drone.connection.DroneSharePrefs;
@@ -206,6 +207,10 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 break;
             case AttributeType.CAMERA:
                 carrier.putParcelable(type, DroneApiUtils.getCameraProxy(drone, service.getCameraDetails()));
+                break;
+
+            case AttributeType.GOPRO:
+                carrier.putParcelable(type, DroneApiUtils.getGoPro(drone));
                 break;
         }
 
@@ -459,6 +464,15 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
             case FollowMeActions.ACTION_DISABLE_FOLLOW_ME:
                 DroneApiUtils.disableFollowMe(getFollowMe());
+                break;
+
+            //************ CAMERA ACTIONS *************//
+            case CameraActions.ACTION_START_VIDEO_RECORDING:
+                DroneApiUtils.startVideoRecording(getDrone());
+                break;
+
+            case CameraActions.ACTION_STOP_VIDEO_RECORDING:
+                DroneApiUtils.stopVideoRecording(getDrone());
                 break;
         }
     }
@@ -755,6 +769,10 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
             case FOOTPRINT:
                 droneEvent = AttributeEvent.CAMERA_FOOTPRINTS_UPDATED;
+                break;
+
+            case GOPRO_STATUS_UPDATE:
+                droneEvent = AttributeEvent.GOPRO_STATE_UPDATED;
                 break;
         }
 
