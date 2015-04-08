@@ -240,6 +240,11 @@ public class DroneInterfaces {
 		 * The drone camera footprints has been updated
 		 */
 		FOOTPRINT,
+
+        /**
+         * The gopro status was updated.
+         */
+        GOPRO_STATUS_UPDATE,
 	}
 
 	public interface OnDroneListener {

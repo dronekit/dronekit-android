@@ -3,6 +3,9 @@ package org.droidplanner.core.MAVLink;
 import com.MAVLink.Messages.ApmModes;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.ardupilotmega.msg_camera_feedback;
+import com.MAVLink.ardupilotmega.msg_gopro_get_response;
+import com.MAVLink.ardupilotmega.msg_gopro_heartbeat;
+import com.MAVLink.ardupilotmega.msg_gopro_set_response;
 import com.MAVLink.ardupilotmega.msg_mount_status;
 import com.MAVLink.ardupilotmega.msg_radio;
 import com.MAVLink.common.msg_attitude;
@@ -141,7 +144,18 @@ public class MavLinkMsgHandler {
                 drone.getCamera().updateMountOrientation(((msg_mount_status) msg));
                 break;
 
+            //*************** GoPro messages handling **************//
+            case msg_gopro_heartbeat.MAVLINK_MSG_ID_GOPRO_HEARTBEAT:
+                drone.getGoPro().onHeartBeat((msg_gopro_heartbeat) msg);
+                break;
 
+            case msg_gopro_set_response.MAVLINK_MSG_ID_GOPRO_SET_RESPONSE:
+                drone.getGoPro().onResponseReceived((msg_gopro_set_response) msg);
+                break;
+
+            case msg_gopro_get_response.MAVLINK_MSG_ID_GOPRO_GET_RESPONSE:
+                drone.getGoPro().onResponseReceived((msg_gopro_get_response)msg);
+                break;
 
             default:
                 break;
