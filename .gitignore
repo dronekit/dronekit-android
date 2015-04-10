@@ -41,3 +41,6 @@ crashlytics.properties
 
 # Temporary files on Linxu
 *~
+
+# Vagrant
+.vagrant/
