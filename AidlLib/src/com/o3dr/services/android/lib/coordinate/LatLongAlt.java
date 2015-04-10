@@ -18,6 +18,11 @@ public class LatLongAlt extends LatLong {
         mAltitude = altitude;
     }
 
+    public LatLongAlt(LatLong location, double altitude){
+        super(location);
+        mAltitude = altitude;
+    }
+
     public LatLongAlt(LatLongAlt copy) {
         this(copy.getLatitude(), copy.getLongitude(), copy.getAltitude());
     }
