@@ -8,6 +8,8 @@ import android.os.Parcelable;
  */
 public class LatLongAlt extends LatLong {
 
+    private static final long serialVersionUID =-4771550293045623743L;
+
     /**
      * Stores the altitude in meters.
      */
