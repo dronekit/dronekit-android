@@ -20,7 +20,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -131,7 +134,7 @@ public class RecommendedAppsAdapter extends RecyclerView.Adapter<RecommendedApps
             if (cachedBmp != null) {
                 appImageView.setImageBitmap(cachedBmp);
             } else if (appIconUrl != null) {
-                new DownloadImageTask(appId, appImageView, appsIconPerId).execute(appIconUrl);
+                new DownloadImageTask(this.context, appId, appImageView, appsIconPerId).execute(appIconUrl);
             }
 
             viewHolder.actionButtonContainer.setVisibility(View.VISIBLE);
@@ -162,25 +165,57 @@ public class RecommendedAppsAdapter extends RecyclerView.Adapter<RecommendedApps
     }
 
     private static class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
+
+        private static final String ROOT_DIR = "/app_store/icons";
+        private static final int BUFFER_SIZE = 1024;
+
         final ImageView bmImage;
         final String appId;
         final Map<String, Bitmap> cachedMap;
+        final File appIconFile;
 
-        public DownloadImageTask(String appId, ImageView bmImage, Map<String, Bitmap> cachedMap) {
+        public DownloadImageTask(Context context, String appId, ImageView bmImage, Map<String, Bitmap> cachedMap) {
             this.bmImage = bmImage;
             this.appId = appId;
             this.cachedMap = cachedMap;
+
+            final File rootDir = new File(context.getExternalFilesDir(null), ROOT_DIR);
+            if (!rootDir.exists() && !rootDir.mkdirs()) {
+                throw new IllegalStateException("Unable to create app store icons cache directory.");
+            }
+
+            this.appIconFile = new File(rootDir, appId);
         }
 
         protected Bitmap doInBackground(String... urls) {
+            Bitmap mIcon11 = null;
+            if (this.appIconFile.isFile() && this.appIconFile.length() > 0) {
+                mIcon11 = BitmapFactory.decodeFile(this.appIconFile.getAbsolutePath());
+                if (mIcon11 != null)
+                    return mIcon11;
+            }
+
             String urlDisplay = urls[0];
-            if(urlDisplay == null)
+            if (urlDisplay == null)
                 return null;
 
-            Bitmap mIcon11 = null;
             try {
-                InputStream in = new URL(urlDisplay).openStream();
-                mIcon11 = BitmapFactory.decodeStream(in);
+                BufferedInputStream in = new BufferedInputStream(new URL(urlDisplay).openStream());
+                final FileOutputStream fos = new FileOutputStream(this.appIconFile);
+
+                final byte[] writeBuffer = new byte[BUFFER_SIZE];
+                int byteCount;
+                do {
+                    byteCount = in.read(writeBuffer);
+                    if (byteCount > -1) {
+                        fos.write(writeBuffer, 0, byteCount);
+                        fos.flush();
+                    }
+                } while (byteCount != -1);
+
+                fos.close();
+
+                mIcon11 = BitmapFactory.decodeFile(this.appIconFile.getAbsolutePath());
             } catch (Exception e) {
                 Log.e(TAG, e.getMessage(), e);
             }
@@ -189,11 +224,11 @@ public class RecommendedAppsAdapter extends RecyclerView.Adapter<RecommendedApps
         }
 
         protected void onPostExecute(Bitmap result) {
-            if(result != null) {
-                if(bmImage != null)
+            if (result != null) {
+                if (bmImage != null)
                     bmImage.setImageBitmap(result);
 
-                if(cachedMap != null && appId != null)
+                if (cachedMap != null)
                     cachedMap.put(appId, result);
             }
         }
