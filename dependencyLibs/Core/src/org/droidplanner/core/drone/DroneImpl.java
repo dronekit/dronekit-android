@@ -99,11 +99,9 @@ public class DroneImpl implements Drone {
 	}
 
 	@Override
-	public void setAltitudeGroundAndAirSpeeds(double altitude, double groundSpeed, double airSpeed,
-			double climb) {
+	public void setAltitudeGroundAndAirSpeeds(double altitude, double groundSpeed, double airSpeed,	double climb) {
 		this.altitude.setAltitude(altitude);
 		speed.setGroundAndAirSpeeds(groundSpeed, airSpeed, climb);
-	    notifyDroneEvent(DroneInterfaces.DroneEventsType.SPEED);
 	}
 
 	@Override

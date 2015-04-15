@@ -11,7 +11,6 @@ import org.droidplanner.core.helpers.coordinates.Coord3D;
 import org.droidplanner.core.helpers.geoTools.GeoTools;
 import org.droidplanner.core.helpers.units.Altitude;
 import org.droidplanner.core.helpers.units.Length;
-import org.droidplanner.core.helpers.units.Speed;
 import org.droidplanner.core.mission.commands.CameraTrigger;
 import org.droidplanner.core.mission.commands.ChangeSpeed;
 import org.droidplanner.core.mission.commands.ConditionYaw;
@@ -351,9 +350,9 @@ public class Mission extends DroneVariable {
 		final int roiDistance = -8;
 		Coord2D slowDownPoint = GeoTools.pointAlongTheLine(start, end, 5);
 
-		Speed defaultSpeed = myDrone.getSpeed().getSpeedParameter();
-		if (defaultSpeed == null) {
-			defaultSpeed = new Speed(5);
+		double defaultSpeed = myDrone.getSpeed().getSpeedParameter();
+		if (defaultSpeed == -1) {
+			defaultSpeed = 5;
 		}
 
 		List<MissionItem> dronieItems = new ArrayList<MissionItem>();
@@ -364,7 +363,7 @@ public class Mission extends DroneVariable {
 				+ GeoTools.getDistance(start, end).valueInMeters() / 2.0))));
 		dronieItems.add(new Waypoint(this, new Coord3D(slowDownPoint, new Altitude(startAltitude
 				+ GeoTools.getDistance(start, slowDownPoint).valueInMeters() / 2.0))));
-		dronieItems.add(new ChangeSpeed(this, new Speed(1.0)));
+		dronieItems.add(new ChangeSpeed(this, 1.0));
 		dronieItems.add(new Waypoint(this, new Coord3D(start, new Altitude(startAltitude))));
 		dronieItems.add(new ChangeSpeed(this, defaultSpeed));
 		dronieItems.add(new Land(this, start));

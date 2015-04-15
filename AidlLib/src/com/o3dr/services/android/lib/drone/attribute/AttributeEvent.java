@@ -121,7 +121,7 @@ public class AttributeEvent {
     /**
      * Altitude's attribute events.
      */
-    public static final String ALTITUDE_400FT_EXCEEDED = PACKAGE_NAME + ".ALTITUDE_400FT_EXCEEDED";
+    public static final String ALTITUDE_UPDATED = PACKAGE_NAME + ".ALTITUDE_UPDATED";
 
     /**
      * Broadcasts updates to the GoPro state.

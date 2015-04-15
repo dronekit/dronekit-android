@@ -752,8 +752,8 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 droneEvent = AttributeEvent.FOLLOW_UPDATE;
                 break;
 
-            case WARNING_400FT_EXCEEDED:
-                droneEvent = AttributeEvent.ALTITUDE_400FT_EXCEEDED;
+            case ALTITUDE:
+                droneEvent = AttributeEvent.ALTITUDE_UPDATED;
                 break;
 
             case WARNING_SIGNAL_WEAK:

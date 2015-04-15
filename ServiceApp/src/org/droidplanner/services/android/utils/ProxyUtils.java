@@ -24,7 +24,6 @@ import com.o3dr.services.android.lib.drone.mission.item.spatial.Waypoint;
 import org.droidplanner.core.helpers.coordinates.Coord2D;
 import org.droidplanner.core.helpers.units.Altitude;
 import org.droidplanner.core.helpers.units.Length;
-import org.droidplanner.core.helpers.units.Speed;
 import org.droidplanner.core.mission.Mission;
 import org.droidplanner.core.mission.commands.ConditionYaw;
 import org.droidplanner.core.mission.commands.ReturnToHome;
@@ -95,7 +94,7 @@ public class ProxyUtils {
                 ChangeSpeed proxy = (ChangeSpeed) proxyItem;
 
                 org.droidplanner.core.mission.commands.ChangeSpeed temp = new org.droidplanner
-                        .core.mission.commands.ChangeSpeed(mission, new Speed(proxy.getSpeed()));
+                        .core.mission.commands.ChangeSpeed(mission, proxy.getSpeed());
 
                 missionItemImpl = temp;
                 break;
@@ -388,7 +387,7 @@ public class ProxyUtils {
                 org.droidplanner.core.mission.commands.ChangeSpeed source = (org.droidplanner.core.mission.commands.ChangeSpeed) itemImpl;
 
                 ChangeSpeed temp = new ChangeSpeed();
-                temp.setSpeed(source.getSpeed().valueInMetersPerSecond());
+                temp.setSpeed(source.getSpeed());
 
                 proxyMissionItem = temp;
                 break;

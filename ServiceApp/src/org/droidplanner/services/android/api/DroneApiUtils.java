@@ -390,9 +390,7 @@ public class DroneApiUtils {
             return new Speed();
 
         org.droidplanner.core.drone.variables.Speed droneSpeed = drone.getSpeed();
-        return new Speed(droneSpeed.getVerticalSpeed().valueInMetersPerSecond(),
-                droneSpeed.getGroundSpeed().valueInMetersPerSecond(),
-                droneSpeed.getAirSpeed().valueInMetersPerSecond());
+        return new Speed(droneSpeed.getVerticalSpeed(), droneSpeed.getGroundSpeed(), droneSpeed.getAirSpeed());
     }
 
     static Attitude getAttitude(Drone drone) {
