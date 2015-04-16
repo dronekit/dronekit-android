@@ -97,6 +97,7 @@ public class AttributeEvent {
      */
     public static final String STATE_UPDATED = PACKAGE_NAME + ".STATE_UPDATED";
     public static final String STATE_ARMING = PACKAGE_NAME + ".STATE_ARMING";
+    public static final String STATE_CONNECTING = PACKAGE_NAME + ".STATE_CONNECTING";
     public static final String STATE_CONNECTED = PACKAGE_NAME + ".STATE_CONNECTED";
     public static final String STATE_DISCONNECTED = PACKAGE_NAME + ".STATE_DISCONNECTED";
     public static final String STATE_VEHICLE_MODE = PACKAGE_NAME + ".STATE_VEHICLE_MODE";
