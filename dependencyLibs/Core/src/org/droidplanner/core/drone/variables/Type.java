@@ -65,8 +65,10 @@ public class Type extends DroneVariable implements DroneInterfaces.OnDroneListen
 	}
 
 	public void setFirmwareVersion(String message) {
-		firmwareVersion = message;
-		myDrone.notifyDroneEvent(DroneEventsType.FIRMWARE);
+        if(firmwareVersion == null || !firmwareVersion.equals(message)) {
+            firmwareVersion = message;
+            myDrone.notifyDroneEvent(DroneEventsType.FIRMWARE);
+        }
 	}
 
     public static boolean isCopter(int type){

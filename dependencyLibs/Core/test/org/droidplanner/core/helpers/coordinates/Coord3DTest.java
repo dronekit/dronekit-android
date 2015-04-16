@@ -7,7 +7,7 @@ import org.droidplanner.core.helpers.units.Altitude;
 public class Coord3DTest extends TestCase {
 
 	public void testConstructor() {
-		Altitude alt = new Altitude(50.0);
+		double alt = (50.0);
 		Coord3D point = new Coord3D(10, -5.6, alt);
 		assertEquals(10.0, point.getX());
 		assertEquals(-5.6, point.getY());
@@ -15,7 +15,7 @@ public class Coord3DTest extends TestCase {
 	}
 
 	public void testConstFrom2dCoord() {
-		Altitude alt = new Altitude(5.0);
+		double alt = (5.0);
 		Coord2D point2d = new Coord2D(1, -0.6);
 		Coord3D point = new Coord3D(point2d, alt);
 
@@ -25,7 +25,7 @@ public class Coord3DTest extends TestCase {
 	}
 
 	public void testSet() {
-		Altitude alt = new Altitude(50.0);
+		double alt = (50.0);
 		Coord3D point = new Coord3D(10, -5.6, alt);
 		point.set(0, 0, alt);
 		assertEquals(0.0, point.getX());

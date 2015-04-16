@@ -446,8 +446,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                                     final Coord2D roiTarget;
                                     if (target instanceof LatLongAlt) {
                                         roiTarget = new Coord3D(target.getLatitude(), target.getLongitude(),
-                                                new org.droidplanner.core.helpers.units.Altitude(((LatLongAlt) target)
-                                                        .getAltitude()));
+                                                ((LatLongAlt) target).getAltitude());
                                     } else {
                                         roiTarget = new Coord2D(target.getLatitude(), target.getLongitude());
                                     }

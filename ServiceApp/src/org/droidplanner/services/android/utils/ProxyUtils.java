@@ -22,8 +22,6 @@ import com.o3dr.services.android.lib.drone.mission.item.spatial.SplineWaypoint;
 import com.o3dr.services.android.lib.drone.mission.item.spatial.Waypoint;
 
 import org.droidplanner.core.helpers.coordinates.Coord2D;
-import org.droidplanner.core.helpers.units.Altitude;
-import org.droidplanner.core.helpers.units.Length;
 import org.droidplanner.core.mission.Mission;
 import org.droidplanner.core.mission.commands.ConditionYaw;
 import org.droidplanner.core.mission.commands.ReturnToHome;
@@ -41,14 +39,14 @@ public class ProxyUtils {
     private static final String TAG = ProxyUtils.class.getSimpleName();
 
     public static CameraDetail getCameraDetail(CameraInfo camInfo) {
-        if(camInfo == null) return null;
+        if (camInfo == null) return null;
         return new CameraDetail(camInfo.name, camInfo.sensorWidth,
                 camInfo.sensorHeight, camInfo.sensorResolution, camInfo.focalLength,
                 camInfo.overlap, camInfo.sidelap, camInfo.isInLandscapeOrientation);
     }
 
-    public static CameraInfo getCameraInfo(CameraDetail camDetail){
-        if(camDetail == null) return null;
+    public static CameraInfo getCameraInfo(CameraDetail camDetail) {
+        if (camDetail == null) return null;
 
         CameraInfo camInfo = new CameraInfo();
         camInfo.name = camDetail.getName();
@@ -69,7 +67,7 @@ public class ProxyUtils {
         surveyDetail.setSidelap(surveyData.getSidelap());
         surveyDetail.setOverlap(surveyData.getOverlap());
         surveyDetail.setAngle(surveyData.getAngle());
-        surveyDetail.setAltitude(surveyData.getAltitude().valueInMeters());
+        surveyDetail.setAltitude(surveyData.getAltitude());
         return surveyDetail;
     }
 
@@ -84,8 +82,7 @@ public class ProxyUtils {
                 CameraTrigger proxy = (CameraTrigger) proxyItem;
 
                 org.droidplanner.core.mission.commands.CameraTrigger temp = new org.droidplanner
-                        .core.mission.commands.CameraTrigger(mission,
-                        new Length(proxy.getTriggerDistance()));
+                        .core.mission.commands.CameraTrigger(mission, (proxy.getTriggerDistance()));
 
                 missionItemImpl = temp;
                 break;
@@ -112,7 +109,7 @@ public class ProxyUtils {
                 ReturnToLaunch proxy = (ReturnToLaunch) proxyItem;
 
                 ReturnToHome temp = new ReturnToHome(mission);
-                temp.setHeight(new Altitude(proxy.getReturnAltitude()));
+                temp.setHeight((proxy.getReturnAltitude()));
 
                 missionItemImpl = temp;
                 break;
@@ -130,7 +127,7 @@ public class ProxyUtils {
                 Takeoff proxy = (Takeoff) proxyItem;
 
                 org.droidplanner.core.mission.commands.Takeoff temp = new org.droidplanner.core
-                        .mission.commands.Takeoff(mission, new Altitude(proxy.getTakeoffAltitude()));
+                        .mission.commands.Takeoff(mission, (proxy.getTakeoffAltitude()));
 
                 missionItemImpl = temp;
                 break;
@@ -190,7 +187,7 @@ public class ProxyUtils {
                 temp.enableCrossHatch(proxy.isCrossHatch());
 
                 CameraDetail camDetail = proxy.getSurveyDetail().getCameraDetail();
-                if(camDetail != null)
+                if (camDetail != null)
                     temp.setCamera(getCameraInfo(camDetail));
 
                 missionItemImpl = temp;
@@ -219,12 +216,12 @@ public class ProxyUtils {
                 org.droidplanner.core.mission.survey.Survey temp = new org.droidplanner.core
                         .mission.survey.Survey(mission, polygonPoints);
 
-                if(surveyDetail != null) {
+                if (surveyDetail != null) {
                     CameraDetail cameraDetail = surveyDetail.getCameraDetail();
-                    if(cameraDetail != null)
+                    if (cameraDetail != null)
                         temp.setCameraInfo(getCameraInfo(cameraDetail));
 
-                    temp.update(surveyDetail.getAngle(), new Altitude(surveyDetail.getAltitude()),
+                    temp.update(surveyDetail.getAngle(), (surveyDetail.getAltitude()),
                             surveyDetail.getOverlap(), surveyDetail.getSidelap());
                 }
 
@@ -296,7 +293,7 @@ public class ProxyUtils {
                 org.droidplanner.core.mission.commands.Takeoff source = (org.droidplanner.core.mission.commands.Takeoff) itemImpl;
 
                 Takeoff temp = new Takeoff();
-                temp.setTakeoffAltitude(source.getFinishedAlt().valueInMeters());
+                temp.setTakeoffAltitude(source.getFinishedAlt());
 
                 proxyMissionItem = temp;
                 break;
@@ -305,7 +302,7 @@ public class ProxyUtils {
                 ReturnToHome source = (ReturnToHome) itemImpl;
 
                 ReturnToLaunch temp = new ReturnToLaunch();
-                temp.setReturnAltitude(source.getHeight().valueInMeters());
+                temp.setReturnAltitude(source.getHeight());
 
                 proxyMissionItem = temp;
                 break;
@@ -357,7 +354,7 @@ public class ProxyUtils {
                 temp.setSurveyDetail(getSurveyDetail(source.surveyData));
                 temp.setPolygonPoints(MathUtils.coord2DToLatLong(source.polygon.getPoints()));
 
-                if(source.grid != null) {
+                if (source.grid != null) {
                     temp.setGridPoints(MathUtils.coord2DToLatLong(source.grid.gridPoints));
                     temp.setCameraLocations(MathUtils.coord2DToLatLong(source.grid.getCameraLocations()));
                 }
@@ -374,9 +371,9 @@ public class ProxyUtils {
                 StructureScanner temp = new StructureScanner();
                 temp.setSurveyDetail(getSurveyDetail(source.getSurveyData()));
                 temp.setCoordinate(MathUtils.coord3DToLatLongAlt(source.getCoordinate()));
-                temp.setRadius(source.getRadius().valueInMeters());
+                temp.setRadius(source.getRadius());
                 temp.setCrossHatch(source.isCrossHatchEnabled());
-                temp.setHeightStep(source.getEndAltitude().valueInMeters());
+                temp.setHeightStep(source.getEndAltitude());
                 temp.setStepsCount(source.getNumberOfSteps());
                 temp.setPath(MathUtils.coord2DToLatLong(source.getPath()));
 
@@ -397,7 +394,7 @@ public class ProxyUtils {
                 org.droidplanner.core.mission.commands.CameraTrigger source = (org.droidplanner.core.mission.commands.CameraTrigger) itemImpl;
 
                 CameraTrigger temp = new CameraTrigger();
-                temp.setTriggerDistance(source.getTriggerDistance().valueInMeters());
+                temp.setTriggerDistance(source.getTriggerDistance());
 
                 proxyMissionItem = temp;
                 break;
@@ -434,7 +431,7 @@ public class ProxyUtils {
                 break;
             }
 
-            case SET_RELAY:{
+            case SET_RELAY: {
                 SetRelayImpl impl = (SetRelayImpl) itemImpl;
 
                 SetRelay proxy = new SetRelay();

@@ -66,9 +66,18 @@ public class GPS extends DroneVariable {
 		}
 	}
 
-	public void setPosition(Coord2D position) {
-		if (this.position != position) {
-			this.position = position;
+	public void setPosition(double latitude, double longitude) {
+        boolean positionUpdated = false;
+        if(this.position == null){
+            this.position = new Coord2D(latitude, longitude);
+            positionUpdated = true;
+        }
+        else if(this.position.getLat() != latitude || this.position.getLng() != longitude){
+            this.position.set(latitude, longitude);
+            positionUpdated = true;
+        }
+
+		if (positionUpdated) {
 			myDrone.notifyDroneEvent(DroneEventsType.GPS);
 		}
 	}

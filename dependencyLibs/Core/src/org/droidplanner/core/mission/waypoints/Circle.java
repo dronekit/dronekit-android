@@ -60,7 +60,7 @@ public class Circle extends SpatialCoordItem {
 		mavMsg.frame = MAV_FRAME.MAV_FRAME_GLOBAL_RELATIVE_ALT;
 		mavMsg.x = (float) coordinate.getLat();
 		mavMsg.y = (float) coordinate.getLng();
-		mavMsg.z = (float) (coordinate.getAltitude().valueInMeters());
+		mavMsg.z = (float) (coordinate.getAltitude());
 		mavMsg.command = MAV_CMD.MAV_CMD_NAV_LOITER_TURNS;
 		mavMsg.param1 = Math.abs(turns);
 		mavMsg.param3 = (float) radius;

@@ -1,12 +1,10 @@
 package org.droidplanner.core.gcs.follow;
 
 import org.droidplanner.core.drone.DroneInterfaces;
-import org.droidplanner.core.drone.variables.Altitude;
 import org.droidplanner.core.gcs.location.Location;
 import org.droidplanner.core.helpers.coordinates.Coord2D;
 import org.droidplanner.core.helpers.coordinates.Coord3D;
 import org.droidplanner.core.helpers.geoTools.GeoTools;
-import org.droidplanner.core.helpers.units.Length;
 import org.droidplanner.core.model.Drone;
 
 /**
@@ -18,10 +16,10 @@ public class FollowSplineLeash extends FollowWithRadiusAlgorithm {
         final Coord3D userLoc = location.getCoord();
         final Coord2D droneLoc = drone.getGps().getPosition();
 
-        if(userLoc == null || droneLoc == null)
+        if (userLoc == null || droneLoc == null)
             return;
 
-        if(GeoTools.getDistance(userLoc, droneLoc).valueInMeters() > radius){
+        if (GeoTools.getDistance(userLoc, droneLoc) > radius) {
             double headingGCSToDrone = GeoTools.getHeadingFromCoordinates(userLoc, droneLoc);
             Coord2D goCoord = GeoTools.newCoordFromBearingAndDistance(userLoc, headingGCSToDrone, radius);
 

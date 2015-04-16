@@ -74,7 +74,7 @@ public class State extends DroneVariable {
         if(parsedError == null || parsedError.trim().isEmpty())
             return false;
 
-        if (!this.errorType.equals(parsedError)) {
+        if (!parsedError.equals(this.errorType)) {
             this.errorType = parsedError;
             myDrone.notifyDroneEvent(DroneEventsType.AUTOPILOT_WARNING);
         }
@@ -121,9 +121,11 @@ public class State extends DroneVariable {
 	}
 
 	protected void resetWarning() {
-		final String defaultWarning = warningParser.getDefaultWarning();
+		String defaultWarning = warningParser.getDefaultWarning();
+        if(defaultWarning == null)
+            defaultWarning = "";
 
-        if (!this.errorType.equals(defaultWarning)) {
+        if (!defaultWarning.equals(this.errorType)) {
             this.errorType = defaultWarning;
             myDrone.notifyDroneEvent(DroneEventsType.AUTOPILOT_WARNING);
         }

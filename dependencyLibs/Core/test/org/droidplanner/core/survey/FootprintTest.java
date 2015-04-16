@@ -26,7 +26,7 @@ public class FootprintTest extends TestCase {
 	public void testGenericFootprint() throws Exception {
 		Footprint footprint = new Footprint(camera, new Altitude(100));
 	
-		assertEquals(120.0, footprint.getLateralSize().valueInMeters(),0.001);
+		assertEquals(120.0, footprint.getLateralSize(),0.001);
 		assertEquals(80.0, footprint.getLongitudinalSize().valueInMeters(),0.001);
 	}
 	

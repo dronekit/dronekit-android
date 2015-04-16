@@ -409,7 +409,7 @@ public class DroneApiUtils {
         org.droidplanner.core.drone.variables.Home droneHome = drone.getHome();
         LatLongAlt homePosition = droneHome.isValid()
                 ? new LatLongAlt(droneHome.getCoord().getLat(), droneHome.getCoord().getLng(),
-                droneHome.getAltitude().valueInMeters())
+                droneHome.getAltitude())
                 : null;
 
         return new Home(homePosition);
@@ -500,11 +500,8 @@ public class DroneApiUtils {
         Coord2D guidedCoord = guidedPoint.getCoord() == null
                 ? new Coord2D(0, 0)
                 : guidedPoint.getCoord();
-        double guidedAlt = guidedPoint.getAltitude() == null
-                ? 0
-                : guidedPoint.getAltitude().valueInMeters();
-        return new GuidedState(guidedState, new LatLongAlt(guidedCoord.getLat(),
-                guidedCoord.getLng(), guidedAlt));
+        double guidedAlt = guidedPoint.getAltitude();
+        return new GuidedState(guidedState, new LatLongAlt(guidedCoord.getLat(), guidedCoord.getLng(), guidedAlt));
     }
 
     static void changeVehicleMode(Drone drone, VehicleMode newMode) {
@@ -572,7 +569,7 @@ public class DroneApiUtils {
                     Coord3D target = (Coord3D) entry.getValue();
                     if (target != null) {
                         params.putParcelable(entry.getKey(), new LatLongAlt(target.getLat(), target.getLng(),
-                                target.getAltitude().valueInMeters()));
+                                target.getAltitude()));
                     }
                     break;
 
@@ -694,7 +691,7 @@ public class DroneApiUtils {
         if (drone == null)
             return;
 
-        drone.getGuidedPoint().doGuidedTakeoff(new org.droidplanner.core.helpers.units.Altitude(altitude));
+        drone.getGuidedPoint().doGuidedTakeoff(altitude);
     }
 
     static void sendMavlinkMessage(Drone drone, MavlinkMessageWrapper messageWrapper) {

@@ -58,8 +58,7 @@ public class MavLinkMsgHandler {
 
             case msg_vfr_hud.MAVLINK_MSG_ID_VFR_HUD:
                 msg_vfr_hud m_hud = (msg_vfr_hud) msg;
-                drone.setAltitudeGroundAndAirSpeeds(m_hud.alt, m_hud.groundspeed, m_hud.airspeed,
-                        m_hud.climb);
+                drone.setAltitudeGroundAndAirSpeeds(m_hud.alt, m_hud.groundspeed, m_hud.airspeed, m_hud.climb);
                 break;
 
             case msg_mission_current.MAVLINK_MSG_ID_MISSION_CURRENT:
@@ -69,8 +68,7 @@ public class MavLinkMsgHandler {
             case msg_nav_controller_output.MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT:
                 msg_nav_controller_output m_nav = (msg_nav_controller_output) msg;
                 drone.setDisttowpAndSpeedAltErrors(m_nav.wp_dist, m_nav.alt_error, m_nav.aspd_error);
-                drone.getNavigation().setNavPitchRollYaw(m_nav.nav_pitch, m_nav.nav_roll,
-                        m_nav.nav_bearing);
+                drone.getNavigation().setNavPitchRollYaw(m_nav.nav_pitch, m_nav.nav_roll, m_nav.nav_bearing);
                 break;
 
             case msg_raw_imu.MAVLINK_MSG_ID_RAW_IMU:
@@ -89,9 +87,8 @@ public class MavLinkMsgHandler {
                 break;
 
             case msg_global_position_int.MAVLINK_MSG_ID_GLOBAL_POSITION_INT:
-                drone.getGps().setPosition(
-                        new Coord2D(((msg_global_position_int) msg).lat / 1E7,
-                                ((msg_global_position_int) msg).lon / 1E7));
+                drone.getGps().setPosition(((msg_global_position_int) msg).lat / 1E7,
+                                ((msg_global_position_int) msg).lon / 1E7);
                 break;
 
             case msg_sys_status.MAVLINK_MSG_ID_SYS_STATUS:
