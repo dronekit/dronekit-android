@@ -1,5 +1,6 @@
 com.o3dr.android.client
 com.o3dr.android.client.apis.drone
+com.o3dr.android.client.apis.drone.camera
 com.o3dr.android.client.apis.gcs
 com.o3dr.android.client.apis.mission
 com.o3dr.android.client.data.tlog
@@ -10,6 +11,9 @@ com.o3dr.services.android.lib.coordinate
 com.o3dr.services.android.lib.data
 com.o3dr.services.android.lib.drone.action
 com.o3dr.services.android.lib.drone.attribute
+com.o3dr.services.android.lib.drone.attribute.error
+com.o3dr.services.android.lib.drone.camera
+com.o3dr.services.android.lib.drone.camera.action
 com.o3dr.services.android.lib.drone.connection
 com.o3dr.services.android.lib.drone.mission
 com.o3dr.services.android.lib.drone.mission.action
