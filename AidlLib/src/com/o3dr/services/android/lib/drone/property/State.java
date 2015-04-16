@@ -16,20 +16,20 @@ public class State implements Parcelable {
     private boolean isFlying;
     private String calibrationStatus;
     private VehicleMode vehicleMode = VehicleMode.UNKNOWN;
-    private String failsafeWarning;
+    private String autopilotError;
     private int mavlinkVersion = INVALID_MAVLINK_VERSION;
     private long flightStartTime;
 
     public State(){}
 
-    public State(boolean isConnected, VehicleMode mode, boolean armed, boolean flying, String failsafeWarning,
+    public State(boolean isConnected, VehicleMode mode, boolean armed, boolean flying, String autopilotError,
                  int mavlinkVersion, String calibrationStatus, long flightStartTime){
         this.isConnected = isConnected;
         this.vehicleMode = mode;
         this.armed = armed;
         this.isFlying = flying;
         this.flightStartTime = flightStartTime;
-        this.failsafeWarning = failsafeWarning;
+        this.autopilotError = autopilotError;
         this.mavlinkVersion = mavlinkVersion;
         this.calibrationStatus = calibrationStatus;
     }
@@ -74,16 +74,16 @@ public class State implements Parcelable {
         return vehicleMode;
     }
 
-    public String getFailsafeWarning() {
-        return failsafeWarning;
+    public String getAutopilotError() {
+        return autopilotError;
     }
 
-    public void setFailsafeWarning(String failsafeWarning) {
-        this.failsafeWarning = failsafeWarning;
+    public void setAutopilotError(String autopilotError) {
+        this.autopilotError = autopilotError;
     }
 
     public boolean isWarning(){
-        return TextUtils.isEmpty(failsafeWarning);
+        return TextUtils.isEmpty(autopilotError);
     }
 
     public boolean isCalibrating(){
@@ -122,7 +122,7 @@ public class State implements Parcelable {
         dest.writeByte(isFlying ? (byte) 1 : (byte) 0);
         dest.writeString(this.calibrationStatus);
         dest.writeParcelable(this.vehicleMode, 0);
-        dest.writeString(this.failsafeWarning);
+        dest.writeString(this.autopilotError);
         dest.writeInt(this.mavlinkVersion);
         dest.writeLong(this.flightStartTime);
     }
@@ -133,7 +133,7 @@ public class State implements Parcelable {
         this.isFlying = in.readByte() != 0;
         this.calibrationStatus = in.readString();
         this.vehicleMode = in.readParcelable(VehicleMode.class.getClassLoader());
-        this.failsafeWarning = in.readString();
+        this.autopilotError = in.readString();
         this.mavlinkVersion = in.readInt();
         this.flightStartTime = in.readLong();
     }

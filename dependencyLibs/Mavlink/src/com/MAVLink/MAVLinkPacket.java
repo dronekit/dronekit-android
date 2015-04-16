@@ -190,6 +190,56 @@ package com.MAVLink;
 			return  new msg_camera_feedback(this);
             		case msg_battery2.MAVLINK_MSG_ID_BATTERY2:
 			return  new msg_battery2(this);
+            		case msg_ahrs3.MAVLINK_MSG_ID_AHRS3:
+			return  new msg_ahrs3(this);
+            		case msg_autopilot_version_request.MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST:
+			return  new msg_autopilot_version_request(this);
+            		case msg_led_control.MAVLINK_MSG_ID_LED_CONTROL:
+			return  new msg_led_control(this);
+            		case msg_mag_cal_progress.MAVLINK_MSG_ID_MAG_CAL_PROGRESS:
+			return  new msg_mag_cal_progress(this);
+            		case msg_mag_cal_report.MAVLINK_MSG_ID_MAG_CAL_REPORT:
+			return  new msg_mag_cal_report(this);
+            		case msg_ekf_status_report.MAVLINK_MSG_ID_EKF_STATUS_REPORT:
+			return  new msg_ekf_status_report(this);
+            		case msg_gimbal_report.MAVLINK_MSG_ID_GIMBAL_REPORT:
+			return  new msg_gimbal_report(this);
+            		case msg_gimbal_control.MAVLINK_MSG_ID_GIMBAL_CONTROL:
+			return  new msg_gimbal_control(this);
+            		case msg_gimbal_reset.MAVLINK_MSG_ID_GIMBAL_RESET:
+			return  new msg_gimbal_reset(this);
+            		case msg_gimbal_axis_calibration_progress.MAVLINK_MSG_ID_GIMBAL_AXIS_CALIBRATION_PROGRESS:
+			return  new msg_gimbal_axis_calibration_progress(this);
+            		case msg_gimbal_set_home_offsets.MAVLINK_MSG_ID_GIMBAL_SET_HOME_OFFSETS:
+			return  new msg_gimbal_set_home_offsets(this);
+            		case msg_gimbal_home_offset_calibration_result.MAVLINK_MSG_ID_GIMBAL_HOME_OFFSET_CALIBRATION_RESULT:
+			return  new msg_gimbal_home_offset_calibration_result(this);
+            		case msg_gimbal_set_factory_parameters.MAVLINK_MSG_ID_GIMBAL_SET_FACTORY_PARAMETERS:
+			return  new msg_gimbal_set_factory_parameters(this);
+            		case msg_gimbal_factory_parameters_loaded.MAVLINK_MSG_ID_GIMBAL_FACTORY_PARAMETERS_LOADED:
+			return  new msg_gimbal_factory_parameters_loaded(this);
+            		case msg_gimbal_erase_firmware_and_config.MAVLINK_MSG_ID_GIMBAL_ERASE_FIRMWARE_AND_CONFIG:
+			return  new msg_gimbal_erase_firmware_and_config(this);
+            		case msg_gimbal_perform_factory_tests.MAVLINK_MSG_ID_GIMBAL_PERFORM_FACTORY_TESTS:
+			return  new msg_gimbal_perform_factory_tests(this);
+            		case msg_gimbal_report_factory_tests_progress.MAVLINK_MSG_ID_GIMBAL_REPORT_FACTORY_TESTS_PROGRESS:
+			return  new msg_gimbal_report_factory_tests_progress(this);
+            		case msg_gimbal_request_axis_calibration_status.MAVLINK_MSG_ID_GIMBAL_REQUEST_AXIS_CALIBRATION_STATUS:
+			return  new msg_gimbal_request_axis_calibration_status(this);
+            		case msg_gimbal_report_axis_calibration_status.MAVLINK_MSG_ID_GIMBAL_REPORT_AXIS_CALIBRATION_STATUS:
+			return  new msg_gimbal_report_axis_calibration_status(this);
+            		case msg_gimbal_request_axis_calibration.MAVLINK_MSG_ID_GIMBAL_REQUEST_AXIS_CALIBRATION:
+			return  new msg_gimbal_request_axis_calibration(this);
+            		case msg_gopro_heartbeat.MAVLINK_MSG_ID_GOPRO_HEARTBEAT:
+			return  new msg_gopro_heartbeat(this);
+            		case msg_gopro_get_request.MAVLINK_MSG_ID_GOPRO_GET_REQUEST:
+			return  new msg_gopro_get_request(this);
+            		case msg_gopro_get_response.MAVLINK_MSG_ID_GOPRO_GET_RESPONSE:
+			return  new msg_gopro_get_response(this);
+            		case msg_gopro_set_request.MAVLINK_MSG_ID_GOPRO_SET_REQUEST:
+			return  new msg_gopro_set_request(this);
+            		case msg_gopro_set_response.MAVLINK_MSG_ID_GOPRO_SET_RESPONSE:
+			return  new msg_gopro_set_response(this);
             
                         		case msg_heartbeat.MAVLINK_MSG_ID_HEARTBEAT:
 			return  new msg_heartbeat(this);

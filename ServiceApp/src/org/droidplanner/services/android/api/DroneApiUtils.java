@@ -10,6 +10,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.enums.MAV_TYPE;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
+import com.o3dr.services.android.lib.drone.camera.GoPro;
 import com.o3dr.services.android.lib.drone.mission.Mission;
 import com.o3dr.services.android.lib.drone.mission.MissionItemType;
 import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
@@ -38,6 +39,7 @@ import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
 import org.droidplanner.core.MAVLink.MavLinkArm;
 import org.droidplanner.core.MAVLink.command.doCmd.MavLinkDoCmds;
 import org.droidplanner.core.drone.DroneInterfaces;
+import org.droidplanner.core.drone.camera.GoProImpl;
 import org.droidplanner.core.drone.profiles.VehicleProfile;
 import org.droidplanner.core.drone.variables.Calibration;
 import org.droidplanner.core.drone.variables.Camera;
@@ -348,7 +350,7 @@ public class DroneApiUtils {
         String calibrationMessage = calibration.isCalibrating() ? calibration.getMessage() : null;
 
         return new State(isConnected, DroneApiUtils.getVehicleMode(droneMode), droneState.isArmed(), droneState.isFlying(),
-                droneState.getWarning(), drone.getMavlinkVersion(), calibrationMessage,
+                droneState.getErrorType(), drone.getMavlinkVersion(), calibrationMessage,
                 droneState.getFlightStartTime());
     }
 
@@ -388,9 +390,7 @@ public class DroneApiUtils {
             return new Speed();
 
         org.droidplanner.core.drone.variables.Speed droneSpeed = drone.getSpeed();
-        return new Speed(droneSpeed.getVerticalSpeed().valueInMetersPerSecond(),
-                droneSpeed.getGroundSpeed().valueInMetersPerSecond(),
-                droneSpeed.getAirSpeed().valueInMetersPerSecond());
+        return new Speed(droneSpeed.getVerticalSpeed(), droneSpeed.getGroundSpeed(), droneSpeed.getAirSpeed());
     }
 
     static Attitude getAttitude(Drone drone) {
@@ -409,10 +409,18 @@ public class DroneApiUtils {
         org.droidplanner.core.drone.variables.Home droneHome = drone.getHome();
         LatLongAlt homePosition = droneHome.isValid()
                 ? new LatLongAlt(droneHome.getCoord().getLat(), droneHome.getCoord().getLng(),
-                droneHome.getAltitude().valueInMeters())
+                droneHome.getAltitude())
                 : null;
 
         return new Home(homePosition);
+    }
+
+    static GoPro getGoPro(Drone drone){
+        if(drone == null)
+            return new GoPro();
+
+        GoProImpl impl = drone.getGoProImpl();
+        return new GoPro(impl.isConnected(), impl.isRecording());
     }
 
     static Battery getBattery(Drone drone) {
@@ -492,11 +500,8 @@ public class DroneApiUtils {
         Coord2D guidedCoord = guidedPoint.getCoord() == null
                 ? new Coord2D(0, 0)
                 : guidedPoint.getCoord();
-        double guidedAlt = guidedPoint.getAltitude() == null
-                ? 0
-                : guidedPoint.getAltitude().valueInMeters();
-        return new GuidedState(guidedState, new LatLongAlt(guidedCoord.getLat(),
-                guidedCoord.getLng(), guidedAlt));
+        double guidedAlt = guidedPoint.getAltitude();
+        return new GuidedState(guidedState, new LatLongAlt(guidedCoord.getLat(), guidedCoord.getLng(), guidedAlt));
     }
 
     static void changeVehicleMode(Drone drone, VehicleMode newMode) {
@@ -564,7 +569,7 @@ public class DroneApiUtils {
                     Coord3D target = (Coord3D) entry.getValue();
                     if (target != null) {
                         params.putParcelable(entry.getKey(), new LatLongAlt(target.getLat(), target.getLng(),
-                                target.getAltitude().valueInMeters()));
+                                target.getAltitude()));
                     }
                     break;
 
@@ -686,7 +691,7 @@ public class DroneApiUtils {
         if (drone == null)
             return;
 
-        drone.getGuidedPoint().doGuidedTakeoff(new org.droidplanner.core.helpers.units.Altitude(altitude));
+        drone.getGuidedPoint().doGuidedTakeoff(altitude);
     }
 
     static void sendMavlinkMessage(Drone drone, MavlinkMessageWrapper messageWrapper) {
@@ -797,5 +802,19 @@ public class DroneApiUtils {
 
         StructureScanner proxyScanner = (StructureScanner) ProxyUtils.getProxyMissionItem(updatedScan);
         return proxyScanner;
+    }
+
+    static void startVideoRecording(Drone drone) {
+        if(drone == null)
+            return;
+
+        drone.getGoProImpl().startRecording();
+    }
+
+    static void stopVideoRecording(Drone drone){
+        if(drone == null)
+            return;
+
+        drone.getGoProImpl().stopRecording();
     }
 }

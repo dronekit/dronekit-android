@@ -5,5 +5,7 @@ package org.droidplanner.core.model;
  */
 public interface AutopilotWarningParser {
 
+    String getDefaultWarning();
+
     String parseWarning(Drone drone, String warning);
 }

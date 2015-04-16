@@ -12,7 +12,11 @@ public class AttributeEvent {
      */
     public static final String ATTITUDE_UPDATED = PACKAGE_NAME + ".ATTITUDE_UPDATED";
 
-    public static final String AUTOPILOT_FAILSAFE = PACKAGE_NAME + ".AUTOPILOT_FAILSAFE";
+    /**
+     * Signals an autopilot error.
+     * @see {@link com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra#EXTRA_AUTOPILOT_ERROR_TYPE}
+     */
+    public static final String AUTOPILOT_ERROR = PACKAGE_NAME + ".AUTOPILOT_ERROR";
 
     /**
      * Event describing a message received from the autopilot.
@@ -92,13 +96,25 @@ public class AttributeEvent {
      */
     public static final String BATTERY_UPDATED = PACKAGE_NAME + ".BATTERY_UPDATED";
 
-    /**
+    /*
      * State attribute events.
      */
+    /**
+     * Signals changes in the vehicle readiness (i.e: standby or active/airborne).
+     */
     public static final String STATE_UPDATED = PACKAGE_NAME + ".STATE_UPDATED";
+
+    /**
+     * Signals changes in the vehicle arming state.
+     */
     public static final String STATE_ARMING = PACKAGE_NAME + ".STATE_ARMING";
+    public static final String STATE_CONNECTING = PACKAGE_NAME + ".STATE_CONNECTING";
     public static final String STATE_CONNECTED = PACKAGE_NAME + ".STATE_CONNECTED";
     public static final String STATE_DISCONNECTED = PACKAGE_NAME + ".STATE_DISCONNECTED";
+
+    /**
+     * Signals update of the vehicle mode.
+     */
     public static final String STATE_VEHICLE_MODE = PACKAGE_NAME + ".STATE_VEHICLE_MODE";
 
     /**
@@ -121,7 +137,12 @@ public class AttributeEvent {
     /**
      * Altitude's attribute events.
      */
-    public static final String ALTITUDE_400FT_EXCEEDED = PACKAGE_NAME +
-            ".ALTITUDE_400FT_EXCEEDED";
+    public static final String ALTITUDE_UPDATED = PACKAGE_NAME + ".ALTITUDE_UPDATED";
+
+    /**
+     * Broadcasts updates to the GoPro state.
+     * @see {@link com.o3dr.services.android.lib.drone.camera.GoPro}
+     */
+    public static final String GOPRO_STATE_UPDATED = PACKAGE_NAME + ".GOPRO_STATE_UPDATED";
 
 }

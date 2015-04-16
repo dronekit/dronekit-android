@@ -15,10 +15,12 @@ public class Navigation extends DroneVariable {
 	}
 
 	public void setNavPitchRollYaw(float nav_pitch, float nav_roll, short nav_bearing) {
-		this.nav_pitch = nav_pitch;
-		this.nav_roll = nav_roll;
-		this.nav_bearing = nav_bearing;
-		myDrone.notifyDroneEvent(DroneEventsType.NAVIGATION);
+        if(this.nav_pitch != nav_pitch || this.nav_roll != nav_roll || this.nav_bearing != nav_bearing) {
+            this.nav_pitch = nav_pitch;
+            this.nav_roll = nav_roll;
+            this.nav_bearing = nav_bearing;
+            myDrone.notifyDroneEvent(DroneEventsType.NAVIGATION);
+        }
 	}
 
 	public double getNavPitch() {

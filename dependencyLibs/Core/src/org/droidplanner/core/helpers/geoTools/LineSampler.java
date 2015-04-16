@@ -41,7 +41,7 @@ public class LineSampler {
 	private List<Coord2D> sampleLine(Coord2D from, Coord2D to, double samplingDistance) {
 		List<Coord2D> result = new ArrayList<Coord2D>();
 		double heading = GeoTools.getHeadingFromCoordinates(from, to);
-		double totalLength = GeoTools.getDistance(from, to).valueInMeters();
+		double totalLength = GeoTools.getDistance(from, to);
 		double distance = 0;
 
 		while (distance < totalLength) {

@@ -96,7 +96,7 @@ public class BasicTest {
         DroidPlannerPrefs dpPrefs = new DroidPlannerPrefs(context);
         MAVLinkClient mavClient = new MAVLinkClient(context, inputStreamListener, connParams, mavlinkApi);
 
-        drone = new DroneImpl(mavClient, clock, dpHandler, dpPrefs, new AndroidApWarningParser(context), new LogMessageListener() {
+        drone = new DroneImpl(mavClient, clock, dpHandler, dpPrefs, new AndroidApWarningParser(), new LogMessageListener() {
             @Override
             public void onMessageLogged(int mavSeverity, String message) {
 

@@ -10,6 +10,8 @@ import java.io.Serializable;
  */
 public class LatLong implements Parcelable, Serializable {
 
+    private static final long serialVersionUID =-5809863197722412339L;
+
     /**
      * Stores latitude, and longitude in degrees
      */

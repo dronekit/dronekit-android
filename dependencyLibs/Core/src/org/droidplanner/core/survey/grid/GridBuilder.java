@@ -21,8 +21,8 @@ public class GridBuilder {
 		this.poly = polygon;
 		this.origin = originPoint;
 		this.angle = surveyData.getAngle();
-		this.lineDist = surveyData.getLateralPictureDistance().valueInMeters();
-		this.wpDistance = surveyData.getLongitudinalPictureDistance().valueInMeters();
+		this.lineDist = surveyData.getLateralPictureDistance();
+		this.wpDistance = surveyData.getLongitudinalPictureDistance();
 	}
 
 	public GridBuilder(Polygon polygon, double angle, double distance, Coord2D originPoint) {

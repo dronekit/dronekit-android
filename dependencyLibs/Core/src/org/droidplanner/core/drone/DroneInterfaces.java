@@ -3,6 +3,7 @@ package org.droidplanner.core.drone;
 import java.util.List;
 
 import org.droidplanner.core.MAVLink.WaypointManager;
+import org.droidplanner.core.drone.variables.GPS;
 import org.droidplanner.core.model.Drone;
 import org.droidplanner.core.parameters.Parameter;
 
@@ -12,13 +13,18 @@ public class DroneInterfaces {
 	 * Sets of drone events used for broadcast throughout the app.
 	 */
 	public enum DroneEventsType {
+        /**
+         * Denotes vehicle altitude change event.
+         */
+        ALTITUDE,
+
 		/**
          *
          */
 		ORIENTATION,
 
 		/**
-         *
+         * Denotes vehicle speed change event.
          */
 		SPEED,
 
@@ -38,7 +44,7 @@ public class DroneInterfaces {
 		NAVIGATION,
 
 		/**
-         *
+         * Denotes vehicle attitude change event.
          */
 		ATTITUDE,
 
@@ -215,11 +221,6 @@ public class DroneInterfaces {
 		/**
 		 *
 		 */
-		WARNING_400FT_EXCEEDED,
-
-		/**
-		 *
-		 */
 		WARNING_SIGNAL_WEAK,
 		/**
 		 * Announces that a new version for the firmware has been received
@@ -240,6 +241,11 @@ public class DroneInterfaces {
 		 * The drone camera footprints has been updated
 		 */
 		FOOTPRINT,
+
+        /**
+         * The gopro status was updated.
+         */
+        GOPRO_STATUS_UPDATE,
 	}
 
 	public interface OnDroneListener {

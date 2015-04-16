@@ -10,8 +10,8 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 21
-        versionCode 20055
-        versionName '2.0.55'
+        versionCode 20103
+        versionName '2.1.03'
     }
 
     defaultPublishConfig "release"
@@ -56,9 +56,8 @@ android.libraryVariants.all { variant ->
     task.from android.sourceSets.main.java.srcDirs
 
     //Include dependent jars with some exceptions
-    task.from configurations.compile.findAll {
-        it.getName() != 'android.jar' && !it.getName().startsWith('junit') && !it.getName().startsWith('hamcrest')
-    }.collect {
+    task.from configurations.compile.findAll { it.getName().startsWith("Mavlink")  }.collect {
+        println("Zipping ${it.getName()}")
         it.isDirectory() ? it : zipTree(it)
     }
 

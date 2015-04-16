@@ -4,6 +4,7 @@ import org.droidplanner.core.MAVLink.MAVLinkStreams;
 import org.droidplanner.core.MAVLink.WaypointManager;
 import org.droidplanner.core.drone.DroneInterfaces;
 import org.droidplanner.core.drone.Preferences;
+import org.droidplanner.core.drone.camera.GoProImpl;
 import org.droidplanner.core.drone.profiles.Parameters;
 import org.droidplanner.core.drone.profiles.VehicleProfile;
 import org.droidplanner.core.drone.variables.Altitude;
@@ -97,8 +98,7 @@ public interface Drone {
 	
 	public Magnetometer getMagnetometer();
 
-	public void setAltitudeGroundAndAirSpeeds(double altitude, double groundSpeed, double airSpeed,
-			double climb);
+	public void setAltitudeGroundAndAirSpeeds(double altitude, double groundSpeed, double airSpeed, double climb);
 
 	public void setDisttowpAndSpeedAltErrors(double disttowp, double alt_error, double aspd_error);
 
@@ -109,4 +109,9 @@ public interface Drone {
 	public Camera getCamera();
 
     public void logMessage(int mavSeverity, String message);
+
+    /**
+     * @return the GoPro instance for the connected vehicle.
+     */
+    public GoProImpl getGoProImpl();
 }

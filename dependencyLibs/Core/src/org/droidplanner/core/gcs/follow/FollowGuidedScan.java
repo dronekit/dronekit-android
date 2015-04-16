@@ -5,7 +5,6 @@ import org.droidplanner.core.drone.DroneInterfaces;
 import org.droidplanner.core.gcs.roi.ROIEstimator;
 import org.droidplanner.core.helpers.coordinates.Coord2D;
 import org.droidplanner.core.helpers.coordinates.Coord3D;
-import org.droidplanner.core.helpers.units.Altitude;
 import org.droidplanner.core.model.Drone;
 
 import java.util.HashMap;
@@ -22,7 +21,7 @@ public class FollowGuidedScan extends FollowAbove {
     public static final String EXTRA_FOLLOW_ROI_TARGET = "extra_follow_roi_target";
 
     public static final double DEFAULT_FOLLOW_ROI_ALTITUDE = 10; //meters
-    private static final Altitude sDefaultRoiAltitude = new Altitude(DEFAULT_FOLLOW_ROI_ALTITUDE);
+    private static final double sDefaultRoiAltitude = (DEFAULT_FOLLOW_ROI_ALTITUDE);
 
     @Override
     public FollowModes getType() {
@@ -34,16 +33,15 @@ public class FollowGuidedScan extends FollowAbove {
     }
 
     @Override
-    public void updateAlgorithmParams(Map<String, ?> params){
+    public void updateAlgorithmParams(Map<String, ?> params) {
         super.updateAlgorithmParams(params);
 
         final Coord3D target;
 
         Coord2D tempCoord = (Coord2D) params.get(EXTRA_FOLLOW_ROI_TARGET);
-        if(tempCoord == null || tempCoord instanceof Coord3D){
+        if (tempCoord == null || tempCoord instanceof Coord3D) {
             target = (Coord3D) tempCoord;
-        }
-        else{
+        } else {
             target = new Coord3D(tempCoord, sDefaultRoiAltitude);
         }
 
@@ -51,19 +49,19 @@ public class FollowGuidedScan extends FollowAbove {
     }
 
     @Override
-    protected ROIEstimator initROIEstimator(Drone drone, DroneInterfaces.Handler handler){
+    protected ROIEstimator initROIEstimator(Drone drone, DroneInterfaces.Handler handler) {
         return new GuidedROIEstimator(drone, handler);
     }
 
     @Override
-    public Map<String, Object> getParams(){
+    public Map<String, Object> getParams() {
         Map<String, Object> params = new HashMap<>();
         params.put(EXTRA_FOLLOW_ROI_TARGET, getROIEstimator().roiTarget);
         return params;
     }
 
     @Override
-    protected GuidedROIEstimator getROIEstimator(){
+    protected GuidedROIEstimator getROIEstimator() {
         return (GuidedROIEstimator) super.getROIEstimator();
     }
 
@@ -75,19 +73,18 @@ public class FollowGuidedScan extends FollowAbove {
             super(drone, handler);
         }
 
-        void updateROITarget(Coord3D roiTarget){
+        void updateROITarget(Coord3D roiTarget) {
             this.roiTarget = roiTarget;
             onLocationUpdate(null);
         }
 
         @Override
-        protected void updateROI(){
-            if(roiTarget == null){
+        protected void updateROI() {
+            if (roiTarget == null) {
                 System.out.println("Cancelling ROI lock.");
                 //Fallback to the default behavior
                 super.updateROI();
-            }
-            else{
+            } else {
                 System.out.println("ROI Target: " + roiTarget.toString());
 
                 //Track the target until told otherwise.
