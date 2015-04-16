@@ -5,30 +5,31 @@ import org.droidplanner.core.drone.DroneInterfaces.Clock;
 import org.droidplanner.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.core.drone.DroneInterfaces.Handler;
 import org.droidplanner.core.drone.DroneVariable;
-import org.droidplanner.core.helpers.units.Altitude;
 import org.droidplanner.core.model.AutopilotWarningParser;
 import org.droidplanner.core.model.Drone;
 
 import com.MAVLink.Messages.ApmModes;
 
 public class State extends DroneVariable {
-	private static final long failsafeOnScreenTimeout = 5000;
-	private String warning = "";
+	private static final long ERROR_ON_SCREEN_TIMEOUT = 5000;
+
+    private final AutopilotWarningParser warningParser;
+
+	private String errorType;
 	private boolean armed = false;
 	private boolean isFlying = false;
 	private ApmModes mode = ApmModes.UNKNOWN;
-    private final AutopilotWarningParser warningParser;
 
 	// flightTimer
 	// ----------------
 	private long startTime = 0;
-	private Clock clock;
+	private final Clock clock;
 
-	public Handler watchdog;
-	public Runnable watchdogCallback = new Runnable() {
+	public final Handler watchdog;
+	public final Runnable watchdogCallback = new Runnable() {
 		@Override
 		public void run() {
-			removeWarning();
+			resetWarning();
 		}
 	};
 
@@ -37,11 +38,8 @@ public class State extends DroneVariable {
 		this.clock = clock;
 		this.watchdog = handler;
         this.warningParser = warningParser;
+        this.errorType = warningParser.getDefaultWarning();
 		resetFlightStartTime();
-	}
-
-	public boolean isWarning() {
-		return !warning.equals("");
 	}
 
 	public boolean isArmed() {
@@ -56,42 +54,49 @@ public class State extends DroneVariable {
 		return mode;
 	}
 
-	public String getWarning() {
-		return warning;
+	public String getErrorType() {
+		return errorType;
 	}
 
 	public void setIsFlying(boolean newState) {
 		if (newState != isFlying) {
 			isFlying = newState;
 			myDrone.notifyDroneEvent(DroneEventsType.STATE);
+
 			if (isFlying) {
 				resetFlightStartTime();
 			}
 		}
 	}
 
-	public void setWarning(String newFailsafe) {
-        String parsedWarning = warningParser.parseWarning(myDrone, newFailsafe);
-		if (!this.warning.equals(parsedWarning)) {
-			this.warning = parsedWarning;
-			myDrone.notifyDroneEvent(DroneEventsType.AUTOPILOT_WARNING);
-		}
-		watchdog.removeCallbacks(watchdogCallback);
-		this.watchdog.postDelayed(watchdogCallback, failsafeOnScreenTimeout);
-	}
+    public boolean parseAutopilotError(String errorMsg){
+        String parsedError = warningParser.parseWarning(myDrone, errorMsg);
+        if(parsedError == null || parsedError.trim().isEmpty())
+            return false;
+
+        if (!this.errorType.equals(parsedError)) {
+            this.errorType = parsedError;
+            myDrone.notifyDroneEvent(DroneEventsType.AUTOPILOT_WARNING);
+        }
+
+        watchdog.removeCallbacks(watchdogCallback);
+        this.watchdog.postDelayed(watchdogCallback, ERROR_ON_SCREEN_TIMEOUT);
+        return true;
+    }
 
     public void repeatWarning(){
-        if(warning == null || warning.length() == 0)
+        if(errorType == null || errorType.length() == 0 || errorType.equals(warningParser.getDefaultWarning()))
             return;
 
         watchdog.removeCallbacks(watchdogCallback);
-        this.watchdog.postDelayed(watchdogCallback, failsafeOnScreenTimeout);
+        this.watchdog.postDelayed(watchdogCallback, ERROR_ON_SCREEN_TIMEOUT);
     }
 
 	public void setArmed(boolean newState) {
 		if (this.armed != newState) {
 			this.armed = newState;
 			myDrone.notifyDroneEvent(DroneEventsType.ARMING);
+
 			if (newState) {
 				myDrone.getWaypointManager().getWaypoints();
 			}else{
@@ -100,10 +105,6 @@ public class State extends DroneVariable {
 				}
 			}
 		}
-	}
-
-	public void doTakeoff(Altitude alt) {
-		myDrone.getGuidedPoint().doGuidedTakeoff(alt);
 	}
 
 	public void setMode(ApmModes mode) {
@@ -119,8 +120,13 @@ public class State extends DroneVariable {
 		}
 	}
 
-	protected void removeWarning() {
-		setWarning("");
+	protected void resetWarning() {
+		final String defaultWarning = warningParser.getDefaultWarning();
+
+        if (!this.errorType.equals(defaultWarning)) {
+            this.errorType = defaultWarning;
+            myDrone.notifyDroneEvent(DroneEventsType.AUTOPILOT_WARNING);
+        }
 	}
 
 	// flightTimer

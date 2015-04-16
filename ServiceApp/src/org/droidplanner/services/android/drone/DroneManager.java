@@ -90,7 +90,7 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream,
 
         DroidPlannerPrefs dpPrefs = new DroidPlannerPrefs(context);
 
-        this.drone = new DroneImpl(mavClient, clock, dpHandler, dpPrefs, new AndroidApWarningParser(context), this);
+        this.drone = new DroneImpl(mavClient, clock, dpHandler, dpPrefs, new AndroidApWarningParser(), this);
         this.drone.getStreamRates().setRates(dpPrefs.getRates());
 
         this.mavLinkMsgHandler = new MavLinkMsgHandler(this.drone);

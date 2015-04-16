@@ -195,25 +195,20 @@ public class MavLinkMsgHandler {
     private void processStatusText(msg_statustext statusText) {
         String message = statusText.getText();
 
-        if (statusText.severity == SEVERITY_HIGH || statusText.severity == SEVERITY_CRITICAL) {
-            drone.getState().setWarning(message);
-        } else {
-            switch (message) {
-                case "Low Battery!":
-                    drone.getState().setWarning(message);
-                    break;
+        switch (message) {
+            case "ArduCopter":
+            case "ArduPlane":
+            case "ArduRover":
+                drone.setFirmwareVersion(message);
+                break;
 
-                case "ArduCopter":
-                case "ArduPlane":
-                case "ArduRover":
-                    drone.setFirmwareVersion(message);
-                    break;
-
-                default:
+            default:
+                //Try parsing as an error.
+                if(!drone.getState().parseAutopilotError(message)) {
                     //Relay to the connected client.
                     drone.logMessage(statusText.severity, message);
-                    break;
-            }
+                }
+                break;
         }
     }
 }
