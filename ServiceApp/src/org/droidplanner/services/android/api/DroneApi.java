@@ -587,11 +587,10 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 break;
 
             case AUTOPILOT_WARNING:
-                extrasBundle = new Bundle(2);
-                extrasBundle.putInt(AttributeEventExtra.EXTRA_AUTOPILOT_FAILSAFE_MESSAGE_LEVEL, Log.ERROR);
-                extrasBundle.putString(AttributeEventExtra.EXTRA_AUTOPILOT_FAILSAFE_MESSAGE,
+                extrasBundle = new Bundle(1);
+                extrasBundle.putString(AttributeEventExtra.EXTRA_AUTOPILOT_ERROR_TYPE,
                         drone.getState().getWarning());
-                droneEvent = AttributeEvent.AUTOPILOT_FAILSAFE;
+                droneEvent = AttributeEvent.AUTOPILOT_ERROR;
                 break;
 
             case MODE:

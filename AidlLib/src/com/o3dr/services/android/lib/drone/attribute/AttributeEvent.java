@@ -12,7 +12,11 @@ public class AttributeEvent {
      */
     public static final String ATTITUDE_UPDATED = PACKAGE_NAME + ".ATTITUDE_UPDATED";
 
-    public static final String AUTOPILOT_FAILSAFE = PACKAGE_NAME + ".AUTOPILOT_FAILSAFE";
+    /**
+     * Signals an autopilot error.
+     * @see {@link com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra#EXTRA_AUTOPILOT_ERROR_TYPE}
+     */
+    public static final String AUTOPILOT_ERROR = PACKAGE_NAME + ".AUTOPILOT_ERROR";
 
     /**
      * Event describing a message received from the autopilot.

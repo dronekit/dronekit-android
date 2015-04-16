@@ -5,20 +5,14 @@ package com.o3dr.services.android.lib.drone.attribute;
  */
 public class AttributeEventExtra {
 
-    private static final String PACKAGE_NAME = "com.o3dr.services.android.lib.attribute.event" +
-            ".extra";
+    private static final String PACKAGE_NAME = "com.o3dr.services.android.lib.attribute.event.extra";
 
     /**
-     * Used to access levels for the received autopilot failsafe messages.
-     * The message levels are based on the android Log api priority constants: https://developer.android.com/reference/android/util/Log.html
+     * Used to access autopilot error type.
+     * @see {@link com.o3dr.services.android.lib.drone.attribute.error.ErrorType}
+     * @see {@link com.o3dr.services.android.lib.drone.attribute.AttributeEvent#AUTOPILOT_ERROR}
      */
-    public static final String EXTRA_AUTOPILOT_FAILSAFE_MESSAGE_LEVEL = PACKAGE_NAME +
-            ".AUTOPILOT_FAILSAFE_MESSAGE_LEVEL";
-
-    /**
-     * Used to access autopilot failsafe messages.
-     */
-    public static final String EXTRA_AUTOPILOT_FAILSAFE_MESSAGE = PACKAGE_NAME + ".AUTOPILOT_FAILSAFE_MESSAGE";
+    public static final String EXTRA_AUTOPILOT_ERROR_TYPE = PACKAGE_NAME + ".AUTOPILOT_ERROR_TYPE";
 
     /**
      * Used to access autopilot messages.
