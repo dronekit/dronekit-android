@@ -43,6 +43,7 @@ import static com.o3dr.services.android.lib.drone.attribute.error.ErrorType.PRE_
 import static com.o3dr.services.android.lib.drone.attribute.error.ErrorType.PRE_ARM_INS_NOT_CALIBRATED;
 import static com.o3dr.services.android.lib.drone.attribute.error.ErrorType.PRE_ARM_NEED_GPS_LOCK;
 import static com.o3dr.services.android.lib.drone.attribute.error.ErrorType.PRE_ARM_RC_NOT_CALIBRATED;
+import static com.o3dr.services.android.lib.drone.attribute.error.ErrorType.RC_FAILSAFE;
 import static com.o3dr.services.android.lib.drone.attribute.error.ErrorType.WAITING_FOR_NAVIGATION_ALIGNMENT;
 
 /**
@@ -187,6 +188,9 @@ public class AndroidApWarningParser implements AutopilotWarningParser {
 
             case "ekf variance":
                 return EKF_VARIANCE;
+
+            case "rc failsafe":
+                return RC_FAILSAFE;
 
 
             default:

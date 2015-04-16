@@ -23,6 +23,7 @@ import com.MAVLink.common.msg_sys_status;
 import com.MAVLink.common.msg_vfr_hud;
 import com.MAVLink.enums.MAV_MODE_FLAG;
 import com.MAVLink.enums.MAV_STATE;
+import com.MAVLink.enums.MAV_SYS_STATUS_SENSOR;
 
 import org.droidplanner.core.helpers.coordinates.Coord2D;
 import org.droidplanner.core.model.Drone;
@@ -95,6 +96,7 @@ public class MavLinkMsgHandler {
                 msg_sys_status m_sys = (msg_sys_status) msg;
                 drone.getBattery().setBatteryState(m_sys.voltage_battery / 1000.0,
                         m_sys.battery_remaining, m_sys.current_battery / 100.0);
+                checkControlSensorsHealth(m_sys);
                 break;
 
             case msg_radio.MAVLINK_MSG_ID_RADIO:
@@ -181,6 +183,14 @@ public class MavLinkMsgHandler {
 
         if (failsafe2) {
             drone.getState().repeatWarning();
+        }
+    }
+
+    private void checkControlSensorsHealth(msg_sys_status sysStatus){
+        boolean isRCFailsafe = (sysStatus.onboard_control_sensors_health & MAV_SYS_STATUS_SENSOR
+                .MAV_SYS_STATUS_SENSOR_RC_RECEIVER) == 0;
+        if(isRCFailsafe){
+            drone.getState().parseAutopilotError("RC FAILSAFE");
         }
     }
 

@@ -51,4 +51,5 @@ public class ErrorType {
     public static final String PARACHUTE_TOO_LOW = PACKAGE_NAME + ".PARACHUTE_TOO_LOW";
     public static final String EKF_VARIANCE = PACKAGE_NAME + ".EKF_VARIANCE";
     public static final String NO_DATAFLASH_INSERTED = PACKAGE_NAME + ".NO_DATAFLASH_INSERTED";
+    public static final String RC_FAILSAFE = PACKAGE_NAME + ".RC_FAILSAFE";
 }
