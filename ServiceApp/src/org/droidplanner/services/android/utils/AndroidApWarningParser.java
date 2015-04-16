@@ -3,7 +3,10 @@ package org.droidplanner.services.android.utils;
 import org.droidplanner.core.model.AutopilotWarningParser;
 import org.droidplanner.core.model.Drone;
 
+import java.util.Locale;
+
 import static com.o3dr.services.android.lib.drone.attribute.error.ErrorType.ALTITUDE_DISPARITY;
+import static com.o3dr.services.android.lib.drone.attribute.error.ErrorType.ARM_COMPASS_CALIBRATION_RUNNING;
 import static com.o3dr.services.android.lib.drone.attribute.error.ErrorType.ARM_GYRO_CALIBRATION_FAILED;
 import static com.o3dr.services.android.lib.drone.attribute.error.ErrorType.ARM_LEANING;
 import static com.o3dr.services.android.lib.drone.attribute.error.ErrorType.ARM_MODE_NOT_ARMABLE;
@@ -31,6 +34,7 @@ import static com.o3dr.services.android.lib.drone.attribute.error.ErrorType.PRE_
 import static com.o3dr.services.android.lib.drone.attribute.error.ErrorType.PRE_ARM_COMPASS_OFFSETS_TOO_HIGH;
 import static com.o3dr.services.android.lib.drone.attribute.error.ErrorType.PRE_ARM_DUPLICATE_AUX_SWITCH_OPTIONS;
 import static com.o3dr.services.android.lib.drone.attribute.error.ErrorType.PRE_ARM_EKF_HOME_VARIANCE;
+import static com.o3dr.services.android.lib.drone.attribute.error.ErrorType.PRE_ARM_GPS_GLITCH;
 import static com.o3dr.services.android.lib.drone.attribute.error.ErrorType.PRE_ARM_GYROS_NOT_HEALTHY;
 import static com.o3dr.services.android.lib.drone.attribute.error.ErrorType.PRE_ARM_HIGH_GPS_HDOP;
 import static com.o3dr.services.android.lib.drone.attribute.error.ErrorType.PRE_ARM_INCONSISTENT_ACCELEROMETERS;
@@ -39,6 +43,7 @@ import static com.o3dr.services.android.lib.drone.attribute.error.ErrorType.PRE_
 import static com.o3dr.services.android.lib.drone.attribute.error.ErrorType.PRE_ARM_INS_NOT_CALIBRATED;
 import static com.o3dr.services.android.lib.drone.attribute.error.ErrorType.PRE_ARM_NEED_GPS_LOCK;
 import static com.o3dr.services.android.lib.drone.attribute.error.ErrorType.PRE_ARM_RC_NOT_CALIBRATED;
+import static com.o3dr.services.android.lib.drone.attribute.error.ErrorType.WAITING_FOR_NAVIGATION_ALIGNMENT;
 
 /**
  * Autopilot error parser.
@@ -59,114 +64,128 @@ public class AndroidApWarningParser implements AutopilotWarningParser {
      */
     @Override
     public String parseWarning(Drone drone, String warning) {
-        switch (warning) {
-            case "Arm: Thr below FS":
-            case "Arm: Throttle below Failsafe":
+        if (android.text.TextUtils.isEmpty(warning))
+            return null;
+
+        switch (warning.toLowerCase(Locale.US)) {
+            case "arm: thr below fs":
+            case "arm: throttle below failsafe":
                 return ARM_THROTTLE_BELOW_FAILSAFE;
 
-            case "Arm: Gyro calibration failed":
+            case "arm: gyro calibration failed":
                 return ARM_GYRO_CALIBRATION_FAILED;
 
-            case "Arm: Mode not armable":
+            case "arm: mode not armable":
                 return ARM_MODE_NOT_ARMABLE;
 
-            case "Arm: Rotor not spinning":
+            case "arm: rotor not spinning":
                 return ARM_ROTOR_NOT_SPINNING;
 
-            case "Arm: Altitude disparity":
-            case "PreArm: Altitude disparity":
+            case "arm: altitude disparity":
+            case "prearm: altitude disparity":
                 return ALTITUDE_DISPARITY;
 
-            case "Arm: Leaning":
+            case "arm: leaning":
                 return ARM_LEANING;
 
-            case "Arm: Throttle too high":
+            case "arm: throttle too high":
                 return ARM_THROTTLE_TOO_HIGH;
 
-            case "Arm: Safety Switch":
+            case "arm: safety switch":
                 return ARM_SAFETY_SWITCH;
 
+            case "arm: compass calibration running":
+                return ARM_COMPASS_CALIBRATION_RUNNING;
 
-            case "PreArm: RC not calibrated":
+
+            case "prearm: rc not calibrated":
                 return PRE_ARM_RC_NOT_CALIBRATED;
 
-            case "PreArm: Barometer not healthy":
+            case "prearm: barometer not healthy":
                 return PRE_ARM_BAROMETER_NOT_HEALTHY;
 
-            case "PreArm: Compass not healthy":
+            case "prearm: compass not healthy":
                 return PRE_ARM_COMPASS_NOT_HEALTHY;
 
-            case "PreArm: Compass not calibrated":
+            case "prearm: compass not calibrated":
                 return PRE_ARM_COMPASS_NOT_CALIBRATED;
 
-            case "PreArm: Compass offsets too high":
+            case "prearm: compass offsets too high":
                 return PRE_ARM_COMPASS_OFFSETS_TOO_HIGH;
 
-            case "PreArm: Check mag field":
+            case "prearm: check mag field":
                 return PRE_ARM_CHECK_MAGNETIC_FIELD;
 
-            case "PreArm: inconsistent compasses":
+            case "prearm: inconsistent compasses":
                 return PRE_ARM_INCONSISTENT_COMPASSES;
 
-            case "PreArm: check fence":
+            case "prearm: check fence":
                 return PRE_ARM_CHECK_FENCE;
 
-            case "PreArm: INS not calibrated":
+            case "prearm: ins not calibrated":
                 return PRE_ARM_INS_NOT_CALIBRATED;
 
-            case "PreArm: Accelerometers not healthy":
+            case "prearm: accelerometers not healthy":
                 return PRE_ARM_ACCELEROMETERS_NOT_HEALTHY;
 
-            case "PreArm: inconsistent Accelerometers":
+            case "prearm: inconsistent accelerometers":
                 return PRE_ARM_INCONSISTENT_ACCELEROMETERS;
 
-            case "PreArm: Gyros not healthy":
+            case "prearm: gyros not healthy":
                 return PRE_ARM_GYROS_NOT_HEALTHY;
 
-            case "PreArm: inconsistent Gyros":
+            case "prearm: inconsistent gyros":
                 return PRE_ARM_INCONSISTENT_GYROS;
 
-            case "PreArm: Check Board Voltage":
+            case "prearm: check board voltage":
                 return PRE_ARM_CHECK_BOARD_VOLTAGE;
 
-            case "PreArm: Duplicate Aux Switch Options":
+            case "prearm: duplicate aux switch options":
                 return PRE_ARM_DUPLICATE_AUX_SWITCH_OPTIONS;
 
-            case "PreArm: Check FS_THR_VALUE":
+            case "prearm: check fs_thr_value":
                 return PRE_ARM_CHECK_FAILSAFE_THRESHOLD_VALUE;
 
-            case "PreArm: Check ANGLE_MAX":
+            case "prearm: check angle_max":
                 return PRE_ARM_CHECK_ANGLE_MAX;
 
-            case "PreArm: ACRO_BAL_ROLL/PITCH":
+            case "prearm: acro_bal_roll/pitch":
                 return PRE_ARM_ACRO_BAL_ROLL_PITCH;
 
-            case "PreArm: Need 3D Fix":
+            case "prearm: need 3d fix":
                 return PRE_ARM_NEED_GPS_LOCK;
 
-            case "PreArm: EKF-home variance":
+            case "prearm: ekf-home variance":
                 return PRE_ARM_EKF_HOME_VARIANCE;
 
-            case "PreArm: High GPS HDOP":
+            case "prearm: high gps hdop":
                 return PRE_ARM_HIGH_GPS_HDOP;
 
+            case "prearm: gps glitch":
+            case "prearm: bad velocity":
+                return PRE_ARM_GPS_GLITCH;
 
-            case "No dataflash inserted":
+            case "prearm: waiting for navigation alignment":
+            case "arm: waiting for navigation alignment":
+                return WAITING_FOR_NAVIGATION_ALIGNMENT;
+
+
+            case "no dataflash inserted":
                 return NO_DATAFLASH_INSERTED;
 
-            case "Low Battery!":
+            case "low battery!":
                 return LOW_BATTERY;
 
-            case "AutoTune: Failed":
+            case "autotune: failed":
                 return AUTO_TUNE_FAILED;
 
-            case "Crash: Disarming":
+            case "crash: disarming":
                 return CRASH_DISARMING;
 
-            case "Parachute: Too Low":
+            case "parachute: too low":
                 return PARACHUTE_TOO_LOW;
 
-            case "EKF variance":
+            case "ekf variance":
                 return EKF_VARIANCE;
 
 

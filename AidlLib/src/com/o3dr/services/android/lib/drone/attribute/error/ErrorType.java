@@ -18,6 +18,7 @@ public class ErrorType {
     public static final String ARM_LEANING = PACKAGE_NAME + ".ARM_LEANING";
     public static final String ARM_THROTTLE_TOO_HIGH = PACKAGE_NAME + ".ARM_THROTTLE_TOO_HIGH";
     public static final String ARM_SAFETY_SWITCH = PACKAGE_NAME + ".ARM_SAFETY_SWITCH";
+    public static final String ARM_COMPASS_CALIBRATION_RUNNING = PACKAGE_NAME + ".ARM_COMPASS_CALIBRATION_RUNNING";
 
     public static final String PRE_ARM_RC_NOT_CALIBRATED = PACKAGE_NAME + ".PRE_ARM_RC_NOT_CALIBRATED";
     public static final String PRE_ARM_BAROMETER_NOT_HEALTHY = PACKAGE_NAME + ".PRE_ARM_BAROMETER_NOT_HEALTHY";
@@ -40,6 +41,8 @@ public class ErrorType {
     public static final String PRE_ARM_NEED_GPS_LOCK = PACKAGE_NAME + ".PRE_ARM_NEED_GPS_LOCK";
     public static final String PRE_ARM_EKF_HOME_VARIANCE = PACKAGE_NAME + ".PRE_ARM_EKF_HOME_VARIANCE";
     public static final String PRE_ARM_HIGH_GPS_HDOP = PACKAGE_NAME + ".PRE_ARM_HIGH_GPS_HDOP";
+    public static final String PRE_ARM_GPS_GLITCH = PACKAGE_NAME + ".PRE_ARM_GPS_GLITCH";
+    public static final String WAITING_FOR_NAVIGATION_ALIGNMENT = PACKAGE_NAME + ".WAITING_FOR_NAVIGATION_ALIGNMENT";
 
     public static final String ALTITUDE_DISPARITY = PACKAGE_NAME + ".ALTITUDE_DISPARITY";
     public static final String LOW_BATTERY = PACKAGE_NAME + ".LOW_BATTERY";
