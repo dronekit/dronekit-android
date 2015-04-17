@@ -25,6 +25,7 @@ public class GoProImpl implements DroneInterfaces.OnDroneListener {
     private static final long HEARTBEAT_TIMEOUT = 5000l; //ms
 
     private int status = GOPRO_HEARTBEAT_STATUS.GOPRO_HEARTBEAT_STATUS_DISCONNECTED;
+    private boolean isRecording;
 
     private final Runnable watchdogCallback = new Runnable() {
         @Override
@@ -36,8 +37,8 @@ public class GoProImpl implements DroneInterfaces.OnDroneListener {
     private final HashMap<Integer, GetResponseHandler> getResponsesFutures = new HashMap<>();
     private final HashMap<Integer, SetResponseHandler> setResponsesFutures = new HashMap<>();
 
-    private final msg_gopro_get_request scratchGetRequest = new msg_gopro_get_request();
-    private final msg_gopro_set_request scratchSetRequest = new msg_gopro_set_request();
+    private final msg_gopro_get_request scratchGetRequest;
+    private final msg_gopro_set_request scratchSetRequest;
 
     private final Drone drone;
     private final Handler watchdog;
@@ -46,12 +47,25 @@ public class GoProImpl implements DroneInterfaces.OnDroneListener {
         this.drone = drone;
         this.watchdog = handler;
 
+        this.scratchGetRequest = new msg_gopro_get_request();
+        this.scratchGetRequest.sysid = 255;
+        this.scratchGetRequest.compid = 0;
+        this.scratchGetRequest.target_system = 0;
+
+        this.scratchSetRequest = new msg_gopro_set_request();
+        this.scratchSetRequest.sysid = 255;
+        this.scratchSetRequest.compid = 0;
+        this.scratchSetRequest.target_system = 0;
+
         if (drone.isConnected()) {
             updateRequestTarget();
         }
     }
 
     public void onHeartBeat(msg_gopro_heartbeat heartBeat) {
+        this.scratchSetRequest.target_component = (byte) heartBeat.compid;
+        this.scratchGetRequest.target_component = (byte) heartBeat.compid;
+
         if (status != heartBeat.status) {
             status = heartBeat.status;
             drone.notifyDroneEvent(DroneEventsType.GOPRO_STATUS_UPDATE);
@@ -116,34 +130,20 @@ public class GoProImpl implements DroneInterfaces.OnDroneListener {
     }
 
     public boolean isRecording() {
-        return status == GOPRO_HEARTBEAT_STATUS.GOPRO_HEARTBEAT_STATUS_RECORDING;
+        return isRecording;
     }
 
     public void startRecording() {
         if (!isConnected() || isRecording())
             return;
 
-        scratchSetRequest.cmd_id = GOPRO_COMMAND.GOPRO_COMMAND_SHUTTER;
-
-        //Turn the gopro on
-        sendSetRequest(GOPRO_COMMAND.GOPRO_COMMAND_POWER, 1, new SetResponseHandler() {
+        //Start recording
+        sendSetRequest(GOPRO_COMMAND.GOPRO_COMMAND_SHUTTER, 1, new SetResponseHandler() {
             @Override
-            public void onResponse(byte commandId, boolean result) {
-                if (result) {
-                    //Switch to video mode
-                    sendSetRequest(GOPRO_COMMAND.GOPRO_COMMAND_CAPTURE_MODE, 0, new SetResponseHandler() {
-                        @Override
-                        public void onResponse(byte commandId, boolean success) {
-                            if (success) {
-                                //Start recording
-                                sendSetRequest(GOPRO_COMMAND.GOPRO_COMMAND_SHUTTER, 1, null);
-                            } else {
-                                System.err.println("Unable to switch to video mode.");
-                            }
-                        }
-                    });
-                } else {
-                    System.err.println("Unable to turn GoPro on.");
+            public void onResponse(byte commandId, boolean success) {
+                if(success != isRecording) {
+                    isRecording = success;
+                    drone.notifyDroneEvent(DroneEventsType.GOPRO_STATUS_UPDATE);
                 }
             }
         });
@@ -154,23 +154,36 @@ public class GoProImpl implements DroneInterfaces.OnDroneListener {
             return;
 
         //Stop recording
-        sendSetRequest(GOPRO_COMMAND.GOPRO_COMMAND_SHUTTER, 0, null);
+        sendSetRequest(GOPRO_COMMAND.GOPRO_COMMAND_SHUTTER, 0, new SetResponseHandler() {
+            @Override
+            public void onResponse(byte commandId, boolean success) {
+                if(success == isRecording) {
+                    isRecording = !success;
+                    drone.notifyDroneEvent(DroneEventsType.GOPRO_STATUS_UPDATE);
+                }
+            }
+        });
     }
 
     private void sendSetRequest(int commandId, int value, SetResponseHandler future) {
-        setResponsesFutures.put(commandId, future);
+        if (future != null)
+            setResponsesFutures.put(commandId, future);
         scratchSetRequest.cmd_id = (byte) commandId;
         scratchSetRequest.value = (byte) value;
         sendMavlinkPacket(scratchSetRequest.pack());
     }
 
     private void sendGetRequest(int commandId, GetResponseHandler future) {
-        getResponsesFutures.put(commandId, future);
+        if (future != null)
+            getResponsesFutures.put(commandId, future);
+
         scratchGetRequest.cmd_id = (byte) commandId;
         sendMavlinkPacket(scratchGetRequest.pack());
     }
 
     private void sendMavlinkPacket(MAVLinkPacket packet) {
+        packet.sysid = 255;
+        packet.compid = 0;
         drone.getMavClient().sendMavPacket(packet);
     }
 
