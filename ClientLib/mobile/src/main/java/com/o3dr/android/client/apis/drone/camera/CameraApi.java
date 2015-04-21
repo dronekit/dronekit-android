@@ -13,6 +13,8 @@ import static com.o3dr.services.android.lib.drone.camera.action.CameraActions.AC
 public class CameraApi {
 
     /**
+     * EXPERIMENTAL
+     *
      * Start recording video on the GoPro.
      * After calling this method, listen for {@link com.o3dr.services.android.lib.drone.attribute.AttributeEvent#GOPRO_STATE_UPDATED} for notification of recording state change.
      * @param drone
@@ -23,6 +25,8 @@ public class CameraApi {
     }
 
     /**
+     * EXPERIMENTAL!
+     *
      * Stop recording video on the GoPro.
      * After calling this method, listen for {@link com.o3dr.services.android.lib.drone.attribute.AttributeEvent#GOPRO_STATE_UPDATED} for notification of recording state change.
      * @param drone
