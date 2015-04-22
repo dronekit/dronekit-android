@@ -14,7 +14,7 @@ public class AttributeEvent {
 
     /**
      * Signals an autopilot error.
-     * @see {@link com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra#EXTRA_AUTOPILOT_ERROR_TYPE}
+     * @see {@link com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra#EXTRA_AUTOPILOT_ERROR_ID}
      */
     public static final String AUTOPILOT_ERROR = PACKAGE_NAME + ".AUTOPILOT_ERROR";
 

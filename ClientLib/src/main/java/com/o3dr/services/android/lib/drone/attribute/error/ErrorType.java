@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.StringRes;
+import android.text.TextUtils;
 
 import com.o3dr.android.client.R;
 
@@ -67,6 +68,13 @@ public enum ErrorType implements Parcelable {
 
     public CharSequence getLabel(Context context){
         return context.getText(this.labelResId);
+    }
+
+    public static ErrorType getErrorById(String errorId){
+        if(TextUtils.isEmpty(errorId))
+            return null;
+
+        return ErrorType.valueOf(errorId);
     }
 
     @Override

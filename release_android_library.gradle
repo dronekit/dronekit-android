@@ -29,6 +29,8 @@ task androidJavadocs(type: Javadoc) {
     title = projectDescription
     exclude '**/*.aidl'
     classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+    options.links("http://docs.oracle.com/javase/7/docs/api/")
+    options.links("https://developer.android.com/reference/packages.html")
 }
 
 task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs){
@@ -77,6 +79,7 @@ bintray {
     pkg {
         repo = getMavenRepo()
         name = projectArtifactId
+        userOrg = '3d-robotics'
         desc = projectDescription
         websiteUrl = 'https://github.com/DroidPlanner/DroneKit-Android'
         issueTrackerUrl = 'https://github.com/DroidPlanner/DroneKit-Android/issues'

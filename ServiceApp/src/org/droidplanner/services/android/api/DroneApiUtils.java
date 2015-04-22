@@ -350,7 +350,7 @@ public class DroneApiUtils {
         String calibrationMessage = calibration.isCalibrating() ? calibration.getMessage() : null;
 
         return new State(isConnected, DroneApiUtils.getVehicleMode(droneMode), droneState.isArmed(), droneState.isFlying(),
-                droneState.getErrorType(), drone.getMavlinkVersion(), calibrationMessage,
+                droneState.getErrorId(), drone.getMavlinkVersion(), calibrationMessage,
                 droneState.getFlightStartTime());
     }
 

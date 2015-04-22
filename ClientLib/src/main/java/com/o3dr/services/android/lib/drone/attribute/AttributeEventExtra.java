@@ -12,7 +12,7 @@ public class AttributeEventExtra {
      * @see {@link com.o3dr.services.android.lib.drone.attribute.error.ErrorType}
      * @see {@link com.o3dr.services.android.lib.drone.attribute.AttributeEvent#AUTOPILOT_ERROR}
      */
-    public static final String EXTRA_AUTOPILOT_ERROR_TYPE = PACKAGE_NAME + ".AUTOPILOT_ERROR_TYPE";
+    public static final String EXTRA_AUTOPILOT_ERROR_ID = PACKAGE_NAME + ".AUTOPILOT_ERROR_ID";
 
     /**
      * Used to access autopilot messages.

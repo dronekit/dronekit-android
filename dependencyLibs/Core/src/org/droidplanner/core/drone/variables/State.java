@@ -15,7 +15,7 @@ public class State extends DroneVariable {
 
     private final AutopilotWarningParser warningParser;
 
-	private String errorType;
+	private String errorId;
 	private boolean armed = false;
 	private boolean isFlying = false;
 	private ApmModes mode = ApmModes.UNKNOWN;
@@ -38,7 +38,7 @@ public class State extends DroneVariable {
 		this.clock = clock;
 		this.watchdog = handler;
         this.warningParser = warningParser;
-        this.errorType = warningParser.getDefaultWarning();
+        this.errorId = warningParser.getDefaultWarning();
 		resetFlightStartTime();
 	}
 
@@ -54,8 +54,8 @@ public class State extends DroneVariable {
 		return mode;
 	}
 
-	public String getErrorType() {
-		return errorType;
+	public String getErrorId() {
+		return errorId;
 	}
 
 	public void setIsFlying(boolean newState) {
@@ -74,8 +74,8 @@ public class State extends DroneVariable {
         if(parsedError == null || parsedError.trim().isEmpty())
             return false;
 
-        if (!parsedError.equals(this.errorType)) {
-            this.errorType = parsedError;
+        if (!parsedError.equals(this.errorId)) {
+            this.errorId = parsedError;
             myDrone.notifyDroneEvent(DroneEventsType.AUTOPILOT_WARNING);
         }
 
@@ -85,7 +85,7 @@ public class State extends DroneVariable {
     }
 
     public void repeatWarning(){
-        if(errorType == null || errorType.length() == 0 || errorType.equals(warningParser.getDefaultWarning()))
+        if(errorId == null || errorId.length() == 0 || errorId.equals(warningParser.getDefaultWarning()))
             return;
 
         watchdog.removeCallbacks(watchdogCallback);
@@ -125,8 +125,8 @@ public class State extends DroneVariable {
         if(defaultWarning == null)
             defaultWarning = "";
 
-        if (!defaultWarning.equals(this.errorType)) {
-            this.errorType = defaultWarning;
+        if (!defaultWarning.equals(this.errorId)) {
+            this.errorId = defaultWarning;
             myDrone.notifyDroneEvent(DroneEventsType.AUTOPILOT_WARNING);
         }
 	}
