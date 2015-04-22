@@ -9,6 +9,7 @@ import com.o3dr.services.android.lib.gcs.event.GCSEvent;
 import com.o3dr.services.android.lib.model.IApiListener;
 import com.o3dr.services.android.lib.model.IDroidPlannerServices;
 import com.o3dr.services.android.lib.model.IDroneApi;
+import com.o3dr.services.android.lib.util.version.VersionUtils;
 
 import org.droidplanner.services.android.BuildConfig;
 import org.droidplanner.services.android.drone.DroneManager;
@@ -41,7 +42,7 @@ final class DPServices extends IDroidPlannerServices.Stub {
 
     @Override
     public int getApiVersionCode() throws RemoteException {
-        return com.o3dr.services.android.lib.BuildConfig.VERSION_CODE;
+        return VersionUtils.LIB_VERSION;
     }
 
     @Override

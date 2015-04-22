@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 
 ext {
     PUBLISH_ARTIFACT_ID = 'dronekit-android'
-    PUBLISH_VERSION = '2.3.07'
+    PUBLISH_VERSION = '2.3.08'
     PROJECT_DESCRIPTION = "DroneKit-Android Client Library"
     PROJECT_LABELS = ['3DR', '3DR Services', 'DroneAPI', 'Android', 'DroneKit']
     PROJECT_LICENSES = ['Apache-2.0']
@@ -17,13 +17,23 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 21
-        versionCode 20307
+        versionCode 20308
         versionName PUBLISH_VERSION
+    }
+
+    sourceSets {
+        main {
+            aidl.srcDirs = ['src/main/java']
+        }
     }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
         targetCompatibility JavaVersion.VERSION_1_7
+    }
+
+    lintOptions {
+        abortOnError false
     }
 
     android.libraryVariants.all { variant ->
@@ -38,8 +48,12 @@ android {
 
 dependencies {
     compile 'com.android.support:support-v4:21.0.3'
-    compile project(':AidlLib')
-    compile files('libs/AidlLib.jar')
+    compile 'com.google.android.gms:play-services-base:6.5.87'
+
+    compile project(':dependencyLibs:Mavlink')
+    compile files('libs/Mavlink.jar')
 }
+
+assemble.dependsOn ':dependencyLibs:Mavlink:jar'
 
 apply from: "${rootDir}/release_android_library.gradle"

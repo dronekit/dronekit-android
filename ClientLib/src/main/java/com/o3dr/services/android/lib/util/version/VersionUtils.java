@@ -8,6 +8,8 @@ import android.content.pm.PackageManager;
  */
 public class VersionUtils {
 
+    public static final int LIB_VERSION = 20200;
+
     public static int getVersion(Context context){
         try {
             return context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionCode;

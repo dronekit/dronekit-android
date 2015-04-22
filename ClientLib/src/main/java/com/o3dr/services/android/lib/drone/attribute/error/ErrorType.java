@@ -5,7 +5,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.StringRes;
 
-import com.o3dr.services.android.lib.R;
+import com.o3dr.android.client.R;
 
 /**
  * List all the possible error types.

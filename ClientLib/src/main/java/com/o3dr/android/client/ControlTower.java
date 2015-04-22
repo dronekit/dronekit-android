@@ -14,9 +14,9 @@ import android.util.Log;
 import com.o3dr.android.client.interfaces.TowerListener;
 import com.o3dr.android.client.utils.InstallServiceDialog;
 import com.o3dr.android.client.utils.UpdateServiceDialog;
-import com.o3dr.services.android.lib.BuildConfig;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.model.IDroidPlannerServices;
+import com.o3dr.services.android.lib.util.version.VersionUtils;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -45,7 +45,7 @@ public class ControlTower {
             o3drServices = IDroidPlannerServices.Stub.asInterface(service);
             try {
                 final int libVersionCode = o3drServices.getApiVersionCode();
-                if (libVersionCode < BuildConfig.VERSION_CODE) {
+                if (libVersionCode < VersionUtils.LIB_VERSION) {
                     //Prompt the user to update the 3DR Services app.
                     o3drServices = null;
                     promptFor3DRServicesUpdate();

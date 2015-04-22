@@ -18,7 +18,10 @@ task androidJavadocs(type: Javadoc) {
         if (it instanceof ProjectDependency) {
             def dependency = it as ProjectDependency
             def depProj = dependency.getDependencyProject()
-            files += depProj.android.sourceSets.main.java.srcDirs
+            def projName = depProj.getName()
+            if(projName != "Mavlink") {
+                files += depProj.android.sourceSets.main.java.srcDirs
+            }
         }
     }
 

@@ -4,6 +4,7 @@ import android.os.RemoteException;
 
 import com.o3dr.services.android.lib.drone.connection.ConnectionResult;
 import com.o3dr.services.android.lib.model.IApiListener;
+import com.o3dr.services.android.lib.util.version.VersionUtils;
 
 /**
  * Created by fhuya on 12/15/14.
@@ -28,6 +29,6 @@ public class DroneApiListener extends IApiListener.Stub {
 
     @Override
     public int getApiVersionCode(){
-        return com.o3dr.services.android.lib.BuildConfig.VERSION_CODE;
+        return VersionUtils.LIB_VERSION;
     }
 }
