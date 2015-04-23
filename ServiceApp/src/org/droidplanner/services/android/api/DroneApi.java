@@ -21,6 +21,7 @@ import com.o3dr.services.android.lib.drone.action.StateActions;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
+import com.o3dr.services.android.lib.drone.attribute.error.ErrorType;
 import com.o3dr.services.android.lib.drone.camera.action.CameraActions;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionResult;
@@ -587,7 +588,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
             case AUTOPILOT_WARNING:
                 extrasBundle = new Bundle(1);
-                extrasBundle.putString(AttributeEventExtra.EXTRA_AUTOPILOT_ERROR_TYPE, drone.getState().getErrorType());
+                extrasBundle.putString(AttributeEventExtra.EXTRA_AUTOPILOT_ERROR_ID, drone.getState().getErrorId());
                 droneEvent = AttributeEvent.AUTOPILOT_ERROR;
                 break;
 

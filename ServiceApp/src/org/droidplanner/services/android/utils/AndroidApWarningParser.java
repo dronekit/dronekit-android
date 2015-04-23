@@ -1,5 +1,7 @@
 package org.droidplanner.services.android.utils;
 
+import com.o3dr.services.android.lib.drone.attribute.error.ErrorType;
+
 import org.droidplanner.core.model.AutopilotWarningParser;
 import org.droidplanner.core.model.Drone;
 
@@ -54,7 +56,7 @@ public class AndroidApWarningParser implements AutopilotWarningParser {
 
     @Override
     public String getDefaultWarning() {
-        return NO_ERROR;
+        return NO_ERROR.name();
     }
 
     /**
@@ -68,6 +70,14 @@ public class AndroidApWarningParser implements AutopilotWarningParser {
         if (android.text.TextUtils.isEmpty(warning))
             return null;
 
+        ErrorType errorType = getErrorType(warning);
+        if(errorType == null)
+            return null;
+
+        return errorType.name();
+    }
+
+    private ErrorType getErrorType(String warning){
         switch (warning.toLowerCase(Locale.US)) {
             case "arm: thr below fs":
             case "arm: throttle below failsafe":
