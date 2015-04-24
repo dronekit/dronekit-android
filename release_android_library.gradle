@@ -2,7 +2,7 @@ apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
 
 def publishFlag = false
-def projectGroupId = 'com.o3dr'
+def projectGroupId = 'com.o3dr.android'
 def projectArtifactId = project.PUBLISH_ARTIFACT_ID
 def projectVersion = project.PUBLISH_VERSION
 def projectDescription = project.PROJECT_DESCRIPTION
@@ -79,9 +79,8 @@ bintray {
     pkg {
         repo = getMavenRepo()
         name = projectArtifactId
-        userOrg = '3d-robotics'
         desc = projectDescription
-        websiteUrl = 'https://github.com/DroidPlanner/DroneKit-Android'
+        websiteUrl = 'http://android.dronekit.io/'
         issueTrackerUrl = 'https://github.com/DroidPlanner/DroneKit-Android/issues'
         vcsUrl = 'https://github.com/DroidPlanner/DroneKit-Android.git'
         licenses = projectLicenses

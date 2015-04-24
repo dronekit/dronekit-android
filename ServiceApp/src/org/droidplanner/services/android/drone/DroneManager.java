@@ -132,15 +132,17 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream,
         if (!mavClient.isConnected()) {
             mavClient.openConnection();
         } else {
-            listener.onDroneEvent(DroneInterfaces.DroneEventsType.CONNECTED, drone);
+            if (drone.isConnected()) {
 
-            if (drone.isConnectionAlive())
-                listener.onDroneEvent(DroneInterfaces.DroneEventsType.HEARTBEAT_FIRST, drone);
-            else
-                listener.onDroneEvent(DroneInterfaces.DroneEventsType.HEARTBEAT_TIMEOUT, drone);
+                if (drone.isConnectionAlive())
+                    listener.onDroneEvent(DroneInterfaces.DroneEventsType.HEARTBEAT_FIRST, drone);
+                else {
+                    listener.onDroneEvent(DroneInterfaces.DroneEventsType.CONNECTED, drone);
+                    listener.onDroneEvent(DroneInterfaces.DroneEventsType.HEARTBEAT_TIMEOUT, drone);
+                }
 
-
-            notifyConnected(appId, listener);
+                notifyConnected(appId, listener);
+            }
         }
 
         mavClient.addLoggingFile(appId);
