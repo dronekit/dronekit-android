@@ -85,7 +85,7 @@ public class AndroidUdpConnection extends AndroidMavLinkConnection {
 
         if (pingHandler != null) {
             for (PingTask pingTask : pingTasks)
-                pingHandler.postDelayed(pingTask, pingTask.period);
+                pingHandler.post(pingTask);
         }
     }
 
