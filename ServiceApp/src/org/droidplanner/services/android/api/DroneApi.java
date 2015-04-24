@@ -685,6 +685,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 break;
 
             case CONNECTION_FAILED:
+                disconnect();
                 onConnectionFailed("");
                 break;
 

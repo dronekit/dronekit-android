@@ -31,18 +31,62 @@ public class ConnectionParameter implements Parcelable {
         return droneSharePrefs;
     }
 
+    public String getUniqueId(){
+        final String uniqueId;
+        switch(connectionType){
+
+            case ConnectionType.TYPE_UDP:
+                int udpPort = ConnectionType.DEFAULT_UDP_SERVER_PORT;
+                if(paramsBundle != null){
+                    udpPort = paramsBundle.getInt(ConnectionType.EXTRA_UDP_SERVER_PORT, udpPort);
+                }
+                uniqueId = "udp." + udpPort;
+                break;
+
+            case ConnectionType.TYPE_BLUETOOTH:
+                String btAddress = null;
+                if(paramsBundle != null){
+                    btAddress = paramsBundle.getString(ConnectionType.EXTRA_BLUETOOTH_ADDRESS);
+                }
+
+                uniqueId = btAddress == null ? "bluetooth" : "bluetooth." + btAddress;
+                break;
+
+            case ConnectionType.TYPE_TCP:
+                String tcpIp = null;
+                int tcpPort = ConnectionType.DEFAULT_TCP_SERVER_PORT;
+                if(paramsBundle != null){
+                    tcpIp = paramsBundle.getString(ConnectionType.EXTRA_TCP_SERVER_IP);
+                    tcpPort = paramsBundle.getInt(ConnectionType.EXTRA_TCP_SERVER_PORT, tcpPort);
+                }
+
+                uniqueId = "tcp"  + "." + tcpPort + (tcpIp == null ? "" : "." + tcpIp);
+                break;
+
+            case ConnectionType.TYPE_USB:
+                uniqueId = "usb";
+                break;
+
+            default:
+                uniqueId = "";
+                break;
+        }
+
+        return uniqueId;
+    }
+
     @Override
     public boolean equals(Object o){
         if(this == o) return true;
         if(!(o instanceof ConnectionParameter)) return false;
 
         ConnectionParameter that = (ConnectionParameter) o;
-        return toString().equals(that.toString());
+        return getUniqueId().equals(that.getUniqueId());
     }
 
     @Override
     public int hashCode(){
-        return toString().hashCode();
+        return getUniqueId().hashCode();
     }
 
     @Override
