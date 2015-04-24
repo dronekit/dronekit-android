@@ -34,12 +34,12 @@ public class ConnectionType {
     /**
      * Key used to retrieve the ip address of the udp server to ping.
      */
-    public static final String EXTRA_UDP_PING_SERVER_IP = "extra_udp_ping_server_ip";
+    public static final String EXTRA_UDP_PING_RECEIVER_IP = "extra_udp_ping_receiver_ip";
 
     /**
      * Key used to retrieve the port of the udp server to ping.
      */
-    public static final String EXTRA_UDP_PING_SERVER_PORT = "extra_udp_ping_server_port";
+    public static final String EXTRA_UDP_PING_RECEIVER_PORT = "extra_udp_ping_receiver_port";
 
     /**
      * Ping payload.

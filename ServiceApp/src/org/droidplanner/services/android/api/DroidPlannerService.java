@@ -186,19 +186,21 @@ public class DroidPlannerService extends Service {
         }
 
         if (connectionType == ConnectionType.TYPE_UDP) {
-            try {
-                final String pingIpAddress = paramsBundle.getString(ConnectionType.EXTRA_UDP_PING_SERVER_IP);
+            final String pingIpAddress = paramsBundle.getString(ConnectionType.EXTRA_UDP_PING_RECEIVER_IP);
+            if (!TextUtils.isEmpty(pingIpAddress)) {
+                try {
+                    final InetAddress resolvedAddress = InetAddress.getByName(pingIpAddress);
 
-                final InetAddress resolvedAddress = InetAddress.getByName(pingIpAddress);
+                    final int pingPort = paramsBundle.getInt(ConnectionType.EXTRA_UDP_PING_RECEIVER_PORT);
+                    final long pingPeriod = paramsBundle.getLong(ConnectionType.EXTRA_UDP_PING_PERIOD,
+                            ConnectionType.DEFAULT_UDP_PING_PERIOD);
+                    final byte[] pingPayload = paramsBundle.getByteArray(ConnectionType.EXTRA_UDP_PING_PAYLOAD);
 
-                final int pingPort = paramsBundle.getInt(ConnectionType.EXTRA_UDP_PING_SERVER_PORT);
-                final long pingPeriod = paramsBundle.getLong(ConnectionType.EXTRA_UDP_PING_PERIOD,
-                        ConnectionType.DEFAULT_UDP_PING_PERIOD);
-                final byte[] pingPayload = paramsBundle.getByteArray(ConnectionType.EXTRA_UDP_PING_PAYLOAD);
+                    ((AndroidUdpConnection) conn).addPingTarget(resolvedAddress, pingPort, pingPeriod, pingPayload);
 
-                ((AndroidUdpConnection) conn).addPingTarget(resolvedAddress, pingPort, pingPeriod, pingPayload);
-            } catch (UnknownHostException e) {
-                Log.e(TAG, "Unable to resolve UDP ping server ip address.", e);
+                } catch (UnknownHostException e) {
+                    Log.e(TAG, "Unable to resolve UDP ping server ip address.", e);
+                }
             }
         }
 
