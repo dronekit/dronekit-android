@@ -29,7 +29,29 @@ public class ConnectionType {
     /**
      * Default value for the upd server port.
      */
-    public static final int DEFAULT_UPD_SERVER_PORT = 14550;
+    public static final int DEFAULT_UDP_SERVER_PORT = 14550;
+
+    /**
+     * Key used to retrieve the ip address of the udp server to ping.
+     */
+    public static final String EXTRA_UDP_PING_SERVER_IP = "extra_udp_ping_server_ip";
+
+    /**
+     * Key used to retrieve the port of the udp server to ping.
+     */
+    public static final String EXTRA_UDP_PING_SERVER_PORT = "extra_udp_ping_server_port";
+
+    /**
+     * Ping payload.
+     */
+    public static final String EXTRA_UDP_PING_PAYLOAD = "extra_udp_ping_payload";
+
+    /**
+     * How often should the udp ping be performed.
+     */
+    public static final String EXTRA_UDP_PING_PERIOD = "extra_udp_ping_period";
+
+    public static final long DEFAULT_UDP_PING_PERIOD = 10000l; //10 seconds
 
     /**
      * TCP connection type

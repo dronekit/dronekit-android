@@ -30,7 +30,7 @@ public class MavLinkServiceApi {
     }
 
     public boolean sendData(ConnectionParameter connParams, MAVLinkPacket packet) {
-        final AndroidMavLinkConnection mavConnection = getService().mavConnections.get(connParams);
+        final AndroidMavLinkConnection mavConnection = getService().mavConnections.get(connParams.getUniqueId());
         if (mavConnection == null) return false;
 
         if (mavConnection.getConnectionStatus() != MavLinkConnection.MAVLINK_DISCONNECTED) {
@@ -42,7 +42,7 @@ public class MavLinkServiceApi {
     }
 
     public int getConnectionStatus(ConnectionParameter connParams, String tag) {
-        final AndroidMavLinkConnection mavConnection = getService().mavConnections.get(connParams);
+        final AndroidMavLinkConnection mavConnection = getService().mavConnections.get(connParams.getUniqueId());
         if (mavConnection == null || !mavConnection.hasMavLinkConnectionListener(tag)) {
             return MavLinkConnection.MAVLINK_DISCONNECTED;
         }

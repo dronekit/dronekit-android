@@ -39,6 +39,8 @@ import org.droidplanner.services.android.utils.Utils;
 import org.droidplanner.services.android.utils.analytics.GAUtils;
 import org.droidplanner.services.android.utils.file.IO.CameraInfoLoader;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -65,7 +67,7 @@ public class DroidPlannerService extends Service {
     /**
      * Caches mavlink connections per connection type.
      */
-    final ConcurrentHashMap<ConnectionParameter, AndroidMavLinkConnection> mavConnections = new ConcurrentHashMap<>();
+    final ConcurrentHashMap<String, AndroidMavLinkConnection> mavConnections = new ConcurrentHashMap<>();
 
     /**
      * Caches drone managers per connection type.
@@ -137,12 +139,12 @@ public class DroidPlannerService extends Service {
 
     void connectMAVConnection(ConnectionParameter connParams, String listenerTag,
                               MavLinkConnectionListener listener) {
-        AndroidMavLinkConnection conn = mavConnections.get(connParams);
+        AndroidMavLinkConnection conn = mavConnections.get(connParams.getUniqueId());
+        final int connectionType = connParams.getConnectionType();
+        final Bundle paramsBundle = connParams.getParamsBundle();
         if (conn == null) {
 
             //Create a new mavlink connection
-            final int connectionType = connParams.getConnectionType();
-            final Bundle paramsBundle = connParams.getParamsBundle();
 
             switch (connectionType) {
                 case ConnectionType.TYPE_USB:
@@ -169,9 +171,9 @@ public class DroidPlannerService extends Service {
                     break;
 
                 case ConnectionType.TYPE_UDP:
-                    final int udpServerPort = paramsBundle.getInt(ConnectionType
-                            .EXTRA_UDP_SERVER_PORT, ConnectionType.DEFAULT_UPD_SERVER_PORT);
-                    conn = new AndroidUdpConnection(getApplicationContext(), udpServerPort);
+                    final int udpServerPort = paramsBundle
+                            .getInt(ConnectionType.EXTRA_UDP_SERVER_PORT, ConnectionType.DEFAULT_UDP_SERVER_PORT);
+                    conn = new AndroidUdpConnection(getApplicationContext(), udpServerPort, new Handler(Looper.getMainLooper()));
                     Log.d(TAG, "Connecting over udp.");
                     break;
 
@@ -180,7 +182,24 @@ public class DroidPlannerService extends Service {
                     return;
             }
 
-            mavConnections.put(connParams, conn);
+            mavConnections.put(connParams.getUniqueId(), conn);
+        }
+
+        if (connectionType == ConnectionType.TYPE_UDP) {
+            try {
+                final String pingIpAddress = paramsBundle.getString(ConnectionType.EXTRA_UDP_PING_SERVER_IP);
+
+                final InetAddress resolvedAddress = InetAddress.getByName(pingIpAddress);
+
+                final int pingPort = paramsBundle.getInt(ConnectionType.EXTRA_UDP_PING_SERVER_PORT);
+                final long pingPeriod = paramsBundle.getLong(ConnectionType.EXTRA_UDP_PING_PERIOD,
+                        ConnectionType.DEFAULT_UDP_PING_PERIOD);
+                final byte[] pingPayload = paramsBundle.getByteArray(ConnectionType.EXTRA_UDP_PING_PAYLOAD);
+
+                ((AndroidUdpConnection) conn).addPingTarget(resolvedAddress, pingPort, pingPeriod, pingPayload);
+            } catch (UnknownHostException e) {
+                Log.e(TAG, "Unable to resolve UDP ping server ip address.", e);
+            }
         }
 
         conn.addMavLinkConnectionListener(listenerTag, listener);
@@ -196,7 +215,7 @@ public class DroidPlannerService extends Service {
     }
 
     void addLoggingFile(ConnectionParameter connParams, String tag, String loggingFilePath) {
-        AndroidMavLinkConnection conn = mavConnections.get(connParams);
+        AndroidMavLinkConnection conn = mavConnections.get(connParams.getUniqueId());
         if (conn == null)
             return;
 
@@ -204,7 +223,7 @@ public class DroidPlannerService extends Service {
     }
 
     void removeLoggingFile(ConnectionParameter connParams, String tag) {
-        AndroidMavLinkConnection conn = mavConnections.get(connParams);
+        AndroidMavLinkConnection conn = mavConnections.get(connParams.getUniqueId());
         if (conn == null)
             return;
 
@@ -212,7 +231,7 @@ public class DroidPlannerService extends Service {
     }
 
     void disconnectMAVConnection(ConnectionParameter connParams, String listenerTag) {
-        final AndroidMavLinkConnection conn = mavConnections.get(connParams);
+        final AndroidMavLinkConnection conn = mavConnections.get(connParams.getUniqueId());
         if (conn == null)
             return;
 
@@ -289,6 +308,7 @@ public class DroidPlannerService extends Service {
         updateForegroundNotification();
     }
 
+    @SuppressLint("NewApi")
     private void updateForegroundNotification() {
         final Context context = getApplicationContext();
 
