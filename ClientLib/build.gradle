@@ -3,7 +3,7 @@ apply plugin: 'com.android.library'
 ext {
     PUBLISH_ARTIFACT_ID = 'dronekit-android'
     PUBLISH_VERSION = '2.3.09'
-    PROJECT_DESCRIPTION = "DroneKit-Android Client Library"
+    PROJECT_DESCRIPTION = "Android DroneKit client library."
     PROJECT_LABELS = ['3DR', '3DR Services', 'DroneAPI', 'Android', 'DroneKit']
     PROJECT_LICENSES = ['Apache-2.0']
 }
