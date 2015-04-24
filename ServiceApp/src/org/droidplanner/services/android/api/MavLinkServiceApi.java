@@ -50,8 +50,7 @@ public class MavLinkServiceApi {
         return mavConnection.getConnectionStatus();
     }
 
-    public void connectMavLink(ConnectionParameter connParams, String tag,
-                               MavLinkConnectionListener listener) {
+    public void connectMavLink(ConnectionParameter connParams, String tag, MavLinkConnectionListener listener) {
         getService().connectMAVConnection(connParams, tag, listener);
     }
 

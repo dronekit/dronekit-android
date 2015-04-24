@@ -68,7 +68,7 @@ public class ConnectionParameter implements Parcelable {
                 break;
 
             default:
-                uniqueId = null;
+                uniqueId = "";
                 break;
         }
 
@@ -81,12 +81,12 @@ public class ConnectionParameter implements Parcelable {
         if(!(o instanceof ConnectionParameter)) return false;
 
         ConnectionParameter that = (ConnectionParameter) o;
-        return toString().equals(that.toString());
+        return getUniqueId().equals(that.getUniqueId());
     }
 
     @Override
     public int hashCode(){
-        return toString().hashCode();
+        return getUniqueId().hashCode();
     }
 
     @Override

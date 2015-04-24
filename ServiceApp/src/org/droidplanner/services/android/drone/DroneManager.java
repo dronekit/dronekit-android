@@ -168,18 +168,19 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream,
         if (TextUtils.isEmpty(appId))
             return;
 
+        Log.d(TAG, "Disconnecting client " + appId);
         DroneEventsListener listener = connectedApps.remove(appId);
 
+        final MAVLinkClient mavClient = (MAVLinkClient) drone.getMavClient();
         if (listener != null) {
-            MAVLinkClient mavClient = (MAVLinkClient) drone.getMavClient();
             mavClient.removeLoggingFile(appId);
-
-            if (mavClient.isConnected() && connectedApps.isEmpty()) {
-                mavClient.closeConnection();
-            }
 
             listener.onDroneEvent(DroneInterfaces.DroneEventsType.DISCONNECTED, drone);
             notifyDisconnected(appId, listener);
+        }
+
+        if (mavClient.isConnected() && connectedApps.isEmpty()) {
+            mavClient.closeConnection();
         }
     }
 

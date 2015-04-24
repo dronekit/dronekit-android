@@ -173,7 +173,7 @@ public class DroidPlannerService extends Service {
                 case ConnectionType.TYPE_UDP:
                     final int udpServerPort = paramsBundle
                             .getInt(ConnectionType.EXTRA_UDP_SERVER_PORT, ConnectionType.DEFAULT_UDP_SERVER_PORT);
-                    conn = new AndroidUdpConnection(getApplicationContext(), udpServerPort, new Handler(Looper.getMainLooper()));
+                    conn = new AndroidUdpConnection(getApplicationContext(), udpServerPort);
                     Log.d(TAG, "Connecting over udp.");
                     break;
 

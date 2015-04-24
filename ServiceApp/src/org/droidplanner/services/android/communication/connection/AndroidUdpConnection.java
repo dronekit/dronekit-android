@@ -1,7 +1,6 @@
 package org.droidplanner.services.android.communication.connection;
 
 import android.content.Context;
-import android.os.Handler;
 import android.util.Log;
 
 import org.droidplanner.core.MAVLink.connection.UdpConnection;
@@ -10,7 +9,9 @@ import org.droidplanner.core.model.Logger;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.HashSet;
-import java.util.LinkedList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class AndroidUdpConnection extends AndroidMavLinkConnection {
 
@@ -21,12 +22,11 @@ public class AndroidUdpConnection extends AndroidMavLinkConnection {
     private final UdpConnection mConnectionImpl;
     private final int serverPort;
 
-    private Handler pingHandler;
+    private ScheduledExecutorService pingRunner;
 
-    public AndroidUdpConnection(Context context, int udpServerPort, Handler pingHandler) {
+    public AndroidUdpConnection(Context context, int udpServerPort) {
         super(context);
         this.serverPort = udpServerPort;
-        this.pingHandler = pingHandler;
 
         mConnectionImpl = new UdpConnection() {
             @Override
@@ -53,22 +53,24 @@ public class AndroidUdpConnection extends AndroidMavLinkConnection {
     }
 
     public void addPingTarget(final InetAddress address, final int port, final long period, final byte[] payload) {
-        if (pingHandler == null || address == null || payload == null || period <= 0)
+        if (address == null || payload == null || period <= 0)
             return;
 
         final PingTask pingTask = new PingTask(address, port, period, payload);
 
         pingTasks.add(pingTask);
 
-        if (getConnectionStatus() == AndroidMavLinkConnection.MAVLINK_CONNECTED)
-            pingHandler.postDelayed(pingTask, period);
+        if (getConnectionStatus() == AndroidMavLinkConnection.MAVLINK_CONNECTED && pingRunner != null && !pingRunner.isShutdown())
+            pingRunner.scheduleWithFixedDelay(pingTask, 0, period, TimeUnit.MILLISECONDS);
     }
 
     @Override
     protected void closeConnection() throws IOException {
-        if (pingHandler != null) {
-            for (PingTask pingTask : pingTasks)
-                pingHandler.removeCallbacks(pingTask);
+        Log.d(TAG, "Closing udp connection.");
+        if (pingRunner != null) {
+            Log.d(TAG, "Shutting down pinging tasks.");
+            pingRunner.shutdownNow();
+            pingRunner = null;
         }
 
         mConnectionImpl.closeConnection();
@@ -81,12 +83,14 @@ public class AndroidUdpConnection extends AndroidMavLinkConnection {
 
     @Override
     protected void openConnection() throws IOException {
+        Log.d(TAG, "Opening udp connection");
         mConnectionImpl.openConnection();
 
-        if (pingHandler != null) {
-            for (PingTask pingTask : pingTasks)
-                pingHandler.post(pingTask);
-        }
+        if (pingRunner == null || pingRunner.isShutdown())
+            pingRunner = Executors.newSingleThreadScheduledExecutor();
+
+        for (PingTask pingTask : pingTasks)
+            pingRunner.scheduleWithFixedDelay(pingTask, 0, pingTask.period, TimeUnit.MILLISECONDS);
     }
 
     @Override
@@ -119,15 +123,20 @@ public class AndroidUdpConnection extends AndroidMavLinkConnection {
         }
 
         @Override
-        public boolean equals(Object other){
-            if(this == other)
+        public boolean equals(Object other) {
+            if (this == other)
                 return true;
 
-            if(!(other instanceof AndroidUdpConnection))
+            if (!(other instanceof PingTask))
                 return false;
 
             PingTask that = (PingTask) other;
             return this.address.equals(that.address) && this.port == that.port && this.period == that.period;
+        }
+
+        @Override
+        public int hashCode(){
+            return toString().hashCode();
         }
 
         @Override
@@ -137,9 +146,11 @@ public class AndroidUdpConnection extends AndroidMavLinkConnection {
             } catch (IOException e) {
                 Log.e(TAG, "Error occurred while sending ping message.", e);
             }
+        }
 
-            if (getConnectionStatus() == AndroidMavLinkConnection.MAVLINK_CONNECTED)
-                pingHandler.postDelayed(this, period);
+        @Override
+        public String toString(){
+            return "[" + address.toString() + "; " + port + "; " + period + "]";
         }
     }
 }
