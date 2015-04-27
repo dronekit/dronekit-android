@@ -2,7 +2,7 @@ apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
 
 def publishFlag = false
-def projectGroupId = 'com.o3dr'
+def projectGroupId = 'com.o3dr.android'
 def projectArtifactId = project.PUBLISH_ARTIFACT_ID
 def projectVersion = project.PUBLISH_VERSION
 def projectDescription = project.PROJECT_DESCRIPTION
@@ -18,7 +18,10 @@ task androidJavadocs(type: Javadoc) {
         if (it instanceof ProjectDependency) {
             def dependency = it as ProjectDependency
             def depProj = dependency.getDependencyProject()
-            files += depProj.android.sourceSets.main.java.srcDirs
+            def projName = depProj.getName()
+            if(projName != "Mavlink") {
+                files += depProj.android.sourceSets.main.java.srcDirs
+            }
         }
     }
 
@@ -26,6 +29,8 @@ task androidJavadocs(type: Javadoc) {
     title = projectDescription
     exclude '**/*.aidl'
     classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+    options.links("http://docs.oracle.com/javase/7/docs/api/")
+    options.links("https://developer.android.com/reference/packages.html")
 }
 
 task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs){
@@ -75,7 +80,7 @@ bintray {
         repo = getMavenRepo()
         name = projectArtifactId
         desc = projectDescription
-        websiteUrl = 'https://github.com/DroidPlanner/DroneKit-Android'
+        websiteUrl = 'http://android.dronekit.io/'
         issueTrackerUrl = 'https://github.com/DroidPlanner/DroneKit-Android/issues'
         vcsUrl = 'https://github.com/DroidPlanner/DroneKit-Android.git'
         licenses = projectLicenses

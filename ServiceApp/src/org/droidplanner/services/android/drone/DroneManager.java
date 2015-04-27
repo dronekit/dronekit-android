@@ -90,7 +90,7 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream,
 
         DroidPlannerPrefs dpPrefs = new DroidPlannerPrefs(context);
 
-        this.drone = new DroneImpl(mavClient, clock, dpHandler, dpPrefs, new AndroidApWarningParser(context), this);
+        this.drone = new DroneImpl(mavClient, clock, dpHandler, dpPrefs, new AndroidApWarningParser(), this);
         this.drone.getStreamRates().setRates(dpPrefs.getRates());
 
         this.mavLinkMsgHandler = new MavLinkMsgHandler(this.drone);
@@ -132,15 +132,17 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream,
         if (!mavClient.isConnected()) {
             mavClient.openConnection();
         } else {
-            listener.onDroneEvent(DroneInterfaces.DroneEventsType.CONNECTED, drone);
+            if (drone.isConnected()) {
 
-            if (drone.isConnectionAlive())
-                listener.onDroneEvent(DroneInterfaces.DroneEventsType.HEARTBEAT_FIRST, drone);
-            else
-                listener.onDroneEvent(DroneInterfaces.DroneEventsType.HEARTBEAT_TIMEOUT, drone);
+                if (drone.isConnectionAlive())
+                    listener.onDroneEvent(DroneInterfaces.DroneEventsType.HEARTBEAT_FIRST, drone);
+                else {
+                    listener.onDroneEvent(DroneInterfaces.DroneEventsType.CONNECTED, drone);
+                    listener.onDroneEvent(DroneInterfaces.DroneEventsType.HEARTBEAT_TIMEOUT, drone);
+                }
 
-
-            notifyConnected(appId, listener);
+                notifyConnected(appId, listener);
+            }
         }
 
         mavClient.addLoggingFile(appId);
@@ -166,18 +168,19 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream,
         if (TextUtils.isEmpty(appId))
             return;
 
+        Log.d(TAG, "Disconnecting client " + appId);
         DroneEventsListener listener = connectedApps.remove(appId);
 
+        final MAVLinkClient mavClient = (MAVLinkClient) drone.getMavClient();
         if (listener != null) {
-            MAVLinkClient mavClient = (MAVLinkClient) drone.getMavClient();
             mavClient.removeLoggingFile(appId);
-
-            if (mavClient.isConnected() && connectedApps.isEmpty()) {
-                mavClient.closeConnection();
-            }
 
             listener.onDroneEvent(DroneInterfaces.DroneEventsType.DISCONNECTED, drone);
             notifyDisconnected(appId, listener);
+        }
+
+        if (mavClient.isConnected() && connectedApps.isEmpty()) {
+            mavClient.closeConnection();
         }
     }
 

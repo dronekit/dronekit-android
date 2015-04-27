@@ -5,3 +5,7 @@ sourceSets {
         java.srcDirs = ['src']
     }
 }
+
+jar {
+    destinationDir (new File("${rootDir}/ClientLib/libs"))
+}

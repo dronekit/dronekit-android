@@ -16,7 +16,6 @@ import com.o3dr.services.android.lib.util.googleApi.GoogleApiClientManager.Googl
 import org.droidplanner.core.gcs.location.Location.LocationFinder;
 import org.droidplanner.core.gcs.location.Location.LocationReceiver;
 import org.droidplanner.core.helpers.coordinates.Coord3D;
-import org.droidplanner.core.helpers.units.Altitude;
 
 /**
  * Feeds Location Data from Android's FusedLocation LocationProvider
@@ -105,7 +104,7 @@ public class FusedLocation implements LocationFinder, com.google.android.gms.loc
                     new Coord3D(
                             androidLocation.getLatitude(),
                             androidLocation.getLongitude(),
-                            new Altitude(androidLocation.getAltitude())),
+                            androidLocation.getAltitude()),
                     androidLocation.getBearing(),
                     androidLocation.hasSpeed() ? androidLocation.getSpeed() : currentSpeed,
                     isLocationAccurate,

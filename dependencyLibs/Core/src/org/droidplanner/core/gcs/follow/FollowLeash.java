@@ -26,7 +26,7 @@ public class FollowLeash extends FollowWithRadiusAlgorithm {
             return;
         }
 
-        if (GeoTools.getDistance(locationCoord, dronePosition).valueInMeters() > radius) {
+        if (GeoTools.getDistance(locationCoord, dronePosition) > radius) {
             double headingGCStoDrone = GeoTools.getHeadingFromCoordinates(locationCoord, dronePosition);
             Coord2D goCoord = GeoTools.newCoordFromBearingAndDistance(locationCoord, headingGCStoDrone, radius);
             drone.getGuidedPoint().newGuidedCoord(goCoord);

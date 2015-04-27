@@ -21,6 +21,8 @@ import com.o3dr.services.android.lib.drone.action.StateActions;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
+import com.o3dr.services.android.lib.drone.attribute.error.ErrorType;
+import com.o3dr.services.android.lib.drone.camera.action.CameraActions;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionResult;
 import com.o3dr.services.android.lib.drone.connection.DroneSharePrefs;
@@ -206,6 +208,10 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 break;
             case AttributeType.CAMERA:
                 carrier.putParcelable(type, DroneApiUtils.getCameraProxy(drone, service.getCameraDetails()));
+                break;
+
+            case AttributeType.GOPRO:
+                carrier.putParcelable(type, DroneApiUtils.getGoPro(drone));
                 break;
         }
 
@@ -441,8 +447,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                                     final Coord2D roiTarget;
                                     if (target instanceof LatLongAlt) {
                                         roiTarget = new Coord3D(target.getLatitude(), target.getLongitude(),
-                                                new org.droidplanner.core.helpers.units.Altitude(((LatLongAlt) target)
-                                                        .getAltitude()));
+                                                ((LatLongAlt) target).getAltitude());
                                     } else {
                                         roiTarget = new Coord2D(target.getLatitude(), target.getLongitude());
                                     }
@@ -459,6 +464,15 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
             case FollowMeActions.ACTION_DISABLE_FOLLOW_ME:
                 DroneApiUtils.disableFollowMe(getFollowMe());
+                break;
+
+            //************ CAMERA ACTIONS *************//
+            case CameraActions.ACTION_START_VIDEO_RECORDING:
+                DroneApiUtils.startVideoRecording(getDrone());
+                break;
+
+            case CameraActions.ACTION_STOP_VIDEO_RECORDING:
+                DroneApiUtils.stopVideoRecording(getDrone());
                 break;
         }
     }
@@ -573,11 +587,9 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 break;
 
             case AUTOPILOT_WARNING:
-                extrasBundle = new Bundle(2);
-                extrasBundle.putInt(AttributeEventExtra.EXTRA_AUTOPILOT_FAILSAFE_MESSAGE_LEVEL, Log.ERROR);
-                extrasBundle.putString(AttributeEventExtra.EXTRA_AUTOPILOT_FAILSAFE_MESSAGE,
-                        drone.getState().getWarning());
-                droneEvent = AttributeEvent.AUTOPILOT_FAILSAFE;
+                extrasBundle = new Bundle(1);
+                extrasBundle.putString(AttributeEventExtra.EXTRA_AUTOPILOT_ERROR_ID, drone.getState().getErrorId());
+                droneEvent = AttributeEvent.AUTOPILOT_ERROR;
                 break;
 
             case MODE:
@@ -669,22 +681,11 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 break;
 
             case CONNECTING:
-                extrasBundle = new Bundle(2);
-                extrasBundle.putInt(AttributeEventExtra.EXTRA_AUTOPILOT_FAILSAFE_MESSAGE_LEVEL, Log.INFO);
-                extrasBundle.putString(AttributeEventExtra.EXTRA_AUTOPILOT_FAILSAFE_MESSAGE,
-                        "Connecting...");
-                droneEvent = AttributeEvent.AUTOPILOT_FAILSAFE;
-                break;
-
-            case CHECKING_VEHICLE_LINK:
-                extrasBundle = new Bundle(2);
-                extrasBundle.putInt(AttributeEventExtra.EXTRA_AUTOPILOT_FAILSAFE_MESSAGE_LEVEL, Log.INFO);
-                extrasBundle.putString(AttributeEventExtra.EXTRA_AUTOPILOT_FAILSAFE_MESSAGE,
-                        "Checking vehicle link...");
-                droneEvent = AttributeEvent.AUTOPILOT_FAILSAFE;
+                droneEvent = AttributeEvent.STATE_CONNECTING;
                 break;
 
             case CONNECTION_FAILED:
+                disconnect();
                 onConnectionFailed("");
                 break;
 
@@ -738,8 +739,8 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 droneEvent = AttributeEvent.FOLLOW_UPDATE;
                 break;
 
-            case WARNING_400FT_EXCEEDED:
-                droneEvent = AttributeEvent.ALTITUDE_400FT_EXCEEDED;
+            case ALTITUDE:
+                droneEvent = AttributeEvent.ALTITUDE_UPDATED;
                 break;
 
             case WARNING_SIGNAL_WEAK:
@@ -755,6 +756,10 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
             case FOOTPRINT:
                 droneEvent = AttributeEvent.CAMERA_FOOTPRINTS_UPDATED;
+                break;
+
+            case GOPRO_STATUS_UPDATE:
+                droneEvent = AttributeEvent.GOPRO_STATE_UPDATED;
                 break;
         }
 

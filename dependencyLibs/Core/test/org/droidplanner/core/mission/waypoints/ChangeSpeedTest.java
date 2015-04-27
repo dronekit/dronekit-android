@@ -4,7 +4,6 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.droidplanner.core.helpers.units.Speed;
 import org.droidplanner.core.mission.Mission;
 import org.droidplanner.core.mission.commands.ChangeSpeed;
 
@@ -15,7 +14,7 @@ public class ChangeSpeedTest extends TestCase {
 
 	public void testPackMissionItem() {
 		Mission mission = new Mission(null);
-		ChangeSpeed item = new ChangeSpeed(mission, new Speed(12.0));
+		ChangeSpeed item = new ChangeSpeed(mission, 12.0);
 
 		List<msg_mission_item> listOfMsg = item.packMissionItem();
 		assertEquals(1, listOfMsg.size());

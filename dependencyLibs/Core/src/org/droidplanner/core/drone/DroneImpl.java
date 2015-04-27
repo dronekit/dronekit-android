@@ -2,6 +2,7 @@ package org.droidplanner.core.drone;
 
 import org.droidplanner.core.MAVLink.MAVLinkStreams;
 import org.droidplanner.core.MAVLink.WaypointManager;
+import org.droidplanner.core.drone.camera.GoProImpl;
 import org.droidplanner.core.drone.profiles.Parameters;
 import org.droidplanner.core.drone.profiles.VehicleProfile;
 import org.droidplanner.core.drone.variables.Altitude;
@@ -55,6 +56,7 @@ public class DroneImpl implements Drone {
 	private final State state;
 	private final HeartBeat heartbeat;
 	private final Parameters parameters;
+    private final GoProImpl goProImpl;
 
 	private final MAVLinkStreams.MAVLinkOutputStream MavClient;
 	private final Preferences preferences;
@@ -91,16 +93,15 @@ public class DroneImpl implements Drone {
         this.calibrationSetup = new Calibration(this);
         this.mag = new Magnetometer(this);
         this.footprints = new Camera(this);
+        this.goProImpl = new GoProImpl(this, handler);
 
         loadVehicleProfile();
 	}
 
 	@Override
-	public void setAltitudeGroundAndAirSpeeds(double altitude, double groundSpeed, double airSpeed,
-			double climb) {
+	public void setAltitudeGroundAndAirSpeeds(double altitude, double groundSpeed, double airSpeed,	double climb) {
 		this.altitude.setAltitude(altitude);
 		speed.setGroundAndAirSpeeds(groundSpeed, airSpeed, climb);
-	    notifyDroneEvent(DroneInterfaces.DroneEventsType.SPEED);
 	}
 
 	@Override
@@ -299,5 +300,10 @@ public class DroneImpl implements Drone {
     public void logMessage(int mavSeverity, String message) {
         if(logListener != null)
             logListener.onMessageLogged(mavSeverity, message);
+    }
+
+    @Override
+    public GoProImpl getGoProImpl() {
+        return this.goProImpl;
     }
 }

@@ -16,7 +16,7 @@ dependencies {
     compile files('libs/droneapi-java.jar')
     compile files('libs/protobuf-java-2.5.0.jar')
 
-    compile project(':AidlLib')
+    compile project(':ClientLib')
     compile project(':dependencyLibs:Core')
     compile project(':dependencyLibs:usb-serial-for-android:UsbSerialLibrary')
     compile('com.crashlytics.sdk.android:crashlytics:2.2.2@aar') {
@@ -35,7 +35,7 @@ android {
         applicationId 'org.droidplanner.services.android'
         minSdkVersion 14
         targetSdkVersion 21
-        versionCode 10210
+        versionCode 10213
         versionName getGitVersion()
     }
 

@@ -76,6 +76,9 @@ public class Coord2D {
 
 	@Override
 	public boolean equals(Object obj) {
+        if(obj == this)
+            return true;
+
 		if (obj instanceof Coord2D) {
 			return equals((Coord2D) obj);
 		}else{
@@ -84,6 +87,6 @@ public class Coord2D {
 	}
 
 	public boolean equals(Coord2D obj) {
-		return GeoTools.getDistance(this, obj).valueInMeters()<1e-6;
+		return GeoTools.getDistance(this, obj) <1e-6;
 	}
 }

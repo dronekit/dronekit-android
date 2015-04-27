@@ -1,7 +1,6 @@
 //Android projects
 include ':ServiceApp'
-include ':ClientLib:mobile'
-include ':AidlLib'
+include ':ClientLib'
 
 //Library projects
 include ':dependencyLibs:Core'

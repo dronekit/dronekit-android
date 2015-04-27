@@ -4,26 +4,29 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Provides support for mavlink connection via udp.
  */
 public abstract class UdpConnection extends MavLinkConnection {
 
-	private DatagramSocket socket;
+	private AtomicReference<DatagramSocket> socketRef = new AtomicReference<>();
 	private int serverPort;
 
 	private int hostPort;
 	private InetAddress hostAdd;
 
 	private void getUdpStream() throws IOException {
-		socket = new DatagramSocket(serverPort);
+		final DatagramSocket socket = new DatagramSocket(serverPort);
 		socket.setBroadcast(true);
 		socket.setReuseAddress(true);
+        socketRef.set(socket);
 	}
 
 	@Override
 	public final void closeConnection() throws IOException {
+        final DatagramSocket socket = socketRef.get();
 		if (socket != null)
 			socket.close();
 	}
@@ -36,6 +39,10 @@ public abstract class UdpConnection extends MavLinkConnection {
 
 	@Override
 	public final void sendBuffer(byte[] buffer) throws IOException {
+        final DatagramSocket socket = socketRef.get();
+        if(socket == null)
+            return;
+
 		try {
 			if (hostAdd != null) { // We can't send to our sister until they
 				// have connected to us
@@ -47,8 +54,21 @@ public abstract class UdpConnection extends MavLinkConnection {
 		}
 	}
 
+    public void sendBuffer(InetAddress targetAddr, int targetPort, byte[] buffer) throws IOException {
+        final DatagramSocket socket = socketRef.get();
+        if(socket == null || targetAddr == null || buffer == null)
+            return;
+
+        DatagramPacket packet = new DatagramPacket(buffer, buffer.length, targetAddr, targetPort);
+        socket.send(packet);
+    }
+
 	@Override
 	public final int readDataBlock(byte[] readData) throws IOException {
+        final DatagramSocket socket = socketRef.get();
+        if(socket == null)
+            return 0;
+
 		DatagramPacket packet = new DatagramPacket(readData, readData.length);
 		socket.receive(packet);
 		hostAdd = packet.getAddress();
