@@ -4,7 +4,7 @@ if [ "$TRAVIS_REPO_SLUG" == "DroidPlanner/DroneKit-Android" ] && [ "$TRAVIS_JDK_
 
   echo -e "Publishing html docs...\n"
 
-  cp -R ClientLib/mobile/build/docs/javadoc $HOME/javadoc-latest
+  cp -R ClientLib/build/docs/javadoc $HOME/javadoc-latest
   cp -R doc/_build $HOME/guide-latest
 
   cd $HOME
