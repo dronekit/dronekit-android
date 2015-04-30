@@ -2,10 +2,9 @@
 
 if [ "$TRAVIS_REPO_SLUG" == "DroidPlanner/DroneKit-Android" ] && [ "$TRAVIS_JDK_VERSION" == "oraclejdk7" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_BRANCH" == "develop" ]; then
 
-  echo -e "Publishing html docs...\n"
+  echo -e "Publishing javadocs...\n"
 
   cp -R ClientLib/build/docs/javadoc $HOME/javadoc-latest
-  cp -R doc/_build $HOME/guide-latest
 
   cd $HOME
   git config --global user.email "travis@travis-ci.org"
@@ -14,12 +13,9 @@ if [ "$TRAVIS_REPO_SLUG" == "DroidPlanner/DroneKit-Android" ] && [ "$TRAVIS_JDK_
 
   cd gh-pages
 
-  ## Clean and update guide doc
+  ## Clean and update javadoc
   git rm -rf .
   touch ./.nojekyll
-  cp -Rf $HOME/guide-latest/html/* .
-
-  ## Update javadoc
   cp -Rf $HOME/javadoc-latest ./javadoc
 
   git add -f .
