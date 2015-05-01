@@ -32,7 +32,7 @@ To add the 3DR Services library to your project, open **build.gradle (Module:app
 
 ::
 
-	compile 'com.o3dr:dronekit-android:2.2.+'
+	compile 'com.o3dr.android:droneKit-android:2.3.+'
 
 under the dependencies section.
 
