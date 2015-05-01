@@ -71,13 +71,38 @@ public class AttributeEvent {
     public static final String MISSION_RECEIVED = PACKAGE_NAME + ".MISSION_RECEIVED";
     public static final String MISSION_ITEM_UPDATED = PACKAGE_NAME + ".MISSION_ITEM_UPDATED";
 
-    /**
+    /*
      * Parameter attribute events.
      */
-    public static final String PARAMETERS_REFRESH_STARTED = PACKAGE_NAME + ".PARAMETERS_REFRESH_STARTED";
-    public static final String PARAMETERS_REFRESH_ENDED = PACKAGE_NAME + ".PARAMETERS_REFRESH_ENDED";
-    public static final String PARAMETERS_RECEIVED = PACKAGE_NAME + ".PARAMETERS_RECEIVED";
 
+    /**
+     * Event to signal the start of parameters refresh from the vehicle.
+     * @see {@link com.o3dr.services.android.lib.drone.property.Parameters}
+     * @see {@link com.o3dr.services.android.lib.drone.property.Parameter}
+     */
+    public static final String PARAMETERS_REFRESH_STARTED = PACKAGE_NAME + ".PARAMETERS_REFRESH_STARTED";
+
+    /**
+     * Event to signal the completion of the parameters refresh from the vehicle.
+     * @see {@link com.o3dr.services.android.lib.drone.property.Parameters}
+     * @see {@link com.o3dr.services.android.lib.drone.property.Parameter}
+     */
+    public static final String PARAMETERS_REFRESH_COMPLETED = PACKAGE_NAME + ".PARAMETERS_REFRESH_ENDED";
+
+    /**
+     * Event to signal receipt of a single parameter from the vehicle. During a parameters refresh, this event will
+     * fire as many times as the count of the set of parameters being refreshed.
+     * Allows listeners to keep track of the parameters refresh progress.
+     * @see {@link AttributeEventExtra#EXTRA_PARAMETER_INDEX}
+     * @see {@link AttributeEventExtra#EXTRA_PARAMETERS_COUNT}
+     * @see {@link AttributeEventExtra#EXTRA_PARAMETER_NAME}
+     * @see {@link AttributeEventExtra#EXTRA_PARAMETER_VALUE}
+     */
+    public static final String PARAMETER_RECEIVED = PACKAGE_NAME + ".PARAMETERS_RECEIVED";
+
+    /**
+     * Event to signal update of the vehicle type.
+     */
     public static final String TYPE_UPDATED = PACKAGE_NAME + ".TYPE_UPDATED";
 
     /**

@@ -121,11 +121,6 @@ public class DroneInterfaces {
 		/**
          *
          */
-		PARAMETER,
-
-		/**
-         *
-         */
 		CALIBRATION_IMU,
 
 		/**

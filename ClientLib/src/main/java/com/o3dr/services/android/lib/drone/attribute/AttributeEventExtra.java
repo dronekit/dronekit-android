@@ -68,6 +68,27 @@ public class AttributeEventExtra {
     public static final String EXTRA_MISSION_DRONIE_BEARING = PACKAGE_NAME + "" +
             ".MISSION_DRONIE_BEARING";
 
+    /**
+     * Used to retrieve the count of the set of parameters being refreshed.
+     * @see {@link AttributeEvent#PARAMETER_RECEIVED}
+     */
     public static final String EXTRA_PARAMETERS_COUNT = PACKAGE_NAME + ".PARAMETERS_COUNT";
+
+    /**
+     * Used to retrieve the index of the received parameter.
+     * @see {@link AttributeEvent#PARAMETER_RECEIVED}
+     */
     public static final String EXTRA_PARAMETER_INDEX = PACKAGE_NAME + ".PARAMETER_INDEX";
+
+    /**
+     * Used to retrieve the name of the received parameter.
+     * @see {@link AttributeEvent#PARAMETER_RECEIVED}
+     */
+    public static final String EXTRA_PARAMETER_NAME = PACKAGE_NAME + ".PARAMETER_NAME";
+
+    /**
+     * Used to retrieve the value of the received parameter.
+     * @see {@link AttributeEvent#PARAMETER_RECEIVED}
+     */
+    public static final String EXTRA_PARAMETER_VALUE = PACKAGE_NAME + ".PARAMETER_VALUE";
 }

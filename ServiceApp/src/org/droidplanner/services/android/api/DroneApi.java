@@ -21,7 +21,6 @@ import com.o3dr.services.android.lib.drone.action.StateActions;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
-import com.o3dr.services.android.lib.drone.attribute.error.ErrorType;
 import com.o3dr.services.android.lib.drone.camera.action.CameraActions;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionResult;
@@ -643,11 +642,6 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 droneEvent = AttributeEvent.GPS_COUNT;
                 break;
 
-            case PARAMETER:
-            case PARAMETERS_DOWNLOADED:
-                droneEvent = AttributeEvent.PARAMETERS_RECEIVED;
-                break;
-
             case CALIBRATION_IMU:
                 final String calIMUMessage = drone.getCalibrationSetup().getMessage();
                 extrasBundle = new Bundle(1);
@@ -779,15 +773,17 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
     @Override
     public void onParameterReceived(Parameter parameter, int index, int count) {
-        Bundle paramsBundle = new Bundle(2);
+        Bundle paramsBundle = new Bundle(4);
         paramsBundle.putInt(AttributeEventExtra.EXTRA_PARAMETER_INDEX, index);
         paramsBundle.putInt(AttributeEventExtra.EXTRA_PARAMETERS_COUNT, count);
-        notifyAttributeUpdate(AttributeEvent.PARAMETERS_RECEIVED, paramsBundle);
+        paramsBundle.putString(AttributeEventExtra.EXTRA_PARAMETER_NAME, parameter.name);
+        paramsBundle.putDouble(AttributeEventExtra.EXTRA_PARAMETER_VALUE, parameter.value);
+        notifyAttributeUpdate(AttributeEvent.PARAMETER_RECEIVED, paramsBundle);
     }
 
     @Override
     public void onEndReceivingParameters() {
-        notifyAttributeUpdate(AttributeEvent.PARAMETERS_REFRESH_ENDED, null);
+        notifyAttributeUpdate(AttributeEvent.PARAMETERS_REFRESH_COMPLETED, null);
     }
 
     @Override
