@@ -24,24 +24,28 @@ public class Calibration extends DroneVariable {
         }
         else {
             calibrating = true;
+			mavMsg = "";
             MavLinkCalibration.sendStartCalibrationMessage(myDrone);
         }
         return calibrating;
 	}
 
-	public void sendAckk(int step) {
+	public void sendAck(int step) {
 		MavLinkCalibration.sendCalibrationAckMessage(step, myDrone);
 	}
 
 	public void processMessage(MAVLinkMessage msg) {
 		if (msg.msgid == msg_statustext.MAVLINK_MSG_ID_STATUSTEXT) {
 			msg_statustext statusMsg = (msg_statustext) msg;
-			mavMsg = statusMsg.getText();
+			final String message = statusMsg.getText();
 
-			if (mavMsg.contains("Calibration"))
-				calibrating = false;
+			if(message != null && (message.startsWith("Place vehicle") || message.startsWith("Calibration"))) {
+				mavMsg = message;
+				if(message.startsWith("Calibration"))
+					calibrating = false;
 
-			myDrone.notifyDroneEvent(DroneEventsType.CALIBRATION_IMU);
+				myDrone.notifyDroneEvent(DroneEventsType.CALIBRATION_IMU);
+			}
 		}
 	}
 
