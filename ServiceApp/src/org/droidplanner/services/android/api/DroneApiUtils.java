@@ -684,7 +684,7 @@ public class DroneApiUtils {
         if (drone == null)
             return;
 
-        drone.getCalibrationSetup().sendAckk(step);
+        drone.getCalibrationSetup().sendAck(step);
     }
 
     static void doGuidedTakeoff(Drone drone, double altitude) {
