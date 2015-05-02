@@ -221,7 +221,7 @@ public class Drone {
 
     public <T extends Parcelable> T getAttribute(String type) {
         if (!isStarted() || type == null)
-            return null;
+            return this.getAttributeDefaultValue(type);
 
         T attribute = null;
         Bundle carrier = null;
@@ -271,6 +271,9 @@ public class Drone {
     }
 
     private <T extends Parcelable> T getAttributeDefaultValue(String attributeType) {
+        if(attributeType == null)
+            return null;
+
         switch (attributeType) {
             case AttributeType.ALTITUDE:
                 return (T) new Altitude();
