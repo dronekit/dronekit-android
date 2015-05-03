@@ -527,18 +527,16 @@ public class Drone {
         DroneStateApi.arm(this, arm);
     }
 
-    public void startMagnetometerCalibration(double[] startPointsX, double[] startPointsY, double[] startPointsZ) {
-        CalibrationApi.startMagnetometerCalibration(this, startPointsX, startPointsY, startPointsZ);
-    }
-
-    public void stopMagnetometerCalibration() {
-        CalibrationApi.stopMagnetometerCalibration(this);
-    }
-
+    /**
+     * @deprecated Use {@link CalibrationApi#startIMUCalibration(Drone)} instead.
+     */
     public void startIMUCalibration() {
         CalibrationApi.startIMUCalibration(this);
     }
 
+    /**
+     * @deprecated Use {@link CalibrationApi#sendIMUAck(Drone, int)} instead.
+     */
     public void sendIMUCalibrationAck(int step) {
         CalibrationApi.sendIMUAck(this, step);
     }

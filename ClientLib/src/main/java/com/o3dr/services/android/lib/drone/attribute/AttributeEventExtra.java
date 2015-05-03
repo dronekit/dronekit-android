@@ -28,36 +28,6 @@ public class AttributeEventExtra {
     public static final String EXTRA_CALIBRATION_IMU_MESSAGE = PACKAGE_NAME + ".CALIBRATION_IMU_MESSAGE";
 
     /**
-     * Used to access the points used to start the magnetometer calibration.
-     */
-    public static final String EXTRA_CALIBRATION_MAG_POINTS_X = PACKAGE_NAME + "" +
-            ".CALIBRATION_MAG_POINTS_X";
-    public static final String EXTRA_CALIBRATION_MAG_POINTS_Y = PACKAGE_NAME + "" +
-            ".CALIBRATION_MAG_POINTS_Y";
-    public static final String EXTRA_CALIBRATION_MAG_POINTS_Z = PACKAGE_NAME + "" +
-            ".CALIBRATION_MAG_POINTS_Z";
-    /**
-     * Used to access the magnetometer calibration fitness value.
-     */
-    public static final String EXTRA_CALIBRATION_MAG_FITNESS = PACKAGE_NAME + "" +
-            ".CALIBRATION_MAG_FITNESS";
-    /**
-     * Used to access the magnetometer calibration fit center values.
-     */
-    public static final String EXTRA_CALIBRATION_MAG_FIT_CENTER = PACKAGE_NAME + "" +
-            ".CALIBRATION_MAG_FIT_CENTER";
-    /**
-     * Used to access the magnetometer calibration fit radii values.
-     */
-    public static final String EXTRA_CALIBRATION_MAG_FIT_RADII = PACKAGE_NAME + "" +
-            ".CALIBRATION_MAG_FIT_RADII";
-    /**
-     * Used to access the magnetometer calibration final offset values.
-     */
-    public static final String EXTRA_CALIBRATION_MAG_OFFSETS = PACKAGE_NAME + "" +
-            ".CALIBRATION_MAG_OFFSETS";
-
-    /**
      * Used to access the mavlink version when the heartbeat is received for the first time or
      * restored.
      */

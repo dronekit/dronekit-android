@@ -37,6 +37,7 @@ import com.o3dr.services.android.lib.gcs.follow.FollowType;
 import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
 
 import org.droidplanner.core.MAVLink.MavLinkArm;
+import org.droidplanner.core.MAVLink.MavLinkCalibration;
 import org.droidplanner.core.MAVLink.command.doCmd.MavLinkDoCmds;
 import org.droidplanner.core.drone.DroneInterfaces;
 import org.droidplanner.core.drone.camera.GoProImpl;
@@ -658,26 +659,33 @@ public class DroneApiUtils {
         MavLinkArm.sendArmMessage(drone, arm);
     }
 
-    static void startMagnetometerCalibration(DroneManager droneMgr, double[] startPointsX, double[] startPointsY,
-                                             double[] startPointsZ) {
-        if (droneMgr == null)
+    static void startMagnetometerCalibration(Drone drone, boolean retryOnFailure, boolean saveAutomatically, int
+            startDelay) {
+        if (drone == null)
             return;
 
-        droneMgr.startMagnetometerCalibration(MathUtils.pointsArrayToThreeSpacePoint(new
-                double[][]{startPointsX, startPointsY, startPointsZ}));
+        MavLinkCalibration.startMagnetometerCalibration(drone, retryOnFailure, saveAutomatically, startDelay);
     }
 
-    static void stopMagnetometerCalibration(DroneManager droneMgr) {
-        if (droneMgr == null)
+    static void cancelMagnetometerCalibration(Drone drone) {
+        if (drone == null)
             return;
-        droneMgr.stopMagnetometerCalibration();
+
+        MavLinkCalibration.cancelMagnetometerCalibration(drone);
     }
 
-    static boolean startIMUCalibration(DroneManager droneMgr) {
-        if (droneMgr == null)
+    public static void acceptMagnetometerCalibration(Drone drone) {
+        if(drone == null)
+            return;
+
+        MavLinkCalibration.acceptMagnetometerCalibration(drone);
+    }
+
+    static boolean startIMUCalibration(Drone drone) {
+        if (drone == null)
             return false;
 
-        return droneMgr.getDrone().getCalibrationSetup().startCalibration();
+        return drone.getCalibrationSetup().startCalibration();
     }
 
     static void sendIMUCalibrationAck(Drone drone, int step) {
@@ -817,4 +825,5 @@ public class DroneApiUtils {
 
         drone.getGoProImpl().stopRecording();
     }
+
 }

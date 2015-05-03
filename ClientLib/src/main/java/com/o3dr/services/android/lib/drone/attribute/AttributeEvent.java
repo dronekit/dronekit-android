@@ -30,11 +30,7 @@ public class AttributeEvent {
      */
     public static final String CALIBRATION_MAG_STARTED = PACKAGE_NAME +
             ".CALIBRATION_MAG_STARTED";
-    /**
-     * Signals a magnetometer calibration fitness update.
-     */
-    public static final String CALIBRATION_MAG_ESTIMATION = PACKAGE_NAME +
-            ".CALIBRATION_MAG_ESTIMATION";
+
     /**
      * Signals completion of the magnetometer calibration.
      */

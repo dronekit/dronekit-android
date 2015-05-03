@@ -17,7 +17,6 @@ import org.droidplanner.core.MAVLink.MavLinkMsgHandler;
 import org.droidplanner.core.drone.DroneImpl;
 import org.droidplanner.core.drone.DroneInterfaces;
 import org.droidplanner.core.drone.LogMessageListener;
-import org.droidplanner.core.drone.variables.helpers.MagnetometerCalibration;
 import org.droidplanner.core.gcs.follow.Follow;
 import org.droidplanner.core.model.Drone;
 import org.droidplanner.core.parameters.Parameter;
@@ -32,18 +31,13 @@ import org.droidplanner.services.android.utils.AndroidApWarningParser;
 import org.droidplanner.services.android.utils.analytics.GAUtils;
 import org.droidplanner.services.android.utils.prefs.DroidPlannerPrefs;
 
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import ellipsoidFit.FitPoints;
-import ellipsoidFit.ThreeSpacePoint;
 
 /**
  * Bridge between the communication channel, the drone instance(s), and the connected client(s).
  */
-public class DroneManager implements MAVLinkStreams.MavlinkInputStream,
-        MagnetometerCalibration.OnMagCalibrationListener, DroneInterfaces.OnDroneListener,
+public class DroneManager implements MAVLinkStreams.MavlinkInputStream, DroneInterfaces.OnDroneListener,
         DroneInterfaces.OnParameterManagerListener, LogMessageListener {
 
     private static final String TAG = DroneManager.class.getSimpleName();
@@ -55,7 +49,6 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream,
     private final Drone drone;
     private final Follow followMe;
     private final MavLinkMsgHandler mavLinkMsgHandler;
-    private MagnetometerCalibration magCalibration;
     private final ConnectionParameter connectionParameter;
 
     public DroneManager(Context context, ConnectionParameter connParams, final Handler handler, MavLinkServiceApi mavlinkApi) {
@@ -97,8 +90,6 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream,
 
         this.followMe = new Follow(this.drone, dpHandler, new FusedLocation(context, handler));
 
-        this.magCalibration = new MagnetometerCalibration(this.drone, this, dpHandler);
-
         drone.addDroneListener(this);
         drone.getParameters().setParameterListener(this);
     }
@@ -113,9 +104,6 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream,
 
         connectedApps.clear();
         tlogUploaders.clear();
-
-        if (magCalibration.isRunning())
-            magCalibration.stop();
 
         if (followMe.isEnabled())
             followMe.toggleFollowMeState();
@@ -275,19 +263,6 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream,
         this.drone.notifyDroneEvent(DroneInterfaces.DroneEventsType.DISCONNECTED);
     }
 
-    public void startMagnetometerCalibration(List<ThreeSpacePoint> startPoints) {
-        if (magCalibration.isRunning()) {
-            magCalibration.stop();
-        }
-
-        magCalibration.start(startPoints);
-    }
-
-    public void stopMagnetometerCalibration() {
-        if (magCalibration.isRunning())
-            magCalibration.stop();
-    }
-
     @Override
     public void notifyReceivedData(MAVLinkPacket packet) {
         MAVLinkMessage receivedMsg = packet.unpack();
@@ -370,42 +345,6 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream,
 
         for (DroneEventsListener droneEventsListener : connectedApps.values()) {
             droneEventsListener.onEndReceivingParameters();
-        }
-    }
-
-    @Override
-    public void onStarted(List<ThreeSpacePoint> points) {
-        if (connectedApps.isEmpty())
-            return;
-
-        for (DroneEventsListener droneEventsListener : connectedApps.values()) {
-            droneEventsListener.onStarted(points);
-        }
-    }
-
-    @Override
-    public void newEstimation(FitPoints fit, List<ThreeSpacePoint> points) {
-        if (connectedApps.isEmpty())
-            return;
-
-        for (DroneEventsListener droneEventsListener : connectedApps.values()) {
-            droneEventsListener.newEstimation(fit, points);
-        }
-    }
-
-    @Override
-    public void finished(FitPoints fit, double[] offsets) {
-        if (connectedApps.isEmpty())
-            return;
-
-        try {
-            offsets = magCalibration.sendOffsets();
-        } catch (Exception e) {
-            Log.e(TAG, e.getMessage(), e);
-        }
-
-        for (DroneEventsListener droneEventsListener : connectedApps.values()) {
-            droneEventsListener.finished(fit, offsets);
         }
     }
 

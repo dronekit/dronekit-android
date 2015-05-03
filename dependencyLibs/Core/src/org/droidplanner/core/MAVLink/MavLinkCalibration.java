@@ -7,6 +7,8 @@ import com.MAVLink.common.msg_command_long;
 import com.MAVLink.enums.MAV_CMD;
 import com.MAVLink.enums.MAV_CMD_ACK;
 
+import java.security.PublicKey;
+
 public class MavLinkCalibration {
 
 	public static void sendCalibrationAckMessage(int count, Drone drone) {
@@ -31,6 +33,75 @@ public class MavLinkCalibration {
 		msg.param7 = 0;
 		msg.confirmation = 0;
 		drone.getMavClient().sendMavPacket(msg.pack());
+	}
+
+	/**
+	 * Initiate a magnetometer calibration
+	 * @param drone
+	 */
+	public static void startMagnetometerCalibration(Drone drone){
+		startMagnetometerCalibration(drone, false, false, 0);
+	}
+
+	/**
+	 * Initiate a magnetometer calibration
+	 * @param drone vehicle to calibrate
+	 * @param retryOnFailure if true, automatically retry the magnetometer calibration if it fails
+	 * @param saveAutomatically if true, save the calibration automatically without user input.
+	 * @param startDelay positive delay in seconds before starting the calibration
+	 */
+	public static void startMagnetometerCalibration(Drone drone, boolean retryOnFailure, boolean saveAutomatically,
+													int startDelay){
+		msg_command_long msg = new msg_command_long();
+		msg.target_system = drone.getSysid();
+		msg.target_component = drone.getCompid();
+
+		msg.command = (short) MAV_CMD.MAV_CMD_DO_START_MAG_CAL;
+		msg.param1 = 0;
+		msg.param2 = retryOnFailure ? 1 : 0;
+		msg.param3 = saveAutomatically ? 1 : 0;
+		msg.param4 = startDelay > 0 ? startDelay : 0;
+		msg.param5 = 0;
+		msg.param6 = 0;
+		msg.param7 = 0;
+	}
+
+	/**
+	 * Cancel the running magnetometer calibration.
+	 * @param drone
+	 */
+	public static void cancelMagnetometerCalibration(Drone drone){
+		msg_command_long msg = new msg_command_long();
+		msg.target_system = drone.getSysid();
+		msg.target_component = drone.getCompid();
+
+		msg.command = (short) MAV_CMD.MAV_CMD_DO_CANCEL_MAG_CAL;
+		msg.param1 = 0;
+		msg.param2 = 0;
+		msg.param3 = 0;
+		msg.param4 = 0;
+		msg.param5 = 0;
+		msg.param6 = 0;
+		msg.param7 = 0;
+	}
+
+	/**
+	 * Accept the magnetometer calibration result.
+	 * @param drone
+	 */
+	public static void acceptMagnetometerCalibration(Drone drone){
+		msg_command_long msg = new msg_command_long();
+		msg.target_system = drone.getSysid();
+		msg.target_component = drone.getCompid();
+
+		msg.command = (short) MAV_CMD.MAV_CMD_DO_ACCEPT_MAG_CAL;
+		msg.param1 = 0;
+		msg.param2 = 0;
+		msg.param3 = 0;
+		msg.param4 = 0;
+		msg.param5 = 0;
+		msg.param6 = 0;
+		msg.param7 = 0;
 	}
 
 }
