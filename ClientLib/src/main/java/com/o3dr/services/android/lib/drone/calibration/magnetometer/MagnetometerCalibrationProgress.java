@@ -8,6 +8,8 @@ import android.os.Parcelable;
  */
 public class MagnetometerCalibrationProgress implements Parcelable {
 
+    private byte compassId;
+
     private byte completionPercentage;
 
     /**
@@ -19,11 +21,21 @@ public class MagnetometerCalibrationProgress implements Parcelable {
 
     public MagnetometerCalibrationProgress(){}
 
-    public MagnetometerCalibrationProgress(byte percentage, float directionX, float directionY, float directionZ){
+    public MagnetometerCalibrationProgress(byte compassId, byte percentage, float directionX, float directionY, float
+            directionZ){
+        this.compassId = compassId;
         this.completionPercentage = percentage;
         this.directionX = directionX;
         this.directionY = directionY;
         this.directionZ = directionZ;
+    }
+
+    public byte getCompassId() {
+        return compassId;
+    }
+
+    public void setCompassId(byte compassId) {
+        this.compassId = compassId;
     }
 
     public byte getCompletionPercentage() {
@@ -65,6 +77,7 @@ public class MagnetometerCalibrationProgress implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeByte(this.compassId);
         dest.writeByte(this.completionPercentage);
         dest.writeFloat(this.directionX);
         dest.writeFloat(this.directionY);
@@ -72,13 +85,14 @@ public class MagnetometerCalibrationProgress implements Parcelable {
     }
 
     private MagnetometerCalibrationProgress(Parcel in) {
+        this.compassId = in.readByte();
         this.completionPercentage = in.readByte();
         this.directionX = in.readFloat();
         this.directionY = in.readFloat();
         this.directionZ = in.readFloat();
     }
 
-    public static final Parcelable.Creator<MagnetometerCalibrationProgress> CREATOR = new Parcelable.Creator<MagnetometerCalibrationProgress>() {
+    public static final Creator<MagnetometerCalibrationProgress> CREATOR = new Creator<MagnetometerCalibrationProgress>() {
         public MagnetometerCalibrationProgress createFromParcel(Parcel source) {
             return new MagnetometerCalibrationProgress(source);
         }

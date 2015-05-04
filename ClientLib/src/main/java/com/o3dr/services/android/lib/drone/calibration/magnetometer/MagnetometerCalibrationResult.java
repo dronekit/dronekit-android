@@ -6,7 +6,9 @@ import android.os.Parcelable;
 /**
  * Created by Fredia Huya-Kouadio on 5/3/15.
  */
-public class MagnetometerCalibrationReport implements Parcelable {
+public class MagnetometerCalibrationResult implements Parcelable {
+
+    private byte compassId;
 
     /**
      * RMS milligauss residuals
@@ -36,11 +38,17 @@ public class MagnetometerCalibrationReport implements Parcelable {
 
     private boolean autoSaved;
 
-    public MagnetometerCalibrationReport(){}
+    private boolean calibrationSuccessful;
 
-    public MagnetometerCalibrationReport(boolean autoSaved, float fitness, float xOffset, float yOffset, float zOffset,
+    public MagnetometerCalibrationResult(){}
+
+    public MagnetometerCalibrationResult(byte compassId,
+                                         boolean calibrationSuccessful, boolean autoSaved, float fitness,
+                                         float xOffset, float yOffset, float zOffset,
                                          float xDiag, float yDiag, float zDiag,
                                          float xOffDiag, float yOffDiag, float zOffDiag) {
+        this.compassId = compassId;
+        this.calibrationSuccessful = calibrationSuccessful;
         this.autoSaved = autoSaved;
         this.fitness = fitness;
         this.xDiag = xDiag;
@@ -52,6 +60,22 @@ public class MagnetometerCalibrationReport implements Parcelable {
         this.zDiag = zDiag;
         this.zOffDiag = zOffDiag;
         this.zOffset = zOffset;
+    }
+
+    public byte getCompassId() {
+        return compassId;
+    }
+
+    public void setCompassId(byte compassId) {
+        this.compassId = compassId;
+    }
+
+    public boolean isCalibrationSuccessful() {
+        return calibrationSuccessful;
+    }
+
+    public void setCalibrationSuccessful(boolean calibrationSuccessful) {
+        this.calibrationSuccessful = calibrationSuccessful;
     }
 
     public boolean isAutoSaved() {
@@ -149,6 +173,7 @@ public class MagnetometerCalibrationReport implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeByte(this.compassId);
         dest.writeFloat(this.fitness);
         dest.writeFloat(this.xOffset);
         dest.writeFloat(this.yOffset);
@@ -160,9 +185,11 @@ public class MagnetometerCalibrationReport implements Parcelable {
         dest.writeFloat(this.yOffDiag);
         dest.writeFloat(this.zOffDiag);
         dest.writeByte(autoSaved ? (byte) 1 : (byte) 0);
+        dest.writeByte(calibrationSuccessful ? (byte) 1 : (byte) 0);
     }
 
-    private MagnetometerCalibrationReport(Parcel in) {
+    private MagnetometerCalibrationResult(Parcel in) {
+        this.compassId = in.readByte();
         this.fitness = in.readFloat();
         this.xOffset = in.readFloat();
         this.yOffset = in.readFloat();
@@ -174,15 +201,16 @@ public class MagnetometerCalibrationReport implements Parcelable {
         this.yOffDiag = in.readFloat();
         this.zOffDiag = in.readFloat();
         this.autoSaved = in.readByte() != 0;
+        this.calibrationSuccessful = in.readByte() != 0;
     }
 
-    public static final Parcelable.Creator<MagnetometerCalibrationReport> CREATOR = new Parcelable.Creator<MagnetometerCalibrationReport>() {
-        public MagnetometerCalibrationReport createFromParcel(Parcel source) {
-            return new MagnetometerCalibrationReport(source);
+    public static final Creator<MagnetometerCalibrationResult> CREATOR = new Creator<MagnetometerCalibrationResult>() {
+        public MagnetometerCalibrationResult createFromParcel(Parcel source) {
+            return new MagnetometerCalibrationResult(source);
         }
 
-        public MagnetometerCalibrationReport[] newArray(int size) {
-            return new MagnetometerCalibrationReport[size];
+        public MagnetometerCalibrationResult[] newArray(int size) {
+            return new MagnetometerCalibrationResult[size];
         }
     };
 }

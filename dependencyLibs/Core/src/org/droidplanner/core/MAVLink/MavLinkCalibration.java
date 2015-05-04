@@ -64,6 +64,8 @@ public class MavLinkCalibration {
 		msg.param5 = 0;
 		msg.param6 = 0;
 		msg.param7 = 0;
+
+		drone.getMavClient().sendMavPacket(msg.pack());
 	}
 
 	/**
@@ -83,6 +85,8 @@ public class MavLinkCalibration {
 		msg.param5 = 0;
 		msg.param6 = 0;
 		msg.param7 = 0;
+
+		drone.getMavClient().sendMavPacket(msg.pack());
 	}
 
 	/**
@@ -102,6 +106,8 @@ public class MavLinkCalibration {
 		msg.param5 = 0;
 		msg.param6 = 0;
 		msg.param7 = 0;
+
+		drone.getMavClient().sendMavPacket(msg.pack());
 	}
 
 }

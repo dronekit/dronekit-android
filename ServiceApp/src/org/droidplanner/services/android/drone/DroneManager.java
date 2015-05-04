@@ -103,6 +103,7 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream, DroneInt
 
         drone.removeDroneListener(this);
         drone.getParameters().setParameterListener(null);
+        drone.getMagnetometerCalibration().setListener(null);
 
         disconnect();
 
@@ -412,29 +413,11 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream, DroneInt
     }
 
     @Override
-    public void onCalibrationReport(msg_mag_cal_report report) {
+    public void onCalibrationCompleted(msg_mag_cal_report report) {
         if(connectedApps.isEmpty())
             return;
 
         for(DroneEventsListener listener: connectedApps.values())
-            listener.onCalibrationReport(report);
-    }
-
-    @Override
-    public void onCalibrationCompleted() {
-        if(connectedApps.isEmpty())
-            return;
-
-        for(DroneEventsListener listener: connectedApps.values())
-            listener.onCalibrationCompleted();
-    }
-
-    @Override
-    public void onCalibrationError(String error) {
-        if(connectedApps.isEmpty())
-            return;
-
-        for(DroneEventsListener listener: connectedApps.values())
-            listener.onCalibrationError(error);
+            listener.onCalibrationCompleted(report);
     }
 }

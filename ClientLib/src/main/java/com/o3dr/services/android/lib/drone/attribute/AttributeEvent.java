@@ -32,12 +32,15 @@ public class AttributeEvent {
 
     /**
      * Signals completion of the magnetometer calibration.
+     * @see {@link AttributeEventExtra#EXTRA_CALIBRATION_MAG_RESULT}
      */
     public static final String CALIBRATION_MAG_COMPLETED = PACKAGE_NAME + ".CALIBRATION_MAG_COMPLETED";
 
+    /**
+     * Provides progress updates for the magnetometer calibration.
+     * @see {@link AttributeEventExtra#EXTRA_CALIBRATION_MAG_PROGRESS}
+     */
     public static final String CALIBRATION_MAG_PROGRESS = PACKAGE_NAME + ".CALIBRATION_MAG_PROGRESS";
-
-    public static final String CALIBRATION_MAG_REPORT = PACKAGE_NAME + ".CALIBRATION_MAG_REPORT";
 
     public static final String CALIBRATION_IMU = PACKAGE_NAME + ".CALIBRATION_IMU";
     public static final String CALIBRATION_IMU_ERROR = PACKAGE_NAME + ".CALIBRATION_IMU_ERROR";

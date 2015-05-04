@@ -40,7 +40,7 @@ public class CalibrationApi {
      * Start the magnetometer calibration process.
      */
     public static void startMagnetometerCalibration(Drone drone) {
-        startMagnetometerCalibration(drone, false, false, 0);
+        startMagnetometerCalibration(drone, false, true, 0);
     }
 
     /**

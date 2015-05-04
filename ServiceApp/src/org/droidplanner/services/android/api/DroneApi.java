@@ -13,6 +13,7 @@ import android.util.Log;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.ardupilotmega.msg_mag_cal_progress;
 import com.MAVLink.ardupilotmega.msg_mag_cal_report;
+import com.MAVLink.enums.MAG_CAL_STATUS;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.action.ConnectionActions;
@@ -24,7 +25,7 @@ import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.calibration.magnetometer.MagnetometerCalibrationProgress;
-import com.o3dr.services.android.lib.drone.calibration.magnetometer.MagnetometerCalibrationReport;
+import com.o3dr.services.android.lib.drone.calibration.magnetometer.MagnetometerCalibrationResult;
 import com.o3dr.services.android.lib.drone.camera.action.CameraActions;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionResult;
@@ -414,7 +415,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
             case CalibrationActions.ACTION_START_MAGNETOMETER_CALIBRATION:
                 final boolean retryOnFailure = data.getBoolean(CalibrationActions.EXTRA_RETRY_ON_FAILURE, false);
-                final boolean saveAutomatically = data.getBoolean(CalibrationActions.EXTRA_SAVE_AUTOMATICALLY, false);
+                final boolean saveAutomatically = data.getBoolean(CalibrationActions.EXTRA_SAVE_AUTOMATICALLY, true);
                 final int startDelay = data.getInt(CalibrationActions.EXTRA_START_DELAY, 0);
                 DroneApiUtils.startMagnetometerCalibration(getDrone(), retryOnFailure, saveAutomatically, startDelay);
                 break;
@@ -817,31 +818,22 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     public void onCalibrationProgress(msg_mag_cal_progress progress) {
         Bundle progressBundle = new Bundle(1);
         progressBundle.putParcelable(AttributeEventExtra.EXTRA_CALIBRATION_MAG_PROGRESS, new
-                MagnetometerCalibrationProgress(progress.completion_pct, progress.direction_x, progress.direction_y,
-                progress.direction_z));
+                MagnetometerCalibrationProgress(progress.compass_id, progress.completion_pct,
+                progress.direction_x, progress.direction_y, progress.direction_z));
 
         notifyAttributeUpdate(AttributeEvent.CALIBRATION_MAG_PROGRESS, progressBundle);
     }
 
     @Override
-    public void onCalibrationReport(msg_mag_cal_report report) {
+    public void onCalibrationCompleted(msg_mag_cal_report report) {
         Bundle reportBundle = new Bundle(1);
-        reportBundle.putParcelable(AttributeEventExtra.EXTRA_CALIBRATION_MAG_REPORT,
-                new MagnetometerCalibrationReport(report.autosaved == 1 , report.fitness,
+        reportBundle.putParcelable(AttributeEventExtra.EXTRA_CALIBRATION_MAG_RESULT,
+                new MagnetometerCalibrationResult(report.compass_id,
+                        report.cal_status == MAG_CAL_STATUS.MAG_CAL_SUCCESS, report.autosaved == 1 , report.fitness,
                         report.ofs_x, report.ofs_y, report.ofs_z,
                         report.diag_x, report.diag_y, report.diag_z,
                         report.offdiag_x, report.offdiag_y, report.offdiag_z));
 
-        notifyAttributeUpdate(AttributeEvent.CALIBRATION_MAG_REPORT, reportBundle);
-    }
-
-    @Override
-    public void onCalibrationCompleted() {
-        notifyAttributeUpdate(AttributeEvent.CALIBRATION_MAG_COMPLETED, null);
-    }
-
-    @Override
-    public void onCalibrationError(String error) {
-        //TODO: figure out how to go about reporting magnetometer calibration error.
+        notifyAttributeUpdate(AttributeEvent.CALIBRATION_MAG_COMPLETED, reportBundle);
     }
 }

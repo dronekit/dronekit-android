@@ -27,9 +27,17 @@ public class AttributeEventExtra {
      */
     public static final String EXTRA_CALIBRATION_IMU_MESSAGE = PACKAGE_NAME + ".CALIBRATION_IMU_MESSAGE";
 
+    /**
+     * Used to access the magnetometer calibration progress.
+     * @see {@link com.o3dr.services.android.lib.drone.calibration.magnetometer.MagnetometerCalibrationProgress}
+     */
     public static final String EXTRA_CALIBRATION_MAG_PROGRESS = PACKAGE_NAME + ".CALIBRATION_MAG_PROGRESS";
 
-    public static final String EXTRA_CALIBRATION_MAG_REPORT = PACKAGE_NAME + ".CALIBRATION_MAG_REPORT";
+    /**
+     * Used to access the result from the magnetometer calibration.
+     * @see {@link com.o3dr.services.android.lib.drone.calibration.magnetometer.MagnetometerCalibrationResult}
+     */
+    public static final String EXTRA_CALIBRATION_MAG_RESULT = PACKAGE_NAME + ".CALIBRATION_MAG_RESULT";
 
     /**
      * Used to access the mavlink version when the heartbeat is received for the first time or
