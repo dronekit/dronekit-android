@@ -23,7 +23,7 @@ import org.droidplanner.core.drone.variables.Radio;
 import org.droidplanner.core.drone.variables.Speed;
 import org.droidplanner.core.drone.variables.State;
 import org.droidplanner.core.drone.variables.StreamRates;
-import org.droidplanner.core.drone.variables.calibration.MagnetometerCalibration;
+import org.droidplanner.core.drone.variables.calibration.MagnetometerCalibrationImpl;
 import org.droidplanner.core.firmware.FirmwareType;
 import org.droidplanner.core.mission.Mission;
 
@@ -95,7 +95,7 @@ public interface Drone {
 
 	public AccelCalibration getCalibrationSetup();
 
-	public MagnetometerCalibration getMagnetometerCalibration();
+	public MagnetometerCalibrationImpl getMagnetometerCalibration();
 
 	public RC getRC();
 	

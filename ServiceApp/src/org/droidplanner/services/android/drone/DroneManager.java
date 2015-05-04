@@ -19,7 +19,7 @@ import org.droidplanner.core.MAVLink.MavLinkMsgHandler;
 import org.droidplanner.core.drone.DroneImpl;
 import org.droidplanner.core.drone.DroneInterfaces;
 import org.droidplanner.core.drone.LogMessageListener;
-import org.droidplanner.core.drone.variables.calibration.MagnetometerCalibration;
+import org.droidplanner.core.drone.variables.calibration.MagnetometerCalibrationImpl;
 import org.droidplanner.core.gcs.follow.Follow;
 import org.droidplanner.core.model.Drone;
 import org.droidplanner.core.parameters.Parameter;
@@ -41,7 +41,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Bridge between the communication channel, the drone instance(s), and the connected client(s).
  */
 public class DroneManager implements MAVLinkStreams.MavlinkInputStream, DroneInterfaces.OnDroneListener,
-        DroneInterfaces.OnParameterManagerListener, LogMessageListener, MagnetometerCalibration.OnMagnetometerCalibrationListener {
+        DroneInterfaces.OnParameterManagerListener, LogMessageListener, MagnetometerCalibrationImpl.OnMagnetometerCalibrationListener {
 
     private static final String TAG = DroneManager.class.getSimpleName();
 

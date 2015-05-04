@@ -213,6 +213,10 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
             case AttributeType.GOPRO:
                 carrier.putParcelable(type, DroneApiUtils.getGoPro(drone));
                 break;
+
+            case AttributeType.MAGNETOMETER_CALIBRATION_STATUS:
+                carrier.putParcelable(type, DroneApiUtils.getMagnetometerCalibrationStatus(drone));
+                break;
         }
 
         return carrier;
@@ -817,9 +821,8 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     @Override
     public void onCalibrationProgress(msg_mag_cal_progress progress) {
         Bundle progressBundle = new Bundle(1);
-        progressBundle.putParcelable(AttributeEventExtra.EXTRA_CALIBRATION_MAG_PROGRESS, new
-                MagnetometerCalibrationProgress(progress.compass_id, progress.completion_pct,
-                progress.direction_x, progress.direction_y, progress.direction_z));
+        progressBundle.putParcelable(AttributeEventExtra.EXTRA_CALIBRATION_MAG_PROGRESS,
+                DroneApiUtils.getMagnetometerCalibrationProgress(progress));
 
         notifyAttributeUpdate(AttributeEvent.CALIBRATION_MAG_PROGRESS, progressBundle);
     }
@@ -828,11 +831,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     public void onCalibrationCompleted(msg_mag_cal_report report) {
         Bundle reportBundle = new Bundle(1);
         reportBundle.putParcelable(AttributeEventExtra.EXTRA_CALIBRATION_MAG_RESULT,
-                new MagnetometerCalibrationResult(report.compass_id,
-                        report.cal_status == MAG_CAL_STATUS.MAG_CAL_SUCCESS, report.autosaved == 1 , report.fitness,
-                        report.ofs_x, report.ofs_y, report.ofs_z,
-                        report.diag_x, report.diag_y, report.diag_z,
-                        report.offdiag_x, report.offdiag_y, report.offdiag_z));
+                DroneApiUtils.getMagnetometerCalibrationResult(report));
 
         notifyAttributeUpdate(AttributeEvent.CALIBRATION_MAG_COMPLETED, reportBundle);
     }

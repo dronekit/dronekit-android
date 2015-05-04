@@ -9,11 +9,12 @@ import org.droidplanner.core.drone.DroneVariable;
 import org.droidplanner.core.model.Drone;
 
 import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by Fredia Huya-Kouadio on 5/3/15.
  */
-public class MagnetometerCalibration extends DroneVariable {
+public class MagnetometerCalibrationImpl extends DroneVariable {
 
     public interface OnMagnetometerCalibrationListener {
         void onCalibrationCancelled();
@@ -27,7 +28,9 @@ public class MagnetometerCalibration extends DroneVariable {
 
     private OnMagnetometerCalibrationListener listener;
 
-    public MagnetometerCalibration(Drone myDrone) {
+    private AtomicBoolean cancelled = new AtomicBoolean(false);
+
+    public MagnetometerCalibrationImpl(Drone myDrone) {
         super(myDrone);
     }
 
@@ -37,14 +40,14 @@ public class MagnetometerCalibration extends DroneVariable {
 
     public void startCalibration(boolean retryOnFailure, boolean saveAutomatically, int startDelay) {
         magCalibrationTracker.clear();
+        cancelled.set(false);
         MavLinkCalibration.startMagnetometerCalibration(myDrone, retryOnFailure, saveAutomatically, startDelay);
     }
 
     public void cancelCalibration() {
         MavLinkCalibration.cancelMagnetometerCalibration(myDrone);
 
-        for (Info info : magCalibrationTracker.values())
-            info.wasCancelled = true;
+        cancelled.set(true);
 
         if (listener != null)
             listener.onCalibrationCancelled();
@@ -92,9 +95,20 @@ public class MagnetometerCalibration extends DroneVariable {
         return magCalibrationTracker;
     }
 
+    public boolean isCancelled() {
+        return cancelled.get();
+    }
+
     public static class Info {
         msg_mag_cal_progress calProgress;
         msg_mag_cal_report calReport;
-        boolean wasCancelled;
+
+        public msg_mag_cal_progress getCalProgress() {
+            return calProgress;
+        }
+
+        public msg_mag_cal_report getCalReport() {
+            return calReport;
+        }
     }
 }

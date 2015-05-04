@@ -23,7 +23,7 @@ import org.droidplanner.core.drone.variables.Speed;
 import org.droidplanner.core.drone.variables.State;
 import org.droidplanner.core.drone.variables.StreamRates;
 import org.droidplanner.core.drone.variables.Type;
-import org.droidplanner.core.drone.variables.calibration.MagnetometerCalibration;
+import org.droidplanner.core.drone.variables.calibration.MagnetometerCalibrationImpl;
 import org.droidplanner.core.firmware.FirmwareType;
 import org.droidplanner.core.mission.Mission;
 import org.droidplanner.core.model.AutopilotWarningParser;
@@ -63,7 +63,7 @@ public class DroneImpl implements Drone {
 	private final Preferences preferences;
 
     private final LogMessageListener logListener;
-	private final MagnetometerCalibration magCalibration;
+	private final MagnetometerCalibrationImpl magCalibration;
 
 	public DroneImpl(MAVLinkStreams.MAVLinkOutputStream mavClient, DroneInterfaces.Clock clock,
 			DroneInterfaces.Handler handler, Preferences pref, AutopilotWarningParser warningParser,
@@ -93,7 +93,7 @@ public class DroneImpl implements Drone {
         this.navigation = new Navigation(this);
         this.guidedPoint =  new GuidedPoint(this);
         this.accelCalibrationSetup = new AccelCalibration(this);
-		this.magCalibration = new MagnetometerCalibration(this);
+		this.magCalibration = new MagnetometerCalibrationImpl(this);
         this.mag = new Magnetometer(this);
         this.footprints = new Camera(this);
         this.goProImpl = new GoProImpl(this, handler);
@@ -281,7 +281,7 @@ public class DroneImpl implements Drone {
 	}
 
 	@Override
-	public MagnetometerCalibration getMagnetometerCalibration() {
+	public MagnetometerCalibrationImpl getMagnetometerCalibration() {
 		return magCalibration;
 	}
 

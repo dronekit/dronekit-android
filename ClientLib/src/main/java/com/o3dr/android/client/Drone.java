@@ -21,6 +21,7 @@ import com.o3dr.android.client.interfaces.DroneListener;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
+import com.o3dr.services.android.lib.drone.calibration.magnetometer.MagnetometerCalibrationStatus;
 import com.o3dr.services.android.lib.drone.camera.GoPro;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionResult;
@@ -321,6 +322,9 @@ public class Drone {
 
             case AttributeType.GOPRO:
                 return (T) new GoPro();
+
+            case AttributeType.MAGNETOMETER_CALIBRATION_STATUS:
+                return (T) new MagnetometerCalibrationStatus();
 
             case AttributeType.CAMERA:
             default:
