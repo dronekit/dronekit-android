@@ -18,7 +18,7 @@ public class MavLinkCalibration {
 		drone.getMavClient().sendMavPacket(msg.pack());
 	}
 
-	public static void sendStartCalibrationMessage(Drone drone) {
+	public static void startAccelerometerCalibration(Drone drone) {
 		msg_command_long msg = new msg_command_long();
 		msg.target_system = drone.getSysid();
 		msg.target_component = drone.getCompid();
@@ -67,7 +67,7 @@ public class MavLinkCalibration {
 	}
 
 	/**
-	 * Cancel the running magnetometer calibration.
+	 * Cancel the running magnetometer calibration.˛
 	 * @param drone
 	 */
 	public static void cancelMagnetometerCalibration(Drone drone){

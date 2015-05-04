@@ -7,7 +7,7 @@ import org.droidplanner.core.drone.profiles.Parameters;
 import org.droidplanner.core.drone.profiles.VehicleProfile;
 import org.droidplanner.core.drone.variables.Altitude;
 import org.droidplanner.core.drone.variables.Battery;
-import org.droidplanner.core.drone.variables.Calibration;
+import org.droidplanner.core.drone.variables.calibration.AccelCalibration;
 import org.droidplanner.core.drone.variables.Camera;
 import org.droidplanner.core.drone.variables.GPS;
 import org.droidplanner.core.drone.variables.GuidedPoint;
@@ -23,6 +23,7 @@ import org.droidplanner.core.drone.variables.Speed;
 import org.droidplanner.core.drone.variables.State;
 import org.droidplanner.core.drone.variables.StreamRates;
 import org.droidplanner.core.drone.variables.Type;
+import org.droidplanner.core.drone.variables.calibration.MagnetometerCalibration;
 import org.droidplanner.core.firmware.FirmwareType;
 import org.droidplanner.core.mission.Mission;
 import org.droidplanner.core.model.AutopilotWarningParser;
@@ -49,7 +50,7 @@ public class DroneImpl implements Drone {
 	private final Orientation orientation;
 	private final Navigation navigation;
 	private final GuidedPoint guidedPoint;
-	private final Calibration calibrationSetup;
+	private final AccelCalibration accelCalibrationSetup;
 	private final WaypointManager waypointManager;
 	private final Magnetometer mag;
 	private final Camera footprints;
@@ -62,6 +63,7 @@ public class DroneImpl implements Drone {
 	private final Preferences preferences;
 
     private final LogMessageListener logListener;
+	private final MagnetometerCalibration magCalibration;
 
 	public DroneImpl(MAVLinkStreams.MAVLinkOutputStream mavClient, DroneInterfaces.Clock clock,
 			DroneInterfaces.Handler handler, Preferences pref, AutopilotWarningParser warningParser,
@@ -90,7 +92,8 @@ public class DroneImpl implements Drone {
         this.orientation = new Orientation(this);
         this.navigation = new Navigation(this);
         this.guidedPoint =  new GuidedPoint(this);
-        this.calibrationSetup = new Calibration(this);
+        this.accelCalibrationSetup = new AccelCalibration(this);
+		this.magCalibration = new MagnetometerCalibration(this);
         this.mag = new Magnetometer(this);
         this.footprints = new Camera(this);
         this.goProImpl = new GoProImpl(this, handler);
@@ -273,8 +276,13 @@ public class DroneImpl implements Drone {
 	}
 
 	@Override
-	public Calibration getCalibrationSetup() {
-		return calibrationSetup;
+	public AccelCalibration getCalibrationSetup() {
+		return accelCalibrationSetup;
+	}
+
+	@Override
+	public MagnetometerCalibration getMagnetometerCalibration() {
+		return magCalibration;
 	}
 
 	@Override

@@ -11,6 +11,8 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.MAVLink.Messages.MAVLinkMessage;
+import com.MAVLink.ardupilotmega.msg_mag_cal_progress;
+import com.MAVLink.ardupilotmega.msg_mag_cal_report;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.action.ConnectionActions;
@@ -21,6 +23,8 @@ import com.o3dr.services.android.lib.drone.action.StateActions;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
+import com.o3dr.services.android.lib.drone.calibration.magnetometer.MagnetometerCalibrationProgress;
+import com.o3dr.services.android.lib.drone.calibration.magnetometer.MagnetometerCalibrationReport;
 import com.o3dr.services.android.lib.drone.camera.action.CameraActions;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionResult;
@@ -42,7 +46,7 @@ import com.o3dr.services.android.lib.model.action.Action;
 
 import org.droidplanner.core.MAVLink.command.doCmd.MavLinkDoCmds;
 import org.droidplanner.core.drone.DroneInterfaces;
-import org.droidplanner.core.drone.variables.Calibration;
+import org.droidplanner.core.drone.variables.calibration.AccelCalibration;
 import org.droidplanner.core.gcs.follow.Follow;
 import org.droidplanner.core.gcs.follow.FollowAlgorithm;
 import org.droidplanner.core.helpers.coordinates.Coord2D;
@@ -657,10 +661,10 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 				 * flag and re-trigger the HEARBEAT_TIMEOUT this however should
 				 * not be happening
 				 */
-                final Calibration calibration = drone.getCalibrationSetup();
-                final String message = calibration.getMessage();
-                if (calibration.isCalibrating() && TextUtils.isEmpty(message)) {
-                    calibration.setCalibrating(false);
+                final AccelCalibration accelCalibration = drone.getCalibrationSetup();
+                final String message = accelCalibration.getMessage();
+                if (accelCalibration.isCalibrating() && TextUtils.isEmpty(message)) {
+                    accelCalibration.setCalibrating(false);
                     droneEvent = AttributeEvent.HEARTBEAT_TIMEOUT;
                 } else {
                     extrasBundle = new Bundle(1);
@@ -802,5 +806,42 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     @Override
     public void binderDied() {
         checkForSelfRelease();
+    }
+
+    @Override
+    public void onCalibrationCancelled() {
+        notifyAttributeUpdate(AttributeEvent.CALIBRATION_MAG_CANCELLED, null);
+    }
+
+    @Override
+    public void onCalibrationProgress(msg_mag_cal_progress progress) {
+        Bundle progressBundle = new Bundle(1);
+        progressBundle.putParcelable(AttributeEventExtra.EXTRA_CALIBRATION_MAG_PROGRESS, new
+                MagnetometerCalibrationProgress(progress.completion_pct, progress.direction_x, progress.direction_y,
+                progress.direction_z));
+
+        notifyAttributeUpdate(AttributeEvent.CALIBRATION_MAG_PROGRESS, progressBundle);
+    }
+
+    @Override
+    public void onCalibrationReport(msg_mag_cal_report report) {
+        Bundle reportBundle = new Bundle(1);
+        reportBundle.putParcelable(AttributeEventExtra.EXTRA_CALIBRATION_MAG_REPORT,
+                new MagnetometerCalibrationReport(report.autosaved == 1 , report.fitness,
+                        report.ofs_x, report.ofs_y, report.ofs_z,
+                        report.diag_x, report.diag_y, report.diag_z,
+                        report.offdiag_x, report.offdiag_y, report.offdiag_z));
+
+        notifyAttributeUpdate(AttributeEvent.CALIBRATION_MAG_REPORT, reportBundle);
+    }
+
+    @Override
+    public void onCalibrationCompleted() {
+        notifyAttributeUpdate(AttributeEvent.CALIBRATION_MAG_COMPLETED, null);
+    }
+
+    @Override
+    public void onCalibrationError(String error) {
+        //TODO: figure out how to go about reporting magnetometer calibration error.
     }
 }

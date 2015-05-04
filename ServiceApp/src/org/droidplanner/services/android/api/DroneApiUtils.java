@@ -42,7 +42,7 @@ import org.droidplanner.core.MAVLink.command.doCmd.MavLinkDoCmds;
 import org.droidplanner.core.drone.DroneInterfaces;
 import org.droidplanner.core.drone.camera.GoProImpl;
 import org.droidplanner.core.drone.profiles.VehicleProfile;
-import org.droidplanner.core.drone.variables.Calibration;
+import org.droidplanner.core.drone.variables.calibration.AccelCalibration;
 import org.droidplanner.core.drone.variables.Camera;
 import org.droidplanner.core.drone.variables.GPS;
 import org.droidplanner.core.drone.variables.GuidedPoint;
@@ -347,8 +347,8 @@ public class DroneApiUtils {
 
         org.droidplanner.core.drone.variables.State droneState = drone.getState();
         ApmModes droneMode = droneState.getMode();
-        Calibration calibration = drone.getCalibrationSetup();
-        String calibrationMessage = calibration.isCalibrating() ? calibration.getMessage() : null;
+        AccelCalibration accelCalibration = drone.getCalibrationSetup();
+        String calibrationMessage = accelCalibration.isCalibrating() ? accelCalibration.getMessage() : null;
 
         return new State(isConnected, DroneApiUtils.getVehicleMode(droneMode), droneState.isArmed(), droneState.isFlying(),
                 droneState.getErrorId(), drone.getMavlinkVersion(), calibrationMessage,
@@ -664,28 +664,25 @@ public class DroneApiUtils {
         if (drone == null)
             return;
 
-        MavLinkCalibration.startMagnetometerCalibration(drone, retryOnFailure, saveAutomatically, startDelay);
+        drone.getMagnetometerCalibration().startCalibration(retryOnFailure, saveAutomatically, startDelay);
     }
 
     static void cancelMagnetometerCalibration(Drone drone) {
         if (drone == null)
             return;
 
-        MavLinkCalibration.cancelMagnetometerCalibration(drone);
+        drone.getMagnetometerCalibration().cancelCalibration();
     }
 
     public static void acceptMagnetometerCalibration(Drone drone) {
         if(drone == null)
             return;
 
-        MavLinkCalibration.acceptMagnetometerCalibration(drone);
+        drone.getMagnetometerCalibration().acceptCalibration();
     }
 
     static boolean startIMUCalibration(Drone drone) {
-        if (drone == null)
-            return false;
-
-        return drone.getCalibrationSetup().startCalibration();
+        return drone != null && drone.getCalibrationSetup().startCalibration();
     }
 
     static void sendIMUCalibrationAck(Drone drone, int step) {

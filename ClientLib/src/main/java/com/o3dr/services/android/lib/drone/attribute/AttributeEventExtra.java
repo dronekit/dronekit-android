@@ -27,6 +27,10 @@ public class AttributeEventExtra {
      */
     public static final String EXTRA_CALIBRATION_IMU_MESSAGE = PACKAGE_NAME + ".CALIBRATION_IMU_MESSAGE";
 
+    public static final String EXTRA_CALIBRATION_MAG_PROGRESS = PACKAGE_NAME + ".CALIBRATION_MAG_PROGRESS";
+
+    public static final String EXTRA_CALIBRATION_MAG_REPORT = PACKAGE_NAME + ".CALIBRATION_MAG_REPORT";
+
     /**
      * Used to access the mavlink version when the heartbeat is received for the first time or
      * restored.

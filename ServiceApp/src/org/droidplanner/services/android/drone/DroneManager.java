@@ -8,6 +8,8 @@ import android.util.Log;
 
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
+import com.MAVLink.ardupilotmega.msg_mag_cal_progress;
+import com.MAVLink.ardupilotmega.msg_mag_cal_report;
 import com.MAVLink.enums.MAV_SEVERITY;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.DroneSharePrefs;
@@ -17,6 +19,7 @@ import org.droidplanner.core.MAVLink.MavLinkMsgHandler;
 import org.droidplanner.core.drone.DroneImpl;
 import org.droidplanner.core.drone.DroneInterfaces;
 import org.droidplanner.core.drone.LogMessageListener;
+import org.droidplanner.core.drone.variables.calibration.MagnetometerCalibration;
 import org.droidplanner.core.gcs.follow.Follow;
 import org.droidplanner.core.model.Drone;
 import org.droidplanner.core.parameters.Parameter;
@@ -38,7 +41,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Bridge between the communication channel, the drone instance(s), and the connected client(s).
  */
 public class DroneManager implements MAVLinkStreams.MavlinkInputStream, DroneInterfaces.OnDroneListener,
-        DroneInterfaces.OnParameterManagerListener, LogMessageListener {
+        DroneInterfaces.OnParameterManagerListener, LogMessageListener, MagnetometerCalibration.OnMagnetometerCalibrationListener {
 
     private static final String TAG = DroneManager.class.getSimpleName();
 
@@ -92,6 +95,7 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream, DroneInt
 
         drone.addDroneListener(this);
         drone.getParameters().setParameterListener(this);
+        drone.getMagnetometerCalibration().setListener(this);
     }
 
     public void destroy() {
@@ -387,5 +391,50 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream, DroneInt
         for (DroneEventsListener listener : connectedApps.values()) {
             listener.onMessageLogged(logLevel, message);
         }
+    }
+
+    @Override
+    public void onCalibrationCancelled() {
+        if(connectedApps.isEmpty())
+            return;
+
+        for(DroneEventsListener listener: connectedApps.values())
+            listener.onCalibrationCancelled();
+    }
+
+    @Override
+    public void onCalibrationProgress(msg_mag_cal_progress progress) {
+        if(connectedApps.isEmpty())
+            return;
+
+        for(DroneEventsListener listener: connectedApps.values())
+            listener.onCalibrationProgress(progress);
+    }
+
+    @Override
+    public void onCalibrationReport(msg_mag_cal_report report) {
+        if(connectedApps.isEmpty())
+            return;
+
+        for(DroneEventsListener listener: connectedApps.values())
+            listener.onCalibrationReport(report);
+    }
+
+    @Override
+    public void onCalibrationCompleted() {
+        if(connectedApps.isEmpty())
+            return;
+
+        for(DroneEventsListener listener: connectedApps.values())
+            listener.onCalibrationCompleted();
+    }
+
+    @Override
+    public void onCalibrationError(String error) {
+        if(connectedApps.isEmpty())
+            return;
+
+        for(DroneEventsListener listener: connectedApps.values())
+            listener.onCalibrationError(error);
     }
 }

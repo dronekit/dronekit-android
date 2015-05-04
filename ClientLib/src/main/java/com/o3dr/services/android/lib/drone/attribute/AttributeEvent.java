@@ -26,16 +26,18 @@ public class AttributeEvent {
     public static final String AUTOPILOT_MESSAGE = PACKAGE_NAME + ".AUTOPILOT_MESSAGE";
 
     /**
-     * Signals the start of magnetometer calibration.
+     * Event to signal cancellation of the magnetometer calibration process.
      */
-    public static final String CALIBRATION_MAG_STARTED = PACKAGE_NAME +
-            ".CALIBRATION_MAG_STARTED";
+    public static final String CALIBRATION_MAG_CANCELLED = PACKAGE_NAME + ".CALIBRATION_MAG_CANCELLED";
 
     /**
      * Signals completion of the magnetometer calibration.
      */
-    public static final String CALIBRATION_MAG_COMPLETED = PACKAGE_NAME +
-            ".CALIBRATION_MAG_COMPLETED";
+    public static final String CALIBRATION_MAG_COMPLETED = PACKAGE_NAME + ".CALIBRATION_MAG_COMPLETED";
+
+    public static final String CALIBRATION_MAG_PROGRESS = PACKAGE_NAME + ".CALIBRATION_MAG_PROGRESS";
+
+    public static final String CALIBRATION_MAG_REPORT = PACKAGE_NAME + ".CALIBRATION_MAG_REPORT";
 
     public static final String CALIBRATION_IMU = PACKAGE_NAME + ".CALIBRATION_IMU";
     public static final String CALIBRATION_IMU_ERROR = PACKAGE_NAME + ".CALIBRATION_IMU_ERROR";
