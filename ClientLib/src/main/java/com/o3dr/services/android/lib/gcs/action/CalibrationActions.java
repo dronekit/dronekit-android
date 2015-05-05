@@ -15,11 +15,13 @@ public class CalibrationActions {
 
     public static final String ACTION_START_MAGNETOMETER_CALIBRATION = Utils.PACKAGE_NAME + ".action" +
             ".START_MAGNETOMETER_CALIBRATION";
-    public static final String ACTION_STOP_MAGNETOMETER_CALIBRATION = Utils.PACKAGE_NAME + ".action" +
-            ".STOP_MAGNETOMETER_CALIBRATION";
+    public static final String ACTION_ACCEPT_MAGNETOMETER_CALIBRATION = Utils.PACKAGE_NAME + ".action" +
+            ".ACCEPT_MAGNETOMETER_CALIBRATION";
+    public static final String ACTION_CANCEL_MAGNETOMETER_CALIBRATION = Utils.PACKAGE_NAME + ".action" +
+            ".CANCEL_MAGNETOMETER_CALIBRATION";
 
-    public static final String EXTRA_MAGNETOMETER_START_X = "extra_magnetometer_start_x";
-    public static final String EXTRA_MAGNETOMETER_START_Y = "extra_magnetometer_start_y";
-    public static final String EXTRA_MAGNETOMETER_START_Z = "extra_magnetometer_start_z";
+    public static final String EXTRA_RETRY_ON_FAILURE = "extra_retry_on_failure";
+    public static final String EXTRA_SAVE_AUTOMATICALLY = "extra_save_automatically";
+    public static final String EXTRA_START_DELAY = "extra_start_delay";
 
 }

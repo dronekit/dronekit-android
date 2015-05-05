@@ -11,6 +11,9 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.MAVLink.Messages.MAVLinkMessage;
+import com.MAVLink.ardupilotmega.msg_mag_cal_progress;
+import com.MAVLink.ardupilotmega.msg_mag_cal_report;
+import com.MAVLink.enums.MAG_CAL_STATUS;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.action.ConnectionActions;
@@ -21,6 +24,8 @@ import com.o3dr.services.android.lib.drone.action.StateActions;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
+import com.o3dr.services.android.lib.drone.calibration.magnetometer.MagnetometerCalibrationProgress;
+import com.o3dr.services.android.lib.drone.calibration.magnetometer.MagnetometerCalibrationResult;
 import com.o3dr.services.android.lib.drone.camera.action.CameraActions;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionResult;
@@ -42,7 +47,7 @@ import com.o3dr.services.android.lib.model.action.Action;
 
 import org.droidplanner.core.MAVLink.command.doCmd.MavLinkDoCmds;
 import org.droidplanner.core.drone.DroneInterfaces;
-import org.droidplanner.core.drone.variables.Calibration;
+import org.droidplanner.core.drone.variables.calibration.AccelCalibration;
 import org.droidplanner.core.gcs.follow.Follow;
 import org.droidplanner.core.gcs.follow.FollowAlgorithm;
 import org.droidplanner.core.helpers.coordinates.Coord2D;
@@ -54,7 +59,6 @@ import org.droidplanner.services.android.R;
 import org.droidplanner.services.android.drone.DroneManager;
 import org.droidplanner.services.android.exception.ConnectionException;
 import org.droidplanner.services.android.interfaces.DroneEventsListener;
-import org.droidplanner.services.android.utils.MathUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -62,9 +66,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
-import ellipsoidFit.FitPoints;
-import ellipsoidFit.ThreeSpacePoint;
 
 /**
  * Implementation for the IDroneApi interface.
@@ -211,6 +212,10 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
             case AttributeType.GOPRO:
                 carrier.putParcelable(type, DroneApiUtils.getGoPro(drone));
+                break;
+
+            case AttributeType.MAGNETOMETER_CALIBRATION_STATUS:
+                carrier.putParcelable(type, DroneApiUtils.getMagnetometerCalibrationStatus(drone));
                 break;
         }
 
@@ -399,7 +404,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
             //CALIBRATION ACTIONS
             case CalibrationActions.ACTION_START_IMU_CALIBRATION:
-                if (!DroneApiUtils.startIMUCalibration(getDroneManager())) {
+                if (!DroneApiUtils.startIMUCalibration(getDrone())) {
                     Bundle extrasBundle = new Bundle(1);
                     extrasBundle.putString(AttributeEventExtra.EXTRA_CALIBRATION_IMU_MESSAGE,
                             context.getString(R.string.failed_start_calibration_message));
@@ -413,14 +418,18 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 break;
 
             case CalibrationActions.ACTION_START_MAGNETOMETER_CALIBRATION:
-                double[] startX = data.getDoubleArray(CalibrationActions.EXTRA_MAGNETOMETER_START_X);
-                double[] startY = data.getDoubleArray(CalibrationActions.EXTRA_MAGNETOMETER_START_Y);
-                double[] startZ = data.getDoubleArray(CalibrationActions.EXTRA_MAGNETOMETER_START_Z);
-                DroneApiUtils.startMagnetometerCalibration(getDroneManager(), startX, startY, startZ);
+                final boolean retryOnFailure = data.getBoolean(CalibrationActions.EXTRA_RETRY_ON_FAILURE, false);
+                final boolean saveAutomatically = data.getBoolean(CalibrationActions.EXTRA_SAVE_AUTOMATICALLY, true);
+                final int startDelay = data.getInt(CalibrationActions.EXTRA_START_DELAY, 0);
+                DroneApiUtils.startMagnetometerCalibration(getDrone(), retryOnFailure, saveAutomatically, startDelay);
                 break;
 
-            case CalibrationActions.ACTION_STOP_MAGNETOMETER_CALIBRATION:
-                DroneApiUtils.stopMagnetometerCalibration(getDroneManager());
+            case CalibrationActions.ACTION_CANCEL_MAGNETOMETER_CALIBRATION:
+                DroneApiUtils.cancelMagnetometerCalibration(getDrone());
+                break;
+
+            case CalibrationActions.ACTION_ACCEPT_MAGNETOMETER_CALIBRATION:
+                DroneApiUtils.acceptMagnetometerCalibration(getDrone());
                 break;
 
             //FOLLOW-ME ACTIONS
@@ -657,10 +666,10 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 				 * flag and re-trigger the HEARBEAT_TIMEOUT this however should
 				 * not be happening
 				 */
-                final Calibration calibration = drone.getCalibrationSetup();
-                final String message = calibration.getMessage();
-                if (calibration.isCalibrating() && TextUtils.isEmpty(message)) {
-                    calibration.setCalibrating(false);
+                final AccelCalibration accelCalibration = drone.getCalibrationSetup();
+                final String message = accelCalibration.getMessage();
+                if (accelCalibration.isCalibrating() && TextUtils.isEmpty(message)) {
+                    accelCalibration.setCalibrating(false);
                     droneEvent = AttributeEvent.HEARTBEAT_TIMEOUT;
                 } else {
                     extrasBundle = new Bundle(1);
@@ -787,51 +796,6 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     }
 
     @Override
-    public void onStarted(List<ThreeSpacePoint> points) {
-        Bundle paramsBundle = new Bundle();
-        double[][] pointsArr = MathUtils.threeSpacePointToPointsArray(points);
-        paramsBundle.putSerializable(AttributeEventExtra.EXTRA_CALIBRATION_MAG_POINTS_X, pointsArr[0]);
-        paramsBundle.putSerializable(AttributeEventExtra.EXTRA_CALIBRATION_MAG_POINTS_Y, pointsArr[1]);
-        paramsBundle.putSerializable(AttributeEventExtra.EXTRA_CALIBRATION_MAG_POINTS_Z, pointsArr[2]);
-
-        notifyAttributeUpdate(AttributeEvent.CALIBRATION_MAG_STARTED, paramsBundle);
-    }
-
-    @Override
-    public void newEstimation(FitPoints fit, List<ThreeSpacePoint> points) {
-        double fitness = fit.getFitness();
-        double[] fitCenter = fit.center.isNaN()
-                ? null
-                : new double[]{fit.center.getEntry(0), fit.center.getEntry(1), fit.center.getEntry(2)};
-        double[] fitRadii = fit.radii.isNaN()
-                ? null
-                : new double[]{fit.radii.getEntry(0), fit.radii.getEntry(1), fit.radii.getEntry(2)};
-
-        Bundle paramsBundle = new Bundle(4);
-        paramsBundle.putDouble(AttributeEventExtra.EXTRA_CALIBRATION_MAG_FITNESS, fitness);
-        paramsBundle.putDoubleArray(AttributeEventExtra.EXTRA_CALIBRATION_MAG_FIT_CENTER, fitCenter);
-        paramsBundle.putDoubleArray(AttributeEventExtra.EXTRA_CALIBRATION_MAG_FIT_RADII, fitRadii);
-
-        double[][] pointsArr = MathUtils.threeSpacePointToPointsArray(points);
-        paramsBundle.putSerializable(AttributeEventExtra.EXTRA_CALIBRATION_MAG_POINTS_X, pointsArr[0]);
-        paramsBundle.putSerializable(AttributeEventExtra.EXTRA_CALIBRATION_MAG_POINTS_Y, pointsArr[1]);
-        paramsBundle.putSerializable(AttributeEventExtra.EXTRA_CALIBRATION_MAG_POINTS_Z, pointsArr[2]);
-
-        notifyAttributeUpdate(AttributeEvent.CALIBRATION_MAG_ESTIMATION, paramsBundle);
-    }
-
-    @Override
-    public void finished(FitPoints fit, double[] offsets) {
-        double fitness = fit.getFitness();
-
-        Bundle paramsBundle = new Bundle(2);
-        paramsBundle.putDouble(AttributeEventExtra.EXTRA_CALIBRATION_MAG_FITNESS, fitness);
-        paramsBundle.putDoubleArray(AttributeEventExtra.EXTRA_CALIBRATION_MAG_OFFSETS, offsets);
-
-        notifyAttributeUpdate(AttributeEvent.CALIBRATION_MAG_COMPLETED, paramsBundle);
-    }
-
-    @Override
     public DroneSharePrefs getDroneSharePrefs() {
         if (connectionParams == null)
             return null;
@@ -847,5 +811,28 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     @Override
     public void binderDied() {
         checkForSelfRelease();
+    }
+
+    @Override
+    public void onCalibrationCancelled() {
+        notifyAttributeUpdate(AttributeEvent.CALIBRATION_MAG_CANCELLED, null);
+    }
+
+    @Override
+    public void onCalibrationProgress(msg_mag_cal_progress progress) {
+        Bundle progressBundle = new Bundle(1);
+        progressBundle.putParcelable(AttributeEventExtra.EXTRA_CALIBRATION_MAG_PROGRESS,
+                DroneApiUtils.getMagnetometerCalibrationProgress(progress));
+
+        notifyAttributeUpdate(AttributeEvent.CALIBRATION_MAG_PROGRESS, progressBundle);
+    }
+
+    @Override
+    public void onCalibrationCompleted(msg_mag_cal_report report) {
+        Bundle reportBundle = new Bundle(1);
+        reportBundle.putParcelable(AttributeEventExtra.EXTRA_CALIBRATION_MAG_RESULT,
+                DroneApiUtils.getMagnetometerCalibrationResult(report));
+
+        notifyAttributeUpdate(AttributeEvent.CALIBRATION_MAG_COMPLETED, reportBundle);
     }
 }

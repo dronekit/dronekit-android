@@ -6,6 +6,8 @@ import com.MAVLink.ardupilotmega.msg_camera_feedback;
 import com.MAVLink.ardupilotmega.msg_gopro_get_response;
 import com.MAVLink.ardupilotmega.msg_gopro_heartbeat;
 import com.MAVLink.ardupilotmega.msg_gopro_set_response;
+import com.MAVLink.ardupilotmega.msg_mag_cal_progress;
+import com.MAVLink.ardupilotmega.msg_mag_cal_report;
 import com.MAVLink.ardupilotmega.msg_mount_status;
 import com.MAVLink.ardupilotmega.msg_radio;
 import com.MAVLink.common.msg_attitude;
@@ -154,6 +156,12 @@ public class MavLinkMsgHandler {
 
             case msg_gopro_get_response.MAVLINK_MSG_ID_GOPRO_GET_RESPONSE:
                 drone.getGoProImpl().onResponseReceived((msg_gopro_get_response)msg);
+                break;
+
+            //*************** Magnetometer calibration messages handling *************//
+            case msg_mag_cal_progress.MAVLINK_MSG_ID_MAG_CAL_PROGRESS:
+            case msg_mag_cal_report.MAVLINK_MSG_ID_MAG_CAL_REPORT:
+                drone.getMagnetometerCalibration().processCalibrationMessage(msg);
                 break;
 
             default:

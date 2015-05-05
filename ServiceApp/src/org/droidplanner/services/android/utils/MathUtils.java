@@ -9,43 +9,10 @@ import org.droidplanner.core.helpers.coordinates.Coord3D;
 import java.util.ArrayList;
 import java.util.List;
 
-import ellipsoidFit.ThreeSpacePoint;
-
 /**
  * Created by fhuya on 11/4/14.
  */
 public class MathUtils {
-
-    public static double[][] threeSpacePointToPointsArray(List<ThreeSpacePoint> spacePoints) {
-        final int pointsCount = spacePoints == null ? 0 : spacePoints.size();
-        final double[][] pointsArray = new double[3][pointsCount];
-
-        if (pointsCount > 0) {
-            for (int i = 0; i < pointsCount; i++) {
-                ThreeSpacePoint point = spacePoints.get(i);
-                pointsArray[0][i] = point.x;
-                pointsArray[1][i] = point.y;
-                pointsArray[2][i] = point.z;
-            }
-        }
-
-        return pointsArray;
-    }
-
-    public static ArrayList<ThreeSpacePoint> pointsArrayToThreeSpacePoint(double[][] points) {
-        final int pointsCount = points == null ? 0 : points[0].length;
-        final ArrayList<ThreeSpacePoint> spacePoints = new ArrayList<ThreeSpacePoint>(pointsCount);
-
-        if (pointsCount > 0) {
-            for (int i = 0; i < pointsCount; i++) {
-                ThreeSpacePoint spacePoint = new ThreeSpacePoint(points[0][i], points[1][i],
-                        points[2][i]);
-                spacePoints.add(spacePoint);
-            }
-        }
-
-        return spacePoints;
-    }
 
     public static Coord2D latLongToCoord2D(LatLong latLong) {
         return new Coord2D(latLong.getLatitude(), latLong.getLongitude());

@@ -1,4 +1,4 @@
-package org.droidplanner.core.drone.variables;
+package org.droidplanner.core.drone.variables.calibration;
 
 import org.droidplanner.core.MAVLink.MavLinkCalibration;
 import org.droidplanner.core.drone.DroneInterfaces.DroneEventsType;
@@ -8,14 +8,12 @@ import org.droidplanner.core.model.Drone;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.common.msg_statustext;
 
-public class Calibration extends DroneVariable {
-	private Drone myDrone;
+public class AccelCalibration extends DroneVariable {
 	private String mavMsg;
 	private boolean calibrating;
 
-	public Calibration(Drone drone) {
+	public AccelCalibration(Drone drone) {
 		super(drone);
-		this.myDrone = drone;
 	}
 
 	public boolean startCalibration() {
@@ -25,7 +23,7 @@ public class Calibration extends DroneVariable {
         else {
             calibrating = true;
 			mavMsg = "";
-            MavLinkCalibration.sendStartCalibrationMessage(myDrone);
+            MavLinkCalibration.startAccelerometerCalibration(myDrone);
         }
         return calibrating;
 	}
