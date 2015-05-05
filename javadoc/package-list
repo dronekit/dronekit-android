@@ -12,6 +12,7 @@ com.o3dr.services.android.lib.data
 com.o3dr.services.android.lib.drone.action
 com.o3dr.services.android.lib.drone.attribute
 com.o3dr.services.android.lib.drone.attribute.error
+com.o3dr.services.android.lib.drone.calibration.magnetometer
 com.o3dr.services.android.lib.drone.camera
 com.o3dr.services.android.lib.drone.camera.action
 com.o3dr.services.android.lib.drone.connection
