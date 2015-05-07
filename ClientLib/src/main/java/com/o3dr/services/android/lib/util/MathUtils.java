@@ -1,6 +1,7 @@
 package com.o3dr.services.android.lib.util;
 
 import com.o3dr.services.android.lib.coordinate.LatLong;
+import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +26,28 @@ public class MathUtils {
      * @return distance in meters
      */
     public static double getDistance(LatLong from, LatLong to) {
-        return RADIUS_OF_EARTH * Math.toRadians(getArcInRadians(from, to));
+        return getDistance(new LatLongAlt(from, 0.0), new LatLongAlt(to, 0.0));
+    }
+
+    /**
+     * Computes the distance between two points taking into consideration altitude
+     *
+     * @return distance in meters
+     */
+    public static double getDistance (LatLongAlt point1, LatLongAlt point2){
+
+        //point1 transform to cartesian
+        final double x1 = (point1.getAltitude() + RADIUS_OF_EARTH) * Math.cos(Math.toRadians(point1.getLatitude())) * Math.sin(Math.toRadians(point1.getLongitude()));
+        final double y1 = (point1.getAltitude() + RADIUS_OF_EARTH) * Math.sin(Math.toRadians(point1.getLatitude()));
+        final double z1 = (point1.getAltitude() + RADIUS_OF_EARTH) * Math.cos(Math.toRadians(point1.getLatitude())) * Math.cos(Math.toRadians(point1.getLongitude()));
+
+        //point2 transform to cartesian
+        final double x2 = (point2.getAltitude() + RADIUS_OF_EARTH) * Math.cos(Math.toRadians(point2.getLatitude())) * Math.sin(Math.toRadians(point2.getLongitude()));
+        final double y2 = (point2.getAltitude() + RADIUS_OF_EARTH) * Math.sin(Math.toRadians(point2.getLatitude()));
+        final double z2 = (point2.getAltitude() + RADIUS_OF_EARTH) * Math.cos(Math.toRadians(point2.getLatitude())) * Math.cos(Math.toRadians(point2.getLongitude()));
+
+        return Math.sqrt( Math.pow((x2 - x1),2) + Math.pow((y2 - y1),2) + Math.pow(z2 - z1,2) );
+
     }
 
     /**
