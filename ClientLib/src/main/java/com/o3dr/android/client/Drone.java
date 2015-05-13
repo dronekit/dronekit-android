@@ -1,5 +1,6 @@
 package com.o3dr.android.client;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -20,6 +21,7 @@ import com.o3dr.android.client.interfaces.DroneListener;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
+import com.o3dr.services.android.lib.drone.calibration.magnetometer.MagnetometerCalibrationStatus;
 import com.o3dr.services.android.lib.drone.camera.GoPro;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionResult;
@@ -109,7 +111,11 @@ public class Drone {
     private long startTime = 0;
     private long elapsedFlightTime = 0;
 
-    public Drone(){}
+    private final Context context;
+
+    public Drone(Context context){
+        this.context = context;
+    }
 
     void init(ControlTower controlTower, Handler handler){
         this.handler = handler;
@@ -221,7 +227,7 @@ public class Drone {
 
     public <T extends Parcelable> T getAttribute(String type) {
         if (!isStarted() || type == null)
-            return null;
+            return this.getAttributeDefaultValue(type);
 
         T attribute = null;
         Bundle carrier = null;
@@ -232,7 +238,7 @@ public class Drone {
         }
 
         if (carrier != null) {
-            ClassLoader classLoader = getAttributeClassLoader(type);
+            ClassLoader classLoader = this.context.getClassLoader();
             if (classLoader != null) {
                 carrier.setClassLoader(classLoader);
                 attribute = carrier.getParcelable(type);
@@ -271,6 +277,9 @@ public class Drone {
     }
 
     private <T extends Parcelable> T getAttributeDefaultValue(String attributeType) {
+        if(attributeType == null)
+            return null;
+
         switch (attributeType) {
             case AttributeType.ALTITUDE:
                 return (T) new Altitude();
@@ -314,59 +323,10 @@ public class Drone {
             case AttributeType.GOPRO:
                 return (T) new GoPro();
 
-            case AttributeType.CAMERA:
-            default:
-                return null;
-        }
-    }
-
-    private ClassLoader getAttributeClassLoader(String attributeType) {
-        switch (attributeType) {
-            case AttributeType.ALTITUDE:
-                return Altitude.class.getClassLoader();
-
-            case AttributeType.GPS:
-                return Gps.class.getClassLoader();
-
-            case AttributeType.STATE:
-                return State.class.getClassLoader();
-
-            case AttributeType.PARAMETERS:
-                return Parameters.class.getClassLoader();
-
-            case AttributeType.SPEED:
-                return Speed.class.getClassLoader();
+            case AttributeType.MAGNETOMETER_CALIBRATION_STATUS:
+                return (T) new MagnetometerCalibrationStatus();
 
             case AttributeType.CAMERA:
-                return CameraProxy.class.getClassLoader();
-
-            case AttributeType.ATTITUDE:
-                return Attitude.class.getClassLoader();
-
-            case AttributeType.HOME:
-                return Home.class.getClassLoader();
-
-            case AttributeType.BATTERY:
-                return Battery.class.getClassLoader();
-
-            case AttributeType.MISSION:
-                return Mission.class.getClassLoader();
-
-            case AttributeType.SIGNAL:
-                return Signal.class.getClassLoader();
-
-            case AttributeType.GUIDED_STATE:
-                return GuidedState.class.getClassLoader();
-
-            case AttributeType.TYPE:
-                return Type.class.getClassLoader();
-
-            case AttributeType.FOLLOW_STATE:
-                return FollowState.class.getClassLoader();
-
-            case AttributeType.GOPRO:
-                return GoPro.class.getClassLoader();
-
             default:
                 return null;
         }
@@ -524,18 +484,16 @@ public class Drone {
         DroneStateApi.arm(this, arm);
     }
 
-    public void startMagnetometerCalibration(double[] startPointsX, double[] startPointsY, double[] startPointsZ) {
-        CalibrationApi.startMagnetometerCalibration(this, startPointsX, startPointsY, startPointsZ);
-    }
-
-    public void stopMagnetometerCalibration() {
-        CalibrationApi.stopMagnetometerCalibration(this);
-    }
-
+    /**
+     * @deprecated Use {@link CalibrationApi#startIMUCalibration(Drone)} instead.
+     */
     public void startIMUCalibration() {
         CalibrationApi.startIMUCalibration(this);
     }
 
+    /**
+     * @deprecated Use {@link CalibrationApi#sendIMUAck(Drone, int)} instead.
+     */
     public void sendIMUCalibrationAck(int step) {
         CalibrationApi.sendIMUAck(this, step);
     }
@@ -594,6 +552,10 @@ public class Drone {
     }
 
     void notifyAttributeUpdated(final String attributeEvent, final Bundle extras) {
+        //Update the bundle classloader
+        if(extras != null)
+            extras.setClassLoader(context.getClassLoader());
+
         if (AttributeEvent.STATE_UPDATED.equals(attributeEvent)) {
             getAttributeAsync(AttributeType.STATE, new OnAttributeRetrievedCallback<State>() {
                 @Override

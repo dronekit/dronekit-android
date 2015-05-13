@@ -9,7 +9,7 @@ import org.droidplanner.core.drone.profiles.Parameters;
 import org.droidplanner.core.drone.profiles.VehicleProfile;
 import org.droidplanner.core.drone.variables.Altitude;
 import org.droidplanner.core.drone.variables.Battery;
-import org.droidplanner.core.drone.variables.Calibration;
+import org.droidplanner.core.drone.variables.calibration.AccelCalibration;
 import org.droidplanner.core.drone.variables.Camera;
 import org.droidplanner.core.drone.variables.GPS;
 import org.droidplanner.core.drone.variables.GuidedPoint;
@@ -23,6 +23,7 @@ import org.droidplanner.core.drone.variables.Radio;
 import org.droidplanner.core.drone.variables.Speed;
 import org.droidplanner.core.drone.variables.State;
 import org.droidplanner.core.drone.variables.StreamRates;
+import org.droidplanner.core.drone.variables.calibration.MagnetometerCalibrationImpl;
 import org.droidplanner.core.firmware.FirmwareType;
 import org.droidplanner.core.mission.Mission;
 
@@ -92,7 +93,9 @@ public interface Drone {
 
 	public GuidedPoint getGuidedPoint();
 
-	public Calibration getCalibrationSetup();
+	public AccelCalibration getCalibrationSetup();
+
+	public MagnetometerCalibrationImpl getMagnetometerCalibration();
 
 	public RC getRC();
 	

@@ -96,6 +96,10 @@ public class Parameters extends DroneVariable implements OnDroneListener {
         parameters.put(param.name.toLowerCase(Locale.US), param);
         final int paramIndex = m_value.param_index;
         if (paramIndex == -1) {
+            // update listener
+            if (parameterListener != null)
+                parameterListener.onParameterReceived(param, 0, 1);
+
             myDrone.notifyDroneEvent(DroneEventsType.PARAMETERS_DOWNLOADED);
 
             if (parameterListener != null) {
@@ -123,7 +127,6 @@ public class Parameters extends DroneVariable implements OnDroneListener {
         } else {
             resetWatchdog();
         }
-        myDrone.notifyDroneEvent(DroneEventsType.PARAMETER);
     }
 
     private void reRequestMissingParams(int howManyParams) {

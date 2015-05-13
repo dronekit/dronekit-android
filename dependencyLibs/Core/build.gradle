@@ -17,7 +17,6 @@ configurations {
 
 dependencies {
     compile project(':dependencyLibs:Mavlink')
-    compile project(':dependencyLibs:EllipsoidFit:EllipsoidFit')
 
     //FIXME: hackish implementation
     unitTestCompile files("$project.buildDir/classes/main")
