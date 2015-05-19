@@ -94,7 +94,7 @@ public class MainActivity extends ActionBarActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_learn_more:
-                startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse("https://droidplanner.github.io/3DRServices/")));
+                startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse("http://dronekit.io/")));
                 return true;
 
             default:
