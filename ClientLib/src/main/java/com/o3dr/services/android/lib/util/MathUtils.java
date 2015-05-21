@@ -26,23 +26,24 @@ public class MathUtils {
      *
      * @return distance in meters
      */
+    public static double getDistance3D(LatLongAlt from, LatLongAlt to){
+        if(from == null || to == null)
+            return -1;
 
-    public static double getDistance (LatLongAlt point1, LatLongAlt point2){
-
-            double distanceSqr = Math.pow(getDistance(new LatLong(point1), new LatLong(point2)), 2);
-            double altitudeSqr = Math.pow(point2.getAltitude() - point1.getAltitude(), 2);
+        final double distance2d = getDistance2D(from, to);
+            double distanceSqr = Math.pow(distance2d, 2);
+            double altitudeSqr = Math.pow(to.getAltitude() - from.getAltitude(), 2);
 
             return Math.sqrt(altitudeSqr + distanceSqr);
     }
 
-    /**
-     * Computes the distance between two coordinates
-     *
-     * @return distance in meters
-     */
-    public static double getDistance(LatLong from, LatLong to) {
+    public static double getDistance2D(LatLong from, LatLong to){
+        if(from == null || to == null)
+            return -1;
+
         return RADIUS_OF_EARTH * Math.toRadians(getArcInRadians(from, to));
     }
+
     /**
      * Calculates the arc between two points
      * http://en.wikipedia.org/wiki/Haversine_formula
@@ -322,7 +323,7 @@ public class MathUtils {
                 continue;
             }
 
-            lenght += getDistance(gridPoints.get(i), to);
+            lenght += getDistance2D(gridPoints.get(i), to);
         }
         return lenght;
     }

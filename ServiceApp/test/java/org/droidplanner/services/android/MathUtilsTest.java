@@ -50,9 +50,9 @@ public class MathUtilsTest extends TestCase {
 
         LatLong origin = new LatLong(originLat, originLon);
 
-        assertEquals(FIRST_RESULT, MathUtils.getDistance(origin, new LatLong(FIRST_LAT, FIRST_LON)), MARGIN_OF_ERROR);
-        assertEquals(SECOND_RESULT, MathUtils.getDistance(origin, new LatLong(SECOND_LAT, SECOND_LON)), MARGIN_OF_ERROR);
-        assertEquals(THIRD_RESULT, MathUtils.getDistance(origin, new LatLong(THIRD_LAT, THIRD_LON)), MARGIN_OF_ERROR);
+        assertEquals(FIRST_RESULT, MathUtils.getDistance2D(origin, new LatLong(FIRST_LAT, FIRST_LON)), MARGIN_OF_ERROR);
+        assertEquals(SECOND_RESULT, MathUtils.getDistance2D(origin, new LatLong(SECOND_LAT, SECOND_LON)), MARGIN_OF_ERROR);
+        assertEquals(THIRD_RESULT, MathUtils.getDistance2D(origin, new LatLong(THIRD_LAT, THIRD_LON)), MARGIN_OF_ERROR);
 
     }
 
@@ -61,7 +61,7 @@ public class MathUtilsTest extends TestCase {
      */
     public void testGetDistanceOnlyAltitude() {
 
-        double distance = MathUtils.getDistance(new LatLongAlt(0.0, 0.0, 50.0), new LatLongAlt(0.0, 0.0, 100.0));
+        double distance = MathUtils.getDistance3D(new LatLongAlt(0.0, 0.0, 50.0), new LatLongAlt(0.0, 0.0, 100.0));
         assertEquals(distance, 50.0, MARGIN_OF_ERROR);
 
     }
@@ -93,9 +93,9 @@ public class MathUtilsTest extends TestCase {
             toLongitude = randDouble(rand, MIN_LONGITUDE, MAX_LONGITUDE);
 
             //3D Distance equation
-            distance1 = MathUtils.getDistance(new LatLongAlt(fromLatitude, fromLongitude, 0.0), new LatLongAlt(toLatitude, toLongitude, 0.0));
+            distance1 = MathUtils.getDistance3D(new LatLongAlt(fromLatitude, fromLongitude, 0.0), new LatLongAlt(toLatitude, toLongitude, 0.0));
             //2D Distance equation
-            distance2 = MathUtils.getDistance(new LatLong(fromLatitude, fromLongitude), new LatLong(toLatitude, toLongitude));
+            distance2 = MathUtils.getDistance2D(new LatLong(fromLatitude, fromLongitude), new LatLong(toLatitude, toLongitude));
 
             //Assert that the results from both equations are equal
             assertEquals(distance1, distance2, MARGIN_OF_ERROR);
