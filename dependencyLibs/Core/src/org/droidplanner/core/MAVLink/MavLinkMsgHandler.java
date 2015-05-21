@@ -15,6 +15,7 @@ import com.MAVLink.common.msg_global_position_int;
 import com.MAVLink.common.msg_gps_raw_int;
 import com.MAVLink.common.msg_heartbeat;
 import com.MAVLink.common.msg_mission_current;
+import com.MAVLink.common.msg_named_value_int;
 import com.MAVLink.common.msg_nav_controller_output;
 import com.MAVLink.common.msg_radio_status;
 import com.MAVLink.common.msg_raw_imu;
@@ -145,6 +146,10 @@ public class MavLinkMsgHandler {
                 drone.getCamera().updateMountOrientation(((msg_mount_status) msg));
                 break;
 
+            case msg_named_value_int.MAVLINK_MSG_ID_NAMED_VALUE_INT:
+                processNamedValueInt((msg_named_value_int) msg);
+                break;
+
             //*************** GoPro messages handling **************//
             case msg_gopro_heartbeat.MAVLINK_MSG_ID_GOPRO_HEARTBEAT:
                 drone.getGoProImpl().onHeartBeat((msg_gopro_heartbeat) msg);
@@ -165,6 +170,18 @@ public class MavLinkMsgHandler {
                 break;
 
             default:
+                break;
+        }
+    }
+
+    private void processNamedValueInt(msg_named_value_int message){
+        if(message == null)
+            return;
+
+        switch(message.getName()){
+            case "ARMMASK":
+                //Give information about the vehicle's ability to arm successfully.
+                final int value = message.value;
                 break;
         }
     }
