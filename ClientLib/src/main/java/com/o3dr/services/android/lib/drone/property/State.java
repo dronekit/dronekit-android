@@ -19,11 +19,12 @@ public class State implements Parcelable {
     private String autopilotErrorId;
     private int mavlinkVersion = INVALID_MAVLINK_VERSION;
     private long flightStartTime;
+    private EkfStatus ekfStatus;
 
     public State(){}
 
     public State(boolean isConnected, VehicleMode mode, boolean armed, boolean flying, String autopilotErrorId,
-                 int mavlinkVersion, String calibrationStatus, long flightStartTime){
+                 int mavlinkVersion, String calibrationStatus, long flightStartTime, EkfStatus ekfStatus){
         this.isConnected = isConnected;
         this.vehicleMode = mode;
         this.armed = armed;
@@ -32,6 +33,7 @@ public class State implements Parcelable {
         this.autopilotErrorId = autopilotErrorId;
         this.mavlinkVersion = mavlinkVersion;
         this.calibrationStatus = calibrationStatus;
+        this.ekfStatus = ekfStatus;
     }
 
     public boolean isConnected() {
@@ -110,6 +112,14 @@ public class State implements Parcelable {
         this.flightStartTime = flightStartTime;
     }
 
+    public EkfStatus getEkfStatus() {
+        return ekfStatus;
+    }
+
+    public void setEkfStatus(EkfStatus ekfStatus) {
+        this.ekfStatus = ekfStatus;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -117,7 +127,7 @@ public class State implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeByte(isConnected ? (byte) 1: (byte) 0);
+        dest.writeByte(isConnected ? (byte) 1 : (byte) 0);
         dest.writeByte(armed ? (byte) 1 : (byte) 0);
         dest.writeByte(isFlying ? (byte) 1 : (byte) 0);
         dest.writeString(this.calibrationStatus);
@@ -125,6 +135,7 @@ public class State implements Parcelable {
         dest.writeString(this.autopilotErrorId);
         dest.writeInt(this.mavlinkVersion);
         dest.writeLong(this.flightStartTime);
+        dest.writeParcelable(this.ekfStatus, 0);
     }
 
     private State(Parcel in) {
@@ -136,6 +147,7 @@ public class State implements Parcelable {
         this.autopilotErrorId = in.readString();
         this.mavlinkVersion = in.readInt();
         this.flightStartTime = in.readLong();
+        this.ekfStatus = in.readParcelable(EkfStatus.class.getClassLoader());
     }
 
     public static final Creator<State> CREATOR = new Creator<State>() {

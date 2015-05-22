@@ -9,12 +9,14 @@ import org.droidplanner.core.model.AutopilotWarningParser;
 import org.droidplanner.core.model.Drone;
 
 import com.MAVLink.Messages.ApmModes;
+import com.MAVLink.ardupilotmega.msg_ekf_status_report;
 
 public class State extends DroneVariable {
 	private static final long ERROR_ON_SCREEN_TIMEOUT = 5000;
 
     private final AutopilotWarningParser warningParser;
 
+	private msg_ekf_status_report ekfStatus;
 	private String errorId;
 	private boolean armed = false;
 	private boolean isFlying = false;
@@ -25,8 +27,8 @@ public class State extends DroneVariable {
 	private long startTime = 0;
 	private final Clock clock;
 
-	public final Handler watchdog;
-	public final Runnable watchdogCallback = new Runnable() {
+	private final Handler watchdog;
+	private final Runnable watchdogCallback = new Runnable() {
 		@Override
 		public void run() {
 			resetWarning();
@@ -120,7 +122,7 @@ public class State extends DroneVariable {
 		}
 	}
 
-	protected void resetWarning() {
+	private void resetWarning() {
 		String defaultWarning = warningParser.getDefaultWarning();
         if(defaultWarning == null)
             defaultWarning = "";
@@ -134,7 +136,7 @@ public class State extends DroneVariable {
 	// flightTimer
 	// ----------------
 
-	public void resetFlightStartTime() {
+	private void resetFlightStartTime() {
 		startTime = clock.elapsedRealtime();
 	}
 
@@ -142,4 +144,18 @@ public class State extends DroneVariable {
         return startTime;
 	}
 
+	public msg_ekf_status_report getEkfStatus() {
+		return ekfStatus;
+	}
+
+	public void setEkfStatus(msg_ekf_status_report ekfState) {
+		if(this.ekfStatus == null || !areEkfStatusEquals(this.ekfStatus, ekfState)) {
+			this.ekfStatus = ekfState;
+			myDrone.notifyDroneEvent(DroneEventsType.EKF_STATUS_UPDATE);
+		}
+	}
+
+	private static boolean areEkfStatusEquals(msg_ekf_status_report one, msg_ekf_status_report two) {
+        return one == two || !(one == null || two == null) && one.toString().equals(two.toString());
+    }
 }

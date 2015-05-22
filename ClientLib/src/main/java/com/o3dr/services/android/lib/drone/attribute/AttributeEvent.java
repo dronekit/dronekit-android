@@ -139,6 +139,11 @@ public class AttributeEvent {
     public static final String STATE_DISCONNECTED = PACKAGE_NAME + ".STATE_DISCONNECTED";
 
     /**
+     * Signals updates of the ekf status.
+     */
+    public static final String STATE_EKF_REPORT = PACKAGE_NAME + ".STATE_EKF_REPORT";
+
+    /**
      * Signals update of the vehicle mode.
      */
     public static final String STATE_VEHICLE_MODE = PACKAGE_NAME + ".STATE_VEHICLE_MODE";

@@ -8,6 +8,7 @@ import android.util.Log;
 
 import com.MAVLink.Messages.ApmModes;
 import com.MAVLink.Messages.MAVLinkMessage;
+import com.MAVLink.ardupilotmega.msg_ekf_status_report;
 import com.MAVLink.ardupilotmega.msg_mag_cal_progress;
 import com.MAVLink.ardupilotmega.msg_mag_cal_report;
 import com.MAVLink.enums.MAG_CAL_STATUS;
@@ -28,6 +29,7 @@ import com.o3dr.services.android.lib.drone.property.Altitude;
 import com.o3dr.services.android.lib.drone.property.Attitude;
 import com.o3dr.services.android.lib.drone.property.Battery;
 import com.o3dr.services.android.lib.drone.property.CameraProxy;
+import com.o3dr.services.android.lib.drone.property.EkfStatus;
 import com.o3dr.services.android.lib.drone.property.FootPrint;
 import com.o3dr.services.android.lib.drone.property.Gps;
 import com.o3dr.services.android.lib.drone.property.GuidedState;
@@ -358,10 +360,13 @@ public class DroneApiUtils {
         ApmModes droneMode = droneState.getMode();
         AccelCalibration accelCalibration = drone.getCalibrationSetup();
         String calibrationMessage = accelCalibration.isCalibrating() ? accelCalibration.getMessage() : null;
+        final msg_ekf_status_report ekfStatus = droneState.getEkfStatus();
 
         return new State(isConnected, DroneApiUtils.getVehicleMode(droneMode), droneState.isArmed(), droneState.isFlying(),
                 droneState.getErrorId(), drone.getMavlinkVersion(), calibrationMessage,
-                droneState.getFlightStartTime());
+                droneState.getFlightStartTime(),
+                new EkfStatus(ekfStatus.flags, ekfStatus.compass_variance, ekfStatus.pos_horiz_variance, ekfStatus
+                        .terrain_alt_variance, ekfStatus.velocity_variance, ekfStatus.pos_vert_variance));
     }
 
     static Parameters getParameters(Drone drone, Context context) {

@@ -241,6 +241,11 @@ public class DroneInterfaces {
          * The gopro status was updated.
          */
         GOPRO_STATUS_UPDATE,
+
+		/**
+		 * The ekf status was updated.
+		 */
+		EKF_STATUS_UPDATE,
 	}
 
 	public interface OnDroneListener {

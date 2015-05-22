@@ -3,6 +3,7 @@ package org.droidplanner.core.MAVLink;
 import com.MAVLink.Messages.ApmModes;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.ardupilotmega.msg_camera_feedback;
+import com.MAVLink.ardupilotmega.msg_ekf_status_report;
 import com.MAVLink.ardupilotmega.msg_gopro_get_response;
 import com.MAVLink.ardupilotmega.msg_gopro_heartbeat;
 import com.MAVLink.ardupilotmega.msg_gopro_set_response;
@@ -27,7 +28,6 @@ import com.MAVLink.enums.MAV_MODE_FLAG;
 import com.MAVLink.enums.MAV_STATE;
 import com.MAVLink.enums.MAV_SYS_STATUS_SENSOR;
 
-import org.droidplanner.core.helpers.coordinates.Coord2D;
 import org.droidplanner.core.model.Drone;
 
 /**
@@ -162,6 +162,11 @@ public class MavLinkMsgHandler {
             case msg_mag_cal_progress.MAVLINK_MSG_ID_MAG_CAL_PROGRESS:
             case msg_mag_cal_report.MAVLINK_MSG_ID_MAG_CAL_REPORT:
                 drone.getMagnetometerCalibration().processCalibrationMessage(msg);
+                break;
+
+            //*************** EKF State handling ******************//
+            case msg_ekf_status_report.MAVLINK_MSG_ID_EKF_STATUS_REPORT:
+                drone.getState().setEkfStatus((msg_ekf_status_report) msg);
                 break;
 
             default:
