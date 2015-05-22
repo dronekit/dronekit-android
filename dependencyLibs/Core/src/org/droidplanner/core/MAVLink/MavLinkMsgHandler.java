@@ -16,6 +16,7 @@ import com.MAVLink.common.msg_global_position_int;
 import com.MAVLink.common.msg_gps_raw_int;
 import com.MAVLink.common.msg_heartbeat;
 import com.MAVLink.common.msg_mission_current;
+import com.MAVLink.common.msg_mission_item;
 import com.MAVLink.common.msg_nav_controller_output;
 import com.MAVLink.common.msg_radio_status;
 import com.MAVLink.common.msg_raw_imu;
@@ -28,6 +29,7 @@ import com.MAVLink.enums.MAV_MODE_FLAG;
 import com.MAVLink.enums.MAV_STATE;
 import com.MAVLink.enums.MAV_SYS_STATUS_SENSOR;
 
+import org.droidplanner.core.drone.variables.Home;
 import org.droidplanner.core.model.Drone;
 
 /**
@@ -167,6 +169,13 @@ public class MavLinkMsgHandler {
             //*************** EKF State handling ******************//
             case msg_ekf_status_report.MAVLINK_MSG_ID_EKF_STATUS_REPORT:
                 drone.getState().setEkfStatus((msg_ekf_status_report) msg);
+                break;
+
+            case msg_mission_item.MAVLINK_MSG_ID_MISSION_ITEM:
+                msg_mission_item missionItem = (msg_mission_item) msg;
+                if(missionItem.seq == Home.HOME_WAYPOINT_INDEX){
+                    drone.getHome().setHome(missionItem);
+                }
                 break;
 
             default:

@@ -144,6 +144,11 @@ public class AttributeEvent {
     public static final String STATE_EKF_REPORT = PACKAGE_NAME + ".STATE_EKF_REPORT";
 
     /**
+     * Signals updates to the ekf position state.
+     */
+    public static final String STATE_EKF_POSITION = PACKAGE_NAME + ".STATE_EKF_POSITION";
+
+    /**
      * Signals update of the vehicle mode.
      */
     public static final String STATE_VEHICLE_MODE = PACKAGE_NAME + ".STATE_VEHICLE_MODE";
@@ -175,5 +180,4 @@ public class AttributeEvent {
      * @see {@link com.o3dr.services.android.lib.drone.camera.GoPro}
      */
     public static final String GOPRO_STATE_UPDATED = PACKAGE_NAME + ".GOPRO_STATE_UPDATED";
-
 }

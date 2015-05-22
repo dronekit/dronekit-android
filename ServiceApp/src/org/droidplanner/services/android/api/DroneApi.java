@@ -768,6 +768,10 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
             case EKF_STATUS_UPDATE:
                 droneEvent = AttributeEvent.STATE_EKF_REPORT;
                 break;
+
+            case EKF_POSITION_STATE_UPDATE:
+                droneEvent = AttributeEvent.STATE_EKF_POSITION;
+                break;
         }
 
         if (droneEvent != null) {

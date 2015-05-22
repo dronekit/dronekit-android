@@ -15,17 +15,23 @@ public class EkfStatus implements Parcelable {
     private static final String TAG = EkfStatus.class.getSimpleName();
     private static final int FLAGS_BIT_COUNT = 16;
 
-    private final static int[] EKF_FLAGS = {
-            EKF_STATUS_FLAGS.EKF_ATTITUDE,
-            EKF_STATUS_FLAGS.EKF_VELOCITY_HORIZ,
-            EKF_STATUS_FLAGS.EKF_VELOCITY_VERT,
-            EKF_STATUS_FLAGS.EKF_POS_HORIZ_REL,
-            EKF_STATUS_FLAGS.EKF_POS_HORIZ_ABS,
-            EKF_STATUS_FLAGS.EKF_POS_VERT_ABS,
-            EKF_STATUS_FLAGS.EKF_POS_VERT_AGL,
-            EKF_STATUS_FLAGS.EKF_CONST_POS_MODE,
-            EKF_STATUS_FLAGS.EKF_PRED_POS_HORIZ_REL,
-            EKF_STATUS_FLAGS.EKF_PRED_POS_HORIZ_ABS
+    private enum EkfFlags  {
+            EKF_ATTITUDE(EKF_STATUS_FLAGS.EKF_ATTITUDE),
+            EKF_VELOCITY_HORIZ(EKF_STATUS_FLAGS.EKF_VELOCITY_HORIZ),
+            EKF_VELOCITY_VERT(EKF_STATUS_FLAGS.EKF_VELOCITY_VERT),
+            EKF_POS_HORIZ_REL(EKF_STATUS_FLAGS.EKF_POS_HORIZ_REL),
+            EKF_POS_HORIZ_ABS(EKF_STATUS_FLAGS.EKF_POS_HORIZ_ABS),
+            EKF_POS_VERT_ABS(EKF_STATUS_FLAGS.EKF_POS_VERT_ABS),
+            EKF_POS_VERT_AGL(EKF_STATUS_FLAGS.EKF_POS_VERT_AGL),
+            EKF_CONST_POS_MODE(EKF_STATUS_FLAGS.EKF_CONST_POS_MODE),
+            EKF_PRED_POS_HORIZ_REL(EKF_STATUS_FLAGS.EKF_PRED_POS_HORIZ_REL),
+            EKF_PRED_POS_HORIZ_ABS(EKF_STATUS_FLAGS.EKF_PRED_POS_HORIZ_ABS);
+
+        final int value;
+
+        EkfFlags(int value){
+            this.value = value;
+        }
     };
 
     private float velocityVariance;
@@ -53,8 +59,9 @@ public class EkfStatus implements Parcelable {
     }
 
     private void fromShortToBitSet(short flags){
-        for(int i = 0; i < EKF_FLAGS.length; i++){
-            this.flags.set(i, (flags & EKF_FLAGS[i]) != 0);
+        final EkfFlags[] ekfFlags = EkfFlags.values();
+        for(int i = 0; i < ekfFlags.length; i++){
+            this.flags.set(i, (flags & ekfFlags[i].value) != 0);
         }
     }
 
@@ -105,10 +112,12 @@ public class EkfStatus implements Parcelable {
      */
     public boolean isPositionOk(boolean armed){
         if(armed){
-            return this.flags.get(4) && !this.flags.get(7);
+            return this.flags.get(EkfFlags.EKF_POS_HORIZ_ABS.ordinal())
+                    && !this.flags.get(EkfFlags.EKF_CONST_POS_MODE.ordinal());
         }
         else{
-            return this.flags.get(4) || this.flags.get(9);
+            return this.flags.get(EkfFlags.EKF_POS_HORIZ_ABS.ordinal())
+                    || this.flags.get(EkfFlags.EKF_PRED_POS_HORIZ_ABS.ordinal());
         }
     }
 

@@ -10,6 +10,7 @@ import org.droidplanner.core.model.Drone;
 
 import com.MAVLink.Messages.ApmModes;
 import com.MAVLink.ardupilotmega.msg_ekf_status_report;
+import com.MAVLink.enums.EKF_STATUS_FLAGS;
 
 public class State extends DroneVariable {
 	private static final long ERROR_ON_SCREEN_TIMEOUT = 5000;
@@ -17,6 +18,8 @@ public class State extends DroneVariable {
     private final AutopilotWarningParser warningParser;
 
 	private msg_ekf_status_report ekfStatus;
+	private boolean isEkfPositionOk;
+
 	private String errorId;
 	private boolean armed = false;
 	private boolean isFlying = false;
@@ -152,10 +155,34 @@ public class State extends DroneVariable {
 		if(this.ekfStatus == null || !areEkfStatusEquals(this.ekfStatus, ekfState)) {
 			this.ekfStatus = ekfState;
 			myDrone.notifyDroneEvent(DroneEventsType.EKF_STATUS_UPDATE);
+
+			checkEkfPositionState(this.ekfStatus);
+		}
+	}
+
+	private void checkEkfPositionState(msg_ekf_status_report ekfStatus){
+		if(ekfStatus == null)
+			return;
+
+		final short flags = ekfStatus.flags;
+
+		final boolean isOk = this.armed
+				? (flags & EKF_STATUS_FLAGS.EKF_POS_HORIZ_ABS) != 0
+				&& (flags & EKF_STATUS_FLAGS.EKF_CONST_POS_MODE) == 0
+				: (flags & EKF_STATUS_FLAGS.EKF_POS_HORIZ_ABS) != 0
+				|| (flags & EKF_STATUS_FLAGS.EKF_PRED_POS_HORIZ_ABS) != 0;
+
+		if(isEkfPositionOk != isOk){
+			isEkfPositionOk = isOk;
+			myDrone.notifyDroneEvent(DroneEventsType.EKF_POSITION_STATE_UPDATE);
 		}
 	}
 
 	private static boolean areEkfStatusEquals(msg_ekf_status_report one, msg_ekf_status_report two) {
         return one == two || !(one == null || two == null) && one.toString().equals(two.toString());
     }
+
+	public boolean isEkfPositionOk() {
+		return isEkfPositionOk;
+	}
 }

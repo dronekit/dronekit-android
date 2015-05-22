@@ -246,6 +246,11 @@ public class DroneInterfaces {
 		 * The ekf status was updated.
 		 */
 		EKF_STATUS_UPDATE,
+
+		/**
+		 * The horizontal position is ok, and the home position is available.
+		 */
+		EKF_POSITION_STATE_UPDATE
 	}
 
 	public interface OnDroneListener {
