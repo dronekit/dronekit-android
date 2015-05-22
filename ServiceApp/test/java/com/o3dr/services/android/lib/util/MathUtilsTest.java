@@ -1,15 +1,18 @@
-package org.droidplanner.services.android;
-
+package com.o3dr.services.android.lib.util;
 
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
-import com.o3dr.services.android.lib.util.MathUtils;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 import java.util.Random;
 
-public class MathUtilsTest extends TestCase {
+import static org.junit.Assert.*;
+
+/**
+ * Created by Fredia Huya-Kouadio on 5/21/15.
+ */
+public class MathUtilsTest {
 
     private static final int MIN_LATITUDE = -90;
     private static final int MAX_LATITUDE = 90;
@@ -42,35 +45,30 @@ public class MathUtilsTest extends TestCase {
     private static final double THIRD_LON = -122.270451;
     private static final double THIRD_RESULT = 202.2891830637083;
 
+    @Test
+    public void testGetDistance3D() throws Exception {
 
-    /**
-     * Validates that the two forms of the method return the same result
-     */
-    public void testGetDistanceWithNoaaValues() {
+        //Test get distance altitude only.
+        double distance = MathUtils.getDistance3D(new LatLongAlt(0.0, 0.0, 50.0), new LatLongAlt(0.0, 0.0, 100.0));
+        assertEquals(distance, 50.0, MARGIN_OF_ERROR);
+    }
 
+    @Test
+    public void testGetDistance2D() throws Exception {
+
+        //Test get distance with Noaa values
         LatLong origin = new LatLong(originLat, originLon);
 
         assertEquals(FIRST_RESULT, MathUtils.getDistance2D(origin, new LatLong(FIRST_LAT, FIRST_LON)), MARGIN_OF_ERROR);
         assertEquals(SECOND_RESULT, MathUtils.getDistance2D(origin, new LatLong(SECOND_LAT, SECOND_LON)), MARGIN_OF_ERROR);
         assertEquals(THIRD_RESULT, MathUtils.getDistance2D(origin, new LatLong(THIRD_LAT, THIRD_LON)), MARGIN_OF_ERROR);
-
     }
 
-    /**
-     * Validate distance based on altitude only
-     */
-    public void testGetDistanceOnlyAltitude() {
-
-        double distance = MathUtils.getDistance3D(new LatLongAlt(0.0, 0.0, 50.0), new LatLongAlt(0.0, 0.0, 100.0));
-        assertEquals(distance, 50.0, MARGIN_OF_ERROR);
-
-    }
-
-    /**
-     * Validate that both the 2D and 3D generate the same result when distance is disregarded.
-     */
-    public void testGetDistanceCompareMethods() {
-
+    @Test
+    public void testGetDistance() throws Exception {
+/**
+ * Validate that both the 2D and 3D generate the same result when distance is disregarded.
+ */
         double distance1;
         double distance2;
 
@@ -111,11 +109,9 @@ public class MathUtilsTest extends TestCase {
      * @return Double between min and max, inclusive.
      * @see java.util.Random#nextInt(int)
      */
-    public double randDouble(Random rand, int min, int max) {
+    private double randDouble(Random rand, int min, int max) {
         // nextDouble is normally exclusive of the top value,
         // so add 1 to make it inclusive
         return (rand.nextDouble() * (max - min)) + min;
     }
-
-
 }
