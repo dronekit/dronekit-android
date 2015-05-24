@@ -15,24 +15,26 @@ public class EkfStatus implements Parcelable {
     private static final String TAG = EkfStatus.class.getSimpleName();
     private static final int FLAGS_BIT_COUNT = 16;
 
-    private enum EkfFlags  {
-            EKF_ATTITUDE(EKF_STATUS_FLAGS.EKF_ATTITUDE),
-            EKF_VELOCITY_HORIZ(EKF_STATUS_FLAGS.EKF_VELOCITY_HORIZ),
-            EKF_VELOCITY_VERT(EKF_STATUS_FLAGS.EKF_VELOCITY_VERT),
-            EKF_POS_HORIZ_REL(EKF_STATUS_FLAGS.EKF_POS_HORIZ_REL),
-            EKF_POS_HORIZ_ABS(EKF_STATUS_FLAGS.EKF_POS_HORIZ_ABS),
-            EKF_POS_VERT_ABS(EKF_STATUS_FLAGS.EKF_POS_VERT_ABS),
-            EKF_POS_VERT_AGL(EKF_STATUS_FLAGS.EKF_POS_VERT_AGL),
-            EKF_CONST_POS_MODE(EKF_STATUS_FLAGS.EKF_CONST_POS_MODE),
-            EKF_PRED_POS_HORIZ_REL(EKF_STATUS_FLAGS.EKF_PRED_POS_HORIZ_REL),
-            EKF_PRED_POS_HORIZ_ABS(EKF_STATUS_FLAGS.EKF_PRED_POS_HORIZ_ABS);
+    private enum EkfFlags {
+        EKF_ATTITUDE(EKF_STATUS_FLAGS.EKF_ATTITUDE),
+        EKF_VELOCITY_HORIZ(EKF_STATUS_FLAGS.EKF_VELOCITY_HORIZ),
+        EKF_VELOCITY_VERT(EKF_STATUS_FLAGS.EKF_VELOCITY_VERT),
+        EKF_POS_HORIZ_REL(EKF_STATUS_FLAGS.EKF_POS_HORIZ_REL),
+        EKF_POS_HORIZ_ABS(EKF_STATUS_FLAGS.EKF_POS_HORIZ_ABS),
+        EKF_POS_VERT_ABS(EKF_STATUS_FLAGS.EKF_POS_VERT_ABS),
+        EKF_POS_VERT_AGL(EKF_STATUS_FLAGS.EKF_POS_VERT_AGL),
+        EKF_CONST_POS_MODE(EKF_STATUS_FLAGS.EKF_CONST_POS_MODE),
+        EKF_PRED_POS_HORIZ_REL(EKF_STATUS_FLAGS.EKF_PRED_POS_HORIZ_REL),
+        EKF_PRED_POS_HORIZ_ABS(EKF_STATUS_FLAGS.EKF_PRED_POS_HORIZ_ABS);
 
         final int value;
 
-        EkfFlags(int value){
+        EkfFlags(int value) {
             this.value = value;
         }
-    };
+    }
+
+    ;
 
     private float velocityVariance;
     private float horizontalPositionVariance;
@@ -42,7 +44,7 @@ public class EkfStatus implements Parcelable {
 
     private final BitSet flags;
 
-    public EkfStatus(){
+    public EkfStatus() {
         this.flags = new BitSet(FLAGS_BIT_COUNT);
     }
 
@@ -58,9 +60,11 @@ public class EkfStatus implements Parcelable {
         fromShortToBitSet(flags);
     }
 
-    private void fromShortToBitSet(short flags){
+    private void fromShortToBitSet(short flags) {
         final EkfFlags[] ekfFlags = EkfFlags.values();
-        for(int i = 0; i < ekfFlags.length; i++){
+        final int ekfFlagsCount = ekfFlags.length;
+
+        for (int i = 0; i < ekfFlagsCount; i++) {
             this.flags.set(i, (flags & ekfFlags[i].value) != 0);
         }
     }
@@ -107,15 +111,15 @@ public class EkfStatus implements Parcelable {
 
     /**
      * Returns true if the horizontal absolute position is ok, and home position is set.
+     *
      * @param armed
      * @return
      */
-    public boolean isPositionOk(boolean armed){
-        if(armed){
+    public boolean isPositionOk(boolean armed) {
+        if (armed) {
             return this.flags.get(EkfFlags.EKF_POS_HORIZ_ABS.ordinal())
                     && !this.flags.get(EkfFlags.EKF_CONST_POS_MODE.ordinal());
-        }
-        else{
+        } else {
             return this.flags.get(EkfFlags.EKF_POS_HORIZ_ABS.ordinal())
                     || this.flags.get(EkfFlags.EKF_PRED_POS_HORIZ_ABS.ordinal());
         }
@@ -133,6 +137,7 @@ public class EkfStatus implements Parcelable {
         dest.writeFloat(this.verticalPositionVariance);
         dest.writeFloat(this.compassVariance);
         dest.writeFloat(this.terrainAltitudeVariance);
+
         dest.writeSerializable(this.flags);
     }
 
@@ -142,6 +147,7 @@ public class EkfStatus implements Parcelable {
         this.verticalPositionVariance = in.readFloat();
         this.compassVariance = in.readFloat();
         this.terrainAltitudeVariance = in.readFloat();
+
         this.flags = (BitSet) in.readSerializable();
     }
 
@@ -154,4 +160,5 @@ public class EkfStatus implements Parcelable {
             return new EkfStatus[size];
         }
     };
+
 }
