@@ -8,7 +8,10 @@ import android.util.Log;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.Api;
+import com.google.android.gms.location.LocationAvailability;
+import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.o3dr.services.android.lib.util.googleApi.GoogleApiClientManager;
 import com.o3dr.services.android.lib.util.googleApi.GoogleApiClientManager.GoogleApiClientTask;
@@ -20,8 +23,7 @@ import org.droidplanner.core.helpers.coordinates.Coord3D;
 /**
  * Feeds Location Data from Android's FusedLocation LocationProvider
  */
-public class FusedLocation implements LocationFinder, com.google.android.gms.location.LocationListener,
-        GoogleApiClientManager.ManagerListener {
+public class FusedLocation extends LocationCallback implements LocationFinder, GoogleApiClientManager.ManagerListener {
 
     private static final String TAG = FusedLocation.class.getSimpleName();
 
@@ -33,18 +35,7 @@ public class FusedLocation implements LocationFinder, com.google.android.gms.loc
     private final static Api<? extends Api.ApiOptions.NotRequiredOptions>[] apisList = new Api[]{LocationServices.API};
 
     private final GoogleApiClientManager gApiMgr;
-    private final GoogleApiClientTask requestLocationUpdate = new GoogleApiClientTask() {
-        @Override
-        protected void doRun() {
-            final LocationRequest locationRequest = LocationRequest.create();
-            locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-            locationRequest.setInterval(MIN_TIME_MS);
-            locationRequest.setFastestInterval(MIN_TIME_MS);
-            locationRequest.setSmallestDisplacement(MIN_DISTANCE_M);
-            LocationServices.FusedLocationApi.requestLocationUpdates(getGoogleApiClient(),
-                    locationRequest, FusedLocation.this);
-        }
-    };
+    private final GoogleApiClientTask requestLocationUpdate;
 
     private final GoogleApiClientTask removeLocationUpdate = new GoogleApiClientTask() {
         @Override
@@ -63,8 +54,22 @@ public class FusedLocation implements LocationFinder, com.google.android.gms.loc
 
     private final Context context;
 
-    public FusedLocation(Context context, Handler handler) {
+    public FusedLocation(Context context, final Handler handler) {
         this.context = context;
+
+        requestLocationUpdate = new GoogleApiClientTask() {
+            @Override
+            protected void doRun() {
+                final LocationRequest locationRequest = LocationRequest.create();
+                locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+                locationRequest.setInterval(MIN_TIME_MS);
+                locationRequest.setFastestInterval(MIN_TIME_MS);
+                locationRequest.setSmallestDisplacement(MIN_DISTANCE_M);
+                LocationServices.FusedLocationApi.requestLocationUpdates(getGoogleApiClient(),
+                        locationRequest, FusedLocation.this, handler.getLooper());
+            }
+        };
+
         gApiMgr = new GoogleApiClientManager(context, handler, apisList);
         gApiMgr.setManagerListener(this);
     }
@@ -84,7 +89,18 @@ public class FusedLocation implements LocationFinder, com.google.android.gms.loc
     }
 
     @Override
-    public void onLocationChanged(Location androidLocation) {
+    public void onLocationAvailability(LocationAvailability locationAvailability) {
+        super.onLocationAvailability(locationAvailability);
+
+        //TODO: notify the location listener.
+    }
+
+    @Override
+    public void onLocationResult(LocationResult result) {
+        final Location androidLocation = result.getLastLocation();
+        if(androidLocation == null)
+            return;
+
         if (receiver != null) {
             float distanceToLast = -1.0f;
             long timeSinceLast = -1L;

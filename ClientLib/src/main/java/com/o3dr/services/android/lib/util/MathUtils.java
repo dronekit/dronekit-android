@@ -1,6 +1,7 @@
 package com.o3dr.services.android.lib.util;
 
 import com.o3dr.services.android.lib.coordinate.LatLong;
+import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,12 +20,27 @@ public class MathUtils {
     public static final int SIGNAL_MAX_FADE_MARGIN = 50;
     public static final int SIGNAL_MIN_FADE_MARGIN = 6;
 
+
     /**
-     * Computes the distance between two coordinates
+     * Computes the distance between two points taking into consideration altitude
      *
      * @return distance in meters
      */
-    public static double getDistance(LatLong from, LatLong to) {
+    public static double getDistance3D(LatLongAlt from, LatLongAlt to){
+        if(from == null || to == null)
+            return -1;
+
+        final double distance2d = getDistance2D(from, to);
+            double distanceSqr = Math.pow(distance2d, 2);
+            double altitudeSqr = Math.pow(to.getAltitude() - from.getAltitude(), 2);
+
+            return Math.sqrt(altitudeSqr + distanceSqr);
+    }
+
+    public static double getDistance2D(LatLong from, LatLong to){
+        if(from == null || to == null)
+            return -1;
+
         return RADIUS_OF_EARTH * Math.toRadians(getArcInRadians(from, to));
     }
 
@@ -307,7 +323,7 @@ public class MathUtils {
                 continue;
             }
 
-            lenght += getDistance(gridPoints.get(i), to);
+            lenght += getDistance2D(gridPoints.get(i), to);
         }
         return lenght;
     }

@@ -41,13 +41,13 @@ public class FootPrint implements Parcelable {
     }
 
     public double getLateralSize() {
-        return  (MathUtils.getDistance(vertex.get(0), vertex.get(1))
-                + MathUtils.getDistance(vertex.get(2), vertex.get(3))) / 2;
+        return  (MathUtils.getDistance2D(vertex.get(0), vertex.get(1))
+                + MathUtils.getDistance2D(vertex.get(2), vertex.get(3))) / 2;
     }
 
     public double getLongitudinalSize() {
-        return (MathUtils.getDistance(vertex.get(0), vertex.get(3))
-                + MathUtils.getDistance(vertex.get(1), vertex.get(2))) / 2;
+        return (MathUtils.getDistance2D(vertex.get(0), vertex.get(3))
+                + MathUtils.getDistance2D(vertex.get(1), vertex.get(2))) / 2;
     }
 
     @Override

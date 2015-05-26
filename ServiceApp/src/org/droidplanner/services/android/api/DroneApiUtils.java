@@ -2,12 +2,12 @@ package org.droidplanner.services.android.api;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.os.RemoteException;
 import android.util.Log;
 
 import com.MAVLink.Messages.ApmModes;
 import com.MAVLink.Messages.MAVLinkMessage;
+import com.MAVLink.ardupilotmega.msg_ekf_status_report;
 import com.MAVLink.ardupilotmega.msg_mag_cal_progress;
 import com.MAVLink.ardupilotmega.msg_mag_cal_report;
 import com.MAVLink.enums.MAG_CAL_STATUS;
@@ -28,6 +28,7 @@ import com.o3dr.services.android.lib.drone.property.Altitude;
 import com.o3dr.services.android.lib.drone.property.Attitude;
 import com.o3dr.services.android.lib.drone.property.Battery;
 import com.o3dr.services.android.lib.drone.property.CameraProxy;
+import com.o3dr.services.android.lib.drone.property.EkfStatus;
 import com.o3dr.services.android.lib.drone.property.FootPrint;
 import com.o3dr.services.android.lib.drone.property.Gps;
 import com.o3dr.services.android.lib.drone.property.GuidedState;
@@ -44,17 +45,16 @@ import com.o3dr.services.android.lib.gcs.follow.FollowType;
 import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
 
 import org.droidplanner.core.MAVLink.MavLinkArm;
-import org.droidplanner.core.MAVLink.MavLinkCalibration;
 import org.droidplanner.core.MAVLink.command.doCmd.MavLinkDoCmds;
 import org.droidplanner.core.drone.DroneInterfaces;
 import org.droidplanner.core.drone.camera.GoProImpl;
 import org.droidplanner.core.drone.profiles.VehicleProfile;
-import org.droidplanner.core.drone.variables.calibration.AccelCalibration;
 import org.droidplanner.core.drone.variables.Camera;
 import org.droidplanner.core.drone.variables.GPS;
 import org.droidplanner.core.drone.variables.GuidedPoint;
 import org.droidplanner.core.drone.variables.Orientation;
 import org.droidplanner.core.drone.variables.Radio;
+import org.droidplanner.core.drone.variables.calibration.AccelCalibration;
 import org.droidplanner.core.drone.variables.calibration.MagnetometerCalibrationImpl;
 import org.droidplanner.core.gcs.follow.Follow;
 import org.droidplanner.core.gcs.follow.FollowAlgorithm;
@@ -358,10 +358,15 @@ public class DroneApiUtils {
         ApmModes droneMode = droneState.getMode();
         AccelCalibration accelCalibration = drone.getCalibrationSetup();
         String calibrationMessage = accelCalibration.isCalibrating() ? accelCalibration.getMessage() : null;
+        final msg_ekf_status_report ekfStatus = droneState.getEkfStatus();
+        final EkfStatus proxyEkfStatus = ekfStatus == null
+                ? new EkfStatus()
+                : new EkfStatus(ekfStatus.flags, ekfStatus.compass_variance, ekfStatus.pos_horiz_variance, ekfStatus
+                .terrain_alt_variance, ekfStatus.velocity_variance, ekfStatus.pos_vert_variance);
 
         return new State(isConnected, DroneApiUtils.getVehicleMode(droneMode), droneState.isArmed(), droneState.isFlying(),
                 droneState.getErrorId(), drone.getMavlinkVersion(), calibrationMessage,
-                droneState.getFlightStartTime());
+                droneState.getFlightStartTime(), proxyEkfStatus);
     }
 
     static Parameters getParameters(Drone drone, Context context) {
@@ -425,8 +430,8 @@ public class DroneApiUtils {
         return new Home(homePosition);
     }
 
-    static GoPro getGoPro(Drone drone){
-        if(drone == null)
+    static GoPro getGoPro(Drone drone) {
+        if (drone == null)
             return new GoPro();
 
         GoProImpl impl = drone.getGoProImpl();
@@ -684,7 +689,7 @@ public class DroneApiUtils {
     }
 
     public static void acceptMagnetometerCalibration(Drone drone) {
-        if(drone == null)
+        if (drone == null)
             return;
 
         drone.getMagnetometerCalibration().acceptCalibration();
@@ -819,14 +824,14 @@ public class DroneApiUtils {
     }
 
     static void startVideoRecording(Drone drone) {
-        if(drone == null)
+        if (drone == null)
             return;
 
         drone.getGoProImpl().startRecording();
     }
 
-    static void stopVideoRecording(Drone drone){
-        if(drone == null)
+    static void stopVideoRecording(Drone drone) {
+        if (drone == null)
             return;
 
         drone.getGoProImpl().stopRecording();
@@ -834,12 +839,12 @@ public class DroneApiUtils {
 
     static MagnetometerCalibrationStatus getMagnetometerCalibrationStatus(Drone drone) {
         final MagnetometerCalibrationStatus calStatus = new MagnetometerCalibrationStatus();
-        if(drone != null) {
+        if (drone != null) {
             final MagnetometerCalibrationImpl magCalImpl = drone.getMagnetometerCalibration();
             calStatus.setCalibrationCancelled(magCalImpl.isCancelled());
 
             Collection<MagnetometerCalibrationImpl.Info> calibrationInfo = magCalImpl.getMagCalibrationTracker().values();
-            for(MagnetometerCalibrationImpl.Info info : calibrationInfo){
+            for (MagnetometerCalibrationImpl.Info info : calibrationInfo) {
                 calStatus.addCalibrationProgress(getMagnetometerCalibrationProgress(info.getCalProgress()));
                 calStatus.addCalibrationResult(getMagnetometerCalibrationResult(info.getCalReport()));
             }
@@ -848,20 +853,20 @@ public class DroneApiUtils {
         return calStatus;
     }
 
-    static MagnetometerCalibrationProgress getMagnetometerCalibrationProgress(msg_mag_cal_progress msgProgress){
-        if(msgProgress == null)
+    static MagnetometerCalibrationProgress getMagnetometerCalibrationProgress(msg_mag_cal_progress msgProgress) {
+        if (msgProgress == null)
             return null;
 
         return new MagnetometerCalibrationProgress(msgProgress.compass_id, msgProgress.completion_pct,
                 msgProgress.direction_x, msgProgress.direction_y, msgProgress.direction_z);
     }
 
-    static MagnetometerCalibrationResult getMagnetometerCalibrationResult(msg_mag_cal_report msgReport){
-        if(msgReport == null)
+    static MagnetometerCalibrationResult getMagnetometerCalibrationResult(msg_mag_cal_report msgReport) {
+        if (msgReport == null)
             return null;
 
         return new MagnetometerCalibrationResult(msgReport.compass_id,
-                msgReport.cal_status == MAG_CAL_STATUS.MAG_CAL_SUCCESS, msgReport.autosaved == 1 , msgReport.fitness,
+                msgReport.cal_status == MAG_CAL_STATUS.MAG_CAL_SUCCESS, msgReport.autosaved == 1, msgReport.fitness,
                 msgReport.ofs_x, msgReport.ofs_y, msgReport.ofs_z,
                 msgReport.diag_x, msgReport.diag_y, msgReport.diag_z,
                 msgReport.offdiag_x, msgReport.offdiag_y, msgReport.offdiag_z);
