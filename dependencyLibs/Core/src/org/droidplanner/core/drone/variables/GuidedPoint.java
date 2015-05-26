@@ -177,6 +177,9 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener {
     }
 
     private void disable() {
+        if(state == GuidedStates.UNINITIALIZED)
+            return;
+
         state = GuidedStates.UNINITIALIZED;
         myDrone.notifyDroneEvent(DroneEventsType.GUIDEDPOINT);
     }
