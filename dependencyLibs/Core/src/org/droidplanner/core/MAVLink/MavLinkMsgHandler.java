@@ -27,6 +27,7 @@ import com.MAVLink.common.msg_statustext;
 import com.MAVLink.common.msg_sys_status;
 import com.MAVLink.common.msg_vfr_hud;
 import com.MAVLink.enums.MAV_MODE_FLAG;
+import com.MAVLink.enums.MAV_SEVERITY;
 import com.MAVLink.enums.MAV_STATE;
 import com.MAVLink.enums.MAV_SYS_STATUS_SENSOR;
 
@@ -37,9 +38,6 @@ import org.droidplanner.core.model.Drone;
  * Parse the received mavlink messages, and update the drone state appropriately.
  */
 public class MavLinkMsgHandler {
-
-    private static final byte SEVERITY_HIGH = 3;
-    private static final byte SEVERITY_CRITICAL = 4;
 
     private Drone drone;
 
@@ -192,10 +190,16 @@ public class MavLinkMsgHandler {
         if(message == null)
             return;
 
-        switch(message.getName()){
+        switch (message.getName()) {
             case "ARMMASK":
                 //Give information about the vehicle's ability to arm successfully.
-                final int value = message.value;
+                final ApmModes vehicleMode = drone.getState().getMode();
+                if (ApmModes.isCopter(vehicleMode.getType())) {
+                    final int value = message.value;
+                    final boolean isReadyToArm = (value & (1 << vehicleMode.getNumber())) != 0;
+                    final String armReadinessMsg = isReadyToArm ? "READY TO ARM" : "UNREADY FOR ARMING";
+                    drone.logMessage(MAV_SEVERITY.MAV_SEVERITY_NOTICE, armReadinessMsg);
+                }
                 break;
         }
     }

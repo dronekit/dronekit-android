@@ -13,7 +13,7 @@ import com.MAVLink.ardupilotmega.msg_ekf_status_report;
 import com.MAVLink.enums.EKF_STATUS_FLAGS;
 
 public class State extends DroneVariable {
-	private static final long ERROR_ON_SCREEN_TIMEOUT = 5000;
+	private static final long ERROR_TIMEOUT = 5000l;
 
     private final AutopilotWarningParser warningParser;
 
@@ -85,7 +85,7 @@ public class State extends DroneVariable {
         }
 
         watchdog.removeCallbacks(watchdogCallback);
-        this.watchdog.postDelayed(watchdogCallback, ERROR_ON_SCREEN_TIMEOUT);
+        this.watchdog.postDelayed(watchdogCallback, ERROR_TIMEOUT);
         return true;
     }
 
@@ -94,7 +94,7 @@ public class State extends DroneVariable {
             return;
 
         watchdog.removeCallbacks(watchdogCallback);
-        this.watchdog.postDelayed(watchdogCallback, ERROR_ON_SCREEN_TIMEOUT);
+        this.watchdog.postDelayed(watchdogCallback, ERROR_TIMEOUT);
     }
 
 	public void setArmed(boolean newState) {
