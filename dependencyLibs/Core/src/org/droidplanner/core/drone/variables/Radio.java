@@ -10,6 +10,8 @@ import org.droidplanner.core.model.Drone;
  * Parses the mavlink radio messages.
  *
  * TODO: update signal info calculations based on the used radio hardware.
+ * TODO: create accessors for the raw signal values, and the updated ones based on the radio hardware. Maybe push the
+ * accessors to the client library layer.
  */
 public class Radio extends DroneVariable implements DroneInterfaces.OnDroneListener{
 	public static final int MAX_FADE_MARGIN = 50;
