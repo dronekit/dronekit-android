@@ -12,6 +12,7 @@ import com.MAVLink.ardupilotmega.msg_mag_cal_report;
 import com.MAVLink.ardupilotmega.msg_mount_status;
 import com.MAVLink.ardupilotmega.msg_radio;
 import com.MAVLink.common.msg_attitude;
+import com.MAVLink.common.msg_command_ack;
 import com.MAVLink.common.msg_global_position_int;
 import com.MAVLink.common.msg_gps_raw_int;
 import com.MAVLink.common.msg_heartbeat;
@@ -181,8 +182,20 @@ public class MavLinkMsgHandler {
                 }
                 break;
 
+            //**************** Command long acknowledgement ******************//
+            case msg_command_ack.MAVLINK_MSG_ID_COMMAND_ACK:
+                final msg_command_ack commandAck = (msg_command_ack) msg;
+                handleCommandAck(commandAck);
+                break;
+
             default:
                 break;
+        }
+    }
+
+    private void handleCommandAck(msg_command_ack ack){
+        if(ack != null){
+            System.out.println(ack.toString());
         }
     }
 
