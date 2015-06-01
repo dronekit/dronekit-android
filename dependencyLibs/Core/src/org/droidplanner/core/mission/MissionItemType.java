@@ -11,6 +11,7 @@ import org.droidplanner.core.mission.commands.SetServo;
 import org.droidplanner.core.mission.commands.Takeoff;
 import org.droidplanner.core.mission.survey.Survey;
 import org.droidplanner.core.mission.waypoints.Circle;
+import org.droidplanner.core.mission.waypoints.DoLandStart;
 import org.droidplanner.core.mission.waypoints.Land;
 import org.droidplanner.core.mission.waypoints.RegionOfInterest;
 import org.droidplanner.core.mission.waypoints.SplineWaypoint;
@@ -25,6 +26,7 @@ public enum MissionItemType {
     TAKEOFF("Takeoff"),
     RTL("Return to Launch"),
     LAND("Land"),
+    DO_LAND_START("Do Land Start"),
     CIRCLE("Circle"),
     ROI("Region of Interest"),
     SURVEY("Survey"),
@@ -64,6 +66,8 @@ public enum MissionItemType {
                 return new ReturnToHome(referenceItem);
             case LAND:
                 return new Land(referenceItem);
+            case DO_LAND_START:
+                return new DoLandStart(referenceItem);
             case CIRCLE:
                 return new Circle(referenceItem);
             case ROI:

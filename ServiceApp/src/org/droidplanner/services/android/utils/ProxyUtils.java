@@ -16,6 +16,7 @@ import com.o3dr.services.android.lib.drone.mission.item.complex.StructureScanner
 import com.o3dr.services.android.lib.drone.mission.item.complex.Survey;
 import com.o3dr.services.android.lib.drone.mission.item.complex.SurveyDetail;
 import com.o3dr.services.android.lib.drone.mission.item.spatial.Circle;
+import com.o3dr.services.android.lib.drone.mission.item.spatial.DoLandStart;
 import com.o3dr.services.android.lib.drone.mission.item.spatial.Land;
 import com.o3dr.services.android.lib.drone.mission.item.spatial.RegionOfInterest;
 import com.o3dr.services.android.lib.drone.mission.item.spatial.SplineWaypoint;
@@ -149,6 +150,16 @@ public class ProxyUtils {
 
                 org.droidplanner.core.mission.waypoints.Land temp = new org.droidplanner.core
                         .mission.waypoints.Land(mission, MathUtils.latLongToCoord2D(proxy
+                        .getCoordinate()));
+
+                missionItemImpl = temp;
+                break;
+            }
+            case DO_LAND_START: {
+                DoLandStart proxy = (DoLandStart) proxyItem;
+
+                org.droidplanner.core.mission.waypoints.DoLandStart temp = new org.droidplanner.core
+                        .mission.waypoints.DoLandStart(mission, MathUtils.latLongToCoord2D(proxy
                         .getCoordinate()));
 
                 missionItemImpl = temp;
@@ -316,7 +327,15 @@ public class ProxyUtils {
                 proxyMissionItem = temp;
                 break;
             }
+            case DO_LAND_START: {
+                org.droidplanner.core.mission.waypoints.DoLandStart source = (org.droidplanner.core.mission.waypoints.DoLandStart) itemImpl;
 
+                DoLandStart temp = new DoLandStart();
+                temp.setCoordinate(MathUtils.coord3DToLatLongAlt(source.getCoordinate()));
+
+                proxyMissionItem = temp;
+                break;
+            }
             case CIRCLE: {
                 org.droidplanner.core.mission.waypoints.Circle source = (org.droidplanner.core.mission.waypoints.Circle) itemImpl;
 
