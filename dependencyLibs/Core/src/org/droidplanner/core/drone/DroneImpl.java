@@ -72,7 +72,7 @@ public class DroneImpl implements Drone {
 		this.preferences = pref;
         this.logListener = logListener;
 
-        events = new DroneEvents(this);
+        events = new DroneEvents(this, handler);
 		state = new State(this, clock, handler, warningParser);
 		heartbeat = new HeartBeat(this, handler);
 		parameters = new Parameters(this, handler);

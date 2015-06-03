@@ -6,6 +6,13 @@ import org.droidplanner.core.drone.DroneVariable;
 import org.droidplanner.core.helpers.math.MathUtil;
 import org.droidplanner.core.model.Drone;
 
+/**
+ * Parses the mavlink radio messages.
+ *
+ * TODO: update signal info calculations based on the used radio hardware.
+ * TODO: create accessors for the raw signal values, and the updated ones based on the radio hardware. Maybe push the
+ * accessors to the client library layer.
+ */
 public class Radio extends DroneVariable implements DroneInterfaces.OnDroneListener{
 	public static final int MAX_FADE_MARGIN = 50;
 	public static final int MIN_FADE_MARGIN = 6;
@@ -102,9 +109,7 @@ public class Radio extends DroneVariable implements DroneInterfaces.OnDroneListe
 
 	/**
 	 * Scalling done at the Si1000 radio More info can be found at:
-	 * http://copter
-	 * .ardupilot.com/wiki/common-using-the-3dr-radio-for-telemetry-
-	 * with-apm-and-px4/#Power_levels
+	 * http://copter.ardupilot.com/wiki/common-using-the-3dr-radio-for-telemetry-with-apm-and-px4/#Power_levels
 	 */
 	private double SikValueToDB(int value) {
 		return (value / 1.9) - 127;
