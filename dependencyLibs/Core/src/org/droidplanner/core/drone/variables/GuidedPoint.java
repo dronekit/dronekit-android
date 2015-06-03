@@ -84,8 +84,7 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener {
             droneState.changeFlightMode(ApmModes.ROTOR_GUIDED);
         } else if (Type.isPlane(droneType)) {
             //You have to send a guided point to the plane in order to trigger guided mode.
-            forceSendGuidedPoint(drone, drone.getGps().getPosition(),
-                    getDroneAltConstrained(drone));
+            forceSendGuidedPoint(drone, drone.getGps().getPosition(), getDroneAltConstrained(drone));
         } else if (Type.isRover(droneType)) {
             droneState.changeFlightMode(ApmModes.ROVER_GUIDED);
         }
@@ -177,6 +176,9 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener {
     }
 
     private void disable() {
+        if(state == GuidedStates.UNINITIALIZED)
+            return;
+
         state = GuidedStates.UNINITIALIZED;
         myDrone.notifyDroneEvent(DroneEventsType.GUIDEDPOINT);
     }
@@ -191,7 +193,7 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener {
                 /** FALL THROUGH **/
 
             case ACTIVE:
-                altitude = Math.max(alt, getMinAltitude(myDrone));
+                altitude = alt;
                 sendGuidedPoint();
                 break;
         }
@@ -257,7 +259,7 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener {
 
     private static double getDroneAltConstrained(Drone drone) {
         double alt = Math.floor(drone.getAltitude().getAltitude());
-        return Math.max(alt, getMinAltitude(drone));
+        return Math.max(alt, getDefaultMinAltitude(drone));
     }
 
     public Coord2D getCoord() {
@@ -284,7 +286,7 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener {
         return state;
     }
 
-    public static float getMinAltitude(Drone drone) {
+    public static float getDefaultMinAltitude(Drone drone) {
         final int droneType = drone.getType();
         if (Type.isCopter(droneType)) {
             return 2f;

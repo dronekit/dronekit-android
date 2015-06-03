@@ -46,7 +46,7 @@ For an existing app:
 	}
 
 	dependencies {
-	    compile 'com.o3dr.android:droneKit-android:2.3.+'
+	    compile 'com.o3dr.android:dronekit-android:2.3.+'
 	    ...
 	}
 

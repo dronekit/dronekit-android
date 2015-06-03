@@ -4,17 +4,22 @@ import com.MAVLink.common.msg_mission_item;
 import com.MAVLink.enums.MAV_CMD;
 import com.MAVLink.enums.MAV_FRAME;
 
+import org.droidplanner.core.MAVLink.MavLinkWaypoint;
+import org.droidplanner.core.drone.DroneInterfaces;
 import org.droidplanner.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.core.drone.DroneVariable;
 import org.droidplanner.core.helpers.coordinates.Coord2D;
 import org.droidplanner.core.model.Drone;
 
-public class Home extends DroneVariable {
+public class Home extends DroneVariable implements DroneInterfaces.OnDroneListener {
+    public static final int HOME_WAYPOINT_INDEX = 0;
+
     private Coord2D coordinate;
     private double altitude = 0;
 
     public Home(Drone drone) {
         super(drone);
+        drone.addDroneListener(this);
     }
 
     public boolean isValid() {
@@ -70,4 +75,17 @@ public class Home extends DroneVariable {
         return mavMsg;
     }
 
+    @Override
+    public void onDroneEvent(DroneEventsType event, Drone drone) {
+        switch(event){
+            case EKF_POSITION_STATE_UPDATE:
+                if(drone.getState().isEkfPositionOk())
+                    requestHomeUpdate(myDrone);
+                break;
+        }
+    }
+
+    private static void requestHomeUpdate(Drone drone){
+        MavLinkWaypoint.requestWayPoint(drone, HOME_WAYPOINT_INDEX);
+    }
 }

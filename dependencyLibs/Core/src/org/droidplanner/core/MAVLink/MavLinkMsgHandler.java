@@ -3,6 +3,7 @@ package org.droidplanner.core.MAVLink;
 import com.MAVLink.Messages.ApmModes;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.ardupilotmega.msg_camera_feedback;
+import com.MAVLink.ardupilotmega.msg_ekf_status_report;
 import com.MAVLink.ardupilotmega.msg_gopro_get_response;
 import com.MAVLink.ardupilotmega.msg_gopro_heartbeat;
 import com.MAVLink.ardupilotmega.msg_gopro_set_response;
@@ -11,10 +12,13 @@ import com.MAVLink.ardupilotmega.msg_mag_cal_report;
 import com.MAVLink.ardupilotmega.msg_mount_status;
 import com.MAVLink.ardupilotmega.msg_radio;
 import com.MAVLink.common.msg_attitude;
+import com.MAVLink.common.msg_command_ack;
 import com.MAVLink.common.msg_global_position_int;
 import com.MAVLink.common.msg_gps_raw_int;
 import com.MAVLink.common.msg_heartbeat;
 import com.MAVLink.common.msg_mission_current;
+import com.MAVLink.common.msg_mission_item;
+import com.MAVLink.common.msg_named_value_int;
 import com.MAVLink.common.msg_nav_controller_output;
 import com.MAVLink.common.msg_radio_status;
 import com.MAVLink.common.msg_raw_imu;
@@ -24,19 +28,17 @@ import com.MAVLink.common.msg_statustext;
 import com.MAVLink.common.msg_sys_status;
 import com.MAVLink.common.msg_vfr_hud;
 import com.MAVLink.enums.MAV_MODE_FLAG;
+import com.MAVLink.enums.MAV_SEVERITY;
 import com.MAVLink.enums.MAV_STATE;
 import com.MAVLink.enums.MAV_SYS_STATUS_SENSOR;
 
-import org.droidplanner.core.helpers.coordinates.Coord2D;
+import org.droidplanner.core.drone.variables.Home;
 import org.droidplanner.core.model.Drone;
 
 /**
  * Parse the received mavlink messages, and update the drone state appropriately.
  */
 public class MavLinkMsgHandler {
-
-    private static final byte SEVERITY_HIGH = 3;
-    private static final byte SEVERITY_CRITICAL = 4;
 
     private Drone drone;
 
@@ -145,6 +147,10 @@ public class MavLinkMsgHandler {
                 drone.getCamera().updateMountOrientation(((msg_mount_status) msg));
                 break;
 
+            case msg_named_value_int.MAVLINK_MSG_ID_NAMED_VALUE_INT:
+                processNamedValueInt((msg_named_value_int) msg);
+                break;
+
             //*************** GoPro messages handling **************//
             case msg_gopro_heartbeat.MAVLINK_MSG_ID_GOPRO_HEARTBEAT:
                 drone.getGoProImpl().onHeartBeat((msg_gopro_heartbeat) msg);
@@ -164,7 +170,49 @@ public class MavLinkMsgHandler {
                 drone.getMagnetometerCalibration().processCalibrationMessage(msg);
                 break;
 
+            //*************** EKF State handling ******************//
+            case msg_ekf_status_report.MAVLINK_MSG_ID_EKF_STATUS_REPORT:
+                drone.getState().setEkfStatus((msg_ekf_status_report) msg);
+                break;
+
+            case msg_mission_item.MAVLINK_MSG_ID_MISSION_ITEM:
+                msg_mission_item missionItem = (msg_mission_item) msg;
+                if(missionItem.seq == Home.HOME_WAYPOINT_INDEX){
+                    drone.getHome().setHome(missionItem);
+                }
+                break;
+
+            //**************** Command long acknowledgement ******************//
+            case msg_command_ack.MAVLINK_MSG_ID_COMMAND_ACK:
+                final msg_command_ack commandAck = (msg_command_ack) msg;
+                handleCommandAck(commandAck);
+                break;
+
             default:
+                break;
+        }
+    }
+
+    private void handleCommandAck(msg_command_ack ack){
+        if(ack != null){
+            System.out.println(ack.toString());
+        }
+    }
+
+    private void processNamedValueInt(msg_named_value_int message){
+        if(message == null)
+            return;
+
+        switch (message.getName()) {
+            case "ARMMASK":
+                //Give information about the vehicle's ability to arm successfully.
+                final ApmModes vehicleMode = drone.getState().getMode();
+                if (ApmModes.isCopter(vehicleMode.getType())) {
+                    final int value = message.value;
+                    final boolean isReadyToArm = (value & (1 << vehicleMode.getNumber())) != 0;
+                    final String armReadinessMsg = isReadyToArm ? "READY TO ARM" : "UNREADY FOR ARMING";
+                    drone.logMessage(MAV_SEVERITY.MAV_SEVERITY_NOTICE, armReadinessMsg);
+                }
                 break;
         }
     }
