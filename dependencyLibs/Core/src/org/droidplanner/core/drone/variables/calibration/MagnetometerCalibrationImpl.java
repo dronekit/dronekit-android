@@ -5,6 +5,7 @@ import com.MAVLink.ardupilotmega.msg_mag_cal_progress;
 import com.MAVLink.ardupilotmega.msg_mag_cal_report;
 
 import org.droidplanner.core.MAVLink.MavLinkCalibration;
+import org.droidplanner.core.drone.DroneInterfaces;
 import org.droidplanner.core.drone.DroneVariable;
 import org.droidplanner.core.model.Drone;
 
@@ -14,7 +15,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Created by Fredia Huya-Kouadio on 5/3/15.
  */
-public class MagnetometerCalibrationImpl extends DroneVariable {
+public class MagnetometerCalibrationImpl extends DroneVariable implements DroneInterfaces.OnDroneListener {
 
     public interface OnMagnetometerCalibrationListener {
         void onCalibrationCancelled();
@@ -32,6 +33,7 @@ public class MagnetometerCalibrationImpl extends DroneVariable {
 
     public MagnetometerCalibrationImpl(Drone myDrone) {
         super(myDrone);
+        myDrone.addDroneListener(this);
     }
 
     public void setListener(OnMagnetometerCalibrationListener listener) {
@@ -109,6 +111,16 @@ public class MagnetometerCalibrationImpl extends DroneVariable {
 
         public msg_mag_cal_report getCalReport() {
             return calReport;
+        }
+    }
+
+    @Override
+    public void onDroneEvent(DroneInterfaces.DroneEventsType event, Drone drone) {
+        switch(event){
+            case HEARTBEAT_TIMEOUT:
+            case DISCONNECTED:
+                cancelCalibration();
+                break;
         }
     }
 }
