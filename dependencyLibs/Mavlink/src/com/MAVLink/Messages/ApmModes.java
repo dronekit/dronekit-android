@@ -30,6 +30,7 @@ public enum ApmModes {
 	ROTOR_SPORT(13, "Sport",MAV_TYPE.MAV_TYPE_QUADROTOR),
 	ROTOR_AUTOTUNE(15, "Autotune",MAV_TYPE.MAV_TYPE_QUADROTOR),
 	ROTOR_POSHOLD(16, "PosHold",MAV_TYPE.MAV_TYPE_QUADROTOR),
+	ROTOR_BRAKE(17,"Brake",MAV_TYPE.MAV_TYPE_QUADROTOR),
 
 	ROVER_MANUAL(0, "MANUAL", MAV_TYPE.MAV_TYPE_GROUND_ROVER),
 	ROVER_LEARNING(2, "LEARNING", MAV_TYPE.MAV_TYPE_GROUND_ROVER),
@@ -70,7 +71,7 @@ public enum ApmModes {
         }
 
 		for (ApmModes mode : ApmModes.values()) {
-			if (i == mode.getNumber() & type == mode.getType()) {
+			if (i == mode.getNumber() && type == mode.getType()) {
 				return mode;
 			}
 		}
@@ -83,7 +84,7 @@ public enum ApmModes {
         }
 
 		for (ApmModes mode : ApmModes.values()) {
-			if (str.equals(mode.getName()) & type == mode.getType()) {
+			if (str.equals(mode.getName()) && type == mode.getType()) {
 				return mode;
 			}
 		}

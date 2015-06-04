@@ -153,6 +153,9 @@ public class DroneApiUtils {
             case ROTOR_POSHOLD:
                 return VehicleMode.COPTER_POSHOLD;
 
+            case ROTOR_BRAKE:
+                return VehicleMode.COPTER_BRAKE;
+
 
             case ROVER_MANUAL:
                 return VehicleMode.ROVER_MANUAL;
@@ -366,7 +369,7 @@ public class DroneApiUtils {
 
         return new State(isConnected, DroneApiUtils.getVehicleMode(droneMode), droneState.isArmed(), droneState.isFlying(),
                 droneState.getErrorId(), drone.getMavlinkVersion(), calibrationMessage,
-                droneState.getFlightStartTime(), proxyEkfStatus);
+                droneState.getFlightStartTime(), proxyEkfStatus, isConnected && drone.isConnectionAlive());
     }
 
     static Parameters getParameters(Drone drone, Context context) {

@@ -21,12 +21,13 @@ public class State implements Parcelable {
 
     private VehicleMode vehicleMode = VehicleMode.UNKNOWN;
     private EkfStatus ekfStatus = new EkfStatus();
+    private boolean isTelemetryLive;
 
     public State() {
     }
 
-    public State(boolean isConnected, VehicleMode mode, boolean armed, boolean flying, String autopilotErrorId,
-                 int mavlinkVersion, String calibrationStatus, long flightStartTime, EkfStatus ekfStatus) {
+    public State(boolean isConnected, VehicleMode mode, boolean armed, boolean flying,
+                 String autopilotErrorId, int mavlinkVersion, String calibrationStatus, long flightStartTime, EkfStatus ekfStatus, boolean isTelemetryLive) {
         this.isConnected = isConnected;
         this.armed = armed;
         this.isFlying = flying;
@@ -40,6 +41,8 @@ public class State implements Parcelable {
 
         if (mode != null)
             this.vehicleMode = mode;
+
+        this.isTelemetryLive = isTelemetryLive;
     }
 
     public boolean isConnected() {
@@ -118,6 +121,14 @@ public class State implements Parcelable {
         this.flightStartTime = flightStartTime;
     }
 
+    public boolean isTelemetryLive() {
+        return isTelemetryLive;
+    }
+
+    public void setIsTelemetryLive(boolean isTelemetryLive) {
+        this.isTelemetryLive = isTelemetryLive;
+    }
+
     public EkfStatus getEkfStatus() {
         return ekfStatus;
     }
@@ -138,6 +149,7 @@ public class State implements Parcelable {
         dest.writeInt(this.mavlinkVersion);
         dest.writeLong(this.flightStartTime);
         dest.writeParcelable(this.ekfStatus, 0);
+        dest.writeByte(isTelemetryLive ? (byte) 1 : (byte) 0);
     }
 
     private State(Parcel in) {
@@ -150,6 +162,7 @@ public class State implements Parcelable {
         this.mavlinkVersion = in.readInt();
         this.flightStartTime = in.readLong();
         this.ekfStatus = in.readParcelable(EkfStatus.class.getClassLoader());
+        this.isTelemetryLive = in.readByte() != 0;
     }
 
     public static final Creator<State> CREATOR = new Creator<State>() {
