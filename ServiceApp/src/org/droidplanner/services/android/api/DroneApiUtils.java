@@ -366,7 +366,7 @@ public class DroneApiUtils {
 
         return new State(isConnected, DroneApiUtils.getVehicleMode(droneMode), droneState.isArmed(), droneState.isFlying(),
                 droneState.getErrorId(), drone.getMavlinkVersion(), calibrationMessage,
-                droneState.getFlightStartTime(), proxyEkfStatus);
+                droneState.getFlightStartTime(), proxyEkfStatus, drone.isConnectionAlive());
     }
 
     static Parameters getParameters(Drone drone, Context context) {
