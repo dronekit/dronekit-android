@@ -39,6 +39,7 @@ public enum VehicleMode implements Parcelable {
     COPTER_FLIP(14, Type.TYPE_COPTER, "Flip"),
     COPTER_AUTOTUNE(15, Type.TYPE_COPTER, "Autotune"),
     COPTER_POSHOLD(16, Type.TYPE_COPTER, "PosHold"),
+    COPTER_BRAKE(17,Type.TYPE_COPTER,"Brake"),
 
     ROVER_MANUAL(0, Type.TYPE_ROVER, "Manual"),
     ROVER_LEARNING(2, Type.TYPE_ROVER, "Learning"),
