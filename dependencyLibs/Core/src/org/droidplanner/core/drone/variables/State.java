@@ -110,6 +110,8 @@ public class State extends DroneVariable {
 				}
 			}
 		}
+
+		checkEkfPositionState(this.ekfStatus);
 	}
 
 	public void setMode(ApmModes mode) {
@@ -155,8 +157,6 @@ public class State extends DroneVariable {
 		if(this.ekfStatus == null || !areEkfStatusEquals(this.ekfStatus, ekfState)) {
 			this.ekfStatus = ekfState;
 			myDrone.notifyDroneEvent(DroneEventsType.EKF_STATUS_UPDATE);
-
-			checkEkfPositionState(this.ekfStatus);
 		}
 	}
 
