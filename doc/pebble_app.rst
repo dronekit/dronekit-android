@@ -2,23 +2,24 @@
 Tower-Pebble
 ==================
 
-In this example, we will learn about the Tower Pebble watchapp and companion app.
+In this example, we will learn about the `Tower Pebble watchapp <http://apps.getPebble.com/en_US/application/54d54fede8bb36ea9d00001f>`_ and `Android companion app <https://play.google.com/store/apps/details?id=org.droidplanner.Pebble>`_.
 
 Project Setup
 =============
 
-Let's start by grabbing the existing code and importing it into Android Studio.  We need to clone the Github repository at **DroidPlanner/Tower-Pebble**.  This process is different in every client, but from the command line it looks like::
+Let's start by grabbing the existing code and importing it into :program:`Android Studio`.  We need to clone the Github repository at `DroidPlanner/Tower-Pebble <https://github.com/DroidPlanner/tower-pebble>`_.  This process is different in every client, but from the command line it looks like::
 
 	git clone https://github.com/DroidPlanner/tower-pebble
 
-Now let's import the project.  Open Android Studio and click **File>Import Project**.  Now find the **build.gradle** file in the project that we just cloned, then click next.
+Now let's import the project.  Open Android Studio and click **File | Import Project**.  Now find the :file:`build.gradle` file in the project that we just cloned, then click **OK**.
 
 .. image:: _static/images/towerpebble_setup_1.png
+        :width: 250 pt
 
 Understanding the Watchapp Code
 ===============================
 
-The code consists of two parts: the watchapp and the Android app.  The communication between the two is done with `AppSync <http://developer.getpebble.com/docs/c/Foundation/AppSync/>`_.  The Android app communicates with the vehicle using 3DR-Services.
+*Tower Pebble* consists of two parts: the watchapp and a companion Android app.  The communication between the two is done with `AppSync <http://developer.getPebble.com/docs/c/Foundation/AppSync/>`_.  The Android app communicates with the vehicle using 3DR-Services.
 
 .. image:: _static/images/towerpebble_setup_2.png
 
@@ -35,15 +36,17 @@ The code for the watchapp can be found in the folder called `Pebble <https://git
         * ``REQUEST_MODE_RTL`` when the bottom button is pushed
 
 .. image:: _static/images/towerpebble_setup_3.png
+        :width: 250 pt
 
 Understanding the Android Code
 ==============================
 
-The Android app looks like this:
+A screenshot of the Android app is shown below.  This app runs in the background and is used to connect the Pebble watchapp to :program:`3DR Services`.
 
 .. image:: _static/images/towerpebble_setup_4.png
+        :width: 250 pt
 
-But that's not important. The actual functionality (i.e. the communication with the Pebble) is handled by a Service called `PebbleCommunicatorService <https://github.com/DroidPlanner/tower-pebble/blob/master/Android/src/main/java/org/droidplanner/pebble/PebbleCommunicatorService.java>`_.  PebbleCommunicatorService is automatically started up when a connection is established. This works because the AndroidManifest.xml has the following:
+The functionality (i.e. the communication with the Pebble) is handled by a Service called `PebbleCommunicatorService <https://github.com/DroidPlanner/tower-pebble/blob/master/Android/src/main/java/org/droidplanner/Pebble/PebbleCommunicatorService.java>`_.  :file:`PebbleCommunicatorService` is automatically started up when a connection is established. This works because the :file:`AndroidManifest.xml` has the following:
 
 .. code-block:: xml
     
@@ -55,7 +58,7 @@ But that's not important. The actual functionality (i.e. the communication with 
         </intent-filter>
     </receiver>
 
-and the GCSEventsReceiver class will start the PebbleCommunicatorService like so:
+and the :file:`GCSEventsReceiver` class will start the :file:`PebbleCommunicatorService` like so:
 
 .. code-block:: java
 
@@ -77,10 +80,10 @@ Once the service is started, it does two things:
 #. Handles requests 
 #. Sends mode and telemetry
 
-1. Handling Requests
-====================
+Handling Requests
+-----------------
 
-In PebbleCommunicatorService, we have a ``public class PebbleReceiverHandler`` which ``extends PebbleKit.PebbleDataReceiver``.  Therefore, every time a request is sent by the pebble, the following method gets called (which handles the request):
+In :file:`PebbleCommunicatorService`, we have a ``public class PebbleReceiverHandler`` which ``extends PebbleKit.PebbleDataReceiver``.  Therefore, every time a request is sent by the Pebble, the following method gets called to handle the request:
 
 .. code-block:: java
 
@@ -151,23 +154,23 @@ to
             break;
 
 
-Obviously we would also want to change the pebble watchapp to say "Loiter" next to the middle button.
+Obviously we would also want to change the Pebble watchapp to say "Loiter" next to the middle button.
 
 
-2. Sending Mode and Telemetry
-=============================
+Sending Mode and Telemetry
+--------------------------
 
-Sending telemetry needs to happen fairly regularly, to keep the info up-to-date on the pebble.  However, the pebble does not have many resources, and will crash very easily if inbound data comes faster than the pebble can process it.
+Sending telemetry needs to happen fairly regularly, to keep the info up-to-date on the Pebble.  However, the Pebble does not have many resources, and will crash very easily if inbound data comes faster than the Pebble can process it.
 
-The app listens for certain DroneEvents.  To do this, ``PebbleCommunicatorService`` needs to implement ``DroneListener`` (1), the DroneListener needs to be registered (2) and a method ``onDroneEvent`` needs to be provided (3).
+The app listens for certain DroneEvents.  To do this, 
 
-1.
+1. :file:`PebbleCommunicatorService` needs to implement :file:`DroneListener`:
 
 .. code-block:: java
 
         public class PebbleCommunicatorService extends Service implements DroneListener, Towerlistener{
 
-2.
+2. The :file:`DroneListener` needs to be registered:
 
 .. code-block:: java
         :emphasize-lines: 6
@@ -191,7 +194,7 @@ The app listens for certain DroneEvents.  To do this, ``PebbleCommunicatorServic
             }
         }
 
-3.
+3. An ``onDroneEvent`` method needs to be provided:
 
 .. code-block:: java
 
@@ -234,7 +237,7 @@ The app listens for certain DroneEvents.  To do this, ``PebbleCommunicatorServic
             }
     }
 
-You may have noticed that certain DroneEvents (``BATTERY_UPDATED`` and ``ATTITUDE_UPDATED``) call the method ``sendDataToWatchIfTimeElapsed(drone)``, while others (``STATE_VEHICLE_MODE``, ``STATE_ARMING``, etc.) call the method ``sendDataToWatchNow(drone)``.  This is because the telemetry values (Battery and Attitude) are changing constantly, but it's not critical that they are updated too frequently.  Mode changes, however, don't happen very often, but it is important to update it very quickly on the watch.
+You may have noticed that certain DroneEvents (``BATTERY_UPDATED`` and ``ATTITUDE_UPDATED``) call the method ``sendDataToWatchIfTimeElapsed(drone)``, while others (``STATE_VEHICLE_MODE``, ``STATE_ARMING``, etc.) call the method ``sendDataToWatchNow(drone)``.  This is because the telemetry values (Battery and Attitude) are changing constantly, but it's not critical that they are updated too frequently.  The user does not need up-to-the-second battery voltage updates.  Mode changes, however, don't happen very often, but it is important to update it very quickly on the watch.
 
 ``sendDataToWatchIfTimeElapsed()`` just calls ``sendDataToWatchNow()`` if 1 second has elapsed.
 
@@ -299,6 +302,6 @@ And here's what ``sendDataToWatchNow()`` looks like:
 
 
 Summary
-======
+=======
 
 All done!  The code can be found on `Github <https://github.com/DroidPlanner/tower-pebble>`_.
