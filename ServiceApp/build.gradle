@@ -36,7 +36,7 @@ android {
         applicationId 'org.droidplanner.services.android'
         minSdkVersion 14
         targetSdkVersion 21
-        versionCode 10217
+        versionCode 10218
         versionName getGitVersion()
     }
 
