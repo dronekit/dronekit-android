@@ -669,7 +669,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 final AccelCalibration accelCalibration = drone.getCalibrationSetup();
                 final String message = accelCalibration.getMessage();
                 if (accelCalibration.isCalibrating() && TextUtils.isEmpty(message)) {
-                    accelCalibration.setCalibrating(false);
+                    accelCalibration.cancelCalibration();
                     droneEvent = AttributeEvent.HEARTBEAT_TIMEOUT;
                 } else {
                     extrasBundle = new Bundle(1);
