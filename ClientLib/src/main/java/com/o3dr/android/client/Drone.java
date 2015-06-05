@@ -254,7 +254,12 @@ public class Drone {
             throw new IllegalArgumentException("Callback must be non-null.");
 
         if (!isStarted()) {
-            callback.onRetrievalFailed();
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    callback.onRetrievalFailed();
+                }
+            });
             return;
         }
 
@@ -381,8 +386,8 @@ public class Drone {
         return this.connectionParameter;
     }
 
-    public <T extends MissionItem> void buildMissionItemsAsync(final OnMissionItemsBuiltCallback<T> callback,
-                                                               final MissionItem.ComplexItem<T>... missionItems) {
+    public <T extends MissionItem> void buildMissionItemsAsync(final MissionItem.ComplexItem<T>[] missionItems,
+                                                               final OnMissionItemsBuiltCallback<T> callback) {
         if (callback == null)
             throw new IllegalArgumentException("Callback must be non-null.");
 
