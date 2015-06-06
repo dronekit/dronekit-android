@@ -1,6 +1,12 @@
 {
     "apps": [
         {
+            "applicationId": "com.o3dr.solo.android",
+            "appName": "Solo",
+            "appDescription" : "Flight made simple: Use the Solo app to control your 3DR Solo drone.",
+            "appIconUrl" : "https://lh3.googleusercontent.com/_rCy-r5n_4TYqbb1nBFBwjCm9vjKDq6LQfsVS-qWSNmOzj7jH1VopvHjr-fFM_NTtN_9=w300-rw"
+        },
+        {
             "applicationId": "org.droidplanner.android",
             "appName": "Tower",
             "appDescription" : "Tower is 3DR’s powerful and intuitive new flight control program. It provides everything you need to plan, fly and track any 3DR-powered drone.",
