@@ -11,22 +11,22 @@ import org.droidplanner.core.mission.MissionItemType;
 
 import java.util.List;
 
-public class DoLandStart extends SpatialCoordItem {
+public class DoLandStartImpl extends SpatialCoordItem {
 
-    public DoLandStart(MissionItem item) {
+    public DoLandStartImpl(MissionItem item) {
         super(item);
         setAltitude((0.0));
     }
 
-    public DoLandStart(Mission mission) {
+    public DoLandStartImpl(Mission mission) {
         this(mission, new Coord2D(0, 0));
     }
 
-    public DoLandStart(Mission mMission, Coord2D coord) {
+    public DoLandStartImpl(Mission mMission, Coord2D coord) {
         super(mMission, new Coord3D(coord, (0)));
     }
 
-    public DoLandStart(msg_mission_item msg, Mission mission) {
+    public DoLandStartImpl(msg_mission_item msg, Mission mission) {
         super(mission, null);
         unpackMAVMessage(msg);
     }
@@ -37,8 +37,6 @@ public class DoLandStart extends SpatialCoordItem {
         List<msg_mission_item> list = super.packMissionItem();
         msg_mission_item mavMsg = list.get(0);
         mavMsg.command = MAV_CMD.MAV_CMD_DO_LAND_START;
-        mavMsg.x = (float)coordinate.getLat();
-        mavMsg.y = (float) coordinate.getLng();
         return list;
     }
 

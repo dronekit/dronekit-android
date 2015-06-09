@@ -27,6 +27,7 @@ import org.droidplanner.core.mission.Mission;
 import org.droidplanner.core.mission.commands.ConditionYaw;
 import org.droidplanner.core.mission.commands.ReturnToHome;
 import org.droidplanner.core.mission.commands.SetRelayImpl;
+import org.droidplanner.core.mission.waypoints.DoLandStartImpl;
 import org.droidplanner.core.survey.CameraInfo;
 import org.droidplanner.core.survey.SurveyData;
 
@@ -158,8 +159,7 @@ public class ProxyUtils {
             case DO_LAND_START: {
                 DoLandStart proxy = (DoLandStart) proxyItem;
 
-                org.droidplanner.core.mission.waypoints.DoLandStart temp = new org.droidplanner.core
-                        .mission.waypoints.DoLandStart(mission, MathUtils.latLongToCoord2D(proxy
+                DoLandStartImpl temp = new DoLandStartImpl(mission, MathUtils.latLongToCoord2D(proxy
                         .getCoordinate()));
 
                 missionItemImpl = temp;
@@ -328,7 +328,7 @@ public class ProxyUtils {
                 break;
             }
             case DO_LAND_START: {
-                org.droidplanner.core.mission.waypoints.DoLandStart source = (org.droidplanner.core.mission.waypoints.DoLandStart) itemImpl;
+                DoLandStartImpl source = (DoLandStartImpl) itemImpl;
 
                 DoLandStart temp = new DoLandStart();
                 temp.setCoordinate(MathUtils.coord3DToLatLongAlt(source.getCoordinate()));
