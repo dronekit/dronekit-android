@@ -21,6 +21,7 @@ import com.o3dr.services.android.lib.drone.mission.item.spatial.Land;
 import com.o3dr.services.android.lib.drone.mission.item.spatial.RegionOfInterest;
 import com.o3dr.services.android.lib.drone.mission.item.spatial.SplineWaypoint;
 import com.o3dr.services.android.lib.drone.mission.item.spatial.Waypoint;
+import com.o3dr.services.android.lib.drone.property.Type;
 import com.o3dr.services.android.lib.util.ParcelableUtils;
 
 /**
@@ -115,6 +116,11 @@ public enum MissionItemType {
     },
 
     DO_LAND_START("Do Land start") {
+        @Override
+        public boolean isTypeSupported(Type vehicleType){
+            return vehicleType.getDroneType() == Type.TYPE_PLANE;
+        }
+
         @Override
         public MissionItem getNewItem() {
             return new DoLandStart();
@@ -272,4 +278,12 @@ public enum MissionItemType {
         return missionItem;
     }
 
+    /**
+     * Indicates if the mission item is supported on the given vehicle type.
+     * @param vehicleType Vehicle type to check against (i.e: plane, copter, rover...)
+     * @return true the mission item is supported, false otherwise.
+     */
+    public boolean isTypeSupported(Type vehicleType){
+        return true;
+    }
 }
