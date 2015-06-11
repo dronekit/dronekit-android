@@ -14,6 +14,7 @@ import org.droidplanner.core.mission.commands.ChangeSpeed;
 import org.droidplanner.core.mission.commands.ConditionYaw;
 import org.droidplanner.core.mission.commands.EpmGripper;
 import org.droidplanner.core.mission.commands.ReturnToHome;
+import org.droidplanner.core.mission.commands.SetRelayImpl;
 import org.droidplanner.core.mission.commands.SetServo;
 import org.droidplanner.core.mission.commands.Takeoff;
 import org.droidplanner.core.mission.waypoints.Circle;
@@ -290,6 +291,11 @@ public class Mission extends DroneVariable {
                 case MAV_CMD.MAV_CMD_CONDITION_YAW:
                     received.add(new ConditionYaw(msg, this));
                     break;
+
+                case MAV_CMD.MAV_CMD_DO_SET_RELAY:
+                    received.add(new SetRelayImpl(msg, this));
+                    break;
+
                 default:
                     break;
             }
