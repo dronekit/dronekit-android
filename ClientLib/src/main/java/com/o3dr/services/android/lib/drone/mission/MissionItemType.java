@@ -16,6 +16,7 @@ import com.o3dr.services.android.lib.drone.mission.item.command.YawCondition;
 import com.o3dr.services.android.lib.drone.mission.item.complex.StructureScanner;
 import com.o3dr.services.android.lib.drone.mission.item.complex.Survey;
 import com.o3dr.services.android.lib.drone.mission.item.spatial.Circle;
+import com.o3dr.services.android.lib.drone.mission.item.spatial.DoLandStart;
 import com.o3dr.services.android.lib.drone.mission.item.spatial.Land;
 import com.o3dr.services.android.lib.drone.mission.item.spatial.RegionOfInterest;
 import com.o3dr.services.android.lib.drone.mission.item.spatial.SplineWaypoint;
@@ -111,6 +112,23 @@ public enum MissionItemType {
         @Override
         protected Creator<ReturnToLaunch> getMissionItemCreator() {
             return ReturnToLaunch.CREATOR;
+        }
+    },
+
+    DO_LAND_START("Do Land start") {
+        @Override
+        public boolean isTypeSupported(Type vehicleType){
+            return super.isTypeSupported(vehicleType) && vehicleType.getDroneType() == Type.TYPE_PLANE;
+        }
+
+        @Override
+        public MissionItem getNewItem() {
+            return new DoLandStart();
+        }
+
+        @Override
+        protected Creator<DoLandStart> getMissionItemCreator() {
+            return DoLandStart.CREATOR;
         }
     },
 
@@ -268,5 +286,4 @@ public enum MissionItemType {
     public boolean isTypeSupported(Type vehicleType){
         return vehicleType != null;
     }
-
 }

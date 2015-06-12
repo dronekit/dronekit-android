@@ -18,6 +18,7 @@ import org.droidplanner.core.mission.commands.SetRelayImpl;
 import org.droidplanner.core.mission.commands.SetServo;
 import org.droidplanner.core.mission.commands.Takeoff;
 import org.droidplanner.core.mission.waypoints.Circle;
+import org.droidplanner.core.mission.waypoints.DoLandStartImpl;
 import org.droidplanner.core.mission.waypoints.Land;
 import org.droidplanner.core.mission.waypoints.RegionOfInterest;
 import org.droidplanner.core.mission.waypoints.SpatialCoordItem;
@@ -266,6 +267,9 @@ public class Mission extends DroneVariable {
                     break;
                 case MAV_CMD.MAV_CMD_NAV_LAND:
                     received.add(new Land(msg, this));
+                    break;
+                case MAV_CMD.MAV_CMD_DO_LAND_START:
+                    received.add(new DoLandStartImpl(msg, this));
                     break;
                 case MAV_CMD.MAV_CMD_NAV_TAKEOFF:
                     received.add(new Takeoff(msg, this));
