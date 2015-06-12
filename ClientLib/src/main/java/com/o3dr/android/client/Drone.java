@@ -530,6 +530,10 @@ public class Drone {
         ExperimentalApi.triggerCamera(this);
     }
 
+    public void setROI(double latitude, double longitude, double altitude) {
+        ExperimentalApi.setROI(this, latitude, longitude, altitude);
+    }
+
     public void epmCommand(boolean release) {
         ExperimentalApi.epmCommand(this, release);
     }

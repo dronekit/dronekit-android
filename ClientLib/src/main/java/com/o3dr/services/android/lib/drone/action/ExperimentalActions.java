@@ -9,6 +9,11 @@ public class ExperimentalActions {
 
     public static final String ACTION_TRIGGER_CAMERA = Utils.PACKAGE_NAME + ".action.TRIGGER_CAMERA";
 
+    public static final String ACTION_SET_ROI = Utils.PACKAGE_NAME + ".action.SET_ROI";
+    public static final String EXTRA_SET_ROI_LAT = "extra_set_roi_lat";
+    public static final String EXTRA_SET_ROI_LONG = "extra_set_roi_long";
+    public static final String EXTRA_SET_ROI_ALT = "extra_set_roi_alt";
+
     public static final String ACTION_EPM_COMMAND = Utils.PACKAGE_NAME + ".action.EPM_COMMAND";
     public static final String EXTRA_EPM_RELEASE = Utils.PACKAGE_NAME + "extra_epm_release";
 

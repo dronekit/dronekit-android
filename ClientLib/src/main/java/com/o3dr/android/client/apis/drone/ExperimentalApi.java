@@ -9,6 +9,7 @@ import com.o3dr.services.android.lib.model.action.Action;
 import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.ACTION_EPM_COMMAND;
 import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.ACTION_SEND_MAVLINK_MESSAGE;
 import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.ACTION_SET_RELAY;
+import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.ACTION_SET_ROI;
 import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.ACTION_TRIGGER_CAMERA;
 import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.EXTRA_EPM_RELEASE;
 import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.EXTRA_IS_RELAY_ON;
@@ -17,6 +18,9 @@ import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.EXT
 import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.ACTION_SET_SERVO;
 import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.EXTRA_SERVO_CHANNEL;
 import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.EXTRA_SERVO_PWM;
+import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.EXTRA_SET_ROI_ALT;
+import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.EXTRA_SET_ROI_LAT;
+import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.EXTRA_SET_ROI_LONG;
 
 
 /**
@@ -26,6 +30,15 @@ public class ExperimentalApi {
 
     public static void triggerCamera(Drone drone) {
         drone.performAsyncAction(new Action(ACTION_TRIGGER_CAMERA));
+    }
+
+    public static void setROI(Drone drone, double latitude, double longitude, double altitude) {
+        Bundle params = new Bundle();
+        params.putDouble(EXTRA_SET_ROI_LAT, latitude);
+        params.putDouble(EXTRA_SET_ROI_LONG, longitude);
+        params.putDouble(EXTRA_SET_ROI_ALT, altitude);
+        Action epmAction = new Action(ACTION_SET_ROI, params);
+        drone.performAsyncAction(epmAction);
     }
 
     public static void epmCommand(Drone drone, boolean release) {
