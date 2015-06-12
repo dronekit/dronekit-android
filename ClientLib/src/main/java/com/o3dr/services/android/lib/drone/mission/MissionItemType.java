@@ -118,7 +118,7 @@ public enum MissionItemType {
     DO_LAND_START("Do Land start") {
         @Override
         public boolean isTypeSupported(Type vehicleType){
-            return vehicleType.getDroneType() == Type.TYPE_PLANE;
+            return super.isTypeSupported(vehicleType) && vehicleType.getDroneType() == Type.TYPE_PLANE;
         }
 
         @Override
@@ -284,6 +284,6 @@ public enum MissionItemType {
      * @return true the mission item is supported, false otherwise.
      */
     public boolean isTypeSupported(Type vehicleType){
-        return true;
+        return vehicleType != null;
     }
 }
