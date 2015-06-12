@@ -16,6 +16,7 @@ import com.o3dr.services.android.lib.drone.mission.item.complex.StructureScanner
 import com.o3dr.services.android.lib.drone.mission.item.complex.Survey;
 import com.o3dr.services.android.lib.drone.mission.item.complex.SurveyDetail;
 import com.o3dr.services.android.lib.drone.mission.item.spatial.Circle;
+import com.o3dr.services.android.lib.drone.mission.item.spatial.DoLandStart;
 import com.o3dr.services.android.lib.drone.mission.item.spatial.Land;
 import com.o3dr.services.android.lib.drone.mission.item.spatial.RegionOfInterest;
 import com.o3dr.services.android.lib.drone.mission.item.spatial.SplineWaypoint;
@@ -26,6 +27,7 @@ import org.droidplanner.core.mission.Mission;
 import org.droidplanner.core.mission.commands.ConditionYaw;
 import org.droidplanner.core.mission.commands.ReturnToHome;
 import org.droidplanner.core.mission.commands.SetRelayImpl;
+import org.droidplanner.core.mission.waypoints.DoLandStartImpl;
 import org.droidplanner.core.survey.CameraInfo;
 import org.droidplanner.core.survey.SurveyData;
 
@@ -149,6 +151,15 @@ public class ProxyUtils {
 
                 org.droidplanner.core.mission.waypoints.Land temp = new org.droidplanner.core
                         .mission.waypoints.Land(mission, MathUtils.latLongToCoord2D(proxy
+                        .getCoordinate()));
+
+                missionItemImpl = temp;
+                break;
+            }
+            case DO_LAND_START: {
+                DoLandStart proxy = (DoLandStart) proxyItem;
+
+                DoLandStartImpl temp = new DoLandStartImpl(mission, MathUtils.latLongToCoord2D(proxy
                         .getCoordinate()));
 
                 missionItemImpl = temp;
@@ -316,7 +327,15 @@ public class ProxyUtils {
                 proxyMissionItem = temp;
                 break;
             }
+            case DO_LAND_START: {
+                DoLandStartImpl source = (DoLandStartImpl) itemImpl;
 
+                DoLandStart temp = new DoLandStart();
+                temp.setCoordinate(MathUtils.coord3DToLatLongAlt(source.getCoordinate()));
+
+                proxyMissionItem = temp;
+                break;
+            }
             case CIRCLE: {
                 org.droidplanner.core.mission.waypoints.Circle source = (org.droidplanner.core.mission.waypoints.Circle) itemImpl;
 
