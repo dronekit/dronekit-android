@@ -3,6 +3,7 @@ package com.o3dr.android.client.apis.drone;
 import android.os.Bundle;
 
 import com.o3dr.android.client.Drone;
+import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
 import com.o3dr.services.android.lib.model.action.Action;
 
@@ -18,9 +19,7 @@ import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.EXT
 import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.ACTION_SET_SERVO;
 import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.EXTRA_SERVO_CHANNEL;
 import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.EXTRA_SERVO_PWM;
-import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.EXTRA_SET_ROI_ALT;
-import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.EXTRA_SET_ROI_LAT;
-import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.EXTRA_SET_ROI_LONG;
+import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.EXTRA_SET_ROI_LAT_LONG_ALT;
 
 
 /**
@@ -32,11 +31,9 @@ public class ExperimentalApi {
         drone.performAsyncAction(new Action(ACTION_TRIGGER_CAMERA));
     }
 
-    public static void setROI(Drone drone, double latitude, double longitude, double altitude) {
+    public static void setROI(Drone drone, LatLongAlt roi) {
         Bundle params = new Bundle();
-        params.putDouble(EXTRA_SET_ROI_LAT, latitude);
-        params.putDouble(EXTRA_SET_ROI_LONG, longitude);
-        params.putDouble(EXTRA_SET_ROI_ALT, altitude);
+        params.putParcelable(EXTRA_SET_ROI_LAT_LONG_ALT, roi);
         Action epmAction = new Action(ACTION_SET_ROI, params);
         drone.performAsyncAction(epmAction);
     }
