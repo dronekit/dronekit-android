@@ -343,9 +343,10 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
             case ExperimentalActions.ACTION_SET_ROI:
                 LatLongAlt roi = data.getParcelable(ExperimentalActions.EXTRA_SET_ROI_LAT_LONG_ALT);
-                Coord3D coord3DRoi =
-                        new Coord3D(roi.getLatitude(), roi.getLongitude(), roi.getAltitude());
-                MavLinkDoCmds.setROI(getDrone(), coord3DRoi);
+                if(roi != null) {
+                    Coord3D coord3DRoi = new Coord3D(roi.getLatitude(), roi.getLongitude(), roi.getAltitude());
+                    MavLinkDoCmds.setROI(getDrone(), coord3DRoi);
+                }
                 break;
 
             case ExperimentalActions.ACTION_SEND_MAVLINK_MESSAGE:
