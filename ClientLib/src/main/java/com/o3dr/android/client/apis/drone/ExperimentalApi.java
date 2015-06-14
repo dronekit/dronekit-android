@@ -3,12 +3,14 @@ package com.o3dr.android.client.apis.drone;
 import android.os.Bundle;
 
 import com.o3dr.android.client.Drone;
+import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
 import com.o3dr.services.android.lib.model.action.Action;
 
 import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.ACTION_EPM_COMMAND;
 import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.ACTION_SEND_MAVLINK_MESSAGE;
 import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.ACTION_SET_RELAY;
+import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.ACTION_SET_ROI;
 import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.ACTION_TRIGGER_CAMERA;
 import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.EXTRA_EPM_RELEASE;
 import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.EXTRA_IS_RELAY_ON;
@@ -17,6 +19,7 @@ import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.EXT
 import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.ACTION_SET_SERVO;
 import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.EXTRA_SERVO_CHANNEL;
 import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.EXTRA_SERVO_PWM;
+import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.EXTRA_SET_ROI_LAT_LONG_ALT;
 
 
 /**
@@ -26,6 +29,13 @@ public class ExperimentalApi {
 
     public static void triggerCamera(Drone drone) {
         drone.performAsyncAction(new Action(ACTION_TRIGGER_CAMERA));
+    }
+
+    public static void setROI(Drone drone, LatLongAlt roi) {
+        Bundle params = new Bundle();
+        params.putParcelable(EXTRA_SET_ROI_LAT_LONG_ALT, roi);
+        Action epmAction = new Action(ACTION_SET_ROI, params);
+        drone.performAsyncAction(epmAction);
     }
 
     public static void epmCommand(Drone drone, boolean release) {
