@@ -25,11 +25,11 @@ Understanding the Watchapp Code
 
 The code for the watchapp can be found in the folder called `Pebble <https://github.com/DroidPlanner/tower-pebble/tree/master/Pebble>`_.  We won't delve into how that code works, but here's a brief overview of what it does:
 
-* Listens for two strings: **mode** and **telem**.
-        * **mode** is displayed in bold at the top of the screen.
-        * **telem** is displayed at the bottom of the screen.
+* Listens for two strings: **mode** and **telem**:
+        * **mode** is displayed in bold at the top of the screen
+        * **telem** is displayed at the bottom of the screen
 
-* Sends requests when the user pushes buttons.
+* Sends requests when the user pushes buttons:
         * ``REQUEST_MODE_FOLLOW`` when the top button is pushed (if the mode is not already ``follow``)
         * ``REQUEST_CYCLE_FOLLOW_TYPE`` when the top button is pushed (if  the mode is already ``follow``)
         * ``REQUEST_PAUSE`` when the middle button is pushed
