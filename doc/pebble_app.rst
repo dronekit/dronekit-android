@@ -23,7 +23,7 @@ Understanding the Watchapp Code
 
 .. image:: _static/images/towerpebble_setup_2.png
 
-The code for the watchapp can be found in the folder called `Pebble <https://github.com/DroidPlanner/tower-pebble/tree/master/Pebble>`_.  We won't delve into how that code works, but here's a brief overview of what it does:
+The code for the watchapp can be found in the folder called `Pebble <https://github.com/DroidPlanner/tower-pebble/tree/master/Pebble>`_.  Here's a brief overview of what it does:
 
 * Listens for two strings: **mode** and **telem**:
         * **mode** is displayed in bold at the top of the screen
@@ -34,6 +34,55 @@ The code for the watchapp can be found in the folder called `Pebble <https://git
         * ``REQUEST_CYCLE_FOLLOW_TYPE`` when the top button is pushed (if  the mode is already ``follow``)
         * ``REQUEST_PAUSE`` when the middle button is pushed
         * ``REQUEST_MODE_RTL`` when the bottom button is pushed
+
+Here is the code that receives telemetry from the phone, then parses and displays it on the screen:
+
+.. code-block:: c
+
+	 void in_received_handler(DictionaryIterator *iter, void *context) {
+	   for(int i=KEY_MODE;i<=KEY_APP_VERSION;i++){
+	     Tuple *tuple = dict_find(iter,i);
+	     if(tuple){
+	       char *data = tuple->value->cstring;
+	       switch(i){
+		 case KEY_MODE:
+		   if(strcmp(data,mode)!=0)
+		     set_mode(data);
+		   break;
+		 case KEY_FOLLOW_TYPE:
+		   if(strcmp(data,follow_type)!=0){
+		     vibe(50);
+		     follow_type=data;
+		   }
+		   if(strcmp(mode,"Follow")==0)
+		       text_layer_set_text(follow_type_layer, follow_type);
+		   else
+		       text_layer_set_text(follow_type_layer, "");
+		   break;
+		 case KEY_TELEM:
+		   text_layer_set_text(telem_layer,data);
+		   break;
+		 case KEY_APP_VERSION:
+		   if(strcmp(data,APP_VERSION)!=0){
+		     request_new_app_version();
+		     return;
+		   }
+	       }
+	     }
+	   }
+	 }
+
+Here is the code that is called after a button is pressed to request a mode change:
+
+.. code-block:: c
+
+	static void send_mode_change_request(int request_type){
+	  Tuplet value = TupletInteger(KEY_PEBBLE_REQUEST,request_type);
+	  DictionaryIterator *iter;
+	  app_message_outbox_begin(&iter);
+	  dict_write_tuplet(iter,&value);
+	  app_message_outbox_send();
+	}
 
 .. image:: _static/images/towerpebble_setup_3.png
         :width: 250 pt
