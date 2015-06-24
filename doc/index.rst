@@ -22,5 +22,6 @@ Contents:
 
    getting_started
    first_app
+   pebble_app
    resources
 

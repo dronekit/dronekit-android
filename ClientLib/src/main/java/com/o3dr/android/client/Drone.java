@@ -162,7 +162,6 @@ public class Drone {
             asyncScheduler = null;
         }
 
-        this.droneApi = null;
         droneListeners.clear();
     }
 
@@ -254,7 +253,12 @@ public class Drone {
             throw new IllegalArgumentException("Callback must be non-null.");
 
         if (!isStarted()) {
-            callback.onRetrievalFailed();
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    callback.onRetrievalFailed();
+                }
+            });
             return;
         }
 
@@ -381,8 +385,8 @@ public class Drone {
         return this.connectionParameter;
     }
 
-    public <T extends MissionItem> void buildMissionItemsAsync(final OnMissionItemsBuiltCallback<T> callback,
-                                                               final MissionItem.ComplexItem<T>... missionItems) {
+    public <T extends MissionItem> void buildMissionItemsAsync(final MissionItem.ComplexItem<T>[] missionItems,
+                                                               final OnMissionItemsBuiltCallback<T> callback) {
         if (callback == null)
             throw new IllegalArgumentException("Callback must be non-null.");
 
@@ -460,26 +464,44 @@ public class Drone {
         }
     }
 
+    /**
+     * @deprecated Use {@link DroneStateApi#setVehicleMode(Drone, VehicleMode)} instead.
+     */
     public void changeVehicleMode(VehicleMode newMode) {
         DroneStateApi.setVehicleMode(this, newMode);
     }
 
+    /**
+     * @deprecated Use {@link ParameterApi#refreshParameters(Drone)} instead.
+     */
     public void refreshParameters() {
         ParameterApi.refreshParameters(this);
     }
 
+    /**
+     * @deprecated Use {@link ParameterApi#writeParameters(Drone, Parameters)} instead.
+     */
     public void writeParameters(Parameters parameters) {
         ParameterApi.writeParameters(this, parameters);
     }
 
+    /**
+     * @deprecated Use {@link MissionApi#setMission(Drone, Mission, boolean)} instead.
+     */
     public void setMission(Mission mission, boolean pushToDrone) {
         MissionApi.setMission(this, mission, pushToDrone);
     }
 
+    /**
+     * @deprecated Use {@link MissionApi#generateDronie(Drone)} instead.
+     */
     public void generateDronie() {
         MissionApi.generateDronie(this);
     }
 
+    /**
+     * @deprecated Use {@link DroneStateApi#arm(Drone, boolean)} instead.
+     */
     public void arm(boolean arm) {
         DroneStateApi.arm(this, arm);
     }
@@ -498,42 +520,72 @@ public class Drone {
         CalibrationApi.sendIMUAck(this, step);
     }
 
+    /**
+     * @deprecated Use {@link GuidedApi#takeoff(Drone, double)} instead.
+     */
     public void doGuidedTakeoff(double altitude) {
         GuidedApi.takeoff(this, altitude);
     }
 
+    /**
+     * @deprecated Use {@link GuidedApi#pauseAtCurrentLocation(Drone)} instead.
+     */
     public void pauseAtCurrentLocation() {
         GuidedApi.pauseAtCurrentLocation(this);
     }
 
+    /**
+     * @deprecated Use {@link GuidedApi#sendGuidedPoint(Drone, LatLong, boolean)} instead.
+     */
     public void sendGuidedPoint(LatLong point, boolean force) {
         GuidedApi.sendGuidedPoint(this, point, force);
     }
 
+    /**
+     * @deprecated Use {@link ExperimentalApi#sendMavlinkMessage(Drone, MavlinkMessageWrapper)} instead.
+     */
     public void sendMavlinkMessage(MavlinkMessageWrapper messageWrapper) {
         ExperimentalApi.sendMavlinkMessage(this, messageWrapper);
     }
 
+    /**
+     * @deprecated Use {@link GuidedApi#setGuidedAltitude(Drone, double)} instead.
+     */
     public void setGuidedAltitude(double altitude) {
         GuidedApi.setGuidedAltitude(this, altitude);
     }
 
+    /**
+     * @deprecated Use {@link FollowApi#enableFollowMe(Drone, FollowType)} instead.
+     */
     public void enableFollowMe(FollowType followType) {
         FollowApi.enableFollowMe(this, followType);
     }
 
+    /**
+     * @deprecated Use {@link FollowApi#disableFollowMe(Drone)} instead.
+     */
     public void disableFollowMe() {
         FollowApi.disableFollowMe(this);
     }
 
+    /**
+     * @deprecated Use {@link ExperimentalApi#triggerCamera(Drone)} instead.
+     */
     public void triggerCamera() {
         ExperimentalApi.triggerCamera(this);
     }
 
+    /**
+     * @deprecated Use {@link ExperimentalApi#epmCommand(Drone, boolean)} instead.
+     */
     public void epmCommand(boolean release) {
         ExperimentalApi.epmCommand(this, release);
     }
 
+    /**
+     * @deprecated Use {@link MissionApi#loadWaypoints(Drone)} instead.
+     */
     public void loadWaypoints() {
         MissionApi.loadWaypoints(this);
     }
