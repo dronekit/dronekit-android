@@ -481,7 +481,7 @@ public class Drone {
     }
 
     public void arm(boolean arm) {
-        DroneStateApi.arm(this, arm, false);
+        DroneStateApi.arm(this, arm);
     }
 
     /**

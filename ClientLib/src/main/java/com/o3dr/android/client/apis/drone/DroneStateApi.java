@@ -23,10 +23,7 @@ public class DroneStateApi {
      * @param arm true to arm, false to disarm.
      */
     public static void arm(Drone drone, boolean arm) {
-        Bundle params = new Bundle();
-        params.putBoolean(EXTRA_ARM, arm);
-        params.putBoolean(EXTRA_EMERGENCY_DISARM, false);
-        drone.performAsyncAction(new Action(ACTION_ARM, params));
+        arm(drone, arm, false);
     }
 
     /**

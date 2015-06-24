@@ -670,10 +670,14 @@ public class DroneApiUtils {
         return (float) drone.getMission().makeAndUploadDronie();
     }
 
+    static void arm(Drone drone, boolean arm) {
+        arm(drone, arm, false);
+    }
+
     static void arm(Drone drone, boolean arm, boolean emergencyDisarm) {
         if (drone == null)
             return;
-        MavLinkArm.sendArmMessage(drone, arm, false);
+        MavLinkArm.sendArmMessage(drone, arm, emergencyDisarm);
     }
 
     static void startMagnetometerCalibration(Drone drone, boolean retryOnFailure, boolean saveAutomatically, int
