@@ -2,7 +2,6 @@ package org.droidplanner.core.MAVLink;
 
 import org.droidplanner.core.model.Drone;
 
-import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.common.msg_heartbeat;
 import com.MAVLink.enums.MAV_AUTOPILOT;
 import com.MAVLink.enums.MAV_TYPE;
@@ -32,7 +31,7 @@ public class MavLinkHeartbeat {
 	 */
 	public static void sendMavHeartbeat(Drone drone) {
 		if (drone != null)
-			drone.getMavClient().sendMavPacket(sMsg, null);
+			drone.getMavClient().sendMavMessage(sMsg, null);
 	}
 
 }

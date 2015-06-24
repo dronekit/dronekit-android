@@ -31,7 +31,7 @@ public class MavLinkModes {
         msg.autocontinue = 1; // TODO use correct parameter
         msg.target_system = drone.getSysid();
         msg.target_component = drone.getCompid();
-        drone.getMavClient().sendMavPacket(msg, null);
+        drone.getMavClient().sendMavMessage(msg, null);
     }
 
     public static void sendGuidedPosition(Drone drone, double latitude, double longitude, double altitude){
@@ -43,7 +43,7 @@ public class MavLinkModes {
         msg.alt = (float) altitude;
         msg.target_system = drone.getSysid();
         msg.target_component = drone.getCompid();
-        drone.getMavClient().sendMavPacket(msg, null);
+        drone.getMavClient().sendMavMessage(msg, null);
     }
 
     public static void sendGuidedVelocity(Drone drone, double xVel, double yVel, double zVel){
@@ -55,7 +55,7 @@ public class MavLinkModes {
         msg.vz = (float) zVel;
         msg.target_system = drone.getSysid();
         msg.target_component = drone.getCompid();
-        drone.getMavClient().sendMavPacket(msg, null);
+        drone.getMavClient().sendMavMessage(msg, null);
     }
 
     public static void sendGuidedPositionAndVelocity(Drone drone, double latitude, double longitude, double altitude,
@@ -71,7 +71,7 @@ public class MavLinkModes {
         msg.vz = (float) zVel;
         msg.target_system = drone.getSysid();
         msg.target_component = drone.getCompid();
-        drone.getMavClient().sendMavPacket(msg, null);
+        drone.getMavClient().sendMavMessage(msg, null);
     }
 
     public static void changeFlightMode(Drone drone, ApmModes mode) {
@@ -79,6 +79,6 @@ public class MavLinkModes {
         msg.target_system = drone.getSysid();
         msg.base_mode = 1; // TODO use meaningful constant
         msg.custom_mode = mode.getNumber();
-        drone.getMavClient().sendMavPacket(msg, null);
+        drone.getMavClient().sendMavMessage(msg, null);
     }
 }

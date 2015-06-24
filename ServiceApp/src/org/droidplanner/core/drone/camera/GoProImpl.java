@@ -182,7 +182,7 @@ public class GoProImpl implements DroneInterfaces.OnDroneListener {
     }
 
     private void sendMavlinkPacket(MAVLinkMessage message) {
-        drone.getMavClient().sendMavPacket(message, 255, 0, null);
+        drone.getMavClient().sendMavMessage(message, 255, 0, null);
     }
 
     private void resetFutures() {

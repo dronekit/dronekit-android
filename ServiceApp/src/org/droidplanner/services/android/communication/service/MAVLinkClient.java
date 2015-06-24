@@ -111,12 +111,12 @@ public class MAVLinkClient implements MAVLinkStreams.MAVLinkOutputStream {
     }
 
     @Override
-    public void sendMavPacket(MAVLinkMessage message, ICommandListener listener) {
-        sendMavPacket(message, DEFAULT_SYS_ID, DEFAULT_COMP_ID, listener);
+    public void sendMavMessage(MAVLinkMessage message, ICommandListener listener) {
+        sendMavMessage(message, DEFAULT_SYS_ID, DEFAULT_COMP_ID, listener);
     }
 
     @Override
-    public void sendMavPacket(MAVLinkMessage message, int sysId, int compId, ICommandListener listener){
+    public void sendMavMessage(MAVLinkMessage message, int sysId, int compId, ICommandListener listener){
         if (this.connParams == null || message == null) {
             return;
         }

@@ -23,7 +23,7 @@ public class MavLinkDoCmds {
         msg.param6 = (float) coord.getY();
         msg.param7 = (float) coord.getAltitude();
 
-        drone.getMavClient().sendMavPacket(msg, listener);
+        drone.getMavClient().sendMavMessage(msg, listener);
     }
 
     public static void resetROI(Drone drone, ICommandListener listener) {
@@ -41,7 +41,7 @@ public class MavLinkDoCmds {
         msg.target_system = drone.getSysid();
         msg.target_component = drone.getCompid();
         msg.shot = 1;
-        drone.getMavClient().sendMavPacket(msg, null);
+        drone.getMavClient().sendMavMessage(msg, null);
     }
 
     public static void empCommand(Drone drone, boolean release, ICommandListener listener) {
@@ -54,7 +54,7 @@ public class MavLinkDoCmds {
         msg.command = EpmGripper.MAV_CMD_DO_GRIPPER;
         msg.param2 = release ? EpmGripper.GRIPPER_ACTION_RELEASE : EpmGripper.GRIPPER_ACTION_GRAB;
 
-        drone.getMavClient().sendMavPacket(msg, listener);
+        drone.getMavClient().sendMavMessage(msg, listener);
     }
 
     /**
@@ -75,7 +75,7 @@ public class MavLinkDoCmds {
         msg.param1 = relayNumber;
         msg.param2 = enabled ? 1 : 0;
 
-        drone.getMavClient().sendMavPacket(msg, listener);
+        drone.getMavClient().sendMavMessage(msg, listener);
     }
 
     /**
@@ -96,7 +96,7 @@ public class MavLinkDoCmds {
         msg.param1 = channel;
         msg.param2 = pwm;
 
-        drone.getMavClient().sendMavPacket(msg, listener);
+        drone.getMavClient().sendMavMessage(msg, listener);
     }
 
 }
