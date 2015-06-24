@@ -484,10 +484,6 @@ public class Drone {
         DroneStateApi.arm(this, arm, false);
     }
 
-    public void arm(boolean arm, boolean emergencyDisarm) {
-        DroneStateApi.arm(this, arm, emergencyDisarm);
-    }
-
     /**
      * @deprecated Use {@link CalibrationApi#startIMUCalibration(Drone)} instead.
      */
