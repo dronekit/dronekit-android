@@ -9,6 +9,7 @@ import com.o3dr.services.android.lib.model.action.Action;
 import static com.o3dr.services.android.lib.drone.action.StateActions.ACTION_ARM;
 import static com.o3dr.services.android.lib.drone.action.StateActions.ACTION_SET_VEHICLE_MODE;
 import static com.o3dr.services.android.lib.drone.action.StateActions.EXTRA_ARM;
+import static com.o3dr.services.android.lib.drone.action.StateActions.EXTRA_EMERGENCY_DISARM;
 import static com.o3dr.services.android.lib.drone.action.StateActions.EXTRA_VEHICLE_MODE;
 
 /**
@@ -21,9 +22,10 @@ public class DroneStateApi {
      *
      * @param arm true to arm, false to disarm.
      */
-    public static void arm(Drone drone, boolean arm) {
+    public static void arm(Drone drone, boolean arm, boolean emergencyDisarm) {
         Bundle params = new Bundle();
         params.putBoolean(EXTRA_ARM, arm);
+        params.putBoolean(EXTRA_EMERGENCY_DISARM, emergencyDisarm);
         drone.performAsyncAction(new Action(ACTION_ARM, params));
     }
 
