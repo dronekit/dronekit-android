@@ -40,6 +40,7 @@ import com.o3dr.services.android.lib.gcs.event.GCSEvent;
 import com.o3dr.services.android.lib.gcs.follow.FollowType;
 import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
 import com.o3dr.services.android.lib.model.IApiListener;
+import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.model.IDroneApi;
 import com.o3dr.services.android.lib.model.IMavlinkObserver;
 import com.o3dr.services.android.lib.model.IObserver;
@@ -285,7 +286,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     }
 
     @Override
-    public void performAction(Action action) throws RemoteException {
+    public void executeAction(Action action, ICommandListener listener) throws RemoteException {
         if (action == null)
             return;
 
@@ -491,6 +492,16 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 DroneApiUtils.stopVideoRecording(getDrone());
                 break;
         }
+    }
+
+    @Override
+    public void executeAsyncAction(Action action, ICommandListener listener) throws RemoteException {
+        executeAction(action, listener);
+    }
+
+    @Override
+    public void performAction(Action action) throws RemoteException {
+        executeAction(action, null);
     }
 
     @Override
