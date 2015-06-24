@@ -2,14 +2,15 @@ package org.droidplanner.core.MAVLink;
 
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
+import com.o3dr.services.android.lib.model.ICommandListener;
 
 public class MAVLinkStreams {
 
 	public interface MAVLinkOutputStream {
 
-		void sendMavPacket(MAVLinkMessage message, int sysId, int compId);
+		void sendMavPacket(MAVLinkMessage message, int sysId, int compId, ICommandListener listener);
 
-		void sendMavPacket(MAVLinkMessage message);
+		void sendMavPacket(MAVLinkMessage message, ICommandListener listener);
 
 		boolean isConnected();
 

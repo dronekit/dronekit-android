@@ -4,10 +4,11 @@ import org.droidplanner.core.model.Drone;
 
 import com.MAVLink.common.msg_command_long;
 import com.MAVLink.enums.MAV_CMD;
+import com.o3dr.services.android.lib.model.ICommandListener;
 
 public class MavLinkArm {
 
-	public static void sendArmMessage(Drone drone, boolean arm) {
+	public static void sendArmMessage(Drone drone, boolean arm, ICommandListener listener) {
 		msg_command_long msg = new msg_command_long();
 		msg.target_system = drone.getSysid();
 		msg.target_component = drone.getCompid();
@@ -21,7 +22,7 @@ public class MavLinkArm {
 		msg.param6 = 0;
 		msg.param7 = 0;
 		msg.confirmation = 0;
-		drone.getMavClient().sendMavPacket(msg);
+		drone.getMavClient().sendMavPacket(msg, listener);
 	}
 
 }

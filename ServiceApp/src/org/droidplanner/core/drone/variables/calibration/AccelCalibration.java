@@ -34,7 +34,7 @@ public class AccelCalibration extends DroneVariable implements DroneInterfaces.O
 
     public void sendAck(int step) {
         if(calibrating)
-            MavLinkCalibration.sendCalibrationAckMessage(step, myDrone);
+            MavLinkCalibration.sendCalibrationAckMessage(myDrone, step);
     }
 
     public void processMessage(MAVLinkMessage msg) {

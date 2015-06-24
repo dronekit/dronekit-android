@@ -4,19 +4,20 @@ import com.MAVLink.common.msg_command_ack;
 import com.MAVLink.common.msg_command_long;
 import com.MAVLink.enums.MAV_CMD;
 import com.MAVLink.enums.MAV_CMD_ACK;
+import com.o3dr.services.android.lib.model.ICommandListener;
 
 import org.droidplanner.core.model.Drone;
 
 public class MavLinkCalibration {
 
-	public static void sendCalibrationAckMessage(int count, Drone drone) {
+	public static void sendCalibrationAckMessage(Drone drone, int count) {
 		msg_command_ack msg = new msg_command_ack();
 		msg.command = (short) count;
 		msg.result = MAV_CMD_ACK.MAV_CMD_ACK_OK;
-		drone.getMavClient().sendMavPacket(msg);
+		drone.getMavClient().sendMavPacket(msg, null);
 	}
 
-	public static void startAccelerometerCalibration(Drone drone) {
+	public static void startAccelerometerCalibration(Drone drone, ICommandListener listener) {
 		msg_command_long msg = new msg_command_long();
 		msg.target_system = drone.getSysid();
 		msg.target_component = drone.getCompid();
@@ -30,15 +31,15 @@ public class MavLinkCalibration {
 		msg.param6 = 0;
 		msg.param7 = 0;
 		msg.confirmation = 0;
-		drone.getMavClient().sendMavPacket(msg);
+		drone.getMavClient().sendMavPacket(msg, listener);
 	}
 
 	/**
 	 * Initiate a magnetometer calibration
 	 * @param drone
 	 */
-	public static void startMagnetometerCalibration(Drone drone){
-		startMagnetometerCalibration(drone, false, false, 0);
+	public static void startMagnetometerCalibration(Drone drone, ICommandListener listener){
+		startMagnetometerCalibration(drone, false, false, 0, listener);
 	}
 
 	/**
@@ -49,7 +50,7 @@ public class MavLinkCalibration {
 	 * @param startDelay positive delay in seconds before starting the calibration
 	 */
 	public static void startMagnetometerCalibration(Drone drone, boolean retryOnFailure, boolean saveAutomatically,
-													int startDelay){
+													int startDelay, ICommandListener listener){
 		msg_command_long msg = new msg_command_long();
 		msg.target_system = drone.getSysid();
 		msg.target_component = drone.getCompid();
@@ -63,14 +64,14 @@ public class MavLinkCalibration {
 		msg.param6 = 0;
 		msg.param7 = 0;
 
-		drone.getMavClient().sendMavPacket(msg);
+		drone.getMavClient().sendMavPacket(msg, listener);
 	}
 
 	/**
 	 * Cancel the running magnetometer calibration.˛
 	 * @param drone
 	 */
-	public static void cancelMagnetometerCalibration(Drone drone){
+	public static void cancelMagnetometerCalibration(Drone drone, ICommandListener listener){
 		msg_command_long msg = new msg_command_long();
 		msg.target_system = drone.getSysid();
 		msg.target_component = drone.getCompid();
@@ -84,14 +85,14 @@ public class MavLinkCalibration {
 		msg.param6 = 0;
 		msg.param7 = 0;
 
-		drone.getMavClient().sendMavPacket(msg);
+		drone.getMavClient().sendMavPacket(msg, listener);
 	}
 
 	/**
 	 * Accept the magnetometer calibration result.
 	 * @param drone
 	 */
-	public static void acceptMagnetometerCalibration(Drone drone){
+	public static void acceptMagnetometerCalibration(Drone drone, ICommandListener listener){
 		msg_command_long msg = new msg_command_long();
 		msg.target_system = drone.getSysid();
 		msg.target_component = drone.getCompid();
@@ -105,7 +106,7 @@ public class MavLinkCalibration {
 		msg.param6 = 0;
 		msg.param7 = 0;
 
-		drone.getMavClient().sendMavPacket(msg);
+		drone.getMavClient().sendMavPacket(msg, listener);
 	}
 
 }

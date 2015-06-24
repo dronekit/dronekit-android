@@ -3,13 +3,14 @@ package org.droidplanner.core.MAVLink.command.doCmd;
 import com.MAVLink.ardupilotmega.msg_digicam_control;
 import com.MAVLink.common.msg_command_long;
 import com.MAVLink.enums.MAV_CMD;
+import com.o3dr.services.android.lib.model.ICommandListener;
 
 import org.droidplanner.core.helpers.coordinates.Coord3D;
 import org.droidplanner.core.mission.commands.EpmGripper;
 import org.droidplanner.core.model.Drone;
 
 public class MavLinkDoCmds {
-    public static void setROI(Drone drone, Coord3D coord) {
+    public static void setROI(Drone drone, Coord3D coord, ICommandListener listener) {
         if (drone == null)
             return;
 
@@ -22,14 +23,14 @@ public class MavLinkDoCmds {
         msg.param6 = (float) coord.getY();
         msg.param7 = (float) coord.getAltitude();
 
-        drone.getMavClient().sendMavPacket(msg);
+        drone.getMavClient().sendMavPacket(msg, listener);
     }
 
-    public static void resetROI(Drone drone) {
+    public static void resetROI(Drone drone, ICommandListener listener) {
         if (drone == null)
             return;
 
-        setROI(drone, new Coord3D(0, 0, 0));
+        setROI(drone, new Coord3D(0, 0, 0), listener);
     }
 
     public static void triggerCamera(Drone drone) {
@@ -40,10 +41,10 @@ public class MavLinkDoCmds {
         msg.target_system = drone.getSysid();
         msg.target_component = drone.getCompid();
         msg.shot = 1;
-        drone.getMavClient().sendMavPacket(msg);
+        drone.getMavClient().sendMavPacket(msg, null);
     }
 
-    public static void empCommand(Drone drone, boolean release) {
+    public static void empCommand(Drone drone, boolean release, ICommandListener listener) {
         if (drone == null)
             return;
 
@@ -53,7 +54,7 @@ public class MavLinkDoCmds {
         msg.command = EpmGripper.MAV_CMD_DO_GRIPPER;
         msg.param2 = release ? EpmGripper.GRIPPER_ACTION_RELEASE : EpmGripper.GRIPPER_ACTION_GRAB;
 
-        drone.getMavClient().sendMavPacket(msg);
+        drone.getMavClient().sendMavPacket(msg, listener);
     }
 
     /**
@@ -63,7 +64,7 @@ public class MavLinkDoCmds {
      * @param relayNumber
      * @param enabled     true for relay to be on, false for relay to be off.
      */
-    public static void setRelay(Drone drone, int relayNumber, boolean enabled) {
+    public static void setRelay(Drone drone, int relayNumber, boolean enabled, ICommandListener listener) {
         if (drone == null)
             return;
 
@@ -74,7 +75,7 @@ public class MavLinkDoCmds {
         msg.param1 = relayNumber;
         msg.param2 = enabled ? 1 : 0;
 
-        drone.getMavClient().sendMavPacket(msg);
+        drone.getMavClient().sendMavPacket(msg, listener);
     }
 
     /**
@@ -84,7 +85,7 @@ public class MavLinkDoCmds {
      * @param channel he output channel the servo is attached to
      * @param pwm     PWM value to output to the servo. Servo’s generally accept pwm values between 1000 and 2000
      */
-    public static void setServo(Drone drone, int channel, int pwm) {
+    public static void setServo(Drone drone, int channel, int pwm, ICommandListener listener) {
         if (drone == null)
             return;
 
@@ -95,7 +96,7 @@ public class MavLinkDoCmds {
         msg.param1 = channel;
         msg.param2 = pwm;
 
-        drone.getMavClient().sendMavPacket(msg);
+        drone.getMavClient().sendMavPacket(msg, listener);
     }
 
 }

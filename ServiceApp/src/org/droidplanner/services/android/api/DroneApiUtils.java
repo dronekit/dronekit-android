@@ -740,7 +740,7 @@ public class DroneApiUtils {
             Log.e(TAG, e.getMessage(), e);
         }
 
-        drone.getMavClient().sendMavPacket(message);
+        drone.getMavClient().sendMavPacket(message, null);
     }
 
     static void sendGuidedPoint(Drone drone, LatLong point, boolean force) {
