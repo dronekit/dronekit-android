@@ -1,13 +1,20 @@
 package org.droidplanner.core.drone.variables.calibration;
 
+import android.os.RemoteException;
+import android.util.Log;
+
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.common.msg_statustext;
+import com.o3dr.services.android.lib.model.ICommandListener;
+import com.o3dr.services.android.lib.model.SimpleCommandListener;
 
 import org.droidplanner.core.MAVLink.MavLinkCalibration;
 import org.droidplanner.core.drone.DroneInterfaces;
 import org.droidplanner.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.core.drone.DroneVariable;
 import org.droidplanner.core.model.Drone;
+
+import timber.log.Timber;
 
 public class AccelCalibration extends DroneVariable implements DroneInterfaces.OnDroneListener {
     private String mavMsg;
@@ -18,18 +25,59 @@ public class AccelCalibration extends DroneVariable implements DroneInterfaces.O
         drone.addDroneListener(this);
     }
 
-    public boolean startCalibration() {
-        if(calibrating)
-            return true;
+    public void startCalibration(final ICommandListener listener) {
+        if(calibrating) {
+            if(listener != null) {
+                try {
+                    listener.onSuccess();
+                } catch (RemoteException e) {
+                    Timber.e(e, e.getMessage());
+                }
+            }
+            return;
+        }
 
         if (myDrone.getState().isFlying()) {
             calibrating = false;
         } else {
-            calibrating = true;
-            mavMsg = "";
-            MavLinkCalibration.startAccelerometerCalibration(myDrone);
+            MavLinkCalibration.startAccelerometerCalibration(myDrone, new SimpleCommandListener(){
+                @Override
+                public void onSuccess(){
+                    calibrating = true;
+                    mavMsg = "";
+
+                    if(listener != null) {
+                        try {
+                            listener.onSuccess();
+                        } catch (RemoteException e) {
+                            Timber.e(e, e.getMessage());
+                        }
+                    }
+                }
+
+                @Override
+                public void onError(int executionError){
+                    if(listener != null){
+                        try {
+                            listener.onError(executionError);
+                        } catch (RemoteException e) {
+                            Timber.e(e, e.getMessage());
+                        }
+                    }
+                }
+
+                @Override
+                public void onTimeout(){
+                    if(listener != null){
+                        try {
+                            listener.onTimeout();
+                        } catch (RemoteException e) {
+                            Timber.e(e, e.getMessage());
+                        }
+                    }
+                }
+            });
         }
-        return calibrating;
     }
 
     public void sendAck(int step) {

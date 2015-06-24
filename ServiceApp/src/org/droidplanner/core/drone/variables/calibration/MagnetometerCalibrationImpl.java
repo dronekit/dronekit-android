@@ -43,11 +43,11 @@ public class MagnetometerCalibrationImpl extends DroneVariable implements DroneI
     public void startCalibration(boolean retryOnFailure, boolean saveAutomatically, int startDelay) {
         magCalibrationTracker.clear();
         cancelled.set(false);
-        MavLinkCalibration.startMagnetometerCalibration(myDrone, retryOnFailure, saveAutomatically, startDelay);
+        MavLinkCalibration.startMagnetometerCalibration(myDrone, retryOnFailure, saveAutomatically, startDelay, null);
     }
 
     public void cancelCalibration() {
-        MavLinkCalibration.cancelMagnetometerCalibration(myDrone);
+        MavLinkCalibration.cancelMagnetometerCalibration(myDrone, null);
 
         cancelled.set(true);
 
@@ -56,7 +56,7 @@ public class MagnetometerCalibrationImpl extends DroneVariable implements DroneI
     }
 
     public void acceptCalibration() {
-        MavLinkCalibration.acceptMagnetometerCalibration(myDrone);
+        MavLinkCalibration.acceptMagnetometerCalibration(myDrone, null);
     }
 
     public void processCalibrationMessage(MAVLinkMessage message) {

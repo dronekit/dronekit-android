@@ -39,14 +39,14 @@ public class ROIEstimator implements LocationReceiver {
     }
 
     public void enableFollow() {
-        MavLinkDoCmds.resetROI(drone);
+        MavLinkDoCmds.resetROI(drone, null);
         isFollowEnabled.set(true);
     }
 
     public void disableFollow() {
         if (isFollowEnabled.compareAndSet(true, false)) {
             realLocation = null;
-            MavLinkDoCmds.resetROI(drone);
+            MavLinkDoCmds.resetROI(drone, null);
             disableWatchdog();
         }
     }
@@ -84,7 +84,7 @@ public class ROIEstimator implements LocationReceiver {
                 * (System.currentTimeMillis() - timeOfLastLocation) / 1000f;
         Coord2D goCoord = GeoTools.newCoordFromBearingAndDistance(gcsCoord, bearing, distanceTraveledSinceLastPoint);
 
-        MavLinkDoCmds.setROI(drone, new Coord3D(goCoord.getLat(), goCoord.getLng(), (0.0)));
+        MavLinkDoCmds.setROI(drone, new Coord3D(goCoord.getLat(), goCoord.getLng(), (0.0)), null);
 
         if (realLocation.getSpeed() > 0)
             watchdog.postDelayed(watchdogCallback, TIMEOUT);

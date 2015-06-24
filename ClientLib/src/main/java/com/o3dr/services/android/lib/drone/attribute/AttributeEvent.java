@@ -43,9 +43,7 @@ public class AttributeEvent {
     public static final String CALIBRATION_MAG_PROGRESS = PACKAGE_NAME + ".CALIBRATION_MAG_PROGRESS";
 
     public static final String CALIBRATION_IMU = PACKAGE_NAME + ".CALIBRATION_IMU";
-    public static final String CALIBRATION_IMU_ERROR = PACKAGE_NAME + ".CALIBRATION_IMU_ERROR";
-    public static final String CALIBRATION_IMU_TIMEOUT = PACKAGE_NAME +
-            ".CALIBRATION_IMU_TIMEOUT";
+    public static final String CALIBRATION_IMU_TIMEOUT = PACKAGE_NAME + ".CALIBRATION_IMU_TIMEOUT";
 
     public static final String FOLLOW_START = PACKAGE_NAME + ".FOLLOW_START";
     public static final String FOLLOW_STOP = PACKAGE_NAME + ".FOLLOW_STOP";

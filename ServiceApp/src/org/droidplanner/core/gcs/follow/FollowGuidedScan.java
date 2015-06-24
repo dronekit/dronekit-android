@@ -10,12 +10,13 @@ import org.droidplanner.core.model.Drone;
 import java.util.HashMap;
 import java.util.Map;
 
+import timber.log.Timber;
+
 /**
  * Created by fhuya on 1/9/15.
  */
 public class FollowGuidedScan extends FollowAbove {
 
-    private static final String TAG = FollowGuidedScan.class.getSimpleName();
     private static final long TIMEOUT = 1000; //ms
 
     public static final String EXTRA_FOLLOW_ROI_TARGET = "extra_follow_roi_target";
@@ -85,10 +86,10 @@ public class FollowGuidedScan extends FollowAbove {
                 //Fallback to the default behavior
                 super.updateROI();
             } else {
-                System.out.println("ROI Target: " + roiTarget.toString());
+                Timber.d("ROI Target: " + roiTarget.toString());
 
                 //Track the target until told otherwise.
-                MavLinkDoCmds.setROI(drone, roiTarget);
+                MavLinkDoCmds.setROI(drone, roiTarget, null);
                 watchdog.postDelayed(watchdogCallback, TIMEOUT);
             }
         }

@@ -13,7 +13,6 @@ import android.util.Log;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.ardupilotmega.msg_mag_cal_progress;
 import com.MAVLink.ardupilotmega.msg_mag_cal_report;
-import com.MAVLink.enums.MAG_CAL_STATUS;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.action.ConnectionActions;
@@ -24,8 +23,6 @@ import com.o3dr.services.android.lib.drone.action.StateActions;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
-import com.o3dr.services.android.lib.drone.calibration.magnetometer.MagnetometerCalibrationProgress;
-import com.o3dr.services.android.lib.drone.calibration.magnetometer.MagnetometerCalibrationResult;
 import com.o3dr.services.android.lib.drone.camera.action.CameraActions;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionResult;
@@ -335,7 +332,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
             //EXPERIMENTAL ACTIONS
             case ExperimentalActions.ACTION_EPM_COMMAND:
                 boolean release = data.getBoolean(ExperimentalActions.EXTRA_EPM_RELEASE);
-                DroneApiUtils.epmCommand(getDrone(), release);
+                DroneApiUtils.epmCommand(getDrone(), release, listener);
                 break;
 
             case ExperimentalActions.ACTION_TRIGGER_CAMERA:
@@ -346,7 +343,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 LatLongAlt roi = data.getParcelable(ExperimentalActions.EXTRA_SET_ROI_LAT_LONG_ALT);
                 if(roi != null) {
                     Coord3D coord3DRoi = new Coord3D(roi.getLatitude(), roi.getLongitude(), roi.getAltitude());
-                    MavLinkDoCmds.setROI(getDrone(), coord3DRoi);
+                    MavLinkDoCmds.setROI(getDrone(), coord3DRoi, listener);
                 }
                 break;
 
@@ -360,20 +357,20 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 if (droneMgr != null) {
                     int relayNumber = data.getInt(ExperimentalActions.EXTRA_RELAY_NUMBER);
                     boolean isOn = data.getBoolean(ExperimentalActions.EXTRA_IS_RELAY_ON);
-                    MavLinkDoCmds.setRelay(droneMgr.getDrone(), relayNumber, isOn);
+                    MavLinkDoCmds.setRelay(droneMgr.getDrone(), relayNumber, isOn, listener);
                 }
             case ExperimentalActions.ACTION_SET_SERVO:
                 if (droneMgr != null) {
                     int channel = data.getInt(ExperimentalActions.EXTRA_SERVO_CHANNEL);
                     int pwm = data.getInt(ExperimentalActions.EXTRA_SERVO_PWM);
-                    MavLinkDoCmds.setServo(droneMgr.getDrone(), channel, pwm);
+                    MavLinkDoCmds.setServo(droneMgr.getDrone(), channel, pwm, listener);
                 }
                 break;
 
             //GUIDED ACTIONS
             case GuidedActions.ACTION_DO_GUIDED_TAKEOFF:
                 double takeoffAltitude = data.getDouble(GuidedActions.EXTRA_ALTITUDE);
-                DroneApiUtils.doGuidedTakeoff(getDrone(), takeoffAltitude);
+                DroneApiUtils.doGuidedTakeoff(getDrone(), takeoffAltitude, listener);
                 break;
 
             case GuidedActions.ACTION_SEND_GUIDED_POINT:
@@ -402,7 +399,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
             //DRONE STATE ACTIONS
             case StateActions.ACTION_ARM:
                 boolean doArm = data.getBoolean(StateActions.EXTRA_ARM);
-                DroneApiUtils.arm(getDrone(), doArm);
+                DroneApiUtils.arm(getDrone(), doArm, listener);
                 break;
 
             case StateActions.ACTION_SET_VEHICLE_MODE:
@@ -413,12 +410,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
             //CALIBRATION ACTIONS
             case CalibrationActions.ACTION_START_IMU_CALIBRATION:
-                if (!DroneApiUtils.startIMUCalibration(getDrone())) {
-                    Bundle extrasBundle = new Bundle(1);
-                    extrasBundle.putString(AttributeEventExtra.EXTRA_CALIBRATION_IMU_MESSAGE,
-                            context.getString(R.string.failed_start_calibration_message));
-                    notifyAttributeUpdate(AttributeEvent.CALIBRATION_IMU_ERROR, extrasBundle);
-                }
+                DroneApiUtils.startIMUCalibration(getDrone(), listener);
                 break;
 
             case CalibrationActions.ACTION_SEND_IMU_CALIBRATION_ACK:

@@ -1,6 +1,7 @@
 package org.droidplanner.core.drone.variables;
 
 import com.MAVLink.Messages.ApmModes;
+import com.o3dr.services.android.lib.model.ICommandListener;
 
 import org.droidplanner.core.MAVLink.MavLinkModes;
 import org.droidplanner.core.MAVLink.MavLinkTakeoff;
@@ -90,13 +91,13 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener {
         }
     }
 
-    public void doGuidedTakeoff(double alt) {
+    public void doGuidedTakeoff(double alt, ICommandListener listener) {
         if (Type.isCopter(myDrone.getType())) {
             coord = myDrone.getGps().getPosition();
             altitude = alt;
             state = GuidedStates.IDLE;
             changeToGuidedMode(myDrone);
-            MavLinkTakeoff.sendTakeoff(myDrone, alt);
+            MavLinkTakeoff.sendTakeoff(myDrone, alt, listener);
             myDrone.notifyDroneEvent(DroneEventsType.GUIDEDPOINT);
         }
     }
