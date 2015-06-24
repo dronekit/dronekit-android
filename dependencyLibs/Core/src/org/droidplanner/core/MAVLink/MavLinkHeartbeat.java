@@ -24,12 +24,6 @@ public class MavLinkHeartbeat {
 	}
 
 	/**
-	 * This is the mavlink packet obtained from the msg heartbeat, and used for
-	 * actual communication.
-	 */
-	private static final MAVLinkPacket sMsgPacket = sMsg.pack();
-
-	/**
 	 * Sends the heartbeat to the {@link org.droidplanner.core.model.Drone}
 	 * object.
 	 * 
@@ -38,7 +32,7 @@ public class MavLinkHeartbeat {
 	 */
 	public static void sendMavHeartbeat(Drone drone) {
 		if (drone != null)
-			drone.getMavClient().sendMavPacket(sMsgPacket);
+			drone.getMavClient().sendMavPacket(sMsg);
 	}
 
 }

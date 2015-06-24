@@ -1,13 +1,11 @@
 package org.droidplanner.core.MAVLink;
 
-import org.droidplanner.core.model.Drone;
-
 import com.MAVLink.common.msg_command_ack;
 import com.MAVLink.common.msg_command_long;
 import com.MAVLink.enums.MAV_CMD;
 import com.MAVLink.enums.MAV_CMD_ACK;
 
-import java.security.PublicKey;
+import org.droidplanner.core.model.Drone;
 
 public class MavLinkCalibration {
 
@@ -15,7 +13,7 @@ public class MavLinkCalibration {
 		msg_command_ack msg = new msg_command_ack();
 		msg.command = (short) count;
 		msg.result = MAV_CMD_ACK.MAV_CMD_ACK_OK;
-		drone.getMavClient().sendMavPacket(msg.pack());
+		drone.getMavClient().sendMavPacket(msg);
 	}
 
 	public static void startAccelerometerCalibration(Drone drone) {
@@ -32,7 +30,7 @@ public class MavLinkCalibration {
 		msg.param6 = 0;
 		msg.param7 = 0;
 		msg.confirmation = 0;
-		drone.getMavClient().sendMavPacket(msg.pack());
+		drone.getMavClient().sendMavPacket(msg);
 	}
 
 	/**
@@ -65,7 +63,7 @@ public class MavLinkCalibration {
 		msg.param6 = 0;
 		msg.param7 = 0;
 
-		drone.getMavClient().sendMavPacket(msg.pack());
+		drone.getMavClient().sendMavPacket(msg);
 	}
 
 	/**
@@ -86,7 +84,7 @@ public class MavLinkCalibration {
 		msg.param6 = 0;
 		msg.param7 = 0;
 
-		drone.getMavClient().sendMavPacket(msg.pack());
+		drone.getMavClient().sendMavPacket(msg);
 	}
 
 	/**
@@ -107,7 +105,7 @@ public class MavLinkCalibration {
 		msg.param6 = 0;
 		msg.param7 = 0;
 
-		drone.getMavClient().sendMavPacket(msg.pack());
+		drone.getMavClient().sendMavPacket(msg);
 	}
 
 }

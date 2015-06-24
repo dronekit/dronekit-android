@@ -1,12 +1,15 @@
 package org.droidplanner.core.MAVLink;
 
 import com.MAVLink.MAVLinkPacket;
+import com.MAVLink.Messages.MAVLinkMessage;
 
 public class MAVLinkStreams {
 
 	public interface MAVLinkOutputStream {
 
-		void sendMavPacket(MAVLinkPacket pack);
+		void sendMavPacket(MAVLinkMessage message, int sysId, int compId);
+
+		void sendMavPacket(MAVLinkMessage message);
 
 		boolean isConnected();
 

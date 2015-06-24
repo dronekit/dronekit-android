@@ -14,6 +14,6 @@ public class MavLinkTakeoff {
 
         msg.param7 = (float) alt;
 
-        drone.getMavClient().sendMavPacket(msg.pack());
+        drone.getMavClient().sendMavPacket(msg);
     }
 }

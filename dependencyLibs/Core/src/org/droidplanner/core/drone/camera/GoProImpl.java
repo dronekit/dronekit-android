@@ -1,7 +1,7 @@
 package org.droidplanner.core.drone.camera;
 
 
-import com.MAVLink.MAVLinkPacket;
+import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.ardupilotmega.msg_gopro_get_request;
 import com.MAVLink.ardupilotmega.msg_gopro_get_response;
 import com.MAVLink.ardupilotmega.msg_gopro_heartbeat;
@@ -170,7 +170,7 @@ public class GoProImpl implements DroneInterfaces.OnDroneListener {
             setResponsesFutures.put(commandId, future);
         scratchSetRequest.cmd_id = (byte) commandId;
         scratchSetRequest.value = (byte) value;
-        sendMavlinkPacket(scratchSetRequest.pack());
+        sendMavlinkPacket(scratchSetRequest);
     }
 
     private void sendGetRequest(int commandId, GetResponseHandler future) {
@@ -178,13 +178,11 @@ public class GoProImpl implements DroneInterfaces.OnDroneListener {
             getResponsesFutures.put(commandId, future);
 
         scratchGetRequest.cmd_id = (byte) commandId;
-        sendMavlinkPacket(scratchGetRequest.pack());
+        sendMavlinkPacket(scratchGetRequest);
     }
 
-    private void sendMavlinkPacket(MAVLinkPacket packet) {
-        packet.sysid = 255;
-        packet.compid = 0;
-        drone.getMavClient().sendMavPacket(packet);
+    private void sendMavlinkPacket(MAVLinkMessage message) {
+        drone.getMavClient().sendMavPacket(message, 255, 0);
     }
 
     private void resetFutures() {

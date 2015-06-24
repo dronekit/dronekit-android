@@ -3,6 +3,7 @@ package org.droidplanner.services.android.communication.service;
 import android.content.Context;
 
 import com.MAVLink.MAVLinkPacket;
+import com.MAVLink.Messages.MAVLinkMessage;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 
 import org.droidplanner.core.MAVLink.MAVLinkStreams;
@@ -22,7 +23,8 @@ import java.util.Date;
  */
 public class MAVLinkClient implements MAVLinkStreams.MAVLinkOutputStream {
 
-    private final static String TAG = MAVLinkClient.class.getSimpleName();
+    private static final int DEFAULT_SYS_ID = 255;
+    private static final int DEFAULT_COMP_ID = 190;
 
     private static final String TLOG_PREFIX = "log";
 
@@ -107,14 +109,22 @@ public class MAVLinkClient implements MAVLinkStreams.MAVLinkOutputStream {
     }
 
     @Override
-    public void sendMavPacket(MAVLinkPacket pack) {
-        if (this.connParams == null) {
+    public void sendMavPacket(MAVLinkMessage message) {
+        sendMavPacket(message, DEFAULT_SYS_ID, DEFAULT_COMP_ID);
+    }
+
+    @Override
+    public void sendMavPacket(MAVLinkMessage message, int sysId, int compId){
+        if (this.connParams == null || message == null) {
             return;
         }
 
-        pack.seq = packetSeqNumber;
+        final MAVLinkPacket packet = message.pack();
+        packet.sysid = sysId;
+        packet.compid = compId;
+        packet.seq = packetSeqNumber;
 
-        if(mavLinkApi.sendData(this.connParams, pack)) {
+        if(mavLinkApi.sendData(this.connParams, packet)) {
             packetSeqNumber = (packetSeqNumber + 1) % (MAX_PACKET_SEQUENCE + 1);
         }
     }

@@ -273,12 +273,12 @@ public class WaypointManager extends DroneVariable {
             case WRITING_WP:
                 // Log.d("TIMEOUT", "re Write Msg: " + String.valueOf(writeIndex));
                 if (writeIndex < mission.size()) {
-                    myDrone.getMavClient().sendMavPacket(mission.get(writeIndex).pack());
+                    myDrone.getMavClient().sendMavPacket(mission.get(writeIndex));
                 }
                 break;
 
             case WAITING_WRITE_ACK:
-                myDrone.getMavClient().sendMavPacket(mission.get(mission.size() - 1).pack());
+                myDrone.getMavClient().sendMavPacket(mission.get(mission.size() - 1));
                 break;
         }
 
@@ -293,7 +293,7 @@ public class WaypointManager extends DroneVariable {
         msg_mission_item item = mission.get(writeIndex);
         item.target_system = myDrone.getSysid();
         item.target_component = myDrone.getCompid();
-        myDrone.getMavClient().sendMavPacket(item.pack());
+        myDrone.getMavClient().sendMavPacket(item);
 
         if (writeIndex + 1 >= mission.size()) {
             state = WaypointStates.WAITING_WRITE_ACK;
