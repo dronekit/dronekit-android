@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import com.o3dr.android.client.Drone;
 import com.o3dr.services.android.lib.drone.property.VehicleMode;
+import com.o3dr.services.android.lib.model.SimpleCommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
 
 import static com.o3dr.services.android.lib.drone.action.StateActions.ACTION_ARM;
@@ -22,9 +23,13 @@ public class DroneStateApi {
      * @param arm true to arm, false to disarm.
      */
     public static void arm(Drone drone, boolean arm) {
+        arm(drone, arm, null);
+    }
+
+    public static void arm(Drone drone, boolean arm, SimpleCommandListener listener){
         Bundle params = new Bundle();
         params.putBoolean(EXTRA_ARM, arm);
-        drone.performAsyncAction(new Action(ACTION_ARM, params));
+        drone.performAsyncAction(new Action(ACTION_ARM, params), listener);
     }
 
     /**

@@ -46,6 +46,7 @@ import com.o3dr.services.android.lib.gcs.follow.FollowType;
 import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
 import com.o3dr.services.android.lib.model.IDroneApi;
 import com.o3dr.services.android.lib.model.IObserver;
+import com.o3dr.services.android.lib.model.SimpleCommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -347,9 +348,13 @@ public class Drone {
     }
 
     public boolean performAction(Action action) {
+        return performAction(action, null);
+    }
+
+    public boolean performAction(Action action, SimpleCommandListener listener){
         if (isStarted()) {
             try {
-                droneApi.performAction(action);
+                droneApi.executeAction(action, listener);
                 return true;
             } catch (RemoteException e) {
                 handleRemoteException(e);
@@ -360,9 +365,13 @@ public class Drone {
     }
 
     public boolean performAsyncAction(Action action) {
+        return performAsyncAction(action, null);
+    }
+
+    public boolean performAsyncAction(Action action, SimpleCommandListener listener){
         if (isStarted()) {
             try {
-                droneApi.performAsyncAction(action);
+                droneApi.executeAsyncAction(action, listener);
                 return true;
             } catch (RemoteException e) {
                 handleRemoteException(e);
