@@ -8,7 +8,7 @@ import android.content.pm.PackageManager;
  */
 public class VersionUtils {
 
-    public static final int LIB_VERSION = 20215;
+    public static final int LIB_VERSION = 20300;
 
     public static int getVersion(Context context){
         try {
@@ -17,4 +17,7 @@ public class VersionUtils {
             return -1;
         }
     }
+
+    //Prevent instantiation.
+    private VersionUtils(){}
 }
