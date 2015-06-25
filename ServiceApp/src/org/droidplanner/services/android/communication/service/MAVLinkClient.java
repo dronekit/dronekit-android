@@ -12,6 +12,7 @@ import org.droidplanner.core.MAVLink.MAVLinkStreams;
 import org.droidplanner.core.MAVLink.connection.MavLinkConnection;
 import org.droidplanner.core.MAVLink.connection.MavLinkConnectionListener;
 import org.droidplanner.core.MAVLink.connection.MavLinkConnectionTypes;
+import org.droidplanner.core.drone.CommandTracker;
 import org.droidplanner.services.android.api.MavLinkServiceApi;
 import org.droidplanner.services.android.data.SessionDB;
 import org.droidplanner.services.android.utils.file.DirectoryPath;
@@ -75,6 +76,8 @@ public class MAVLinkClient implements MAVLinkStreams.MAVLinkOutputStream {
     private int packetSeqNumber = 0;
     private final ConnectionParameter connParams;
 
+    private CommandTracker commandTracker;
+
     public MAVLinkClient(Context context, MAVLinkStreams.MavlinkInputStream listener,
                          ConnectionParameter connParams, MavLinkServiceApi serviceApi) {
         this.context = context;
@@ -82,6 +85,10 @@ public class MAVLinkClient implements MAVLinkStreams.MAVLinkOutputStream {
         this.mavLinkApi = serviceApi;
         this.connParams = connParams;
         this.sessionDB = new SessionDB(context);
+    }
+
+    public void setCommandTracker(CommandTracker commandTracker) {
+        this.commandTracker = commandTracker;
     }
 
     @Override
@@ -121,10 +128,6 @@ public class MAVLinkClient implements MAVLinkStreams.MAVLinkOutputStream {
             return;
         }
 
-        if(message instanceof msg_command_long && listener != null){
-            //TODO: complete
-        }
-
         final MAVLinkPacket packet = message.pack();
         packet.sysid = sysId;
         packet.compid = compId;
@@ -132,6 +135,10 @@ public class MAVLinkClient implements MAVLinkStreams.MAVLinkOutputStream {
 
         if(mavLinkApi.sendData(this.connParams, packet)) {
             packetSeqNumber = (packetSeqNumber + 1) % (MAX_PACKET_SEQUENCE + 1);
+
+            if(message instanceof msg_command_long && listener != null && commandTracker != null){
+                commandTracker.onCommandSubmitted((msg_command_long) message, listener);
+            }
         }
     }
 

@@ -1,7 +1,5 @@
 package com.o3dr.services.android.lib.drone.attribute.error;
 
-import com.MAVLink.enums.MAV_RESULT;
-
 /**
  * List the possible command execution errors.
  * Created by Fredia Huya-Kouadio on 6/24/15.

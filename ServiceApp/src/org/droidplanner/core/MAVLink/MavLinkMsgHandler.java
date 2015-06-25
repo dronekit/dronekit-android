@@ -32,6 +32,7 @@ import com.MAVLink.enums.MAV_SEVERITY;
 import com.MAVLink.enums.MAV_STATE;
 import com.MAVLink.enums.MAV_SYS_STATUS_SENSOR;
 
+import org.droidplanner.core.drone.CommandTracker;
 import org.droidplanner.core.drone.variables.Home;
 import org.droidplanner.core.model.Drone;
 
@@ -42,8 +43,14 @@ public class MavLinkMsgHandler {
 
     private Drone drone;
 
+    private CommandTracker commandTracker;
+
     public MavLinkMsgHandler(Drone drone) {
         this.drone = drone;
+    }
+
+    public void setCommandTracker(CommandTracker tracker){
+        this.commandTracker = tracker;
     }
 
     public void receiveData(MAVLinkMessage msg) {
@@ -194,8 +201,8 @@ public class MavLinkMsgHandler {
     }
 
     private void handleCommandAck(msg_command_ack ack){
-        if(ack != null){
-            System.out.println(ack.toString());
+        if(ack != null && this.commandTracker != null){
+            commandTracker.onCommandAcknowledged(ack);
         }
     }
 

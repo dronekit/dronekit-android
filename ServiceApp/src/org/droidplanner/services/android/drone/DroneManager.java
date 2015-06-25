@@ -58,7 +58,10 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream, DroneInt
         this.context = context;
         this.connectionParameter = connParams;
 
+        final DroneCommandTracker commandTracker = new DroneCommandTracker(handler);
+
         MAVLinkClient mavClient = new MAVLinkClient(context, this, connParams, mavlinkApi);
+        mavClient.setCommandTracker(commandTracker);
 
         DroneInterfaces.Clock clock = new DroneInterfaces.Clock() {
             @Override
@@ -90,6 +93,7 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream, DroneInt
         this.drone.getStreamRates().setRates(dpPrefs.getRates());
 
         this.mavLinkMsgHandler = new MavLinkMsgHandler(this.drone);
+        this.mavLinkMsgHandler.setCommandTracker(commandTracker);
 
         this.followMe = new Follow(this.drone, dpHandler, new FusedLocation(context, handler));
 
