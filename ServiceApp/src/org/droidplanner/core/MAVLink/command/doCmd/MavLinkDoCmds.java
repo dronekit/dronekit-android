@@ -99,4 +99,27 @@ public class MavLinkDoCmds {
         drone.getMavClient().sendMavMessage(msg, listener);
     }
 
+    /**
+     * Set the orientation of a gimbal
+     *
+     * @param drone       target vehicle
+     * @param pitch       the desired gimbal pitch in degrees
+     * @param roll       the desired gimbal roll in degrees
+     * @param yaw       the desired gimbal yaw in degrees
+     */
+    public static void setGimbalOrientation(Drone drone, double pitch, double roll, double yaw) {
+        if (drone == null)
+            return;
+
+        msg_command_long msg = new msg_command_long();
+        msg.target_system = drone.getSysid();
+        msg.target_component = drone.getCompid();
+        msg.command = MAV_CMD.MAV_CMD_DO_MOUNT_CONTROL;
+        msg.param1 = (int) (pitch * 100);
+        msg.param2 = (int) (roll * 100);
+        msg.param3 = (int) (yaw * 100);
+
+        drone.getMavClient().sendMavPacket(msg.pack());
+    }
+
 }
