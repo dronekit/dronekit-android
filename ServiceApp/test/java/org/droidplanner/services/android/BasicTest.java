@@ -119,7 +119,7 @@ public class BasicTest {
      */
     @Test
     public void testArm() {
-        MavLinkArm.sendArmMessage(drone, true);
+        MavLinkArm.sendArmMessage(drone, true, null);
         MAVLinkPacket data = mavlinkApi.getData();
         Assert.assertTrue(data != null);
 
