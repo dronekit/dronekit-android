@@ -106,8 +106,10 @@ public class MavLinkDoCmds {
      * @param pitch       the desired gimbal pitch in degrees
      * @param roll       the desired gimbal roll in degrees
      * @param yaw       the desired gimbal yaw in degrees
+     * @param listener Register a callback to receive update of the command execution state.
      */
-    public static void setGimbalOrientation(Drone drone, double pitch, double roll, double yaw) {
+    public static void setGimbalOrientation(Drone drone, double pitch, double roll, double yaw, ICommandListener
+            listener) {
         if (drone == null)
             return;
 
@@ -119,7 +121,7 @@ public class MavLinkDoCmds {
         msg.param2 = (int) (roll * 100);
         msg.param3 = (int) (yaw * 100);
 
-        drone.getMavClient().sendMavPacket(msg.pack());
+        drone.getMavClient().sendMavMessage(msg, listener);
     }
 
 }

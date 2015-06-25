@@ -13,8 +13,6 @@ import android.util.Log;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.ardupilotmega.msg_mag_cal_progress;
 import com.MAVLink.ardupilotmega.msg_mag_cal_report;
-import com.MAVLink.enums.MAG_CAL_STATUS;
-import com.o3dr.android.client.apis.drone.camera.GimbalApi;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.action.ConnectionActions;
@@ -56,7 +54,6 @@ import org.droidplanner.core.helpers.coordinates.Coord3D;
 import org.droidplanner.core.model.Drone;
 import org.droidplanner.core.parameters.Parameter;
 import org.droidplanner.core.util.Pair;
-import org.droidplanner.services.android.R;
 import org.droidplanner.services.android.drone.DroneManager;
 import org.droidplanner.services.android.exception.ConnectionException;
 import org.droidplanner.services.android.interfaces.DroneEventsListener;
@@ -491,7 +488,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 double pitch = data.getDouble(GimbalActions.GIMBAL_PITCH);
                 double roll = data.getDouble(GimbalActions.GIMBAL_ROLL);
                 double yaw = data.getDouble(GimbalActions.GIMBAL_YAW);
-                MavLinkDoCmds.setGimbalOrientation(getDrone(), pitch, roll, yaw);
+                MavLinkDoCmds.setGimbalOrientation(getDrone(), pitch, roll, yaw, listener);
                 break;
         }
     }
