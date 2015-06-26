@@ -6,9 +6,11 @@ import com.MAVLink.ardupilotmega.msg_mount_control;
 import com.MAVLink.common.msg_command_long;
 import com.MAVLink.enums.MAV_CMD;
 
+import org.droidplanner.core.drone.profiles.Parameters;
 import org.droidplanner.core.helpers.coordinates.Coord3D;
 import org.droidplanner.core.mission.commands.EpmGripper;
 import org.droidplanner.core.model.Drone;
+import org.droidplanner.core.parameters.Parameter;
 
 public class MavLinkDoCmds {
     public static void setROI(Drone drone, Coord3D coord) {
@@ -117,14 +119,21 @@ public class MavLinkDoCmds {
         if (drone == null)
             return;
 
-        msg_mount_configure msg = new msg_mount_configure();
-        msg.target_system = drone.getSysid();
-        msg.target_component = drone.getCompid();
-        msg.mount_mode = (byte) mountMode;
-        msg.stab_pitch = stabilizePitch ? (byte) 1  : 0;
-        msg.stab_roll = stabilizeRoll ? (byte) 1 : 0;
-        msg.stab_yaw = stabilizeYaw ? (byte) 1 : 0;
-        drone.getMavClient().sendMavPacket(msg.pack());
+        Parameter mountParam = drone.getParameters().getParameter("MNT_MODE");
+        if(mountParam==null){
+            msg_mount_configure msg = new msg_mount_configure();
+            msg.target_system = drone.getSysid();
+            msg.target_component = drone.getCompid();
+            msg.mount_mode = (byte) mountMode;
+            msg.stab_pitch = stabilizePitch ? (byte) 1  : 0;
+            msg.stab_roll = stabilizeRoll ? (byte) 1 : 0;
+            msg.stab_yaw = stabilizeYaw ? (byte) 1 : 0;
+            drone.getMavClient().sendMavPacket(msg.pack());
+        }else{
+            drone.getParameters().sendParameter("MNT_MODE", 1, mountMode);
+            mountParam.value = mountMode;
+        }
+
     }
 
     /**
