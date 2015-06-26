@@ -98,7 +98,14 @@ public class MavLinkMsgHandler {
 
             case msg_sys_status.MAVLINK_MSG_ID_SYS_STATUS:
                 msg_sys_status m_sys = (msg_sys_status) msg;
-                drone.getBattery().setBatteryState(m_sys.voltage_battery / 1000.0,
+
+                //Correct for any short overflow that may have occurred
+                double milliVoltage = m_sys.voltage_battery;
+                if(milliVoltage < 0){
+                    milliVoltage = Short.MAX_VALUE + (milliVoltage - Short.MIN_VALUE);
+                }
+
+                drone.getBattery().setBatteryState(milliVoltage / 1000.0,
                         m_sys.battery_remaining, m_sys.current_battery / 100.0);
                 checkControlSensorsHealth(m_sys);
                 break;
