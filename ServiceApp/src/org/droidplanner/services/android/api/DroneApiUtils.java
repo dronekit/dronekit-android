@@ -672,9 +672,13 @@ public class DroneApiUtils {
     }
 
     static void arm(Drone drone, boolean arm, ICommandListener listener) {
+        arm(drone, arm, false, listener);
+    }
+
+    static void arm(Drone drone, boolean arm, boolean emergencyDisarm, ICommandListener listener) {
         if (drone == null)
             return;
-        MavLinkArm.sendArmMessage(drone, arm, listener);
+        MavLinkArm.sendArmMessage(drone, arm, emergencyDisarm, listener);
     }
 
     static void startMagnetometerCalibration(Drone drone, boolean retryOnFailure, boolean saveAutomatically, int

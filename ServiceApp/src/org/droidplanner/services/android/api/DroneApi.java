@@ -399,7 +399,8 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
             //DRONE STATE ACTIONS
             case StateActions.ACTION_ARM:
                 boolean doArm = data.getBoolean(StateActions.EXTRA_ARM);
-                DroneApiUtils.arm(getDrone(), doArm, listener);
+                boolean emergencyDisarm = data.getBoolean(StateActions.EXTRA_EMERGENCY_DISARM);
+                DroneApiUtils.arm(getDrone(), doArm, emergencyDisarm, listener);
                 break;
 
             case StateActions.ACTION_SET_VEHICLE_MODE:
