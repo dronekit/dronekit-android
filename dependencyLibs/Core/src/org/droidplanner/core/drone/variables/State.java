@@ -15,6 +15,9 @@ import com.MAVLink.enums.EKF_STATUS_FLAGS;
 public class State extends DroneVariable {
 	private static final long ERROR_TIMEOUT = 5000l;
 
+	// TODO: Hack: have to define this here while MAVLink libraries/headers get updated
+	private final static int EKF_GPS_GLITCHING = 1 << 15;  // changed from 14 to 15 with new bit introduced
+
     private final AutopilotWarningParser warningParser;
 
 	private msg_ekf_status_report ekfStatus;
@@ -166,11 +169,12 @@ public class State extends DroneVariable {
 
 		final short flags = ekfStatus.flags;
 
-		final boolean isOk = this.armed
+		final boolean isGlitching = (flags & EKF_GPS_GLITCHING) > 0;
+		final boolean isOk = !isGlitching && (this.armed
 				? (flags & EKF_STATUS_FLAGS.EKF_POS_HORIZ_ABS) != 0
 				&& (flags & EKF_STATUS_FLAGS.EKF_CONST_POS_MODE) == 0
 				: (flags & EKF_STATUS_FLAGS.EKF_POS_HORIZ_ABS) != 0
-				|| (flags & EKF_STATUS_FLAGS.EKF_PRED_POS_HORIZ_ABS) != 0;
+				|| (flags & EKF_STATUS_FLAGS.EKF_PRED_POS_HORIZ_ABS) != 0);
 
 		if(isEkfPositionOk != isOk){
 			isEkfPositionOk = isOk;
