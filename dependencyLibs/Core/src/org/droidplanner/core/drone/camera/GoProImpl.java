@@ -140,7 +140,7 @@ public class GoProImpl implements DroneInterfaces.OnDroneListener {
         //Start recording
         sendSetRequest(GOPRO_COMMAND.GOPRO_COMMAND_SHUTTER, 1, new SetResponseHandler() {
             @Override
-            public void onResponse(byte commandId, boolean success) {
+            public void onResponse(short commandId, boolean success) {
                 if(success != isRecording) {
                     isRecording = success;
                     drone.notifyDroneEvent(DroneEventsType.GOPRO_STATUS_UPDATE);
@@ -156,7 +156,7 @@ public class GoProImpl implements DroneInterfaces.OnDroneListener {
         //Stop recording
         sendSetRequest(GOPRO_COMMAND.GOPRO_COMMAND_SHUTTER, 0, new SetResponseHandler() {
             @Override
-            public void onResponse(byte commandId, boolean success) {
+            public void onResponse(short commandId, boolean success) {
                 if(success == isRecording) {
                     isRecording = !success;
                     drone.notifyDroneEvent(DroneEventsType.GOPRO_STATUS_UPDATE);
@@ -212,10 +212,10 @@ public class GoProImpl implements DroneInterfaces.OnDroneListener {
      */
     private static abstract class GetResponseHandler {
 
-        public abstract void onResponse(byte commandId, byte value);
+        public abstract void onResponse(short commandId, short value);
     }
 
     private static abstract class SetResponseHandler {
-        public abstract void onResponse(byte commandId, boolean success);
+        public abstract void onResponse(short commandId, boolean success);
     }
 }

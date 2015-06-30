@@ -26,7 +26,6 @@ public enum MissionItemType {
     TAKEOFF("Takeoff"),
     RTL("Return to Launch"),
     LAND("Land"),
-    DO_LAND_START("Do Land Start"),
     CIRCLE("Circle"),
     ROI("Region of Interest"),
     SURVEY("Survey"),
@@ -36,7 +35,8 @@ public enum MissionItemType {
     EPM_GRIPPER("EPM"),
     SET_SERVO("Set Servo"),
     CONDITION_YAW("Set Yaw"),
-    SET_RELAY("Set Relay");
+    SET_RELAY("Set Relay"),
+    DO_LAND_START("Do Land Start");
 
     private final String name;
 
@@ -66,8 +66,6 @@ public enum MissionItemType {
                 return new ReturnToHome(referenceItem);
             case LAND:
                 return new Land(referenceItem);
-            case DO_LAND_START:
-                return new DoLandStartImpl(referenceItem);
             case CIRCLE:
                 return new Circle(referenceItem);
             case ROI:
@@ -82,6 +80,8 @@ public enum MissionItemType {
                 return new ConditionYaw(referenceItem);
             case SET_RELAY:
                 return new SetRelayImpl(referenceItem);
+            case DO_LAND_START:
+                return new DoLandStartImpl(referenceItem);
             default:
                 throw new IllegalArgumentException("Unrecognized mission item type (" + name + ")" + "");
         }
