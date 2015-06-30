@@ -164,7 +164,7 @@ public class State extends DroneVariable {
 		if(ekfStatus == null)
 			return;
 
-		final short flags = ekfStatus.flags;
+		final int flags = ekfStatus.flags;
 
 		final boolean isOk = this.armed
 				? (flags & EKF_STATUS_FLAGS.EKF_POS_HORIZ_ABS) != 0

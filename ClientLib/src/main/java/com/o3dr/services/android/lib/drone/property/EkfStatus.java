@@ -48,7 +48,7 @@ public class EkfStatus implements Parcelable {
         this.flags = new BitSet(FLAGS_BIT_COUNT);
     }
 
-    public EkfStatus(short flags, float compassVariance, float horizontalPositionVariance, float
+    public EkfStatus(int flags, float compassVariance, float horizontalPositionVariance, float
             terrainAltitudeVariance, float velocityVariance, float verticalPositionVariance) {
         this();
         this.compassVariance = compassVariance;
@@ -60,7 +60,7 @@ public class EkfStatus implements Parcelable {
         fromShortToBitSet(flags);
     }
 
-    private void fromShortToBitSet(short flags) {
+    private void fromShortToBitSet(int flags) {
         final EkfFlags[] ekfFlags = EkfFlags.values();
         final int ekfFlagsCount = ekfFlags.length;
 

@@ -13,7 +13,7 @@ public class MavLinkCalibration {
 
 	public static void sendCalibrationAckMessage(int count, Drone drone) {
 		msg_command_ack msg = new msg_command_ack();
-		msg.command = (short) count;
+		msg.command = count;
 		msg.result = MAV_CMD_ACK.MAV_CMD_ACK_OK;
 		drone.getMavClient().sendMavPacket(msg.pack());
 	}
@@ -56,7 +56,7 @@ public class MavLinkCalibration {
 		msg.target_system = drone.getSysid();
 		msg.target_component = drone.getCompid();
 
-		msg.command = (short) MAV_CMD.MAV_CMD_DO_START_MAG_CAL;
+		msg.command = MAV_CMD.MAV_CMD_DO_START_MAG_CAL;
 		msg.param1 = 0;
 		msg.param2 = retryOnFailure ? 1 : 0;
 		msg.param3 = saveAutomatically ? 1 : 0;
@@ -77,7 +77,7 @@ public class MavLinkCalibration {
 		msg.target_system = drone.getSysid();
 		msg.target_component = drone.getCompid();
 
-		msg.command = (short) MAV_CMD.MAV_CMD_DO_CANCEL_MAG_CAL;
+		msg.command = MAV_CMD.MAV_CMD_DO_CANCEL_MAG_CAL;
 		msg.param1 = 0;
 		msg.param2 = 0;
 		msg.param3 = 0;
@@ -98,7 +98,7 @@ public class MavLinkCalibration {
 		msg.target_system = drone.getSysid();
 		msg.target_component = drone.getCompid();
 
-		msg.command = (short) MAV_CMD.MAV_CMD_DO_ACCEPT_MAG_CAL;
+		msg.command = MAV_CMD.MAV_CMD_DO_ACCEPT_MAG_CAL;
 		msg.param1 = 0;
 		msg.param2 = 0;
 		msg.param3 = 0;
