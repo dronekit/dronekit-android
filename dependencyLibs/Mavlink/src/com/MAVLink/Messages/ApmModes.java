@@ -43,17 +43,17 @@ public enum ApmModes {
 
 	UNKNOWN(-1, "Unknown", MAV_TYPE.MAV_TYPE_GENERIC);
 
-	private final int number;
+	private final long number;
     private final String name;
 	private final int type;
 
-	ApmModes(int number,String name, int type){
+	ApmModes(long number,String name, int type){
 		this.number = number;
 		this.name = name;
 		this.type = type;
 	}
 
-	public int getNumber() {
+	public long getNumber() {
 		return number;
 	}
 
@@ -65,7 +65,7 @@ public enum ApmModes {
 		return type;
 	}
 
-	public static ApmModes getMode(int i, int type) {
+	public static ApmModes getMode(long i, int type) {
         if (isCopter(type)) {
             type = MAV_TYPE.MAV_TYPE_QUADROTOR;
         }
