@@ -11,13 +11,13 @@ import java.nio.ByteBuffer;
 public class MAVLinkPayload {
 
     private static final byte UNSIGNED_BYTE_MIN_VALUE = 0;
-    private static final byte UNSIGNED_BYTE_MAX_VALUE = Byte.MAX_VALUE - Byte.MIN_VALUE;
+    private static final short UNSIGNED_BYTE_MAX_VALUE = Byte.MAX_VALUE - Byte.MIN_VALUE;
 
     private static final short UNSIGNED_SHORT_MIN_VALUE = 0;
-    private static final short UNSIGNED_SHORT_MAX_VALUE = Short.MAX_VALUE - Short.MIN_VALUE;
+    private static final int UNSIGNED_SHORT_MAX_VALUE = Short.MAX_VALUE - Short.MIN_VALUE;
 
     private static final int UNSIGNED_INT_MIN_VALUE = 0;
-    private static final int UNSIGNED_INT_MAX_VALUE = Int.MAX_VALUE - Int.MIN_VALUE;
+    private static final long UNSIGNED_INT_MAX_VALUE = (long) Integer.MAX_VALUE - Integer.MIN_VALUE;
 
     private static final long UNSIGNED_LONG_MIN_VALUE = 0;
 
@@ -141,7 +141,7 @@ public class MAVLinkPayload {
             throw new IllegalArgumentException("Value is outside of the range of an unsigned byte.");
         }
 
-        putByte(data);
+        putByte((byte) data);
     }
 
     public void putShort(short data) {
@@ -154,7 +154,7 @@ public class MAVLinkPayload {
             throw new IllegalArgumentException("Value is outside of the range of an unsigned short.");
         }
 
-        putShort(data);
+        putShort((short) data);
     }
 
     public void putInt(int data) {
@@ -169,7 +169,7 @@ public class MAVLinkPayload {
             throw new IllegalArgumentException("Value is outside of the range of an unsigned int.");
         }
 
-        putInt(data);
+        putInt((int) data);
     }
 
     public void putLong(long data) {
