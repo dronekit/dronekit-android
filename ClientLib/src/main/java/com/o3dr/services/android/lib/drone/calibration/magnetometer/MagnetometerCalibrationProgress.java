@@ -8,9 +8,9 @@ import android.os.Parcelable;
  */
 public class MagnetometerCalibrationProgress implements Parcelable {
 
-    private byte compassId;
+    private int compassId;
 
-    private byte completionPercentage;
+    private int completionPercentage;
 
     /**
      * Body frame direction vector for display
@@ -21,7 +21,7 @@ public class MagnetometerCalibrationProgress implements Parcelable {
 
     public MagnetometerCalibrationProgress(){}
 
-    public MagnetometerCalibrationProgress(byte compassId, byte percentage, float directionX, float directionY, float
+    public MagnetometerCalibrationProgress(int compassId, int percentage, float directionX, float directionY, float
             directionZ){
         this.compassId = compassId;
         this.completionPercentage = percentage;
@@ -30,7 +30,7 @@ public class MagnetometerCalibrationProgress implements Parcelable {
         this.directionZ = directionZ;
     }
 
-    public byte getCompassId() {
+    public int getCompassId() {
         return compassId;
     }
 
@@ -38,7 +38,7 @@ public class MagnetometerCalibrationProgress implements Parcelable {
         this.compassId = compassId;
     }
 
-    public byte getCompletionPercentage() {
+    public int getCompletionPercentage() {
         return completionPercentage;
     }
 
@@ -77,16 +77,16 @@ public class MagnetometerCalibrationProgress implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeByte(this.compassId);
-        dest.writeByte(this.completionPercentage);
+        dest.writeInt(this.compassId);
+        dest.writeInt(this.completionPercentage);
         dest.writeFloat(this.directionX);
         dest.writeFloat(this.directionY);
         dest.writeFloat(this.directionZ);
     }
 
     private MagnetometerCalibrationProgress(Parcel in) {
-        this.compassId = in.readByte();
-        this.completionPercentage = in.readByte();
+        this.compassId = in.readInt();
+        this.completionPercentage = in.readInt();
         this.directionX = in.readFloat();
         this.directionY = in.readFloat();
         this.directionZ = in.readFloat();

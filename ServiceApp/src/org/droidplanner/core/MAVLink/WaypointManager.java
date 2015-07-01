@@ -153,13 +153,13 @@ public class WaypointManager extends DroneVariable {
      *
      * @param seq number of the updated waypoint
      */
-    private void onCurrentWaypointUpdate(short seq) {
+    private void onCurrentWaypointUpdate(int seq) {
     }
 
     /**
      * number of waypoints to be received, used when reading waypoints
      */
-    private short waypointCount;
+    private int waypointCount;
     /**
      * list of waypoints used when writing or receiving
      */

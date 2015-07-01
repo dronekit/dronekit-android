@@ -115,23 +115,6 @@ public enum MissionItemType {
         }
     },
 
-    DO_LAND_START("Do Land start") {
-        @Override
-        public boolean isTypeSupported(Type vehicleType){
-            return super.isTypeSupported(vehicleType) && vehicleType.getDroneType() == Type.TYPE_PLANE;
-        }
-
-        @Override
-        public MissionItem getNewItem() {
-            return new DoLandStart();
-        }
-
-        @Override
-        protected Creator<DoLandStart> getMissionItemCreator() {
-            return DoLandStart.CREATOR;
-        }
-    },
-
     LAND("Land") {
         @Override
         public MissionItem getNewItem() {
@@ -225,6 +208,23 @@ public enum MissionItemType {
         @Override
         protected Creator<SetRelay> getMissionItemCreator() {
             return SetRelay.CREATOR;
+        }
+    },
+
+    DO_LAND_START("Do Land start") {
+        @Override
+        public boolean isTypeSupported(Type vehicleType){
+            return super.isTypeSupported(vehicleType) && vehicleType.getDroneType() == Type.TYPE_PLANE;
+        }
+
+        @Override
+        public MissionItem getNewItem() {
+            return new DoLandStart();
+        }
+
+        @Override
+        protected Creator<DoLandStart> getMissionItemCreator() {
+            return DoLandStart.CREATOR;
         }
     };
 

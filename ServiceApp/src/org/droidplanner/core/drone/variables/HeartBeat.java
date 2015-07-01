@@ -26,7 +26,7 @@ public class HeartBeat extends DroneVariable implements OnDroneListener {
     /**
      * Stores the version of the mavlink protocol.
      */
-    private byte mMavlinkVersion = INVALID_MAVLINK_VERSION;
+    private short mMavlinkVersion = INVALID_MAVLINK_VERSION;
 
     public enum HeartbeatState {
         FIRST_HEARTBEAT, LOST_HEARTBEAT, NORMAL_HEARTBEAT, IMU_CALIBRATION
@@ -58,7 +58,7 @@ public class HeartBeat extends DroneVariable implements OnDroneListener {
     /**
      * @return the version of the mavlink protocol.
      */
-    public byte getMavlinkVersion() {
+    public short getMavlinkVersion() {
         return mMavlinkVersion;
     }
 

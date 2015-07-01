@@ -25,7 +25,7 @@ public class MagnetometerCalibrationImpl extends DroneVariable implements DroneI
         void onCalibrationCompleted(msg_mag_cal_report result);
     }
 
-    private final HashMap<Byte, Info> magCalibrationTracker = new HashMap<>();
+    private final HashMap<Short, Info> magCalibrationTracker = new HashMap<>();
 
     private OnMagnetometerCalibrationListener listener;
 
@@ -93,7 +93,7 @@ public class MagnetometerCalibrationImpl extends DroneVariable implements DroneI
         }
     }
 
-    public HashMap<Byte, Info> getMagCalibrationTracker() {
+    public HashMap<Short, Info> getMagCalibrationTracker() {
         return magCalibrationTracker;
     }
 

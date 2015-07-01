@@ -80,8 +80,8 @@ public class Radio extends DroneVariable implements DroneInterfaces.OnDroneListe
 				MIN_FADE_MARGIN, MAX_FADE_MARGIN) * 100);
 	}
 
-	public void setRadioState(short rxerrors, short fixed, byte rssi, byte remrssi, byte txbuf,
-			byte noise, byte remnoise) {
+	public void setRadioState(int rxerrors, int fixed, short rssi, short remrssi, short txbuf,
+			short noise, short remnoise) {
 		isValid = true;
 		if (this.rxerrors != rxerrors || this.fixed != fixed || this.rssi != rssi
 				|| this.remrssi != remrssi || this.txbuf != txbuf || this.noise != noise

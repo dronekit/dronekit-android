@@ -225,7 +225,7 @@ public class MavLinkMsgHandler {
     }
 
     private void checkIfFlying(msg_heartbeat msg_heart) {
-        final byte systemStatus = msg_heart.system_status;
+        final short systemStatus = msg_heart.system_status;
         final boolean wasFlying = drone.getState().isFlying();
 
         final boolean isFlying = systemStatus == MAV_STATE.MAV_STATE_ACTIVE
@@ -241,7 +241,7 @@ public class MavLinkMsgHandler {
     }
 
     private void checkFailsafe(msg_heartbeat msg_heart) {
-        boolean failsafe2 = msg_heart.system_status == (byte) MAV_STATE.MAV_STATE_CRITICAL
+        boolean failsafe2 = msg_heart.system_status == MAV_STATE.MAV_STATE_CRITICAL
                 || msg_heart.system_status == MAV_STATE.MAV_STATE_EMERGENCY;
 
         if (failsafe2) {
@@ -259,7 +259,7 @@ public class MavLinkMsgHandler {
 
     private void checkArmState(msg_heartbeat msg_heart) {
         drone.getState().setArmed(
-                (msg_heart.base_mode & (byte) MAV_MODE_FLAG.MAV_MODE_FLAG_SAFETY_ARMED) == (byte) MAV_MODE_FLAG.MAV_MODE_FLAG_SAFETY_ARMED);
+                (msg_heart.base_mode & MAV_MODE_FLAG.MAV_MODE_FLAG_SAFETY_ARMED) == MAV_MODE_FLAG.MAV_MODE_FLAG_SAFETY_ARMED);
     }
 
     private void processStatusText(msg_statustext statusText) {
