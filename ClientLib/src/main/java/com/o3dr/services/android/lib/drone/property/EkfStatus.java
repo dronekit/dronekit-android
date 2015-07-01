@@ -12,8 +12,10 @@ import java.util.BitSet;
  */
 public class EkfStatus implements Parcelable {
 
-    private static final String TAG = EkfStatus.class.getSimpleName();
     private static final int FLAGS_BIT_COUNT = 16;
+
+    // TODO: Hack: have to define this here while MAVLink libraries/headers get updated
+    public final static int EKF_GPS_GLITCHING = 1 << 15;  // changed from 14 to 15 with new bit introduced
 
     private enum EkfFlags {
         EKF_ATTITUDE(EKF_STATUS_FLAGS.EKF_ATTITUDE),
@@ -25,7 +27,8 @@ public class EkfStatus implements Parcelable {
         EKF_POS_VERT_AGL(EKF_STATUS_FLAGS.EKF_POS_VERT_AGL),
         EKF_CONST_POS_MODE(EKF_STATUS_FLAGS.EKF_CONST_POS_MODE),
         EKF_PRED_POS_HORIZ_REL(EKF_STATUS_FLAGS.EKF_PRED_POS_HORIZ_REL),
-        EKF_PRED_POS_HORIZ_ABS(EKF_STATUS_FLAGS.EKF_PRED_POS_HORIZ_ABS);
+        EKF_PRED_POS_HORIZ_ABS(EKF_STATUS_FLAGS.EKF_PRED_POS_HORIZ_ABS),
+        EKF_GPS_GLITCHING(EkfStatus.EKF_GPS_GLITCHING);
 
         final int value;
 
@@ -116,6 +119,10 @@ public class EkfStatus implements Parcelable {
      * @return
      */
     public boolean isPositionOk(boolean armed) {
+        final boolean isGlitching = this.flags.get(EkfFlags.EKF_GPS_GLITCHING.ordinal());
+        if(isGlitching)
+            return false;
+
         if (armed) {
             return this.flags.get(EkfFlags.EKF_POS_HORIZ_ABS.ordinal())
                     && !this.flags.get(EkfFlags.EKF_CONST_POS_MODE.ordinal());
