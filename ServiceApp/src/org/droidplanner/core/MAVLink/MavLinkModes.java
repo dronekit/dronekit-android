@@ -1,6 +1,6 @@
 package org.droidplanner.core.MAVLink;
 
-import com.MAVLink.Messages.ApmModes;
+import org.droidplanner.core.drone.variables.ApmModes;
 import com.MAVLink.common.msg_mission_item;
 import com.MAVLink.common.msg_set_position_target_global_int;
 import com.MAVLink.common.msg_set_mode;

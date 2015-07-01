@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.os.RemoteException;
 import android.util.Log;
 
-import com.MAVLink.Messages.ApmModes;
+import org.droidplanner.core.drone.variables.ApmModes;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.ardupilotmega.msg_ekf_status_report;
 import com.MAVLink.ardupilotmega.msg_mag_cal_progress;

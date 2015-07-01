@@ -1,4 +1,4 @@
-package com.MAVLink.Messages;
+package org.droidplanner.core.drone.variables;
 
 import java.util.ArrayList;
 import java.util.List;

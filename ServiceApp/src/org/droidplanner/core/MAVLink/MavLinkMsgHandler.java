@@ -1,6 +1,6 @@
 package org.droidplanner.core.MAVLink;
 
-import com.MAVLink.Messages.ApmModes;
+import org.droidplanner.core.drone.variables.ApmModes;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.ardupilotmega.msg_camera_feedback;
 import com.MAVLink.ardupilotmega.msg_ekf_status_report;

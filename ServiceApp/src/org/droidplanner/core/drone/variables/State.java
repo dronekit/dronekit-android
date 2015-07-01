@@ -8,7 +8,6 @@ import org.droidplanner.core.drone.DroneVariable;
 import org.droidplanner.core.model.AutopilotWarningParser;
 import org.droidplanner.core.model.Drone;
 
-import com.MAVLink.Messages.ApmModes;
 import com.MAVLink.ardupilotmega.msg_ekf_status_report;
 import com.MAVLink.enums.EKF_STATUS_FLAGS;
 

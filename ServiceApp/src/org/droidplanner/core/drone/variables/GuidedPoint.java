@@ -1,6 +1,5 @@
 package org.droidplanner.core.drone.variables;
 
-import com.MAVLink.Messages.ApmModes;
 import com.o3dr.services.android.lib.model.ICommandListener;
 
 import org.droidplanner.core.MAVLink.MavLinkModes;
