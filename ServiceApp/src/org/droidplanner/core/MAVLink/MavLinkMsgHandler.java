@@ -1,5 +1,7 @@
 package org.droidplanner.core.MAVLink;
 
+import android.text.TextUtils;
+
 import org.droidplanner.core.drone.variables.ApmModes;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.ardupilotmega.msg_camera_feedback;
@@ -264,21 +266,18 @@ public class MavLinkMsgHandler {
 
     private void processStatusText(msg_statustext statusText) {
         String message = statusText.getText();
+        if(TextUtils.isEmpty(message))
+            return;
 
-        switch (message) {
-            case "ArduCopter":
-            case "ArduPlane":
-            case "ArduRover":
-                drone.setFirmwareVersion(message);
-                break;
-
-            default:
-                //Try parsing as an error.
-                if(!drone.getState().parseAutopilotError(message)) {
-                    //Relay to the connected client.
-                    drone.logMessage(statusText.severity, message);
-                }
-                break;
+        if(message.startsWith("ArduCopter") || message.startsWith("ArduPlane") || message.startsWith("ArduRover")){
+            drone.setFirmwareVersion(message);
+        }
+        else{
+            //Try parsing as an error.
+            if(!drone.getState().parseAutopilotError(message)) {
+                //Relay to the connected client.
+                drone.logMessage(statusText.severity, message);
+            }
         }
     }
 }
