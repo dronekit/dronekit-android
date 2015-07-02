@@ -2,7 +2,7 @@
 Tower-Pebble
 ==================
 
-In this example, we will learn about the `Tower Pebble watchapp <http://apps.getPebble.com/en_US/application/54d54fede8bb36ea9d00001f>`_ and `Android companion app <https://play.google.com/store/apps/details?id=org.droidplanner.Pebble>`_.
+In this example, we will learn about the `Tower Pebble watchapp <http://apps.getPebble.com/en_US/application/54d54fede8bb36ea9d00001f>`_ and `Android companion app <https://play.google.com/store/apps/details?id=org.droidplanner.pebble>`_.
 
 Project Setup
 =============
