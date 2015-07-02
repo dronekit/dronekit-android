@@ -95,7 +95,7 @@ A screenshot of the Android app is shown below.  This app runs in the background
 .. image:: _static/images/towerpebble_setup_4.png
         :width: 250 pt
 
-The functionality (i.e. the communication with the Pebble) is handled by a Service called `PebbleCommunicatorService <https://github.com/DroidPlanner/tower-pebble/blob/master/Android/src/main/java/org/droidplanner/Pebble/PebbleCommunicatorService.java>`_.  :file:`PebbleCommunicatorService` is automatically started up when a connection is established. This works because the :file:`AndroidManifest.xml` has the following:
+The functionality (i.e. the communication with the Pebble) is handled by a Service called `PebbleCommunicatorService <https://github.com/DroidPlanner/tower-pebble/blob/master/Android/src/main/java/org/droidplanner/pebble/PebbleCommunicatorService.java>`_.  :file:`PebbleCommunicatorService` is automatically started up when a connection is established. This works because the :file:`AndroidManifest.xml` has the following:
 
 .. code-block:: xml
     
@@ -203,7 +203,7 @@ to
             break;
 
 
-Obviously we would also want to change the Pebble watchapp to say "Loiter" next to the middle button.
+Obviously we would also want to change the Pebble watchapp to say ``Loiter`` next to the middle button.
 
 
 Sending Mode and Telemetry
