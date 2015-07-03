@@ -4,7 +4,6 @@ import android.content.Context;
 
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
-import com.MAVLink.common.msg_command_long;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.model.ICommandListener;
 
@@ -136,10 +135,8 @@ public class MAVLinkClient implements MAVLinkStreams.MAVLinkOutputStream {
         if(mavLinkApi.sendData(this.connParams, packet)) {
             packetSeqNumber = (packetSeqNumber + 1) % (MAX_PACKET_SEQUENCE + 1);
 
-            if(commandTracker != null && listener != null) {
-                if (message instanceof msg_command_long) {
-                    commandTracker.onCommandSubmitted((msg_command_long) message, listener);
-                }
+            if (commandTracker != null && listener != null) {
+                commandTracker.onCommandSubmitted(message, listener);
             }
         }
     }

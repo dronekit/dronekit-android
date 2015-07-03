@@ -97,11 +97,7 @@ public class MavLinkMsgHandler {
                 checkIfFlying(msg_heart);
                 processState(msg_heart);
                 ApmModes newMode = ApmModes.getMode(msg_heart.custom_mode, drone.getType());
-                if(drone.getState().setMode(newMode)){
-                    if(this.commandTracker != null){
-                        this.commandTracker.onCommandAck(msg_set_mode.MAVLINK_MSG_ID_SET_MODE, newMode);
-                    }
-                }
+                drone.getState().setMode(newMode);
                 drone.onHeartbeat(msg_heart);
                 break;
 

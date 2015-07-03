@@ -1,7 +1,6 @@
 package org.droidplanner.core.drone.variables.calibration;
 
 import android.os.RemoteException;
-import android.util.Log;
 
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.common.msg_statustext;
@@ -14,20 +13,41 @@ import org.droidplanner.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.core.drone.DroneVariable;
 import org.droidplanner.core.model.Drone;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 import timber.log.Timber;
 
 public class AccelCalibration extends DroneVariable implements DroneInterfaces.OnDroneListener {
+
+    private final Runnable onCalibrationStart = new Runnable() {
+        @Override
+        public void run() {
+            final ICommandListener listener = listenerRef.getAndSet(null);
+            if (listener != null) {
+                try {
+                    listener.onSuccess();
+                } catch (RemoteException e) {
+                    Timber.e(e, e.getMessage());
+                }
+            }
+        }
+    };
+
     private String mavMsg;
     private boolean calibrating;
 
-    public AccelCalibration(Drone drone) {
+    private final DroneInterfaces.Handler handler;
+    private final AtomicReference<ICommandListener> listenerRef = new AtomicReference<>(null);
+
+    public AccelCalibration(Drone drone, DroneInterfaces.Handler handler) {
         super(drone);
+        this.handler = handler;
         drone.addDroneListener(this);
     }
 
-    public void startCalibration(final ICommandListener listener) {
-        if(calibrating) {
-            if(listener != null) {
+    public void startCalibration(ICommandListener listener) {
+        if (calibrating) {
+            if (listener != null) {
                 try {
                     listener.onSuccess();
                 } catch (RemoteException e) {
@@ -40,13 +60,15 @@ public class AccelCalibration extends DroneVariable implements DroneInterfaces.O
         if (myDrone.getState().isFlying()) {
             calibrating = false;
         } else {
-            MavLinkCalibration.startAccelerometerCalibration(myDrone, new SimpleCommandListener(){
-                @Override
-                public void onSuccess(){
-                    calibrating = true;
-                    mavMsg = "";
+            calibrating = true;
+            mavMsg = "";
 
-                    if(listener != null) {
+            listenerRef.set(listener);
+            MavLinkCalibration.startAccelerometerCalibration(myDrone, new SimpleCommandListener() {
+                @Override
+                public void onSuccess() {
+                    final ICommandListener listener = listenerRef.getAndSet(null);
+                    if (listener != null) {
                         try {
                             listener.onSuccess();
                         } catch (RemoteException e) {
@@ -56,8 +78,9 @@ public class AccelCalibration extends DroneVariable implements DroneInterfaces.O
                 }
 
                 @Override
-                public void onError(int executionError){
-                    if(listener != null){
+                public void onError(int executionError) {
+                    final ICommandListener listener = listenerRef.getAndSet(null);
+                    if (listener != null) {
                         try {
                             listener.onError(executionError);
                         } catch (RemoteException e) {
@@ -67,8 +90,9 @@ public class AccelCalibration extends DroneVariable implements DroneInterfaces.O
                 }
 
                 @Override
-                public void onTimeout(){
-                    if(listener != null){
+                public void onTimeout() {
+                    final ICommandListener listener = listenerRef.getAndSet(null);
+                    if (listener != null) {
                         try {
                             listener.onTimeout();
                         } catch (RemoteException e) {
@@ -81,7 +105,7 @@ public class AccelCalibration extends DroneVariable implements DroneInterfaces.O
     }
 
     public void sendAck(int step) {
-        if(calibrating)
+        if (calibrating)
             MavLinkCalibration.sendCalibrationAckMessage(myDrone, step);
     }
 
@@ -91,6 +115,8 @@ public class AccelCalibration extends DroneVariable implements DroneInterfaces.O
             final String message = statusMsg.getText();
 
             if (message != null && (message.startsWith("Place vehicle") || message.startsWith("Calibration"))) {
+                handler.post(onCalibrationStart);
+
                 mavMsg = message;
                 if (message.startsWith("Calibration"))
                     calibrating = false;

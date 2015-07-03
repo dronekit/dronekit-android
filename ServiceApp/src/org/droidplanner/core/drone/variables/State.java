@@ -121,13 +121,11 @@ public class State extends DroneVariable {
 		checkEkfPositionState(this.ekfStatus);
 	}
 
-	public boolean setMode(ApmModes mode) {
+	public void setMode(ApmModes mode) {
 		if (this.mode != mode) {
 			this.mode = mode;
 			myDrone.notifyDroneEvent(DroneEventsType.MODE);
-			return true;
 		}
-		return false;
 	}
 
 	public void changeFlightMode(ApmModes mode, final ICommandListener listener) {

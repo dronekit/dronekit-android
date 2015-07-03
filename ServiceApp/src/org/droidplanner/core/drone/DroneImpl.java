@@ -92,7 +92,7 @@ public class DroneImpl implements Drone {
         this.orientation = new Orientation(this);
         this.navigation = new Navigation(this);
         this.guidedPoint =  new GuidedPoint(this, handler);
-        this.accelCalibrationSetup = new AccelCalibration(this);
+        this.accelCalibrationSetup = new AccelCalibration(this, handler);
 		this.magCalibration = new MagnetometerCalibrationImpl(this);
         this.mag = new Magnetometer(this);
         this.footprints = new Camera(this);
