@@ -49,7 +49,7 @@ public class Follow implements OnDroneListener, LocationReceiver {
         } else {
             if (drone.isConnected()) {
                 if (droneState.isArmed()) {
-                    GuidedPoint.changeToGuidedMode(drone);
+                    GuidedPoint.changeToGuidedMode(drone, null);
                     enableFollowMe();
                 } else {
                     state = FollowStates.FOLLOW_DRONE_NOT_ARMED;

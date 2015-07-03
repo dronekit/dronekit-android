@@ -23,7 +23,8 @@ public class GuidedApi {
 
     /**
      * Perform a guided take off.
-     * @param drone target vehicle
+     *
+     * @param drone    target vehicle
      * @param altitude altitude in meters
      */
     public static void takeoff(Drone drone, double altitude) {
@@ -45,20 +46,34 @@ public class GuidedApi {
 
     /**
      * Send a guided point to the connected drone.
-     *@param drone target vehicle
+     *
+     * @param drone target vehicle
      * @param point guided point location
      * @param force true to enable guided mode is required.
      */
     public static void sendGuidedPoint(Drone drone, LatLong point, boolean force) {
+        sendGuidedPoint(drone, point, force, null);
+    }
+
+    /**
+     * Send a guided point to the connected drone.
+     *
+     * @param drone    target vehicle
+     * @param point    guided point location
+     * @param force    true to enable guided mode is required.
+     * @param listener Register a callback to receive update of the command execution state.
+     */
+    public static void sendGuidedPoint(Drone drone, LatLong point, boolean force, SimpleCommandListener listener) {
         Bundle params = new Bundle();
         params.putBoolean(EXTRA_FORCE_GUIDED_POINT, force);
         params.putParcelable(EXTRA_GUIDED_POINT, point);
-        drone.performAsyncAction(new Action(ACTION_SEND_GUIDED_POINT, params));
+        drone.performAsyncAction(new Action(ACTION_SEND_GUIDED_POINT, params), listener);
     }
 
     /**
      * Set the altitude for the guided point.
-     *@param drone target vehicle
+     *
+     * @param drone    target vehicle
      * @param altitude altitude in meters
      */
     public static void setGuidedAltitude(Drone drone, double altitude) {
@@ -68,14 +83,25 @@ public class GuidedApi {
     }
 
     /**
-     *  Pause the vehicle at its current location.
+     * Pause the vehicle at its current location.
+     *
      * @param drone target vehicle
      */
-    public static void pauseAtCurrentLocation(final Drone drone){
+    public static void pauseAtCurrentLocation(final Drone drone) {
+        pauseAtCurrentLocation(drone, null);
+    }
+
+    /**
+     * Pause the vehicle at its current location.
+     *
+     * @param drone    target vehicle
+     * @param listener Register a callback to receive update of the command execution state.
+     */
+    public static void pauseAtCurrentLocation(final Drone drone, final SimpleCommandListener listener) {
         drone.getAttributeAsync(AttributeType.GPS, new Drone.AttributeRetrievedListener<Gps>() {
             @Override
             public void onRetrievalSucceed(Gps gps) {
-                sendGuidedPoint(drone, gps.getPosition(), true);
+                sendGuidedPoint(drone, gps.getPosition(), true, listener);
             }
         });
     }

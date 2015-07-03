@@ -1,5 +1,6 @@
 package org.droidplanner.core.drone;
 
+import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.common.msg_command_ack;
 import com.MAVLink.common.msg_command_long;
 import com.o3dr.services.android.lib.model.ICommandListener;
@@ -9,7 +10,7 @@ import com.o3dr.services.android.lib.model.ICommandListener;
  */
 public interface CommandTracker {
 
-    void onCommandSubmitted(msg_command_long command, ICommandListener listener);
+    void onCommandSubmitted(MAVLinkMessage command, ICommandListener listener);
 
-    void onCommandAcknowledged(msg_command_ack ack);
+    void onCommandAck(int commandId, Object ack);
 }

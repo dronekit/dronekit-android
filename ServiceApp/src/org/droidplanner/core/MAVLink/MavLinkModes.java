@@ -6,6 +6,7 @@ import com.MAVLink.common.msg_set_position_target_global_int;
 import com.MAVLink.common.msg_set_mode;
 import com.MAVLink.enums.MAV_CMD;
 import com.MAVLink.enums.MAV_FRAME;
+import com.o3dr.services.android.lib.model.ICommandListener;
 
 import org.droidplanner.core.model.Drone;
 
@@ -74,11 +75,11 @@ public class MavLinkModes {
         drone.getMavClient().sendMavMessage(msg, null);
     }
 
-    public static void changeFlightMode(Drone drone, ApmModes mode) {
+    public static void changeFlightMode(Drone drone, ApmModes mode, ICommandListener listener) {
         msg_set_mode msg = new msg_set_mode();
         msg.target_system = drone.getSysid();
         msg.base_mode = 1; // TODO use meaningful constant
         msg.custom_mode = mode.getNumber();
-        drone.getMavClient().sendMavMessage(msg, null);
+        drone.getMavClient().sendMavMessage(msg, listener);
     }
 }

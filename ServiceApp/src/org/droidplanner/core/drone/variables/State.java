@@ -1,5 +1,8 @@
 package org.droidplanner.core.drone.variables;
 
+import android.os.RemoteException;
+import android.util.Log;
+
 import org.droidplanner.core.MAVLink.MavLinkModes;
 import org.droidplanner.core.drone.DroneInterfaces.Clock;
 import org.droidplanner.core.drone.DroneInterfaces.DroneEventsType;
@@ -10,6 +13,10 @@ import org.droidplanner.core.model.Drone;
 
 import com.MAVLink.ardupilotmega.msg_ekf_status_report;
 import com.MAVLink.enums.EKF_STATUS_FLAGS;
+import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
+import com.o3dr.services.android.lib.model.ICommandListener;
+
+import timber.log.Timber;
 
 public class State extends DroneVariable {
 	private static final long ERROR_TIMEOUT = 5000l;
@@ -29,7 +36,7 @@ public class State extends DroneVariable {
 	private long startTime = 0;
 	private final Clock clock;
 
-	private final Handler watchdog;
+	private final Handler handler;
 	private final Runnable watchdogCallback = new Runnable() {
 		@Override
 		public void run() {
@@ -40,7 +47,7 @@ public class State extends DroneVariable {
 	public State(Drone myDrone, Clock clock, Handler handler, AutopilotWarningParser warningParser) {
 		super(myDrone);
 		this.clock = clock;
-		this.watchdog = handler;
+		this.handler = handler;
         this.warningParser = warningParser;
         this.errorId = warningParser.getDefaultWarning();
 		resetFlightStartTime();
@@ -83,8 +90,8 @@ public class State extends DroneVariable {
             myDrone.notifyDroneEvent(DroneEventsType.AUTOPILOT_WARNING);
         }
 
-        watchdog.removeCallbacks(watchdogCallback);
-        this.watchdog.postDelayed(watchdogCallback, ERROR_TIMEOUT);
+        handler.removeCallbacks(watchdogCallback);
+        this.handler.postDelayed(watchdogCallback, ERROR_TIMEOUT);
         return true;
     }
 
@@ -92,8 +99,8 @@ public class State extends DroneVariable {
         if(errorId == null || errorId.length() == 0 || errorId.equals(warningParser.getDefaultWarning()))
             return;
 
-        watchdog.removeCallbacks(watchdogCallback);
-        this.watchdog.postDelayed(watchdogCallback, ERROR_TIMEOUT);
+        handler.removeCallbacks(watchdogCallback);
+        this.handler.postDelayed(watchdogCallback, ERROR_TIMEOUT);
     }
 
 	public void setArmed(boolean newState) {
@@ -105,7 +112,8 @@ public class State extends DroneVariable {
 				myDrone.getWaypointManager().getWaypoints();
 			}else{
 				if (mode == ApmModes.ROTOR_RTL || mode == ApmModes.ROTOR_LAND) {
-					changeFlightMode(ApmModes.ROTOR_LOITER);  // When disarming set the mode back to loiter so we can do a takeoff in the future.					
+					changeFlightMode(ApmModes.ROTOR_LOITER, null);  // When disarming set the mode back to loiter so we
+					// can do a takeoff in the future.
 				}
 			}
 		}
@@ -113,16 +121,48 @@ public class State extends DroneVariable {
 		checkEkfPositionState(this.ekfStatus);
 	}
 
-	public void setMode(ApmModes mode) {
+	public boolean setMode(ApmModes mode) {
 		if (this.mode != mode) {
 			this.mode = mode;
 			myDrone.notifyDroneEvent(DroneEventsType.MODE);
+			return true;
 		}
+		return false;
 	}
 
-	public void changeFlightMode(ApmModes mode) {
+	public void changeFlightMode(ApmModes mode, final ICommandListener listener) {
+		if(this.mode == mode) {
+			if(listener != null) {
+				handler.post(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							listener.onSuccess();
+						} catch (RemoteException e) {
+							Timber.e(e, e.getMessage());
+						}
+					}
+				});
+			}
+			return;
+		}
+
 		if (ApmModes.isValid(mode)) {
-			MavLinkModes.changeFlightMode(myDrone, mode);
+			MavLinkModes.changeFlightMode(myDrone, mode, listener);
+		}
+		else{
+			if(listener != null) {
+				handler.post(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							listener.onError(CommandExecutionError.COMMAND_FAILED);
+						} catch (RemoteException e) {
+							Timber.e(e, e.getMessage());
+						}
+					}
+				});
+			}
 		}
 	}
 

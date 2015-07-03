@@ -50,6 +50,10 @@ public class GPS extends DroneVariable {
 		return gpsFix;
 	}
 
+	public boolean hasGpsLock(){
+		return fixType == LOCK_3D;
+	}
+
 	public int getFixTypeNumeric() {
 		return fixType;
 	}

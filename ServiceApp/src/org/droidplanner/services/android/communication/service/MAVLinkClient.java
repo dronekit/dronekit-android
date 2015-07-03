@@ -136,8 +136,10 @@ public class MAVLinkClient implements MAVLinkStreams.MAVLinkOutputStream {
         if(mavLinkApi.sendData(this.connParams, packet)) {
             packetSeqNumber = (packetSeqNumber + 1) % (MAX_PACKET_SEQUENCE + 1);
 
-            if(message instanceof msg_command_long && listener != null && commandTracker != null){
-                commandTracker.onCommandSubmitted((msg_command_long) message, listener);
+            if(commandTracker != null && listener != null) {
+                if (message instanceof msg_command_long) {
+                    commandTracker.onCommandSubmitted((msg_command_long) message, listener);
+                }
             }
         }
     }

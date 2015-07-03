@@ -3,13 +3,16 @@ package org.droidplanner.services.android.drone;
 import android.os.Handler;
 import android.os.RemoteException;
 
+import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.common.msg_command_ack;
 import com.MAVLink.common.msg_command_long;
+import com.MAVLink.common.msg_set_mode;
+import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.model.ICommandListener;
 
 import org.droidplanner.core.drone.CommandTracker;
+import org.droidplanner.core.drone.variables.ApmModes;
 
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import timber.log.Timber;
@@ -24,41 +27,107 @@ public class DroneCommandTracker implements CommandTracker {
 
     private final Handler handler;
 
-    private final ConcurrentHashMap<CallbackKey, AckCallback> callbacksStore = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, CallbackKey> keyStore = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<CallbackKey, AckCallback> callbackStore = new ConcurrentHashMap<>();
 
     DroneCommandTracker(Handler handler){
         this.handler = handler;
     }
 
     @Override
-    public void onCommandSubmitted(msg_command_long command, ICommandListener listener) {
+    public void onCommandSubmitted(MAVLinkMessage command, ICommandListener listener) {
         if(command == null || listener == null)
             return;
 
-        final CallbackKey key = new CallbackKey(command.command);
-        final AckCallback callback = new AckCallback(listener, key, callbacksStore);
-        callbacksStore.put(key, callback);
+        if(command instanceof msg_command_long){
+            onCommandSubmittedImpl((msg_command_long) command, listener);
+        }
+        else if(command instanceof msg_set_mode){
+            onCommandSubmittedImpl((msg_set_mode) command, listener);
+        }
+    }
+
+    private void onCommandSubmittedImpl(msg_command_long command, ICommandListener listener){
+        final int commandId = command.command;
+        final CallbackKey<msg_command_ack> key = new CallbackKey<msg_command_ack>(commandId){
+
+            @Override
+            public int checkAckResult(msg_command_ack result) {
+                return result.result;
+            }
+        };
+        final AckCallback callback = new AckCallback(listener, commandId);
+
+        keyStore.put(commandId, key);
+        callbackStore.put(key, callback);
+
+        handler.postDelayed(callback, COMMAND_TIMEOUT_PERIOD);
+    }
+
+    private void onCommandSubmittedImpl(final msg_set_mode command, ICommandListener listener){
+        final int commandId = command.msgid;
+
+        final CallbackKey<ApmModes> key = new CallbackKey<ApmModes>(commandId) {
+            @Override
+            public int checkAckResult(ApmModes result) {
+                return result.getNumber() == command.custom_mode ? AckCallback.COMMAND_SUCCEED : CommandExecutionError.COMMAND_FAILED;
+            }
+        };
+        final AckCallback callback = new AckCallback(listener, commandId);
+
+        keyStore.put(commandId, key);
+        callbackStore.put(key, callback);
 
         handler.postDelayed(callback, COMMAND_TIMEOUT_PERIOD);
     }
 
     @Override
-    public void onCommandAcknowledged(msg_command_ack ack) {
-        final CallbackKey key = new CallbackKey(ack.command);
-        final AckCallback callback = callbacksStore.remove(key);
+    public void onCommandAck(int commandId, Object ack){
+        switch(commandId){
+            case msg_command_ack.MAVLINK_MSG_ID_COMMAND_ACK:
+                onCommandAckImpl((msg_command_ack) ack);
+                break;
+
+            case msg_set_mode.MAVLINK_MSG_ID_SET_MODE:
+                onCommandAckImpl((ApmModes) ack);
+                break;
+        }
+    }
+
+    private void onCommandAckImpl(msg_command_ack ack) {
+        final CallbackKey<msg_command_ack> key = keyStore.get(ack.command);
+        if(key == null)
+            return;
+
+        final AckCallback callback = callbackStore.remove(key);
         if(callback != null){
             handler.removeCallbacks(callback);
-            callback.setAckResult(ack.result);
+            callback.setAckResult(key.checkAckResult(ack));
             handler.post(callback);
         }
     }
 
-    private static class CallbackKey {
+    private void onCommandAckImpl(ApmModes mode){
+        final CallbackKey<ApmModes> key = keyStore.get(msg_set_mode.MAVLINK_MSG_ID_SET_MODE);
+        if(key == null)
+            return;
+
+        final AckCallback callback = callbackStore.remove(key);
+        if(callback != null){
+            handler.removeCallbacks(callback);
+            callback.setAckResult(key.checkAckResult(mode));
+            handler.post(callback);
+        }
+    }
+
+    private static abstract class CallbackKey<T> {
         private final int commandId;
 
         CallbackKey(int commandId){
             this.commandId = commandId;
         }
+
+        public abstract int checkAckResult(T result);
 
         @Override
         public boolean equals(Object o){
@@ -78,7 +147,7 @@ public class DroneCommandTracker implements CommandTracker {
         }
     }
 
-    private static class AckCallback implements Runnable {
+    private class AckCallback implements Runnable {
 
         private static final int COMMAND_TIMED_OUT = -1;
         private static final int COMMAND_SUCCEED = 0;
@@ -86,13 +155,11 @@ public class DroneCommandTracker implements CommandTracker {
         private int ackResult = COMMAND_TIMED_OUT;
 
         private final ICommandListener listener;
-        private final CallbackKey key;
-        private final Map<CallbackKey, AckCallback> store;
+        private final int ackId;
 
-        AckCallback(ICommandListener listener, CallbackKey key, Map<CallbackKey, AckCallback> store){
+        AckCallback(ICommandListener listener, int ackId){
             this.listener = listener;
-            this.key = key;
-            this.store = store;
+            this.ackId = ackId;
         }
 
         void setAckResult(int result){
@@ -104,7 +171,11 @@ public class DroneCommandTracker implements CommandTracker {
             if(listener == null)
                 return;
 
-            store.remove(key);
+            final CallbackKey key = keyStore.remove(ackId);
+            if(key != null)
+                callbackStore.remove(key);
+
+            Timber.d("Callback with ack result %d", ackResult);
 
             try {
                 switch (ackResult) {

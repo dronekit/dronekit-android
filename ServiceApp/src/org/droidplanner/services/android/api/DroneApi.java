@@ -377,7 +377,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 data.setClassLoader(LatLong.class.getClassLoader());
                 boolean force = data.getBoolean(GuidedActions.EXTRA_FORCE_GUIDED_POINT);
                 LatLong guidedPoint = data.getParcelable(GuidedActions.EXTRA_GUIDED_POINT);
-                DroneApiUtils.sendGuidedPoint(getDrone(), guidedPoint, force);
+                DroneApiUtils.sendGuidedPoint(getDrone(), guidedPoint, force, listener);
                 break;
 
             case GuidedActions.ACTION_SET_GUIDED_ALTITUDE:
@@ -406,7 +406,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
             case StateActions.ACTION_SET_VEHICLE_MODE:
                 data.setClassLoader(VehicleMode.class.getClassLoader());
                 VehicleMode newMode = data.getParcelable(StateActions.EXTRA_VEHICLE_MODE);
-                DroneApiUtils.changeVehicleMode(getDrone(), newMode);
+                DroneApiUtils.changeVehicleMode(getDrone(), newMode, listener);
                 break;
 
             //CALIBRATION ACTIONS

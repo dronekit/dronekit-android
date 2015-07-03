@@ -1,14 +1,22 @@
 package org.droidplanner.core.drone.variables;
 
+import android.os.RemoteException;
+import android.util.Log;
+
+import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.model.ICommandListener;
+import com.o3dr.services.android.lib.model.SimpleCommandListener;
 
 import org.droidplanner.core.MAVLink.MavLinkModes;
 import org.droidplanner.core.MAVLink.MavLinkTakeoff;
+import org.droidplanner.core.drone.DroneInterfaces;
 import org.droidplanner.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.core.drone.DroneInterfaces.OnDroneListener;
 import org.droidplanner.core.drone.DroneVariable;
 import org.droidplanner.core.helpers.coordinates.Coord2D;
 import org.droidplanner.core.model.Drone;
+
+import timber.log.Timber;
 
 public class GuidedPoint extends DroneVariable implements OnDroneListener {
 
@@ -18,12 +26,15 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener {
 
     private Runnable mPostInitializationTask;
 
+    private final DroneInterfaces.Handler handler;
+
     public enum GuidedStates {
         UNINITIALIZED, IDLE, ACTIVE
     }
 
-    public GuidedPoint(Drone myDrone) {
+    public GuidedPoint(Drone myDrone, DroneInterfaces.Handler handler) {
         super(myDrone);
+        this.handler = handler;
         myDrone.addDroneListener(this);
     }
 
@@ -68,36 +79,78 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener {
         return false;
     }
 
-    public void pauseAtCurrentLocation() {
+    public void pauseAtCurrentLocation(ICommandListener listener) {
         if (state == GuidedStates.UNINITIALIZED) {
-            changeToGuidedMode(myDrone);
+            changeToGuidedMode(myDrone, listener);
         } else {
             newGuidedCoord(myDrone.getGps().getPosition());
             state = GuidedStates.IDLE;
         }
     }
 
-    public static void changeToGuidedMode(Drone drone) {
+    public static void changeToGuidedMode(Drone drone, ICommandListener listener) {
         final State droneState = drone.getState();
         final int droneType = drone.getType();
+
         if (Type.isCopter(droneType)) {
-            droneState.changeFlightMode(ApmModes.ROTOR_GUIDED);
+            droneState.changeFlightMode(ApmModes.ROTOR_GUIDED, listener);
         } else if (Type.isPlane(droneType)) {
             //You have to send a guided point to the plane in order to trigger guided mode.
             forceSendGuidedPoint(drone, drone.getGps().getPosition(), getDroneAltConstrained(drone));
         } else if (Type.isRover(droneType)) {
-            droneState.changeFlightMode(ApmModes.ROVER_GUIDED);
+            droneState.changeFlightMode(ApmModes.ROVER_GUIDED, listener);
         }
     }
 
-    public void doGuidedTakeoff(double alt, ICommandListener listener) {
+    public void doGuidedTakeoff(final double alt, final ICommandListener listener) {
         if (Type.isCopter(myDrone.getType())) {
             coord = myDrone.getGps().getPosition();
             altitude = alt;
             state = GuidedStates.IDLE;
-            changeToGuidedMode(myDrone);
-            MavLinkTakeoff.sendTakeoff(myDrone, alt, listener);
-            myDrone.notifyDroneEvent(DroneEventsType.GUIDEDPOINT);
+
+            changeToGuidedMode(myDrone, new SimpleCommandListener() {
+                @Override
+                public void onSuccess() {
+                    MavLinkTakeoff.sendTakeoff(myDrone, alt, listener);
+                    myDrone.notifyDroneEvent(DroneEventsType.GUIDEDPOINT);
+                }
+
+                @Override
+                public void onError(int executionError){
+                    if(listener != null){
+                        try {
+                            listener.onError(executionError);
+                        } catch (RemoteException e) {
+                            Timber.e(e, e.getMessage());
+                        }
+                    }
+                }
+
+                @Override
+                public void onTimeout(){
+                    if(listener != null){
+                        try {
+                            listener.onTimeout();
+                        } catch (RemoteException e) {
+                            Timber.e(e, e.getMessage());
+                        }
+                    }
+                }
+            });
+        }
+        else{
+            if(listener !=  null){
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            listener.onError(CommandExecutionError.COMMAND_UNSUPPORTED);
+                        } catch (RemoteException e) {
+                            Timber.e(e, e.getMessage());
+                        }
+                    }
+                });
+            }
         }
     }
 
@@ -121,13 +174,15 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener {
         changeAlt(alt);
     }
 
-    public void forcedGuidedCoordinate(final Coord2D coord) throws Exception {
-        if ((myDrone.getGps().getFixTypeNumeric() != GPS.LOCK_3D)) {
-            throw new Exception("Bad GPS for guided");
+    public void forcedGuidedCoordinate(final Coord2D coord, final ICommandListener listener) {
+        if (!myDrone.getGps().hasGpsLock()) {
+            postErrorEvent(handler, listener, CommandExecutionError.COMMAND_FAILED);
+            return;
         }
 
         if (isInitialized()) {
             changeCoord(coord);
+            postSuccessEvent(handler, listener);
         } else {
             mPostInitializationTask = new Runnable() {
                 @Override
@@ -136,18 +191,20 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener {
                 }
             };
 
-            changeToGuidedMode(myDrone);
+            changeToGuidedMode(myDrone, listener);
         }
     }
 
-    public void forcedGuidedCoordinate(final Coord2D coord, final double alt) throws Exception {
-        if ((myDrone.getGps().getFixTypeNumeric() != GPS.LOCK_3D)) {
-            throw new Exception("Bad GPS for guided");
+    public void forcedGuidedCoordinate(final Coord2D coord, final double alt, final ICommandListener listener) {
+        if (!myDrone.getGps().hasGpsLock()) {
+            postErrorEvent(handler, listener, CommandExecutionError.COMMAND_FAILED);
+            return;
         }
 
         if (isInitialized()) {
             changeCoord(coord);
             changeAlt(alt);
+            postSuccessEvent(handler, listener);
         } else {
             mPostInitializationTask = new Runnable() {
                 @Override
@@ -157,7 +214,7 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener {
                 }
             };
 
-            changeToGuidedMode(myDrone);
+            changeToGuidedMode(myDrone, listener);
         }
     }
 

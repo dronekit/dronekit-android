@@ -523,7 +523,7 @@ public class DroneApiUtils {
         return new GuidedState(guidedState, new LatLongAlt(guidedCoord.getLat(), guidedCoord.getLng(), guidedAlt));
     }
 
-    static void changeVehicleMode(Drone drone, VehicleMode newMode) {
+    static void changeVehicleMode(Drone drone, VehicleMode newMode, ICommandListener listener) {
         if (drone == null)
             return;
 
@@ -543,7 +543,7 @@ public class DroneApiUtils {
                 break;
         }
 
-        drone.getState().changeFlightMode(ApmModes.getMode(newMode.getMode(), mavType));
+        drone.getState().changeFlightMode(ApmModes.getMode(newMode.getMode(), mavType), listener);
     }
 
     static FollowState getFollowState(Follow followMe) {
@@ -749,7 +749,7 @@ public class DroneApiUtils {
         drone.getMavClient().sendMavMessage(message, null);
     }
 
-    static void sendGuidedPoint(Drone drone, LatLong point, boolean force) {
+    static void sendGuidedPoint(Drone drone, LatLong point, boolean force, ICommandListener listener) {
         if (drone == null)
             return;
 
@@ -758,7 +758,7 @@ public class DroneApiUtils {
             guidedPoint.newGuidedCoord(MathUtils.latLongToCoord2D(point));
         } else if (force) {
             try {
-                guidedPoint.forcedGuidedCoordinate(MathUtils.latLongToCoord2D(point));
+                guidedPoint.forcedGuidedCoordinate(MathUtils.latLongToCoord2D(point), listener);
             } catch (Exception e) {
                 Log.e(TAG, e.getMessage(), e);
             }

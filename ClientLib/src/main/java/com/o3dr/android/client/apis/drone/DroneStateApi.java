@@ -21,6 +21,7 @@ public class DroneStateApi {
     /**
      * Arm or disarm the connected drone.
      *
+     * @param drone target vehicle
      * @param arm true to arm, false to disarm.
      */
     public static void arm(Drone drone, boolean arm) {
@@ -30,9 +31,11 @@ public class DroneStateApi {
     /**
      * Arm or disarm the connected drone.
      *
-     * @param arm true to arm, false to disarm.
+     * @param drone target vehicle
+     * @param arm             true to arm, false to disarm.
      * @param emergencyDisarm true to skip landing check and disarm immediately,
      *                        false to disarm only if it is safe to do so.
+     * @param listener Register a callback to receive update of the command execution state.
      */
     public static void arm(Drone drone, boolean arm, boolean emergencyDisarm, SimpleCommandListener listener) {
         Bundle params = new Bundle();
@@ -44,11 +47,23 @@ public class DroneStateApi {
     /**
      * Change the vehicle mode for the connected drone.
      *
+     * @param drone target vehicle
      * @param newMode new vehicle mode.
      */
     public static void setVehicleMode(Drone drone, VehicleMode newMode) {
+        setVehicleMode(drone, newMode, null);
+    }
+
+    /**
+     * Change the vehicle mode for the connected drone.
+     *
+     * @param drone target vehicle
+     * @param newMode  new vehicle mode.
+     * @param listener Register a callback to receive update of the command execution state.
+     */
+    public static void setVehicleMode(Drone drone, VehicleMode newMode, SimpleCommandListener listener) {
         Bundle params = new Bundle();
         params.putParcelable(EXTRA_VEHICLE_MODE, newMode);
-        drone.performAsyncAction(new Action(ACTION_SET_VEHICLE_MODE, params));
+        drone.performAsyncAction(new Action(ACTION_SET_VEHICLE_MODE, params), listener);
     }
 }

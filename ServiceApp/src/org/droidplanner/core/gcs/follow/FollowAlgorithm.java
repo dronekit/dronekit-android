@@ -33,7 +33,7 @@ public abstract class FollowAlgorithm {
     public void disableFollow() {
         if(isFollowEnabled.compareAndSet(true, false)) {
             if (GuidedPoint.isGuidedMode(drone)) {
-                drone.getGuidedPoint().pauseAtCurrentLocation();
+                drone.getGuidedPoint().pauseAtCurrentLocation(null);
             }
 
             roiEstimator.disableFollow();

@@ -26,6 +26,7 @@ import com.MAVLink.common.msg_radio_status;
 import com.MAVLink.common.msg_raw_imu;
 import com.MAVLink.common.msg_rc_channels_raw;
 import com.MAVLink.common.msg_servo_output_raw;
+import com.MAVLink.common.msg_set_mode;
 import com.MAVLink.common.msg_statustext;
 import com.MAVLink.common.msg_sys_status;
 import com.MAVLink.common.msg_vfr_hud;
@@ -96,7 +97,11 @@ public class MavLinkMsgHandler {
                 checkIfFlying(msg_heart);
                 processState(msg_heart);
                 ApmModes newMode = ApmModes.getMode(msg_heart.custom_mode, drone.getType());
-                drone.getState().setMode(newMode);
+                if(drone.getState().setMode(newMode)){
+                    if(this.commandTracker != null){
+                        this.commandTracker.onCommandAck(msg_set_mode.MAVLINK_MSG_ID_SET_MODE, newMode);
+                    }
+                }
                 drone.onHeartbeat(msg_heart);
                 break;
 
@@ -204,7 +209,7 @@ public class MavLinkMsgHandler {
 
     private void handleCommandAck(msg_command_ack ack){
         if(ack != null && this.commandTracker != null){
-            commandTracker.onCommandAcknowledged(ack);
+            commandTracker.onCommandAck(msg_command_ack.MAVLINK_MSG_ID_COMMAND_ACK, ack);
         }
     }
 
@@ -269,7 +274,8 @@ public class MavLinkMsgHandler {
         if(TextUtils.isEmpty(message))
             return;
 
-        if(message.startsWith("ArduCopter") || message.startsWith("ArduPlane") || message.startsWith("ArduRover")){
+        if(message.startsWith("ArduCopter") || message.startsWith("ArduPlane")
+                || message.startsWith("ArduRover") || message.startsWith("Solo")){
             drone.setFirmwareVersion(message);
         }
         else{
