@@ -6,6 +6,7 @@ import com.o3dr.android.client.Drone;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.property.Gps;
+import com.o3dr.services.android.lib.model.AbstractCommandListener;
 import com.o3dr.services.android.lib.model.SimpleCommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
 
@@ -38,10 +39,10 @@ public class GuidedApi {
      * @param altitude altitude in meters
      * @param listener Register a callback to receive update of the command execution state.
      */
-    public static void takeoff(Drone drone, double altitude, SimpleCommandListener listener) {
+    public static void takeoff(Drone drone, double altitude, AbstractCommandListener listener) {
         Bundle params = new Bundle();
         params.putDouble(EXTRA_ALTITUDE, altitude);
-        drone.performAsyncAction(new Action(ACTION_DO_GUIDED_TAKEOFF, params), listener);
+        drone.performAsyncActionOnDroneThread(new Action(ACTION_DO_GUIDED_TAKEOFF, params), listener);
     }
 
     /**
@@ -63,11 +64,11 @@ public class GuidedApi {
      * @param force    true to enable guided mode is required.
      * @param listener Register a callback to receive update of the command execution state.
      */
-    public static void sendGuidedPoint(Drone drone, LatLong point, boolean force, SimpleCommandListener listener) {
+    public static void sendGuidedPoint(Drone drone, LatLong point, boolean force, AbstractCommandListener listener) {
         Bundle params = new Bundle();
         params.putBoolean(EXTRA_FORCE_GUIDED_POINT, force);
         params.putParcelable(EXTRA_GUIDED_POINT, point);
-        drone.performAsyncAction(new Action(ACTION_SEND_GUIDED_POINT, params), listener);
+        drone.performAsyncActionOnDroneThread(new Action(ACTION_SEND_GUIDED_POINT, params), listener);
     }
 
     /**
@@ -97,7 +98,7 @@ public class GuidedApi {
      * @param drone    target vehicle
      * @param listener Register a callback to receive update of the command execution state.
      */
-    public static void pauseAtCurrentLocation(final Drone drone, final SimpleCommandListener listener) {
+    public static void pauseAtCurrentLocation(final Drone drone, final AbstractCommandListener listener) {
         drone.getAttributeAsync(AttributeType.GPS, new Drone.AttributeRetrievedListener<Gps>() {
             @Override
             public void onRetrievalSucceed(Gps gps) {

@@ -3,6 +3,7 @@ package com.o3dr.android.client.apis.gcs;
 import android.os.Bundle;
 
 import com.o3dr.android.client.Drone;
+import com.o3dr.services.android.lib.model.AbstractCommandListener;
 import com.o3dr.services.android.lib.model.SimpleCommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
 
@@ -34,8 +35,8 @@ public class CalibrationApi {
      * @param drone target vehicle
      * @param listener Register a callback to receive update of the command execution state.
      */
-    public static void startIMUCalibration(Drone drone, SimpleCommandListener listener){
-        drone.performAsyncAction(new Action(ACTION_START_IMU_CALIBRATION), listener);
+    public static void startIMUCalibration(Drone drone, AbstractCommandListener listener){
+        drone.performAsyncActionOnDroneThread(new Action(ACTION_START_IMU_CALIBRATION), listener);
     }
 
     /**

@@ -7,7 +7,6 @@ import android.os.IBinder;
 import android.os.Parcelable;
 import android.os.RemoteException;
 import android.os.SystemClock;
-import android.util.Log;
 
 import com.o3dr.android.client.apis.drone.ConnectApi;
 import com.o3dr.android.client.apis.drone.DroneStateApi;
@@ -30,7 +29,6 @@ import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
 import com.o3dr.services.android.lib.drone.property.Altitude;
 import com.o3dr.services.android.lib.drone.property.Attitude;
 import com.o3dr.services.android.lib.drone.property.Battery;
-import com.o3dr.services.android.lib.drone.property.CameraProxy;
 import com.o3dr.services.android.lib.drone.property.Gps;
 import com.o3dr.services.android.lib.drone.property.GuidedState;
 import com.o3dr.services.android.lib.drone.property.Home;
@@ -44,14 +42,17 @@ import com.o3dr.services.android.lib.drone.property.VehicleMode;
 import com.o3dr.services.android.lib.gcs.follow.FollowState;
 import com.o3dr.services.android.lib.gcs.follow.FollowType;
 import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
+import com.o3dr.services.android.lib.model.AbstractCommandListener;
 import com.o3dr.services.android.lib.model.IDroneApi;
 import com.o3dr.services.android.lib.model.IObserver;
-import com.o3dr.services.android.lib.model.SimpleCommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
 
+import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import timber.log.Timber;
 
 /**
  * Created by fhuya on 11/4/14.
@@ -59,7 +60,6 @@ import java.util.concurrent.Executors;
 public class Drone {
 
     private static final String CLAZZ_NAME = Drone.class.getName();
-    private static final String TAG = Drone.class.getSimpleName();
 
     public interface OnAttributeRetrievedCallback<T extends Parcelable> {
         void onRetrievalSucceed(T attribute);
@@ -114,6 +114,10 @@ public class Drone {
 
     private final Context context;
 
+    /**
+     * Creates a Drone instance.
+     * @param context Application context
+     */
     public Drone(Context context){
         this.context = context;
     }
@@ -154,8 +158,8 @@ public class Drone {
                 this.droneApi.asBinder().unlinkToDeath(binderDeathRecipient, 0);
                 serviceMgr.get3drServices().releaseDroneApi(this.droneApi);
             }
-        } catch (RemoteException e) {
-            Log.e(TAG, e.getMessage(), e);
+        } catch (RemoteException | NoSuchElementException e) {
+            Timber.e(e, e.getMessage());
         }
 
         if (asyncScheduler != null) {
@@ -188,7 +192,7 @@ public class Drone {
     private void handleRemoteException(RemoteException e) {
         if (droneApi != null && !droneApi.asBinder().pingBinder()) {
             final String errorMsg = e.getMessage();
-            Log.e(TAG, errorMsg, e);
+            Timber.e(e, errorMsg);
             notifyDroneServiceInterrupted(errorMsg);
         }
     }
@@ -202,6 +206,17 @@ public class Drone {
         }
 
         return 0;
+    }
+
+    /**
+     * Causes the Runnable to be added to the message queue.
+     * @param action Runnabl that will be executed.
+     */
+    public void post(Runnable action){
+        if(action == null)
+            return;
+
+        handler.post(action);
     }
 
     public void resetFlightTimer() {
@@ -347,14 +362,57 @@ public class Drone {
             this.connectionParameter = null;
     }
 
-    public boolean performAction(Action action) {
-        return performAction(action, null);
+    private static AbstractCommandListener wrapListener(final Handler handler, final AbstractCommandListener listener){
+        AbstractCommandListener wrapperListener = listener;
+        if(handler != null && listener != null){
+            wrapperListener = new AbstractCommandListener() {
+                @Override
+                public void onSuccess() {
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            listener.onSuccess();
+                        }
+                    });
+                }
+
+                @Override
+                public void onError(final int executionError) {
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            listener.onError(executionError);
+                        }
+                    });
+                }
+
+                @Override
+                public void onTimeout() {
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            listener.onTimeout();
+                        }
+                    });
+                }
+            };
+        }
+
+        return wrapperListener;
     }
 
-    public boolean performAction(Action action, SimpleCommandListener listener){
+    public boolean performAction(Action action) {
+        return performActionOnDroneThread(action, null);
+    }
+
+    public boolean performActionOnDroneThread(Action action, AbstractCommandListener listener){
+        return performActionOnHandler(action, this.handler, listener);
+    }
+
+    public boolean performActionOnHandler(Action action, final Handler handler, final AbstractCommandListener listener){
         if (isStarted()) {
             try {
-                droneApi.executeAction(action, listener);
+                droneApi.executeAction(action, wrapListener(handler, listener));
                 return true;
             } catch (RemoteException e) {
                 handleRemoteException(e);
@@ -365,13 +423,17 @@ public class Drone {
     }
 
     public boolean performAsyncAction(Action action) {
-        return performAsyncAction(action, null);
+        return performAsyncActionOnDroneThread(action, null);
     }
 
-    public boolean performAsyncAction(Action action, SimpleCommandListener listener){
+    public boolean performAsyncActionOnDroneThread(Action action, AbstractCommandListener listener){
+        return performAsyncActionOnHandler(action, this.handler, listener);
+    }
+
+    public boolean performAsyncActionOnHandler(Action action, Handler handler, AbstractCommandListener listener){
         if (isStarted()) {
             try {
-                droneApi.executeAsyncAction(action, listener);
+                droneApi.executeAsyncAction(action, wrapListener(handler, listener));
                 return true;
             } catch (RemoteException e) {
                 handleRemoteException(e);

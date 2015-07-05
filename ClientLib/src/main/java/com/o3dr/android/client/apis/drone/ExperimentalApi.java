@@ -5,6 +5,7 @@ import android.os.Bundle;
 import com.o3dr.android.client.Drone;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
+import com.o3dr.services.android.lib.model.AbstractCommandListener;
 import com.o3dr.services.android.lib.model.SimpleCommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
 
@@ -49,22 +50,22 @@ public class ExperimentalApi {
      * @param roi   Region of interest coordinate.
      * @param listener Register a callback to receive update of the command execution state.
      */
-    public static void setROI(Drone drone, LatLongAlt roi, SimpleCommandListener listener) {
+    public static void setROI(Drone drone, LatLongAlt roi, AbstractCommandListener listener) {
         Bundle params = new Bundle();
         params.putParcelable(EXTRA_SET_ROI_LAT_LONG_ALT, roi);
         Action epmAction = new Action(ACTION_SET_ROI, params);
-        drone.performAsyncAction(epmAction, listener);
+        drone.performAsyncActionOnDroneThread(epmAction, listener);
     }
 
     public static void epmCommand(Drone drone, boolean release) {
         epmCommand(drone, release, null);
     }
 
-    public static void epmCommand(Drone drone, boolean release, SimpleCommandListener listener) {
+    public static void epmCommand(Drone drone, boolean release, AbstractCommandListener listener) {
         Bundle params = new Bundle();
         params.putBoolean(EXTRA_EPM_RELEASE, release);
         Action epmAction = new Action(ACTION_EPM_COMMAND, params);
-        drone.performAsyncAction(epmAction, listener);
+        drone.performAsyncActionOnDroneThread(epmAction, listener);
     }
 
     /**
@@ -107,11 +108,11 @@ public class ExperimentalApi {
      * @param enabled     true for relay to be on, false for relay to be off.
      * @param listener    Register a callback to receive update of the command execution state.
      */
-    public static void setRelay(Drone drone, int relayNumber, boolean enabled, SimpleCommandListener listener) {
+    public static void setRelay(Drone drone, int relayNumber, boolean enabled, AbstractCommandListener listener) {
         Bundle params = new Bundle(2);
         params.putInt(EXTRA_RELAY_NUMBER, relayNumber);
         params.putBoolean(EXTRA_IS_RELAY_ON, enabled);
-        drone.performAsyncAction(new Action(ACTION_SET_RELAY, params), listener);
+        drone.performAsyncActionOnDroneThread(new Action(ACTION_SET_RELAY, params), listener);
     }
 
     /**
@@ -133,10 +134,10 @@ public class ExperimentalApi {
      * @param pwm      PWM value to output to the servo. Servo’s generally accept pwm values between 1000 and 2000
      * @param listener Register a callback to receive update of the command execution state.
      */
-    public static void setServo(Drone drone, int channel, int pwm, SimpleCommandListener listener) {
+    public static void setServo(Drone drone, int channel, int pwm, AbstractCommandListener listener) {
         Bundle params = new Bundle(2);
         params.putInt(EXTRA_SERVO_CHANNEL, channel);
         params.putInt(EXTRA_SERVO_PWM, pwm);
-        drone.performAsyncAction(new Action(ACTION_SET_SERVO, params), listener);
+        drone.performAsyncActionOnDroneThread(new Action(ACTION_SET_SERVO, params), listener);
     }
 }
