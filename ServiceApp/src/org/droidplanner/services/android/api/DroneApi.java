@@ -8,7 +8,6 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.RemoteException;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.ardupilotmega.msg_mag_cal_progress;
@@ -62,15 +61,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
+import timber.log.Timber;
 
 /**
  * Implementation for the IDroneApi interface.
  */
 public final class DroneApi extends IDroneApi.Stub implements DroneEventsListener, IBinder.DeathRecipient {
-
-    private final static String TAG = DroneApi.class.getSimpleName();
 
     private final Context context;
     private final DroneInterfaces.Handler droneHandler;
@@ -118,22 +118,26 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
             this.apiListener.asBinder().linkToDeath(this, 0);
             checkForSelfRelease();
         } catch (RemoteException e) {
-            Log.e(TAG, e.getMessage(), e);
+            Timber.e(e, e.getMessage());
             dpService.releaseDroneApi(this.ownerId);
         }
     }
 
     void destroy() {
-        Log.d(TAG, "Destroying drone api instance for " + this.ownerId);
+        Timber.d("Destroying drone api instance for %s", this.ownerId);
         this.observersList.clear();
         this.mavlinkObserversList.clear();
 
-        this.apiListener.asBinder().unlinkToDeath(this, 0);
+        try {
+            this.apiListener.asBinder().unlinkToDeath(this, 0);
+        }catch(NoSuchElementException e){
+            Timber.e(e, e.getMessage());
+        }
 
         try {
             this.service.disconnectDroneManager(this.droneMgr, this.ownerId);
         } catch (ConnectionException e) {
-            Log.e(TAG, e.getMessage(), e);
+            Timber.e(e, e.getMessage());
         }
     }
 
@@ -246,7 +250,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     private void checkForSelfRelease() {
         //Check if the apiListener is still connected instead.
         if (!apiListener.asBinder().pingBinder()) {
-            Log.w(TAG, "Client is not longer available.");
+            Timber.w("Client is not longer available.");
             this.context.startService(new Intent(this.context, DroidPlannerService.class)
                     .setAction(DroidPlannerService.ACTION_RELEASE_API_INSTANCE)
                     .putExtra(DroidPlannerService.EXTRA_API_INSTANCE_APP_ID, this.ownerId));
@@ -527,11 +531,11 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 try {
                     observer.onAttributeUpdated(attributeEvent, extrasBundle);
                 } catch (RemoteException e) {
-                    Log.e(TAG, e.getMessage(), e);
+                    Timber.e(e, e.getMessage());
                     try {
                         removeAttributesObserver(observer);
                     } catch (RemoteException e1) {
-                        Log.e(TAG, e1.getMessage(), e1);
+                        Timber.e(e, e1.getMessage());
                     }
                 }
             }
@@ -544,7 +548,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 apiListener.onConnectionFailed(result);
                 return;
             } catch (RemoteException e) {
-                Log.w(TAG, "Unable to forward connection fail to client.", e);
+                Timber.w(e, "Unable to forward connection fail to client.");
             }
             checkForSelfRelease();
         }
@@ -561,11 +565,11 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 try {
                     observer.onMavlinkMessageReceived(msgWrapper);
                 } catch (RemoteException e) {
-                    Log.e(TAG, e.getMessage(), e);
+                    Timber.e(e, e.getMessage());
                     try {
                         removeMavlinkObserver(observer);
                     } catch (RemoteException e1) {
-                        Log.e(TAG, e1.getMessage(), e1);
+                        Timber.e(e1, e1.getMessage());
                     }
                 }
             }
