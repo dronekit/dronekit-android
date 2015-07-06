@@ -7,6 +7,7 @@ import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.property.Gps;
+import com.o3dr.services.android.lib.drone.property.Parameters;
 import com.o3dr.services.android.lib.drone.property.VehicleMode;
 import com.o3dr.services.android.lib.model.AbstractCommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
@@ -22,6 +23,9 @@ import static com.o3dr.services.android.lib.drone.action.GuidedActions.ACTION_SE
 import static com.o3dr.services.android.lib.drone.action.GuidedActions.EXTRA_ALTITUDE;
 import static com.o3dr.services.android.lib.drone.action.GuidedActions.EXTRA_FORCE_GUIDED_POINT;
 import static com.o3dr.services.android.lib.drone.action.GuidedActions.EXTRA_GUIDED_POINT;
+import static com.o3dr.services.android.lib.drone.action.ParameterActions.ACTION_REFRESH_PARAMETERS;
+import static com.o3dr.services.android.lib.drone.action.ParameterActions.ACTION_WRITE_PARAMETERS;
+import static com.o3dr.services.android.lib.drone.action.ParameterActions.EXTRA_PARAMETERS;
 import static com.o3dr.services.android.lib.drone.action.StateActions.ACTION_ARM;
 import static com.o3dr.services.android.lib.drone.action.StateActions.ACTION_SET_VEHICLE_MODE;
 import static com.o3dr.services.android.lib.drone.action.StateActions.EXTRA_ARM;
@@ -204,5 +208,23 @@ public class VehicleApi implements Api {
                 sendGuidedPoint(gps.getPosition(), true, listener);
             }
         });
+    }
+
+    /**
+     * Generate action used to refresh the parameters for the connected drone.
+     */
+    public void refreshParameters(){
+        drone.performAsyncAction(new Action(ACTION_REFRESH_PARAMETERS));
+    }
+
+    /**
+     * Generate action used to write the given parameters to the connected drone.
+     * @param parameters parameters to write to the drone.
+     * @return
+     */
+    public void writeParameters(Parameters parameters){
+        Bundle params = new Bundle();
+        params.putParcelable(EXTRA_PARAMETERS, parameters);
+        drone.performAsyncAction(new Action(ACTION_WRITE_PARAMETERS, params));
     }
 }
