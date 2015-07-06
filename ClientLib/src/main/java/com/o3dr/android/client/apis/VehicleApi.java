@@ -3,7 +3,10 @@ package com.o3dr.android.client.apis;
 import android.os.Bundle;
 
 import com.o3dr.android.client.Drone;
+import com.o3dr.services.android.lib.coordinate.LatLong;
+import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
+import com.o3dr.services.android.lib.drone.property.Gps;
 import com.o3dr.services.android.lib.drone.property.VehicleMode;
 import com.o3dr.services.android.lib.model.AbstractCommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
@@ -13,6 +16,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import static com.o3dr.services.android.lib.drone.action.ConnectionActions.ACTION_CONNECT;
 import static com.o3dr.services.android.lib.drone.action.ConnectionActions.ACTION_DISCONNECT;
 import static com.o3dr.services.android.lib.drone.action.ConnectionActions.EXTRA_CONNECT_PARAMETER;
+import static com.o3dr.services.android.lib.drone.action.GuidedActions.ACTION_DO_GUIDED_TAKEOFF;
+import static com.o3dr.services.android.lib.drone.action.GuidedActions.ACTION_SEND_GUIDED_POINT;
+import static com.o3dr.services.android.lib.drone.action.GuidedActions.ACTION_SET_GUIDED_ALTITUDE;
+import static com.o3dr.services.android.lib.drone.action.GuidedActions.EXTRA_ALTITUDE;
+import static com.o3dr.services.android.lib.drone.action.GuidedActions.EXTRA_FORCE_GUIDED_POINT;
+import static com.o3dr.services.android.lib.drone.action.GuidedActions.EXTRA_GUIDED_POINT;
 import static com.o3dr.services.android.lib.drone.action.StateActions.ACTION_ARM;
 import static com.o3dr.services.android.lib.drone.action.StateActions.ACTION_SET_VEHICLE_MODE;
 import static com.o3dr.services.android.lib.drone.action.StateActions.EXTRA_ARM;
@@ -118,5 +127,82 @@ public class VehicleApi implements Api {
         Bundle params = new Bundle();
         params.putParcelable(EXTRA_VEHICLE_MODE, newMode);
         drone.performAsyncActionOnDroneThread(new Action(ACTION_SET_VEHICLE_MODE, params), listener);
+    }
+
+    /**
+     * Perform a guided take off.
+     *
+     * @param altitude altitude in meters
+     */
+    public void takeoff(double altitude) {
+        takeoff(altitude, null);
+    }
+
+    /**
+     * Perform a guided take off.
+     *
+     * @param altitude altitude in meters
+     * @param listener Register a callback to receive update of the command execution state.
+     */
+    public void takeoff(double altitude, AbstractCommandListener listener) {
+        Bundle params = new Bundle();
+        params.putDouble(EXTRA_ALTITUDE, altitude);
+        drone.performAsyncActionOnDroneThread(new Action(ACTION_DO_GUIDED_TAKEOFF, params), listener);
+    }
+
+    /**
+     * Send a guided point to the connected drone.
+     *
+     * @param point guided point location
+     * @param force true to enable guided mode is required.
+     */
+    public void sendGuidedPoint(LatLong point, boolean force) {
+        sendGuidedPoint(point, force, null);
+    }
+
+    /**
+     * Send a guided point to the connected drone.
+     *
+     * @param point    guided point location
+     * @param force    true to enable guided mode is required.
+     * @param listener Register a callback to receive update of the command execution state.
+     */
+    public void sendGuidedPoint(LatLong point, boolean force, AbstractCommandListener listener) {
+        Bundle params = new Bundle();
+        params.putBoolean(EXTRA_FORCE_GUIDED_POINT, force);
+        params.putParcelable(EXTRA_GUIDED_POINT, point);
+        drone.performAsyncActionOnDroneThread(new Action(ACTION_SEND_GUIDED_POINT, params), listener);
+    }
+
+    /**
+     * Set the altitude for the guided point.
+     *
+     * @param altitude altitude in meters
+     */
+    public void setGuidedAltitude(double altitude) {
+        Bundle params = new Bundle();
+        params.putDouble(EXTRA_ALTITUDE, altitude);
+        drone.performAsyncAction(new Action(ACTION_SET_GUIDED_ALTITUDE, params));
+    }
+
+    /**
+     * Pause the vehicle at its current location.
+     */
+    public void pauseAtCurrentLocation() {
+        pauseAtCurrentLocation(null);
+    }
+
+    /**
+     * Pause the vehicle at its current location.
+     *
+     * @param listener Register a callback to receive update of the command execution state.
+     */
+    public void pauseAtCurrentLocation(final AbstractCommandListener listener) {
+        drone.getAttributeAsync(AttributeType.GPS, new Drone.AttributeRetrievedListener<Gps>() {
+            @Override
+            public void onRetrievalSucceed(Gps gps) {
+                sendGuidedPoint(gps.getPosition(), true, listener);
+            }
+        });
     }
 }
