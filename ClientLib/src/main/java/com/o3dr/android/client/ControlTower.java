@@ -19,12 +19,12 @@ import com.o3dr.services.android.lib.util.version.VersionUtils;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import timber.log.Timber;
-
 /**
  * Created by fhuya on 11/12/14.
  */
 public class ControlTower {
+
+    private static final String TAG = ControlTower.class.getSimpleName();
 
     private final Intent serviceIntent = new Intent(IDroidPlannerServices.class.getName());
 
@@ -108,7 +108,7 @@ public class ControlTower {
                     }
                 }
             } catch (RemoteException e) {
-                Timber.e(e, e.getMessage());
+                Log.e(TAG, e.getMessage(), e);
             }
         }
 
@@ -161,7 +161,7 @@ public class ControlTower {
         try {
             context.unbindService(o3drServicesConnection);
         } catch (Exception e) {
-            Timber.e(e, "Error occurred while unbinding from 3DR Services.");
+            Log.e(TAG, "Error occurred while unbinding from 3DR Services.");
         }
     }
 

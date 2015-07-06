@@ -16,7 +16,9 @@ class ApiUtils {
         T apiInstance = apiCache.get(drone);
         if(apiInstance == null && apiBuilder != null){
             apiInstance = apiBuilder.build();
-            apiInstance = apiCache.putIfAbsent(drone, apiInstance);
+            final T previousInstance = apiCache.putIfAbsent(drone, apiInstance);
+            if(previousInstance != null)
+                apiInstance = previousInstance;
         }
 
         return apiInstance;

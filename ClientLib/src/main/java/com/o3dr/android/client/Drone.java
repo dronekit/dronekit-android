@@ -7,6 +7,7 @@ import android.os.IBinder;
 import android.os.Parcelable;
 import android.os.RemoteException;
 import android.os.SystemClock;
+import android.util.Log;
 
 import com.o3dr.android.client.apis.CalibrationApi;
 import com.o3dr.android.client.apis.ExperimentalApi;
@@ -49,14 +50,13 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import timber.log.Timber;
-
 /**
  * Created by fhuya on 11/4/14.
  */
 public class Drone {
 
     private static final String CLAZZ_NAME = Drone.class.getName();
+    private static final String TAG = Drone.class.getSimpleName();
 
     public interface OnAttributeRetrievedCallback<T extends Parcelable> {
         void onRetrievalSucceed(T attribute);
@@ -157,7 +157,7 @@ public class Drone {
                 serviceMgr.get3drServices().releaseDroneApi(this.droneApi);
             }
         } catch (RemoteException | NoSuchElementException e) {
-            Timber.e(e, e.getMessage());
+            Log.e(TAG, e.getMessage(), e);
         }
 
         if (asyncScheduler != null) {
@@ -190,7 +190,7 @@ public class Drone {
     private void handleRemoteException(RemoteException e) {
         if (droneApi != null && !droneApi.asBinder().pingBinder()) {
             final String errorMsg = e.getMessage();
-            Timber.e(e, errorMsg);
+            Log.e(TAG, errorMsg, e);
             notifyDroneServiceInterrupted(errorMsg);
         }
     }
