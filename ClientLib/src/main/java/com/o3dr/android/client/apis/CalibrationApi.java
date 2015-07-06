@@ -1,11 +1,12 @@
-package com.o3dr.android.client.apis.gcs;
+package com.o3dr.android.client.apis;
 
 import android.os.Bundle;
 
 import com.o3dr.android.client.Drone;
 import com.o3dr.services.android.lib.model.AbstractCommandListener;
-import com.o3dr.services.android.lib.model.SimpleCommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.o3dr.services.android.lib.gcs.action.CalibrationActions.ACTION_ACCEPT_MAGNETOMETER_CALIBRATION;
 import static com.o3dr.services.android.lib.gcs.action.CalibrationActions.ACTION_CANCEL_MAGNETOMETER_CALIBRATION;
@@ -18,31 +19,54 @@ import static com.o3dr.services.android.lib.gcs.action.CalibrationActions.EXTRA_
 import static com.o3dr.services.android.lib.gcs.action.CalibrationActions.EXTRA_START_DELAY;
 
 /**
+ * Provides access to the calibration specific functionality.
  * Created by Fredia Huya-Kouadio on 1/19/15.
  */
-public class CalibrationApi {
+public class CalibrationApi implements Api {
+
+    private static final ConcurrentHashMap<Drone, CalibrationApi> calibrationApiCache = new ConcurrentHashMap<>();
 
     /**
-     * Start the imu calibration.
-     * @param drone target vehicle
+     * Retrieves a CalibrationApi instance.
+     *
+     * @param drone target vehicle.
+     * @return a CalibrationApi instance.
      */
-    public static void startIMUCalibration(Drone drone) {
-        startIMUCalibration(drone, null);
+    public static CalibrationApi getApi(final Drone drone) {
+        return ApiUtils.getApi(drone, calibrationApiCache, new Api.Builder<CalibrationApi>() {
+            @Override
+            public CalibrationApi build() {
+                return new CalibrationApi(drone);
+            }
+        });
+    }
+
+    private final Drone drone;
+
+    private CalibrationApi(Drone drone) {
+        this.drone = drone;
     }
 
     /**
      * Start the imu calibration.
-     * @param drone target vehicle
+     */
+    public void startIMUCalibration() {
+        startIMUCalibration(null);
+    }
+
+    /**
+     * Start the imu calibration.
+     *
      * @param listener Register a callback to receive update of the command execution state.
      */
-    public static void startIMUCalibration(Drone drone, AbstractCommandListener listener){
+    public void startIMUCalibration(AbstractCommandListener listener) {
         drone.performAsyncActionOnDroneThread(new Action(ACTION_START_IMU_CALIBRATION), listener);
     }
 
     /**
      * Generate an action to send an imu calibration acknowledgement.
      */
-    public static void sendIMUAck(Drone drone, int step) {
+    public void sendIMUAck(int step) {
         Bundle params = new Bundle();
         params.putInt(EXTRA_IMU_STEP, step);
         drone.performAsyncAction(new Action(ACTION_SEND_IMU_CALIBRATION_ACK, params));
@@ -51,19 +75,18 @@ public class CalibrationApi {
     /**
      * Start the magnetometer calibration process.
      */
-    public static void startMagnetometerCalibration(Drone drone) {
-        startMagnetometerCalibration(drone, false, true, 0);
+    public void startMagnetometerCalibration() {
+        startMagnetometerCalibration(false, true, 0);
     }
 
     /**
      * Start the magnetometer calibration process
-     * @param drone vehicle to calibrate
-     * @param retryOnFailure if true, automatically retry the magnetometer calibration if it fails
+     *
+     * @param retryOnFailure    if true, automatically retry the magnetometer calibration if it fails
      * @param saveAutomatically if true, save the calibration automatically without user input.
-     * @param startDelay positive delay in seconds before starting the calibration
+     * @param startDelay        positive delay in seconds before starting the calibration
      */
-    public static void startMagnetometerCalibration(Drone drone, boolean retryOnFailure, boolean saveAutomatically,
-                                                    int startDelay){
+    public void startMagnetometerCalibration(boolean retryOnFailure, boolean saveAutomatically, int startDelay) {
         Bundle params = new Bundle();
         params.putBoolean(EXTRA_RETRY_ON_FAILURE, retryOnFailure);
         params.putBoolean(EXTRA_SAVE_AUTOMATICALLY, saveAutomatically);
@@ -72,15 +95,17 @@ public class CalibrationApi {
         drone.performAsyncAction(new Action(ACTION_START_MAGNETOMETER_CALIBRATION, params));
     }
 
-    public static void acceptMagnetometerCalibration(Drone drone) {
+    /**
+     * Confirm the result of the magnetometer calibration.
+     */
+    public void acceptMagnetometerCalibration() {
         drone.performAsyncAction(new Action(ACTION_ACCEPT_MAGNETOMETER_CALIBRATION));
     }
 
     /**
      * Cancel the magnetometer calibration is one if running.
-     * @param drone vehicle to calibrate
      */
-    public static void cancelMagnetometerCalibration(Drone drone) {
+    public void cancelMagnetometerCalibration() {
         drone.performAsyncAction(new Action(ACTION_CANCEL_MAGNETOMETER_CALIBRATION));
     }
 }

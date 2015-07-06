@@ -1,4 +1,4 @@
-package com.o3dr.android.client.apis.mission;
+package com.o3dr.android.client.apis;
 
 import android.os.Bundle;
 
@@ -8,6 +8,8 @@ import com.o3dr.services.android.lib.drone.mission.MissionItemType;
 import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
 import com.o3dr.services.android.lib.model.action.Action;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 import static com.o3dr.services.android.lib.drone.mission.action.MissionActions.ACTION_BUILD_COMPLEX_MISSION_ITEM;
 import static com.o3dr.services.android.lib.drone.mission.action.MissionActions.ACTION_GENERATE_DRONIE;
 import static com.o3dr.services.android.lib.drone.mission.action.MissionActions.ACTION_LOAD_WAYPOINTS;
@@ -16,14 +18,37 @@ import static com.o3dr.services.android.lib.drone.mission.action.MissionActions.
 import static com.o3dr.services.android.lib.drone.mission.action.MissionActions.EXTRA_PUSH_TO_DRONE;
 
 /**
+ * Provides access to missions specific functionality.
  * Created by Fredia Huya-Kouadio on 1/19/15.
  */
-public class MissionApi {
+public class MissionApi implements Api {
+
+    private static final ConcurrentHashMap<Drone, MissionApi> missionApiCache = new ConcurrentHashMap<>();
+
+    /**
+     * Retrieves a MissionApi instance.
+     * @param drone Target vehicle
+     * @return a MissionApi instance.
+     */
+    public static MissionApi getApi(final Drone drone){
+        return ApiUtils.getApi(drone, missionApiCache, new Builder<MissionApi>() {
+            @Override
+            public MissionApi build() {
+                return new MissionApi(drone);
+            }
+        });
+    }
+
+    private final Drone drone;
+
+    private MissionApi(Drone drone){
+        this.drone = drone;
+    }
 
     /**
      * Generate action to create a dronie mission, and upload it to the connected drone.
      */
-    public static void generateDronie(Drone drone) {
+    public void generateDronie() {
         drone.performAsyncAction(new Action(ACTION_GENERATE_DRONIE));
     }
 
@@ -33,14 +58,17 @@ public class MissionApi {
      * @param mission     mission to upload to the drone.
      * @param pushToDrone if true, upload the mission to the connected device.
      */
-    public static void setMission(Drone drone, Mission mission, boolean pushToDrone) {
+    public void setMission(Mission mission, boolean pushToDrone) {
         Bundle params = new Bundle();
         params.putParcelable(EXTRA_MISSION, mission);
         params.putBoolean(EXTRA_PUSH_TO_DRONE, pushToDrone);
         drone.performAsyncAction(new Action(ACTION_SET_MISSION, params));
     }
 
-    public static void loadWaypoints(Drone drone) {
+    /**
+     * Load waypoints from the target vehicle.
+     */
+    public void loadWaypoints() {
         drone.performAsyncAction(new Action(ACTION_LOAD_WAYPOINTS));
     }
 
@@ -48,7 +76,7 @@ public class MissionApi {
      * Build and return complex mission item.
      * @param itemBundle bundle containing the complex mission item to update.
      */
-    private static Action buildComplexMissionItem(Drone drone, Bundle itemBundle) {
+    private Action buildComplexMissionItem(Bundle itemBundle) {
         Action payload = new Action(ACTION_BUILD_COMPLEX_MISSION_ITEM, itemBundle);
         boolean result = drone.performAction(payload);
         if(result)
@@ -57,14 +85,18 @@ public class MissionApi {
             return null;
     }
 
-    public static <T extends MissionItem> T buildMissionItem(Drone drone,
-                                                                      MissionItem.ComplexItem<T> complexItem){
+    /**
+     * Builds and validates a complex mission item against the target vehicle.
+     * @param complexItem Mission item to build.
+     * @return an updated mission item.
+     */
+    public <T extends MissionItem> T buildMissionItem(MissionItem.ComplexItem<T> complexItem){
         T missionItem = (T) complexItem;
         Bundle payload = missionItem.getType().storeMissionItem(missionItem);
         if (payload == null)
             return null;
 
-        Action result = buildComplexMissionItem(drone, payload);
+        Action result = buildComplexMissionItem(payload);
         if(result != null){
             T updatedItem = MissionItemType.restoreMissionItemFromBundle(result.getData());
             complexItem.copy(updatedItem);

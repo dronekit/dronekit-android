@@ -8,14 +8,11 @@ import android.os.Parcelable;
 import android.os.RemoteException;
 import android.os.SystemClock;
 
-import com.o3dr.android.client.apis.drone.ConnectApi;
-import com.o3dr.android.client.apis.drone.DroneStateApi;
-import com.o3dr.android.client.apis.drone.ExperimentalApi;
-import com.o3dr.android.client.apis.drone.GuidedApi;
-import com.o3dr.android.client.apis.drone.ParameterApi;
-import com.o3dr.android.client.apis.gcs.CalibrationApi;
-import com.o3dr.android.client.apis.gcs.FollowApi;
-import com.o3dr.android.client.apis.mission.MissionApi;
+import com.o3dr.android.client.apis.CalibrationApi;
+import com.o3dr.android.client.apis.ExperimentalApi;
+import com.o3dr.android.client.apis.FollowApi;
+import com.o3dr.android.client.apis.MissionApi;
+import com.o3dr.android.client.apis.VehicleApi;
 import com.o3dr.android.client.interfaces.DroneListener;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
@@ -116,13 +113,14 @@ public class Drone {
 
     /**
      * Creates a Drone instance.
+     *
      * @param context Application context
      */
-    public Drone(Context context){
+    public Drone(Context context) {
         this.context = context;
     }
 
-    void init(ControlTower controlTower, Handler handler){
+    void init(ControlTower controlTower, Handler handler) {
         this.handler = handler;
         this.serviceMgr = controlTower;
         this.apiListener = new DroneApiListener(this);
@@ -210,10 +208,11 @@ public class Drone {
 
     /**
      * Causes the Runnable to be added to the message queue.
+     *
      * @param action Runnabl that will be executed.
      */
-    public void post(Runnable action){
-        if(action == null)
+    public void post(Runnable action) {
+        if (action == null)
             return;
 
         handler.post(action);
@@ -297,7 +296,7 @@ public class Drone {
     }
 
     private <T extends Parcelable> T getAttributeDefaultValue(String attributeType) {
-        if(attributeType == null)
+        if (attributeType == null)
             return null;
 
         switch (attributeType) {
@@ -353,18 +352,18 @@ public class Drone {
     }
 
     public void connect(final ConnectionParameter connParams) {
-        if (ConnectApi.connect(this, connParams))
-            this.connectionParameter = connParams;
+        VehicleApi.getApi(this).connect(connParams);
+        this.connectionParameter = connParams;
     }
 
     public void disconnect() {
-        if (ConnectApi.disconnect(this))
-            this.connectionParameter = null;
+        VehicleApi.getApi(this).disconnect();
+        this.connectionParameter = null;
     }
 
-    private static AbstractCommandListener wrapListener(final Handler handler, final AbstractCommandListener listener){
+    private static AbstractCommandListener wrapListener(final Handler handler, final AbstractCommandListener listener) {
         AbstractCommandListener wrapperListener = listener;
-        if(handler != null && listener != null){
+        if (handler != null && listener != null) {
             wrapperListener = new AbstractCommandListener() {
                 @Override
                 public void onSuccess() {
@@ -405,11 +404,11 @@ public class Drone {
         return performActionOnDroneThread(action, null);
     }
 
-    public boolean performActionOnDroneThread(Action action, AbstractCommandListener listener){
+    public boolean performActionOnDroneThread(Action action, AbstractCommandListener listener) {
         return performActionOnHandler(action, this.handler, listener);
     }
 
-    public boolean performActionOnHandler(Action action, final Handler handler, final AbstractCommandListener listener){
+    public boolean performActionOnHandler(Action action, final Handler handler, final AbstractCommandListener listener) {
         if (isStarted()) {
             try {
                 droneApi.executeAction(action, wrapListener(handler, listener));
@@ -426,11 +425,11 @@ public class Drone {
         return performAsyncActionOnDroneThread(action, null);
     }
 
-    public boolean performAsyncActionOnDroneThread(Action action, AbstractCommandListener listener){
+    public boolean performAsyncActionOnDroneThread(Action action, AbstractCommandListener listener) {
         return performAsyncActionOnHandler(action, this.handler, listener);
     }
 
-    public boolean performAsyncActionOnHandler(Action action, Handler handler, AbstractCommandListener listener){
+    public boolean performAsyncActionOnHandler(Action action, Handler handler, AbstractCommandListener listener) {
         if (isStarted()) {
             try {
                 droneApi.executeAsyncAction(action, wrapListener(handler, listener));
@@ -468,7 +467,7 @@ public class Drone {
             @Override
             public void run() {
                 for (MissionItem.ComplexItem<T> missionItem : missionItems)
-                    MissionApi.buildMissionItem(Drone.this, missionItem);
+                    MissionApi.getApi(Drone.this).buildMissionItem(missionItem);
 
                 handler.post(new Runnable() {
                     @Override
@@ -536,129 +535,122 @@ public class Drone {
     }
 
     /**
-     * @deprecated Use {@link DroneStateApi#setVehicleMode(Drone, VehicleMode)} instead.
+     * @deprecated Use {@link VehicleApi#setVehicleMode(VehicleMode)} instead.
      */
     public void changeVehicleMode(VehicleMode newMode) {
-        DroneStateApi.setVehicleMode(this, newMode);
+        VehicleApi.getApi(this).setVehicleMode(newMode);
     }
 
     /**
-     * @deprecated Use {@link ParameterApi#refreshParameters(Drone)} instead.
+     * @deprecated Use {@link VehicleApi#refreshParameters()} instead.
      */
     public void refreshParameters() {
-        ParameterApi.refreshParameters(this);
+        VehicleApi.getApi(this).refreshParameters();
     }
 
     /**
-     * @deprecated Use {@link ParameterApi#writeParameters(Drone, Parameters)} instead.
+     * @deprecated Use {@link VehicleApi#writeParameters(Parameters)} instead.
      */
     public void writeParameters(Parameters parameters) {
-        ParameterApi.writeParameters(this, parameters);
+        VehicleApi.getApi(this).writeParameters(parameters);
     }
 
     /**
-     * @deprecated Use {@link MissionApi#setMission(Drone, Mission, boolean)} instead.
+     * @deprecated Use {@link MissionApi#setMission(Mission, boolean)} instead.
      */
     public void setMission(Mission mission, boolean pushToDrone) {
-        MissionApi.setMission(this, mission, pushToDrone);
+        MissionApi.getApi(this).setMission(mission, pushToDrone);
     }
 
     /**
-     * @deprecated Use {@link MissionApi#generateDronie(Drone)} instead.
+     * @deprecated Use {@link MissionApi#generateDronie()} instead.
      */
     public void generateDronie() {
-        MissionApi.generateDronie(this);
+        MissionApi.getApi(this).generateDronie();
     }
 
     /**
-     * @deprecated Use {@link DroneStateApi#arm(Drone, boolean)} instead.
+     * @deprecated Use {@link VehicleApi#arm(boolean)} instead.
      */
     public void arm(boolean arm) {
-        DroneStateApi.arm(this, arm);
+        VehicleApi.getApi(this).arm(arm);
     }
 
     /**
-     * @deprecated Use {@link CalibrationApi#startIMUCalibration(Drone)} instead.
+     * @deprecated Use {@link CalibrationApi#startIMUCalibration()} instead.
      */
     public void startIMUCalibration() {
-        CalibrationApi.startIMUCalibration(this);
+        CalibrationApi.getApi(this).startIMUCalibration();
     }
 
     /**
-     * @deprecated Use {@link CalibrationApi#sendIMUAck(Drone, int)} instead.
+     * @deprecated Use {@link CalibrationApi#sendIMUAck(int)} instead.
      */
     public void sendIMUCalibrationAck(int step) {
-        CalibrationApi.sendIMUAck(this, step);
+        CalibrationApi.getApi(this).sendIMUAck(step);
     }
 
     /**
-     * @deprecated Use {@link GuidedApi#takeoff(Drone, double)} instead.
+     * @deprecated Use {@link VehicleApi#takeoff(double)} instead.
      */
     public void doGuidedTakeoff(double altitude) {
-        GuidedApi.takeoff(this, altitude);
+        VehicleApi.getApi(this).takeoff(altitude);
     }
 
     /**
-     * @deprecated Use {@link GuidedApi#pauseAtCurrentLocation(Drone)} instead.
+     * @deprecated Use {@link VehicleApi#pauseAtCurrentLocation()} instead.
      */
     public void pauseAtCurrentLocation() {
-        GuidedApi.pauseAtCurrentLocation(this);
+        VehicleApi.getApi(this).pauseAtCurrentLocation();
     }
 
     /**
-     * @deprecated Use {@link GuidedApi#sendGuidedPoint(Drone, LatLong, boolean)} instead.
+     * @deprecated Use {@link VehicleApi#sendGuidedPoint(LatLong, boolean)} instead.
      */
     public void sendGuidedPoint(LatLong point, boolean force) {
-        GuidedApi.sendGuidedPoint(this, point, force);
+        VehicleApi.getApi(this).sendGuidedPoint(point, force);
     }
 
     /**
-     * @deprecated Use {@link ExperimentalApi#sendMavlinkMessage(Drone, MavlinkMessageWrapper)} instead.
+     * @deprecated Use {@link ExperimentalApi#sendMavlinkMessage(MavlinkMessageWrapper)} instead.
      */
     public void sendMavlinkMessage(MavlinkMessageWrapper messageWrapper) {
-        ExperimentalApi.sendMavlinkMessage(this, messageWrapper);
+        ExperimentalApi.getApi(this).sendMavlinkMessage(messageWrapper);
     }
 
     /**
-     * @deprecated Use {@link GuidedApi#setGuidedAltitude(Drone, double)} instead.
+     * @deprecated Use {@link VehicleApi#setGuidedAltitude(double)} instead.
      */
     public void setGuidedAltitude(double altitude) {
-        GuidedApi.setGuidedAltitude(this, altitude);
+        VehicleApi.getApi(this).setGuidedAltitude(altitude);
     }
 
     /**
-     * @deprecated Use {@link FollowApi#enableFollowMe(Drone, FollowType)} instead.
+     * @deprecated Use {@link FollowApi#enableFollowMe(FollowType)} instead.
      */
     public void enableFollowMe(FollowType followType) {
-        FollowApi.enableFollowMe(this, followType);
+        FollowApi.getApi(this).enableFollowMe(followType);
     }
 
     /**
-     * @deprecated Use {@link FollowApi#disableFollowMe(Drone)} instead.
+     * @deprecated Use {@link FollowApi#disableFollowMe()} instead.
      */
     public void disableFollowMe() {
-        FollowApi.disableFollowMe(this);
+        FollowApi.getApi(this).disableFollowMe();
     }
 
     /**
-     * @deprecated Use {@link ExperimentalApi#triggerCamera(Drone)} instead.
+     * @deprecated Use {@link ExperimentalApi#triggerCamera()} instead.
      */
     public void triggerCamera() {
-        ExperimentalApi.triggerCamera(this);
+        ExperimentalApi.getApi(this).triggerCamera();
     }
 
     /**
-     * @deprecated Use {@link ExperimentalApi#epmCommand(Drone, boolean)} instead.
-     */
-    public void epmCommand(boolean release) {
-        ExperimentalApi.epmCommand(this, release);
-    }
-
-    /**
-     * @deprecated Use {@link MissionApi#loadWaypoints(Drone)} instead.
+     * @deprecated Use {@link MissionApi#loadWaypoints()} instead.
      */
     public void loadWaypoints() {
-        MissionApi.loadWaypoints(this);
+        MissionApi.getApi(this).loadWaypoints();
     }
 
     void notifyDroneConnectionFailed(final ConnectionResult result) {
@@ -676,7 +668,7 @@ public class Drone {
 
     void notifyAttributeUpdated(final String attributeEvent, final Bundle extras) {
         //Update the bundle classloader
-        if(extras != null)
+        if (extras != null)
             extras.setClassLoader(context.getClassLoader());
 
         if (AttributeEvent.STATE_UPDATED.equals(attributeEvent)) {
