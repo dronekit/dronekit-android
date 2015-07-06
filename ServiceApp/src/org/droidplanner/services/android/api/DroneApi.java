@@ -14,10 +14,12 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.ardupilotmega.msg_mag_cal_progress;
 import com.MAVLink.ardupilotmega.msg_mag_cal_report;
 import com.MAVLink.enums.MAG_CAL_STATUS;
+import com.o3dr.android.client.apis.drone.camera.GimbalApi;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.action.ConnectionActions;
 import com.o3dr.services.android.lib.drone.action.ExperimentalActions;
+import com.o3dr.services.android.lib.drone.action.GimbalActions;
 import com.o3dr.services.android.lib.drone.action.GuidedActions;
 import com.o3dr.services.android.lib.drone.action.ParameterActions;
 import com.o3dr.services.android.lib.drone.action.StateActions;
@@ -341,6 +343,14 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 DroneApiUtils.triggerCamera(getDrone());
                 break;
 
+            case ExperimentalActions.ACTION_SET_ROI:
+                LatLongAlt roi = data.getParcelable(ExperimentalActions.EXTRA_SET_ROI_LAT_LONG_ALT);
+                if(roi != null) {
+                    Coord3D coord3DRoi = new Coord3D(roi.getLatitude(), roi.getLongitude(), roi.getAltitude());
+                    MavLinkDoCmds.setROI(getDrone(), coord3DRoi);
+                }
+                break;
+
             case ExperimentalActions.ACTION_SEND_MAVLINK_MESSAGE:
                 data.setClassLoader(MavlinkMessageWrapper.class.getClassLoader());
                 MavlinkMessageWrapper messageWrapper = data.getParcelable(ExperimentalActions.EXTRA_MAVLINK_MESSAGE);
@@ -393,7 +403,8 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
             //DRONE STATE ACTIONS
             case StateActions.ACTION_ARM:
                 boolean doArm = data.getBoolean(StateActions.EXTRA_ARM);
-                DroneApiUtils.arm(getDrone(), doArm);
+                boolean emergencyDisarm = data.getBoolean(StateActions.EXTRA_EMERGENCY_DISARM);
+                DroneApiUtils.arm(getDrone(), doArm, emergencyDisarm);
                 break;
 
             case StateActions.ACTION_SET_VEHICLE_MODE:
@@ -481,6 +492,13 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
             case CameraActions.ACTION_STOP_VIDEO_RECORDING:
                 DroneApiUtils.stopVideoRecording(getDrone());
+                break;
+
+            case GimbalActions.ACTION_SET_GIMBAL_ORIENTATION:
+                double pitch = data.getDouble(GimbalActions.GIMBAL_PITCH);
+                double roll = data.getDouble(GimbalActions.GIMBAL_ROLL);
+                double yaw = data.getDouble(GimbalActions.GIMBAL_YAW);
+                MavLinkDoCmds.setGimbalOrientation(getDrone(), pitch, roll, yaw);
                 break;
         }
     }

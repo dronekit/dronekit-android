@@ -13,7 +13,6 @@ import android.util.Log;
 
 import com.o3dr.android.client.interfaces.TowerListener;
 import com.o3dr.android.client.utils.InstallServiceDialog;
-import com.o3dr.android.client.utils.UpdateServiceDialog;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.model.IDroidPlannerServices;
 import com.o3dr.services.android.lib.util.version.VersionUtils;
@@ -180,10 +179,14 @@ public class ControlTower {
     }
 
     private void promptFor3DRServicesInstall() {
-        context.startActivity(new Intent(context, InstallServiceDialog.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        context.startActivity(new Intent(context, InstallServiceDialog.class)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                .putExtra(InstallServiceDialog.EXTRA_REQUIREMENT, InstallServiceDialog.REQUIRE_INSTALL));
     }
 
     private void promptFor3DRServicesUpdate() {
-        context.startActivity(new Intent(context, UpdateServiceDialog.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        context.startActivity(new Intent(context, InstallServiceDialog.class)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                .putExtra(InstallServiceDialog.EXTRA_REQUIREMENT, InstallServiceDialog.REQUIRE_UPDATE));
     }
 }

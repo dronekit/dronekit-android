@@ -13,10 +13,10 @@ import java.util.Map;
  */
 public class MagnetometerCalibrationStatus implements Parcelable {
 
-    private final Map<Byte, MagnetometerCalibrationProgress> calibrationProgressTracker = new HashMap<>();
-    private final Map<Byte, MagnetometerCalibrationResult> calibrationResultTracker = new HashMap<>();
+    private final Map<Integer, MagnetometerCalibrationProgress> calibrationProgressTracker = new HashMap<>();
+    private final Map<Integer, MagnetometerCalibrationResult> calibrationResultTracker = new HashMap<>();
 
-    private final List<Byte> compassList = new ArrayList<>();
+    private final List<Integer> compassList = new ArrayList<>();
 
     private boolean calibrationCancelled;
 
@@ -25,7 +25,7 @@ public class MagnetometerCalibrationStatus implements Parcelable {
 
     public void addCalibrationProgress(MagnetometerCalibrationProgress progress) {
         if (progress != null) {
-            final byte compassId = progress.getCompassId();
+            final int compassId = progress.getCompassId();
             calibrationProgressTracker.put(compassId, progress);
             compassList.add(compassId);
         }
@@ -33,21 +33,21 @@ public class MagnetometerCalibrationStatus implements Parcelable {
 
     public void addCalibrationResult(MagnetometerCalibrationResult result) {
         if (result != null) {
-            final byte compassId = result.getCompassId();
+            final int compassId = result.getCompassId();
             calibrationResultTracker.put(result.getCompassId(), result);
             compassList.add(compassId);
         }
     }
 
-    public List<Byte> getCompassIds() {
+    public List<Integer> getCompassIds() {
         return compassList;
     }
 
-    public MagnetometerCalibrationProgress getCalibrationProgress(byte compassId) {
+    public MagnetometerCalibrationProgress getCalibrationProgress(int compassId) {
         return calibrationProgressTracker.get(compassId);
     }
 
-    public MagnetometerCalibrationResult getCalibrationResult(byte compassId) {
+    public MagnetometerCalibrationResult getCalibrationResult(int compassId) {
         return calibrationResultTracker.get(compassId);
     }
 
@@ -60,7 +60,7 @@ public class MagnetometerCalibrationStatus implements Parcelable {
     }
 
     public boolean isCalibrationComplete(){
-        for(Byte compassId: compassList){
+        for(Integer compassId: compassList){
             if(!calibrationResultTracker.containsKey(compassId))
                 return false;
         }

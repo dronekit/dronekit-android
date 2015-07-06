@@ -8,7 +8,7 @@ import android.os.Parcelable;
  */
 public class MagnetometerCalibrationResult implements Parcelable {
 
-    private byte compassId;
+    private int compassId;
 
     /**
      * RMS milligauss residuals
@@ -42,7 +42,7 @@ public class MagnetometerCalibrationResult implements Parcelable {
 
     public MagnetometerCalibrationResult(){}
 
-    public MagnetometerCalibrationResult(byte compassId,
+    public MagnetometerCalibrationResult(int compassId,
                                          boolean calibrationSuccessful, boolean autoSaved, float fitness,
                                          float xOffset, float yOffset, float zOffset,
                                          float xDiag, float yDiag, float zDiag,
@@ -62,7 +62,7 @@ public class MagnetometerCalibrationResult implements Parcelable {
         this.zOffset = zOffset;
     }
 
-    public byte getCompassId() {
+    public int getCompassId() {
         return compassId;
     }
 
@@ -173,7 +173,7 @@ public class MagnetometerCalibrationResult implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeByte(this.compassId);
+        dest.writeInt(this.compassId);
         dest.writeFloat(this.fitness);
         dest.writeFloat(this.xOffset);
         dest.writeFloat(this.yOffset);
@@ -189,7 +189,7 @@ public class MagnetometerCalibrationResult implements Parcelable {
     }
 
     private MagnetometerCalibrationResult(Parcel in) {
-        this.compassId = in.readByte();
+        this.compassId = in.readInt();
         this.fitness = in.readFloat();
         this.xOffset = in.readFloat();
         this.yOffset = in.readFloat();

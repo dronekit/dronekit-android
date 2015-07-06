@@ -23,11 +23,6 @@ import java.util.UUID;
  */
 public class DroidPlannerPrefs implements org.droidplanner.core.drone.Preferences {
 
-    /*
-     * Default preference value
-     */
-    public static final boolean DEFAULT_USAGE_STATISTICS = true;
-
     // Public for legacy usage
     public SharedPreferences prefs;
     private Context context;
@@ -89,8 +84,7 @@ public class DroidPlannerPrefs implements org.droidplanner.core.drone.Preference
      * @return true if google analytics reporting is enabled.
      */
     public boolean isUsageStatisticsEnabled() {
-        return prefs.getBoolean(context.getString(R.string.pref_usage_statistics_key),
-                DEFAULT_USAGE_STATISTICS);
+        return prefs.getBoolean("pref_usage_statistics", true);
     }
 
 }

@@ -28,8 +28,8 @@ public class MavLinkStreamRates {
 		msg.target_system = sysid;
 		msg.target_component = compid;
 
-		msg.req_message_rate = (short) rate;
-		msg.req_stream_id = (byte) stream_id;
+		msg.req_message_rate = rate;
+		msg.req_stream_id = (short) stream_id;
 
 		if (rate > 0) {
 			msg.start_stop = 1;

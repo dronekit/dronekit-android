@@ -29,6 +29,28 @@ public class Parameters extends DroneVariable implements OnDroneListener {
 
     private static final int TIMEOUT = 1000; //milliseconds
 
+    private final Runnable parametersReceiptStartNotification = new Runnable() {
+        @Override
+        public void run() {
+            if (parameterListener != null)
+                parameterListener.onBeginReceivingParameters();
+        }
+    };
+
+    public final Runnable watchdogCallback = new Runnable() {
+        @Override
+        public void run() {
+            onParameterStreamStopped();
+        }
+    };
+    private final Runnable parametersReceiptEndNotification = new Runnable() {
+        @Override
+        public void run() {
+            if (parameterListener != null)
+                parameterListener.onEndReceivingParameters();
+        }
+    };
+
     private final AtomicBoolean isRefreshing = new AtomicBoolean(false);
 
     private int expectedParams;
@@ -38,13 +60,7 @@ public class Parameters extends DroneVariable implements OnDroneListener {
 
     private DroneInterfaces.OnParameterManagerListener parameterListener;
 
-    public Handler watchdog;
-    public Runnable watchdogCallback = new Runnable() {
-        @Override
-        public void run() {
-            onParameterStreamStopped();
-        }
-    };
+    public final Handler watchdog;
 
     public Parameters(Drone myDrone, Handler handler) {
         super(myDrone);
@@ -58,8 +74,7 @@ public class Parameters extends DroneVariable implements OnDroneListener {
             parameters.clear();
             paramsRollCall.clear();
 
-            if (parameterListener != null)
-                parameterListener.onBeginReceivingParameters();
+            notifyParametersReceiptStart();
 
             MavLinkParameters.requestParametersList(myDrone);
             resetWatchdog();
@@ -97,14 +112,11 @@ public class Parameters extends DroneVariable implements OnDroneListener {
         final int paramIndex = m_value.param_index;
         if (paramIndex == -1) {
             // update listener
-            if (parameterListener != null)
-                parameterListener.onParameterReceived(param, 0, 1);
+            notifyParameterReceipt(param, 0, 1);
 
             myDrone.notifyDroneEvent(DroneEventsType.PARAMETERS_DOWNLOADED);
 
-            if (parameterListener != null) {
-                parameterListener.onEndReceivingParameters();
-            }
+            notifyParametersReceiptEnd();
             return;
         }
 
@@ -112,8 +124,7 @@ public class Parameters extends DroneVariable implements OnDroneListener {
         expectedParams = m_value.param_count;
 
         // update listener
-        if (parameterListener != null)
-            parameterListener.onParameterReceived(param, paramIndex, m_value.param_count);
+        notifyParameterReceipt(param, paramIndex, m_value.param_count);
 
         // Are all parameters here? Notify the listener with the parameters
         if (parameters.size() >= m_value.param_count) {
@@ -121,9 +132,7 @@ public class Parameters extends DroneVariable implements OnDroneListener {
             isRefreshing.set(false);
             myDrone.notifyDroneEvent(DroneEventsType.PARAMETERS_DOWNLOADED);
 
-            if (parameterListener != null) {
-                parameterListener.onEndReceivingParameters();
-            }
+            notifyParametersReceiptEnd();
         } else {
             resetWatchdog();
         }
@@ -193,5 +202,27 @@ public class Parameters extends DroneVariable implements OnDroneListener {
 
     public void setParameterListener(DroneInterfaces.OnParameterManagerListener parameterListener) {
         this.parameterListener = parameterListener;
+    }
+
+    private void notifyParametersReceiptStart() {
+        if (parameterListener != null)
+            watchdog.post(parametersReceiptStartNotification);
+    }
+
+    private void notifyParametersReceiptEnd() {
+        if (parameterListener != null)
+            watchdog.post(parametersReceiptEndNotification);
+    }
+
+    private void notifyParameterReceipt(final Parameter parameter, final int index, final int count) {
+        if (parameterListener != null) {
+            watchdog.post(new Runnable() {
+                @Override
+                public void run() {
+                    if(parameterListener != null)
+                    parameterListener.onParameterReceived(parameter, index, count);
+                }
+            });
+        }
     }
 }
