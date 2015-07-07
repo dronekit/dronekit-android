@@ -127,6 +127,10 @@ public class Drone {
         this.droneObserver = new DroneObserver(this);
     }
 
+    Context getContext(){
+        return this.context;
+    }
+
     void start() {
         if (!serviceMgr.isTowerConnected())
             throw new IllegalStateException("Service manager must be connected.");

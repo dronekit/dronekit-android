@@ -44,7 +44,7 @@ public class ControlTower {
             o3drServices = IDroidPlannerServices.Stub.asInterface(service);
             try {
                 final int libVersionCode = o3drServices.getApiVersionCode();
-                if (libVersionCode < VersionUtils.LIB_VERSION) {
+                if (libVersionCode < VersionUtils.getCoreLibVersion(context)) {
                     //Prompt the user to update the 3DR Services app.
                     o3drServices = null;
                     promptFor3DRServicesUpdate();

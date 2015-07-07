@@ -3,19 +3,15 @@ package com.o3dr.services.android.lib.util.version;
 import android.content.Context;
 import android.content.pm.PackageManager;
 
+import com.o3dr.android.client.R;
+
 /**
  * Created by fhuya on 11/12/14.
  */
 public class VersionUtils {
 
-    public static final int LIB_VERSION = 20302;
-
-    public static int getVersion(Context context){
-        try {
-            return context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionCode;
-        } catch (PackageManager.NameNotFoundException e) {
-            return -1;
-        }
+    public static int getCoreLibVersion(Context context){
+        return context.getResources().getInteger(R.integer.core_lib_version);
     }
 
     //Prevent instantiation.

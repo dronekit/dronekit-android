@@ -81,7 +81,7 @@ public class ApiAvailability {
                 final IDroidPlannerServices apiServices = IDroidPlannerServices.Stub.asInterface(service);
                 try{
                     final int libVersionCode = apiServices.getApiVersionCode();
-                    if(libVersionCode < VersionUtils.LIB_VERSION){
+                    if(libVersionCode < VersionUtils.getCoreLibVersion(context)){
                         postCallback(handler, listener, API_UPDATE_REQUIRED);
                     }
                     else{
