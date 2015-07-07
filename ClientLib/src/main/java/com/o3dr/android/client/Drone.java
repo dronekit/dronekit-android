@@ -48,6 +48,7 @@ import com.o3dr.services.android.lib.model.IDroneApi;
 import com.o3dr.services.android.lib.model.IObserver;
 import com.o3dr.services.android.lib.model.action.Action;
 
+import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -153,7 +154,7 @@ public class Drone {
                 this.droneApi.asBinder().unlinkToDeath(binderDeathRecipient, 0);
                 serviceMgr.get3drServices().releaseDroneApi(this.droneApi);
             }
-        } catch (RemoteException e) {
+        } catch (RemoteException | NoSuchElementException e) {
             Log.e(TAG, e.getMessage(), e);
         }
 
