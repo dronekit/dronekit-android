@@ -133,25 +133,22 @@ public class ControlTower {
         towerListener = listener;
 
         if (!isTowerConnected() && !isServiceConnecting.get()) {
-            ApiAvailability.getInstance().checkApiAvailability(context, null, new ApiAvailability.ApiAvailabilityListener() {
-                @Override
-                public void onApiAvailabilityResult(int result) {
-                    switch (result) {
-                        case ApiAvailability.API_AVAILABLE:
-                            final ResolveInfo info = context.getPackageManager().resolveService(serviceIntent, 0);
-                            if (info != null) {
-                                serviceIntent.setClassName(info.serviceInfo.packageName, info.serviceInfo.name);
-                                isServiceConnecting.set(context.bindService(serviceIntent, o3drServicesConnection,
-                                        Context.BIND_AUTO_CREATE));
-                            }
-                            break;
+            final int apiAvailableResult = ApiAvailability.getInstance().checkApiAvailability(context);
 
-                        default:
-                            ApiAvailability.getInstance().showErrorDialog(context, result);
-                            break;
+            switch(apiAvailableResult){
+                case ApiAvailability.API_AVAILABLE:
+                    final ResolveInfo info = context.getPackageManager().resolveService(serviceIntent, 0);
+                    if (info != null) {
+                        serviceIntent.setClassName(info.serviceInfo.packageName, info.serviceInfo.name);
+                        isServiceConnecting.set(context.bindService(serviceIntent, o3drServicesConnection,
+                                Context.BIND_AUTO_CREATE));
                     }
-                }
-            });
+                    break;
+
+                default:
+                    ApiAvailability.getInstance().showErrorDialog(context, apiAvailableResult);
+                    break;
+            }
         }
     }
 
