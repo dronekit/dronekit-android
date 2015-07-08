@@ -2,22 +2,28 @@
 Tower-Pebble
 ==================
 
-In this example, we will learn about the `Tower Pebble watchapp <http://apps.getPebble.com/en_US/application/54d54fede8bb36ea9d00001f>`_ and `Android companion app <https://play.google.com/store/apps/details?id=org.droidplanner.Pebble>`_.
+In this example, we will learn about the `Tower Pebble watchapp <http://apps.getPebble.com/en_US/application/54d54fede8bb36ea9d00001f>`_ and `Android companion app <https://play.google.com/store/apps/details?id=org.droidplanner.pebble>`_.
 
 Project Setup
 =============
 
+Clone Tower-Pebble Repo
+-----------------------
+
 Let's start by grabbing the existing code and importing it into :program:`Android Studio`.  We need to clone the Github repository at `DroidPlanner/Tower-Pebble <https://github.com/DroidPlanner/tower-pebble>`_.  This process is different in every client, but from the command line it looks like::
 
 	git clone https://github.com/DroidPlanner/tower-pebble
+
+Import Project
+--------------
 
 Now let's import the project.  Open Android Studio and click **File | Import Project**.  Now find the :file:`build.gradle` file in the project that we just cloned, then click **OK**.
 
 .. image:: _static/images/towerpebble_setup_1.png
         :width: 250 pt
 
-Understanding the Watchapp Code
-===============================
+Watchapp Code Overview
+======================
 
 *Tower Pebble* consists of two parts: the watchapp and a companion Android app.  The communication between the two is done with `AppSync <http://developer.getPebble.com/docs/c/Foundation/AppSync/>`_.  The Android app communicates with the vehicle using 3DR-Services.
 
@@ -25,15 +31,21 @@ Understanding the Watchapp Code
 
 The code for the watchapp can be found in the folder called `Pebble <https://github.com/DroidPlanner/tower-pebble/tree/master/Pebble>`_.  Here's a brief overview of what it does:
 
-* Listens for two strings: **mode** and **telem**:
+Parts
+-----
+
+Listens for two strings: **mode** and **telem**:
         * **mode** is displayed in bold at the top of the screen
         * **telem** is displayed at the bottom of the screen
 
-* Sends requests when the user pushes buttons:
+Sends requests when the user pushes buttons:
         * ``REQUEST_MODE_FOLLOW`` when the top button is pushed (if the mode is not already ``follow``)
         * ``REQUEST_CYCLE_FOLLOW_TYPE`` when the top button is pushed (if  the mode is already ``follow``)
         * ``REQUEST_PAUSE`` when the middle button is pushed
         * ``REQUEST_MODE_RTL`` when the bottom button is pushed
+
+Code Overview
+-------------
 
 Here is the code that receives telemetry from the phone, then parses and displays it on the screen:
 
@@ -87,15 +99,18 @@ Here is the code that is called after a button is pressed to request a mode chan
 .. image:: _static/images/towerpebble_setup_3.png
         :width: 250 pt
 
-Understanding the Android Code
-==============================
+Android Code Overview
+=====================
 
 A screenshot of the Android app is shown below.  This app runs in the background and is used to connect the Pebble watchapp to :program:`3DR Services`.
 
 .. image:: _static/images/towerpebble_setup_4.png
         :width: 250 pt
 
-The functionality (i.e. the communication with the Pebble) is handled by a Service called `PebbleCommunicatorService <https://github.com/DroidPlanner/tower-pebble/blob/master/Android/src/main/java/org/droidplanner/Pebble/PebbleCommunicatorService.java>`_.  :file:`PebbleCommunicatorService` is automatically started up when a connection is established. This works because the :file:`AndroidManifest.xml` has the following:
+Functionality
+-------------
+
+The functionality (i.e. the communication with the Pebble) is handled by a Service called `PebbleCommunicatorService <https://github.com/DroidPlanner/tower-pebble/blob/master/Android/src/main/java/org/droidplanner/pebble/PebbleCommunicatorService.java>`_.  :file:`PebbleCommunicatorService` is automatically started up when a connection is established. This works because the :file:`AndroidManifest.xml` has the following:
 
 .. code-block:: xml
     
@@ -203,7 +218,7 @@ to
             break;
 
 
-Obviously we would also want to change the Pebble watchapp to say "Loiter" next to the middle button.
+Obviously we would also want to change the Pebble watchapp to say ``Loiter`` next to the middle button.
 
 
 Sending Mode and Telemetry
@@ -215,76 +230,76 @@ The app listens for certain DroneEvents.  To do this,
 
 1. :file:`PebbleCommunicatorService` needs to implement :file:`DroneListener`:
 
-.. code-block:: java
+   .. code-block:: java
 
-        public class PebbleCommunicatorService extends Service implements DroneListener, Towerlistener{
+       public class PebbleCommunicatorService extends Service implements DroneListener, Towerlistener{
 
 2. The :file:`DroneListener` needs to be registered:
 
-.. code-block:: java
-        :emphasize-lines: 6
+   .. code-block:: java
+       :emphasize-lines: 6
 
-        //Runs when 3dr-services is connected.  Immediately connects to drone.
-        @Override
-        public void onTowerConnected() {
-                if (!drone.isStarted()) {
-                    controlTower.registerDrone(drone, handler);
-                    this.drone.registerDroneListener(this);
-                }
+       //Runs when 3dr-services is connected.  Immediately connects to drone.
+       @Override
+       public void onTowerConnected() {
+       if (!drone.isStarted()) {
+           controlTower.registerDrone(drone, handler);
+           this.drone.registerDroneListener(this);
+       }
 
-            switch(lastReceivedAction) {
-                case GCSEvent.ACTION_VEHICLE_CONNECTION:
-                    connectDrone();
-                    break;
+       switch(lastReceivedAction) {
+           case GCSEvent.ACTION_VEHICLE_CONNECTION:
+               connectDrone();
+               break;
 
-                case ACTION_CHECK_CONNECTION_STATE:
-                    checkConnectedApps();
-                    break;
-            }
-        }
+           case ACTION_CHECK_CONNECTION_STATE:
+               checkConnectedApps();
+               break;
+           }
+       }
 
 3. An ``onDroneEvent`` method needs to be provided:
 
-.. code-block:: java
+   .. code-block:: java
 
-    @Override
-    public void onDroneEvent(String event, Bundle bundle) {
-            final String action = new Intent(event).getAction();
-            switch (action) {
-                case AttributeEvent.STATE_DISCONNECTED:
-                    PebbleKit.closeAppOnPebble(applicationContext, DP_UUID);
-                    stopSelf();
-                    break;
-                case AttributeEvent.STATE_CONNECTED:
-                case AttributeEvent.HEARTBEAT_FIRST:
-                    PebbleKit.startAppOnPebble(applicationContext, DP_UUID);
-                    Thread.sleep(250);
-                    sendDataToWatchNow(drone);
-                    break;
-                //Telem gets slow updates
-                case AttributeEvent.BATTERY_UPDATED:
-                case AttributeEvent.ATTITUDE_UPDATED:
-                    sendDataToWatchIfTimeHasElapsed(drone);
-                    break;
-                //Mode changes get fast updates
-                case AttributeEvent.STATE_VEHICLE_MODE:
-                case AttributeEvent.FOLLOW_START:
-                case AttributeEvent.STATE_ARMING:
-                case AttributeEvent.STATE_UPDATED:
-                    sendDataToWatchNow(drone);
-                    break;
-                //Follow type update gets fast update
-                case AttributeEvent.FOLLOW_UPDATE:
-                    final FollowState followState = drone.getAttribute(AttributeType.FOLLOW_STATE);
-                    if(followState != null){
-                        final FollowType followType = followState.getMode();
-                        if(!previousFollowType.equals(followType)){
-                            previousFollowType = followType;
-                            sendDataToWatchNow(drone);
-                        }
-                    }
-            }
-    }
+       @Override
+       public void onDroneEvent(String event, Bundle bundle) {
+               final String action = new Intent(event).getAction();
+               switch (action) {
+                   case AttributeEvent.STATE_DISCONNECTED:
+                       PebbleKit.closeAppOnPebble(applicationContext, DP_UUID);
+                       stopSelf();
+                       break;
+                   case AttributeEvent.STATE_CONNECTED:
+                   case AttributeEvent.HEARTBEAT_FIRST:
+                       PebbleKit.startAppOnPebble(applicationContext, DP_UUID);
+                       Thread.sleep(250);
+                       sendDataToWatchNow(drone);
+                       break;
+                   //Telem gets slow updates
+                   case AttributeEvent.BATTERY_UPDATED:
+                   case AttributeEvent.ATTITUDE_UPDATED:
+                       sendDataToWatchIfTimeHasElapsed(drone);
+                       break;
+                   //Mode changes get fast updates
+                   case AttributeEvent.STATE_VEHICLE_MODE:
+                   case AttributeEvent.FOLLOW_START:
+                   case AttributeEvent.STATE_ARMING:
+                   case AttributeEvent.STATE_UPDATED:
+                       sendDataToWatchNow(drone);
+                       break;
+                   //Follow type update gets fast update
+                   case AttributeEvent.FOLLOW_UPDATE:
+                       final FollowState followState = drone.getAttribute(AttributeType.FOLLOW_STATE);
+                       if(followState != null){
+                           final FollowType followType = followState.getMode();
+                           if(!previousFollowType.equals(followType)){
+                               previousFollowType = followType;
+                               sendDataToWatchNow(drone);
+                           }
+                       }
+               }
+       }
 
 You may have noticed that certain DroneEvents (``BATTERY_UPDATED`` and ``ATTITUDE_UPDATED``) call the method ``sendDataToWatchIfTimeElapsed(drone)``, while others (``STATE_VEHICLE_MODE``, ``STATE_ARMING``, etc.) call the method ``sendDataToWatchNow(drone)``.  This is because the telemetry values (Battery and Attitude) are changing constantly, but it's not critical that they are updated too frequently.  The user does not need up-to-the-second battery voltage updates.  Mode changes, however, don't happen very often, but it is important to update it very quickly on the watch.
 

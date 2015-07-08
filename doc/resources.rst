@@ -27,6 +27,12 @@ The most used Android ground control station for drones.
 
 `Source <https://github.com/DroidPlanner/Tower>`_ | `Play Store <https://play.google.com/store/apps/details?id=org.droidplanner.android>`_
 
+Tower Pebble
+----------
+
+Control a drone from your Pebble watch!
+
+`Source <https://github.com/DroidPlanner/tower-pebble>`_ | `Play Store <https://play.google.com/store/apps/details?id=org.droidplanner.pebble>`_
 
 Tower Wear
 ----------
