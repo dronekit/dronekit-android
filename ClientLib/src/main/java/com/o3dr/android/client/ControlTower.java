@@ -11,11 +11,10 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
 
+import com.o3dr.android.client.apis.ApiAvailability;
 import com.o3dr.android.client.interfaces.TowerListener;
-import com.o3dr.android.client.utils.InstallServiceDialog;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.model.IDroidPlannerServices;
-import com.o3dr.services.android.lib.util.version.VersionUtils;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -43,16 +42,8 @@ public class ControlTower {
 
             o3drServices = IDroidPlannerServices.Stub.asInterface(service);
             try {
-                final int libVersionCode = o3drServices.getApiVersionCode();
-                if (libVersionCode < VersionUtils.LIB_VERSION) {
-                    //Prompt the user to update the 3DR Services app.
-                    o3drServices = null;
-                    promptFor3DRServicesUpdate();
-                    context.unbindService(o3drServicesConnection);
-                } else {
-                    o3drServices.asBinder().linkToDeath(binderDeathRecipient, 0);
-                    notifyTowerConnected();
-                }
+                o3drServices.asBinder().linkToDeath(binderDeathRecipient, 0);
+                notifyTowerConnected();
             } catch (RemoteException e) {
                 notifyTowerDisconnected();
             }
@@ -102,8 +93,8 @@ public class ControlTower {
         if (isTowerConnected()) {
             try {
                 connectedApps = o3drServices.getConnectedApps(getApplicationId());
-                if(connectedApps != null){
-                    for(Bundle appInfo: connectedApps){
+                if (connectedApps != null) {
+                    for (Bundle appInfo : connectedApps) {
                         appInfo.setClassLoader(ConnectionParameter.class.getClassLoader());
                     }
                 }
@@ -116,7 +107,7 @@ public class ControlTower {
     }
 
     public void registerDrone(Drone drone, Handler handler) {
-        if(drone == null)
+        if (drone == null)
             return;
 
         if (!isTowerConnected())
@@ -142,11 +133,22 @@ public class ControlTower {
         towerListener = listener;
 
         if (!isTowerConnected() && !isServiceConnecting.get()) {
-            if (is3DRServicesInstalled()) {
-                isServiceConnecting.set(context.bindService(serviceIntent, o3drServicesConnection,
-                        Context.BIND_AUTO_CREATE));
-            } else
-                promptFor3DRServicesInstall();
+            final int apiAvailableResult = ApiAvailability.getInstance().checkApiAvailability(context);
+
+            switch(apiAvailableResult){
+                case ApiAvailability.API_AVAILABLE:
+                    final ResolveInfo info = context.getPackageManager().resolveService(serviceIntent, 0);
+                    if (info != null) {
+                        serviceIntent.setClassName(info.serviceInfo.packageName, info.serviceInfo.name);
+                        isServiceConnecting.set(context.bindService(serviceIntent, o3drServicesConnection,
+                                Context.BIND_AUTO_CREATE));
+                    }
+                    break;
+
+                default:
+                    ApiAvailability.getInstance().showErrorDialog(context, apiAvailableResult);
+                    break;
+            }
         }
     }
 
@@ -161,32 +163,11 @@ public class ControlTower {
         try {
             context.unbindService(o3drServicesConnection);
         } catch (Exception e) {
-            Log.e(TAG, "Error occurred while unbinding from 3DR Services.", e);
+            Log.e(TAG, "Error occurred while unbinding from 3DR Services.");
         }
     }
 
     String getApplicationId() {
         return context.getPackageName();
-    }
-
-    private boolean is3DRServicesInstalled() {
-        final ResolveInfo info = context.getPackageManager().resolveService(serviceIntent, 0);
-        if (info == null)
-            return false;
-
-        this.serviceIntent.setClassName(info.serviceInfo.packageName, info.serviceInfo.name);
-        return true;
-    }
-
-    private void promptFor3DRServicesInstall() {
-        context.startActivity(new Intent(context, InstallServiceDialog.class)
-                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                .putExtra(InstallServiceDialog.EXTRA_REQUIREMENT, InstallServiceDialog.REQUIRE_INSTALL));
-    }
-
-    private void promptFor3DRServicesUpdate() {
-        context.startActivity(new Intent(context, InstallServiceDialog.class)
-                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                .putExtra(InstallServiceDialog.EXTRA_REQUIREMENT, InstallServiceDialog.REQUIRE_UPDATE));
     }
 }

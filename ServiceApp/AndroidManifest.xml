@@ -109,6 +109,10 @@
                 <action
                     android:name="com.o3dr.services.android.lib.model.IDroidPlannerServices"/>
             </intent-filter>
+
+            <meta-data
+                android:name="com.o3dr.dronekit.android.core.version"
+                android:value="@integer/core_lib_version"/>
         </service>
 
         <receiver

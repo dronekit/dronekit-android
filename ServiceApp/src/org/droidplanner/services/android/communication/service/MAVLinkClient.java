@@ -3,12 +3,15 @@ package org.droidplanner.services.android.communication.service;
 import android.content.Context;
 
 import com.MAVLink.MAVLinkPacket;
+import com.MAVLink.Messages.MAVLinkMessage;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
+import com.o3dr.services.android.lib.model.ICommandListener;
 
 import org.droidplanner.core.MAVLink.MAVLinkStreams;
 import org.droidplanner.core.MAVLink.connection.MavLinkConnection;
 import org.droidplanner.core.MAVLink.connection.MavLinkConnectionListener;
 import org.droidplanner.core.MAVLink.connection.MavLinkConnectionTypes;
+import org.droidplanner.core.drone.CommandTracker;
 import org.droidplanner.services.android.api.MavLinkServiceApi;
 import org.droidplanner.services.android.data.SessionDB;
 import org.droidplanner.services.android.utils.file.DirectoryPath;
@@ -22,7 +25,8 @@ import java.util.Date;
  */
 public class MAVLinkClient implements MAVLinkStreams.MAVLinkOutputStream {
 
-    private final static String TAG = MAVLinkClient.class.getSimpleName();
+    private static final int DEFAULT_SYS_ID = 255;
+    private static final int DEFAULT_COMP_ID = 190;
 
     private static final String TLOG_PREFIX = "log";
 
@@ -71,6 +75,8 @@ public class MAVLinkClient implements MAVLinkStreams.MAVLinkOutputStream {
     private int packetSeqNumber = 0;
     private final ConnectionParameter connParams;
 
+    private CommandTracker commandTracker;
+
     public MAVLinkClient(Context context, MAVLinkStreams.MavlinkInputStream listener,
                          ConnectionParameter connParams, MavLinkServiceApi serviceApi) {
         this.context = context;
@@ -78,6 +84,10 @@ public class MAVLinkClient implements MAVLinkStreams.MAVLinkOutputStream {
         this.mavLinkApi = serviceApi;
         this.connParams = connParams;
         this.sessionDB = new SessionDB(context);
+    }
+
+    public void setCommandTracker(CommandTracker commandTracker) {
+        this.commandTracker = commandTracker;
     }
 
     @Override
@@ -107,15 +117,27 @@ public class MAVLinkClient implements MAVLinkStreams.MAVLinkOutputStream {
     }
 
     @Override
-    public void sendMavPacket(MAVLinkPacket pack) {
-        if (this.connParams == null) {
+    public void sendMavMessage(MAVLinkMessage message, ICommandListener listener) {
+        sendMavMessage(message, DEFAULT_SYS_ID, DEFAULT_COMP_ID, listener);
+    }
+
+    @Override
+    public void sendMavMessage(MAVLinkMessage message, int sysId, int compId, ICommandListener listener){
+        if (this.connParams == null || message == null) {
             return;
         }
 
-        pack.seq = packetSeqNumber;
+        final MAVLinkPacket packet = message.pack();
+        packet.sysid = sysId;
+        packet.compid = compId;
+        packet.seq = packetSeqNumber;
 
-        if(mavLinkApi.sendData(this.connParams, pack)) {
+        if(mavLinkApi.sendData(this.connParams, packet)) {
             packetSeqNumber = (packetSeqNumber + 1) % (MAX_PACKET_SEQUENCE + 1);
+
+            if (commandTracker != null && listener != null) {
+                commandTracker.onCommandSubmitted(message, listener);
+            }
         }
     }
 

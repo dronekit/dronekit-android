@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.os.RemoteException;
 import android.util.Log;
 
-import com.MAVLink.Messages.ApmModes;
+import org.droidplanner.core.drone.variables.ApmModes;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.ardupilotmega.msg_ekf_status_report;
 import com.MAVLink.ardupilotmega.msg_mag_cal_progress;
@@ -43,6 +43,7 @@ import com.o3dr.services.android.lib.drone.property.VehicleMode;
 import com.o3dr.services.android.lib.gcs.follow.FollowState;
 import com.o3dr.services.android.lib.gcs.follow.FollowType;
 import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
+import com.o3dr.services.android.lib.model.ICommandListener;
 
 import org.droidplanner.core.MAVLink.MavLinkArm;
 import org.droidplanner.core.MAVLink.command.doCmd.MavLinkDoCmds;
@@ -522,7 +523,7 @@ public class DroneApiUtils {
         return new GuidedState(guidedState, new LatLongAlt(guidedCoord.getLat(), guidedCoord.getLng(), guidedAlt));
     }
 
-    static void changeVehicleMode(Drone drone, VehicleMode newMode) {
+    static void changeVehicleMode(Drone drone, VehicleMode newMode, ICommandListener listener) {
         if (drone == null)
             return;
 
@@ -542,7 +543,7 @@ public class DroneApiUtils {
                 break;
         }
 
-        drone.getState().changeFlightMode(ApmModes.getMode(newMode.getMode(), mavType));
+        drone.getState().changeFlightMode(ApmModes.getMode(newMode.getMode(), mavType), listener);
     }
 
     static FollowState getFollowState(Follow followMe) {
@@ -615,11 +616,11 @@ public class DroneApiUtils {
         MavLinkDoCmds.triggerCamera(drone);
     }
 
-    static void epmCommand(Drone drone, boolean release) {
+    static void epmCommand(Drone drone, boolean release, ICommandListener listener) {
         if (drone == null)
             return;
 
-        MavLinkDoCmds.empCommand(drone, release);
+        MavLinkDoCmds.empCommand(drone, release, listener);
     }
 
     static void loadWaypoints(Drone drone) {
@@ -670,14 +671,14 @@ public class DroneApiUtils {
         return (float) drone.getMission().makeAndUploadDronie();
     }
 
-    static void arm(Drone drone, boolean arm) {
-        arm(drone, arm, false);
+    static void arm(Drone drone, boolean arm, ICommandListener listener) {
+        arm(drone, arm, false, listener);
     }
 
-    static void arm(Drone drone, boolean arm, boolean emergencyDisarm) {
+    static void arm(Drone drone, boolean arm, boolean emergencyDisarm, ICommandListener listener) {
         if (drone == null)
             return;
-        MavLinkArm.sendArmMessage(drone, arm, emergencyDisarm);
+        MavLinkArm.sendArmMessage(drone, arm, emergencyDisarm, listener);
     }
 
     static void startMagnetometerCalibration(Drone drone, boolean retryOnFailure, boolean saveAutomatically, int
@@ -702,8 +703,9 @@ public class DroneApiUtils {
         drone.getMagnetometerCalibration().acceptCalibration();
     }
 
-    static boolean startIMUCalibration(Drone drone) {
-        return drone != null && drone.getCalibrationSetup().startCalibration();
+    static void startIMUCalibration(Drone drone, ICommandListener listener) {
+        if(drone != null)
+            drone.getCalibrationSetup().startCalibration(listener);
     }
 
     static void sendIMUCalibrationAck(Drone drone, int step) {
@@ -713,11 +715,11 @@ public class DroneApiUtils {
         drone.getCalibrationSetup().sendAck(step);
     }
 
-    static void doGuidedTakeoff(Drone drone, double altitude) {
+    static void doGuidedTakeoff(Drone drone, double altitude, ICommandListener listener) {
         if (drone == null)
             return;
 
-        drone.getGuidedPoint().doGuidedTakeoff(altitude);
+        drone.getGuidedPoint().doGuidedTakeoff(altitude, listener);
     }
 
     static void sendMavlinkMessage(Drone drone, MavlinkMessageWrapper messageWrapper) {
@@ -744,10 +746,10 @@ public class DroneApiUtils {
             Log.e(TAG, e.getMessage(), e);
         }
 
-        drone.getMavClient().sendMavPacket(message.pack());
+        drone.getMavClient().sendMavMessage(message, null);
     }
 
-    static void sendGuidedPoint(Drone drone, LatLong point, boolean force) {
+    static void sendGuidedPoint(Drone drone, LatLong point, boolean force, ICommandListener listener) {
         if (drone == null)
             return;
 
@@ -756,7 +758,7 @@ public class DroneApiUtils {
             guidedPoint.newGuidedCoord(MathUtils.latLongToCoord2D(point));
         } else if (force) {
             try {
-                guidedPoint.forcedGuidedCoordinate(MathUtils.latLongToCoord2D(point));
+                guidedPoint.forcedGuidedCoordinate(MathUtils.latLongToCoord2D(point), listener);
             } catch (Exception e) {
                 Log.e(TAG, e.getMessage(), e);
             }

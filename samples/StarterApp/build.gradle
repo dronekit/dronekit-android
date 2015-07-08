@@ -1,0 +1,67 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:1.2.3'
+
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+def getMavenUsername(){
+    return hasProperty('COM_O3DR_MAVEN_USERNAME') ? COM_O3DR_MAVEN_USERNAME : ''
+}
+
+def getMavenApiKey(){
+    return hasProperty('COM_O3DR_MAVEN_APIKEY') ? COM_O3DR_MAVEN_APIKEY : ''
+}
+
+def getMavenRepoUrl(){
+    return hasProperty('COM_O3DR_MAVEN_REPO_URL') ? COM_O3DR_MAVEN_REPO_URL : ''
+}
+
+allprojects {
+    repositories {
+        jcenter()
+
+        maven {
+            url getMavenRepoUrl()
+            credentials {
+                username getMavenUsername()
+                password getMavenApiKey()
+            }
+        }
+    }
+}
+
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 21
+    buildToolsVersion "21.1.2"
+
+    defaultConfig {
+        applicationId "com.o3dr.sample.hellodrone"
+        minSdkVersion 14
+        targetSdkVersion 21
+        versionCode 2
+        versionName "3.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.android.support:appcompat-v7:21.0.3'
+
+    compile project(':ClientLib')
+}

@@ -42,7 +42,7 @@ final class DPServices extends IDroidPlannerServices.Stub {
 
     @Override
     public int getApiVersionCode() throws RemoteException {
-        return VersionUtils.LIB_VERSION;
+        return VersionUtils.getCoreLibVersion(serviceRef.getApplicationContext());
     }
 
     @Override

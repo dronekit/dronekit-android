@@ -13,7 +13,6 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.google.android.gms.analytics.HitBuilders;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
@@ -45,23 +44,35 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
+import timber.log.Timber;
+
 /**
  * 3DR Services background service implementation.
  */
 public class DroidPlannerService extends Service {
 
-    private static final String TAG = DroidPlannerService.class.getSimpleName();
-
+    /**
+     * Status bar notification id
+     */
     private static final int FOREGROUND_ID = 101;
 
+    /**
+     * Set of actions to notify the local app's components of the service events.
+     */
     public static final String ACTION_DRONE_CREATED = Utils.PACKAGE_NAME + ".ACTION_DRONE_CREATED";
     public static final String ACTION_DRONE_DESTROYED = Utils.PACKAGE_NAME + ".ACTION_DRONE_DESTROYED";
     public static final String ACTION_KICK_START_DRONESHARE_UPLOADS = Utils.PACKAGE_NAME + ".ACTION_KICK_START_DRONESHARE_UPLOADS";
     public static final String ACTION_RELEASE_API_INSTANCE = Utils.PACKAGE_NAME + ".action.RELEASE_API_INSTANCE";
     public static final String EXTRA_API_INSTANCE_APP_ID = "extra_api_instance_app_id";
 
+    /**
+     * Used to broadcast service events.
+     */
     private LocalBroadcastManager lbm;
 
+    /**
+     * Stores drone api instances per connected client. The client are denoted by their app id.
+     */
     final ConcurrentHashMap<String, DroneApi> droneApiStore = new ConcurrentHashMap<>();
 
     /**
@@ -74,8 +85,6 @@ public class DroidPlannerService extends Service {
      */
     final ConcurrentHashMap<ConnectionParameter, DroneManager> droneManagers = new ConcurrentHashMap<>();
 
-//    private HandlerThread handlerThread;
-
     private DPServices dpServices;
     private DroneAccess droneAccess;
     private MavLinkServiceApi mavlinkApi;
@@ -83,6 +92,12 @@ public class DroidPlannerService extends Service {
     private CameraInfoLoader cameraInfoLoader;
     private List<CameraDetail> cachedCameraDetails;
 
+    /**
+     * Generate a drone api instance for the client denoted by the given app id.
+     * @param listener Used to retrieve api information.
+     * @param appId Application id of the connecting client.
+     * @return a IDroneApi instance
+     */
     DroneApi registerDroneApi(IApiListener listener, String appId) {
         if (listener == null)
             return null;
@@ -94,51 +109,74 @@ public class DroidPlannerService extends Service {
         return droneApi;
     }
 
+    /**
+     * Release the drone api instance attached to the given app id.
+     * @param appId Application id of the disconnecting client.
+     */
     void releaseDroneApi(String appId) {
         if (appId == null)
             return;
 
         DroneApi droneApi = droneApiStore.remove(appId);
         if (droneApi != null) {
-            Log.d(TAG, "Releasing drone api instance for " + appId);
+            Timber.d("Releasing drone api instance for " + appId);
             droneApi.destroy();
             lbm.sendBroadcast(new Intent(ACTION_DRONE_DESTROYED));
             updateForegroundNotification();
         }
     }
 
+    /**
+     * Establish a connection with a vehicle using the given connection parameter.
+     * @param connParams Parameters used to connect to the vehicle.
+     * @param appId Application id of the connecting client.
+     * @param listener Callback to receive drone events.
+     * @return A DroneManager instance which acts as router between the connected vehicle and the listeneing client(s).
+     * @throws ConnectionException
+     */
     DroneManager connectDroneManager(ConnectionParameter connParams, String appId, DroneEventsListener listener) throws ConnectionException {
         if (connParams == null || TextUtils.isEmpty(appId) || listener == null)
             return null;
 
         DroneManager droneMgr = droneManagers.get(connParams);
         if (droneMgr == null) {
-            Log.d(TAG, "Generating new drone manager.");
+            Timber.d("Generating new drone manager.");
             droneMgr = new DroneManager(getApplicationContext(), connParams, new Handler(Looper.getMainLooper()),
                     mavlinkApi);
             droneManagers.put(connParams, droneMgr);
         }
 
-        Log.d(TAG, "Drone manager connection for " + appId);
+        Timber.d("Drone manager connection for " + appId);
         droneMgr.connect(appId, listener);
         return droneMgr;
     }
 
+    /**
+     * Disconnect the given client from the vehicle managed by the given drone manager.
+     * @param droneMgr Handler for the connected vehicle.
+     * @param appId Application id of the disconnecting client.
+     * @throws ConnectionException
+     */
     void disconnectDroneManager(DroneManager droneMgr, String appId) throws ConnectionException {
         if (droneMgr == null || TextUtils.isEmpty(appId))
             return;
 
-        Log.d(TAG, "Drone manager disconnection for " + appId);
+        Timber.d("Drone manager disconnection for " + appId);
         droneMgr.disconnect(appId);
         if (droneMgr.getConnectedAppsCount() == 0) {
-            Log.d(TAG, "Destroying drone manager.");
+            Timber.d("Destroying drone manager.");
             droneMgr.destroy();
             droneManagers.remove(droneMgr.getConnectionParameter());
         }
     }
 
-    void connectMAVConnection(ConnectionParameter connParams, String listenerTag,
-                              MavLinkConnectionListener listener) {
+    /**
+     * Setup a MAVLink connection using the given parameter.
+     * @param connParams Parameter used to setup the MAVLink connection.
+     * @param listenerTag Used to identify the connection requester.
+     * @param listener Callback to receive the connection events.
+     */
+    void connectMAVConnection(ConnectionParameter connParams, String listenerTag, MavLinkConnectionListener listener) {
         AndroidMavLinkConnection conn = mavConnections.get(connParams.getUniqueId());
         final int connectionType = connParams.getConnectionType();
         final Bundle paramsBundle = connParams.getParamsBundle();
@@ -151,14 +189,14 @@ public class DroidPlannerService extends Service {
                     final int baudRate = paramsBundle.getInt(ConnectionType.EXTRA_USB_BAUD_RATE,
                             ConnectionType.DEFAULT_USB_BAUD_RATE);
                     conn = new UsbConnection(getApplicationContext(), baudRate);
-                    Log.d(TAG, "Connecting over usb.");
+                    Timber.d("Connecting over usb.");
                     break;
 
                 case ConnectionType.TYPE_BLUETOOTH:
                     //Retrieve the bluetooth address to connect to
                     final String bluetoothAddress = paramsBundle.getString(ConnectionType.EXTRA_BLUETOOTH_ADDRESS);
                     conn = new BluetoothConnection(getApplicationContext(), bluetoothAddress);
-                    Log.d(TAG, "Connecting over bluetooth.");
+                    Timber.d("Connecting over bluetooth.");
                     break;
 
                 case ConnectionType.TYPE_TCP:
@@ -167,18 +205,18 @@ public class DroidPlannerService extends Service {
                     final int tcpServerPort = paramsBundle.getInt(ConnectionType
                             .EXTRA_TCP_SERVER_PORT, ConnectionType.DEFAULT_TCP_SERVER_PORT);
                     conn = new AndroidTcpConnection(getApplicationContext(), tcpServerIp, tcpServerPort);
-                    Log.d(TAG, "Connecting over tcp.");
+                    Timber.d("Connecting over tcp.");
                     break;
 
                 case ConnectionType.TYPE_UDP:
                     final int udpServerPort = paramsBundle
                             .getInt(ConnectionType.EXTRA_UDP_SERVER_PORT, ConnectionType.DEFAULT_UDP_SERVER_PORT);
                     conn = new AndroidUdpConnection(getApplicationContext(), udpServerPort);
-                    Log.d(TAG, "Connecting over udp.");
+                    Timber.d("Connecting over udp.");
                     break;
 
                 default:
-                    Log.e(TAG, "Unrecognized connection type: " + connectionType);
+                    Timber.e("Unrecognized connection type: %s", connectionType);
                     return;
             }
 
@@ -199,7 +237,7 @@ public class DroidPlannerService extends Service {
                     ((AndroidUdpConnection) conn).addPingTarget(resolvedAddress, pingPort, pingPeriod, pingPayload);
 
                 } catch (UnknownHostException e) {
-                    Log.e(TAG, "Unable to resolve UDP ping server ip address.", e);
+                    Timber.e(e, "Unable to resolve UDP ping server ip address.");
                 }
             }
         }
@@ -216,22 +254,11 @@ public class DroidPlannerService extends Service {
         }
     }
 
-    void addLoggingFile(ConnectionParameter connParams, String tag, String loggingFilePath) {
-        AndroidMavLinkConnection conn = mavConnections.get(connParams.getUniqueId());
-        if (conn == null)
-            return;
-
-        conn.addLoggingPath(tag, loggingFilePath);
-    }
-
-    void removeLoggingFile(ConnectionParameter connParams, String tag) {
-        AndroidMavLinkConnection conn = mavConnections.get(connParams.getUniqueId());
-        if (conn == null)
-            return;
-
-        conn.removeLoggingPath(tag);
-    }
-
+    /**
+     * Disconnect the MAVLink connection for the given listener.
+     * @param connParams Connection parameters
+     * @param listenerTag Listener to be disconnected.
+     */
     void disconnectMAVConnection(ConnectionParameter connParams, String listenerTag) {
         final AndroidMavLinkConnection conn = mavConnections.get(connParams.getUniqueId());
         if (conn == null)
@@ -241,7 +268,7 @@ public class DroidPlannerService extends Service {
 
         if (conn.getMavLinkConnectionListenersCount() == 0 && conn.getConnectionStatus() !=
                 MavLinkConnection.MAVLINK_DISCONNECTED) {
-            Log.d(TAG, "Disconnecting...");
+            Timber.d("Disconnecting...");
             conn.disconnect();
 
             GAUtils.sendEvent(new HitBuilders.EventBuilder()
@@ -251,6 +278,37 @@ public class DroidPlannerService extends Service {
         }
     }
 
+    /**
+     * Register a log listener.
+     * @param connParams Parameters whose connection's data to log.
+     * @param tag Tag for the listener.
+     * @param loggingFilePath File path for the logging file.
+     */
+    void addLoggingFile(ConnectionParameter connParams, String tag, String loggingFilePath) {
+        AndroidMavLinkConnection conn = mavConnections.get(connParams.getUniqueId());
+        if (conn == null)
+            return;
+
+        conn.addLoggingPath(tag, loggingFilePath);
+    }
+
+    /**
+     * Unregister a log listener.
+     * @param connParams Connection parameters from whom to stop the logging.
+     * @param tag Tag for the listener.
+     */
+    void removeLoggingFile(ConnectionParameter connParams, String tag) {
+        AndroidMavLinkConnection conn = mavConnections.get(connParams.getUniqueId());
+        if (conn == null)
+            return;
+
+        conn.removeLoggingPath(tag);
+    }
+
+    /**
+     * Retrieves the set of camera info provided by the app.
+     * @return a list of {@link CameraDetail} objects.
+     */
     synchronized List<CameraDetail> getCameraDetails() {
         if (cachedCameraDetails == null) {
             List<String> cameraInfoNames = cameraInfoLoader.getCameraInfoList();
@@ -260,7 +318,7 @@ public class DroidPlannerService extends Service {
                 try {
                     cameraInfos.add(cameraInfoLoader.openFile(infoName));
                 } catch (Exception e) {
-                    Log.e(TAG, e.getMessage(), e);
+                    Timber.e(e, e.getMessage());
                 }
             }
 
@@ -279,7 +337,7 @@ public class DroidPlannerService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        Log.d(TAG, "Binding intent: " + intent);
+        Timber.d("Binding intent: " + intent);
         final String action = intent.getAction();
         if (IDroidPlannerServices.class.getName().equals(action)) {
             // Return binder to ipc client-server interaction.
@@ -294,12 +352,9 @@ public class DroidPlannerService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.d(TAG, "Creating 3DR Services.");
+        Timber.d("Creating 3DR Services.");
 
         final Context context = getApplicationContext();
-
-//        handlerThread = new HandlerThread("Connected apps looper");
-//        handlerThread.start();
 
         mavlinkApi = new MavLinkServiceApi(this);
         droneAccess = new DroneAccess(this);
@@ -339,7 +394,7 @@ public class DroidPlannerService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.d(TAG, "Destroying 3DR Services.");
+        Timber.d("Destroying 3DR Services.");
 
         for (DroneApi droneApi : droneApiStore.values()) {
             droneApi.destroy();
@@ -353,7 +408,6 @@ public class DroidPlannerService extends Service {
 
         mavConnections.clear();
         dpServices.destroy();
-//        handlerThread.quit();
 
         stopForeground(true);
     }
