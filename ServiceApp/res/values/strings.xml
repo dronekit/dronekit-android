@@ -25,11 +25,31 @@
     <string name="pref_mavlink_stream_rate_rc_channels">RC Channel Data</string>
     <string name="pref_mavlink_stream_rate_raw_sensors">Raw Sensors</string>
     <string name="pref_mavlink_stream_rate_raw_controller">Raw Controller</string>
+
     <string name="app_connections_default_message">NO ACTIVE APPS</string>
+
     <string name="label_learn_more">Learn more</string>
     <string name="label_action_button_install">Install</string>
     <string name="label_action_button_open">Open</string>
     <string name="label_view_category_active">Active</string>
     <string name="label_view_category_recommended">Recommended</string>
+
+    <string name="label_free_flight">Free Flight</string>
+    <string name="label_selfie">Selfie</string>
+    <string name="label_cable_cam">Cable Cam</string>
+    <string name="label_preset_cable_cam">Cable Cam</string>
+    <string name="label_preset_orbit">Orbit</string>
+    <string name="label_orbit">Orbit</string>
+    <string name="label_preset_selfie">Selfie</string>
+    <string name="label_follow">Follow</string>
+
+    <!-- Shot type indicator -->
+    <string name="copter_alt_hold_label">FLY: Manual</string>
+    <string name="copter_loiter_label">FLY</string>
+    <string name="copter_rtl_label">Return Home</string>
+    <string name="copter_guided_label">Take off</string>
+    <string name="copter_auto_tune_label">Auto-tune</string>
+    <string name="copter_pos_hold_label">Position Hold</string>
+    <string name="copter_auto_label">Mission</string>
 
 </resources>
