@@ -2,49 +2,51 @@
 First App: Hello Drone
 ======================
 
-In the first example, we’ll walk through making an app that connects to a copter and executes basic commands, including changing ArduPilot flight modes, arming, taking off and landing.
+In the first example, we’ll walk through making an app that connects to a Copter and executes basic commands, including changing ArduPilot flight modes, arming, taking off and landing.
 
 
 Project Setup
 =============
 
-First, let's set up a basic Android Studio project.
+#. Set up a basic Android Studio project.
 
-.. image:: _static/images/hellodrone_setup_1.png
+   .. image:: _static/images/hellodrone_setup_1.png
 
-Make sure to use API 15 (Ice Cream Sandwich) or later.
+   Make sure to use API 15 (Ice Cream Sandwich) or later.
 
-.. image:: _static/images/hellodrone_setup_2.png
+   .. image:: _static/images/hellodrone_setup_2.png
 
-Let's start with a blank activity.
+#. Start with a blank activity.
 
-.. image:: _static/images/hellodrone_setup_3.png
+   .. image:: _static/images/hellodrone_setup_3.png
 
-Click **Finish** to create your project.
+#. Click **Finish** to create your project.
 
-.. image:: _static/images/hellodrone_setup_4.png
+   .. image:: _static/images/hellodrone_setup_4.png
 
 
 Adding the Client Library
 =========================
 
-To add the 3DR Services library to your project, open **build.gradle (Module:app)** and add: 
+To add the 3DR Services library to your project:
 
-::
+#. Open **build.gradle (Module:app)** and, under the dependencies section, add: 
 
-	compile 'com.o3dr.android:droneKit-android:2.3.+'
+   .. code-block:: bash
 
-under the dependencies section.
+       compile 'com.o3dr.android:dronekit-android:2.3.+'
 
-.. image:: _static/images/hellodrone_setup_5.png
+#. Click **Sync** in the top-right corner to re-sync the gradle:
 
-Click **Sync** in the top-right corner to re-sync the gradle.
+   .. image:: _static/images/hellodrone_setup_5.png
+
+
 
 
 Connecting to 3DR Services
 ==========================
 
-Implement a TowerListener on your MainActivity to listen for events sent from 3DR Services to your app.
+Implement a ``TowerListener`` on your ``MainActivity`` to listen for events sent from 3DR Services to your app.
 
 .. code-block:: java
    :linenos:
@@ -73,57 +75,57 @@ Implement a TowerListener on your MainActivity to listen for events sent from 3D
 
 Now you'll need to:
 
-1. Add a ControlTower instance to manage the communication to 3DR Services.
-2. Connect to 3DR Services on start of the Main Activity and disconnect on its stop.
+1. Add a ``ControlTower`` instance to manage the communication to 3DR Services.
+2. Connect to 3DR Services on start of the ``MainActivity`` and disconnect on its stop.
 
-.. code-block:: java
-   :linenos:
-   :emphasize-lines: 3,11,18,25,28-36
+   .. code-block:: java
+       :linenos:
+       :emphasize-lines: 3,11,18,25,28-36
 
-	public class MainActivity extends ActionBarActivity implements TowerListener {
+       public class MainActivity extends ActionBarActivity implements TowerListener {
 
-		private ControlTower controlTower;
+       private ControlTower controlTower;
 
-		@Override
-		protected void onCreate(Bundle savedInstanceState) {
-			super.onCreate(savedInstanceState);
-			setContentView(R.layout.activity_main);
+       @Override
+       protected void onCreate(Bundle savedInstanceState) {
+           super.onCreate(savedInstanceState);
+           setContentView(R.layout.activity_main);
 
-			// Initialize the service manager
-			this.controlTower = new ControlTower(getApplicationContext());
+           // Initialize the service manager
+           this.controlTower = new ControlTower(getApplicationContext());
 
-		}
+       }
 
-		@Override
-		public void onStart() {
-			super.onStart();
-			this.controlTower.connect(this);
+       @Override
+       public void onStart() {
+           super.onStart();
+           this.controlTower.connect(this);
 
-		}
+       }
 
-		@Override
-		public void onStop() {
-			super.onStop();
-			this.controlTower.disconnect();
-		}
+       @Override
+       public void onStop() {
+           super.onStop();
+           this.controlTower.disconnect();
+       }
 
-		@Override
-		public void onTowerConnected() {
+       @Override
+       public void onTowerConnected() {
 
-		}
+       }
 
-		@Override
-		public void onTowerDisconnected() {
+       @Override
+       public void onTowerDisconnected() {
 			
-		}
+       }
 
-		@Override
-		protected void onCreate(Bundle savedInstanceState) {
-			super.onCreate(savedInstanceState);
-			setContentView(R.layout.activity_main);
+       @Override
+       protected void onCreate(Bundle savedInstanceState) {
+           super.onCreate(savedInstanceState);
+           setContentView(R.layout.activity_main);
 
-		}
-	}
+       }
+   }
 
 
 Connecting to a Drone via UDP
@@ -131,19 +133,19 @@ Connecting to a Drone via UDP
 
 Make sure you have your SITL instance running. Power up a simulated drone with a UDP output to the IP of your Android device.
 
-For this example, you’ll simulate a drone in Berkeley, CA, display the telemetry console and set the output IP to your Android testing device. (You can find the IP for your Android device in Settings > Wi-Fi. Tap on the connection to get information about it.)
+For this example, you’ll simulate a drone in Berkeley, CA, display the telemetry console and set the output IP to your Android testing device. (You can find the IP for your Android device in **Settings | Wi-Fi**. Tap on the connection to get information about it.)
 
 In your terminal, navigate to the folder with the cloned ardupilot repo and enter the following:
 
-::
+.. code-block:: bash
 
-	sim_vehicle.sh -L 3DRBerkeley --console  --out <ANDROID_DEVICE_IP>:14550
+    sim_vehicle.sh -L 3DRBerkeley --console  --out <ANDROID_DEVICE_IP>:14550
 
 
 
 Now that you have a virtual drone, let’s add the ability to connect to it.
 
-First, declare that your MainActivity can act as an interface for DroneListener and implement some methods to listen for drone events.
+First, declare that your ``MainActivity`` can act as an interface for DroneListener and implement some methods to listen for drone events.
 
 .. code-block:: java
 	:linenos:
@@ -168,7 +170,7 @@ First, declare that your MainActivity can act as an interface for DroneListener 
 		...
 	}
 
-Next, add an instance variable to the top of your MainActivity to keep track of the drone instance.
+Next, add an instance variable to the top of your ``MainActivity`` to keep track of the drone instance.
 
 .. code-block:: java
 	:linenos:
@@ -191,7 +193,7 @@ In order to register with the control tower, the drone instance needs a generic 
 		private final Handler handler = new Handler();
 
 
-Add an instantiation of the new drone upon the creation of your MainActivity. After creation, the new drone will need to be registered with the control tower to be active.
+Add an instantiation of the new drone upon the creation of your ``MainActivity``. After creation, the new drone will need to be registered with the control tower to be active.
 
 .. code-block:: java
 	:linenos:
@@ -213,7 +215,7 @@ Add an instantiation of the new drone upon the creation of your MainActivity. Af
         }
 
 
-Make sure that when the MainActivity is stopped, the drone is unregistered from the control tower. 
+Make sure that when the ``MainActivity`` is stopped, the drone is unregistered from the control tower. 
 
 .. code-block:: java
 	:linenos:
@@ -244,7 +246,7 @@ Now let's add a button in **activity_main.xml** that will connect to the drone o
 		android:layout_alignParentRight="true"
 		android:layout_alignParentEnd="true" />
 
-Add a method to your MainActivity to handle the connect button press so that:
+Add a method to your ``MainActivity`` to handle the connect button press so that:
 
 1. If the drone is connected, use this button to disconnect.
 2. If the drone isn’t connected, build a set of connection parameters and connect.
@@ -266,7 +268,7 @@ Add a method to your MainActivity to handle the connect button press so that:
 	}
 
 
-Now add some UI elements to alert you when the drone is connected. Add the following UI helper method to the bottom of your MainActivity file.
+Now add some UI elements to alert you when the drone is connected. Add the following UI helper method to the bottom of your ``MainActivity`` file.
 
 .. code-block:: java
 	:linenos:
@@ -285,7 +287,7 @@ Now add some UI elements to alert you when the drone is connected. Add the follo
 		}
 	}
 
-Let’s revisit the **onDroneEvent** method. Add the following to your **onDroneEvent** method to alert the user when the drone is connected:
+Let’s revisit the ``onDroneEvent`` method. Add the following to your ``onDroneEvent`` method to alert the user when the drone is connected:
 
 .. code-block:: java
 	:linenos:
@@ -329,7 +331,7 @@ For USB connections, you'll need to define an extra param for the baud rate.
 Getting Telemetry from the Drone
 ================================
 
-In order to get telemetry updates from the drone, you'll need to add cases for different drone events returned in **onDroneEvent**.
+In order to get telemetry updates from the drone, you'll need to add cases for different drone events returned in ``onDroneEvent``.
 
 .. code-block:: java
 	:linenos:
@@ -375,7 +377,7 @@ In order to get telemetry updates from the drone, you'll need to add cases for d
 		}
 	}
 
-Add some TextViews to your UI to output telemetry values. In **activity_main.xml**, add a table with TextViews and a Spinner Dropdown view that will let you change the vehicle’s modes.
+Add some TextViews to your UI to output telemetry values. In **activity_main.xml**, add a table with ``TextViews`` and a Spinner Dropdown view that will let you change the vehicle’s modes.
 
 .. code-block:: xml
 
@@ -497,7 +499,7 @@ Add some TextViews to your UI to output telemetry values. In **activity_main.xml
 
 	</TableLayout>
 
-Add a class-level Spinner variable in MainActivity so you can reference the table throughout the code.
+Add a class-level Spinner variable in ``MainActivity`` so you can reference the table throughout the code.
 
 .. code-block:: java
 	:linenos:
@@ -509,7 +511,7 @@ Add a class-level Spinner variable in MainActivity so you can reference the tabl
 		private final Handler handler = new Handler();
 		Spinner modeSelector;
 
-Add a reference to the Spinner defined in the XML layout to the **onCreate** method.
+Add a reference to the Spinner defined in the XML layout to the ``onCreate`` method.
 
 .. code-block:: java
 	:linenos:
@@ -537,7 +539,7 @@ Add a reference to the Spinner defined in the XML layout to the **onCreate** met
 		});
 	}
 
-Now implement some of the methods in **onDroneEvent** in order to update the UI. Add the following methods to your MainActivity.
+Now implement some of the methods in ``onDroneEvent`` in order to update the UI. Add the following methods to your ``MainActivity``.
 
 .. code-block:: java
 	:linenos:
@@ -616,7 +618,7 @@ This changes the drone's flight mode when the user changes the mode selector.
 
 	protected void updateVehicleModesForType(int droneType)
 
-This is triggered when the **onDroneEvent** tells us the type of vehicle we're dealing with. In the **onDroneEvent**, we get the type of vehicle and the modes the vehicle can have.
+This is triggered when the ``onDroneEvent`` tells us the type of vehicle we're dealing with. In the ``onDroneEvent``, we get the type of vehicle and the modes the vehicle can have.
 
 ::
 
@@ -659,7 +661,7 @@ Add a button to your app that will allow you to arm, take off and land the drone
 		android:visibility="invisible"
 		android:onClick="onArmButtonTap" />
 
-Add a method to your MainActivity to update the button's UI depending on the vehicle state:
+Add a method to your ``MainActivity`` to update the button's UI depending on the vehicle state:
 
 .. code-block:: java
 	:linenos:
@@ -687,7 +689,7 @@ Add a method to your MainActivity to update the button's UI depending on the veh
 		}
 	}
 
-Add a method to your MainActivity to handle the arm button press:
+Add a method to your ``MainActivity`` to handle the arm button press:
 
 .. code-block:: java
 	:linenos:
@@ -712,7 +714,7 @@ Add a method to your MainActivity to handle the arm button press:
 		}
 	}
 
-Finally, go back to your good old **onDroneEvent** to link updating the arm button UI to the drone events:
+Finally, go back to your good old `onDroneEvent`` to link updating the arm button UI to the drone events:
 
 .. code-block:: java
 	:linenos:
