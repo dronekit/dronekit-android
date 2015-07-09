@@ -271,7 +271,9 @@ public class MavLinkMsgHandler {
             return;
 
         if(message.startsWith("ArduCopter") || message.startsWith("ArduPlane")
-                || message.startsWith("ArduRover") || message.startsWith("Solo")){
+                || message.startsWith("ArduRover") || message.startsWith("Solo")
+                || message.startsWith("APM:Copter") || message.startsWith("APM:Plane")
+                || message.startsWith("APM:Rover")){
             drone.setFirmwareVersion(message);
         }
         else{
