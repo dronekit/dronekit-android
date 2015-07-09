@@ -3,6 +3,7 @@ package org.droidplanner.services.android.api;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.RemoteException;
+import android.text.TextUtils;
 import android.util.Log;
 
 import org.droidplanner.core.drone.variables.ApmModes;
@@ -43,6 +44,7 @@ import com.o3dr.services.android.lib.drone.property.VehicleMode;
 import com.o3dr.services.android.lib.gcs.follow.FollowState;
 import com.o3dr.services.android.lib.gcs.follow.FollowType;
 import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
+import com.o3dr.services.android.lib.model.AbstractCommandListener;
 import com.o3dr.services.android.lib.model.ICommandListener;
 
 import org.droidplanner.core.MAVLink.MavLinkArm;
@@ -76,6 +78,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import timber.log.Timber;
 
 /**
  * Created by Fredia Huya-Kouadio on 3/23/15.
@@ -675,10 +679,72 @@ public class DroneApiUtils {
         arm(drone, arm, false, listener);
     }
 
-    static void arm(Drone drone, boolean arm, boolean emergencyDisarm, ICommandListener listener) {
+    static void arm(final Drone drone, final boolean arm, final boolean emergencyDisarm, final ICommandListener listener) {
         if (drone == null)
             return;
+
+        if(!arm && emergencyDisarm){
+            if(org.droidplanner.core.drone.variables.Type.isCopter(drone.getType()) && !isKillSwitchSupported(drone)) {
+
+                changeVehicleMode(drone, VehicleMode.COPTER_STABILIZE, new AbstractCommandListener() {
+                    @Override
+                    public void onSuccess() {
+                        MavLinkArm.sendArmMessage(drone, arm, emergencyDisarm, listener);
+                    }
+
+                    @Override
+                    public void onError(int executionError) {
+                        if(listener != null) {
+                            try {
+                                listener.onError(executionError);
+                            } catch (RemoteException e) {
+                                Timber.e(e, e.getMessage());
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onTimeout() {
+                        if(listener != null){
+                            try {
+                                listener.onTimeout();
+                            } catch (RemoteException e) {
+                                Timber.e(e, e.getMessage());
+                            }
+                        }
+                    }
+                });
+
+                return;
+            }
+        }
+
         MavLinkArm.sendArmMessage(drone, arm, emergencyDisarm, listener);
+    }
+
+    /**
+     * Check if the kill switch feature is supported on the given drone
+     * @param drone
+     * @return true if it's supported, false otherwise.
+     */
+    static boolean isKillSwitchSupported(Drone drone){
+        if(drone == null)
+            return false;
+
+        if(!org.droidplanner.core.drone.variables.Type.isCopter(drone.getType()))
+            return false;
+
+        final String firmwareVersion = drone.getFirmwareVersion();
+        if(TextUtils.isEmpty(firmwareVersion))
+            return false;
+
+        if(!firmwareVersion.startsWith("APM:Copter V3.3")
+                && !firmwareVersion.startsWith("APM:Copter V3.4")
+                && !firmwareVersion.startsWith("Solo")){
+            return false;
+        }
+
+        return true;
     }
 
     static void startMagnetometerCalibration(Drone drone, boolean retryOnFailure, boolean saveAutomatically, int
