@@ -63,6 +63,7 @@ import org.droidplanner.core.gcs.follow.Follow;
 import org.droidplanner.core.gcs.follow.FollowAlgorithm;
 import org.droidplanner.core.helpers.coordinates.Coord2D;
 import org.droidplanner.core.helpers.coordinates.Coord3D;
+import org.droidplanner.core.mission.survey.SplineSurvey;
 import org.droidplanner.core.model.Drone;
 import org.droidplanner.core.survey.Footprint;
 import org.droidplanner.services.android.drone.DroneManager;
@@ -869,6 +870,12 @@ public class DroneApiUtils {
                     itemType.storeMissionItem(updatedSurvey, itemBundle);
                 break;
 
+            case SPLINE_SURVEY:
+                Survey updatedSplineSurvey = buildSplineSurvey(drone, (Survey) missionItem);
+                if (updatedSplineSurvey != null)
+                    itemType.storeMissionItem(updatedSplineSurvey, itemBundle);
+                break;
+
             case STRUCTURE_SCANNER:
                 StructureScanner updatedScanner = buildStructureScanner(drone, (StructureScanner) missionItem);
                 if (updatedScanner != null)
@@ -887,6 +894,14 @@ public class DroneApiUtils {
                 (droneMission, survey);
 
         return (Survey) ProxyUtils.getProxyMissionItem(updatedSurvey);
+    }
+
+    static Survey buildSplineSurvey(Drone drone, Survey survey) {
+        org.droidplanner.core.mission.Mission droneMission = drone == null ? null : drone.getMission();
+        org.droidplanner.core.mission.survey.SplineSurvey updatedSplineSurvey = (org.droidplanner.core.mission.survey.SplineSurvey)
+                ProxyUtils.getMissionItemImpl(droneMission, survey);
+
+        return (Survey) ProxyUtils.getProxyMissionItem(updatedSplineSurvey);
     }
 
     static StructureScanner buildStructureScanner(Drone drone, StructureScanner item) {
