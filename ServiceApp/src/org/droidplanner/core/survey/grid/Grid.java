@@ -27,7 +27,7 @@ public class Grid {
     }
 
     public int getCameraCount() {
-        return getCameraLocations().size();
+        return cameraLocations.size();
     }
 
 }
