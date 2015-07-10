@@ -28,6 +28,7 @@ import org.droidplanner.core.mission.Mission;
 import org.droidplanner.core.mission.commands.ConditionYaw;
 import org.droidplanner.core.mission.commands.ReturnToHome;
 import org.droidplanner.core.mission.commands.SetRelayImpl;
+import org.droidplanner.core.mission.survey.SplineSurveyImpl;
 import org.droidplanner.core.mission.waypoints.DoLandStartImpl;
 import org.droidplanner.core.survey.CameraInfo;
 import org.droidplanner.core.survey.SurveyData;
@@ -251,8 +252,7 @@ public class ProxyUtils {
                 SurveyDetail surveyDetail = proxy.getSurveyDetail();
                 List<Coord2D> polygonPoints = MathUtils.latLongToCoord2D(proxy.getPolygonPoints());
 
-                org.droidplanner.core.mission.survey.SplineSurvey temp = new org.droidplanner.core
-                        .mission.survey.SplineSurvey(mission, polygonPoints);
+                SplineSurveyImpl temp = new SplineSurveyImpl(mission, polygonPoints);
 
                 if (surveyDetail != null) {
                     CameraDetail cameraDetail = surveyDetail.getCameraDetail();
@@ -412,7 +412,7 @@ public class ProxyUtils {
             }
 
             case SPLINE_SURVEY: {
-                org.droidplanner.core.mission.survey.SplineSurvey source = (org.droidplanner.core.mission.survey.SplineSurvey) itemImpl;
+                SplineSurveyImpl source = (SplineSurveyImpl) itemImpl;
 
                 boolean isValid = true;
                 try {

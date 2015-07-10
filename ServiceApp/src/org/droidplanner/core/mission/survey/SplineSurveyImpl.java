@@ -18,13 +18,13 @@ import org.droidplanner.core.survey.grid.GridBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SplineSurvey extends MissionItem {
+public class SplineSurveyImpl extends MissionItem {
 
     public Polygon polygon = new Polygon();
     public SurveyData surveyData = new SurveyData();
     public Grid grid;
 
-    public SplineSurvey(Mission mission, List<Coord2D> points) {
+    public SplineSurveyImpl(Mission mission, List<Coord2D> points) {
         super(mission);
         polygon.addPoints(points);
     }

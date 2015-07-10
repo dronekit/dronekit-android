@@ -9,7 +9,7 @@ import org.droidplanner.core.mission.commands.ReturnToHome;
 import org.droidplanner.core.mission.commands.SetRelayImpl;
 import org.droidplanner.core.mission.commands.SetServo;
 import org.droidplanner.core.mission.commands.Takeoff;
-import org.droidplanner.core.mission.survey.SplineSurvey;
+import org.droidplanner.core.mission.survey.SplineSurveyImpl;
 import org.droidplanner.core.mission.survey.Survey;
 import org.droidplanner.core.mission.waypoints.Circle;
 import org.droidplanner.core.mission.waypoints.DoLandStartImpl;
@@ -75,7 +75,7 @@ public enum MissionItemType {
             case SURVEY:
                 return new Survey(referenceItem.getMission(), Collections.<Coord2D>emptyList());
             case SPLINE_SURVEY:
-                return new SplineSurvey(referenceItem.getMission(), Collections.<Coord2D>emptyList());
+                return new SplineSurveyImpl(referenceItem.getMission(), Collections.<Coord2D>emptyList());
             case CYLINDRICAL_SURVEY:
                 return new StructureScanner(referenceItem);
             case SET_SERVO:

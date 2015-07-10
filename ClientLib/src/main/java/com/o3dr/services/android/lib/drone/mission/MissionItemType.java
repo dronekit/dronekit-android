@@ -164,18 +164,6 @@ public enum MissionItemType {
         }
     },
 
-    SPLINE_SURVEY("Spline Survey") {
-        @Override
-        public MissionItem getNewItem() {
-            return new SplineSurvey();
-        }
-
-        @Override
-        protected Creator<SplineSurvey> getMissionItemCreator() {
-            return SplineSurvey.CREATOR;
-        }
-    },
-
     STRUCTURE_SCANNER("Structure Scanner") {
         @Override
         public MissionItem getNewItem() {
@@ -238,6 +226,18 @@ public enum MissionItemType {
         @Override
         protected Creator<DoLandStart> getMissionItemCreator() {
             return DoLandStart.CREATOR;
+        }
+    },
+
+    SPLINE_SURVEY("Spline Survey") {
+        @Override
+        public MissionItem getNewItem() {
+            return new SplineSurvey();
+        }
+
+        @Override
+        protected Creator<SplineSurvey> getMissionItemCreator() {
+            return SplineSurvey.CREATOR;
         }
     };
 
