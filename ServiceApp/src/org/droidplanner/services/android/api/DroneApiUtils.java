@@ -2,7 +2,9 @@ package org.droidplanner.services.android.api;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.os.RemoteException;
+import android.support.v4.util.Pair;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -19,6 +21,9 @@ import com.o3dr.services.android.lib.drone.calibration.magnetometer.Magnetometer
 import com.o3dr.services.android.lib.drone.calibration.magnetometer.MagnetometerCalibrationResult;
 import com.o3dr.services.android.lib.drone.calibration.magnetometer.MagnetometerCalibrationStatus;
 import com.o3dr.services.android.lib.drone.camera.GoPro;
+import com.o3dr.services.android.lib.drone.companion.solo.SoloLinkState;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSettingSetter;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
 import com.o3dr.services.android.lib.drone.mission.Mission;
 import com.o3dr.services.android.lib.drone.mission.MissionItemType;
 import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
@@ -66,6 +71,7 @@ import org.droidplanner.core.helpers.coordinates.Coord3D;
 import org.droidplanner.core.model.Drone;
 import org.droidplanner.core.survey.Footprint;
 import org.droidplanner.services.android.drone.DroneManager;
+import org.droidplanner.services.android.drone.companion.solo.SoloComp;
 import org.droidplanner.services.android.utils.MathUtils;
 import org.droidplanner.services.android.utils.ProxyUtils;
 import org.droidplanner.services.android.utils.file.IO.ParameterMetadataLoader;
@@ -945,5 +951,43 @@ public class DroneApiUtils {
                 msgReport.ofs_x, msgReport.ofs_y, msgReport.ofs_z,
                 msgReport.diag_x, msgReport.diag_y, msgReport.diag_z,
                 msgReport.offdiag_x, msgReport.offdiag_y, msgReport.offdiag_z);
+    }
+
+    static SoloLinkState getSoloLinkState(DroneManager droneManager) {
+        if(droneManager == null || !droneManager.isCompanionComputerEnabled())
+            return null;
+
+        final SoloComp soloComp = droneManager.getSoloComp();
+        final Pair<String, String> wifiSettings = soloComp.getWifiSettings();
+        return new SoloLinkState(soloComp.getAutopilotVersion(), soloComp.getControllerFirmwareVersion(),
+                soloComp.getControllerVersion(), soloComp.getVehicleVersion(),
+                wifiSettings.second, wifiSettings.first, soloComp.getButtonSettings());
+    }
+
+    static void sendSoloLinkMessage(DroneManager droneManager, TLVPacket messageData) {
+        if(droneManager == null || messageData == null || !droneManager.isCompanionComputerEnabled())
+            return;
+
+        final SoloComp soloComp = droneManager.getSoloComp();
+        soloComp.sendSoloLinkMessage(messageData);
+    }
+
+    static void updateSoloLinkWifiSettings(DroneManager droneManager, String wifiSsid, String wifiPassword) {
+        if(droneManager == null || !droneManager.isCompanionComputerEnabled())
+            return;
+
+        if(TextUtils.isEmpty(wifiSsid) && TextUtils.isEmpty(wifiPassword))
+            return;
+
+        final SoloComp soloComp = droneManager.getSoloComp();
+        soloComp.updateWifiSettings(wifiSsid, wifiPassword);
+    }
+
+    static void updateSoloLinkButtonSettings(DroneManager droneManager, SoloButtonSettingSetter buttonSettings) {
+        if(droneManager == null || !droneManager.isCompanionComputerEnabled() || buttonSettings == null)
+            return;
+
+        final SoloComp soloComp = droneManager.getSoloComp();
+        soloComp.pushButtonSettings(buttonSettings);
     }
 }

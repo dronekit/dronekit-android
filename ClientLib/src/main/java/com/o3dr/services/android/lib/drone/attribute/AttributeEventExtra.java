@@ -73,4 +73,15 @@ public class AttributeEventExtra {
      * @see {@link AttributeEvent#PARAMETER_RECEIVED}
      */
     public static final String EXTRA_PARAMETER_VALUE = PACKAGE_NAME + ".PARAMETER_VALUE";
+
+    /**
+     * Used to retrieve the {@link com.o3dr.services.android.lib.drone.companion.solo.button.ButtonPacket} object describing the button event.
+     */
+    public static final String EXTRA_SOLOLINK_BUTTON_EVENT = PACKAGE_NAME + ".EXTRA_SOLOLINK_BUTTON_EVENT";
+
+    /**
+     * Used to retrieve the received sololink message data in bytes.
+     */
+    public static final String EXTRA_SOLOLINK_MESSAGE_DATA = PACKAGE_NAME + ".EXTRA_SOLOLINK_MESSAGE_DATA";
+
 }

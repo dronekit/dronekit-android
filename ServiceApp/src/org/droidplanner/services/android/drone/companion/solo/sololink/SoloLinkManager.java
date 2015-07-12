@@ -1,23 +1,20 @@
 package org.droidplanner.services.android.drone.companion.solo.sololink;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Handler;
-import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
 import org.droidplanner.services.android.drone.companion.solo.AbstractLinkManager;
 import org.droidplanner.services.android.drone.companion.solo.SoloComp;
 import org.droidplanner.services.android.drone.companion.solo.artoo.ArtooLinkManager;
-import org.droidplanner.services.android.drone.companion.solo.artoo.button.ButtonTypes;
-import org.droidplanner.services.android.drone.companion.solo.sololink.tlv.SoloButtonSetting;
-import org.droidplanner.services.android.drone.companion.solo.sololink.tlv.SoloButtonSettingGetter;
-import org.droidplanner.services.android.drone.companion.solo.sololink.tlv.SoloButtonSettingSetter;
-import org.droidplanner.services.android.drone.companion.solo.sololink.tlv.SoloMessageShotManagerError;
-import org.droidplanner.services.android.drone.companion.solo.sololink.tlv.TLVMessageParser;
-import org.droidplanner.services.android.drone.companion.solo.sololink.tlv.TLVMessageTypes;
-import org.droidplanner.services.android.drone.companion.solo.sololink.tlv.TLVPacket;
-import org.droidplanner.services.android.utils.Utils;
+import com.o3dr.services.android.lib.drone.companion.solo.button.ButtonTypes;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSetting;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSettingGetter;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSettingSetter;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloMessageShotManagerError;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageParser;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
 import org.droidplanner.services.android.utils.connection.SshConnection;
 import org.droidplanner.services.android.utils.connection.TcpConnection;
 import org.droidplanner.services.android.utils.connection.UdpConnection;
@@ -34,7 +31,7 @@ import timber.log.Timber;
 /**
  * Handles solo link related logic.
  */
-public class SoloLinkManager extends AbstractLinkManager {
+public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
 
     public static final String SOLO_LINK_DEFAULT_PASSWORD = "sololink";
 
@@ -43,18 +40,8 @@ public class SoloLinkManager extends AbstractLinkManager {
 
     private static final int SHOT_FOLLOW_UDP_PORT = 14558;
 
-    public static final String ACTION_PRESET_BUTTON_LOADED = Utils.PACKAGE_NAME + ".action" +
-            ".PRESET_BUTTON_LOADED";
-    public static final String EXTRA_PRESET_BUTTON_TYPE = "extra_preset_button_type";
-
-    public static final String ACTION_SOLO_LINK_CONNECTED = Utils.PACKAGE_NAME + ".action.SOLO_LINK_CONNECTED";
-
-    public static final String ACTION_SOLO_LINK_DISCONNECTED = Utils.PACKAGE_NAME + ".action.SOLO_LINK_DISCONNECTED";
-
     private static final String SOLO_VERSION_FILENAME = "/VERSION";
     private static final String PIXHAWK_VERSION_FILENAME = "/PIX_VERSION";
-
-    private final LocalBroadcastManager lbm;
 
     private final UdpConnection followDataConn;
 
@@ -76,7 +63,7 @@ public class SoloLinkManager extends AbstractLinkManager {
         @Override
         public void run() {
             final String version = retrieveVersion(SOLO_VERSION_FILENAME);
-            if(version != null)
+            if (version != null)
                 vehicleVersion.set(version);
         }
     };
@@ -85,15 +72,15 @@ public class SoloLinkManager extends AbstractLinkManager {
         @Override
         public void run() {
             final String version = retrieveVersion(PIXHAWK_VERSION_FILENAME);
-            if(version != null)
+            if (version != null)
                 pixhawkVersion.set(version);
         }
     };
 
+    private SoloLinkListener linkListener;
+
     public SoloLinkManager(Context context, Handler handler, ExecutorService asyncExecutor) {
         super(context, new TcpConnection(getSoloLinkIp(), SOLO_LINK_TCP_PORT), handler, asyncExecutor);
-
-        lbm = LocalBroadcastManager.getInstance(context);
 
         UdpConnection dataConn = null;
         try {
@@ -111,13 +98,22 @@ public class SoloLinkManager extends AbstractLinkManager {
     }
 
     public static String getSoloLinkIp() {
-            return SOLO_LINK_IP;
+        return SOLO_LINK_IP;
+    }
+
+    public String getVehicleVersion(){
+        return vehicleVersion.get();
+    }
+
+    public String getPixhawkVersion(){
+        return pixhawkVersion.get();
     }
 
     @Override
-    public void start(LinkListener listener) {
+    public void start(SoloLinkListener listener) {
         Timber.d("Starting solo link manager");
         super.start(listener);
+        this.linkListener = listener;
     }
 
     @Override
@@ -128,7 +124,6 @@ public class SoloLinkManager extends AbstractLinkManager {
 
     @Override
     public void onIpConnected() {
-        lbm.sendBroadcast(new Intent(ACTION_SOLO_LINK_CONNECTED));
         Timber.d("Connected to sololink.");
         super.onIpConnected();
 
@@ -141,9 +136,7 @@ public class SoloLinkManager extends AbstractLinkManager {
 
     @Override
     public void onIpDisconnected() {
-        lbm.sendBroadcast(new Intent(ACTION_SOLO_LINK_DISCONNECTED));
         Timber.d("Disconnected from sololink.");
-
         super.onIpDisconnected();
     }
 
@@ -157,20 +150,19 @@ public class SoloLinkManager extends AbstractLinkManager {
         Timber.d("Received tlv message: " + messageType);
 
         //Have shot manager examine the received message first.
-            switch (messageType) {
-                case TLVMessageTypes.TYPE_SOLO_MESSAGE_SHOT_MANAGER_ERROR:
-                    Timber.w(((SoloMessageShotManagerError) tlvMsg).getExceptionInfo());
-                    break;
+        switch (messageType) {
+            case TLVMessageTypes.TYPE_SOLO_MESSAGE_SHOT_MANAGER_ERROR:
+                Timber.w(((SoloMessageShotManagerError) tlvMsg).getExceptionInfo());
+                break;
 
-                case TLVMessageTypes.TYPE_SOLO_GET_BUTTON_SETTING:
-                    final SoloButtonSettingGetter receivedPresetButton = (SoloButtonSettingGetter) tlvMsg;
-                    handleReceivedPresetButton(receivedPresetButton);
-                    break;
-            }
+            case TLVMessageTypes.TYPE_SOLO_GET_BUTTON_SETTING:
+                final SoloButtonSettingGetter receivedPresetButton = (SoloButtonSettingGetter) tlvMsg;
+                handleReceivedPresetButton(receivedPresetButton);
+                break;
+        }
 
-        lbm.sendBroadcast(new Intent(ACTION_TLV_PACKET_RECEIVED)
-                .putExtra(EXTRA_TLV_PACKET_TYPE, messageType)
-                .putExtra(EXTRA_TLV_PACKET_BYTES, tlvMsg.toBytes()));
+        if (linkListener != null)
+            linkListener.onTlvPacketReceived(tlvMsg);
     }
 
     private void sendPacket(byte[] payload, int payloadSize) {
@@ -211,14 +203,16 @@ public class SoloLinkManager extends AbstractLinkManager {
         switch (buttonType) {
             case ButtonTypes.BUTTON_A:
                 loadedPresetButtonA.set(presetButton);
-                lbm.sendBroadcast(new Intent(ACTION_PRESET_BUTTON_LOADED)
-                        .putExtra(EXTRA_PRESET_BUTTON_TYPE, buttonType));
+                if (linkListener != null) {
+                    linkListener.onPresetButtonLoaded(buttonType, presetButton);
+                }
                 break;
 
             case ButtonTypes.BUTTON_B:
                 loadedPresetButtonB.set(presetButton);
-                lbm.sendBroadcast(new Intent(ACTION_PRESET_BUTTON_LOADED)
-                        .putExtra(EXTRA_PRESET_BUTTON_TYPE, buttonType));
+                if (linkListener != null) {
+                    linkListener.onPresetButtonLoaded(buttonType, presetButton);
+                }
                 break;
         }
     }
@@ -276,7 +270,7 @@ public class SoloLinkManager extends AbstractLinkManager {
         postAsyncTask(soloLinkVersionRetriever);
     }
 
-    private void updatePixhawkVersion(){
+    private void updatePixhawkVersion() {
         postAsyncTask(pixhawkVersionRetriever);
     }
 
@@ -284,13 +278,13 @@ public class SoloLinkManager extends AbstractLinkManager {
         try {
             String version = sshLink.execute("cat " + versionFile);
             if (TextUtils.isEmpty(version)) {
-                Timber.d( "No version file was found");
+                Timber.d("No version file was found");
                 return "";
             } else {
                 return version.split("\n")[0];
             }
         } catch (IOException e) {
-            Timber.e( "Unable to retrieve the current version.", e);
+            Timber.e("Unable to retrieve the current version.", e);
         }
 
         return null;

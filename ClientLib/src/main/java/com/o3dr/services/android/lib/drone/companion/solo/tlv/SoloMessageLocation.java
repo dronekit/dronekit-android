@@ -1,4 +1,6 @@
-package org.droidplanner.services.android.drone.companion.solo.sololink.tlv;
+package com.o3dr.services.android.lib.drone.companion.solo.tlv;
+
+import android.os.Parcel;
 
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 
@@ -35,4 +37,25 @@ public class SoloMessageLocation extends TLVPacket {
         valueCarrier.putDouble(coordinate.getLongitude());
         valueCarrier.putFloat((float) coordinate.getAltitude());
     }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        super.writeToParcel(dest, flags);
+        dest.writeParcelable(this.coordinate, 0);
+    }
+
+    protected SoloMessageLocation(Parcel in) {
+        super(in);
+        this.coordinate = in.readParcelable(LatLongAlt.class.getClassLoader());
+    }
+
+    public static final Creator<SoloMessageLocation> CREATOR = new Creator<SoloMessageLocation>() {
+        public SoloMessageLocation createFromParcel(Parcel source) {
+            return new SoloMessageLocation(source);
+        }
+
+        public SoloMessageLocation[] newArray(int size) {
+            return new SoloMessageLocation[size];
+        }
+    };
 }

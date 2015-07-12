@@ -1,4 +1,4 @@
-package org.droidplanner.services.android.drone.companion.solo.artoo.button;
+package com.o3dr.services.android.lib.drone.companion.solo.button;
 
 /**
  * Created by djmedina on 4/15/15.

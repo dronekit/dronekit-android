@@ -1,5 +1,7 @@
 package org.droidplanner.services.android.interfaces;
 
+import android.os.Bundle;
+
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.o3dr.services.android.lib.drone.connection.DroneSharePrefs;
 
@@ -19,4 +21,6 @@ public interface DroneEventsListener extends DroneInterfaces.OnDroneListener,
     void onReceivedMavLinkMessage(MAVLinkMessage msg);
 
     void onMessageLogged(int logLevel, String message);
+
+    void onAttributeEvent(String attributeEvent, Bundle eventInfo);
 }

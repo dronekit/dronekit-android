@@ -1,13 +1,12 @@
-package org.droidplanner.services.android.drone.companion.solo.artoo.button;
+package com.o3dr.services.android.lib.drone.companion.solo.button;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-
-import timber.log.Timber;
 
 /**
  * Created by djmedina on 4/15/15.
@@ -117,7 +116,7 @@ public class ButtonPacket implements Parcelable {
             return new ButtonPacket(pressedMask,buttonId, eventType,timestamp);
 
         } catch (BufferUnderflowException e) {
-            Timber.e("Invalid data for button packet");
+            Log.e(TAG, "Invalid data for button packet", e);
             return null;
         } finally {
             packetBuffer.order(originalOrder);

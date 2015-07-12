@@ -8,6 +8,9 @@ import com.o3dr.services.android.lib.util.Utils;
  */
 public class CameraActions {
 
+    //Private to prevent instantiation
+    private CameraActions(){}
+
     /**
      * Used to start video recording.
      */

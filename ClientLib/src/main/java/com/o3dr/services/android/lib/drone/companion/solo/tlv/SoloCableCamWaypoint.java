@@ -1,4 +1,6 @@
-package org.droidplanner.services.android.drone.companion.solo.sololink.tlv;
+package com.o3dr.services.android.lib.drone.companion.solo.tlv;
+
+import android.os.Parcel;
 
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 
@@ -48,4 +50,29 @@ public class SoloCableCamWaypoint extends TLVPacket {
         valueCarrier.putFloat(degreesYaw);
         valueCarrier.putFloat(pitch);
     }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        super.writeToParcel(dest, flags);
+        dest.writeParcelable(this.coordinate, 0);
+        dest.writeFloat(this.degreesYaw);
+        dest.writeFloat(this.pitch);
+    }
+
+    protected SoloCableCamWaypoint(Parcel in) {
+        super(in);
+        this.coordinate = in.readParcelable(LatLongAlt.class.getClassLoader());
+        this.degreesYaw = in.readFloat();
+        this.pitch = in.readFloat();
+    }
+
+    public static final Creator<SoloCableCamWaypoint> CREATOR = new Creator<SoloCableCamWaypoint>() {
+        public SoloCableCamWaypoint createFromParcel(Parcel source) {
+            return new SoloCableCamWaypoint(source);
+        }
+
+        public SoloCableCamWaypoint[] newArray(int size) {
+            return new SoloCableCamWaypoint[size];
+        }
+    };
 }

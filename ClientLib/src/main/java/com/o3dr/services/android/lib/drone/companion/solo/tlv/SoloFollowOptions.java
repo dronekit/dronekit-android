@@ -1,4 +1,6 @@
-package org.droidplanner.services.android.drone.companion.solo.sololink.tlv;
+package com.o3dr.services.android.lib.drone.companion.solo.tlv;
+
+import android.os.Parcel;
 
 import java.nio.ByteBuffer;
 
@@ -41,4 +43,24 @@ public class SoloFollowOptions extends SoloShotOptions {
         valueCarrier.putInt(lookAt ? LOOK_AT_ENABLED_VALUE : LOOK_AT_DISABLED_VALUE);
     }
 
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        super.writeToParcel(dest, flags);
+        dest.writeByte(lookAt ? (byte) 1 : (byte) 0);
+    }
+
+    protected SoloFollowOptions(Parcel in) {
+        super(in);
+        this.lookAt = in.readByte() != 0;
+    }
+
+    public static final Creator<SoloFollowOptions> CREATOR = new Creator<SoloFollowOptions>() {
+        public SoloFollowOptions createFromParcel(Parcel source) {
+            return new SoloFollowOptions(source);
+        }
+
+        public SoloFollowOptions[] newArray(int size) {
+            return new SoloFollowOptions[size];
+        }
+    };
 }

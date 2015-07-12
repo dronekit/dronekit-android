@@ -1,4 +1,6 @@
-package org.droidplanner.services.android.drone.companion.solo.sololink.tlv;
+package com.o3dr.services.android.lib.drone.companion.solo.tlv;
+
+import android.os.Parcel;
 
 import java.nio.ByteBuffer;
 
@@ -59,4 +61,27 @@ public class SoloCableCamOptions extends SoloShotOptions {
         valueCarrier.putShort((short) (yawDirectionClockwise ? YAW_DIRECTION_CW_VALUE : YAW_DIRECTION_CCW_VALUE));
         super.getMessageValue(valueCarrier);
     }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        super.writeToParcel(dest, flags);
+        dest.writeByte(camInterpolation ? (byte) 1 : (byte) 0);
+        dest.writeByte(yawDirectionClockwise ? (byte) 1 : (byte) 0);
+    }
+
+    protected SoloCableCamOptions(Parcel in) {
+        super(in);
+        this.camInterpolation = in.readByte() != 0;
+        this.yawDirectionClockwise = in.readByte() != 0;
+    }
+
+    public static final Creator<SoloCableCamOptions> CREATOR = new Creator<SoloCableCamOptions>() {
+        public SoloCableCamOptions createFromParcel(Parcel source) {
+            return new SoloCableCamOptions(source);
+        }
+
+        public SoloCableCamOptions[] newArray(int size) {
+            return new SoloCableCamOptions[size];
+        }
+    };
 }

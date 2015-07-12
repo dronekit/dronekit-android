@@ -7,6 +7,9 @@ import com.o3dr.services.android.lib.util.Utils;
  */
 public class MissionActions {
 
+    //Private to prevent instantiation
+    private MissionActions(){}
+
     public static final String ACTION_GENERATE_DRONIE = Utils.PACKAGE_NAME + ".action.GENERATE_DRONIE";
 
     public static final String ACTION_SET_MISSION = Utils.PACKAGE_NAME + ".action.SET_MISSION";

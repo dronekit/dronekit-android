@@ -1,4 +1,6 @@
-package org.droidplanner.services.android.drone.companion.solo.sololink.tlv;
+package com.o3dr.services.android.lib.drone.companion.solo.tlv;
+
+import android.os.Parcel;
 
 import java.nio.ByteBuffer;
 
@@ -7,6 +9,7 @@ import java.nio.ByteBuffer;
  */
 public abstract class SoloButtonSetting extends TLVPacket {
 
+    public static final int MESSAGE_LENGTH = 16;
 
     private int button;
     private int event;
@@ -22,7 +25,7 @@ public abstract class SoloButtonSetting extends TLVPacket {
     private int flightMode;
 
     public SoloButtonSetting(int messageType, int button, int event, int shotType, int flightModeIndex) {
-        super(messageType, 16);
+        super(messageType, MESSAGE_LENGTH);
         this.button = button;
         this.event = event;
         this.shotType = shotType;
@@ -64,5 +67,22 @@ public abstract class SoloButtonSetting extends TLVPacket {
         valueCarrier.putInt(event);
         valueCarrier.putInt(shotType);
         valueCarrier.putInt(flightMode);
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        super.writeToParcel(dest, flags);
+        dest.writeInt(this.button);
+        dest.writeInt(this.event);
+        dest.writeInt(this.shotType);
+        dest.writeInt(this.flightMode);
+    }
+
+    protected SoloButtonSetting(Parcel in) {
+        super(in);
+        this.button = in.readInt();
+        this.event = in.readInt();
+        this.shotType = in.readInt();
+        this.flightMode = in.readInt();
     }
 }

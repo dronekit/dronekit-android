@@ -1,4 +1,6 @@
-package org.droidplanner.services.android.drone.companion.solo.sololink.tlv;
+package com.o3dr.services.android.lib.drone.companion.solo.tlv;
+
+import android.os.Parcel;
 
 import java.nio.ByteBuffer;
 
@@ -41,4 +43,16 @@ public class SoloShotOptions extends TLVPacket {
     protected void getMessageValue(ByteBuffer valueCarrier) {
         valueCarrier.putFloat(cruiseSpeed);
     }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        super.writeToParcel(dest, flags);
+        dest.writeFloat(this.cruiseSpeed);
+    }
+
+    protected SoloShotOptions(Parcel in) {
+        super(in);
+        this.cruiseSpeed = in.readFloat();
+    }
+
 }

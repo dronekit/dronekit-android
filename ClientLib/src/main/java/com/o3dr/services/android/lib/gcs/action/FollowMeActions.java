@@ -7,6 +7,9 @@ import com.o3dr.services.android.lib.util.Utils;
  */
 public class FollowMeActions {
 
+    //Private to prevent instantiation
+    private FollowMeActions(){}
+
     public static final String ACTION_ENABLE_FOLLOW_ME = Utils.PACKAGE_NAME + ".action.ENABLE_FOLLOW_ME";
     public static final String EXTRA_FOLLOW_TYPE = "extra_follow_type";
 

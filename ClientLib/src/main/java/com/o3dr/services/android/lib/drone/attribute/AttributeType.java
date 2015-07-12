@@ -103,4 +103,9 @@ public class AttributeType {
      * @see {@link com.o3dr.services.android.lib.drone.calibration.magnetometer.MagnetometerCalibrationStatus}
      */
     public static final String MAGNETOMETER_CALIBRATION_STATUS = PACKAGE_NAME + ".MAGNETOMETER_CALIBRATION_STATUS";
+
+    /**
+     * Used to access the sololink state.
+     */
+    public static final String SOLOLINK_STATE = PACKAGE_NAME + ".SOLOLINK_STATE";
 }

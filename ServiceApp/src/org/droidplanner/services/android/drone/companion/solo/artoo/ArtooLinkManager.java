@@ -1,20 +1,17 @@
 package org.droidplanner.services.android.drone.companion.solo.artoo;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Handler;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.util.Pair;
 import android.text.TextUtils;
 import android.view.Surface;
 
 import org.droidplanner.services.android.drone.companion.solo.AbstractLinkManager;
 import org.droidplanner.services.android.drone.companion.solo.SoloComp;
-import org.droidplanner.services.android.drone.companion.solo.artoo.button.ButtonPacket;
-import org.droidplanner.services.android.drone.companion.solo.sololink.tlv.TLVMessageParser;
-import org.droidplanner.services.android.drone.companion.solo.sololink.tlv.TLVPacket;
+import com.o3dr.services.android.lib.drone.companion.solo.button.ButtonPacket;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageParser;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
 import org.droidplanner.services.android.utils.NetworkUtils;
-import org.droidplanner.services.android.utils.Utils;
 import org.droidplanner.services.android.utils.connection.IpConnectionListener;
 import org.droidplanner.services.android.utils.connection.SshConnection;
 import org.droidplanner.services.android.utils.connection.TcpConnection;
@@ -32,17 +29,11 @@ import timber.log.Timber;
 /**
  * Handles artoo link related logic.
  */
-public class ArtooLinkManager extends AbstractLinkManager {
-
-    public static final String ACTION_BUTTON_PACKET_RECEIVED = Utils.PACKAGE_NAME + ".action.ACTION_BUTTON_PACKET_RECEIVED";
-    public static final String EXTRA_BUTTON_PACKET = "extra_button_packet";
+public class ArtooLinkManager extends AbstractLinkManager<ArtooLinkListener> {
 
     private static final long RECONNECT_COUNTDOWN = 1000l; //ms
 
     public static final String SOLOLINK_SSID_CONFIG_PATH = "/usr/bin/sololink_config";
-
-    public static final String ACTION_SOLOLINK_WIFI_INFO_UPDATED = Utils.PACKAGE_NAME + ".action" +
-            ".SOLOLINK_WIFI_INFO_UPDATED";
 
     private static final String ARTOO_VERSION_FILENAME = "/VERSION";
     private static final String STM32_VERSION_FILENAME = "/STM_VERSION";
@@ -90,8 +81,6 @@ public class ArtooLinkManager extends AbstractLinkManager {
     private final AtomicBoolean isVideoHandshakeStarted = new AtomicBoolean(false);
     private final AtomicBoolean isBatteryStarted = new AtomicBoolean(false);
 
-    private final LocalBroadcastManager lbm;
-
     private final TcpConnection videoHandshake;
     private final TcpConnection batteryConnection;
 
@@ -102,7 +91,7 @@ public class ArtooLinkManager extends AbstractLinkManager {
         @Override
         public void run() {
             final String version = retrieveVersion(ARTOO_VERSION_FILENAME);
-            if(version != null)
+            if (version != null)
                 controllerVersion.set(version);
         }
     };
@@ -111,15 +100,15 @@ public class ArtooLinkManager extends AbstractLinkManager {
         @Override
         public void run() {
             final String version = retrieveVersion(STM32_VERSION_FILENAME);
-            if(version != null)
+            if (version != null)
                 stm32Version.set(version);
         }
     };
+    private ArtooLinkListener linkListener;
 
     public ArtooLinkManager(Context context, final Handler handler, ExecutorService asyncExecutor) {
         super(context, new TcpConnection(ARTOO_IP, ARTOO_BUTTON_PORT), handler, asyncExecutor);
 
-        lbm = LocalBroadcastManager.getInstance(context);
         this.videoMgr = new VideoManager(context, handler, asyncExecutor);
 
         videoHandshake = new TcpConnection(ARTOO_IP, ARTOO_VIDEO_HANDSHAKE_PORT);
@@ -139,15 +128,16 @@ public class ArtooLinkManager extends AbstractLinkManager {
 
             @Override
             public void onIpDisconnected() {
-                if(isVideoHandshakeStarted.get())
+                if (isVideoHandshakeStarted.get())
                     handler.postDelayed(reconnectVideoHandshake, ++disconnectTracker * RECONNECT_COUNTDOWN);
             }
 
             @Override
-            public void onPacketReceived(ByteBuffer packetBuffer) {}
+            public void onPacketReceived(ByteBuffer packetBuffer) {
+            }
         });
 
-        batteryConnection = new TcpConnection(ARTOO_IP,ARTOO_BATTERY_PORT);
+        batteryConnection = new TcpConnection(ARTOO_IP, ARTOO_BATTERY_PORT);
         batteryConnection.setIpConnectionListener(new IpConnectionListener() {
 
             private int disconnectTracker = 0;
@@ -161,7 +151,7 @@ public class ArtooLinkManager extends AbstractLinkManager {
             @Override
             public void onIpDisconnected() {
                 //Try to connect
-                if (isBatteryStarted.get()){
+                if (isBatteryStarted.get()) {
                     handler.postDelayed(reconnectBatteryTask, ++disconnectTracker * RECONNECT_COUNTDOWN);
 
                 }
@@ -177,9 +167,8 @@ public class ArtooLinkManager extends AbstractLinkManager {
                 final int messageType = tlvMsg.getMessageType();
                 Timber.d("Received tlv message: " + messageType);
 
-                lbm.sendBroadcast(new Intent(ACTION_TLV_PACKET_RECEIVED)
-                        .putExtra(EXTRA_TLV_PACKET_TYPE, messageType)
-                        .putExtra(EXTRA_TLV_PACKET_BYTES, tlvMsg.toBytes()));
+                if (linkListener != null)
+                    linkListener.onTlvPacketReceived(tlvMsg);
             }
         });
 
@@ -188,26 +177,26 @@ public class ArtooLinkManager extends AbstractLinkManager {
     /**
      * @return the controller version.
      */
-    public String getArtooVersion(){
+    public String getArtooVersion() {
         return controllerVersion.get();
     }
 
     /**
      * @return the stm32 version
      */
-    public String getStm32Version(){
+    public String getStm32Version() {
         return stm32Version.get();
     }
 
-    public void startVideoManager(){
+    public void startVideoManager() {
         handler.post(startVideoMgr);
     }
 
-    public void stopVideoManager(){
+    public void stopVideoManager() {
         this.videoMgr.stop();
     }
 
-    public static SshConnection getSshLink(){
+    public static SshConnection getSshLink() {
         return sshLink;
     }
 
@@ -216,10 +205,12 @@ public class ArtooLinkManager extends AbstractLinkManager {
             String wifiName = sshLink.execute(SOLOLINK_SSID_CONFIG_PATH + " --get-wifi-ssid");
             String wifiPassword = sshLink.execute(SOLOLINK_SSID_CONFIG_PATH + " --get-wifi-password");
 
-            if(!TextUtils.isEmpty(wifiName) && !TextUtils.isEmpty(wifiPassword)){
+            if (!TextUtils.isEmpty(wifiName) && !TextUtils.isEmpty(wifiPassword)) {
                 Pair<String, String> wifiInfo = Pair.create(wifiName.trim(), wifiPassword.trim());
                 this.sololinkWifiInfo.set(wifiInfo);
-                lbm.sendBroadcast(new Intent(ACTION_SOLOLINK_WIFI_INFO_UPDATED));
+
+                if (linkListener != null)
+                    linkListener.onWifiInfoUpdated(wifiInfo.first, wifiInfo.second);
             }
 
         } catch (IOException e) {
@@ -229,24 +220,26 @@ public class ArtooLinkManager extends AbstractLinkManager {
 
     public boolean updateSololinkWifi(CharSequence wifiSsid, CharSequence password) {
         Timber.d(String.format(Locale.US, "Updating artoo wifi ssid to %s with password %s", wifiSsid, password));
-        try{
+        try {
             String ssidUpdateResult = sshLink.execute(SOLOLINK_SSID_CONFIG_PATH + " --set-wifi-ssid " + wifiSsid);
             String passwordUpdateResult = sshLink.execute(SOLOLINK_SSID_CONFIG_PATH + " --set-wifi-password " +
                     password);
             String restartResult = sshLink.execute(SOLOLINK_SSID_CONFIG_PATH + " --reboot");
             return true;
-        } catch(IOException e){
+        } catch (IOException e) {
             Timber.e(e, "Error occurred while updating the sololink wifi ssid.");
             return false;
         }
     }
 
-    public Pair<String, String> getSoloLinkWifiInfo(){
+    public Pair<String, String> getSoloLinkWifiInfo() {
         return sololinkWifiInfo.get();
     }
 
     @Override
-    public void start(LinkListener listener) {
+    public void start(ArtooLinkListener listener) {
+        this.linkListener = listener;
+
         Timber.d("Starting artoo link manager");
         super.start(listener);
 
@@ -275,7 +268,7 @@ public class ArtooLinkManager extends AbstractLinkManager {
     }
 
     @Override
-    public boolean isLinkConnected(){
+    public boolean isLinkConnected() {
         return NetworkUtils.isOnSololinkNetwork(context);
     }
 
@@ -320,23 +313,23 @@ public class ArtooLinkManager extends AbstractLinkManager {
         final int buttonId = buttonPacket.getButtonId();
         Timber.d("Button pressed: " + buttonId);
 
-        lbm.sendBroadcast(new Intent(ACTION_BUTTON_PACKET_RECEIVED)
-                .putExtra(EXTRA_BUTTON_PACKET, buttonPacket));
+        if (linkListener != null)
+            linkListener.onButtonPacketReceived(buttonPacket);
     }
 
     public void startDecoding(Surface surface, DecoderListener listener) {
         videoMgr.startDecoding(surface, listener);
     }
 
-    public void stopDecoding(DecoderListener listener){
+    public void stopDecoding(DecoderListener listener) {
         videoMgr.stopDecoding(listener);
     }
 
-    private void updateArtooVersion(){
+    private void updateArtooVersion() {
         postAsyncTask(artooVersionRetriever);
     }
 
-    private void updateStm32Version(){
+    private void updateStm32Version() {
         postAsyncTask(stm32VersionRetriever);
     }
 
@@ -344,13 +337,13 @@ public class ArtooLinkManager extends AbstractLinkManager {
         try {
             String version = sshLink.execute("cat " + versionFile);
             if (TextUtils.isEmpty(version)) {
-                Timber.d( "No version file was found");
+                Timber.d("No version file was found");
                 return "";
             } else {
                 return version.split("\n")[0];
             }
         } catch (IOException e) {
-            Timber.e( "Unable to retrieve the current version.", e);
+            Timber.e("Unable to retrieve the current version.", e);
         }
 
         return null;

@@ -178,4 +178,28 @@ public class AttributeEvent {
      * @see {@link com.o3dr.services.android.lib.drone.camera.GoPro}
      */
     public static final String GOPRO_STATE_UPDATED = PACKAGE_NAME + ".GOPRO_STATE_UPDATED";
+
+    /**
+     * Signals update to the sololink wifi settings
+     * @see {@link com.o3dr.services.android.lib.drone.companion.solo.SoloLinkState}
+     */
+    public static final String SOLOLINK_WIFI_SETTINGS_UPDATED = PACKAGE_NAME + ".SOLOLINK_WIFI_SETTINGS_UPDATED";
+
+    /**
+     * Signals update to the sololink button settings
+     * @see {@link com.o3dr.services.android.lib.drone.companion.solo.SoloLinkState}
+     */
+    public static final String SOLOLINK_BUTTON_SETTINGS_UPDATED = PACKAGE_NAME + ".SOLOLINK_BUTTON_SETTINGS_UPDATED";
+
+    /**
+     * Triggers every time a button event occurs.
+     * @see {@link AttributeEventExtra#EXTRA_SOLOLINK_BUTTON_EVENT}
+     */
+    public static final String SOLOLINK_BUTTON_EVENT = PACKAGE_NAME + ".SOLOLINK_BUTTON_EVENT";
+
+    /**
+     * Triggers upon receipt of a sololink message.
+     * @see {@link AttributeEventExtra#EXTRA_SOLOLINK_MESSAGE_DATA}
+     */
+    public static final String SOLOLINK_MESSAGE_RECEIVED = PACKAGE_NAME + ".SOLOLINK_MESSAGE_RECEIVED";
 }

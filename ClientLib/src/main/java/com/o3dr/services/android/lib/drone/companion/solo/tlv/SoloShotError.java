@@ -1,4 +1,6 @@
-package org.droidplanner.services.android.drone.companion.solo.sololink.tlv;
+package com.o3dr.services.android.lib.drone.companion.solo.tlv;
+
+import android.os.Parcel;
 
 import java.nio.ByteBuffer;
 
@@ -29,4 +31,25 @@ public class SoloShotError extends TLVPacket {
     protected void getMessageValue(ByteBuffer valueCarrier) {
         valueCarrier.putInt(errorType);
     }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        super.writeToParcel(dest, flags);
+        dest.writeInt(this.errorType);
+    }
+
+    protected SoloShotError(Parcel in) {
+        super(in);
+        this.errorType = in.readInt();
+    }
+
+    public static final Creator<SoloShotError> CREATOR = new Creator<SoloShotError>() {
+        public SoloShotError createFromParcel(Parcel source) {
+            return new SoloShotError(source);
+        }
+
+        public SoloShotError[] newArray(int size) {
+            return new SoloShotError[size];
+        }
+    };
 }

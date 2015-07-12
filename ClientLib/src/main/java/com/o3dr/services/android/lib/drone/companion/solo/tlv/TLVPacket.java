@@ -1,4 +1,7 @@
-package org.droidplanner.services.android.drone.companion.solo.sololink.tlv;
+package com.o3dr.services.android.lib.drone.companion.solo.tlv;
+
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -6,7 +9,7 @@ import java.nio.ByteOrder;
 /**
  * All communication follows this TLV format in little endian.
  */
-public abstract class TLVPacket {
+public abstract class TLVPacket implements Parcelable {
 
     public static final ByteOrder TLV_BYTE_ORDER = ByteOrder.LITTLE_ENDIAN;
 
@@ -27,6 +30,10 @@ public abstract class TLVPacket {
         return messageType;
     }
 
+    public final int getMessageLength() {
+        return messageLength;
+    }
+
     public final byte[] toBytes(){
         byteBuffer.clear();
 
@@ -43,4 +50,19 @@ public abstract class TLVPacket {
     }
 
     protected abstract void getMessageValue(ByteBuffer valueCarrier);
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(this.messageType);
+        dest.writeInt(this.messageLength);
+    }
+
+    protected TLVPacket(Parcel in) {
+        this(in.readInt(), in.readInt());
+    }
 }

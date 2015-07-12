@@ -1,4 +1,4 @@
-package org.droidplanner.services.android.drone.companion.solo.sololink.tlv;
+package com.o3dr.services.android.lib.drone.companion.solo.tlv;
 
 /**
  * All sololink messages types.

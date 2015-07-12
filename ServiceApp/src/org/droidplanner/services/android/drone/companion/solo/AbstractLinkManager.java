@@ -13,13 +13,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Created by Fredia Huya-Kouadio on 2/20/15.
  */
-public abstract class AbstractLinkManager implements IpConnectionListener {
+public abstract class AbstractLinkManager<T extends AbstractLinkManager.LinkListener> implements IpConnectionListener {
 
     private static final long RECONNECT_COUNTDOWN = 1000l; //ms
-
-    public static final String ACTION_TLV_PACKET_RECEIVED = Utils.PACKAGE_NAME + ".action.TLV_PACKET_RECEIVED";
-    public static final String EXTRA_TLV_PACKET_TYPE = "extra_tlv_packet_type";
-    public static final String EXTRA_TLV_PACKET_BYTES = "extra_tlv_packet_bytes";
 
     public interface LinkListener {
         void onLinkConnected();
@@ -42,7 +38,7 @@ public abstract class AbstractLinkManager implements IpConnectionListener {
     protected final AbstractIpConnection linkConn;
 
     private int disconnectTracker = 0;
-    private LinkListener linkListener;
+    private T linkListener;
 
     public AbstractLinkManager(Context context, AbstractIpConnection ipConn, Handler handler, ExecutorService asyncExecutor) {
         this.context = context;
@@ -63,7 +59,7 @@ public abstract class AbstractLinkManager implements IpConnectionListener {
         return this.linkConn.getConnectionStatus() == AbstractIpConnection.STATE_CONNECTED;
     }
 
-    public void start(LinkListener listener) {
+    public void start(T listener) {
         disconnectTracker = 0;
         handler.removeCallbacks(reconnectTask);
 

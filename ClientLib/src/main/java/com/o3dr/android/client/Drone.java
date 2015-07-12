@@ -350,6 +350,7 @@ public class Drone {
                 return (T) new MagnetometerCalibrationStatus();
 
             case AttributeType.CAMERA:
+            case AttributeType.SOLOLINK_STATE:
             default:
                 return null;
         }

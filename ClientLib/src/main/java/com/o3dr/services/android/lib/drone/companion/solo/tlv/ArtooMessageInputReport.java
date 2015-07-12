@@ -1,4 +1,6 @@
-package org.droidplanner.services.android.drone.companion.solo.sololink.tlv;
+package com.o3dr.services.android.lib.drone.companion.solo.tlv;
+
+import android.os.Parcel;
 
 import java.nio.ByteBuffer;
 
@@ -38,11 +40,36 @@ public class ArtooMessageInputReport extends TLVPacket {
 
     @Override
     protected void getMessageValue(ByteBuffer valueCarrier) {
-
         valueCarrier.putDouble(timestamp);
         valueCarrier.putShort(gimbalY);
         valueCarrier.putShort(gimbalRate);
         valueCarrier.putShort(battery);
-
     }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        super.writeToParcel(dest, flags);
+        dest.writeDouble(this.timestamp);
+        dest.writeInt(this.gimbalY);
+        dest.writeInt(this.gimbalRate);
+        dest.writeInt(this.battery);
+    }
+
+    protected ArtooMessageInputReport(Parcel in) {
+        super(in);
+        this.timestamp = in.readDouble();
+        this.gimbalY = (short) in.readInt();
+        this.gimbalRate = (short) in.readInt();
+        this.battery = (short) in.readInt();
+    }
+
+    public static final Creator<ArtooMessageInputReport> CREATOR = new Creator<ArtooMessageInputReport>() {
+        public ArtooMessageInputReport createFromParcel(Parcel source) {
+            return new ArtooMessageInputReport(source);
+        }
+
+        public ArtooMessageInputReport[] newArray(int size) {
+            return new ArtooMessageInputReport[size];
+        }
+    };
 }

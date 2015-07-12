@@ -1,12 +1,12 @@
-package org.droidplanner.services.android.drone.companion.solo.sololink.tlv;
+package com.o3dr.services.android.lib.drone.companion.solo.tlv;
+
+import android.util.Log;
 
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import timber.log.Timber;
-
-import static org.droidplanner.services.android.drone.companion.solo.sololink.tlv.TLVMessageTypes.*;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.*;
 
 /**
  * Utility class to generate tlv packet from received bytes.
@@ -14,6 +14,13 @@ import static org.droidplanner.services.android.drone.companion.solo.sololink.tl
 public class TLVMessageParser {
 
     private static final String TAG = TLVMessageParser.class.getSimpleName();
+
+    public static TLVPacket parseTLVPacket(byte[] packetData){
+        if(packetData == null || packetData.length == 0)
+            return null;
+
+        return parseTLVPacket(ByteBuffer.wrap(packetData));
+    }
 
     public static TLVPacket parseTLVPacket(ByteBuffer packetBuffer) {
         if (packetBuffer == null || packetBuffer.limit() <= 0)
@@ -27,7 +34,7 @@ public class TLVMessageParser {
 
             messageType = packetBuffer.getInt();
             final int messageLength = packetBuffer.getInt();
-            Timber.d(String.format("Received message %d of with value of length %d", messageType, messageLength));
+            Log.d(TAG, String.format("Received message %d of with value of length %d", messageType, messageLength));
 
             switch (messageType) {
                 case TYPE_SOLO_MESSAGE_GET_CURRENT_SHOT:
@@ -114,7 +121,7 @@ public class TLVMessageParser {
                     return null;
             }
         }catch(BufferUnderflowException e){
-            Timber.e( "Invalid data for tlv packet of type " + messageType);
+            Log.e(TAG, "Invalid data for tlv packet of type " + messageType);
             return null;
         } finally {
             packetBuffer.order(originalOrder);

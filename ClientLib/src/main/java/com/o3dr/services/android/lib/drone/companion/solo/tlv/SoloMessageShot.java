@@ -1,10 +1,11 @@
-package org.droidplanner.services.android.drone.companion.solo.sololink.tlv;
+package com.o3dr.services.android.lib.drone.companion.solo.tlv;
 
 import android.content.Context;
+import android.os.Parcel;
 
+import com.o3dr.android.client.R;
 import com.o3dr.services.android.lib.drone.property.VehicleMode;
 
-import org.droidplanner.services.android.R;
 
 import java.nio.ByteBuffer;
 
@@ -102,5 +103,16 @@ public abstract class SoloMessageShot extends TLVPacket {
                 return flightMode.getLabel();
 
         }
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        super.writeToParcel(dest, flags);
+        dest.writeInt(this.shotType);
+    }
+
+    protected SoloMessageShot(Parcel in) {
+        super(in);
+        this.shotType = in.readInt();
     }
 }

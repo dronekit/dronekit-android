@@ -24,6 +24,9 @@ import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.camera.action.CameraActions;
+import com.o3dr.services.android.lib.drone.companion.solo.action.SoloLinkActions;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSettingSetter;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionResult;
 import com.o3dr.services.android.lib.drone.connection.DroneSharePrefs;
@@ -218,6 +221,10 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
             case AttributeType.MAGNETOMETER_CALIBRATION_STATUS:
                 carrier.putParcelable(type, DroneApiUtils.getMagnetometerCalibrationStatus(drone));
+                break;
+
+            case AttributeType.SOLOLINK_STATE:
+                carrier.putParcelable(type, DroneApiUtils.getSoloLinkState(getDroneManager()));
                 break;
         }
 
@@ -495,6 +502,27 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 double yaw = data.getDouble(GimbalActions.GIMBAL_YAW);
                 MavLinkDoCmds.setGimbalOrientation(getDrone(), pitch, roll, yaw, listener);
                 break;
+
+            //************ SOLOLINK ACTIONS *************//
+            case SoloLinkActions.ACTION_SEND_MESSAGE:
+                final TLVPacket messageData = data.getParcelable(SoloLinkActions.EXTRA_MESSAGE_DATA);
+                if(messageData != null){
+                    DroneApiUtils.sendSoloLinkMessage(getDroneManager(), messageData);
+                }
+                break;
+
+            case SoloLinkActions.ACTION_UPDATE_WIFI_SETTINGS:
+                final String wifiSsid = data.getString(SoloLinkActions.EXTRA_WIFI_SSID);
+                final String wifiPassword = data.getString(SoloLinkActions.EXTRA_WIFI_PASSWORD);
+                DroneApiUtils.updateSoloLinkWifiSettings(getDroneManager(), wifiSsid, wifiPassword);
+                break;
+
+            case SoloLinkActions.ACTION_UPDATE_BUTTON_SETTINGS:
+                final SoloButtonSettingSetter buttonSettings = data.getParcelable(SoloLinkActions.EXTRA_BUTTON_SETTINGS);
+                if(buttonSettings != null){
+                    DroneApiUtils.updateSoloLinkButtonSettings(getDroneManager(), buttonSettings);
+                }
+                break;
         }
     }
 
@@ -511,6 +539,14 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     @Override
     public void performAsyncAction(Action action) throws RemoteException {
         performAction(action);
+    }
+
+    @Override
+    public void onAttributeEvent(String attributeEvent, Bundle eventInfo){
+        if(TextUtils.isEmpty(attributeEvent))
+            return;
+
+        notifyAttributeUpdate(attributeEvent, eventInfo);
     }
 
     private void notifyAttributeUpdate(List<Pair<String, Bundle>> attributesInfo) {
