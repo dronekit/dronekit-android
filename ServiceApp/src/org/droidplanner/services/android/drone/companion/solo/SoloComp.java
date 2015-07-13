@@ -4,10 +4,10 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.RemoteException;
 import android.support.v4.util.Pair;
-import android.util.Log;
 import android.util.SparseArray;
 
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
+import com.o3dr.services.android.lib.drone.companion.solo.SoloControllerMode;
 import com.o3dr.services.android.lib.drone.companion.solo.button.ButtonPacket;
 import com.o3dr.services.android.lib.drone.companion.solo.button.ButtonTypes;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSetting;
@@ -59,7 +59,7 @@ public class SoloComp implements CompComp, SoloLinkListener, ArtooLinkListener {
     private final Handler handler;
     private final ExecutorService asyncExecutor;
 
-    private SoloCompListener listener;
+    private SoloCompListener compListener;
 
     /**
      * Solo companion computer implementation
@@ -77,7 +77,7 @@ public class SoloComp implements CompComp, SoloLinkListener, ArtooLinkListener {
     }
 
     public void setListener(SoloCompListener listener) {
-        this.listener = listener;
+        this.compListener = listener;
     }
 
     public boolean isAvailable() {
@@ -109,34 +109,34 @@ public class SoloComp implements CompComp, SoloLinkListener, ArtooLinkListener {
 
     @Override
     public void onTlvPacketReceived(TLVPacket packet) {
-        if (listener != null)
-            listener.onTlvPacketReceived(packet);
+        if (compListener != null)
+            compListener.onTlvPacketReceived(packet);
     }
 
     @Override
     public void onWifiInfoUpdated(String wifiName, String wifiPassword) {
-        if (listener != null)
-            listener.onWifiInfoUpdated(wifiName, wifiPassword);
+        if (compListener != null)
+            compListener.onWifiInfoUpdated(wifiName, wifiPassword);
     }
 
     @Override
     public void onButtonPacketReceived(ButtonPacket packet) {
-        if (listener != null)
-            listener.onButtonPacketReceived(packet);
+        if (compListener != null)
+            compListener.onButtonPacketReceived(packet);
     }
 
     @Override
     public void onPresetButtonLoaded(int buttonType, SoloButtonSetting buttonSettings) {
-        if (listener != null)
-            listener.onPresetButtonLoaded(buttonType, buttonSettings);
+        if (compListener != null)
+            compListener.onPresetButtonLoaded(buttonType, buttonSettings);
     }
 
     @Override
     public void onLinkConnected() {
         tryStartingVideo();
         if (isConnected()) {
-            if (listener != null)
-                listener.onConnected();
+            if (compListener != null)
+                compListener.onConnected();
         } else {
             if (!artooMgr.isLinkConnected())
                 artooMgr.start(this);
@@ -148,8 +148,8 @@ public class SoloComp implements CompComp, SoloLinkListener, ArtooLinkListener {
 
     @Override
     public void onLinkDisconnected() {
-        if (listener != null)
-            listener.onDisconnected();
+        if (compListener != null)
+            compListener.onDisconnected();
 
         artooMgr.stopVideoManager();
         soloLinkMgr.stop();
@@ -245,6 +245,10 @@ public class SoloComp implements CompComp, SoloLinkListener, ArtooLinkListener {
 
     public void pushButtonSettings(SoloButtonSettingSetter buttonSettings, ICommandListener listener){
         soloLinkMgr.pushPresetButtonSettings(buttonSettings, listener);
+    }
+
+    public void updateControllerMode(@SoloControllerMode.ControllerMode final int selectedMode, ICommandListener listener){
+        artooMgr.updateArtooMode(selectedMode, listener);
     }
 
 }

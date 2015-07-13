@@ -30,4 +30,12 @@ public class SoloLinkActions {
      * @see {@link com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket}
      */
     public static final String EXTRA_MESSAGE_DATA = "extra_message_data";
+
+    public static final String ACTION_UPDATE_CONTROLLER_MODE = Utils.PACKAGE_NAME + ".action.UPDATE_CONTROLLER_MODE";
+
+    /**
+     * Controller mode to apply.
+     * @see {@link com.o3dr.services.android.lib.drone.companion.solo.SoloControllerMode}
+     */
+    public static final String EXTRA_CONTROLLER_MODE = "extra_controller_mode";
 }

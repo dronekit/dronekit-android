@@ -2,15 +2,21 @@ package org.droidplanner.services.android.drone.companion.solo.artoo;
 
 import android.content.Context;
 import android.os.Handler;
+import android.support.annotation.IntDef;
 import android.support.v4.util.Pair;
 import android.text.TextUtils;
 import android.view.Surface;
 
 import org.droidplanner.services.android.drone.companion.solo.AbstractLinkManager;
 import org.droidplanner.services.android.drone.companion.solo.SoloComp;
+
+import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
+import com.o3dr.services.android.lib.drone.companion.solo.SoloControllerMode;
 import com.o3dr.services.android.lib.drone.companion.solo.button.ButtonPacket;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageParser;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
+import com.o3dr.services.android.lib.model.ICommandListener;
+
 import org.droidplanner.services.android.utils.NetworkUtils;
 import org.droidplanner.services.android.utils.connection.IpConnectionListener;
 import org.droidplanner.services.android.utils.connection.SshConnection;
@@ -18,6 +24,8 @@ import org.droidplanner.services.android.utils.connection.TcpConnection;
 import org.droidplanner.services.android.utils.video.DecoderListener;
 
 import java.io.IOException;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.nio.ByteBuffer;
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
@@ -347,5 +355,39 @@ public class ArtooLinkManager extends AbstractLinkManager<ArtooLinkListener> {
         }
 
         return null;
+    }
+
+    public void updateArtooMode(@SoloControllerMode.ControllerMode final int mode, final ICommandListener listener) {
+            postAsyncTask(new Runnable() {
+                @Override
+                public void run() {
+                    Timber.d("Switching controller to mode %n", mode);
+                    try {
+                        final String response;
+                        switch (mode) {
+                            case SoloControllerMode.MODE_1:
+                                response = sshLink.execute("runStickMapperMode1.sh");
+                                postSuccessEvent(listener);
+                                break;
+
+                            case SoloControllerMode.MODE_2:
+                                response = sshLink.execute("runStickMapperMode2.sh");
+                                postSuccessEvent(listener);
+                                break;
+
+                            default:
+                                response = "No response.";
+                                postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
+                                break;
+                        }
+                        Timber.d("Response from switch mode command was: %s", response);
+                    } catch (IOException e) {
+                        Timber.e(e, "Error occurred while changing artoo modes.");
+                        postTimeoutEvent(listener);
+                    }
+
+                }
+            });
+
     }
 }
