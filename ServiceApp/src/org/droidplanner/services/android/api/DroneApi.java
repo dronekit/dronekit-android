@@ -489,6 +489,15 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 DroneApiUtils.stopVideoRecording(getDrone());
                 break;
 
+            case GimbalActions.ACTION_CONFIGURE_GIMBAL:
+                boolean stabilizePitch = data.getBoolean(GimbalActions.GIMBAL_PITCH);
+                boolean stabilizeRoll = data.getBoolean(GimbalActions.GIMBAL_ROLL);
+                boolean stabilizeYaw = data.getBoolean(GimbalActions.GIMBAL_YAW);
+                int mountMode = data.getInt(GimbalActions.MOUNT_MODE);
+                MavLinkDoCmds.configureGimbal(getDrone(), mountMode, stabilizePitch,
+                        stabilizeRoll, stabilizeYaw, listener);
+                break;
+
             case GimbalActions.ACTION_SET_GIMBAL_ORIENTATION:
                 double pitch = data.getDouble(GimbalActions.GIMBAL_PITCH);
                 double roll = data.getDouble(GimbalActions.GIMBAL_ROLL);
