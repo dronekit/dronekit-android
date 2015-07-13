@@ -507,20 +507,20 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
             case SoloLinkActions.ACTION_SEND_MESSAGE:
                 final TLVPacket messageData = data.getParcelable(SoloLinkActions.EXTRA_MESSAGE_DATA);
                 if(messageData != null){
-                    DroneApiUtils.sendSoloLinkMessage(getDroneManager(), messageData);
+                    DroneApiUtils.sendSoloLinkMessage(getDroneManager(), messageData, listener);
                 }
                 break;
 
             case SoloLinkActions.ACTION_UPDATE_WIFI_SETTINGS:
                 final String wifiSsid = data.getString(SoloLinkActions.EXTRA_WIFI_SSID);
                 final String wifiPassword = data.getString(SoloLinkActions.EXTRA_WIFI_PASSWORD);
-                DroneApiUtils.updateSoloLinkWifiSettings(getDroneManager(), wifiSsid, wifiPassword);
+                DroneApiUtils.updateSoloLinkWifiSettings(getDroneManager(), wifiSsid, wifiPassword, listener);
                 break;
 
             case SoloLinkActions.ACTION_UPDATE_BUTTON_SETTINGS:
                 final SoloButtonSettingSetter buttonSettings = data.getParcelable(SoloLinkActions.EXTRA_BUTTON_SETTINGS);
                 if(buttonSettings != null){
-                    DroneApiUtils.updateSoloLinkButtonSettings(getDroneManager(), buttonSettings);
+                    DroneApiUtils.updateSoloLinkButtonSettings(getDroneManager(), buttonSettings, listener);
                 }
                 break;
         }

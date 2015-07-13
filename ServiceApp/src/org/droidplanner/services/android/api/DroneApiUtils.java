@@ -964,15 +964,18 @@ public class DroneApiUtils {
                 wifiSettings.second, wifiSettings.first, soloComp.getButtonSettings());
     }
 
-    static void sendSoloLinkMessage(DroneManager droneManager, TLVPacket messageData) {
+    static void sendSoloLinkMessage(DroneManager droneManager, TLVPacket messageData,
+                                    ICommandListener listener) {
         if(droneManager == null || messageData == null || !droneManager.isCompanionComputerEnabled())
             return;
 
         final SoloComp soloComp = droneManager.getSoloComp();
-        soloComp.sendSoloLinkMessage(messageData);
+        soloComp.sendSoloLinkMessage(messageData, listener);
     }
 
-    static void updateSoloLinkWifiSettings(DroneManager droneManager, String wifiSsid, String wifiPassword) {
+    static void updateSoloLinkWifiSettings(DroneManager droneManager,
+                                           String wifiSsid, String wifiPassword,
+                                           ICommandListener listener) {
         if(droneManager == null || !droneManager.isCompanionComputerEnabled())
             return;
 
@@ -980,14 +983,16 @@ public class DroneApiUtils {
             return;
 
         final SoloComp soloComp = droneManager.getSoloComp();
-        soloComp.updateWifiSettings(wifiSsid, wifiPassword);
+        soloComp.updateWifiSettings(wifiSsid, wifiPassword, listener);
     }
 
-    static void updateSoloLinkButtonSettings(DroneManager droneManager, SoloButtonSettingSetter buttonSettings) {
+    static void updateSoloLinkButtonSettings(DroneManager droneManager,
+                                             SoloButtonSettingSetter buttonSettings,
+                                             ICommandListener listener) {
         if(droneManager == null || !droneManager.isCompanionComputerEnabled() || buttonSettings == null)
             return;
 
         final SoloComp soloComp = droneManager.getSoloComp();
-        soloComp.pushButtonSettings(buttonSettings);
+        soloComp.pushButtonSettings(buttonSettings, listener);
     }
 }

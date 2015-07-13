@@ -2,6 +2,10 @@ package org.droidplanner.services.android.drone.companion.solo;
 
 import android.content.Context;
 import android.os.Handler;
+import android.os.RemoteException;
+import android.util.Log;
+
+import com.o3dr.services.android.lib.model.ICommandListener;
 
 import org.droidplanner.services.android.utils.Utils;
 import org.droidplanner.services.android.utils.connection.AbstractIpConnection;
@@ -9,6 +13,8 @@ import org.droidplanner.services.android.utils.connection.IpConnectionListener;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import timber.log.Timber;
 
 /**
  * Created by Fredia Huya-Kouadio on 2/20/15.
@@ -52,6 +58,51 @@ public abstract class AbstractLinkManager<T extends AbstractLinkManager.LinkList
     protected void postAsyncTask(Runnable task){
         if(asyncExecutor != null && !asyncExecutor.isShutdown()){
             asyncExecutor.execute(task);
+        }
+    }
+
+    protected void postSuccessEvent(final ICommandListener listener){
+        if(handler != null && listener != null){
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        listener.onSuccess();
+                    } catch (RemoteException e) {
+                        Timber.e(e, e.getMessage());
+                    }
+                }
+            });
+        }
+    }
+
+    protected void postTimeoutEvent(final ICommandListener listener){
+        if(handler != null && listener != null){
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        listener.onTimeout();
+                    } catch (RemoteException e) {
+                        Timber.e(e, e.getMessage());
+                    }
+                }
+            });
+        }
+    }
+
+    protected void postErrorEvent(final int error, final ICommandListener listener){
+        if(handler != null && listener != null){
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        listener.onError(error);
+                    } catch (RemoteException e) {
+                        Timber.e(e, e.getMessage());
+                    }
+                }
+            });
         }
     }
 

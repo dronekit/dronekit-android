@@ -107,11 +107,11 @@ public class ArtooLinkManager extends AbstractLinkManager<ArtooLinkListener> {
     private ArtooLinkListener linkListener;
 
     public ArtooLinkManager(Context context, final Handler handler, ExecutorService asyncExecutor) {
-        super(context, new TcpConnection(ARTOO_IP, ARTOO_BUTTON_PORT), handler, asyncExecutor);
+        super(context, new TcpConnection(handler, ARTOO_IP, ARTOO_BUTTON_PORT), handler, asyncExecutor);
 
         this.videoMgr = new VideoManager(context, handler, asyncExecutor);
 
-        videoHandshake = new TcpConnection(ARTOO_IP, ARTOO_VIDEO_HANDSHAKE_PORT);
+        videoHandshake = new TcpConnection(handler, ARTOO_IP, ARTOO_VIDEO_HANDSHAKE_PORT);
         videoHandshake.setIpConnectionListener(new IpConnectionListener() {
 
             private int disconnectTracker = 0;
@@ -137,7 +137,7 @@ public class ArtooLinkManager extends AbstractLinkManager<ArtooLinkListener> {
             }
         });
 
-        batteryConnection = new TcpConnection(ARTOO_IP, ARTOO_BATTERY_PORT);
+        batteryConnection = new TcpConnection(handler, ARTOO_IP, ARTOO_BATTERY_PORT);
         batteryConnection.setIpConnectionListener(new IpConnectionListener() {
 
             private int disconnectTracker = 0;

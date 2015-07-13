@@ -15,6 +15,9 @@ import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloMessageShotMan
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageParser;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
+import com.o3dr.services.android.lib.model.ICommandListener;
+import com.o3dr.services.android.lib.model.SimpleCommandListener;
+
 import org.droidplanner.services.android.utils.connection.SshConnection;
 import org.droidplanner.services.android.utils.connection.TcpConnection;
 import org.droidplanner.services.android.utils.connection.UdpConnection;
@@ -80,11 +83,11 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
     private SoloLinkListener linkListener;
 
     public SoloLinkManager(Context context, Handler handler, ExecutorService asyncExecutor) {
-        super(context, new TcpConnection(getSoloLinkIp(), SOLO_LINK_TCP_PORT), handler, asyncExecutor);
+        super(context, new TcpConnection(handler, getSoloLinkIp(), SOLO_LINK_TCP_PORT), handler, asyncExecutor);
 
         UdpConnection dataConn = null;
         try {
-            dataConn = new UdpConnection(getSoloLinkIp(), SHOT_FOLLOW_UDP_PORT, 14557);
+            dataConn = new UdpConnection(handler, getSoloLinkIp(), SHOT_FOLLOW_UDP_PORT, 14557);
         } catch (UnknownHostException e) {
             Timber.e(e, "Error while creating follow udp connection.");
         }
@@ -165,37 +168,41 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
             linkListener.onTlvPacketReceived(tlvMsg);
     }
 
-    private void sendPacket(byte[] payload, int payloadSize) {
-        linkConn.sendPacket(payload, payloadSize);
+    private void sendPacket(byte[] payload, int payloadSize, ICommandListener listener) {
+        linkConn.sendPacket(payload, payloadSize, listener);
     }
 
-    private void sendFollowPacket(byte[] payload, int payloadSize) {
+    private void sendFollowPacket(byte[] payload, int payloadSize, ICommandListener listener) {
         if (followDataConn == null) {
             throw new IllegalStateException("Unable to send follow data.");
         }
 
-        followDataConn.sendPacket(payload, payloadSize);
+        followDataConn.sendPacket(payload, payloadSize, listener);
     }
 
-    public void sendTLVPacket(TLVPacket packet) {
-        sendTLVPacket(packet, false);
+    public void sendTLVPacket(TLVPacket packet, ICommandListener listener) {
+        sendTLVPacket(packet, false, listener);
     }
 
-    public void sendTLVPacket(TLVPacket packet, boolean useFollowLink) {
+    public void sendTLVPacket(TLVPacket packet, boolean useFollowLink, ICommandListener listener) {
         if (packet == null)
             return;
 
         final byte[] messagePayload = packet.toBytes();
         if (useFollowLink) {
-            sendFollowPacket(messagePayload, messagePayload.length);
+            sendFollowPacket(messagePayload, messagePayload.length, listener);
         } else {
-            sendPacket(messagePayload, messagePayload.length);
+            sendPacket(messagePayload, messagePayload.length, listener);
         }
     }
 
     public void loadPresetButtonSettings() {
-        sendTLVPacket(presetButtonAGetter);
-        sendTLVPacket(presetButtonBGetter);
+        sendTLVPacket(presetButtonAGetter, new SimpleCommandListener(){
+            @Override
+            public void onSuccess(){
+                sendTLVPacket(presetButtonBGetter, null);
+            }
+        });
     }
 
     private void handleReceivedPresetButton(SoloButtonSetting presetButton) {
@@ -233,12 +240,22 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
     /**
      * Update the vehicle preset button settings
      */
-    public void pushPresetButtonSettings(SoloButtonSettingSetter buttonSetter) {
+    public void pushPresetButtonSettings(final SoloButtonSettingSetter buttonSetter, final ICommandListener listener) {
         if (!isLinkConnected() || buttonSetter == null)
             return;
 
-        sendTLVPacket(buttonSetter);
-        handleReceivedPresetButton(buttonSetter);
+        sendTLVPacket(buttonSetter, new SimpleCommandListener() {
+            @Override
+            public void onSuccess() {
+                postSuccessEvent(listener);
+                handleReceivedPresetButton(buttonSetter);
+            }
+
+            @Override
+            public void onTimeout() {
+                postTimeoutEvent(listener);
+            }
+        });
     }
 
     public void disableFollowDataConnection() {

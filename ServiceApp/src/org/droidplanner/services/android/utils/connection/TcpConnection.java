@@ -1,5 +1,7 @@
 package org.droidplanner.services.android.utils.connection;
 
+import android.os.Handler;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -20,7 +22,8 @@ public class TcpConnection extends AbstractIpConnection {
     private BufferedOutputStream connOut;
     private BufferedInputStream connIn;
 
-    public TcpConnection(String serverIp, int serverPort){
+    public TcpConnection(Handler handler, String serverIp, int serverPort){
+        super(handler);
         this.serverIp = serverIp;
         this.serverPort = serverPort;
     }

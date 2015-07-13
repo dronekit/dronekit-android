@@ -2,14 +2,18 @@ package org.droidplanner.services.android.drone.companion.solo;
 
 import android.content.Context;
 import android.os.Handler;
+import android.os.RemoteException;
 import android.support.v4.util.Pair;
+import android.util.Log;
 import android.util.SparseArray;
 
+import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.drone.companion.solo.button.ButtonPacket;
 import com.o3dr.services.android.lib.drone.companion.solo.button.ButtonTypes;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSetting;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSettingSetter;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
+import com.o3dr.services.android.lib.model.ICommandListener;
 
 import org.droidplanner.services.android.drone.companion.CompComp;
 import org.droidplanner.services.android.drone.companion.solo.artoo.ArtooLinkListener;
@@ -52,6 +56,7 @@ public class SoloComp implements CompComp, SoloLinkListener, ArtooLinkListener {
     private final SoloLinkManager soloLinkMgr;
 
     private final Context context;
+    private final Handler handler;
     private final ExecutorService asyncExecutor;
 
     private SoloCompListener listener;
@@ -64,6 +69,7 @@ public class SoloComp implements CompComp, SoloLinkListener, ArtooLinkListener {
     public SoloComp(Context context, Handler handler) {
         this.context = context;
 
+        this.handler = handler;
         asyncExecutor = Executors.newCachedThreadPool();
 
         this.artooMgr = new ArtooLinkManager(context, handler, asyncExecutor);
@@ -190,11 +196,12 @@ public class SoloComp implements CompComp, SoloLinkListener, ArtooLinkListener {
         return buttonSettings;
     }
 
-    public void sendSoloLinkMessage(TLVPacket message){
-        soloLinkMgr.sendTLVPacket(message);
+    public void sendSoloLinkMessage(TLVPacket message, ICommandListener listener){
+        soloLinkMgr.sendTLVPacket(message, listener);
     }
 
-    public void updateWifiSettings(final String wifiSsid, final String wifiPassword){
+    public void updateWifiSettings(final String wifiSsid, final String wifiPassword,
+                                   final ICommandListener listener){
         if(asyncExecutor != null && !asyncExecutor.isShutdown()){
             asyncExecutor.execute(new Runnable() {
                 @Override
@@ -202,17 +209,42 @@ public class SoloComp implements CompComp, SoloLinkListener, ArtooLinkListener {
                     if(soloLinkMgr.updateSololinkWifi(wifiSsid, wifiPassword)
                             && artooMgr.updateSololinkWifi(wifiSsid, wifiPassword)){
                         Timber.d("Sololink wifi update successful.");
+
+                        if(listener != null) {
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        listener.onSuccess();
+                                    } catch (RemoteException e) {
+                                        Timber.e(e, e.getMessage());
+                                    }
+                                }
+                            });
+                        }
                     }
                     else{
                         Timber.d("Sololink wifi update failed.");
+                        if(listener != null){
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        listener.onError(CommandExecutionError.COMMAND_FAILED);
+                                    } catch (RemoteException e) {
+                                        Timber.e(e, e.getMessage());
+                                    }
+                                }
+                            });
+                        }
                     }
                 }
             });
         }
     }
 
-    public void pushButtonSettings(SoloButtonSettingSetter buttonSettings){
-        soloLinkMgr.pushPresetButtonSettings(buttonSettings);
+    public void pushButtonSettings(SoloButtonSettingSetter buttonSettings, ICommandListener listener){
+        soloLinkMgr.pushPresetButtonSettings(buttonSettings, listener);
     }
 
 }

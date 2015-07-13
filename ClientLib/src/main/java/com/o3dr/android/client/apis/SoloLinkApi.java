@@ -4,6 +4,8 @@ import com.o3dr.android.client.Drone;
 
 import java.util.concurrent.ConcurrentHashMap;
 
+import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloLinkActions.*;
+
 /**
  * Provides access to the sololink specific functionality
  * Created by Fredia Huya-Kouadio on 7/12/15.
@@ -30,5 +32,9 @@ public class SoloLinkApi implements Api {
 
     private SoloLinkApi(Drone drone){
         this.drone = drone;
+    }
+
+    public void updateWifiSettings(String wifiSsid, String wifiPassword){
+
     }
 }

@@ -1,5 +1,6 @@
 package org.droidplanner.services.android.utils.connection;
 
+import android.os.Handler;
 import android.util.Log;
 
 import java.io.IOException;
@@ -28,12 +29,12 @@ public class UdpConnection extends AbstractIpConnection {
     private int hostPort;
     private InetAddress hostAddress;
 
-    public UdpConnection(int serverPort, int readBufferSize) {
-        this(serverPort, readBufferSize, false, 0);
+    public UdpConnection(Handler handler, int serverPort, int readBufferSize) {
+        this(handler, serverPort, readBufferSize, false, 0);
     }
 
-    public UdpConnection(int serverPort, int readBufferSize, boolean polling, int readTimeout){
-        super(readBufferSize, polling);
+    public UdpConnection(Handler handler, int serverPort, int readBufferSize, boolean polling, int readTimeout){
+        super(handler, readBufferSize, polling);
         this.serverPort = serverPort;
         if(polling) {
             this.readTimeout = readTimeout > 0 ? readTimeout : 33;//millisecond
@@ -43,8 +44,8 @@ public class UdpConnection extends AbstractIpConnection {
         }
     }
 
-    public UdpConnection(String address, int hostPort, int serverPort) throws UnknownHostException {
-        super(false, true);
+    public UdpConnection(Handler handler, String address, int hostPort, int serverPort) throws UnknownHostException {
+        super(handler, false, true);
         this.serverPort = serverPort;
         this.hostPort = hostPort;
         hostAddress = InetAddress.getByName(address);

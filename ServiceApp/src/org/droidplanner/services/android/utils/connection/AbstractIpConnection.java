@@ -1,6 +1,11 @@
 package org.droidplanner.services.android.utils.connection;
 
+import android.os.Handler;
 import android.os.Process;
+import android.os.RemoteException;
+import android.util.Log;
+
+import com.o3dr.services.android.lib.model.ICommandListener;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
@@ -120,11 +125,14 @@ public abstract class AbstractIpConnection {
             try{
                 while(connectionStatus.get() == STATE_CONNECTED){
                     final PacketData packetData = packetsToSend.take();
+                    final ICommandListener listener = packetData.listener;
 
                     try {
                         send(packetData);
+                        postSendSuccess(listener);
                     } catch (IOException e) {
                         Timber.e( "Error occurred while sending packet.", e);
+                        postSendTimeout(listener);
                     }
                 }
             } catch (InterruptedException e) {
@@ -135,25 +143,59 @@ public abstract class AbstractIpConnection {
                 Timber.i( "Exiting packet dispatcher thread.");
             }
         }
+
+        private void postSendSuccess(final ICommandListener listener){
+            if(handler == null || listener == null)
+                return;
+
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        listener.onSuccess();
+                    } catch (RemoteException e) {
+                        Timber.e(e, e.getMessage());
+                    }
+                }
+            });
+        }
+
+        private void postSendTimeout(final ICommandListener listener){
+            if(handler == null || listener == null)
+                return;
+
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        listener.onTimeout();
+                    } catch (RemoteException e) {
+                        Timber.e(e, e.getMessage());
+                    }
+                }
+            });
+        }
     };
 
     private final boolean isPolling;
+    private final Handler handler;
 
     private Thread managerThread;
 
-    public AbstractIpConnection(){
-        this(false, false);
+    public AbstractIpConnection(Handler handler){
+        this(handler, false, false);
     }
 
-    public AbstractIpConnection(int readBufferSize, boolean isPolling){
-        this(readBufferSize, false, false, isPolling);
+    public AbstractIpConnection(Handler handler, int readBufferSize, boolean isPolling){
+        this(handler, readBufferSize, false, false, isPolling);
     }
 
-    public AbstractIpConnection(boolean disableSending, boolean disableReading){
-        this(DEFAULT_READ_BUFFER_SIZE, disableSending, disableReading, false);
+    public AbstractIpConnection(Handler handler, boolean disableSending, boolean disableReading){
+        this(handler, DEFAULT_READ_BUFFER_SIZE, disableSending, disableReading, false);
     }
 
-    public AbstractIpConnection(int readBufferSize, boolean disableSending, boolean disableReading, boolean isPolling){
+    public AbstractIpConnection(Handler handler, int readBufferSize, boolean disableSending, boolean disableReading, boolean isPolling){
+        this.handler = handler;
         this.readBuffer = ByteBuffer.allocate(readBufferSize);
         isReadingDisabled = disableReading;
         isSendingDisabled = disableSending;
@@ -206,11 +248,11 @@ public abstract class AbstractIpConnection {
         this.ipConnectionListener = ipConnectionListener;
     }
 
-    public void sendPacket(byte[] packet, int packetSize){
+    public void sendPacket(byte[] packet, int packetSize, ICommandListener listener){
         if(packet == null || packetSize <= 0)
             return;
 
-        packetsToSend.offer(new PacketData(packetSize, packet));
+        packetsToSend.offer(new PacketData(packetSize, packet, listener));
     }
 
     public int getConnectionStatus(){
@@ -220,10 +262,12 @@ public abstract class AbstractIpConnection {
     protected static final class PacketData {
         public final int dataLength;
         public final byte[] data;
+        public final ICommandListener listener;
 
-        public PacketData(int dataLength, byte[] data) {
+        public PacketData(int dataLength, byte[] data, ICommandListener listener) {
             this.dataLength = dataLength;
             this.data = data;
+            this.listener = listener;
         }
     }
 }
