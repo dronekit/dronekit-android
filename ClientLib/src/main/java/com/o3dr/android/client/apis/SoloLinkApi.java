@@ -3,6 +3,7 @@ package com.o3dr.android.client.apis;
 import android.os.Bundle;
 
 import com.o3dr.android.client.Drone;
+import com.o3dr.services.android.lib.drone.companion.solo.SoloControllerMode;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSettingSetter;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
 import com.o3dr.services.android.lib.model.AbstractCommandListener;
@@ -73,5 +74,17 @@ public class SoloLinkApi implements Api {
         Bundle params = new Bundle();
         params.putParcelable(EXTRA_MESSAGE_DATA, messagePacket);
         drone.performAsyncActionOnDroneThread(new Action(ACTION_SEND_MESSAGE, params), listener);
+    }
+
+    /**
+     * Updates the controller mode (joystick mapping)
+     *
+     * @param controllerMode Controller mode. @see {@link SoloControllerMode}
+     * @param listener Register a callback to receive update of the command execution status.
+     */
+    public void updateControllerMode(@SoloControllerMode.ControllerMode int controllerMode, AbstractCommandListener listener){
+        Bundle params = new Bundle();
+        params.putInt(EXTRA_CONTROLLER_MODE, controllerMode);
+        drone.performAsyncActionOnDroneThread(new Action(ACTION_UPDATE_CONTROLLER_MODE, params), listener);
     }
 }

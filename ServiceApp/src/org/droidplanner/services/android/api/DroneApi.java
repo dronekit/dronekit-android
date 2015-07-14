@@ -24,6 +24,7 @@ import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.camera.action.CameraActions;
+import com.o3dr.services.android.lib.drone.companion.solo.SoloControllerMode;
 import com.o3dr.services.android.lib.drone.companion.solo.action.SoloLinkActions;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSettingSetter;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
@@ -522,6 +523,11 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 if(buttonSettings != null){
                     DroneApiUtils.updateSoloLinkButtonSettings(getDroneManager(), buttonSettings, listener);
                 }
+                break;
+
+            case SoloLinkActions.ACTION_UPDATE_CONTROLLER_MODE:
+                final @SoloControllerMode.ControllerMode int mode = data.getInt(SoloLinkActions.EXTRA_CONTROLLER_MODE);
+                DroneApiUtils.updateSoloLinkControllerMode(getDroneManager(), mode, listener);
                 break;
         }
     }

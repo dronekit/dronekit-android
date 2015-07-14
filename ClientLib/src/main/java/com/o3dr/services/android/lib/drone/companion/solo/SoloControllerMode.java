@@ -16,9 +16,17 @@ public class SoloControllerMode {
     public @interface ControllerMode {}
 
     /**
-     *
+     * Controller mode 1:
+     * - Left stick: pitch/yaw
+     * - Right stick: throttle/roll
      */
     public static final int MODE_1 = 1;
+
+    /**
+     * Controller mode 2:
+     * - Left stick: throttle/yaw
+     * - right stick: pitch/roll
+     */
     public static final int MODE_2 = 2;
 
     //Private to prevent instantiation.

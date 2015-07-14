@@ -21,6 +21,7 @@ import com.o3dr.services.android.lib.drone.calibration.magnetometer.Magnetometer
 import com.o3dr.services.android.lib.drone.calibration.magnetometer.MagnetometerCalibrationResult;
 import com.o3dr.services.android.lib.drone.calibration.magnetometer.MagnetometerCalibrationStatus;
 import com.o3dr.services.android.lib.drone.camera.GoPro;
+import com.o3dr.services.android.lib.drone.companion.solo.SoloControllerMode;
 import com.o3dr.services.android.lib.drone.companion.solo.SoloLinkState;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSettingSetter;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
@@ -994,5 +995,15 @@ public class DroneApiUtils {
 
         final SoloComp soloComp = droneManager.getSoloComp();
         soloComp.pushButtonSettings(buttonSettings, listener);
+    }
+
+    static void updateSoloLinkControllerMode(DroneManager droneManager,
+                                             @SoloControllerMode.ControllerMode int mode,
+                                             ICommandListener listener) {
+        if(droneManager == null || !droneManager.isCompanionComputerEnabled())
+            return;
+
+        final SoloComp soloComp = droneManager.getSoloComp();
+        soloComp.updateControllerMode(mode, listener);
     }
 }
