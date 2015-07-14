@@ -22,6 +22,9 @@ public class TLVMessageTypes {
 
     public static final int TYPE_ARTOO_INPUT_REPORT_MESSAGE = 2003;
 
+    public static final int TYPE_SOLO_GOPRO_SET_REQUEST = 5001;
+    public static final int TYPE_SOLO_GOPRO_RECORD = 5003;
+
     //Private constructor to prevent instantiation
     private TLVMessageTypes(){}
 }
