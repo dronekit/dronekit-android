@@ -9,7 +9,7 @@ package com.MAVLink.common;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-        
+
 /**
 * 
 */
@@ -20,27 +20,27 @@ public class msg_request_data_stream extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_REQUEST_DATA_STREAM;
 
 
-      
+    
     /**
     * The requested interval between two messages of this type
     */
     public int req_message_rate;
-      
+    
     /**
     * The target requested to send the message stream.
     */
     public short target_system;
-      
+    
     /**
     * The target requested to send the message stream.
     */
     public short target_component;
-      
+    
     /**
     * The ID of the requested data stream
     */
     public short req_stream_id;
-      
+    
     /**
     * 1 to start sending, 0 to stop sending.
     */
@@ -57,15 +57,15 @@ public class msg_request_data_stream extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_REQUEST_DATA_STREAM;
-              
+        
         packet.payload.putUnsignedShort(req_message_rate);
-              
+        
         packet.payload.putUnsignedByte(target_system);
-              
+        
         packet.payload.putUnsignedByte(target_component);
-              
+        
         packet.payload.putUnsignedByte(req_stream_id);
-              
+        
         packet.payload.putUnsignedByte(start_stop);
         
         return packet;
@@ -78,15 +78,15 @@ public class msg_request_data_stream extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-              
+        
         this.req_message_rate = payload.getUnsignedShort();
-              
+        
         this.target_system = payload.getUnsignedByte();
-              
+        
         this.target_component = payload.getUnsignedByte();
-              
+        
         this.req_stream_id = payload.getUnsignedByte();
-              
+        
         this.start_stop = payload.getUnsignedByte();
         
     }
@@ -107,7 +107,7 @@ public class msg_request_data_stream extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_REQUEST_DATA_STREAM;
-        unpack(mavLinkPacket.payload);        
+        unpack(mavLinkPacket.payload);
     }
 
               

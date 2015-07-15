@@ -9,7 +9,7 @@ package com.MAVLink.common;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-        
+
 /**
 * The heartbeat message shows that a system is present and responding. The type of the MAV and Autopilot hardware allow the receiving system to treat further messages from this system appropriate (e.g. by laying out the user interface based on the autopilot).
 */
@@ -20,32 +20,32 @@ public class msg_heartbeat extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_HEARTBEAT;
 
 
-      
+    
     /**
     * A bitfield for use for autopilot-specific flags.
     */
     public long custom_mode;
-      
+    
     /**
     * Type of the MAV (quadrotor, helicopter, etc., up to 15 types, defined in MAV_TYPE ENUM)
     */
     public short type;
-      
+    
     /**
     * Autopilot type / class. defined in MAV_AUTOPILOT ENUM
     */
     public short autopilot;
-      
+    
     /**
     * System mode bitfield, see MAV_MODE_FLAG ENUM in mavlink/include/mavlink_types.h
     */
     public short base_mode;
-      
+    
     /**
     * System status flag, see MAV_STATE ENUM
     */
     public short system_status;
-      
+    
     /**
     * MAVLink version, not writable by user, gets added by protocol because of magic data type: uint8_t_mavlink_version
     */
@@ -62,17 +62,17 @@ public class msg_heartbeat extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_HEARTBEAT;
-              
+        
         packet.payload.putUnsignedInt(custom_mode);
-              
+        
         packet.payload.putUnsignedByte(type);
-              
+        
         packet.payload.putUnsignedByte(autopilot);
-              
+        
         packet.payload.putUnsignedByte(base_mode);
-              
+        
         packet.payload.putUnsignedByte(system_status);
-              
+        
         packet.payload.putUnsignedByte(mavlink_version);
         
         return packet;
@@ -85,17 +85,17 @@ public class msg_heartbeat extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-              
+        
         this.custom_mode = payload.getUnsignedInt();
-              
+        
         this.type = payload.getUnsignedByte();
-              
+        
         this.autopilot = payload.getUnsignedByte();
-              
+        
         this.base_mode = payload.getUnsignedByte();
-              
+        
         this.system_status = payload.getUnsignedByte();
-              
+        
         this.mavlink_version = payload.getUnsignedByte();
         
     }
@@ -116,7 +116,7 @@ public class msg_heartbeat extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_HEARTBEAT;
-        unpack(mavLinkPacket.payload);        
+        unpack(mavLinkPacket.payload);
     }
 
                 

@@ -9,7 +9,7 @@ package com.MAVLink.ardupilotmega;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-        
+
 /**
 * 
             Sent by the gimbal after the factory parameters are successfully loaded, to inform the factory software that the load is complete
@@ -22,7 +22,7 @@ public class msg_gimbal_factory_parameters_loaded extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_GIMBAL_FACTORY_PARAMETERS_LOADED;
 
 
-      
+    
     /**
     * Dummy field because mavgen doesn't allow messages with no fields
     */
@@ -39,7 +39,7 @@ public class msg_gimbal_factory_parameters_loaded extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_GIMBAL_FACTORY_PARAMETERS_LOADED;
-              
+        
         packet.payload.putUnsignedByte(dummy);
         
         return packet;
@@ -52,7 +52,7 @@ public class msg_gimbal_factory_parameters_loaded extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-              
+        
         this.dummy = payload.getUnsignedByte();
         
     }
@@ -73,7 +73,7 @@ public class msg_gimbal_factory_parameters_loaded extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_GIMBAL_FACTORY_PARAMETERS_LOADED;
-        unpack(mavLinkPacket.payload);        
+        unpack(mavLinkPacket.payload);
     }
 
       

@@ -9,7 +9,7 @@ package com.MAVLink.ardupilotmega;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-        
+
 /**
 * 
             Instructs the gimbal to set its current position as its new home position.  Will primarily be used for factory calibration
@@ -22,12 +22,12 @@ public class msg_gimbal_set_home_offsets extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_GIMBAL_SET_HOME_OFFSETS;
 
 
-      
+    
     /**
     * System ID
     */
     public short target_system;
-      
+    
     /**
     * Component ID
     */
@@ -44,9 +44,9 @@ public class msg_gimbal_set_home_offsets extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_GIMBAL_SET_HOME_OFFSETS;
-              
+        
         packet.payload.putUnsignedByte(target_system);
-              
+        
         packet.payload.putUnsignedByte(target_component);
         
         return packet;
@@ -59,9 +59,9 @@ public class msg_gimbal_set_home_offsets extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-              
+        
         this.target_system = payload.getUnsignedByte();
-              
+        
         this.target_component = payload.getUnsignedByte();
         
     }
@@ -82,7 +82,7 @@ public class msg_gimbal_set_home_offsets extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_GIMBAL_SET_HOME_OFFSETS;
-        unpack(mavLinkPacket.payload);        
+        unpack(mavLinkPacket.payload);
     }
 
         

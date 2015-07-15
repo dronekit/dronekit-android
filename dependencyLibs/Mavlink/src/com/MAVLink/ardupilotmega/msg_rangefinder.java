@@ -9,7 +9,7 @@ package com.MAVLink.ardupilotmega;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-        
+
 /**
 * Rangefinder reporting
 */
@@ -20,12 +20,12 @@ public class msg_rangefinder extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_RANGEFINDER;
 
 
-      
+    
     /**
     * distance in meters
     */
     public float distance;
-      
+    
     /**
     * raw voltage if available, zero otherwise
     */
@@ -42,9 +42,9 @@ public class msg_rangefinder extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_RANGEFINDER;
-              
+        
         packet.payload.putFloat(distance);
-              
+        
         packet.payload.putFloat(voltage);
         
         return packet;
@@ -57,9 +57,9 @@ public class msg_rangefinder extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-              
+        
         this.distance = payload.getFloat();
-              
+        
         this.voltage = payload.getFloat();
         
     }
@@ -80,7 +80,7 @@ public class msg_rangefinder extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_RANGEFINDER;
-        unpack(mavLinkPacket.payload);        
+        unpack(mavLinkPacket.payload);
     }
 
         

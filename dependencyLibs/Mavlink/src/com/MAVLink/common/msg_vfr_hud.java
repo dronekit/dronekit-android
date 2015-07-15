@@ -9,7 +9,7 @@ package com.MAVLink.common;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-        
+
 /**
 * Metrics typically displayed on a HUD for fixed wing aircraft
 */
@@ -20,32 +20,32 @@ public class msg_vfr_hud extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_VFR_HUD;
 
 
-      
+    
     /**
     * Current airspeed in m/s
     */
     public float airspeed;
-      
+    
     /**
     * Current ground speed in m/s
     */
     public float groundspeed;
-      
+    
     /**
     * Current altitude (MSL), in meters
     */
     public float alt;
-      
+    
     /**
     * Current climb rate in meters/second
     */
     public float climb;
-      
+    
     /**
     * Current heading in degrees, in compass units (0..360, 0=north)
     */
     public short heading;
-      
+    
     /**
     * Current throttle setting in integer percent, 0 to 100
     */
@@ -62,17 +62,17 @@ public class msg_vfr_hud extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_VFR_HUD;
-              
+        
         packet.payload.putFloat(airspeed);
-              
+        
         packet.payload.putFloat(groundspeed);
-              
+        
         packet.payload.putFloat(alt);
-              
+        
         packet.payload.putFloat(climb);
-              
+        
         packet.payload.putShort(heading);
-              
+        
         packet.payload.putUnsignedShort(throttle);
         
         return packet;
@@ -85,17 +85,17 @@ public class msg_vfr_hud extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-              
+        
         this.airspeed = payload.getFloat();
-              
+        
         this.groundspeed = payload.getFloat();
-              
+        
         this.alt = payload.getFloat();
-              
+        
         this.climb = payload.getFloat();
-              
+        
         this.heading = payload.getShort();
-              
+        
         this.throttle = payload.getUnsignedShort();
         
     }
@@ -116,7 +116,7 @@ public class msg_vfr_hud extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_VFR_HUD;
-        unpack(mavLinkPacket.payload);        
+        unpack(mavLinkPacket.payload);
     }
 
                 
