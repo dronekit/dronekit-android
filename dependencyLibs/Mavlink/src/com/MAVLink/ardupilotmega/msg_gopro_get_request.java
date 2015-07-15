@@ -9,7 +9,7 @@ package com.MAVLink.ardupilotmega;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-        
+
 /**
 * Request a GOPRO_COMMAND response from the GoPro
 */
@@ -20,17 +20,17 @@ public class msg_gopro_get_request extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_GOPRO_GET_REQUEST;
 
 
-      
+    
     /**
     * System ID
     */
     public short target_system;
-      
+    
     /**
     * Component ID
     */
     public short target_component;
-      
+    
     /**
     * Command ID
     */
@@ -47,11 +47,11 @@ public class msg_gopro_get_request extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_GOPRO_GET_REQUEST;
-              
+        
         packet.payload.putUnsignedByte(target_system);
-              
+        
         packet.payload.putUnsignedByte(target_component);
-              
+        
         packet.payload.putUnsignedByte(cmd_id);
         
         return packet;
@@ -64,11 +64,11 @@ public class msg_gopro_get_request extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-              
+        
         this.target_system = payload.getUnsignedByte();
-              
+        
         this.target_component = payload.getUnsignedByte();
-              
+        
         this.cmd_id = payload.getUnsignedByte();
         
     }
@@ -89,7 +89,7 @@ public class msg_gopro_get_request extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_GOPRO_GET_REQUEST;
-        unpack(mavLinkPacket.payload);        
+        unpack(mavLinkPacket.payload);
     }
 
           

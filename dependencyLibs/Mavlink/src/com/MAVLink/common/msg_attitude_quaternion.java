@@ -9,7 +9,7 @@ package com.MAVLink.common;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-        
+
 /**
 * The attitude in the aeronautical frame (right-handed, Z-down, X-front, Y-right), expressed as quaternion. Quaternion order is w, x, y, z and a zero rotation would be expressed as (1 0 0 0).
 */
@@ -20,42 +20,42 @@ public class msg_attitude_quaternion extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_ATTITUDE_QUATERNION;
 
 
-      
+    
     /**
     * Timestamp (milliseconds since system boot)
     */
     public long time_boot_ms;
-      
+    
     /**
     * Quaternion component 1, w (1 in null-rotation)
     */
     public float q1;
-      
+    
     /**
     * Quaternion component 2, x (0 in null-rotation)
     */
     public float q2;
-      
+    
     /**
     * Quaternion component 3, y (0 in null-rotation)
     */
     public float q3;
-      
+    
     /**
     * Quaternion component 4, z (0 in null-rotation)
     */
     public float q4;
-      
+    
     /**
     * Roll angular speed (rad/s)
     */
     public float rollspeed;
-      
+    
     /**
     * Pitch angular speed (rad/s)
     */
     public float pitchspeed;
-      
+    
     /**
     * Yaw angular speed (rad/s)
     */
@@ -72,21 +72,21 @@ public class msg_attitude_quaternion extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_ATTITUDE_QUATERNION;
-              
+        
         packet.payload.putUnsignedInt(time_boot_ms);
-              
+        
         packet.payload.putFloat(q1);
-              
+        
         packet.payload.putFloat(q2);
-              
+        
         packet.payload.putFloat(q3);
-              
+        
         packet.payload.putFloat(q4);
-              
+        
         packet.payload.putFloat(rollspeed);
-              
+        
         packet.payload.putFloat(pitchspeed);
-              
+        
         packet.payload.putFloat(yawspeed);
         
         return packet;
@@ -99,21 +99,21 @@ public class msg_attitude_quaternion extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-              
+        
         this.time_boot_ms = payload.getUnsignedInt();
-              
+        
         this.q1 = payload.getFloat();
-              
+        
         this.q2 = payload.getFloat();
-              
+        
         this.q3 = payload.getFloat();
-              
+        
         this.q4 = payload.getFloat();
-              
+        
         this.rollspeed = payload.getFloat();
-              
+        
         this.pitchspeed = payload.getFloat();
-              
+        
         this.yawspeed = payload.getFloat();
         
     }
@@ -134,7 +134,7 @@ public class msg_attitude_quaternion extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_ATTITUDE_QUATERNION;
-        unpack(mavLinkPacket.payload);        
+        unpack(mavLinkPacket.payload);
     }
 
                     

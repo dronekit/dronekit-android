@@ -9,7 +9,7 @@ package com.MAVLink.common;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-        
+
 /**
 * 
 */
@@ -20,37 +20,37 @@ public class msg_vision_position_estimate extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_VISION_POSITION_ESTIMATE;
 
 
-      
+    
     /**
     * Timestamp (microseconds, synced to UNIX time or since system boot)
     */
     public long usec;
-      
+    
     /**
     * Global X position
     */
     public float x;
-      
+    
     /**
     * Global Y position
     */
     public float y;
-      
+    
     /**
     * Global Z position
     */
     public float z;
-      
+    
     /**
     * Roll angle in rad
     */
     public float roll;
-      
+    
     /**
     * Pitch angle in rad
     */
     public float pitch;
-      
+    
     /**
     * Yaw angle in rad
     */
@@ -67,19 +67,19 @@ public class msg_vision_position_estimate extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_VISION_POSITION_ESTIMATE;
-              
+        
         packet.payload.putUnsignedLong(usec);
-              
+        
         packet.payload.putFloat(x);
-              
+        
         packet.payload.putFloat(y);
-              
+        
         packet.payload.putFloat(z);
-              
+        
         packet.payload.putFloat(roll);
-              
+        
         packet.payload.putFloat(pitch);
-              
+        
         packet.payload.putFloat(yaw);
         
         return packet;
@@ -92,19 +92,19 @@ public class msg_vision_position_estimate extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-              
+        
         this.usec = payload.getUnsignedLong();
-              
+        
         this.x = payload.getFloat();
-              
+        
         this.y = payload.getFloat();
-              
+        
         this.z = payload.getFloat();
-              
+        
         this.roll = payload.getFloat();
-              
+        
         this.pitch = payload.getFloat();
-              
+        
         this.yaw = payload.getFloat();
         
     }
@@ -125,7 +125,7 @@ public class msg_vision_position_estimate extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_VISION_POSITION_ESTIMATE;
-        unpack(mavLinkPacket.payload);        
+        unpack(mavLinkPacket.payload);
     }
 
                   
