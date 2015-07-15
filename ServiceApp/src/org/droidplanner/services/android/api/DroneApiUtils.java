@@ -64,6 +64,7 @@ import org.droidplanner.core.gcs.follow.FollowAlgorithm;
 import org.droidplanner.core.helpers.coordinates.Coord2D;
 import org.droidplanner.core.helpers.coordinates.Coord3D;
 import org.droidplanner.core.mission.survey.SplineSurveyImpl;
+import org.droidplanner.core.mission.survey.SurveyImpl;
 import org.droidplanner.core.model.Drone;
 import org.droidplanner.core.survey.Footprint;
 import org.droidplanner.services.android.drone.DroneManager;
@@ -890,10 +891,10 @@ public class DroneApiUtils {
 
     static Survey buildSurvey(Drone drone, Survey survey) {
         org.droidplanner.core.mission.Mission droneMission = drone == null ? null : drone.getMission();
-        org.droidplanner.core.mission.survey.Survey updatedSurvey = (org.droidplanner.core.mission.survey.Survey) ProxyUtils.getMissionItemImpl
+        SurveyImpl updatedSurveyImpl = (SurveyImpl) ProxyUtils.getMissionItemImpl
                 (droneMission, survey);
 
-        return (Survey) ProxyUtils.getProxyMissionItem(updatedSurvey);
+        return (Survey) ProxyUtils.getProxyMissionItem(updatedSurveyImpl);
     }
 
     static Survey buildSplineSurvey(Drone drone, Survey survey) {
