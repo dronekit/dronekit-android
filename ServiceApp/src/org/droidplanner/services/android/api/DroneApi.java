@@ -304,6 +304,9 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
             return;
 
         Bundle data = action.getData();
+        if(data != null)
+            data.setClassLoader(context.getClassLoader());
+
         switch (type) {
             // MISSION ACTIONS
             case MissionActions.ACTION_GENERATE_DRONIE:

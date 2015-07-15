@@ -80,8 +80,6 @@ public class MediaCodecManager {
         }
     };
 
-    private final Handler handler = new Handler();
-
     private final AtomicBoolean decodedFirstFrame = new AtomicBoolean(false);
 
     private final AtomicBoolean isDecoding = new AtomicBoolean(false);
@@ -91,9 +89,12 @@ public class MediaCodecManager {
     private final AtomicReference<DecoderListener> decoderListenerRef = new AtomicReference<>();
     private final NALUChunkAssembler naluChunkAssembler;
 
+    private final Handler handler;
+
     private DequeueCodec dequeueRunner;
 
-    public MediaCodecManager() {
+    public MediaCodecManager(Handler handler) {
+        this.handler = handler;
         this.naluChunkAssembler = new NALUChunkAssembler();
     }
 

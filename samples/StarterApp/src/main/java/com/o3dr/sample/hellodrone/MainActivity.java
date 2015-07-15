@@ -15,6 +15,7 @@ import android.view.View;
 
 import com.o3dr.android.client.ControlTower;
 import com.o3dr.android.client.Drone;
+import com.o3dr.android.client.apis.SoloLinkApi;
 import com.o3dr.android.client.apis.VehicleApi;
 import com.o3dr.android.client.interfaces.DroneListener;
 import com.o3dr.android.client.interfaces.TowerListener;
@@ -72,6 +73,14 @@ public class MainActivity extends ActionBarActivity implements DroneListener, To
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
                 // Do nothing
+            }
+        });
+
+        final Button takePic = (Button) findViewById(R.id.take_photo_button);
+        takePic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                takePhoto();
             }
         });
     }
@@ -373,6 +382,25 @@ public class MainActivity extends ActionBarActivity implements DroneListener, To
         double dy  = pointA.getLongitude() - pointB.getLongitude();
         double dz = pointA.getAltitude() - pointB.getAltitude();
         return Math.sqrt(dx*dx + dy*dy + dz*dz);
+    }
+
+    private void takePhoto(){
+        SoloLinkApi.getApi(drone).takePhoto(new AbstractCommandListener() {
+            @Override
+            public void onSuccess() {
+                alertUser("Photo taken.");
+            }
+
+            @Override
+            public void onError(int executionError) {
+                alertUser("Error while trying to take the photo: " + executionError);
+            }
+
+            @Override
+            public void onTimeout() {
+                alertUser("Timeout while trying to take the photo.");
+            }
+        });
     }
 
 }

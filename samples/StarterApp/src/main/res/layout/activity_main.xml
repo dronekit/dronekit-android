@@ -1,5 +1,5 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="wrap_content"
     android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
@@ -50,6 +50,7 @@
         android:layout_width="fill_parent"
         android:layout_height="200dp"
         android:layout_below="@+id/telemetryLabel"
+        android:id="@+id/telemetryInfo"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_marginTop="10dp">
@@ -183,5 +184,14 @@
         </TableRow>
 
     </TableLayout>
+
+    <Button
+        android:layout_below="@+id/telemetryInfo"
+        android:id="@+id/take_photo_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minHeight="48dp"
+        android:layout_centerHorizontal="true"
+        android:text="Take a picture"/>
 
 </RelativeLayout>
