@@ -463,7 +463,7 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
     }
 
     private void streamVideo(Surface videoSurface){
-        SoloLinkApi.getApi(drone).streamVideo(videoSurface, null);
+        SoloLinkApi.getApi(drone).startVideoStream(videoSurface, null);
     }
 
 }

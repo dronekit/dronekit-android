@@ -39,7 +39,9 @@ public class SoloLinkActions {
      */
     public static final String EXTRA_CONTROLLER_MODE = "extra_controller_mode";
 
-    public static final String ACTION_STREAM_VIDEO = Utils.PACKAGE_NAME + ".action.STREAM_VIDEO";
+    public static final String ACTION_START_VIDEO_STREAM = Utils.PACKAGE_NAME + ".action.START_VIDEO_STREAM";
 
     public static final String EXTRA_VIDEO_DISPLAY = "extra_video_display";
+
+    public static final String ACTION_STOP_VIDEO_STREAM = Utils.PACKAGE_NAME + ".action.STOP_VIDEO_STREAM";
 }

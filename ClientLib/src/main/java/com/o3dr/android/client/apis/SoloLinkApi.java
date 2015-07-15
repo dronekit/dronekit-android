@@ -4,8 +4,8 @@ import android.os.Bundle;
 import android.view.Surface;
 
 import com.o3dr.android.client.Drone;
+import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.drone.companion.solo.SoloControllerMode;
-import com.o3dr.services.android.lib.drone.companion.solo.action.SoloLinkActions;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSettingSetter;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloGoproRecord;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloGoproSetRequest;
@@ -40,9 +40,11 @@ public class SoloLinkApi implements Api {
     }
 
     private final Drone drone;
+    private final CapabilityApi capabilityChecker;
 
     private SoloLinkApi(Drone drone){
         this.drone = drone;
+        this.capabilityChecker = CapabilityApi.getApi(drone);
     }
 
     /**
@@ -158,9 +160,70 @@ public class SoloLinkApi implements Api {
         });
     }
 
-    public void streamVideo(Surface surface, final AbstractCommandListener listener){
-        final Bundle params = new Bundle();
-        params.putParcelable(EXTRA_VIDEO_DISPLAY, surface);
-        drone.performAsyncActionOnDroneThread(new Action(ACTION_STREAM_VIDEO, params), listener);
+    /**
+     * Attempt to grab ownership and start the video stream from the connected drone. Can fail if
+     * the video stream is already owned by another client.
+     * @param surface Surface object onto which the video is decoded.
+     * @param listener Register a callback to receive update of the command execution status.
+     */
+    public void startVideoStream(final Surface surface, final AbstractCommandListener listener){
+        capabilityChecker.checkFeatureSupport(CapabilityApi.FeatureIds.SOLOLINK_VIDEO_STREAMING,
+                new CapabilityApi.FeatureSupportListener() {
+                    @Override
+                    public void onFeatureSupportResult(String featureId, int result, Bundle resultInfo) {
+                        switch (result) {
+
+                            case CapabilityApi.FEATURE_SUPPORTED:
+                                final Bundle params = new Bundle();
+                                params.putParcelable(EXTRA_VIDEO_DISPLAY, surface);
+                                drone.performAsyncActionOnDroneThread(new Action(ACTION_START_VIDEO_STREAM, params), listener);
+                                break;
+
+                            case CapabilityApi.FEATURE_UNSUPPORTED:
+                                if (listener != null) {
+                                    listener.onError(CommandExecutionError.COMMAND_UNSUPPORTED);
+                                }
+                                break;
+
+                            default:
+                                if (listener != null) {
+                                    listener.onError(CommandExecutionError.COMMAND_FAILED);
+                                }
+                                break;
+                        }
+                    }
+                });
+
+    }
+
+    /**
+     * Stop the video stream from the connected drone, and release ownership.
+     * @param listener Register a callback to receive update of the command execution status.
+     */
+    public void stopVideoStream(final AbstractCommandListener listener){
+        capabilityChecker.checkFeatureSupport(CapabilityApi.FeatureIds.SOLOLINK_VIDEO_STREAMING,
+                new CapabilityApi.FeatureSupportListener() {
+                    @Override
+                    public void onFeatureSupportResult(String featureId, int result, Bundle resultInfo) {
+                        switch(result){
+
+                            case CapabilityApi.FEATURE_SUPPORTED:
+                                drone.performAsyncActionOnDroneThread(new Action(ACTION_STOP_VIDEO_STREAM), listener);
+                                break;
+
+                            case CapabilityApi.FEATURE_UNSUPPORTED:
+                                if (listener != null) {
+                                    listener.onError(CommandExecutionError.COMMAND_UNSUPPORTED);
+                                }
+                                break;
+
+                            default:
+                                if (listener != null) {
+                                    listener.onError(CommandExecutionError.COMMAND_FAILED);
+                                }
+                                break;
+                        }
+                    }
+                });
     }
 }

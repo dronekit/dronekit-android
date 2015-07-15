@@ -529,7 +529,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 DroneApiUtils.updateSoloLinkControllerMode(droneMgr, mode, listener);
                 break;
 
-            case SoloLinkActions.ACTION_STREAM_VIDEO:
+            case SoloLinkActions.ACTION_START_VIDEO_STREAM:
                 final Surface videoSurface = data.getParcelable(SoloLinkActions.EXTRA_VIDEO_DISPLAY);
                 DroneApiUtils.streamVideo(droneMgr, videoSurface, listener);
                 break;
