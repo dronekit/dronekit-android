@@ -9,7 +9,7 @@ package com.MAVLink.ardupilotmega;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-        
+
 /**
 * Offsets and calibrations values for hardware
         sensors. This makes it easier to debug the calibration process.
@@ -21,62 +21,62 @@ public class msg_sensor_offsets extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_SENSOR_OFFSETS;
 
 
-      
+    
     /**
     * magnetic declination (radians)
     */
     public float mag_declination;
-      
+    
     /**
     * raw pressure from barometer
     */
     public int raw_press;
-      
+    
     /**
     * raw temperature from barometer
     */
     public int raw_temp;
-      
+    
     /**
     * gyro X calibration
     */
     public float gyro_cal_x;
-      
+    
     /**
     * gyro Y calibration
     */
     public float gyro_cal_y;
-      
+    
     /**
     * gyro Z calibration
     */
     public float gyro_cal_z;
-      
+    
     /**
     * accel X calibration
     */
     public float accel_cal_x;
-      
+    
     /**
     * accel Y calibration
     */
     public float accel_cal_y;
-      
+    
     /**
     * accel Z calibration
     */
     public float accel_cal_z;
-      
+    
     /**
     * magnetometer X offset
     */
     public short mag_ofs_x;
-      
+    
     /**
     * magnetometer Y offset
     */
     public short mag_ofs_y;
-      
+    
     /**
     * magnetometer Z offset
     */
@@ -93,29 +93,29 @@ public class msg_sensor_offsets extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_SENSOR_OFFSETS;
-              
+        
         packet.payload.putFloat(mag_declination);
-              
+        
         packet.payload.putInt(raw_press);
-              
+        
         packet.payload.putInt(raw_temp);
-              
+        
         packet.payload.putFloat(gyro_cal_x);
-              
+        
         packet.payload.putFloat(gyro_cal_y);
-              
+        
         packet.payload.putFloat(gyro_cal_z);
-              
+        
         packet.payload.putFloat(accel_cal_x);
-              
+        
         packet.payload.putFloat(accel_cal_y);
-              
+        
         packet.payload.putFloat(accel_cal_z);
-              
+        
         packet.payload.putShort(mag_ofs_x);
-              
+        
         packet.payload.putShort(mag_ofs_y);
-              
+        
         packet.payload.putShort(mag_ofs_z);
         
         return packet;
@@ -128,29 +128,29 @@ public class msg_sensor_offsets extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-              
+        
         this.mag_declination = payload.getFloat();
-              
+        
         this.raw_press = payload.getInt();
-              
+        
         this.raw_temp = payload.getInt();
-              
+        
         this.gyro_cal_x = payload.getFloat();
-              
+        
         this.gyro_cal_y = payload.getFloat();
-              
+        
         this.gyro_cal_z = payload.getFloat();
-              
+        
         this.accel_cal_x = payload.getFloat();
-              
+        
         this.accel_cal_y = payload.getFloat();
-              
+        
         this.accel_cal_z = payload.getFloat();
-              
+        
         this.mag_ofs_x = payload.getShort();
-              
+        
         this.mag_ofs_y = payload.getShort();
-              
+        
         this.mag_ofs_z = payload.getShort();
         
     }
@@ -171,7 +171,7 @@ public class msg_sensor_offsets extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_SENSOR_OFFSETS;
-        unpack(mavLinkPacket.payload);        
+        unpack(mavLinkPacket.payload);
     }
 
                             

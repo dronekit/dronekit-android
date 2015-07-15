@@ -9,7 +9,7 @@ package com.MAVLink.common;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-        
+
 /**
 * Reply to LOG_REQUEST_LIST
 */
@@ -20,27 +20,27 @@ public class msg_log_entry extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_LOG_ENTRY;
 
 
-      
+    
     /**
     * UTC timestamp of log in seconds since 1970, or 0 if not available
     */
     public long time_utc;
-      
+    
     /**
     * Size of the log (may be approximate) in bytes
     */
     public long size;
-      
+    
     /**
     * Log id
     */
     public int id;
-      
+    
     /**
     * Total number of logs
     */
     public int num_logs;
-      
+    
     /**
     * High log number
     */
@@ -57,15 +57,15 @@ public class msg_log_entry extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_LOG_ENTRY;
-              
+        
         packet.payload.putUnsignedInt(time_utc);
-              
+        
         packet.payload.putUnsignedInt(size);
-              
+        
         packet.payload.putUnsignedShort(id);
-              
+        
         packet.payload.putUnsignedShort(num_logs);
-              
+        
         packet.payload.putUnsignedShort(last_log_num);
         
         return packet;
@@ -78,15 +78,15 @@ public class msg_log_entry extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-              
+        
         this.time_utc = payload.getUnsignedInt();
-              
+        
         this.size = payload.getUnsignedInt();
-              
+        
         this.id = payload.getUnsignedShort();
-              
+        
         this.num_logs = payload.getUnsignedShort();
-              
+        
         this.last_log_num = payload.getUnsignedShort();
         
     }
@@ -107,7 +107,7 @@ public class msg_log_entry extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_LOG_ENTRY;
-        unpack(mavLinkPacket.payload);        
+        unpack(mavLinkPacket.payload);
     }
 
               

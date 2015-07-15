@@ -9,7 +9,7 @@ package com.MAVLink.ardupilotmega;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-        
+
 /**
 * Deprecated. Use MAV_CMD_PREFLIGHT_SET_SENSOR_OFFSETS instead. Set the magnetometer offsets
 */
@@ -20,27 +20,27 @@ public class msg_set_mag_offsets extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_SET_MAG_OFFSETS;
 
 
-      
+    
     /**
     * magnetometer X offset
     */
     public short mag_ofs_x;
-      
+    
     /**
     * magnetometer Y offset
     */
     public short mag_ofs_y;
-      
+    
     /**
     * magnetometer Z offset
     */
     public short mag_ofs_z;
-      
+    
     /**
     * System ID
     */
     public short target_system;
-      
+    
     /**
     * Component ID
     */
@@ -57,15 +57,15 @@ public class msg_set_mag_offsets extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_SET_MAG_OFFSETS;
-              
+        
         packet.payload.putShort(mag_ofs_x);
-              
+        
         packet.payload.putShort(mag_ofs_y);
-              
+        
         packet.payload.putShort(mag_ofs_z);
-              
+        
         packet.payload.putUnsignedByte(target_system);
-              
+        
         packet.payload.putUnsignedByte(target_component);
         
         return packet;
@@ -78,15 +78,15 @@ public class msg_set_mag_offsets extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-              
+        
         this.mag_ofs_x = payload.getShort();
-              
+        
         this.mag_ofs_y = payload.getShort();
-              
+        
         this.mag_ofs_z = payload.getShort();
-              
+        
         this.target_system = payload.getUnsignedByte();
-              
+        
         this.target_component = payload.getUnsignedByte();
         
     }
@@ -107,7 +107,7 @@ public class msg_set_mag_offsets extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_SET_MAG_OFFSETS;
-        unpack(mavLinkPacket.payload);        
+        unpack(mavLinkPacket.payload);
     }
 
               

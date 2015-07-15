@@ -9,7 +9,7 @@ package com.MAVLink.ardupilotmega;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-        
+
 /**
 * Status of simulation environment, if used
 */
@@ -20,57 +20,57 @@ public class msg_simstate extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_SIMSTATE;
 
 
-      
+    
     /**
     * Roll angle (rad)
     */
     public float roll;
-      
+    
     /**
     * Pitch angle (rad)
     */
     public float pitch;
-      
+    
     /**
     * Yaw angle (rad)
     */
     public float yaw;
-      
+    
     /**
     * X acceleration m/s/s
     */
     public float xacc;
-      
+    
     /**
     * Y acceleration m/s/s
     */
     public float yacc;
-      
+    
     /**
     * Z acceleration m/s/s
     */
     public float zacc;
-      
+    
     /**
     * Angular speed around X axis rad/s
     */
     public float xgyro;
-      
+    
     /**
     * Angular speed around Y axis rad/s
     */
     public float ygyro;
-      
+    
     /**
     * Angular speed around Z axis rad/s
     */
     public float zgyro;
-      
+    
     /**
     * Latitude in degrees * 1E7
     */
     public int lat;
-      
+    
     /**
     * Longitude in degrees * 1E7
     */
@@ -87,27 +87,27 @@ public class msg_simstate extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_SIMSTATE;
-              
+        
         packet.payload.putFloat(roll);
-              
+        
         packet.payload.putFloat(pitch);
-              
+        
         packet.payload.putFloat(yaw);
-              
+        
         packet.payload.putFloat(xacc);
-              
+        
         packet.payload.putFloat(yacc);
-              
+        
         packet.payload.putFloat(zacc);
-              
+        
         packet.payload.putFloat(xgyro);
-              
+        
         packet.payload.putFloat(ygyro);
-              
+        
         packet.payload.putFloat(zgyro);
-              
+        
         packet.payload.putInt(lat);
-              
+        
         packet.payload.putInt(lng);
         
         return packet;
@@ -120,27 +120,27 @@ public class msg_simstate extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-              
+        
         this.roll = payload.getFloat();
-              
+        
         this.pitch = payload.getFloat();
-              
+        
         this.yaw = payload.getFloat();
-              
+        
         this.xacc = payload.getFloat();
-              
+        
         this.yacc = payload.getFloat();
-              
+        
         this.zacc = payload.getFloat();
-              
+        
         this.xgyro = payload.getFloat();
-              
+        
         this.ygyro = payload.getFloat();
-              
+        
         this.zgyro = payload.getFloat();
-              
+        
         this.lat = payload.getInt();
-              
+        
         this.lng = payload.getInt();
         
     }
@@ -161,7 +161,7 @@ public class msg_simstate extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_SIMSTATE;
-        unpack(mavLinkPacket.payload);        
+        unpack(mavLinkPacket.payload);
     }
 
                           
