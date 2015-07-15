@@ -16,13 +16,7 @@ public class MavLinkParameters {
 	}
 
 	public static void sendParameter(Drone drone, Parameter parameter) {
-		msg_param_set msg = new msg_param_set();
-		msg.target_system = drone.getSysid();
-		msg.target_component = drone.getCompid();
-		msg.setParam_Id(parameter.name);
-		msg.param_type = (byte) parameter.type;
-		msg.param_value = (float) parameter.value;
-		drone.getMavClient().sendMavMessage(msg, null);
+		sendParameter(drone, parameter.name, parameter.type, (float) parameter.value);
 	}
 
 	public static void sendParameter(Drone drone, String name, int type, float value) {
