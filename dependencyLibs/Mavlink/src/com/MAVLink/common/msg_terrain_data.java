@@ -9,7 +9,7 @@ package com.MAVLink.common;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-        
+
 /**
 * Terrain data sent from GCS. The lat/lon and grid_spacing must be the same as a lat/lon from a TERRAIN_REQUEST
 */
@@ -20,27 +20,27 @@ public class msg_terrain_data extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_TERRAIN_DATA;
 
 
-      
+    
     /**
     * Latitude of SW corner of first grid (degrees *10^7)
     */
     public int lat;
-      
+    
     /**
     * Longitude of SW corner of first grid (in degrees *10^7)
     */
     public int lon;
-      
+    
     /**
     * Grid spacing in meters
     */
     public int grid_spacing;
-      
+    
     /**
     * Terrain data in meters AMSL
     */
     public short data[] = new short[16];
-      
+    
     /**
     * bit within the terrain request mask
     */
@@ -57,19 +57,19 @@ public class msg_terrain_data extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_TERRAIN_DATA;
-              
+        
         packet.payload.putInt(lat);
-              
+        
         packet.payload.putInt(lon);
-              
+        
         packet.payload.putUnsignedShort(grid_spacing);
-              
+        
         
         for (int i = 0; i < data.length; i++) {
             packet.payload.putShort(data[i]);
         }
                     
-              
+        
         packet.payload.putUnsignedByte(gridbit);
         
         return packet;
@@ -82,19 +82,19 @@ public class msg_terrain_data extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-              
+        
         this.lat = payload.getInt();
-              
+        
         this.lon = payload.getInt();
-              
+        
         this.grid_spacing = payload.getUnsignedShort();
-              
-         
+        
+        
         for (int i = 0; i < this.data.length; i++) {
             this.data[i] = payload.getShort();
         }
                 
-              
+        
         this.gridbit = payload.getUnsignedByte();
         
     }
@@ -115,7 +115,7 @@ public class msg_terrain_data extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_TERRAIN_DATA;
-        unpack(mavLinkPacket.payload);        
+        unpack(mavLinkPacket.payload);
     }
 
               

@@ -9,7 +9,7 @@ package com.MAVLink.ardupilotmega;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-        
+
 /**
 * state of APM memory
 */
@@ -20,12 +20,12 @@ public class msg_meminfo extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_MEMINFO;
 
 
-      
+    
     /**
     * heap top
     */
     public int brkval;
-      
+    
     /**
     * free memory
     */
@@ -42,9 +42,9 @@ public class msg_meminfo extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_MEMINFO;
-              
+        
         packet.payload.putUnsignedShort(brkval);
-              
+        
         packet.payload.putUnsignedShort(freemem);
         
         return packet;
@@ -57,9 +57,9 @@ public class msg_meminfo extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-              
+        
         this.brkval = payload.getUnsignedShort();
-              
+        
         this.freemem = payload.getUnsignedShort();
         
     }
@@ -80,7 +80,7 @@ public class msg_meminfo extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_MEMINFO;
-        unpack(mavLinkPacket.payload);        
+        unpack(mavLinkPacket.payload);
     }
 
         

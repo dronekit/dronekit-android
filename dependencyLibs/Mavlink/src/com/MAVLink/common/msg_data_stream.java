@@ -9,7 +9,7 @@ package com.MAVLink.common;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-        
+
 /**
 * 
 */
@@ -20,17 +20,17 @@ public class msg_data_stream extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_DATA_STREAM;
 
 
-      
+    
     /**
     * The requested interval between two messages of this type
     */
     public int message_rate;
-      
+    
     /**
     * The ID of the requested data stream
     */
     public short stream_id;
-      
+    
     /**
     * 1 stream is enabled, 0 stream is stopped.
     */
@@ -47,11 +47,11 @@ public class msg_data_stream extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_DATA_STREAM;
-              
+        
         packet.payload.putUnsignedShort(message_rate);
-              
+        
         packet.payload.putUnsignedByte(stream_id);
-              
+        
         packet.payload.putUnsignedByte(on_off);
         
         return packet;
@@ -64,11 +64,11 @@ public class msg_data_stream extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-              
+        
         this.message_rate = payload.getUnsignedShort();
-              
+        
         this.stream_id = payload.getUnsignedByte();
-              
+        
         this.on_off = payload.getUnsignedByte();
         
     }
@@ -89,7 +89,7 @@ public class msg_data_stream extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_DATA_STREAM;
-        unpack(mavLinkPacket.payload);        
+        unpack(mavLinkPacket.payload);
     }
 
           
