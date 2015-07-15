@@ -323,7 +323,6 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 break;
 
             case MissionActions.ACTION_SET_MISSION:
-                data.setClassLoader(Mission.class.getClassLoader());
                 Mission mission = data.getParcelable(MissionActions.EXTRA_MISSION);
                 boolean pushToDrone = data.getBoolean(MissionActions.EXTRA_PUSH_TO_DRONE);
                 DroneApiUtils.setMission(getDrone(), mission, pushToDrone);
@@ -335,7 +334,6 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
             //CONNECTION ACTIONS
             case ConnectionActions.ACTION_CONNECT:
-                data.setClassLoader(ConnectionParameter.class.getClassLoader());
                 ConnectionParameter parameter = data.getParcelable(ConnectionActions.EXTRA_CONNECT_PARAMETER);
                 connect(parameter);
                 break;
@@ -363,7 +361,6 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 break;
 
             case ExperimentalActions.ACTION_SEND_MAVLINK_MESSAGE:
-                data.setClassLoader(MavlinkMessageWrapper.class.getClassLoader());
                 MavlinkMessageWrapper messageWrapper = data.getParcelable(ExperimentalActions.EXTRA_MAVLINK_MESSAGE);
                 DroneApiUtils.sendMavlinkMessage(getDrone(), messageWrapper);
                 break;
@@ -389,7 +386,6 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 break;
 
             case GuidedActions.ACTION_SEND_GUIDED_POINT:
-                data.setClassLoader(LatLong.class.getClassLoader());
                 boolean force = data.getBoolean(GuidedActions.EXTRA_FORCE_GUIDED_POINT);
                 LatLong guidedPoint = data.getParcelable(GuidedActions.EXTRA_GUIDED_POINT);
                 DroneApiUtils.sendGuidedPoint(getDrone(), guidedPoint, force, listener);
@@ -406,7 +402,6 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 break;
 
             case ParameterActions.ACTION_WRITE_PARAMETERS:
-                data.setClassLoader(Parameters.class.getClassLoader());
                 Parameters parameters = data.getParcelable(ParameterActions.EXTRA_PARAMETERS);
                 DroneApiUtils.writeParameters(getDrone(), parameters);
                 break;
@@ -419,7 +414,6 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 break;
 
             case StateActions.ACTION_SET_VEHICLE_MODE:
-                data.setClassLoader(VehicleMode.class.getClassLoader());
                 VehicleMode newMode = data.getParcelable(StateActions.EXTRA_VEHICLE_MODE);
                 DroneApiUtils.changeVehicleMode(getDrone(), newMode, listener);
                 break;
@@ -451,14 +445,12 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
             //FOLLOW-ME ACTIONS
             case FollowMeActions.ACTION_ENABLE_FOLLOW_ME:
-                data.setClassLoader(FollowType.class.getClassLoader());
                 FollowType followType = data.getParcelable(FollowMeActions.EXTRA_FOLLOW_TYPE);
                 DroneApiUtils.enableFollowMe(getDroneManager(), droneHandler, followType);
                 break;
 
             case FollowMeActions.ACTION_UPDATE_FOLLOW_PARAMS:
                 if (droneMgr != null) {
-                    data.setClassLoader(LatLong.class.getClassLoader());
 
                     final FollowAlgorithm followAlgorithm = this.droneMgr.getFollowMe().getFollowAlgorithm();
                     if (followAlgorithm != null) {

@@ -90,15 +90,54 @@ public class SoloLinkApi implements Api {
         drone.performAsyncActionOnDroneThread(new Action(ACTION_UPDATE_CONTROLLER_MODE, params), listener);
     }
 
+    /**
+     * Take a photo with the connected gopro.
+     * @param listener Register a callback to receive update of the command execution status.
+     */
     public void takePhoto(final AbstractCommandListener listener){
         //Set the gopro to photo mode
-        final SoloGoproSetRequest photoModeRequest = new SoloGoproSetRequest(SoloGoproSetRequest.CAPTURE_MODE, (short) 1);
+        final SoloGoproSetRequest photoModeRequest = new SoloGoproSetRequest(SoloGoproSetRequest.CAPTURE_MODE,
+                SoloGoproSetRequest.CAPTURE_MODE_PHOTO);
+
         sendMessage(photoModeRequest, new AbstractCommandListener() {
             @Override
             public void onSuccess() {
                 //Send the command to take a picture.
                 final SoloGoproRecord photoRecord = new SoloGoproRecord(SoloGoproRecord.START_RECORDING);
                 sendMessage(photoRecord, listener);
+            }
+
+            @Override
+            public void onError(int executionError) {
+                if (listener != null) {
+                    listener.onError(executionError);
+                }
+            }
+
+            @Override
+            public void onTimeout() {
+                if (listener != null) {
+                    listener.onTimeout();
+                }
+            }
+        });
+    }
+
+    /**
+     * Toggle video recording on the connected gopro.
+     * @param listener Register a callback to receive update of the command execution status.
+     */
+    public void toggleVideoRecording(final AbstractCommandListener listener){
+        //Set the gopro to video mode
+        final SoloGoproSetRequest videoModeRequest = new SoloGoproSetRequest(SoloGoproSetRequest.CAPTURE_MODE,
+                SoloGoproSetRequest.CAPTURE_MODE_VIDEO);
+
+        sendMessage(videoModeRequest, new AbstractCommandListener() {
+            @Override
+            public void onSuccess() {
+                //Send the command to toggle video recording
+                final SoloGoproRecord videoToggle = new SoloGoproRecord(SoloGoproRecord.TOGGLE_RECORDING);
+                sendMessage(videoToggle, listener);
             }
 
             @Override

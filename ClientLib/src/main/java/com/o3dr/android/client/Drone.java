@@ -110,6 +110,7 @@ public class Drone {
     private long elapsedFlightTime = 0;
 
     private final Context context;
+    private final ClassLoader contextClassLoader;
 
     /**
      * Creates a Drone instance.
@@ -118,6 +119,7 @@ public class Drone {
      */
     public Drone(Context context) {
         this.context = context;
+        this.contextClassLoader = context.getClassLoader();
     }
 
     void init(ControlTower controlTower, Handler handler) {
@@ -256,11 +258,8 @@ public class Drone {
         }
 
         if (carrier != null) {
-            ClassLoader classLoader = this.context.getClassLoader();
-            if (classLoader != null) {
-                carrier.setClassLoader(classLoader);
-                attribute = carrier.getParcelable(type);
-            }
+            carrier.setClassLoader(contextClassLoader);
+            attribute = carrier.getParcelable(type);
         }
 
         return attribute == null ? this.<T>getAttributeDefaultValue(type) : attribute;
@@ -674,7 +673,7 @@ public class Drone {
     void notifyAttributeUpdated(final String attributeEvent, final Bundle extras) {
         //Update the bundle classloader
         if (extras != null)
-            extras.setClassLoader(context.getClassLoader());
+            extras.setClassLoader(contextClassLoader);
 
         if (AttributeEvent.STATE_UPDATED.equals(attributeEvent)) {
             getAttributeAsync(AttributeType.STATE, new OnAttributeRetrievedCallback<State>() {

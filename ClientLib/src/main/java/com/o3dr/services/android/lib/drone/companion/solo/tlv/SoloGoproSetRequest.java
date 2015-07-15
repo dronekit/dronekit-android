@@ -15,18 +15,32 @@ public class SoloGoproSetRequest extends TLVPacket {
 
     public static final int MESSAGE_LENGTH = 4;
 
-    @IntDef({POWER, CAPTURE_MODE, SHUTTER_STATUS})
+    @IntDef({POWER, CAPTURE_MODE})
     @Retention(RetentionPolicy.SOURCE)
     public @interface RequestCommand{}
 
     public static final short POWER = 0;
     public static final short CAPTURE_MODE = 1;
-    public static final short SHUTTER_STATUS = 2;
 
+    @IntDef({POWER_OFF, POWER_ON,
+            CAPTURE_MODE_VIDEO, CAPTURE_MODE_PHOTO, CAPTURE_MODE_BURST, CAPTURE_MODE_TIME_LAPSE})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface RequestCommandValue{}
+
+    public static final short POWER_OFF = 0;
+    public static final short POWER_ON = 1;
+    public static final short CAPTURE_MODE_VIDEO = 0;
+    public static final short CAPTURE_MODE_PHOTO = 1;
+    public static final short CAPTURE_MODE_BURST = 2;
+    public static final short CAPTURE_MODE_TIME_LAPSE = 3;
+
+    @RequestCommand
     private short command;
+
+    @RequestCommandValue
     private short value;
 
-    public SoloGoproSetRequest(@RequestCommand short requestCommand, short value){
+    public SoloGoproSetRequest(@RequestCommand short requestCommand, @RequestCommandValue short value){
         super(TLVMessageTypes.TYPE_SOLO_GOPRO_SET_REQUEST, MESSAGE_LENGTH);
         this.command = requestCommand;
         this.value = value;
@@ -41,11 +55,12 @@ public class SoloGoproSetRequest extends TLVPacket {
         this.command = command;
     }
 
+    @RequestCommandValue
     public short getValue() {
         return value;
     }
 
-    public void setValue(short value) {
+    public void setValue(@RequestCommandValue short value) {
         this.value = value;
     }
 
@@ -64,8 +79,11 @@ public class SoloGoproSetRequest extends TLVPacket {
 
     protected SoloGoproSetRequest(Parcel in) {
         super(in);
-        this.command = (short) in.readInt();
-        this.value = (short) in.readInt();
+        @RequestCommand short readCommand = (short) in.readInt();
+        @RequestCommandValue short readValue = (short) in.readInt();
+
+        this.command = readCommand;
+        this.value = readValue;
     }
 
     public static final Creator<SoloGoproSetRequest> CREATOR = new Creator<SoloGoproSetRequest>() {
