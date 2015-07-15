@@ -14,6 +14,7 @@ import com.o3dr.services.android.lib.drone.mission.item.command.YawCondition;
 import com.o3dr.services.android.lib.drone.mission.item.complex.CameraDetail;
 import com.o3dr.services.android.lib.drone.mission.item.complex.StructureScanner;
 import com.o3dr.services.android.lib.drone.mission.item.complex.Survey;
+import com.o3dr.services.android.lib.drone.mission.item.complex.SplineSurvey;
 import com.o3dr.services.android.lib.drone.mission.item.complex.SurveyDetail;
 import com.o3dr.services.android.lib.drone.mission.item.spatial.Circle;
 import com.o3dr.services.android.lib.drone.mission.item.spatial.DoLandStart;
@@ -27,6 +28,7 @@ import org.droidplanner.core.mission.Mission;
 import org.droidplanner.core.mission.commands.ConditionYaw;
 import org.droidplanner.core.mission.commands.ReturnToHome;
 import org.droidplanner.core.mission.commands.SetRelayImpl;
+import org.droidplanner.core.mission.survey.SplineSurveyImpl;
 import org.droidplanner.core.mission.waypoints.DoLandStartImpl;
 import org.droidplanner.core.survey.CameraInfo;
 import org.droidplanner.core.survey.SurveyData;
@@ -245,6 +247,31 @@ public class ProxyUtils {
                 missionItemImpl = temp;
                 break;
             }
+            case SPLINE_SURVEY: {
+                SplineSurvey proxy = (SplineSurvey) proxyItem;
+                SurveyDetail surveyDetail = proxy.getSurveyDetail();
+                List<Coord2D> polygonPoints = MathUtils.latLongToCoord2D(proxy.getPolygonPoints());
+
+                SplineSurveyImpl temp = new SplineSurveyImpl(mission, polygonPoints);
+
+                if (surveyDetail != null) {
+                    CameraDetail cameraDetail = surveyDetail.getCameraDetail();
+                    if (cameraDetail != null)
+                        temp.setCameraInfo(getCameraInfo(cameraDetail));
+
+                    temp.update(surveyDetail.getAngle(), (surveyDetail.getAltitude()),
+                            surveyDetail.getOverlap(), surveyDetail.getSidelap());
+                }
+
+                try {
+                    temp.build();
+                } catch (Exception e) {
+                    Log.e(TAG, e.getMessage(), e);
+                }
+
+                missionItemImpl = temp;
+                break;
+            }
             case YAW_CONDITION: {
                 YawCondition proxy = (YawCondition) proxyItem;
 
@@ -384,6 +411,32 @@ public class ProxyUtils {
                 break;
             }
 
+            case SPLINE_SURVEY: {
+                SplineSurveyImpl source = (SplineSurveyImpl) itemImpl;
+
+                boolean isValid = true;
+                try {
+                    source.build();
+                } catch (Exception e) {
+                    isValid = false;
+                }
+
+                Survey temp = new Survey();
+                temp.setValid(isValid);
+                temp.setSurveyDetail(getSurveyDetail(source.surveyData));
+                temp.setPolygonPoints(MathUtils.coord2DToLatLong(source.polygon.getPoints()));
+
+                if (source.grid != null) {
+                    temp.setGridPoints(MathUtils.coord2DToLatLong(source.grid.gridPoints));
+                    temp.setCameraLocations(MathUtils.coord2DToLatLong(source.grid.getCameraLocations()));
+                }
+
+                temp.setPolygonArea(source.polygon.getArea().valueInSqMeters());
+
+                proxyMissionItem = temp;
+                break;
+            }
+
             case CYLINDRICAL_SURVEY: {
                 org.droidplanner.core.mission.waypoints.StructureScanner source = (org.droidplanner.core.mission.waypoints.StructureScanner) itemImpl;
 
@@ -399,6 +452,7 @@ public class ProxyUtils {
                 proxyMissionItem = temp;
                 break;
             }
+
             case CHANGE_SPEED: {
                 org.droidplanner.core.mission.commands.ChangeSpeed source = (org.droidplanner.core.mission.commands.ChangeSpeed) itemImpl;
 
