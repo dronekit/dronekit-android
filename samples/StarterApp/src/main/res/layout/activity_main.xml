@@ -230,20 +230,32 @@
                 android:orientation="vertical"
                 android:gravity="center_horizontal">
 
-                <Button
-                    android:id="@+id/take_photo_button"
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:minHeight="48dp"
-                    android:text="Take a picture" />
+                    android:gravity="center"
+                    android:orientation="horizontal">
 
-                <Button
-                    android:id="@+id/toggle_video_recording"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:minHeight="48dp"
-                    android:text="Toggle video " />
+                    <Button
+                        android:id="@+id/take_photo_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:minHeight="48dp"
+                        android:text="Take a picture" />
 
+                    <Button
+                        android:id="@+id/toggle_video_recording"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:minHeight="48dp"
+                        android:text="Toggle video " />
+                </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal">
                 <Button
                     android:id="@+id/start_video_stream"
                     android:layout_width="wrap_content"
@@ -251,9 +263,17 @@
                     android:minHeight="48dp"
                     android:text="Start streaming"/>
 
+                <Button
+                    android:id="@+id/stop_video_stream"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:minHeight="48dp"
+                    android:text="Stop streaming"/>
+
+            </LinearLayout>
                 <TextureView
                     android:id="@+id/video_content"
-                    android:layout_width="256dp"
+                    android:layout_width="300dp"
                     android:layout_height="144dp"/>
 
             </LinearLayout>

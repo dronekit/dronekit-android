@@ -54,7 +54,9 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
     private static final int DEFAULT_UDP_PORT = 14550;
     private static final int DEFAULT_USB_BAUD_RATE = 57600;
 
-    Spinner modeSelector;
+    private Spinner modeSelector;
+    private Button startVideoStream;
+    private Button stopVideoStream;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,6 +101,7 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
             @Override
             public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
                 alertUser("Video display is available.");
+                startVideoStream.setEnabled(true);
             }
 
             @Override
@@ -108,7 +111,8 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
 
             @Override
             public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-                return false;
+                startVideoStream.setEnabled(false);
+                return true;
             }
 
             @Override
@@ -117,12 +121,23 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
             }
         });
 
-        final Button startStreaming = (Button) findViewById(R.id.start_video_stream);
-        startStreaming.setOnClickListener(new View.OnClickListener() {
+        startVideoStream = (Button) findViewById(R.id.start_video_stream);
+        startVideoStream.setEnabled(false);
+        startVideoStream.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 alertUser("Starting video stream.");
-                streamVideo(new Surface(videoView.getSurfaceTexture()));
+                startVideoStream(new Surface(videoView.getSurfaceTexture()));
+            }
+        });
+
+        stopVideoStream = (Button) findViewById(R.id.stop_video_stream);
+        stopVideoStream.setEnabled(false);
+        stopVideoStream.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertUser("Stopping video stream.");
+                stopVideoStream();
             }
         });
     }
@@ -462,8 +477,40 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
         });
     }
 
-    private void streamVideo(Surface videoSurface){
-        SoloLinkApi.getApi(drone).startVideoStream(videoSurface, null);
+    private void startVideoStream(Surface videoSurface){
+        SoloLinkApi.getApi(drone).startVideoStream(videoSurface, new AbstractCommandListener() {
+            @Override
+            public void onSuccess() {
+                if(stopVideoStream != null)
+                    stopVideoStream.setEnabled(true);
+
+                if(startVideoStream != null)
+                    startVideoStream.setEnabled(false);
+            }
+
+            @Override
+            public void onError(int executionError) {
+                alertUser("Error while starting the video stream: " + executionError);
+            }
+
+            @Override
+            public void onTimeout() {
+                alertUser("Timed out while attempting to start the video stream.");
+            }
+        });
+    }
+
+    private void stopVideoStream() {
+        SoloLinkApi.getApi(drone).stopVideoStream(new SimpleCommandListener() {
+            @Override
+            public void onSuccess() {
+                if (stopVideoStream != null)
+                    stopVideoStream.setEnabled(false);
+
+                if(startVideoStream != null)
+                    startVideoStream.setEnabled(true);
+            }
+        });
     }
 
 }
