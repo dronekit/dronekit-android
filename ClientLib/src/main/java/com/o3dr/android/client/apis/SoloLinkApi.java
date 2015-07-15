@@ -1,9 +1,11 @@
 package com.o3dr.android.client.apis;
 
 import android.os.Bundle;
+import android.view.Surface;
 
 import com.o3dr.android.client.Drone;
 import com.o3dr.services.android.lib.drone.companion.solo.SoloControllerMode;
+import com.o3dr.services.android.lib.drone.companion.solo.action.SoloLinkActions;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSettingSetter;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloGoproRecord;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloGoproSetRequest;
@@ -154,5 +156,11 @@ public class SoloLinkApi implements Api {
                 }
             }
         });
+    }
+
+    public void streamVideo(Surface surface, final AbstractCommandListener listener){
+        final Bundle params = new Bundle();
+        params.putParcelable(EXTRA_VIDEO_DISPLAY, surface);
+        drone.performAsyncActionOnDroneThread(new Action(ACTION_STREAM_VIDEO, params), listener);
     }
 }

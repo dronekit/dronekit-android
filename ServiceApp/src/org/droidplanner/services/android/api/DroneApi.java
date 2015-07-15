@@ -8,6 +8,7 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.RemoteException;
 import android.text.TextUtils;
+import android.view.Surface;
 
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.ardupilotmega.msg_mag_cal_progress;
@@ -523,6 +524,11 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
             case SoloLinkActions.ACTION_UPDATE_CONTROLLER_MODE:
                 final @SoloControllerMode.ControllerMode int mode = data.getInt(SoloLinkActions.EXTRA_CONTROLLER_MODE);
                 DroneApiUtils.updateSoloLinkControllerMode(getDroneManager(), mode, listener);
+                break;
+
+            case SoloLinkActions.ACTION_STREAM_VIDEO:
+                final Surface videoSurface = data.getParcelable(SoloLinkActions.EXTRA_VIDEO_DISPLAY);
+                DroneApiUtils.streamVideo(getDroneManager(), videoSurface, listener);
                 break;
         }
     }

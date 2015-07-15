@@ -1,10 +1,13 @@
 package com.o3dr.sample.hellodrone;
 
 import android.content.Context;
+import android.graphics.SurfaceTexture;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Surface;
+import android.view.TextureView;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -88,6 +91,38 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
             @Override
             public void onClick(View v) {
                 toggleVideoRecording();
+            }
+        });
+
+        final TextureView videoView = (TextureView) findViewById(R.id.video_content);
+        videoView.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
+            @Override
+            public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
+                alertUser("Video display is available.");
+            }
+
+            @Override
+            public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
+
+            }
+
+            @Override
+            public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+                return false;
+            }
+
+            @Override
+            public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+
+            }
+        });
+
+        final Button startStreaming = (Button) findViewById(R.id.start_video_stream);
+        startStreaming.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertUser("Starting video stream.");
+                streamVideo(new Surface(videoView.getSurfaceTexture()));
             }
         });
     }
@@ -425,6 +460,10 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
                 alertUser("Timeout while trying to toggle video recording.");
             }
         });
+    }
+
+    private void streamVideo(Surface videoSurface){
+        SoloLinkApi.getApi(drone).streamVideo(videoSurface, null);
     }
 
 }

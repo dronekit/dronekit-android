@@ -38,4 +38,8 @@ public class SoloLinkActions {
      * @see {@link com.o3dr.services.android.lib.drone.companion.solo.SoloControllerMode}
      */
     public static final String EXTRA_CONTROLLER_MODE = "extra_controller_mode";
+
+    public static final String ACTION_STREAM_VIDEO = Utils.PACKAGE_NAME + ".action.STREAM_VIDEO";
+
+    public static final String EXTRA_VIDEO_DISPLAY = "extra_video_display";
 }

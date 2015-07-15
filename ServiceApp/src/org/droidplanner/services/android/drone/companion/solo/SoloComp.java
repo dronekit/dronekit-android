@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.os.RemoteException;
 import android.support.v4.util.Pair;
 import android.util.SparseArray;
+import android.view.Surface;
 
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.drone.companion.solo.SoloControllerMode;
@@ -21,6 +22,7 @@ import org.droidplanner.services.android.drone.companion.solo.artoo.ArtooLinkMan
 import org.droidplanner.services.android.drone.companion.solo.sololink.SoloLinkListener;
 import org.droidplanner.services.android.drone.companion.solo.sololink.SoloLinkManager;
 import org.droidplanner.services.android.utils.NetworkUtils;
+import org.droidplanner.services.android.utils.video.DecoderListener;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -249,6 +251,26 @@ public class SoloComp implements CompComp, SoloLinkListener, ArtooLinkListener {
 
     public void updateControllerMode(@SoloControllerMode.ControllerMode final int selectedMode, ICommandListener listener){
         artooMgr.updateArtooMode(selectedMode, listener);
+    }
+
+    public void streamVideo(Surface videoSurface){
+        Timber.d("Setting video surface layer.");
+        artooMgr.startDecoding(videoSurface, new DecoderListener() {
+            @Override
+            public void onDecodingStarted() {
+                Timber.d("Video decoding started.");
+            }
+
+            @Override
+            public void onDecodingError() {
+                Timber.d("Video decoding failed.");
+            }
+
+            @Override
+            public void onDecodingEnded() {
+                Timber.d("Video decoding ended successfully.");
+            }
+        });
     }
 
 }

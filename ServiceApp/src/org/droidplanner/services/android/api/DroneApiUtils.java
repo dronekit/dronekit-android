@@ -7,6 +7,7 @@ import android.os.RemoteException;
 import android.support.v4.util.Pair;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Surface;
 
 import org.droidplanner.core.drone.variables.ApmModes;
 import com.MAVLink.Messages.MAVLinkMessage;
@@ -1005,5 +1006,14 @@ public class DroneApiUtils {
 
         final SoloComp soloComp = droneManager.getSoloComp();
         soloComp.updateControllerMode(mode, listener);
+    }
+
+    static void streamVideo(DroneManager droneManager, Surface videoSurface, ICommandListener listener) {
+        //TODO: complete implementation
+        if(droneManager == null || !droneManager.isCompanionComputerEnabled())
+            return;
+
+        final SoloComp soloComp = droneManager.getSoloComp();
+        soloComp.streamVideo(videoSurface);
     }
 }
