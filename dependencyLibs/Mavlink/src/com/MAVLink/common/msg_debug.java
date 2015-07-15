@@ -9,7 +9,7 @@ package com.MAVLink.common;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-        
+
 /**
 * Send a debug value. The index is used to discriminate between values. These values show up in the plot of QGroundControl as DEBUG N.
 */
@@ -20,17 +20,17 @@ public class msg_debug extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_DEBUG;
 
 
-      
+    
     /**
     * Timestamp (milliseconds since system boot)
     */
     public long time_boot_ms;
-      
+    
     /**
     * DEBUG value
     */
     public float value;
-      
+    
     /**
     * index of debug variable
     */
@@ -47,11 +47,11 @@ public class msg_debug extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_DEBUG;
-              
+        
         packet.payload.putUnsignedInt(time_boot_ms);
-              
+        
         packet.payload.putFloat(value);
-              
+        
         packet.payload.putUnsignedByte(ind);
         
         return packet;
@@ -64,11 +64,11 @@ public class msg_debug extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-              
+        
         this.time_boot_ms = payload.getUnsignedInt();
-              
+        
         this.value = payload.getFloat();
-              
+        
         this.ind = payload.getUnsignedByte();
         
     }
@@ -89,7 +89,7 @@ public class msg_debug extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_DEBUG;
-        unpack(mavLinkPacket.payload);        
+        unpack(mavLinkPacket.payload);
     }
 
           

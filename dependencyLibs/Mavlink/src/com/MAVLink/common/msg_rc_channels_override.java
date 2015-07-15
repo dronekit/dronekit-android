@@ -9,7 +9,7 @@ package com.MAVLink.common;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-        
+
 /**
 * The RAW values of the RC channels sent to the MAV to override info received from the RC radio. A value of UINT16_MAX means no change to that channel. A value of 0 means control of that channel should be released back to the RC radio. The standard PPM modulation is as follows: 1000 microseconds: 0%, 2000 microseconds: 100%. Individual receivers/transmitters might violate this specification.
 */
@@ -20,52 +20,52 @@ public class msg_rc_channels_override extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_RC_CHANNELS_OVERRIDE;
 
 
-      
+    
     /**
     * RC channel 1 value, in microseconds. A value of UINT16_MAX means to ignore this field.
     */
     public int chan1_raw;
-      
+    
     /**
     * RC channel 2 value, in microseconds. A value of UINT16_MAX means to ignore this field.
     */
     public int chan2_raw;
-      
+    
     /**
     * RC channel 3 value, in microseconds. A value of UINT16_MAX means to ignore this field.
     */
     public int chan3_raw;
-      
+    
     /**
     * RC channel 4 value, in microseconds. A value of UINT16_MAX means to ignore this field.
     */
     public int chan4_raw;
-      
+    
     /**
     * RC channel 5 value, in microseconds. A value of UINT16_MAX means to ignore this field.
     */
     public int chan5_raw;
-      
+    
     /**
     * RC channel 6 value, in microseconds. A value of UINT16_MAX means to ignore this field.
     */
     public int chan6_raw;
-      
+    
     /**
     * RC channel 7 value, in microseconds. A value of UINT16_MAX means to ignore this field.
     */
     public int chan7_raw;
-      
+    
     /**
     * RC channel 8 value, in microseconds. A value of UINT16_MAX means to ignore this field.
     */
     public int chan8_raw;
-      
+    
     /**
     * System ID
     */
     public short target_system;
-      
+    
     /**
     * Component ID
     */
@@ -82,25 +82,25 @@ public class msg_rc_channels_override extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_RC_CHANNELS_OVERRIDE;
-              
+        
         packet.payload.putUnsignedShort(chan1_raw);
-              
+        
         packet.payload.putUnsignedShort(chan2_raw);
-              
+        
         packet.payload.putUnsignedShort(chan3_raw);
-              
+        
         packet.payload.putUnsignedShort(chan4_raw);
-              
+        
         packet.payload.putUnsignedShort(chan5_raw);
-              
+        
         packet.payload.putUnsignedShort(chan6_raw);
-              
+        
         packet.payload.putUnsignedShort(chan7_raw);
-              
+        
         packet.payload.putUnsignedShort(chan8_raw);
-              
+        
         packet.payload.putUnsignedByte(target_system);
-              
+        
         packet.payload.putUnsignedByte(target_component);
         
         return packet;
@@ -113,25 +113,25 @@ public class msg_rc_channels_override extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-              
+        
         this.chan1_raw = payload.getUnsignedShort();
-              
+        
         this.chan2_raw = payload.getUnsignedShort();
-              
+        
         this.chan3_raw = payload.getUnsignedShort();
-              
+        
         this.chan4_raw = payload.getUnsignedShort();
-              
+        
         this.chan5_raw = payload.getUnsignedShort();
-              
+        
         this.chan6_raw = payload.getUnsignedShort();
-              
+        
         this.chan7_raw = payload.getUnsignedShort();
-              
+        
         this.chan8_raw = payload.getUnsignedShort();
-              
+        
         this.target_system = payload.getUnsignedByte();
-              
+        
         this.target_component = payload.getUnsignedByte();
         
     }
@@ -152,7 +152,7 @@ public class msg_rc_channels_override extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_RC_CHANNELS_OVERRIDE;
-        unpack(mavLinkPacket.payload);        
+        unpack(mavLinkPacket.payload);
     }
 
                         

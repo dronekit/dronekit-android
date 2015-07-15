@@ -9,7 +9,7 @@ package com.MAVLink.common;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-        
+
 /**
 * Emit an encrypted signature / key identifying this system. PLEASE NOTE: This protocol has been kept simple, so transmitting the key requires an encrypted channel for true safety.
 */
@@ -20,7 +20,7 @@ public class msg_auth_key extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_AUTH_KEY;
 
 
-      
+    
     /**
     * key
     */
@@ -37,7 +37,7 @@ public class msg_auth_key extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_AUTH_KEY;
-              
+        
         
         for (int i = 0; i < key.length; i++) {
             packet.payload.putByte(key[i]);
@@ -54,8 +54,8 @@ public class msg_auth_key extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-              
-         
+        
+        
         for (int i = 0; i < this.key.length; i++) {
             this.key[i] = payload.getByte();
         }
@@ -79,7 +79,7 @@ public class msg_auth_key extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_AUTH_KEY;
-        unpack(mavLinkPacket.payload);        
+        unpack(mavLinkPacket.payload);
     }
 
      
