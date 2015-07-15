@@ -18,13 +18,13 @@ import org.droidplanner.core.survey.grid.GridBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Survey extends MissionItem {
+public class SurveyImpl extends MissionItem {
 
     public Polygon polygon = new Polygon();
     public SurveyData surveyData = new SurveyData();
     public Grid grid;
 
-    public Survey(Mission mission, List<Coord2D> points) {
+    public SurveyImpl(Mission mission, List<Coord2D> points) {
         super(mission);
         polygon.addPoints(points);
     }
@@ -62,10 +62,15 @@ public class Survey extends MissionItem {
     }
 
     private void packGridPoints(List<msg_mission_item> list) {
+        final double altitude = surveyData.getAltitude();
         for (Coord2D point : grid.gridPoints) {
-            msg_mission_item mavMsg = packSurveyPoint(point, surveyData.getAltitude());
+            msg_mission_item mavMsg = getSurveyPoint(point, altitude);
             list.add(mavMsg);
         }
+    }
+
+    protected msg_mission_item getSurveyPoint(Coord2D point, double altitude){
+        return packSurveyPoint(point, altitude);
     }
 
     public static msg_mission_item packSurveyPoint(Coord2D point, double altitude) {
