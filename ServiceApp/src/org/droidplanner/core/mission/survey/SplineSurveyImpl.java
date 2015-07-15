@@ -6,69 +6,18 @@ import com.MAVLink.enums.MAV_FRAME;
 
 import org.droidplanner.core.helpers.coordinates.Coord2D;
 import org.droidplanner.core.mission.Mission;
-import org.droidplanner.core.mission.MissionItem;
 import org.droidplanner.core.mission.MissionItemType;
-import org.droidplanner.core.mission.commands.CameraTrigger;
-import org.droidplanner.core.polygon.Polygon;
-import org.droidplanner.core.survey.CameraInfo;
-import org.droidplanner.core.survey.SurveyData;
-import org.droidplanner.core.survey.grid.Grid;
-import org.droidplanner.core.survey.grid.GridBuilder;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class SplineSurveyImpl extends MissionItem {
-
-    public Polygon polygon = new Polygon();
-    public SurveyData surveyData = new SurveyData();
-    public Grid grid;
+public class SplineSurveyImpl extends SurveyImpl {
 
     public SplineSurveyImpl(Mission mission, List<Coord2D> points) {
-        super(mission);
-        polygon.addPoints(points);
-    }
-
-    public void update(double angle, double altitude, double overlap, double sidelap) {
-        surveyData.update(angle, altitude, overlap, sidelap);
-    }
-
-    public void setCameraInfo(CameraInfo camera) {
-        surveyData.setCameraInfo(camera);
-    }
-
-    public void build() throws Exception {
-        // TODO find better point than (0,0) to reference the grid
-        grid = null;
-        GridBuilder gridBuilder = new GridBuilder(polygon, surveyData, new Coord2D(0, 0));
-        polygon.checkIfValid();
-        grid = gridBuilder.generate(true);
+        super(mission, points);
     }
 
     @Override
-    public List<msg_mission_item> packMissionItem() {
-        try {
-            List<msg_mission_item> list = new ArrayList<msg_mission_item>();
-            build();
-
-            list.addAll((new CameraTrigger(mission, surveyData.getLongitudinalPictureDistance())).packMissionItem());
-            packGridPoints(list);
-            list.addAll((new CameraTrigger(mission, (0.0)).packMissionItem()));
-
-            return list;
-        } catch (Exception e) {
-            return new ArrayList<msg_mission_item>();
-        }
-    }
-
-    private void packGridPoints(List<msg_mission_item> list) {
-        for (Coord2D point : grid.gridPoints) {
-            msg_mission_item mavMsg = packSurveyPoint(point, surveyData.getAltitude());
-            list.add(mavMsg);
-        }
-    }
-
-    public static msg_mission_item packSurveyPoint(Coord2D point, double altitude) {
+    protected msg_mission_item getSurveyPoint(Coord2D point, double altitude) {
         msg_mission_item mavMsg = new msg_mission_item();
         mavMsg.autocontinue = 1;
         mavMsg.frame = MAV_FRAME.MAV_FRAME_GLOBAL_RELATIVE_ALT;
@@ -84,14 +33,8 @@ public class SplineSurveyImpl extends MissionItem {
     }
 
     @Override
-    public void unpackMAVMessage(msg_mission_item mavMsg) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
     public MissionItemType getType() {
-        return MissionItemType.SURVEY;
+        return MissionItemType.SPLINE_SURVEY;
     }
 
 }

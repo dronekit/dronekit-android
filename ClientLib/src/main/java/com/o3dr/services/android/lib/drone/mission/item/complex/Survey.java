@@ -29,7 +29,11 @@ public class Survey extends MissionItem implements MissionItem.ComplexItem<Surve
     private boolean isValid;
 
     public Survey(){
-        super(MissionItemType.SURVEY);
+        this(MissionItemType.SURVEY);
+    }
+
+    protected Survey(MissionItemType type){
+        super(type);
     }
 
     public Survey(Survey copy){
@@ -126,7 +130,7 @@ public class Survey extends MissionItem implements MissionItem.ComplexItem<Surve
         dest.writeByte(isValid ? (byte) 1 : (byte) 0);
     }
 
-    private Survey(Parcel in) {
+    protected Survey(Parcel in) {
         super(in);
         this.surveyDetail = in.readParcelable(SurveyDetail.class.getClassLoader());
         this.polygonArea = in.readDouble();
