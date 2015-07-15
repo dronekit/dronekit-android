@@ -2,7 +2,6 @@ package org.droidplanner.services.android.api;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.os.RemoteException;
 import android.support.v4.util.Pair;
 import android.text.TextUtils;
@@ -18,6 +17,7 @@ import com.MAVLink.enums.MAG_CAL_STATUS;
 import com.MAVLink.enums.MAV_TYPE;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
+import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.drone.calibration.magnetometer.MagnetometerCalibrationProgress;
 import com.o3dr.services.android.lib.drone.calibration.magnetometer.MagnetometerCalibrationResult;
 import com.o3dr.services.android.lib.drone.calibration.magnetometer.MagnetometerCalibrationStatus;
@@ -966,9 +966,27 @@ public class DroneApiUtils {
                 wifiSettings.second, wifiSettings.first, soloComp.getButtonSettings());
     }
 
+    private static boolean isSoloLinkFeatureAvailable(DroneManager droneManager, ICommandListener listener){
+        if(droneManager == null)
+            return false;
+
+        if(!droneManager.isCompanionComputerEnabled()){
+            if(listener != null){
+                try {
+                    listener.onError(CommandExecutionError.COMMAND_UNSUPPORTED);
+                } catch (RemoteException e) {
+                    Timber.e(e, e.getMessage());
+                }
+            }
+            return false;
+        }
+
+        return true;
+    }
+
     static void sendSoloLinkMessage(DroneManager droneManager, TLVPacket messageData,
                                     ICommandListener listener) {
-        if(droneManager == null || messageData == null || !droneManager.isCompanionComputerEnabled())
+        if(!isSoloLinkFeatureAvailable(droneManager, listener) || messageData == null)
             return;
 
         final SoloComp soloComp = droneManager.getSoloComp();
@@ -978,7 +996,7 @@ public class DroneApiUtils {
     static void updateSoloLinkWifiSettings(DroneManager droneManager,
                                            String wifiSsid, String wifiPassword,
                                            ICommandListener listener) {
-        if(droneManager == null || !droneManager.isCompanionComputerEnabled())
+        if(!isSoloLinkFeatureAvailable(droneManager, listener))
             return;
 
         if(TextUtils.isEmpty(wifiSsid) && TextUtils.isEmpty(wifiPassword))
@@ -991,7 +1009,7 @@ public class DroneApiUtils {
     static void updateSoloLinkButtonSettings(DroneManager droneManager,
                                              SoloButtonSettingSetter buttonSettings,
                                              ICommandListener listener) {
-        if(droneManager == null || !droneManager.isCompanionComputerEnabled() || buttonSettings == null)
+        if(!isSoloLinkFeatureAvailable(droneManager, listener) || buttonSettings == null)
             return;
 
         final SoloComp soloComp = droneManager.getSoloComp();
@@ -1001,19 +1019,27 @@ public class DroneApiUtils {
     static void updateSoloLinkControllerMode(DroneManager droneManager,
                                              @SoloControllerMode.ControllerMode int mode,
                                              ICommandListener listener) {
-        if(droneManager == null || !droneManager.isCompanionComputerEnabled())
+        if(!isSoloLinkFeatureAvailable(droneManager, listener))
             return;
 
         final SoloComp soloComp = droneManager.getSoloComp();
         soloComp.updateControllerMode(mode, listener);
     }
 
-    static void streamVideo(DroneManager droneManager, Surface videoSurface, ICommandListener listener) {
-        //TODO: complete implementation
-        if(droneManager == null || !droneManager.isCompanionComputerEnabled())
+    static void startVideoStream(DroneManager droneManager, String ownerId, Surface videoSurface,
+                                 ICommandListener listener) {
+        if(!isSoloLinkFeatureAvailable(droneManager, listener))
             return;
 
         final SoloComp soloComp = droneManager.getSoloComp();
-        soloComp.streamVideo(videoSurface);
+        soloComp.startVideoStream(ownerId, videoSurface, listener);
+    }
+
+    static void stopVideoStream(DroneManager droneManager, String ownerId, ICommandListener listener){
+        if(!isSoloLinkFeatureAvailable(droneManager, listener))
+            return;
+
+        final SoloComp soloComp = droneManager.getSoloComp();
+        soloComp.stopVideoStream(ownerId, listener);
     }
 }

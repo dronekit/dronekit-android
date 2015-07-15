@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.RemoteException;
 import android.support.v4.util.Pair;
+import android.text.TextUtils;
 import android.util.SparseArray;
 import android.view.Surface;
 
@@ -26,6 +27,7 @@ import org.droidplanner.services.android.utils.video.DecoderListener;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicReference;
 
 import timber.log.Timber;
 
@@ -49,6 +51,8 @@ public class SoloComp implements CompComp, SoloLinkListener, ArtooLinkListener {
         void onButtonPacketReceived(ButtonPacket packet);
     }
 
+    private static final String NO_VIDEO_OWNER = "no_video_owner";
+
     public static final String SOLO_LINK_WIFI_PREFIX = "SoloLink_";
 
     public static final String SSH_USERNAME = "root";
@@ -60,6 +64,8 @@ public class SoloComp implements CompComp, SoloLinkListener, ArtooLinkListener {
     private final Context context;
     private final Handler handler;
     private final ExecutorService asyncExecutor;
+
+    private final AtomicReference<String> videoOwnerId = new AtomicReference<>(NO_VIDEO_OWNER);
 
     private SoloCompListener compListener;
 
@@ -205,7 +211,7 @@ public class SoloComp implements CompComp, SoloLinkListener, ArtooLinkListener {
     public void updateWifiSettings(final String wifiSsid, final String wifiPassword,
                                    final ICommandListener listener){
         if(asyncExecutor != null && !asyncExecutor.isShutdown()){
-            asyncExecutor.execute(new Runnable() {
+            postAsyncTask(new Runnable() {
                 @Override
                 public void run() {
                     if(soloLinkMgr.updateSololinkWifi(wifiSsid, wifiPassword)
@@ -213,31 +219,13 @@ public class SoloComp implements CompComp, SoloLinkListener, ArtooLinkListener {
                         Timber.d("Sololink wifi update successful.");
 
                         if(listener != null) {
-                            handler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    try {
-                                        listener.onSuccess();
-                                    } catch (RemoteException e) {
-                                        Timber.e(e, e.getMessage());
-                                    }
-                                }
-                            });
+                            postSuccessEvent(listener);
                         }
                     }
                     else{
                         Timber.d("Sololink wifi update failed.");
                         if(listener != null){
-                            handler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    try {
-                                        listener.onError(CommandExecutionError.COMMAND_FAILED);
-                                    } catch (RemoteException e) {
-                                        Timber.e(e, e.getMessage());
-                                    }
-                                }
-                            });
+                            postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
                         }
                     }
                 }
@@ -253,24 +241,120 @@ public class SoloComp implements CompComp, SoloLinkListener, ArtooLinkListener {
         artooMgr.updateArtooMode(selectedMode, listener);
     }
 
-    public void streamVideo(Surface videoSurface){
-        Timber.d("Setting video surface layer.");
-        artooMgr.startDecoding(videoSurface, new DecoderListener() {
-            @Override
-            public void onDecodingStarted() {
-                Timber.d("Video decoding started.");
-            }
+    public void startVideoStream(String ownerId, Surface videoSurface, final ICommandListener listener){
+        if(TextUtils.isEmpty(ownerId)){
+            postErrorEvent(CommandExecutionError.COMMAND_DENIED, listener);
+            return;
+        }
 
-            @Override
-            public void onDecodingError() {
-                Timber.d("Video decoding failed.");
-            }
+        if(videoSurface == null){
+            postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
+            return;
+        }
 
-            @Override
-            public void onDecodingEnded() {
-                Timber.d("Video decoding ended successfully.");
-            }
-        });
+        if(videoOwnerId.compareAndSet(NO_VIDEO_OWNER, ownerId)){
+            Timber.d("Setting video surface layer.");
+            artooMgr.startDecoding(videoSurface, new DecoderListener() {
+                @Override
+                public void onDecodingStarted() {
+                    Timber.d("Video decoding started.");
+                    postSuccessEvent(listener);
+                }
+
+                @Override
+                public void onDecodingError() {
+                    Timber.d("Video decoding failed.");
+                    postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
+                }
+
+                @Override
+                public void onDecodingEnded() {
+                    Timber.d("Video decoding ended successfully.");
+                }
+            });
+        }
+        else{
+            postErrorEvent(CommandExecutionError.COMMAND_DENIED, listener);
+        }
+    }
+
+    public void stopVideoStream(String ownerId, final ICommandListener listener){
+        if(TextUtils.isEmpty(ownerId)){
+            postErrorEvent(CommandExecutionError.COMMAND_DENIED, listener);
+            return;
+        }
+
+        if(videoOwnerId.compareAndSet(ownerId, NO_VIDEO_OWNER)){
+            //stop the video decoding.
+            artooMgr.stopDecoding(new DecoderListener() {
+                @Override
+                public void onDecodingStarted() {}
+
+                @Override
+                public void onDecodingError() {
+                    postSuccessEvent(listener);
+                }
+
+                @Override
+                public void onDecodingEnded() {
+                    postSuccessEvent(listener);
+                }
+            });
+        }
+        else{
+            postErrorEvent(CommandExecutionError.COMMAND_DENIED, listener);
+        }
+    }
+
+    protected void postAsyncTask(Runnable task){
+        if(asyncExecutor != null && !asyncExecutor.isShutdown()){
+            asyncExecutor.execute(task);
+        }
+    }
+
+    protected void postSuccessEvent(final ICommandListener listener){
+        if(handler != null && listener != null){
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        listener.onSuccess();
+                    } catch (RemoteException e) {
+                        Timber.e(e, e.getMessage());
+                    }
+                }
+            });
+        }
+    }
+
+    protected void postTimeoutEvent(final ICommandListener listener){
+        if(handler != null && listener != null){
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        listener.onTimeout();
+                    } catch (RemoteException e) {
+                        Timber.e(e, e.getMessage());
+                    }
+                }
+            });
+        }
+    }
+
+    protected void postErrorEvent(final int error, final ICommandListener listener){
+        if(handler != null && listener != null){
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        listener.onError(error);
+                    } catch (RemoteException e) {
+                        Timber.e(e, e.getMessage());
+                    }
+                }
+            });
+        }
     }
 
 }
