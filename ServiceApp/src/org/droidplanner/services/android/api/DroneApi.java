@@ -13,8 +13,10 @@ import android.view.Surface;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.ardupilotmega.msg_mag_cal_progress;
 import com.MAVLink.ardupilotmega.msg_mag_cal_report;
+import com.o3dr.android.client.apis.CapabilityApi;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
+import com.o3dr.services.android.lib.drone.action.CapabilityActions;
 import com.o3dr.services.android.lib.drone.action.ConnectionActions;
 import com.o3dr.services.android.lib.drone.action.ExperimentalActions;
 import com.o3dr.services.android.lib.drone.action.GimbalActions;
@@ -24,6 +26,7 @@ import com.o3dr.services.android.lib.drone.action.StateActions;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
+import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.drone.camera.action.CameraActions;
 import com.o3dr.services.android.lib.drone.companion.solo.SoloControllerMode;
 import com.o3dr.services.android.lib.drone.companion.solo.action.SoloLinkActions;
@@ -447,7 +450,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
             //FOLLOW-ME ACTIONS
             case FollowMeActions.ACTION_ENABLE_FOLLOW_ME:
                 FollowType followType = data.getParcelable(FollowMeActions.EXTRA_FOLLOW_TYPE);
-                DroneApiUtils.enableFollowMe(getDroneManager(), droneHandler, followType);
+                DroneApiUtils.enableFollowMe(droneMgr, droneHandler, followType);
                 break;
 
             case FollowMeActions.ACTION_UPDATE_FOLLOW_PARAMS:
@@ -504,31 +507,55 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
             case SoloLinkActions.ACTION_SEND_MESSAGE:
                 final TLVPacket messageData = data.getParcelable(SoloLinkActions.EXTRA_MESSAGE_DATA);
                 if(messageData != null){
-                    DroneApiUtils.sendSoloLinkMessage(getDroneManager(), messageData, listener);
+                    DroneApiUtils.sendSoloLinkMessage(droneMgr, messageData, listener);
                 }
                 break;
 
             case SoloLinkActions.ACTION_UPDATE_WIFI_SETTINGS:
                 final String wifiSsid = data.getString(SoloLinkActions.EXTRA_WIFI_SSID);
                 final String wifiPassword = data.getString(SoloLinkActions.EXTRA_WIFI_PASSWORD);
-                DroneApiUtils.updateSoloLinkWifiSettings(getDroneManager(), wifiSsid, wifiPassword, listener);
+                DroneApiUtils.updateSoloLinkWifiSettings(droneMgr, wifiSsid, wifiPassword, listener);
                 break;
 
             case SoloLinkActions.ACTION_UPDATE_BUTTON_SETTINGS:
                 final SoloButtonSettingSetter buttonSettings = data.getParcelable(SoloLinkActions.EXTRA_BUTTON_SETTINGS);
                 if(buttonSettings != null){
-                    DroneApiUtils.updateSoloLinkButtonSettings(getDroneManager(), buttonSettings, listener);
+                    DroneApiUtils.updateSoloLinkButtonSettings(droneMgr, buttonSettings, listener);
                 }
                 break;
 
             case SoloLinkActions.ACTION_UPDATE_CONTROLLER_MODE:
                 final @SoloControllerMode.ControllerMode int mode = data.getInt(SoloLinkActions.EXTRA_CONTROLLER_MODE);
-                DroneApiUtils.updateSoloLinkControllerMode(getDroneManager(), mode, listener);
+                DroneApiUtils.updateSoloLinkControllerMode(droneMgr, mode, listener);
                 break;
 
             case SoloLinkActions.ACTION_STREAM_VIDEO:
                 final Surface videoSurface = data.getParcelable(SoloLinkActions.EXTRA_VIDEO_DISPLAY);
-                DroneApiUtils.streamVideo(getDroneManager(), videoSurface, listener);
+                DroneApiUtils.streamVideo(droneMgr, videoSurface, listener);
+                break;
+
+            //**************** CAPABILITY ACTIONS **************//
+            case CapabilityActions.ACTION_CHECK_FEATURE_SUPPORT:
+                if(listener != null) {
+                    final String featureId = data.getString(CapabilityActions.EXTRA_FEATURE_ID);
+                    if (!TextUtils.isEmpty(featureId)) {
+                        switch (featureId) {
+                            case CapabilityApi.FeatureIds.SOLOLINK_VIDEO_STREAMING:
+                            case CapabilityApi.FeatureIds.COMPASS_CALIBRATION:
+                                if(droneMgr.isCompanionComputerEnabled()){
+                                    listener.onSuccess();
+                                }
+                                else{
+                                    listener.onError(CommandExecutionError.COMMAND_UNSUPPORTED);
+                                }
+                                break;
+
+                            default:
+                                listener.onError(CommandExecutionError.COMMAND_UNSUPPORTED);
+                                break;
+                        }
+                    }
+                }
                 break;
         }
     }
