@@ -744,7 +744,7 @@ public class DroneApiUtils {
                             }
                         });
                     }else{
-                        postErrorEvent(CommandExecutionError.COMMAND_DENIED, listener);
+                        postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
                     }
                     return;
                 }else{
