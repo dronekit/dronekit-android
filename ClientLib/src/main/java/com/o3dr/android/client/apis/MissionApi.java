@@ -6,16 +6,13 @@ import com.o3dr.android.client.Drone;
 import com.o3dr.services.android.lib.drone.mission.Mission;
 import com.o3dr.services.android.lib.drone.mission.MissionItemType;
 import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
+import com.o3dr.services.android.lib.model.AbstractCommandListener;
+import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.o3dr.services.android.lib.drone.mission.action.MissionActions.ACTION_BUILD_COMPLEX_MISSION_ITEM;
-import static com.o3dr.services.android.lib.drone.mission.action.MissionActions.ACTION_GENERATE_DRONIE;
-import static com.o3dr.services.android.lib.drone.mission.action.MissionActions.ACTION_LOAD_WAYPOINTS;
-import static com.o3dr.services.android.lib.drone.mission.action.MissionActions.ACTION_SET_MISSION;
-import static com.o3dr.services.android.lib.drone.mission.action.MissionActions.EXTRA_MISSION;
-import static com.o3dr.services.android.lib.drone.mission.action.MissionActions.EXTRA_PUSH_TO_DRONE;
+import static com.o3dr.services.android.lib.drone.mission.action.MissionActions.*;
 
 /**
  * Provides access to missions specific functionality.
@@ -63,6 +60,21 @@ public class MissionApi implements Api {
         params.putParcelable(EXTRA_MISSION, mission);
         params.putBoolean(EXTRA_PUSH_TO_DRONE, pushToDrone);
         drone.performAsyncAction(new Action(ACTION_SET_MISSION, params));
+    }
+
+    /**
+     * Starts the mission. The vehicle will only accept this command if armed and in Auto mode.
+     * note: This command is only supported by APM:Copter V3.3 and newer.
+     *
+     * @param forceModeChange Change to Auto mode if not in Auto.
+     * @param forceArm Arm the vehicle if it is disarmed.
+     * @param listener
+     */
+    public void startMission(boolean forceModeChange, boolean forceArm, AbstractCommandListener listener){
+        Bundle params = new Bundle();
+        params.putBoolean(EXTRA_FORCE_MODE_CHANGE, forceModeChange);
+        params.putBoolean(EXTRA_FORCE_ARM, forceArm);
+        drone.performAsyncActionOnDroneThread(new Action(ACTION_START_MISSION, params), listener);
     }
 
     /**
