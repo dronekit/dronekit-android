@@ -318,6 +318,12 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 DroneApiUtils.setMission(getDrone(), mission, pushToDrone);
                 break;
 
+            case MissionActions.ACTION_START_MISSION:
+                boolean forceModeChange = data.getBoolean(MissionActions.EXTRA_FORCE_MODE_CHANGE);
+                boolean forceArm = data.getBoolean(MissionActions.EXTRA_FORCE_ARM);
+                DroneApiUtils.startMission(droneMgr, forceModeChange, forceArm, listener);
+                break;
+
             case MissionActions.ACTION_BUILD_COMPLEX_MISSION_ITEM:
                 DroneApiUtils.buildComplexMissionItem(getDrone(), data);
                 break;
