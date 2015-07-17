@@ -170,54 +170,54 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
         switch (type) {
             case AttributeType.STATE:
-                carrier.putParcelable(type, DroneApiUtils.getState(drone, isConnected()));
+                carrier.putParcelable(type, CommonApiUtils.getState(drone, isConnected()));
                 break;
             case AttributeType.GPS:
-                carrier.putParcelable(type, DroneApiUtils.getGps(drone));
+                carrier.putParcelable(type, CommonApiUtils.getGps(drone));
                 break;
             case AttributeType.PARAMETERS:
-                carrier.putParcelable(type, DroneApiUtils.getParameters(drone, context));
+                carrier.putParcelable(type, CommonApiUtils.getParameters(drone, context));
                 break;
             case AttributeType.SPEED:
-                carrier.putParcelable(type, DroneApiUtils.getSpeed(drone));
+                carrier.putParcelable(type, CommonApiUtils.getSpeed(drone));
                 break;
             case AttributeType.ATTITUDE:
-                carrier.putParcelable(type, DroneApiUtils.getAttitude(drone));
+                carrier.putParcelable(type, CommonApiUtils.getAttitude(drone));
                 break;
             case AttributeType.HOME:
-                carrier.putParcelable(type, DroneApiUtils.getHome(drone));
+                carrier.putParcelable(type, CommonApiUtils.getHome(drone));
                 break;
             case AttributeType.BATTERY:
-                carrier.putParcelable(type, DroneApiUtils.getBattery(drone));
+                carrier.putParcelable(type, CommonApiUtils.getBattery(drone));
                 break;
             case AttributeType.ALTITUDE:
-                carrier.putParcelable(type, DroneApiUtils.getAltitude(drone));
+                carrier.putParcelable(type, CommonApiUtils.getAltitude(drone));
                 break;
             case AttributeType.MISSION:
-                carrier.putParcelable(type, DroneApiUtils.getMission(drone));
+                carrier.putParcelable(type, CommonApiUtils.getMission(drone));
                 break;
             case AttributeType.SIGNAL:
-                carrier.putParcelable(type, DroneApiUtils.getSignal(drone));
+                carrier.putParcelable(type, CommonApiUtils.getSignal(drone));
                 break;
             case AttributeType.TYPE:
-                carrier.putParcelable(type, DroneApiUtils.getType(drone));
+                carrier.putParcelable(type, CommonApiUtils.getType(drone));
                 break;
             case AttributeType.GUIDED_STATE:
-                carrier.putParcelable(type, DroneApiUtils.getGuidedState(drone));
+                carrier.putParcelable(type, CommonApiUtils.getGuidedState(drone));
                 break;
             case AttributeType.FOLLOW_STATE:
-                carrier.putParcelable(type, DroneApiUtils.getFollowState(getFollowMe()));
+                carrier.putParcelable(type, CommonApiUtils.getFollowState(getFollowMe()));
                 break;
             case AttributeType.CAMERA:
-                carrier.putParcelable(type, DroneApiUtils.getCameraProxy(drone, service.getCameraDetails()));
+                carrier.putParcelable(type, CommonApiUtils.getCameraProxy(drone, service.getCameraDetails()));
                 break;
 
             case AttributeType.GOPRO:
-                carrier.putParcelable(type, DroneApiUtils.getGoPro(drone));
+                carrier.putParcelable(type, CommonApiUtils.getGoPro(drone));
                 break;
 
             case AttributeType.MAGNETOMETER_CALIBRATION_STATUS:
-                carrier.putParcelable(type, DroneApiUtils.getMagnetometerCalibrationStatus(drone));
+                carrier.putParcelable(type, CommonApiUtils.getMagnetometerCalibrationStatus(drone));
                 break;
         }
 
@@ -299,7 +299,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
         switch (type) {
             // MISSION ACTIONS
             case MissionActions.ACTION_GENERATE_DRONIE:
-                final float bearing = DroneApiUtils.generateDronie(getDrone());
+                final float bearing = CommonApiUtils.generateDronie(getDrone());
                 if (bearing != -1) {
                     Bundle bundle = new Bundle(1);
                     bundle.putFloat(AttributeEventExtra.EXTRA_MISSION_DRONIE_BEARING, bearing);
@@ -308,24 +308,24 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 break;
 
             case MissionActions.ACTION_LOAD_WAYPOINTS:
-                DroneApiUtils.loadWaypoints(getDrone());
+                CommonApiUtils.loadWaypoints(getDrone());
                 break;
 
             case MissionActions.ACTION_SET_MISSION:
                 data.setClassLoader(Mission.class.getClassLoader());
                 Mission mission = data.getParcelable(MissionActions.EXTRA_MISSION);
                 boolean pushToDrone = data.getBoolean(MissionActions.EXTRA_PUSH_TO_DRONE);
-                DroneApiUtils.setMission(getDrone(), mission, pushToDrone);
+                CommonApiUtils.setMission(getDrone(), mission, pushToDrone);
                 break;
 
             case MissionActions.ACTION_START_MISSION:
                 boolean forceModeChange = data.getBoolean(MissionActions.EXTRA_FORCE_MODE_CHANGE);
                 boolean forceArm = data.getBoolean(MissionActions.EXTRA_FORCE_ARM);
-                DroneApiUtils.startMission(droneMgr, forceModeChange, forceArm, listener);
+                CommonApiUtils.startMission(droneMgr, forceModeChange, forceArm, listener);
                 break;
 
             case MissionActions.ACTION_BUILD_COMPLEX_MISSION_ITEM:
-                DroneApiUtils.buildComplexMissionItem(getDrone(), data);
+                CommonApiUtils.buildComplexMissionItem(getDrone(), data);
                 break;
 
             //CONNECTION ACTIONS
@@ -342,11 +342,11 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
             //EXPERIMENTAL ACTIONS
             case ExperimentalActions.ACTION_EPM_COMMAND:
                 boolean release = data.getBoolean(ExperimentalActions.EXTRA_EPM_RELEASE);
-                DroneApiUtils.epmCommand(getDrone(), release, listener);
+                CommonApiUtils.epmCommand(getDrone(), release, listener);
                 break;
 
             case ExperimentalActions.ACTION_TRIGGER_CAMERA:
-                DroneApiUtils.triggerCamera(getDrone());
+                CommonApiUtils.triggerCamera(getDrone());
                 break;
 
             case ExperimentalActions.ACTION_SET_ROI:
@@ -360,7 +360,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
             case ExperimentalActions.ACTION_SEND_MAVLINK_MESSAGE:
                 data.setClassLoader(MavlinkMessageWrapper.class.getClassLoader());
                 MavlinkMessageWrapper messageWrapper = data.getParcelable(ExperimentalActions.EXTRA_MAVLINK_MESSAGE);
-                DroneApiUtils.sendMavlinkMessage(getDrone(), messageWrapper);
+                CommonApiUtils.sendMavlinkMessage(getDrone(), messageWrapper);
                 break;
 
             case ExperimentalActions.ACTION_SET_RELAY:
@@ -380,75 +380,75 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
             //GUIDED ACTIONS
             case GuidedActions.ACTION_DO_GUIDED_TAKEOFF:
                 double takeoffAltitude = data.getDouble(GuidedActions.EXTRA_ALTITUDE);
-                DroneApiUtils.doGuidedTakeoff(getDrone(), takeoffAltitude, listener);
+                CommonApiUtils.doGuidedTakeoff(getDrone(), takeoffAltitude, listener);
                 break;
 
             case GuidedActions.ACTION_SEND_GUIDED_POINT:
                 data.setClassLoader(LatLong.class.getClassLoader());
                 boolean force = data.getBoolean(GuidedActions.EXTRA_FORCE_GUIDED_POINT);
                 LatLong guidedPoint = data.getParcelable(GuidedActions.EXTRA_GUIDED_POINT);
-                DroneApiUtils.sendGuidedPoint(getDrone(), guidedPoint, force, listener);
+                CommonApiUtils.sendGuidedPoint(getDrone(), guidedPoint, force, listener);
                 break;
 
             case GuidedActions.ACTION_SET_GUIDED_ALTITUDE:
                 double guidedAltitude = data.getDouble(GuidedActions.EXTRA_ALTITUDE);
-                DroneApiUtils.setGuidedAltitude(getDrone(), guidedAltitude);
+                CommonApiUtils.setGuidedAltitude(getDrone(), guidedAltitude);
                 break;
 
             //PARAMETER ACTIONS
             case ParameterActions.ACTION_REFRESH_PARAMETERS:
-                DroneApiUtils.refreshParameters(getDrone());
+                CommonApiUtils.refreshParameters(getDrone());
                 break;
 
             case ParameterActions.ACTION_WRITE_PARAMETERS:
                 data.setClassLoader(Parameters.class.getClassLoader());
                 Parameters parameters = data.getParcelable(ParameterActions.EXTRA_PARAMETERS);
-                DroneApiUtils.writeParameters(getDrone(), parameters);
+                CommonApiUtils.writeParameters(getDrone(), parameters);
                 break;
 
             //DRONE STATE ACTIONS
             case StateActions.ACTION_ARM:
                 boolean doArm = data.getBoolean(StateActions.EXTRA_ARM);
                 boolean emergencyDisarm = data.getBoolean(StateActions.EXTRA_EMERGENCY_DISARM);
-                DroneApiUtils.arm(getDrone(), doArm, emergencyDisarm, listener);
+                CommonApiUtils.arm(getDrone(), doArm, emergencyDisarm, listener);
                 break;
 
             case StateActions.ACTION_SET_VEHICLE_MODE:
                 data.setClassLoader(VehicleMode.class.getClassLoader());
                 VehicleMode newMode = data.getParcelable(StateActions.EXTRA_VEHICLE_MODE);
-                DroneApiUtils.changeVehicleMode(getDrone(), newMode, listener);
+                CommonApiUtils.changeVehicleMode(getDrone(), newMode, listener);
                 break;
 
             //CALIBRATION ACTIONS
             case CalibrationActions.ACTION_START_IMU_CALIBRATION:
-                DroneApiUtils.startIMUCalibration(getDrone(), listener);
+                CommonApiUtils.startIMUCalibration(getDrone(), listener);
                 break;
 
             case CalibrationActions.ACTION_SEND_IMU_CALIBRATION_ACK:
                 int imuAck = data.getInt(CalibrationActions.EXTRA_IMU_STEP);
-                DroneApiUtils.sendIMUCalibrationAck(getDrone(), imuAck);
+                CommonApiUtils.sendIMUCalibrationAck(getDrone(), imuAck);
                 break;
 
             case CalibrationActions.ACTION_START_MAGNETOMETER_CALIBRATION:
                 final boolean retryOnFailure = data.getBoolean(CalibrationActions.EXTRA_RETRY_ON_FAILURE, false);
                 final boolean saveAutomatically = data.getBoolean(CalibrationActions.EXTRA_SAVE_AUTOMATICALLY, true);
                 final int startDelay = data.getInt(CalibrationActions.EXTRA_START_DELAY, 0);
-                DroneApiUtils.startMagnetometerCalibration(getDrone(), retryOnFailure, saveAutomatically, startDelay);
+                CommonApiUtils.startMagnetometerCalibration(getDrone(), retryOnFailure, saveAutomatically, startDelay);
                 break;
 
             case CalibrationActions.ACTION_CANCEL_MAGNETOMETER_CALIBRATION:
-                DroneApiUtils.cancelMagnetometerCalibration(getDrone());
+                CommonApiUtils.cancelMagnetometerCalibration(getDrone());
                 break;
 
             case CalibrationActions.ACTION_ACCEPT_MAGNETOMETER_CALIBRATION:
-                DroneApiUtils.acceptMagnetometerCalibration(getDrone());
+                CommonApiUtils.acceptMagnetometerCalibration(getDrone());
                 break;
 
             //FOLLOW-ME ACTIONS
             case FollowMeActions.ACTION_ENABLE_FOLLOW_ME:
                 data.setClassLoader(FollowType.class.getClassLoader());
                 FollowType followType = data.getParcelable(FollowMeActions.EXTRA_FOLLOW_TYPE);
-                DroneApiUtils.enableFollowMe(getDroneManager(), droneHandler, followType);
+                CommonApiUtils.enableFollowMe(getDroneManager(), droneHandler, followType);
                 break;
 
             case FollowMeActions.ACTION_UPDATE_FOLLOW_PARAMS:
@@ -483,16 +483,16 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 break;
 
             case FollowMeActions.ACTION_DISABLE_FOLLOW_ME:
-                DroneApiUtils.disableFollowMe(getFollowMe());
+                CommonApiUtils.disableFollowMe(getFollowMe());
                 break;
 
             //************ CAMERA ACTIONS *************//
             case CameraActions.ACTION_START_VIDEO_RECORDING:
-                DroneApiUtils.startVideoRecording(getDrone());
+                CommonApiUtils.startVideoRecording(getDrone());
                 break;
 
             case CameraActions.ACTION_STOP_VIDEO_RECORDING:
-                DroneApiUtils.stopVideoRecording(getDrone());
+                CommonApiUtils.stopVideoRecording(getDrone());
                 break;
 
             case GimbalActions.ACTION_SET_GIMBAL_ORIENTATION:
@@ -859,7 +859,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     public void onCalibrationProgress(msg_mag_cal_progress progress) {
         Bundle progressBundle = new Bundle(1);
         progressBundle.putParcelable(AttributeEventExtra.EXTRA_CALIBRATION_MAG_PROGRESS,
-                DroneApiUtils.getMagnetometerCalibrationProgress(progress));
+                CommonApiUtils.getMagnetometerCalibrationProgress(progress));
 
         notifyAttributeUpdate(AttributeEvent.CALIBRATION_MAG_PROGRESS, progressBundle);
     }
@@ -868,7 +868,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     public void onCalibrationCompleted(msg_mag_cal_report report) {
         Bundle reportBundle = new Bundle(1);
         reportBundle.putParcelable(AttributeEventExtra.EXTRA_CALIBRATION_MAG_RESULT,
-                DroneApiUtils.getMagnetometerCalibrationResult(report));
+                CommonApiUtils.getMagnetometerCalibrationResult(report));
 
         notifyAttributeUpdate(AttributeEvent.CALIBRATION_MAG_COMPLETED, reportBundle);
     }

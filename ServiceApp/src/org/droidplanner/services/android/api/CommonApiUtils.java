@@ -4,9 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.text.TextUtils;
-import android.util.Log;
 
-import org.droidplanner.core.drone.variables.ApmModes;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.ardupilotmega.msg_ekf_status_report;
 import com.MAVLink.ardupilotmega.msg_mag_cal_progress;
@@ -55,6 +53,7 @@ import org.droidplanner.core.MAVLink.command.doCmd.MavLinkDoCmds;
 import org.droidplanner.core.drone.DroneInterfaces;
 import org.droidplanner.core.drone.camera.GoProImpl;
 import org.droidplanner.core.drone.profiles.VehicleProfile;
+import org.droidplanner.core.drone.variables.ApmModes;
 import org.droidplanner.core.drone.variables.Camera;
 import org.droidplanner.core.drone.variables.GPS;
 import org.droidplanner.core.drone.variables.GuidedPoint;
@@ -89,11 +88,14 @@ import timber.log.Timber;
 /**
  * Created by Fredia Huya-Kouadio on 3/23/15.
  */
-public class DroneApiUtils {
-    private static final String TAG = DroneApiUtils.class.getSimpleName();
+public class CommonApiUtils {
 
-    private static void postSuccessEvent(ICommandListener listener){
-        if(listener != null){
+    //Private to prevent instantiation
+    private CommonApiUtils() {
+    }
+
+    private static void postSuccessEvent(ICommandListener listener) {
+        if (listener != null) {
             try {
                 listener.onSuccess();
             } catch (RemoteException e) {
@@ -102,8 +104,8 @@ public class DroneApiUtils {
         }
     }
 
-    private static void postErrorEvent(int errorCode, ICommandListener listener){
-        if(listener != null){
+    private static void postErrorEvent(int errorCode, ICommandListener listener) {
+        if (listener != null) {
             try {
                 listener.onError(errorCode);
             } catch (RemoteException e) {
@@ -112,8 +114,8 @@ public class DroneApiUtils {
         }
     }
 
-    private static void postTimeoutEvent(ICommandListener listener){
-        if(listener != null){
+    private static void postTimeoutEvent(ICommandListener listener) {
+        if (listener != null) {
             try {
                 listener.onTimeout();
             } catch (RemoteException e) {
@@ -368,12 +370,12 @@ public class DroneApiUtils {
 
             List<Footprint> footprints = droneCamera.getFootprints();
             for (Footprint footprint : footprints) {
-                proxyPrints.add(DroneApiUtils.getProxyCameraFootPrint(footprint));
+                proxyPrints.add(CommonApiUtils.getProxyCameraFootPrint(footprint));
             }
 
             GPS droneGps = drone.getGps();
             currentFieldOfView = droneGps.isPositionValid()
-                    ? DroneApiUtils.getProxyCameraFootPrint(droneCamera.getCurrentFieldOfView())
+                    ? CommonApiUtils.getProxyCameraFootPrint(droneCamera.getCurrentFieldOfView())
                     : new FootPrint();
         }
 
@@ -407,7 +409,7 @@ public class DroneApiUtils {
                 : new EkfStatus(ekfStatus.flags, ekfStatus.compass_variance, ekfStatus.pos_horiz_variance, ekfStatus
                 .terrain_alt_variance, ekfStatus.velocity_variance, ekfStatus.pos_vert_variance);
 
-        return new State(isConnected, DroneApiUtils.getVehicleMode(droneMode), droneState.isArmed(), droneState.isFlying(),
+        return new State(isConnected, CommonApiUtils.getVehicleMode(droneMode), droneState.isArmed(), droneState.isFlying(),
                 droneState.getErrorId(), drone.getMavlinkVersion(), calibrationMessage,
                 droneState.getFlightStartTime(), proxyEkfStatus, isConnected && drone.isConnectionAlive());
     }
@@ -436,7 +438,7 @@ public class DroneApiUtils {
                     }
                 }
             } catch (IOException | XmlPullParserException e) {
-                Log.e(TAG, e.getMessage(), e);
+                Timber.e(e, e.getMessage());
             }
         }
 
@@ -531,7 +533,7 @@ public class DroneApiUtils {
         if (drone == null)
             return new Type();
 
-        return new Type(DroneApiUtils.getDroneProxyType(drone.getType()), drone.getFirmwareVersion());
+        return new Type(CommonApiUtils.getDroneProxyType(drone.getType()), drone.getFirmwareVersion());
     }
 
     static GuidedState getGuidedState(Drone drone) {
@@ -638,7 +640,7 @@ public class DroneApiUtils {
                     break;
             }
         }
-        return new FollowState(state, DroneApiUtils.followModeToType(currentAlg.getType()), params);
+        return new FollowState(state, CommonApiUtils.followModeToType(currentAlg.getType()), params);
     }
 
     static void disableFollowMe(Follow follow) {
@@ -703,8 +705,8 @@ public class DroneApiUtils {
             droneMission.sendMissionToAPM();
     }
 
-    static void startMission(final DroneManager droneMgr, final boolean forceModeChange, final boolean forceArm, final ICommandListener listener){
-        if(droneMgr == null){
+    static void startMission(final DroneManager droneMgr, final boolean forceModeChange, final boolean forceArm, final ICommandListener listener) {
+        if (droneMgr == null) {
             return;
         }
 
@@ -725,8 +727,8 @@ public class DroneApiUtils {
         final Runnable modeCheckRunnable = new Runnable() {
             @Override
             public void run() {
-                if(drone.getState().getMode() != ApmModes.ROTOR_AUTO){
-                    if(forceModeChange){
+                if (drone.getState().getMode() != ApmModes.ROTOR_AUTO) {
+                    if (forceModeChange) {
                         changeVehicleMode(drone, VehicleMode.COPTER_AUTO, new AbstractCommandListener() {
                             @Override
                             public void onSuccess() {
@@ -743,18 +745,18 @@ public class DroneApiUtils {
                                 postTimeoutEvent(listener);
                             }
                         });
-                    }else{
+                    } else {
                         postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
                     }
                     return;
-                }else{
+                } else {
                     sendCommandRunnable.run();
                 }
             }
         };
 
-        if(!drone.getState().isArmed()){
-            if(forceArm){
+        if (!drone.getState().isArmed()) {
+            if (forceArm) {
                 arm(drone, true, new AbstractCommandListener() {
                     @Override
                     public void onSuccess() {
@@ -771,7 +773,7 @@ public class DroneApiUtils {
                         postTimeoutEvent(listener);
                     }
                 });
-            }else {
+            } else {
                 postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
             }
             return;
@@ -795,8 +797,8 @@ public class DroneApiUtils {
         if (drone == null)
             return;
 
-        if(!arm && emergencyDisarm){
-            if(org.droidplanner.core.drone.variables.Type.isCopter(drone.getType()) && !isKillSwitchSupported(drone)) {
+        if (!arm && emergencyDisarm) {
+            if (org.droidplanner.core.drone.variables.Type.isCopter(drone.getType()) && !isKillSwitchSupported(drone)) {
 
                 changeVehicleMode(drone, VehicleMode.COPTER_STABILIZE, new AbstractCommandListener() {
                     @Override
@@ -806,7 +808,7 @@ public class DroneApiUtils {
 
                     @Override
                     public void onError(int executionError) {
-                        if(listener != null) {
+                        if (listener != null) {
                             try {
                                 listener.onError(executionError);
                             } catch (RemoteException e) {
@@ -817,7 +819,7 @@ public class DroneApiUtils {
 
                     @Override
                     public void onTimeout() {
-                        if(listener != null){
+                        if (listener != null) {
                             try {
                                 listener.onTimeout();
                             } catch (RemoteException e) {
@@ -836,23 +838,24 @@ public class DroneApiUtils {
 
     /**
      * Check if the kill switch feature is supported on the given drone
+     *
      * @param drone
      * @return true if it's supported, false otherwise.
      */
-    static boolean isKillSwitchSupported(Drone drone){
-        if(drone == null)
+    static boolean isKillSwitchSupported(Drone drone) {
+        if (drone == null)
             return false;
 
-        if(!org.droidplanner.core.drone.variables.Type.isCopter(drone.getType()))
+        if (!org.droidplanner.core.drone.variables.Type.isCopter(drone.getType()))
             return false;
 
         final String firmwareVersion = drone.getFirmwareVersion();
-        if(TextUtils.isEmpty(firmwareVersion))
+        if (TextUtils.isEmpty(firmwareVersion))
             return false;
 
-        if(!firmwareVersion.startsWith("APM:Copter V3.3")
+        if (!firmwareVersion.startsWith("APM:Copter V3.3")
                 && !firmwareVersion.startsWith("APM:Copter V3.4")
-                && !firmwareVersion.startsWith("Solo")){
+                && !firmwareVersion.startsWith("Solo")) {
             return false;
         }
 
@@ -882,7 +885,7 @@ public class DroneApiUtils {
     }
 
     static void startIMUCalibration(Drone drone, ICommandListener listener) {
-        if(drone != null)
+        if (drone != null)
             drone.getCalibrationSetup().startCalibration(listener);
     }
 
@@ -921,7 +924,7 @@ public class DroneApiUtils {
             target_system.setByte(message, (byte) message.sysid);
             target_component.setByte(message, (byte) message.compid);
         } catch (NoSuchFieldException | SecurityException | IllegalAccessException | IllegalArgumentException | ExceptionInInitializerError e) {
-            Log.e(TAG, e.getMessage(), e);
+            Timber.e(e, e.getMessage());
         }
 
         drone.getMavClient().sendMavMessage(message, null);
@@ -938,7 +941,7 @@ public class DroneApiUtils {
             try {
                 guidedPoint.forcedGuidedCoordinate(MathUtils.latLongToCoord2D(point), listener);
             } catch (Exception e) {
-                Log.e(TAG, e.getMessage(), e);
+                Timber.e(e, e.getMessage());
             }
         }
     }
@@ -954,7 +957,7 @@ public class DroneApiUtils {
         if (droneMgr == null)
             return;
 
-        final FollowAlgorithm.FollowModes selectedMode = DroneApiUtils.followTypeToMode(followType);
+        final FollowAlgorithm.FollowModes selectedMode = CommonApiUtils.followTypeToMode(followType);
 
         if (selectedMode != null) {
             final Follow followMe = droneMgr.getFollowMe();
@@ -994,7 +997,7 @@ public class DroneApiUtils {
                 break;
 
             default:
-                Log.w(TAG, "Unrecognized complex mission item.");
+                Timber.w("Unrecognized complex mission item.");
                 break;
         }
     }
