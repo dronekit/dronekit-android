@@ -13,7 +13,9 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.ardupilotmega.msg_ekf_status_report;
 import com.MAVLink.ardupilotmega.msg_mag_cal_progress;
 import com.MAVLink.ardupilotmega.msg_mag_cal_report;
+import com.MAVLink.common.msg_command_long;
 import com.MAVLink.enums.MAG_CAL_STATUS;
+import com.MAVLink.enums.MAV_CMD;
 import com.MAVLink.enums.MAV_TYPE;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
@@ -70,6 +72,8 @@ import org.droidplanner.core.gcs.follow.Follow;
 import org.droidplanner.core.gcs.follow.FollowAlgorithm;
 import org.droidplanner.core.helpers.coordinates.Coord2D;
 import org.droidplanner.core.helpers.coordinates.Coord3D;
+import org.droidplanner.core.mission.survey.SplineSurveyImpl;
+import org.droidplanner.core.mission.survey.SurveyImpl;
 import org.droidplanner.core.model.Drone;
 import org.droidplanner.core.survey.Footprint;
 import org.droidplanner.services.android.drone.DroneManager;
@@ -94,6 +98,36 @@ import timber.log.Timber;
  */
 public class DroneApiUtils {
     private static final String TAG = DroneApiUtils.class.getSimpleName();
+
+    private static void postSuccessEvent(ICommandListener listener){
+        if(listener != null){
+            try {
+                listener.onSuccess();
+            } catch (RemoteException e) {
+                Timber.e(e, e.getMessage());
+            }
+        }
+    }
+
+    private static void postErrorEvent(int errorCode, ICommandListener listener){
+        if(listener != null){
+            try {
+                listener.onError(errorCode);
+            } catch (RemoteException e) {
+                Timber.e(e, e.getMessage());
+            }
+        }
+    }
+
+    private static void postTimeoutEvent(ICommandListener listener){
+        if(listener != null){
+            try {
+                listener.onTimeout();
+            } catch (RemoteException e) {
+                Timber.e(e, e.getMessage());
+            }
+        }
+    }
 
     static VehicleMode getVehicleMode(ApmModes mode) {
         switch (mode) {
@@ -676,6 +710,83 @@ public class DroneApiUtils {
             droneMission.sendMissionToAPM();
     }
 
+    static void startMission(final DroneManager droneMgr, final boolean forceModeChange, final boolean forceArm, final ICommandListener listener){
+        if(droneMgr == null){
+            return;
+        }
+
+        final Drone drone = droneMgr.getDrone();
+
+        final Runnable sendCommandRunnable = new Runnable() {
+            @Override
+            public void run() {
+                msg_command_long msg = new msg_command_long();
+                msg.target_system = drone.getSysid();
+                msg.target_component = drone.getCompid();
+                msg.command = MAV_CMD.MAV_CMD_MISSION_START;
+
+                drone.getMavClient().sendMavMessage(msg, listener);
+            }
+        };
+
+        final Runnable modeCheckRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if(drone.getState().getMode() != ApmModes.ROTOR_AUTO){
+                    if(forceModeChange){
+                        changeVehicleMode(drone, VehicleMode.COPTER_AUTO, new AbstractCommandListener() {
+                            @Override
+                            public void onSuccess() {
+                                sendCommandRunnable.run();
+                            }
+
+                            @Override
+                            public void onError(int executionError) {
+                                postErrorEvent(executionError, listener);
+                            }
+
+                            @Override
+                            public void onTimeout() {
+                                postTimeoutEvent(listener);
+                            }
+                        });
+                    }else{
+                        postErrorEvent(CommandExecutionError.COMMAND_DENIED, listener);
+                    }
+                    return;
+                }else{
+                    sendCommandRunnable.run();
+                }
+            }
+        };
+
+        if(!drone.getState().isArmed()){
+            if(forceArm){
+                arm(drone, true, new AbstractCommandListener() {
+                    @Override
+                    public void onSuccess() {
+                        modeCheckRunnable.run();
+                    }
+
+                    @Override
+                    public void onError(int executionError) {
+                        postErrorEvent(executionError, listener);
+                    }
+
+                    @Override
+                    public void onTimeout() {
+                        postTimeoutEvent(listener);
+                    }
+                });
+            }else {
+                postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
+            }
+            return;
+        }
+
+        modeCheckRunnable.run();
+    }
+
     static float generateDronie(Drone drone) {
         if (drone == null)
             return -1;
@@ -877,6 +988,12 @@ public class DroneApiUtils {
                     itemType.storeMissionItem(updatedSurvey, itemBundle);
                 break;
 
+            case SPLINE_SURVEY:
+                Survey updatedSplineSurvey = buildSplineSurvey(drone, (Survey) missionItem);
+                if (updatedSplineSurvey != null)
+                    itemType.storeMissionItem(updatedSplineSurvey, itemBundle);
+                break;
+
             case STRUCTURE_SCANNER:
                 StructureScanner updatedScanner = buildStructureScanner(drone, (StructureScanner) missionItem);
                 if (updatedScanner != null)
@@ -891,10 +1008,18 @@ public class DroneApiUtils {
 
     static Survey buildSurvey(Drone drone, Survey survey) {
         org.droidplanner.core.mission.Mission droneMission = drone == null ? null : drone.getMission();
-        org.droidplanner.core.mission.survey.Survey updatedSurvey = (org.droidplanner.core.mission.survey.Survey) ProxyUtils.getMissionItemImpl
+        SurveyImpl updatedSurveyImpl = (SurveyImpl) ProxyUtils.getMissionItemImpl
                 (droneMission, survey);
 
-        return (Survey) ProxyUtils.getProxyMissionItem(updatedSurvey);
+        return (Survey) ProxyUtils.getProxyMissionItem(updatedSurveyImpl);
+    }
+
+    static Survey buildSplineSurvey(Drone drone, Survey survey) {
+        org.droidplanner.core.mission.Mission droneMission = drone == null ? null : drone.getMission();
+        SplineSurveyImpl updatedSplineSurvey = (SplineSurveyImpl)
+                ProxyUtils.getMissionItemImpl(droneMission, survey);
+
+        return (Survey) ProxyUtils.getProxyMissionItem(updatedSplineSurvey);
     }
 
     static StructureScanner buildStructureScanner(Drone drone, StructureScanner item) {
