@@ -218,7 +218,7 @@ public class Drone {
      * @param action Runnabl that will be executed.
      */
     public void post(Runnable action) {
-        if (action == null)
+        if (handler == null || action == null)
             return;
 
         handler.post(action);
