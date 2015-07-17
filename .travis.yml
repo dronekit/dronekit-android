@@ -3,7 +3,6 @@ language: android
 
 env:
   global:
-    - MALLOC_ARENA_MAX=2
     - secure: OTmx8EZyUxB3LHYw9o8XaWmYo4UiZKIG97bgGMXEjkuXDnszcq6hy3o4q+tTbelkdv9NnEbRoIJ3pt2rG4QXPEXCCJkjN7nUq+JvmBXLylwAo5ngyqPqbYGYh7p4eyy473xDh/eLk/hk/WVg8SVS2FcKt3XSqOc66cazGgSBJSM=
 
 android:

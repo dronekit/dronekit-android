@@ -102,6 +102,11 @@ android {
     lintOptions {
         abortOnError false
     }
+
+    dexOptions {
+        // Skip pre-dexing when running on Travis CI or when disabled via -Dpre-dex=false.
+        preDexLibraries = false
+    }
 }
 
 /**
