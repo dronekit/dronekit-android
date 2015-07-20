@@ -265,11 +265,13 @@ public class SoloComp implements CompComp, SoloLinkListener, ArtooLinkListener {
                 public void onDecodingError() {
                     Timber.d("Video decoding failed.");
                     postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
+                    resetVideoOwner();
                 }
 
                 @Override
                 public void onDecodingEnded() {
                     Timber.d("Video decoding ended successfully.");
+                    resetVideoOwner();
                 }
             });
         }
@@ -304,6 +306,11 @@ public class SoloComp implements CompComp, SoloLinkListener, ArtooLinkListener {
         else{
             postErrorEvent(CommandExecutionError.COMMAND_DENIED, listener);
         }
+    }
+
+    private void resetVideoOwner(){
+        videoOwnerId.set(NO_VIDEO_OWNER);
+        artooMgr.stopDecoding(null);
     }
 
     protected void postAsyncTask(Runnable task){

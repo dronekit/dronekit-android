@@ -535,14 +535,18 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 DroneApiUtils.updateSoloLinkControllerMode(droneMgr, mode, listener);
                 break;
 
-            case SoloLinkActions.ACTION_START_VIDEO_STREAM:
+            case SoloLinkActions.ACTION_START_VIDEO_STREAM: {
                 final Surface videoSurface = data.getParcelable(SoloLinkActions.EXTRA_VIDEO_DISPLAY);
-                DroneApiUtils.startVideoStream(droneMgr, ownerId, videoSurface, listener);
+                final String videoTag = data.getString(SoloLinkActions.EXTRA_VIDEO_TAG, "");
+                DroneApiUtils.startVideoStream(droneMgr, ownerId + videoTag, videoSurface, listener);
                 break;
+            }
 
-            case SoloLinkActions.ACTION_STOP_VIDEO_STREAM:
-                DroneApiUtils.stopVideoStream(droneMgr, ownerId, listener);
+            case SoloLinkActions.ACTION_STOP_VIDEO_STREAM: {
+                final String videoTag = data.getString(SoloLinkActions.EXTRA_VIDEO_TAG, "");
+                DroneApiUtils.stopVideoStream(droneMgr, ownerId + videoTag, listener);
                 break;
+            }
 
             //**************** CAPABILITY ACTIONS **************//
             case CapabilityActions.ACTION_CHECK_FEATURE_SUPPORT:

@@ -164,9 +164,10 @@ public class SoloLinkApi implements Api {
      * Attempt to grab ownership and start the video stream from the connected drone. Can fail if
      * the video stream is already owned by another client.
      * @param surface Surface object onto which the video is decoded.
+     * @param tag Video tag.
      * @param listener Register a callback to receive update of the command execution status.
      */
-    public void startVideoStream(final Surface surface, final AbstractCommandListener listener){
+    public void startVideoStream(final Surface surface, final String tag, final AbstractCommandListener listener){
         capabilityChecker.checkFeatureSupport(CapabilityApi.FeatureIds.SOLOLINK_VIDEO_STREAMING,
                 new CapabilityApi.FeatureSupportListener() {
                     @Override
@@ -176,6 +177,7 @@ public class SoloLinkApi implements Api {
                             case CapabilityApi.FEATURE_SUPPORTED:
                                 final Bundle params = new Bundle();
                                 params.putParcelable(EXTRA_VIDEO_DISPLAY, surface);
+                                params.putString(EXTRA_VIDEO_TAG, tag);
                                 drone.performAsyncActionOnDroneThread(new Action(ACTION_START_VIDEO_STREAM, params), listener);
                                 break;
 
@@ -197,10 +199,29 @@ public class SoloLinkApi implements Api {
     }
 
     /**
+     * Attempt to grab ownership and start the video stream from the connected drone. Can fail if
+     * the video stream is already owned by another client.
+     * @param surface Surface object onto which the video is decoded.
+     * @param listener Register a callback to receive update of the command execution status.
+     */
+    public void startVideoStream(final Surface surface, final AbstractCommandListener listener){
+        startVideoStream(surface, "", listener);
+    }
+
+    /**
      * Stop the video stream from the connected drone, and release ownership.
      * @param listener Register a callback to receive update of the command execution status.
      */
     public void stopVideoStream(final AbstractCommandListener listener){
+        stopVideoStream("", listener);
+    }
+
+    /**
+     * Stop the video stream from the connected drone, and release ownership.
+     * @param tag Video tag.
+     * @param listener Register a callback to receive update of the command execution status.
+     */
+    public void stopVideoStream(final String tag, final AbstractCommandListener listener){
         capabilityChecker.checkFeatureSupport(CapabilityApi.FeatureIds.SOLOLINK_VIDEO_STREAMING,
                 new CapabilityApi.FeatureSupportListener() {
                     @Override
@@ -208,7 +229,9 @@ public class SoloLinkApi implements Api {
                         switch(result){
 
                             case CapabilityApi.FEATURE_SUPPORTED:
-                                drone.performAsyncActionOnDroneThread(new Action(ACTION_STOP_VIDEO_STREAM), listener);
+                                final Bundle params = new Bundle();
+                                params.putString(EXTRA_VIDEO_TAG, tag);
+                                drone.performAsyncActionOnDroneThread(new Action(ACTION_STOP_VIDEO_STREAM, params), listener);
                                 break;
 
                             case CapabilityApi.FEATURE_UNSUPPORTED:
