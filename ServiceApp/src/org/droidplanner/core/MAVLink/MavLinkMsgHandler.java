@@ -44,6 +44,7 @@ import org.droidplanner.core.model.Drone;
  */
 public class MavLinkMsgHandler {
 
+    public static final int AUTOPILOT_COMPONENT_ID = 1;
     private Drone drone;
 
     private CommandTracker commandTracker;
@@ -57,7 +58,7 @@ public class MavLinkMsgHandler {
     }
 
     public void receiveData(MAVLinkMessage msg) {
-        if (msg.compid != 1){
+        if (msg.compid != AUTOPILOT_COMPONENT_ID){
             return;
         }
 
