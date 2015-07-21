@@ -242,6 +242,7 @@ public class SoloComp implements CompComp, SoloLinkListener, ArtooLinkListener {
     }
 
     public void startVideoStream(String ownerId, Surface videoSurface, final ICommandListener listener){
+        Timber.d("Video stream start request from %s. Video owner is %s.", ownerId, videoOwnerId.get());
         if(TextUtils.isEmpty(ownerId)){
             postErrorEvent(CommandExecutionError.COMMAND_DENIED, listener);
             return;
@@ -249,6 +250,11 @@ public class SoloComp implements CompComp, SoloLinkListener, ArtooLinkListener {
 
         if(videoSurface == null){
             postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
+            return;
+        }
+
+        if(ownerId.equals(videoOwnerId.get())){
+            postSuccessEvent(listener);
             return;
         }
 
@@ -281,13 +287,22 @@ public class SoloComp implements CompComp, SoloLinkListener, ArtooLinkListener {
     }
 
     public void stopVideoStream(String ownerId, final ICommandListener listener){
+        Timber.d("Video stream stop request from %s. Video owner is %s.", ownerId, videoOwnerId.get());
         if(TextUtils.isEmpty(ownerId)){
+            Timber.w("Owner id is empty.");
             postErrorEvent(CommandExecutionError.COMMAND_DENIED, listener);
             return;
         }
 
-        if(videoOwnerId.compareAndSet(ownerId, NO_VIDEO_OWNER)){
-            //stop the video decoding.
+        final String currentVideoOwner = videoOwnerId.get();
+        if(NO_VIDEO_OWNER.equals(currentVideoOwner)){
+            Timber.d("No video owner set. Nothing to do.");
+            postSuccessEvent(listener);
+            return;
+        }
+
+        if(ownerId.equals(currentVideoOwner) && videoOwnerId.compareAndSet(currentVideoOwner, NO_VIDEO_OWNER)){
+            Timber.d("Stopping video decoding. Current owner is %s.", videoOwnerId.get());
             artooMgr.stopDecoding(new DecoderListener() {
                 @Override
                 public void onDecodingStarted() {}
@@ -309,6 +324,7 @@ public class SoloComp implements CompComp, SoloLinkListener, ArtooLinkListener {
     }
 
     private void resetVideoOwner(){
+        Timber.d("Resetting video owner from %s", videoOwnerId.get());
         videoOwnerId.set(NO_VIDEO_OWNER);
         artooMgr.stopDecoding(null);
     }
