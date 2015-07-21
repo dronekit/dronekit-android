@@ -57,6 +57,10 @@ public class MavLinkMsgHandler {
     }
 
     public void receiveData(MAVLinkMessage msg) {
+        if (msg.compid != 1){
+            return;
+        }
+
         if (drone.getParameters().processMessage(msg)) {
             return;
         }
