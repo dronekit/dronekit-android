@@ -20,6 +20,7 @@ import com.MAVLink.common.msg_gps_raw_int;
 import com.MAVLink.common.msg_heartbeat;
 import com.MAVLink.common.msg_mission_current;
 import com.MAVLink.common.msg_mission_item;
+import com.MAVLink.common.msg_mission_item_reached;
 import com.MAVLink.common.msg_named_value_int;
 import com.MAVLink.common.msg_nav_controller_output;
 import com.MAVLink.common.msg_radio_status;
@@ -83,6 +84,10 @@ public class MavLinkMsgHandler {
 
             case msg_mission_current.MAVLINK_MSG_ID_MISSION_CURRENT:
                 drone.getMissionStats().setWpno(((msg_mission_current) msg).seq);
+                break;
+
+            case msg_mission_item_reached.MAVLINK_MSG_ID_MISSION_ITEM_REACHED:
+                drone.getMissionStats().setLastReachedWaypointNumber(((msg_mission_item_reached) msg).seq);
                 break;
 
             case msg_nav_controller_output.MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT:
