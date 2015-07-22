@@ -197,11 +197,18 @@ public class ArtooLinkManager extends AbstractLinkManager<ArtooLinkListener> {
     }
 
     public void startVideoManager() {
-        handler.post(startVideoMgr);
+        handler.removeCallbacks(reconnectVideoHandshake);
+        isVideoHandshakeStarted.set(true);
+        videoHandshake.connect();
     }
 
     public void stopVideoManager() {
+        handler.removeCallbacks(startVideoMgr);
         this.videoMgr.stop();
+
+        handler.removeCallbacks(reconnectVideoHandshake);
+        isVideoHandshakeStarted.set(false);
+        videoHandshake.disconnect();
     }
 
     public static SshConnection getSshLink() {
@@ -261,12 +268,7 @@ public class ArtooLinkManager extends AbstractLinkManager<ArtooLinkListener> {
     public void stop() {
         Timber.d("Stopping artoo link manager");
 
-        handler.removeCallbacks(startVideoMgr);
-        this.videoMgr.stop();
-
-        handler.removeCallbacks(reconnectVideoHandshake);
-        isVideoHandshakeStarted.set(false);
-        videoHandshake.disconnect();
+        stopVideoManager();
 
         handler.removeCallbacks(reconnectBatteryTask);
         isBatteryStarted.set(false);
@@ -288,10 +290,6 @@ public class ArtooLinkManager extends AbstractLinkManager<ArtooLinkListener> {
 
         //Update sololink wifi
         loadSololinkWifiInfo();
-
-        handler.removeCallbacks(reconnectVideoHandshake);
-        isVideoHandshakeStarted.set(true);
-        videoHandshake.connect();
 
         //Refresh the vehicle's components versions
         updateArtooVersion();
