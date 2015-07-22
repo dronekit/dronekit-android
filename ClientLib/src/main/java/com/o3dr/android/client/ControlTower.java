@@ -158,9 +158,6 @@ public class ControlTower {
             o3drServices = null;
         }
 
-+       //Tell the TowerListener that a disconnect occurred.
-+       //Call here since it only gets called otherwise if the service actually crashed. It's
-+       //not called if unbindService is called as long as the service is still running.
 +       notifyTowerDisconnected();
 
         towerListener = null;
