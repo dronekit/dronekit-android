@@ -158,7 +158,7 @@ public class ControlTower {
             o3drServices = null;
         }
 
-+       notifyTowerDisconnected();
+        notifyTowerDisconnected();
 
         towerListener = null;
 
