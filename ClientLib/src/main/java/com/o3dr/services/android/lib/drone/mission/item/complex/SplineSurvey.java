@@ -13,9 +13,13 @@ public class SplineSurvey extends Survey {
         super(MissionItemType.SPLINE_SURVEY);
     }
 
-    public SplineSurvey(SplineSurvey copy) {
+    public SplineSurvey(Survey copy){
         this();
         copy(copy);
+    }
+
+    public SplineSurvey(SplineSurvey copy) {
+        this((Survey) copy);
     }
 
     private SplineSurvey(Parcel in) {
