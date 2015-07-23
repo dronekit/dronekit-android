@@ -7,7 +7,6 @@ import com.o3dr.services.android.lib.drone.mission.Mission;
 import com.o3dr.services.android.lib.drone.mission.MissionItemType;
 import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
 import com.o3dr.services.android.lib.model.AbstractCommandListener;
-import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -75,6 +74,19 @@ public class MissionApi implements Api {
         params.putBoolean(EXTRA_FORCE_MODE_CHANGE, forceModeChange);
         params.putBoolean(EXTRA_FORCE_ARM, forceArm);
         drone.performAsyncActionOnDroneThread(new Action(ACTION_START_MISSION, params), listener);
+    }
+
+    /**
+     * Jump to the desired command in the mission list. Repeat this action only the specified number of times
+     * @param missionItemIndex command to jump to
+     * @param repeatCount number of times to repeat this command
+     * @param listener
+     */
+    public void gotoMissionItem(int missionItemIndex, int repeatCount, AbstractCommandListener listener){
+        Bundle params = new Bundle();
+        params.putInt(EXTRA_MISSION_ITEM_INDEX, missionItemIndex);
+        params.putInt(EXTRA_REPEAT_COUNT, repeatCount);
+        drone.performAsyncActionOnDroneThread(new Action(ACTION_GOTO_MISSION_ITEM, params), listener);
     }
 
     /**

@@ -124,4 +124,24 @@ public class MavLinkDoCmds {
         drone.getMavClient().sendMavMessage(msg, listener);
     }
 
+    /**
+     * Jump to the desired command in the mission list. Repeat this action only the specified number of times
+     * @param drone               target vehicle
+     * @param waypoint    command
+     * @param repeatCount         number of times to repeat command
+     * @param listener            Register a callback to receive update of the command execution state.
+     */
+    public static void jumpToWaypoint(Drone drone, int waypoint, int repeatCount, ICommandListener listener){
+        if (drone == null)
+            return;
+        msg_command_long msg = new msg_command_long();
+        msg.target_system = drone.getSysid();
+        msg.target_component = drone.getCompid();
+        msg.command = MAV_CMD.MAV_CMD_DO_JUMP;
+        msg.param1 = waypoint;
+        msg.param2 = repeatCount;
+
+        drone.getMavClient().sendMavMessage(msg, listener);
+    }
+
 }

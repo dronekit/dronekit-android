@@ -338,6 +338,12 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 DroneApiUtils.startMission(droneMgr, forceModeChange, forceArm, listener);
                 break;
 
+            case MissionActions.ACTION_GOTO_MISSION_ITEM:
+                int missionItemIndex = data.getInt(MissionActions.EXTRA_MISSION_ITEM_INDEX);
+                int repeatCount = data.getInt(MissionActions.EXTRA_REPEAT_COUNT);
+                DroneApiUtils.jumpToMissionItem(getDrone(), missionItemIndex, repeatCount, listener);
+                break;
+
             case MissionActions.ACTION_BUILD_COMPLEX_MISSION_ITEM:
                 DroneApiUtils.buildComplexMissionItem(getDrone(), data);
                 break;
