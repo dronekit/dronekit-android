@@ -196,6 +196,10 @@ public class Mission extends DroneVariable {
         return missionItemToWaypoint.get(missionItemindex, -1);
     }
 
+    public int getMissionItemIndexFromWaypoint(int waypoint){
+        return waypointToMissionItem.get(waypoint, -1);
+    }
+
     public void onWriteWaypoints(msg_mission_ack msg) {
         myDrone.notifyDroneEvent(DroneEventsType.MISSION_SENT);
     }

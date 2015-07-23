@@ -14,6 +14,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.ardupilotmega.msg_mag_cal_progress;
 import com.MAVLink.ardupilotmega.msg_mag_cal_report;
 import com.o3dr.android.client.apis.CapabilityApi;
+import com.o3dr.android.client.apis.MissionApi;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.action.CapabilityActions;
@@ -844,8 +845,10 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
             case MISSION_WP_REACHED:
                 final int lastReachedWaypoint = drone.getMissionStats().getLastReachedWP();
-                extrasBundle = new Bundle(1);
+                extrasBundle = new Bundle(2);
                 extrasBundle.putInt(AttributeEventExtra.EXTRA_MISSION_LAST_REACHED_WAYPOINT, lastReachedWaypoint);
+                extrasBundle.putInt(AttributeEventExtra.EXTRA_MISSION_CURRENT_MISSION_ITEM,
+                        drone.getMission().getMissionItemIndexFromWaypoint(lastReachedWaypoint));
                 droneEvent = AttributeEvent.MISSION_ITEM_REACHED;
                 break;
 
