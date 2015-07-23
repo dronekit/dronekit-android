@@ -48,7 +48,7 @@ android {
 
 dependencies {
     compile 'com.android.support:support-v4:22.2.1'
-    compile 'com.google.android.gms:play-services-base:7.5.0'
+    compile 'com.google.android.gms:play-services-base:7.3.0'
 
     compile project(':dependencyLibs:Mavlink')
     compile files('libs/Mavlink.jar')
