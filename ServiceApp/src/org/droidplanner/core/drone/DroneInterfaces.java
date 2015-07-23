@@ -250,7 +250,12 @@ public class DroneInterfaces {
 		/**
 		 * The horizontal position is ok, and the home position is available.
 		 */
-		EKF_POSITION_STATE_UPDATE
+		EKF_POSITION_STATE_UPDATE,
+
+		/**
+		 * A mission item has been reached.
+		 */
+		MISSION_WP_REACHED,
 	}
 
 	public interface OnDroneListener {

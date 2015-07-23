@@ -47,6 +47,10 @@ public class AttributeEventExtra {
 
     public static final String EXTRA_MISSION_CURRENT_WAYPOINT = PACKAGE_NAME + "" +
             ".MISSION_CURRENT_WAYPOINT";
+
+    public static final String EXTRA_MISSION_LAST_REACHED_WAYPOINT = PACKAGE_NAME + "" +
+            ".MISSION_REACHED_WAYPOINT";
+
     public static final String EXTRA_MISSION_DRONIE_BEARING = PACKAGE_NAME + "" +
             ".MISSION_DRONIE_BEARING";
 
