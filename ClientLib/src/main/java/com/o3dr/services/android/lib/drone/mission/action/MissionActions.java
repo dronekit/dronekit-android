@@ -14,8 +14,11 @@ public class MissionActions {
 
     public static final String ACTION_SET_MISSION = Utils.PACKAGE_NAME + ".action.SET_MISSION";
     public static final String ACTION_START_MISSION = Utils.PACKAGE_NAME + ".action.START_MISSION";
+    public static final String ACTION_GOTO_MISSION_ITEM = Utils.PACKAGE_NAME + ".action.GOTO_MISSION_ITEM";
 
     public static final String EXTRA_MISSION = "extra_mission";
+    public static final String EXTRA_MISSION_ITEM_INDEX = "extra_mission_item_index";
+    public static final String EXTRA_REPEAT_COUNT = "extra_repeat_count";
     public static final String EXTRA_PUSH_TO_DRONE = "extra_push_to_drone";
     public static final String EXTRA_FORCE_MODE_CHANGE = "extra_force_mode_change";
     public static final String EXTRA_FORCE_ARM = "extra_force_arm";
