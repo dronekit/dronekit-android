@@ -14,6 +14,7 @@ doc/_build/
 # Generated files
 bin/
 gen/
+ClientLib/libs/Mavlink.jar
 
 # Gradle files
 .gradle/
