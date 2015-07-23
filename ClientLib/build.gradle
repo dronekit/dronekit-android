@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 
 ext {
     PUBLISH_ARTIFACT_ID = 'dronekit-android'
-    PUBLISH_VERSION = '2.5.5'
+    PUBLISH_VERSION = '2.5.6'
     PROJECT_DESCRIPTION = "Android DroneKit client library."
     PROJECT_LABELS = ['3DR', '3DR Services', 'DroneAPI', 'Android', 'DroneKit']
     PROJECT_LICENSES = ['Apache-2.0']
@@ -17,7 +17,7 @@ android {
     defaultConfig {
         minSdkVersion Integer.parseInt(project.ANDROID_BUILD_MIN_SDK_VERSION)
         targetSdkVersion Integer.parseInt(project.ANDROID_BUILD_TARGET_SDK_VERSION)
-        versionCode 20505
+        versionCode 20506
         versionName PUBLISH_VERSION
     }
 
@@ -47,8 +47,8 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:22.1.1'
-    compile 'com.google.android.gms:play-services-base:7.3.0'
+    compile 'com.android.support:support-v4:22.2.1'
+    compile 'com.google.android.gms:play-services-base:7.5.0'
 
     compile project(':dependencyLibs:Mavlink')
     compile files('libs/Mavlink.jar')
