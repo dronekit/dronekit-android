@@ -151,6 +151,10 @@ public class Parameters extends DroneVariable implements OnDroneListener {
         MavLinkParameters.sendParameter(myDrone, parameter);
     }
 
+    public void sendParameter(String name, int type, float value) {
+        MavLinkParameters.sendParameter(myDrone, name, type, value);
+    }
+
     public void readParameter(String name) {
         MavLinkParameters.readParameter(myDrone, name);
     }

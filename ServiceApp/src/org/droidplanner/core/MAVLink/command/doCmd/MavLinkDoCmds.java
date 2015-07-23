@@ -1,6 +1,8 @@
 package org.droidplanner.core.MAVLink.command.doCmd;
 
 import com.MAVLink.ardupilotmega.msg_digicam_control;
+import com.MAVLink.ardupilotmega.msg_mount_configure;
+import com.MAVLink.ardupilotmega.msg_mount_control;
 import com.MAVLink.common.msg_command_long;
 import com.MAVLink.enums.MAV_CMD;
 import com.o3dr.services.android.lib.model.ICommandListener;
@@ -8,6 +10,7 @@ import com.o3dr.services.android.lib.model.ICommandListener;
 import org.droidplanner.core.helpers.coordinates.Coord3D;
 import org.droidplanner.core.mission.commands.EpmGripper;
 import org.droidplanner.core.model.Drone;
+import org.droidplanner.core.parameters.Parameter;
 
 public class MavLinkDoCmds {
     public static void setROI(Drone drone, Coord3D coord, ICommandListener listener) {
@@ -100,6 +103,37 @@ public class MavLinkDoCmds {
     }
 
     /**
+     +     * Set the mount_mode of the gimbal.  This decides how the gimbal decides where to point.
+     +     * Should it listen to RC input, should it point at an ROI point, or should it point to
+     +     * a MAVLink direction.
+     +     *
+     +     * @param drone
+     +     * @param mountMode What mode should the gimbal be in?  See MAV_MOUNT_MODE
+     +     * @param stabilizePitch Leave these false unless the gimbal is a servo gimbal.
+     +     * @param stabilizeRoll
+     +     * @param stabilizeYaw
+     +     * @return
+     +     */
+    public static void configureGimbal(Drone drone, int mountMode, boolean stabilizePitch,
+                                       boolean stabilizeRoll, boolean stabilizeYaw, ICommandListener listener) {
+        if (drone == null)
+            return;
+        Parameter mountParam = drone.getParameters().getParameter("MNT_MODE");
+        if (mountParam == null) {
+            msg_mount_configure msg = new msg_mount_configure();
+            msg.target_system = drone.getSysid();
+            msg.target_component = drone.getCompid();
+            msg.mount_mode = (byte) mountMode;
+            msg.stab_pitch = stabilizePitch ? (byte) 1 : 0;
+            msg.stab_roll = stabilizeRoll ? (byte) 1 : 0;
+            msg.stab_yaw = stabilizeYaw ? (byte) 1 : 0;
+            drone.getMavClient().sendMavMessage(msg, listener);
+        } else {
+            drone.getParameters().sendParameter("MNT_MODE", 1, mountMode);
+        }
+    }
+
+    /**
      * Set the orientation of a gimbal
      *
      * @param drone       target vehicle
@@ -113,13 +147,12 @@ public class MavLinkDoCmds {
         if (drone == null)
             return;
 
-        msg_command_long msg = new msg_command_long();
+        msg_mount_control msg = new msg_mount_control();
         msg.target_system = drone.getSysid();
         msg.target_component = drone.getCompid();
-        msg.command = MAV_CMD.MAV_CMD_DO_MOUNT_CONTROL;
-        msg.param1 = (int) (pitch * 100);
-        msg.param2 = (int) (roll * 100);
-        msg.param3 = (int) (yaw * 100);
+        msg.input_a = (int) (pitch * 100);
+        msg.input_b = (int) (roll * 100);
+        msg.input_c = (int) (yaw * 100);
 
         drone.getMavClient().sendMavMessage(msg, listener);
     }
