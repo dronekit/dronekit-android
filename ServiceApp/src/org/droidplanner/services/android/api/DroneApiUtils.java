@@ -975,7 +975,7 @@ public class DroneApiUtils {
         }
     }
 
-    static void jumpToMissionItem(Drone drone, int missionItemIndex, int repeatCount, ICommandListener listener){
+    static void jumpToMissionItem(Drone drone, int missionItemIndex, ICommandListener listener){
         if(drone == null)
             return;
         int waypoint = drone.getMission().getWaypointFromMissionItemIndex(missionItemIndex);
@@ -983,7 +983,7 @@ public class DroneApiUtils {
             postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
             return;
         }
-        MavLinkDoCmds.jumpToWaypoint(drone, waypoint, repeatCount, listener);
+        MavLinkDoCmds.jumpToWaypoint(drone, waypoint, listener);
     }
 
     static void buildComplexMissionItem(Drone drone, Bundle itemBundle) {

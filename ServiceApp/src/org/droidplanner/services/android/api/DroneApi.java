@@ -341,8 +341,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
             case MissionActions.ACTION_GOTO_MISSION_ITEM:
                 int missionItemIndex = data.getInt(MissionActions.EXTRA_MISSION_ITEM_INDEX);
-                int repeatCount = data.getInt(MissionActions.EXTRA_REPEAT_COUNT);
-                DroneApiUtils.jumpToMissionItem(getDrone(), missionItemIndex, repeatCount, listener);
+                DroneApiUtils.jumpToMissionItem(getDrone(), missionItemIndex, listener);
                 break;
 
             case MissionActions.ACTION_BUILD_COMPLEX_MISSION_ITEM:
@@ -838,8 +837,10 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
             case MISSION_WP_UPDATE:
                 final int currentWaypoint = drone.getMissionStats().getCurrentWP();
-                extrasBundle = new Bundle(1);
+                extrasBundle = new Bundle(2);
                 extrasBundle.putInt(AttributeEventExtra.EXTRA_MISSION_CURRENT_WAYPOINT, currentWaypoint);
+                extrasBundle.putInt(AttributeEventExtra.EXTRA_MISSION_CURRENT_MISSION_ITEM,
+                        drone.getMission().getMissionItemIndexFromWaypoint(currentWaypoint));
                 droneEvent = AttributeEvent.MISSION_ITEM_UPDATED;
                 break;
 
