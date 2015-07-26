@@ -6,9 +6,13 @@ import android.util.SparseIntArray;
 import com.MAVLink.common.msg_mission_ack;
 import com.MAVLink.common.msg_mission_item;
 import com.MAVLink.enums.MAV_CMD;
+import com.google.android.gms.maps.model.LatLng;
+import com.o3dr.services.android.lib.coordinate.LatLong;
+import com.o3dr.services.android.lib.util.MathUtils;
 
 import org.droidplanner.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.core.drone.DroneVariable;
+import org.droidplanner.core.drone.variables.GPS;
 import org.droidplanner.core.helpers.coordinates.Coord2D;
 import org.droidplanner.core.helpers.coordinates.Coord3D;
 import org.droidplanner.core.helpers.geoTools.GeoTools;
@@ -265,9 +269,13 @@ public class Mission extends DroneVariable {
     }
 
     private List<MissionItem> processMavLinkMessages(List<msg_mission_item> msgs) {
+        waypointToMissionItem.clear();
+        missionItemToWaypoint.clear();
         List<MissionItem> received = new ArrayList<MissionItem>();
-
+        int waypointCount = 0;
         for (msg_mission_item msg : msgs) {
+            missionItemToWaypoint.append(waypointCount, waypointCount);
+            waypointToMissionItem.append(waypointCount, waypointCount);
             switch (msg.command) {
                 case MAV_CMD.MAV_CMD_DO_SET_SERVO:
                     received.add(new SetServo(msg, this));
@@ -316,6 +324,7 @@ public class Mission extends DroneVariable {
                 default:
                     break;
             }
+            waypointCount++;
         }
         return received;
     }
