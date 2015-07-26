@@ -16,6 +16,7 @@ public class Takeoff extends MissionItem implements MissionItem.Command, android
     public static final double DEFAULT_TAKEOFF_ALTITUDE = 10.0;
 
     private double takeoffAltitude;
+    private double minPitch;
 
     public Takeoff(){
         super(MissionItemType.TAKEOFF);
@@ -24,6 +25,7 @@ public class Takeoff extends MissionItem implements MissionItem.Command, android
     public Takeoff(Takeoff copy){
         this();
         takeoffAltitude = copy.takeoffAltitude;
+        setMinPitch(copy.getMinPitch());
     }
 
     public double getTakeoffAltitude() {
@@ -38,11 +40,13 @@ public class Takeoff extends MissionItem implements MissionItem.Command, android
     public void writeToParcel(Parcel dest, int flags) {
         super.writeToParcel(dest, flags);
         dest.writeDouble(this.takeoffAltitude);
+        dest.writeDouble(this.getMinPitch());
     }
 
     private Takeoff(Parcel in) {
         super(in);
         this.takeoffAltitude = in.readDouble();
+        this.setMinPitch(in.readDouble());
     }
 
     @Override
@@ -59,4 +63,12 @@ public class Takeoff extends MissionItem implements MissionItem.Command, android
             return new Takeoff[size];
         }
     };
+
+    public double getMinPitch() {
+        return minPitch;
+    }
+
+    public void setMinPitch(double minPitch) {
+        this.minPitch = minPitch;
+    }
 }
