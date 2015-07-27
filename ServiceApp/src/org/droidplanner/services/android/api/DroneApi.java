@@ -14,7 +14,6 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.ardupilotmega.msg_mag_cal_progress;
 import com.MAVLink.ardupilotmega.msg_mag_cal_report;
 import com.o3dr.android.client.apis.CapabilityApi;
-import com.o3dr.android.client.apis.MissionApi;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.action.CapabilityActions;
@@ -28,7 +27,6 @@ import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
-import com.o3dr.services.android.lib.drone.camera.action.CameraActions;
 import com.o3dr.services.android.lib.drone.companion.solo.SoloControllerMode;
 import com.o3dr.services.android.lib.drone.companion.solo.action.SoloLinkActions;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSettingSetter;
@@ -139,7 +137,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
         try {
             this.apiListener.asBinder().unlinkToDeath(this, 0);
-        }catch(NoSuchElementException e){
+        } catch (NoSuchElementException e) {
             Timber.e(e, e.getMessage());
         }
 
@@ -219,10 +217,6 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 break;
             case AttributeType.CAMERA:
                 carrier.putParcelable(type, DroneApiUtils.getCameraProxy(drone, service.getCameraDetails()));
-                break;
-
-            case AttributeType.GOPRO:
-                carrier.putParcelable(type, DroneApiUtils.getGoPro(drone));
                 break;
 
             case AttributeType.MAGNETOMETER_CALIBRATION_STATUS:
@@ -309,7 +303,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
             return;
 
         Bundle data = action.getData();
-        if(data != null)
+        if (data != null)
             data.setClassLoader(context.getClassLoader());
 
         switch (type) {
@@ -371,7 +365,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
             case ExperimentalActions.ACTION_SET_ROI:
                 LatLongAlt roi = data.getParcelable(ExperimentalActions.EXTRA_SET_ROI_LAT_LONG_ALT);
-                if(roi != null) {
+                if (roi != null) {
                     Coord3D coord3DRoi = new Coord3D(roi.getLatitude(), roi.getLongitude(), roi.getAltitude());
                     MavLinkDoCmds.setROI(getDrone(), coord3DRoi, listener);
                 }
@@ -500,15 +494,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 DroneApiUtils.disableFollowMe(getFollowMe());
                 break;
 
-            //************ CAMERA ACTIONS *************//
-            case CameraActions.ACTION_START_VIDEO_RECORDING:
-                DroneApiUtils.startVideoRecording(getDrone());
-                break;
-
-            case CameraActions.ACTION_STOP_VIDEO_RECORDING:
-                DroneApiUtils.stopVideoRecording(getDrone());
-                break;
-
+            //************ Gimbal ACTIONS *************//
             case GimbalActions.ACTION_SET_GIMBAL_ORIENTATION:
                 double pitch = data.getDouble(GimbalActions.GIMBAL_PITCH);
                 double roll = data.getDouble(GimbalActions.GIMBAL_ROLL);
@@ -519,7 +505,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
             //************ SOLOLINK ACTIONS *************//
             case SoloLinkActions.ACTION_SEND_MESSAGE:
                 final TLVPacket messageData = data.getParcelable(SoloLinkActions.EXTRA_MESSAGE_DATA);
-                if(messageData != null){
+                if (messageData != null) {
                     DroneApiUtils.sendSoloLinkMessage(droneMgr, messageData, listener);
                 }
                 break;
@@ -532,7 +518,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
             case SoloLinkActions.ACTION_UPDATE_BUTTON_SETTINGS:
                 final SoloButtonSettingSetter buttonSettings = data.getParcelable(SoloLinkActions.EXTRA_BUTTON_SETTINGS);
-                if(buttonSettings != null){
+                if (buttonSettings != null) {
                     DroneApiUtils.updateSoloLinkButtonSettings(droneMgr, buttonSettings, listener);
                 }
                 break;
@@ -557,16 +543,15 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
             //**************** CAPABILITY ACTIONS **************//
             case CapabilityActions.ACTION_CHECK_FEATURE_SUPPORT:
-                if(listener != null) {
+                if (listener != null) {
                     final String featureId = data.getString(CapabilityActions.EXTRA_FEATURE_ID);
                     if (!TextUtils.isEmpty(featureId)) {
                         switch (featureId) {
                             case CapabilityApi.FeatureIds.SOLOLINK_VIDEO_STREAMING:
                             case CapabilityApi.FeatureIds.COMPASS_CALIBRATION:
-                                if(droneMgr.isCompanionComputerEnabled()){
+                                if (droneMgr.isCompanionComputerEnabled()) {
                                     listener.onSuccess();
-                                }
-                                else{
+                                } else {
                                     listener.onError(CommandExecutionError.COMMAND_UNSUPPORTED);
                                 }
                                 break;
@@ -597,8 +582,8 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     }
 
     @Override
-    public void onAttributeEvent(String attributeEvent, Bundle eventInfo){
-        if(TextUtils.isEmpty(attributeEvent))
+    public void onAttributeEvent(String attributeEvent, Bundle eventInfo) {
+        if (TextUtils.isEmpty(attributeEvent))
             return;
 
         notifyAttributeUpdate(attributeEvent, eventInfo);

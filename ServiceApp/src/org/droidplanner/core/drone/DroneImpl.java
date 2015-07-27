@@ -2,7 +2,6 @@ package org.droidplanner.core.drone;
 
 import org.droidplanner.core.MAVLink.MAVLinkStreams;
 import org.droidplanner.core.MAVLink.WaypointManager;
-import org.droidplanner.core.drone.camera.GoProImpl;
 import org.droidplanner.core.drone.profiles.Parameters;
 import org.droidplanner.core.drone.profiles.VehicleProfile;
 import org.droidplanner.core.drone.variables.Altitude;
@@ -57,7 +56,6 @@ public class DroneImpl implements Drone {
 	private final State state;
 	private final HeartBeat heartbeat;
 	private final Parameters parameters;
-    private final GoProImpl goProImpl;
 
 	private final MAVLinkStreams.MAVLinkOutputStream MavClient;
 	private final Preferences preferences;
@@ -96,7 +94,6 @@ public class DroneImpl implements Drone {
 		this.magCalibration = new MagnetometerCalibrationImpl(this);
         this.mag = new Magnetometer(this);
         this.footprints = new Camera(this);
-        this.goProImpl = new GoProImpl(this, handler);
 
         loadVehicleProfile();
 	}
@@ -310,8 +307,4 @@ public class DroneImpl implements Drone {
             logListener.onMessageLogged(mavSeverity, message);
     }
 
-    @Override
-    public GoProImpl getGoProImpl() {
-        return this.goProImpl;
-    }
 }

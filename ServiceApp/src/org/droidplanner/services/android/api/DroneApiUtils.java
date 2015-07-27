@@ -23,7 +23,6 @@ import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError
 import com.o3dr.services.android.lib.drone.calibration.magnetometer.MagnetometerCalibrationProgress;
 import com.o3dr.services.android.lib.drone.calibration.magnetometer.MagnetometerCalibrationResult;
 import com.o3dr.services.android.lib.drone.calibration.magnetometer.MagnetometerCalibrationStatus;
-import com.o3dr.services.android.lib.drone.camera.GoPro;
 import com.o3dr.services.android.lib.drone.companion.solo.SoloControllerMode;
 import com.o3dr.services.android.lib.drone.companion.solo.SoloLinkState;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSettingSetter;
@@ -59,7 +58,6 @@ import com.o3dr.services.android.lib.model.ICommandListener;
 import org.droidplanner.core.MAVLink.MavLinkArm;
 import org.droidplanner.core.MAVLink.command.doCmd.MavLinkDoCmds;
 import org.droidplanner.core.drone.DroneInterfaces;
-import org.droidplanner.core.drone.camera.GoProImpl;
 import org.droidplanner.core.drone.profiles.VehicleProfile;
 import org.droidplanner.core.drone.variables.Camera;
 import org.droidplanner.core.drone.variables.GPS;
@@ -478,14 +476,6 @@ public class DroneApiUtils {
                 : null;
 
         return new Home(homePosition);
-    }
-
-    static GoPro getGoPro(Drone drone) {
-        if (drone == null)
-            return new GoPro();
-
-        GoProImpl impl = drone.getGoProImpl();
-        return new GoPro(impl.isConnected(), impl.isRecording());
     }
 
     static Battery getBattery(Drone drone) {
@@ -1040,20 +1030,6 @@ public class DroneApiUtils {
 
         StructureScanner proxyScanner = (StructureScanner) ProxyUtils.getProxyMissionItem(updatedScan);
         return proxyScanner;
-    }
-
-    static void startVideoRecording(Drone drone) {
-        if (drone == null)
-            return;
-
-        drone.getGoProImpl().startRecording();
-    }
-
-    static void stopVideoRecording(Drone drone) {
-        if (drone == null)
-            return;
-
-        drone.getGoProImpl().stopRecording();
     }
 
     static MagnetometerCalibrationStatus getMagnetometerCalibrationStatus(Drone drone) {

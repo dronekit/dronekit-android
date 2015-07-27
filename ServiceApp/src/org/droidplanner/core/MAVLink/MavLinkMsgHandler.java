@@ -3,13 +3,9 @@ package org.droidplanner.core.MAVLink;
 import android.os.Bundle;
 import android.text.TextUtils;
 
-import org.droidplanner.core.drone.variables.ApmModes;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.ardupilotmega.msg_camera_feedback;
 import com.MAVLink.ardupilotmega.msg_ekf_status_report;
-import com.MAVLink.ardupilotmega.msg_gopro_get_response;
-import com.MAVLink.ardupilotmega.msg_gopro_heartbeat;
-import com.MAVLink.ardupilotmega.msg_gopro_set_response;
 import com.MAVLink.ardupilotmega.msg_mag_cal_progress;
 import com.MAVLink.ardupilotmega.msg_mag_cal_report;
 import com.MAVLink.ardupilotmega.msg_mount_status;
@@ -28,7 +24,6 @@ import com.MAVLink.common.msg_radio_status;
 import com.MAVLink.common.msg_raw_imu;
 import com.MAVLink.common.msg_rc_channels_raw;
 import com.MAVLink.common.msg_servo_output_raw;
-import com.MAVLink.common.msg_set_mode;
 import com.MAVLink.common.msg_statustext;
 import com.MAVLink.common.msg_sys_status;
 import com.MAVLink.common.msg_vfr_hud;
@@ -40,6 +35,7 @@ import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
 
 import org.droidplanner.core.drone.CommandTracker;
+import org.droidplanner.core.drone.variables.ApmModes;
 import org.droidplanner.core.drone.variables.Home;
 import org.droidplanner.core.model.Drone;
 import org.droidplanner.services.android.drone.DroneManager;
@@ -60,12 +56,12 @@ public class MavLinkMsgHandler {
         this.drone = droneMgr.getDrone();
     }
 
-    public void setCommandTracker(CommandTracker tracker){
+    public void setCommandTracker(CommandTracker tracker) {
         this.commandTracker = tracker;
     }
 
     public void receiveData(MAVLinkMessage msg) {
-        if (msg.compid != AUTOPILOT_COMPONENT_ID){
+        if (msg.compid != AUTOPILOT_COMPONENT_ID) {
             return;
         }
 
@@ -119,7 +115,7 @@ public class MavLinkMsgHandler {
 
             case msg_global_position_int.MAVLINK_MSG_ID_GLOBAL_POSITION_INT:
                 drone.getGps().setPosition(((msg_global_position_int) msg).lat / 1E7,
-                                ((msg_global_position_int) msg).lon / 1E7);
+                        ((msg_global_position_int) msg).lon / 1E7);
                 break;
 
             case msg_sys_status.MAVLINK_MSG_ID_SYS_STATUS:
@@ -183,19 +179,6 @@ public class MavLinkMsgHandler {
                 processNamedValueInt((msg_named_value_int) msg);
                 break;
 
-            //*************** GoPro messages handling **************//
-            case msg_gopro_heartbeat.MAVLINK_MSG_ID_GOPRO_HEARTBEAT:
-                drone.getGoProImpl().onHeartBeat((msg_gopro_heartbeat) msg);
-                break;
-
-            case msg_gopro_set_response.MAVLINK_MSG_ID_GOPRO_SET_RESPONSE:
-                drone.getGoProImpl().onResponseReceived((msg_gopro_set_response) msg);
-                break;
-
-            case msg_gopro_get_response.MAVLINK_MSG_ID_GOPRO_GET_RESPONSE:
-                drone.getGoProImpl().onResponseReceived((msg_gopro_get_response)msg);
-                break;
-
             //*************** Magnetometer calibration messages handling *************//
             case msg_mag_cal_progress.MAVLINK_MSG_ID_MAG_CAL_PROGRESS:
             case msg_mag_cal_report.MAVLINK_MSG_ID_MAG_CAL_REPORT:
@@ -209,7 +192,7 @@ public class MavLinkMsgHandler {
 
             case msg_mission_item.MAVLINK_MSG_ID_MISSION_ITEM:
                 msg_mission_item missionItem = (msg_mission_item) msg;
-                if(missionItem.seq == Home.HOME_WAYPOINT_INDEX){
+                if (missionItem.seq == Home.HOME_WAYPOINT_INDEX) {
                     drone.getHome().setHome(missionItem);
                 }
                 break;
@@ -225,14 +208,14 @@ public class MavLinkMsgHandler {
         }
     }
 
-    private void handleCommandAck(msg_command_ack ack){
-        if(ack != null && this.commandTracker != null){
+    private void handleCommandAck(msg_command_ack ack) {
+        if (ack != null && this.commandTracker != null) {
             commandTracker.onCommandAck(msg_command_ack.MAVLINK_MSG_ID_COMMAND_ACK, ack);
         }
     }
 
-    private void processNamedValueInt(msg_named_value_int message){
-        if(message == null)
+    private void processNamedValueInt(msg_named_value_int message) {
+        if (message == null)
             return;
 
         switch (message.getName()) {
@@ -274,10 +257,10 @@ public class MavLinkMsgHandler {
         }
     }
 
-    private void checkControlSensorsHealth(msg_sys_status sysStatus){
+    private void checkControlSensorsHealth(msg_sys_status sysStatus) {
         boolean isRCFailsafe = (sysStatus.onboard_control_sensors_health & MAV_SYS_STATUS_SENSOR
                 .MAV_SYS_STATUS_SENSOR_RC_RECEIVER) == 0;
-        if(isRCFailsafe){
+        if (isRCFailsafe) {
             drone.getState().parseAutopilotError("RC FAILSAFE");
         }
     }
@@ -289,25 +272,24 @@ public class MavLinkMsgHandler {
 
     private void processStatusText(msg_statustext statusText) {
         String message = statusText.getText();
-        if(TextUtils.isEmpty(message))
+        if (TextUtils.isEmpty(message))
             return;
 
-        if(message.startsWith("ArduCopter") || message.startsWith("ArduPlane")
+        if (message.startsWith("ArduCopter") || message.startsWith("ArduPlane")
                 || message.startsWith("ArduRover") || message.startsWith("Solo")
                 || message.startsWith("APM:Copter") || message.startsWith("APM:Plane")
-                || message.startsWith("APM:Rover")){
+                || message.startsWith("APM:Rover")) {
             drone.setFirmwareVersion(message);
-        }
-        else{
+        } else {
             //Try parsing as an error.
-            if(!drone.getState().parseAutopilotError(message)) {
+            if (!drone.getState().parseAutopilotError(message)) {
                 //Relay to the connected client.
                 drone.logMessage(statusText.severity, message);
             }
         }
     }
 
-    private void onGimbalOrientationUpdate(float pitch, float roll, float yaw){
+    private void onGimbalOrientationUpdate(float pitch, float roll, float yaw) {
         final Bundle eventInfo = new Bundle(3);
         eventInfo.putFloat(AttributeEventExtra.EXTRA_GIMBAL_ORIENTATION_PITCH, pitch);
         eventInfo.putFloat(AttributeEventExtra.EXTRA_GIMBAL_ORIENTATION_ROLL, roll);
