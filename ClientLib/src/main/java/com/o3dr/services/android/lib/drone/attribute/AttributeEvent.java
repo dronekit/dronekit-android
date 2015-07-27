@@ -203,4 +203,12 @@ public class AttributeEvent {
      * @see {@link AttributeEventExtra#EXTRA_SOLOLINK_MESSAGE_DATA}
      */
     public static final String SOLOLINK_MESSAGE_RECEIVED = PACKAGE_NAME + ".SOLOLINK_MESSAGE_RECEIVED";
+
+    /**
+     * Signals the gimbal orientation was updated.
+     * @see {@link AttributeEventExtra#EXTRA_GIMBAL_ORIENTATION_PITCH}
+     * @see {@link AttributeEventExtra#EXTRA_GIMBAL_ORIENTATION_ROLL}
+     * @see {@link AttributeEventExtra#EXTRA_GIMBAL_ORIENTATION_YAW}
+     */
+    public static final String GIMBAL_ORIENTATION_UPDATED = PACKAGE_NAME + ".GIMBAL_ORIENTATION_UPDATED";
 }

@@ -1,5 +1,6 @@
 package org.droidplanner.core.MAVLink;
 
+import android.os.Bundle;
 import android.text.TextUtils;
 
 import org.droidplanner.core.drone.variables.ApmModes;
@@ -35,10 +36,13 @@ import com.MAVLink.enums.MAV_MODE_FLAG;
 import com.MAVLink.enums.MAV_SEVERITY;
 import com.MAVLink.enums.MAV_STATE;
 import com.MAVLink.enums.MAV_SYS_STATUS_SENSOR;
+import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
+import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
 
 import org.droidplanner.core.drone.CommandTracker;
 import org.droidplanner.core.drone.variables.Home;
 import org.droidplanner.core.model.Drone;
+import org.droidplanner.services.android.drone.DroneManager;
 
 /**
  * Parse the received mavlink messages, and update the drone state appropriately.
@@ -46,12 +50,14 @@ import org.droidplanner.core.model.Drone;
 public class MavLinkMsgHandler {
 
     public static final int AUTOPILOT_COMPONENT_ID = 1;
-    private Drone drone;
+    private final DroneManager droneMgr;
+    private final Drone drone;
 
     private CommandTracker commandTracker;
 
-    public MavLinkMsgHandler(Drone drone) {
-        this.drone = drone;
+    public MavLinkMsgHandler(DroneManager droneMgr) {
+        this.droneMgr = droneMgr;
+        this.drone = droneMgr.getDrone();
     }
 
     public void setCommandTracker(CommandTracker tracker){
@@ -164,7 +170,13 @@ public class MavLinkMsgHandler {
                 break;
 
             case msg_mount_status.MAVLINK_MSG_ID_MOUNT_STATUS:
-                drone.getCamera().updateMountOrientation(((msg_mount_status) msg));
+                final msg_mount_status mountStatus = (msg_mount_status) msg;
+                drone.getCamera().updateMountOrientation((mountStatus));
+
+                //Propagate the gimbal orientation angles to the listening clients.
+                onGimbalOrientationUpdate(mountStatus.pointing_a / 100f,
+                        mountStatus.pointing_b / 100f,
+                        mountStatus.pointing_c / 100f);
                 break;
 
             case msg_named_value_int.MAVLINK_MSG_ID_NAMED_VALUE_INT:
@@ -293,5 +305,13 @@ public class MavLinkMsgHandler {
                 drone.logMessage(statusText.severity, message);
             }
         }
+    }
+
+    private void onGimbalOrientationUpdate(float pitch, float roll, float yaw){
+        final Bundle eventInfo = new Bundle(3);
+        eventInfo.putFloat(AttributeEventExtra.EXTRA_GIMBAL_ORIENTATION_PITCH, pitch);
+        eventInfo.putFloat(AttributeEventExtra.EXTRA_GIMBAL_ORIENTATION_ROLL, roll);
+        eventInfo.putFloat(AttributeEventExtra.EXTRA_GIMBAL_ORIENTATION_YAW, yaw);
+        droneMgr.notifyDroneAttributeEvent(AttributeEvent.GIMBAL_ORIENTATION_UPDATED, eventInfo);
     }
 }

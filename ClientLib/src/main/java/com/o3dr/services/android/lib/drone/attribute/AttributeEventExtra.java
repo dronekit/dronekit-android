@@ -90,4 +90,22 @@ public class AttributeEventExtra {
      */
     public static final String EXTRA_SOLOLINK_MESSAGE_DATA = PACKAGE_NAME + ".EXTRA_SOLOLINK_MESSAGE_DATA";
 
+    /**
+     * Used to retrieve the gimbal pitch angle in degree.
+     * @see {@link AttributeEvent#GIMBAL_ORIENTATION_UPDATED}
+     */
+    public static final String EXTRA_GIMBAL_ORIENTATION_PITCH = PACKAGE_NAME + ".EXTRA_GIMBAL_ORIENTATION_PITCH";
+
+    /**
+     * Used to retrieve the gimbal roll angle in degree.
+     * @see {@link AttributeEvent#GIMBAL_ORIENTATION_UPDATED}
+     */
+    public static final String EXTRA_GIMBAL_ORIENTATION_ROLL = PACKAGE_NAME + ".EXTRA_GIMBAL_ORIENTATION_ROLL";
+
+    /**
+     * Used to retrieve the gimbal yaw angle in degree.
+     * @see {@link AttributeEvent#GIMBAL_ORIENTATION_UPDATED}
+     */
+    public static final String EXTRA_GIMBAL_ORIENTATION_YAW = PACKAGE_NAME + ".EXTRA_GIMBAL_ORIENTATION_YAW";
+
 }

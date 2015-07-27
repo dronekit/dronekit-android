@@ -156,7 +156,7 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream, DroneInt
         this.drone = new DroneImpl(mavClient, clock, dpHandler, dpPrefs, new AndroidApWarningParser(), this);
         this.drone.getStreamRates().setRates(dpPrefs.getRates());
 
-        this.mavLinkMsgHandler = new MavLinkMsgHandler(this.drone);
+        this.mavLinkMsgHandler = new MavLinkMsgHandler(this);
         this.mavLinkMsgHandler.setCommandTracker(commandTracker);
 
         this.followMe = new Follow(this.drone, dpHandler, new FusedLocation(context, handler));
@@ -389,7 +389,7 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream, DroneInt
         }
     }
 
-    private void notifyDroneAttributeEvent(String attributeEvent, Bundle eventInfo){
+    public void notifyDroneAttributeEvent(String attributeEvent, Bundle eventInfo){
         if(TextUtils.isEmpty(attributeEvent) || connectedApps.isEmpty())
             return;
 
