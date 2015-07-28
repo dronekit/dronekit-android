@@ -1,9 +1,11 @@
 package org.droidplanner.core.gcs.follow;
 
+import android.os.Handler;
+
 import org.droidplanner.core.drone.DroneInterfaces;
 import org.droidplanner.core.gcs.location.Location;
 import org.droidplanner.core.helpers.coordinates.Coord2D;
-import org.droidplanner.core.model.Drone;
+import org.droidplanner.services.android.drone.autopilot.MavLinkDrone;
 
 /**
  * Created by fhuya on 1/5/15.
@@ -27,7 +29,7 @@ public class FollowSplineAbove extends FollowAlgorithm {
         return FollowModes.SPLINE_ABOVE;
     }
 
-    public FollowSplineAbove(Drone drone, DroneInterfaces.Handler handler) {
+    public FollowSplineAbove(MavLinkDrone drone, Handler handler) {
         super(drone, handler);
     }
 }

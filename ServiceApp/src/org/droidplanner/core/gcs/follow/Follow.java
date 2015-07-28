@@ -1,14 +1,15 @@
 package org.droidplanner.core.gcs.follow;
 
+import android.os.Handler;
+
 import org.droidplanner.core.drone.DroneInterfaces.DroneEventsType;
-import org.droidplanner.core.drone.DroneInterfaces.Handler;
 import org.droidplanner.core.drone.DroneInterfaces.OnDroneListener;
 import org.droidplanner.core.drone.variables.GuidedPoint;
 import org.droidplanner.core.drone.variables.State;
 import org.droidplanner.core.gcs.location.Location;
 import org.droidplanner.core.gcs.location.Location.LocationFinder;
 import org.droidplanner.core.gcs.location.Location.LocationReceiver;
-import org.droidplanner.core.model.Drone;
+import org.droidplanner.services.android.drone.autopilot.MavLinkDrone;
 
 public class Follow implements OnDroneListener, LocationReceiver {
 
@@ -22,12 +23,12 @@ public class Follow implements OnDroneListener, LocationReceiver {
     }
 
     private FollowStates state = FollowStates.FOLLOW_INVALID_STATE;
-    private Drone drone;
+    private MavLinkDrone drone;
 
     private LocationFinder locationFinder;
     private FollowAlgorithm followAlgorithm;
 
-    public Follow(Drone drone, Handler handler, LocationFinder locationFinder) {
+    public Follow(MavLinkDrone drone, Handler handler, LocationFinder locationFinder) {
         this.drone = drone;
         drone.addDroneListener(this);
 
@@ -87,7 +88,7 @@ public class Follow implements OnDroneListener, LocationReceiver {
     }
 
     @Override
-    public void onDroneEvent(DroneEventsType event, Drone drone) {
+    public void onDroneEvent(DroneEventsType event, MavLinkDrone drone) {
         switch (event) {
             case MODE:
                 if (isEnabled() && !GuidedPoint.isGuidedMode(drone)) {

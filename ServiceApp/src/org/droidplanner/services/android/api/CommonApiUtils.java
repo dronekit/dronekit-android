@@ -2,6 +2,7 @@ package org.droidplanner.services.android.api;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.RemoteException;
 import android.text.TextUtils;
 
@@ -67,7 +68,7 @@ import org.droidplanner.core.helpers.coordinates.Coord2D;
 import org.droidplanner.core.helpers.coordinates.Coord3D;
 import org.droidplanner.core.mission.survey.SplineSurveyImpl;
 import org.droidplanner.core.mission.survey.SurveyImpl;
-import org.droidplanner.core.model.Drone;
+import org.droidplanner.services.android.drone.autopilot.MavLinkDrone;
 import org.droidplanner.core.survey.Footprint;
 import org.droidplanner.services.android.drone.DroneManager;
 import org.droidplanner.services.android.utils.MathUtils;
@@ -94,7 +95,7 @@ public class CommonApiUtils {
     private CommonApiUtils() {
     }
 
-    private static void postSuccessEvent(ICommandListener listener) {
+    public static void postSuccessEvent(ICommandListener listener) {
         if (listener != null) {
             try {
                 listener.onSuccess();
@@ -104,7 +105,7 @@ public class CommonApiUtils {
         }
     }
 
-    private static void postErrorEvent(int errorCode, ICommandListener listener) {
+    public static void postErrorEvent(int errorCode, ICommandListener listener) {
         if (listener != null) {
             try {
                 listener.onError(errorCode);
@@ -114,7 +115,7 @@ public class CommonApiUtils {
         }
     }
 
-    private static void postTimeoutEvent(ICommandListener listener) {
+    public static void postTimeoutEvent(ICommandListener listener) {
         if (listener != null) {
             try {
                 listener.onTimeout();
@@ -124,7 +125,7 @@ public class CommonApiUtils {
         }
     }
 
-    static VehicleMode getVehicleMode(ApmModes mode) {
+    public static VehicleMode getVehicleMode(ApmModes mode) {
         switch (mode) {
             case FIXED_WING_MANUAL:
                 return VehicleMode.PLANE_MANUAL;
@@ -230,7 +231,7 @@ public class CommonApiUtils {
         }
     }
 
-    static int getDroneProxyType(int originalType) {
+    public static int getDroneProxyType(int originalType) {
         switch (originalType) {
             case MAV_TYPE.MAV_TYPE_TRICOPTER:
             case MAV_TYPE.MAV_TYPE_QUADROTOR:
@@ -251,14 +252,14 @@ public class CommonApiUtils {
         }
     }
 
-    static FootPrint getProxyCameraFootPrint(Footprint footprint) {
+    public static FootPrint getProxyCameraFootPrint(Footprint footprint) {
         if (footprint == null) return null;
 
         return new FootPrint(footprint.getGSD(),
                 MathUtils.coord2DToLatLong(footprint.getVertexInGlobalFrame()));
     }
 
-    static FollowAlgorithm.FollowModes followTypeToMode(FollowType followType) {
+    public static FollowAlgorithm.FollowModes followTypeToMode(FollowType followType) {
         final FollowAlgorithm.FollowModes followMode;
 
         switch (followType) {
@@ -306,7 +307,7 @@ public class CommonApiUtils {
         return followMode;
     }
 
-    static FollowType followModeToType(FollowAlgorithm.FollowModes followMode) {
+    public static FollowType followModeToType(FollowAlgorithm.FollowModes followMode) {
         final FollowType followType;
 
         switch (followMode) {
@@ -355,7 +356,7 @@ public class CommonApiUtils {
         return followType;
     }
 
-    static CameraProxy getCameraProxy(Drone drone, List<CameraDetail> cameraDetails) {
+    public static CameraProxy getCameraProxy(MavLinkDrone drone, List<CameraDetail> cameraDetails) {
         final CameraDetail camDetail;
         final FootPrint currentFieldOfView;
         final List<FootPrint> proxyPrints = new ArrayList<>();
@@ -382,7 +383,7 @@ public class CommonApiUtils {
         return new CameraProxy(camDetail, currentFieldOfView, proxyPrints, cameraDetails);
     }
 
-    static Gps getGps(Drone drone) {
+    public static Gps getGps(MavLinkDrone drone) {
         if (drone == null)
             return new Gps();
 
@@ -395,7 +396,7 @@ public class CommonApiUtils {
                 droneGps.getFixTypeNumeric());
     }
 
-    static State getState(Drone drone, boolean isConnected) {
+    public static State getState(MavLinkDrone drone, boolean isConnected) {
         if (drone == null)
             return new State();
 
@@ -414,7 +415,7 @@ public class CommonApiUtils {
                 droneState.getFlightStartTime(), proxyEkfStatus, isConnected && drone.isConnectionAlive());
     }
 
-    static Parameters getParameters(Drone drone, Context context) {
+    public static Parameters getParameters(MavLinkDrone drone, Context context) {
         if (drone == null)
             return new Parameters();
 
@@ -445,7 +446,7 @@ public class CommonApiUtils {
         return new Parameters(new ArrayList<>(proxyParams.values()));
     }
 
-    static Speed getSpeed(Drone drone) {
+    public static Speed getSpeed(MavLinkDrone drone) {
         if (drone == null)
             return new Speed();
 
@@ -453,7 +454,7 @@ public class CommonApiUtils {
         return new Speed(droneSpeed.getVerticalSpeed(), droneSpeed.getGroundSpeed(), droneSpeed.getAirSpeed());
     }
 
-    static Attitude getAttitude(Drone drone) {
+    public static Attitude getAttitude(MavLinkDrone drone) {
         if (drone == null)
             return new Attitude();
 
@@ -462,7 +463,7 @@ public class CommonApiUtils {
                 droneOrientation.getYaw());
     }
 
-    static Home getHome(Drone drone) {
+    public static Home getHome(MavLinkDrone drone) {
         if (drone == null)
             return new Home();
 
@@ -475,7 +476,7 @@ public class CommonApiUtils {
         return new Home(homePosition);
     }
 
-    static GoPro getGoPro(Drone drone) {
+    public static GoPro getGoPro(MavLinkDrone drone) {
         if (drone == null)
             return new GoPro();
 
@@ -483,7 +484,7 @@ public class CommonApiUtils {
         return new GoPro(impl.isConnected(), impl.isRecording());
     }
 
-    static Battery getBattery(Drone drone) {
+    public static Battery getBattery(MavLinkDrone drone) {
         if (drone == null)
             return new Battery();
 
@@ -492,7 +493,7 @@ public class CommonApiUtils {
                 droneBattery.getBattCurrent(), droneBattery.getBattDischarge());
     }
 
-    static Altitude getAltitude(Drone drone) {
+    public static Altitude getAltitude(MavLinkDrone drone) {
         if (drone == null)
             return new Altitude();
 
@@ -500,7 +501,7 @@ public class CommonApiUtils {
         return new Altitude(droneAltitude.getAltitude(), droneAltitude.getTargetAltitude());
     }
 
-    static Mission getMission(Drone drone) {
+    public static Mission getMission(MavLinkDrone drone) {
         Mission proxyMission = new Mission();
         if (drone == null)
             return proxyMission;
@@ -519,7 +520,7 @@ public class CommonApiUtils {
         return proxyMission;
     }
 
-    static Signal getSignal(Drone drone) {
+    public static Signal getSignal(MavLinkDrone drone) {
         if (drone == null)
             return new Signal();
 
@@ -529,14 +530,14 @@ public class CommonApiUtils {
                 droneRadio.getNoise(), droneRadio.getRemNoise());
     }
 
-    static Type getType(Drone drone) {
+    public static Type getType(MavLinkDrone drone) {
         if (drone == null)
             return new Type();
 
         return new Type(CommonApiUtils.getDroneProxyType(drone.getType()), drone.getFirmwareVersion());
     }
 
-    static GuidedState getGuidedState(Drone drone) {
+    public static GuidedState getGuidedState(MavLinkDrone drone) {
         if (drone == null)
             return new GuidedState();
 
@@ -564,7 +565,7 @@ public class CommonApiUtils {
         return new GuidedState(guidedState, new LatLongAlt(guidedCoord.getLat(), guidedCoord.getLng(), guidedAlt));
     }
 
-    static void changeVehicleMode(Drone drone, VehicleMode newMode, ICommandListener listener) {
+    public static void changeVehicleMode(MavLinkDrone drone, VehicleMode newMode, ICommandListener listener) {
         if (drone == null)
             return;
 
@@ -587,7 +588,7 @@ public class CommonApiUtils {
         drone.getState().changeFlightMode(ApmModes.getMode(newMode.getMode(), mavType), listener);
     }
 
-    static FollowState getFollowState(Follow followMe) {
+    public static FollowState getFollowState(Follow followMe) {
         if (followMe == null)
             return new FollowState();
 
@@ -643,7 +644,7 @@ public class CommonApiUtils {
         return new FollowState(state, CommonApiUtils.followModeToType(currentAlg.getType()), params);
     }
 
-    static void disableFollowMe(Follow follow) {
+    public static void disableFollowMe(Follow follow) {
         if (follow == null)
             return;
 
@@ -651,32 +652,32 @@ public class CommonApiUtils {
             follow.toggleFollowMeState();
     }
 
-    static void triggerCamera(Drone drone) throws RemoteException {
+    public static void triggerCamera(MavLinkDrone drone) {
         if (drone == null)
             return;
         MavLinkDoCmds.triggerCamera(drone);
     }
 
-    static void epmCommand(Drone drone, boolean release, ICommandListener listener) {
+    public static void epmCommand(MavLinkDrone drone, boolean release, ICommandListener listener) {
         if (drone == null)
             return;
 
         MavLinkDoCmds.empCommand(drone, release, listener);
     }
 
-    static void loadWaypoints(Drone drone) {
+    public static void loadWaypoints(MavLinkDrone drone) {
         if (drone == null)
             return;
         drone.getWaypointManager().getWaypoints();
     }
 
-    static void refreshParameters(Drone drone) {
+    public static void refreshParameters(MavLinkDrone drone) {
         if (drone == null)
             return;
         drone.getParameters().refreshParameters();
     }
 
-    static void writeParameters(Drone drone, Parameters parameters) {
+    public static void writeParameters(MavLinkDrone drone, Parameters parameters) {
         if (drone == null || parameters == null) return;
 
         List<Parameter> parametersList = parameters.getParameters();
@@ -689,7 +690,7 @@ public class CommonApiUtils {
         }
     }
 
-    static void setMission(Drone drone, Mission mission, boolean pushToDrone) {
+    public static void setMission(MavLinkDrone drone, Mission mission, boolean pushToDrone) {
         if (drone == null)
             return;
 
@@ -705,12 +706,10 @@ public class CommonApiUtils {
             droneMission.sendMissionToAPM();
     }
 
-    static void startMission(final DroneManager droneMgr, final boolean forceModeChange, final boolean forceArm, final ICommandListener listener) {
-        if (droneMgr == null) {
+    public static void startMission(final MavLinkDrone drone, final boolean forceModeChange, final boolean forceArm, final ICommandListener listener) {
+        if (drone == null) {
             return;
         }
-
-        final Drone drone = droneMgr.getDrone();
 
         final Runnable sendCommandRunnable = new Runnable() {
             @Override
@@ -782,18 +781,18 @@ public class CommonApiUtils {
         modeCheckRunnable.run();
     }
 
-    static float generateDronie(Drone drone) {
+    public static float generateDronie(MavLinkDrone drone) {
         if (drone == null)
             return -1;
 
         return (float) drone.getMission().makeAndUploadDronie();
     }
 
-    static void arm(Drone drone, boolean arm, ICommandListener listener) {
+    public static void arm(MavLinkDrone drone, boolean arm, ICommandListener listener) {
         arm(drone, arm, false, listener);
     }
 
-    static void arm(final Drone drone, final boolean arm, final boolean emergencyDisarm, final ICommandListener listener) {
+    public static void arm(final MavLinkDrone drone, final boolean arm, final boolean emergencyDisarm, final ICommandListener listener) {
         if (drone == null)
             return;
 
@@ -842,7 +841,7 @@ public class CommonApiUtils {
      * @param drone
      * @return true if it's supported, false otherwise.
      */
-    static boolean isKillSwitchSupported(Drone drone) {
+    public static boolean isKillSwitchSupported(MavLinkDrone drone) {
         if (drone == null)
             return false;
 
@@ -862,7 +861,7 @@ public class CommonApiUtils {
         return true;
     }
 
-    static void startMagnetometerCalibration(Drone drone, boolean retryOnFailure, boolean saveAutomatically, int
+    public static void startMagnetometerCalibration(MavLinkDrone drone, boolean retryOnFailure, boolean saveAutomatically, int
             startDelay) {
         if (drone == null)
             return;
@@ -870,40 +869,40 @@ public class CommonApiUtils {
         drone.getMagnetometerCalibration().startCalibration(retryOnFailure, saveAutomatically, startDelay);
     }
 
-    static void cancelMagnetometerCalibration(Drone drone) {
+    public static void cancelMagnetometerCalibration(MavLinkDrone drone) {
         if (drone == null)
             return;
 
         drone.getMagnetometerCalibration().cancelCalibration();
     }
 
-    public static void acceptMagnetometerCalibration(Drone drone) {
+    public static void acceptMagnetometerCalibration(MavLinkDrone drone) {
         if (drone == null)
             return;
 
         drone.getMagnetometerCalibration().acceptCalibration();
     }
 
-    static void startIMUCalibration(Drone drone, ICommandListener listener) {
+    public static void startIMUCalibration(MavLinkDrone drone, ICommandListener listener) {
         if (drone != null)
             drone.getCalibrationSetup().startCalibration(listener);
     }
 
-    static void sendIMUCalibrationAck(Drone drone, int step) {
+    public static void sendIMUCalibrationAck(MavLinkDrone drone, int step) {
         if (drone == null)
             return;
 
         drone.getCalibrationSetup().sendAck(step);
     }
 
-    static void doGuidedTakeoff(Drone drone, double altitude, ICommandListener listener) {
+    public static void doGuidedTakeoff(MavLinkDrone drone, double altitude, ICommandListener listener) {
         if (drone == null)
             return;
 
         drone.getGuidedPoint().doGuidedTakeoff(altitude, listener);
     }
 
-    static void sendMavlinkMessage(Drone drone, MavlinkMessageWrapper messageWrapper) {
+    public static void sendMavlinkMessage(MavLinkDrone drone, MavlinkMessageWrapper messageWrapper) {
         if (drone == null || messageWrapper == null)
             return;
 
@@ -930,7 +929,7 @@ public class CommonApiUtils {
         drone.getMavClient().sendMavMessage(message, null);
     }
 
-    static void sendGuidedPoint(Drone drone, LatLong point, boolean force, ICommandListener listener) {
+    public static void sendGuidedPoint(MavLinkDrone drone, LatLong point, boolean force, ICommandListener listener) {
         if (drone == null)
             return;
 
@@ -946,14 +945,14 @@ public class CommonApiUtils {
         }
     }
 
-    static void setGuidedAltitude(Drone drone, double altitude) {
+    public static void setGuidedAltitude(MavLinkDrone drone, double altitude) {
         if (drone == null)
             return;
 
         drone.getGuidedPoint().changeGuidedAltitude(altitude);
     }
 
-    static void enableFollowMe(DroneManager droneMgr, DroneInterfaces.Handler droneHandler, FollowType followType) {
+    public static void enableFollowMe(DroneManager droneMgr, Handler droneHandler, FollowType followType) {
         if (droneMgr == null)
             return;
 
@@ -961,6 +960,9 @@ public class CommonApiUtils {
 
         if (selectedMode != null) {
             final Follow followMe = droneMgr.getFollowMe();
+            if(followMe == null)
+                return;
+
             if (!followMe.isEnabled())
                 followMe.toggleFollowMeState();
 
@@ -971,7 +973,7 @@ public class CommonApiUtils {
         }
     }
 
-    static void buildComplexMissionItem(Drone drone, Bundle itemBundle) {
+    public static void buildComplexMissionItem(MavLinkDrone drone, Bundle itemBundle) {
         MissionItem missionItem = MissionItemType.restoreMissionItemFromBundle(itemBundle);
         if (missionItem == null || !(missionItem instanceof MissionItem.ComplexItem))
             return;
@@ -1002,7 +1004,7 @@ public class CommonApiUtils {
         }
     }
 
-    static Survey buildSurvey(Drone drone, Survey survey) {
+    public static Survey buildSurvey(MavLinkDrone drone, Survey survey) {
         org.droidplanner.core.mission.Mission droneMission = drone == null ? null : drone.getMission();
         SurveyImpl updatedSurveyImpl = (SurveyImpl) ProxyUtils.getMissionItemImpl
                 (droneMission, survey);
@@ -1010,7 +1012,7 @@ public class CommonApiUtils {
         return (Survey) ProxyUtils.getProxyMissionItem(updatedSurveyImpl);
     }
 
-    static Survey buildSplineSurvey(Drone drone, Survey survey) {
+    public static Survey buildSplineSurvey(MavLinkDrone drone, Survey survey) {
         org.droidplanner.core.mission.Mission droneMission = drone == null ? null : drone.getMission();
         SplineSurveyImpl updatedSplineSurvey = (SplineSurveyImpl)
                 ProxyUtils.getMissionItemImpl(droneMission, survey);
@@ -1018,7 +1020,7 @@ public class CommonApiUtils {
         return (Survey) ProxyUtils.getProxyMissionItem(updatedSplineSurvey);
     }
 
-    static StructureScanner buildStructureScanner(Drone drone, StructureScanner item) {
+    public static StructureScanner buildStructureScanner(MavLinkDrone drone, StructureScanner item) {
         org.droidplanner.core.mission.Mission droneMission = drone == null ? null : drone.getMission();
         org.droidplanner.core.mission.waypoints.StructureScanner updatedScan = (org.droidplanner.core.mission.waypoints.StructureScanner) ProxyUtils
                 .getMissionItemImpl(droneMission, item);
@@ -1027,21 +1029,21 @@ public class CommonApiUtils {
         return proxyScanner;
     }
 
-    static void startVideoRecording(Drone drone) {
+    public static void startVideoRecording(MavLinkDrone drone) {
         if (drone == null)
             return;
 
         drone.getGoProImpl().startRecording();
     }
 
-    static void stopVideoRecording(Drone drone) {
+    public static void stopVideoRecording(MavLinkDrone drone) {
         if (drone == null)
             return;
 
         drone.getGoProImpl().stopRecording();
     }
 
-    static MagnetometerCalibrationStatus getMagnetometerCalibrationStatus(Drone drone) {
+    public static MagnetometerCalibrationStatus getMagnetometerCalibrationStatus(MavLinkDrone drone) {
         final MagnetometerCalibrationStatus calStatus = new MagnetometerCalibrationStatus();
         if (drone != null) {
             final MagnetometerCalibrationImpl magCalImpl = drone.getMagnetometerCalibration();
@@ -1057,7 +1059,7 @@ public class CommonApiUtils {
         return calStatus;
     }
 
-    static MagnetometerCalibrationProgress getMagnetometerCalibrationProgress(msg_mag_cal_progress msgProgress) {
+    public static MagnetometerCalibrationProgress getMagnetometerCalibrationProgress(msg_mag_cal_progress msgProgress) {
         if (msgProgress == null)
             return null;
 
@@ -1065,7 +1067,7 @@ public class CommonApiUtils {
                 msgProgress.direction_x, msgProgress.direction_y, msgProgress.direction_z);
     }
 
-    static MagnetometerCalibrationResult getMagnetometerCalibrationResult(msg_mag_cal_report msgReport) {
+    public static MagnetometerCalibrationResult getMagnetometerCalibrationResult(msg_mag_cal_report msgReport) {
         if (msgReport == null)
             return null;
 

@@ -2,7 +2,7 @@ package org.droidplanner.core.drone.variables;
 
 import org.droidplanner.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.core.drone.DroneVariable;
-import org.droidplanner.core.model.Drone;
+import org.droidplanner.services.android.drone.autopilot.MavLinkDrone;
 
 public class Navigation extends DroneVariable {
 
@@ -10,7 +10,7 @@ public class Navigation extends DroneVariable {
 	private double nav_roll;
 	private double nav_bearing;
 
-	public Navigation(Drone myDrone) {
+	public Navigation(MavLinkDrone myDrone) {
 		super(myDrone);
 	}
 

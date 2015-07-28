@@ -7,7 +7,7 @@ import com.MAVLink.ardupilotmega.msg_mag_cal_report;
 import org.droidplanner.core.MAVLink.MavLinkCalibration;
 import org.droidplanner.core.drone.DroneInterfaces;
 import org.droidplanner.core.drone.DroneVariable;
-import org.droidplanner.core.model.Drone;
+import org.droidplanner.services.android.drone.autopilot.MavLinkDrone;
 
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -31,7 +31,7 @@ public class MagnetometerCalibrationImpl extends DroneVariable implements DroneI
 
     private AtomicBoolean cancelled = new AtomicBoolean(false);
 
-    public MagnetometerCalibrationImpl(Drone myDrone) {
+    public MagnetometerCalibrationImpl(MavLinkDrone myDrone) {
         super(myDrone);
         myDrone.addDroneListener(this);
     }
@@ -115,7 +115,7 @@ public class MagnetometerCalibrationImpl extends DroneVariable implements DroneI
     }
 
     @Override
-    public void onDroneEvent(DroneInterfaces.DroneEventsType event, Drone drone) {
+    public void onDroneEvent(DroneInterfaces.DroneEventsType event, MavLinkDrone drone) {
         switch(event){
             case HEARTBEAT_TIMEOUT:
             case DISCONNECTED:

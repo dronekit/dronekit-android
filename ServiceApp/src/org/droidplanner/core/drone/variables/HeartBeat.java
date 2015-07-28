@@ -6,12 +6,12 @@ import org.droidplanner.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.core.drone.DroneInterfaces.Handler;
 import org.droidplanner.core.drone.DroneInterfaces.OnDroneListener;
 import org.droidplanner.core.drone.DroneVariable;
-import org.droidplanner.core.gcs.GCSHeartbeat;
-import org.droidplanner.core.model.Drone;
+import org.droidplanner.services.android.drone.autopilot.MavLinkDrone;
+
+import timber.log.Timber;
 
 public class HeartBeat extends DroneVariable implements OnDroneListener {
 
-    private static final long CONNECTION_TIMEOUT = 5000; //ms
     private static final long HEARTBEAT_NORMAL_TIMEOUT = 5000; //ms
     private static final long HEARTBEAT_LOST_TIMEOUT = 15000; //ms
     private static final long HEARTBEAT_IMU_CALIBRATION_TIMEOUT = 35000; //ms
@@ -21,7 +21,6 @@ public class HeartBeat extends DroneVariable implements OnDroneListener {
     public HeartbeatState heartbeatState = HeartbeatState.FIRST_HEARTBEAT;
     private byte sysid = 1;
     private byte compid = 1;
-    private final GCSHeartbeat gcsHeartbeat;
 
     /**
      * Stores the version of the mavlink protocol.
@@ -40,10 +39,9 @@ public class HeartBeat extends DroneVariable implements OnDroneListener {
         }
     };
 
-    public HeartBeat(Drone myDrone, Handler handler) {
+    public HeartBeat(MavLinkDrone myDrone, Handler handler) {
         super(myDrone);
         this.watchdog = handler;
-        this.gcsHeartbeat = new GCSHeartbeat(myDrone, 1);
         myDrone.addDroneListener(this);
     }
 
@@ -70,7 +68,7 @@ public class HeartBeat extends DroneVariable implements OnDroneListener {
         switch (heartbeatState) {
             case FIRST_HEARTBEAT:
                 notifyConnected();
-                System.out.println("Received first heartbeat.");
+                Timber.d("Received first heartbeat.");
                 myDrone.notifyDroneEvent(DroneEventsType.HEARTBEAT_FIRST);
                 break;
 
@@ -92,7 +90,7 @@ public class HeartBeat extends DroneVariable implements OnDroneListener {
     }
 
     @Override
-    public void onDroneEvent(DroneEventsType event, Drone drone) {
+    public void onDroneEvent(DroneEventsType event, MavLinkDrone drone) {
         switch (event) {
             case CALIBRATION_IMU:
                 //Set the heartbeat in imu calibration mode.
@@ -100,25 +98,14 @@ public class HeartBeat extends DroneVariable implements OnDroneListener {
                 restartWatchdog(HEARTBEAT_IMU_CALIBRATION_TIMEOUT);
                 break;
 
-            case CHECKING_VEHICLE_LINK:
-                System.out.println("Received connecting event.");
-                gcsHeartbeat.setActive(true);
-                notifyConnecting();
-                break;
-
             case CONNECTION_FAILED:
             case DISCONNECTED:
-                gcsHeartbeat.setActive(false);
                 notifyDisconnected();
                 break;
 
             default:
                 break;
         }
-    }
-
-    private void notifyConnecting(){
-        restartWatchdog(CONNECTION_TIMEOUT);
     }
 
     private void notifyConnected() {
@@ -139,7 +126,7 @@ public class HeartBeat extends DroneVariable implements OnDroneListener {
                 break;
 
             case FIRST_HEARTBEAT:
-                System.out.println("First heartbeat timeout.");
+                Timber.d("First heartbeat timeout.");
                 myDrone.notifyDroneEvent(DroneEventsType.CONNECTION_FAILED);
                 break;
 

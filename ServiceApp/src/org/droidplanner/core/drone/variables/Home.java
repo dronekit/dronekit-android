@@ -9,7 +9,7 @@ import org.droidplanner.core.drone.DroneInterfaces;
 import org.droidplanner.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.core.drone.DroneVariable;
 import org.droidplanner.core.helpers.coordinates.Coord2D;
-import org.droidplanner.core.model.Drone;
+import org.droidplanner.services.android.drone.autopilot.MavLinkDrone;
 
 public class Home extends DroneVariable implements DroneInterfaces.OnDroneListener {
     public static final int HOME_WAYPOINT_INDEX = 0;
@@ -17,7 +17,7 @@ public class Home extends DroneVariable implements DroneInterfaces.OnDroneListen
     private Coord2D coordinate;
     private double altitude = 0;
 
-    public Home(Drone drone) {
+    public Home(MavLinkDrone drone) {
         super(drone);
         drone.addDroneListener(this);
     }
@@ -76,7 +76,7 @@ public class Home extends DroneVariable implements DroneInterfaces.OnDroneListen
     }
 
     @Override
-    public void onDroneEvent(DroneEventsType event, Drone drone) {
+    public void onDroneEvent(DroneEventsType event, MavLinkDrone drone) {
         switch(event){
             case EKF_POSITION_STATE_UPDATE:
                 if(drone.getState().isEkfPositionOk())
@@ -85,7 +85,7 @@ public class Home extends DroneVariable implements DroneInterfaces.OnDroneListen
         }
     }
 
-    private static void requestHomeUpdate(Drone drone){
+    private static void requestHomeUpdate(MavLinkDrone drone){
         MavLinkWaypoint.requestWayPoint(drone, HOME_WAYPOINT_INDEX);
     }
 }

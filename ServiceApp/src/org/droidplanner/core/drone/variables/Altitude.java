@@ -2,13 +2,13 @@ package org.droidplanner.core.drone.variables;
 
 import org.droidplanner.core.drone.DroneInterfaces;
 import org.droidplanner.core.drone.DroneVariable;
-import org.droidplanner.core.model.Drone;
+import org.droidplanner.services.android.drone.autopilot.MavLinkDrone;
 
 public class Altitude extends DroneVariable {
 	private double altitude = 0;
 	private double targetAltitude = 0;
 
-	public Altitude(Drone myDrone) {
+	public Altitude(MavLinkDrone myDrone) {
 		super(myDrone);
 	}
 

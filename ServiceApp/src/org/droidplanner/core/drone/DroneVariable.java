@@ -1,18 +1,17 @@
 package org.droidplanner.core.drone;
 
 import android.os.RemoteException;
-import android.util.Log;
 
 import com.o3dr.services.android.lib.model.ICommandListener;
 
-import org.droidplanner.core.model.Drone;
+import org.droidplanner.services.android.drone.autopilot.MavLinkDrone;
 
 import timber.log.Timber;
 
 public class DroneVariable {
-	protected Drone myDrone;
+	protected MavLinkDrone myDrone;
 
-	public DroneVariable(Drone myDrone) {
+	public DroneVariable(MavLinkDrone myDrone) {
 		this.myDrone = myDrone;
 	}
 

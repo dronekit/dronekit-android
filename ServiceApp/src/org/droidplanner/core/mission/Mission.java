@@ -1,5 +1,7 @@
 package org.droidplanner.core.mission;
 
+import android.util.Pair;
+
 import com.MAVLink.common.msg_mission_ack;
 import com.MAVLink.common.msg_mission_item;
 import com.MAVLink.enums.MAV_CMD;
@@ -24,8 +26,7 @@ import org.droidplanner.core.mission.waypoints.RegionOfInterest;
 import org.droidplanner.core.mission.waypoints.SpatialCoordItem;
 import org.droidplanner.core.mission.waypoints.SplineWaypoint;
 import org.droidplanner.core.mission.waypoints.Waypoint;
-import org.droidplanner.core.model.Drone;
-import org.droidplanner.core.util.Pair;
+import org.droidplanner.services.android.drone.autopilot.MavLinkDrone;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -44,7 +45,7 @@ public class Mission extends DroneVariable {
     private List<MissionItem> items = new ArrayList<MissionItem>();
     private double defaultAlt = 20.0;
 
-    public Mission(Drone myDrone) {
+    public Mission(MavLinkDrone myDrone) {
         super(myDrone);
     }
 

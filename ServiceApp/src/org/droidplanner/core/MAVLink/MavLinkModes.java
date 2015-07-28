@@ -8,7 +8,7 @@ import com.MAVLink.enums.MAV_CMD;
 import com.MAVLink.enums.MAV_FRAME;
 import com.o3dr.services.android.lib.model.ICommandListener;
 
-import org.droidplanner.core.model.Drone;
+import org.droidplanner.services.android.drone.autopilot.MavLinkDrone;
 
 public class MavLinkModes {
 
@@ -16,7 +16,7 @@ public class MavLinkModes {
     private static final int MAVLINK_SET_POS_TYPE_MASK_VEL_IGNORE = ((1 << 3) | (1 << 4) | (1 << 5));
     private static final int MAVLINK_SET_POS_TYPE_MASK_ACC_IGNORE = ((1 << 6) | (1 << 7) | (1 << 8));
 
-    public static void setGuidedMode(Drone drone, double latitude, double longitude, double d) {
+    public static void setGuidedMode(MavLinkDrone drone, double latitude, double longitude, double d) {
         msg_mission_item msg = new msg_mission_item();
         msg.seq = 0;
         msg.current = 2; // TODO use guided mode enum
@@ -35,7 +35,7 @@ public class MavLinkModes {
         drone.getMavClient().sendMavMessage(msg, null);
     }
 
-    public static void sendGuidedPosition(Drone drone, double latitude, double longitude, double altitude){
+    public static void sendGuidedPosition(MavLinkDrone drone, double latitude, double longitude, double altitude){
         msg_set_position_target_global_int msg = new msg_set_position_target_global_int();
         msg.type_mask = MAVLINK_SET_POS_TYPE_MASK_ACC_IGNORE | MAVLINK_SET_POS_TYPE_MASK_VEL_IGNORE;
         msg.coordinate_frame = MAV_FRAME.MAV_FRAME_GLOBAL_RELATIVE_ALT_INT;
@@ -47,7 +47,7 @@ public class MavLinkModes {
         drone.getMavClient().sendMavMessage(msg, null);
     }
 
-    public static void sendGuidedVelocity(Drone drone, double xVel, double yVel, double zVel){
+    public static void sendGuidedVelocity(MavLinkDrone drone, double xVel, double yVel, double zVel){
         msg_set_position_target_global_int msg = new msg_set_position_target_global_int();
         msg.type_mask = MAVLINK_SET_POS_TYPE_MASK_ACC_IGNORE | MAVLINK_SET_POS_TYPE_MASK_POS_IGNORE;
         msg.coordinate_frame = MAV_FRAME.MAV_FRAME_GLOBAL_RELATIVE_ALT_INT;
@@ -59,7 +59,7 @@ public class MavLinkModes {
         drone.getMavClient().sendMavMessage(msg, null);
     }
 
-    public static void sendGuidedPositionAndVelocity(Drone drone, double latitude, double longitude, double altitude,
+    public static void sendGuidedPositionAndVelocity(MavLinkDrone drone, double latitude, double longitude, double altitude,
                                                      double xVel, double yVel, double zVel){
         msg_set_position_target_global_int msg = new msg_set_position_target_global_int();
         msg.type_mask = MAVLINK_SET_POS_TYPE_MASK_ACC_IGNORE;
@@ -75,7 +75,7 @@ public class MavLinkModes {
         drone.getMavClient().sendMavMessage(msg, null);
     }
 
-    public static void changeFlightMode(Drone drone, ApmModes mode, ICommandListener listener) {
+    public static void changeFlightMode(MavLinkDrone drone, ApmModes mode, ICommandListener listener) {
         msg_set_mode msg = new msg_set_mode();
         msg.target_system = drone.getSysid();
         msg.base_mode = 1; // TODO use meaningful constant

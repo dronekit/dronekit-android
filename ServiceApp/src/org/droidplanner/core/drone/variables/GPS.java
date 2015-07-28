@@ -3,7 +3,7 @@ package org.droidplanner.core.drone.variables;
 import org.droidplanner.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.core.drone.DroneVariable;
 import org.droidplanner.core.helpers.coordinates.Coord2D;
-import org.droidplanner.core.model.Drone;
+import org.droidplanner.services.android.drone.autopilot.MavLinkDrone;
 
 public class GPS extends DroneVariable {
 	public final static int LOCK_2D = 2;
@@ -14,7 +14,7 @@ public class GPS extends DroneVariable {
 	private int fixType = -1;
 	private Coord2D position;
 
-	public GPS(Drone myDrone) {
+	public GPS(MavLinkDrone myDrone) {
 		super(myDrone);
 	}
 

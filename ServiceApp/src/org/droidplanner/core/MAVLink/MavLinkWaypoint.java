@@ -1,6 +1,6 @@
 package org.droidplanner.core.MAVLink;
 
-import org.droidplanner.core.model.Drone;
+import org.droidplanner.services.android.drone.autopilot.MavLinkDrone;
 
 import com.MAVLink.common.msg_mission_ack;
 import com.MAVLink.common.msg_mission_count;
@@ -11,7 +11,7 @@ import com.MAVLink.enums.MAV_MISSION_RESULT;
 
 public class MavLinkWaypoint {
 
-	public static void sendAck(Drone drone) {
+	public static void sendAck(MavLinkDrone drone) {
 		msg_mission_ack msg = new msg_mission_ack();
 		msg.target_system = drone.getSysid();
 		msg.target_component = drone.getCompid();
@@ -20,7 +20,7 @@ public class MavLinkWaypoint {
 
 	}
 
-	public static void requestWayPoint(Drone drone, int index) {
+	public static void requestWayPoint(MavLinkDrone drone, int index) {
 		msg_mission_request msg = new msg_mission_request();
 		msg.target_system = drone.getSysid();
 		msg.target_component = drone.getCompid();
@@ -28,14 +28,14 @@ public class MavLinkWaypoint {
 		drone.getMavClient().sendMavMessage(msg, null);
 	}
 
-	public static void requestWaypointsList(Drone drone) {
+	public static void requestWaypointsList(MavLinkDrone drone) {
 		msg_mission_request_list msg = new msg_mission_request_list();
 		msg.target_system = drone.getSysid();
 		msg.target_component = drone.getCompid();
 		drone.getMavClient().sendMavMessage(msg, null);
 	}
 
-	public static void sendWaypointCount(Drone drone, int count) {
+	public static void sendWaypointCount(MavLinkDrone drone, int count) {
 		msg_mission_count msg = new msg_mission_count();
 		msg.target_system = drone.getSysid();
 		msg.target_component = drone.getCompid();
@@ -43,7 +43,7 @@ public class MavLinkWaypoint {
 		drone.getMavClient().sendMavMessage(msg, null);
 	}
 
-	public static void sendSetCurrentWaypoint(Drone drone, short i) {
+	public static void sendSetCurrentWaypoint(MavLinkDrone drone, short i) {
 		msg_mission_set_current msg = new msg_mission_set_current();
 		msg.target_system = drone.getSysid();
 		msg.target_component = drone.getCompid();

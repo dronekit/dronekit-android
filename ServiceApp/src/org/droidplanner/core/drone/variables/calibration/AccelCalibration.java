@@ -11,7 +11,7 @@ import org.droidplanner.core.MAVLink.MavLinkCalibration;
 import org.droidplanner.core.drone.DroneInterfaces;
 import org.droidplanner.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.core.drone.DroneVariable;
-import org.droidplanner.core.model.Drone;
+import org.droidplanner.services.android.drone.autopilot.MavLinkDrone;
 
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -39,7 +39,7 @@ public class AccelCalibration extends DroneVariable implements DroneInterfaces.O
     private final DroneInterfaces.Handler handler;
     private final AtomicReference<ICommandListener> listenerRef = new AtomicReference<>(null);
 
-    public AccelCalibration(Drone drone, DroneInterfaces.Handler handler) {
+    public AccelCalibration(MavLinkDrone drone, DroneInterfaces.Handler handler) {
         super(drone);
         this.handler = handler;
         drone.addDroneListener(this);
@@ -135,7 +135,7 @@ public class AccelCalibration extends DroneVariable implements DroneInterfaces.O
     }
 
     @Override
-    public void onDroneEvent(DroneEventsType event, Drone drone) {
+    public void onDroneEvent(DroneEventsType event, MavLinkDrone drone) {
         switch (event) {
             case HEARTBEAT_TIMEOUT:
             case DISCONNECTED:

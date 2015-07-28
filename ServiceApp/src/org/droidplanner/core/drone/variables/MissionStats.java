@@ -2,14 +2,14 @@ package org.droidplanner.core.drone.variables;
 
 import org.droidplanner.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.core.drone.DroneVariable;
-import org.droidplanner.core.model.Drone;
+import org.droidplanner.services.android.drone.autopilot.MavLinkDrone;
 
 public class MissionStats extends DroneVariable {
     private double distanceToWp = 0;
     private int currentWP = -1;
     private int lastReachedWP = -1;
 
-    public MissionStats(Drone myDrone) {
+    public MissionStats(MavLinkDrone myDrone) {
         super(myDrone);
     }
 

@@ -1,10 +1,7 @@
 package org.droidplanner.core.drone;
 
-import java.util.List;
-
 import org.droidplanner.core.MAVLink.WaypointManager;
-import org.droidplanner.core.drone.variables.GPS;
-import org.droidplanner.core.model.Drone;
+import org.droidplanner.services.android.drone.autopilot.MavLinkDrone;
 import org.droidplanner.core.parameters.Parameter;
 
 public class DroneInterfaces {
@@ -159,11 +156,6 @@ public class DroneInterfaces {
         CONNECTING,
 
         /**
-         * Vehicle link is being validated.
-         */
-        CHECKING_VEHICLE_LINK,
-
-        /**
          * Connection failed event.
          */
         CONNECTION_FAILED,
@@ -259,7 +251,7 @@ public class DroneInterfaces {
 	}
 
 	public interface OnDroneListener {
-		public void onDroneEvent(DroneEventsType event, Drone drone);
+		public void onDroneEvent(DroneEventsType event, MavLinkDrone drone);
 	}
 
 	public interface OnParameterManagerListener {

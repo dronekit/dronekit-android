@@ -1,7 +1,6 @@
 package org.droidplanner.core.drone.variables;
 
 import android.os.RemoteException;
-import android.util.Log;
 
 import org.droidplanner.core.MAVLink.MavLinkModes;
 import org.droidplanner.core.drone.DroneInterfaces.Clock;
@@ -9,7 +8,7 @@ import org.droidplanner.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.core.drone.DroneInterfaces.Handler;
 import org.droidplanner.core.drone.DroneVariable;
 import org.droidplanner.core.model.AutopilotWarningParser;
-import org.droidplanner.core.model.Drone;
+import org.droidplanner.services.android.drone.autopilot.MavLinkDrone;
 
 import com.MAVLink.ardupilotmega.msg_ekf_status_report;
 import com.MAVLink.enums.EKF_STATUS_FLAGS;
@@ -44,7 +43,7 @@ public class State extends DroneVariable {
 		}
 	};
 
-	public State(Drone myDrone, Clock clock, Handler handler, AutopilotWarningParser warningParser) {
+	public State(MavLinkDrone myDrone, Clock clock, Handler handler, AutopilotWarningParser warningParser) {
 		super(myDrone);
 		this.clock = clock;
 		this.handler = handler;

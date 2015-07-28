@@ -2,7 +2,7 @@ package org.droidplanner.core.drone.variables;
 
 import org.droidplanner.core.drone.DroneInterfaces;
 import org.droidplanner.core.drone.DroneVariable;
-import org.droidplanner.core.model.Drone;
+import org.droidplanner.services.android.drone.autopilot.MavLinkDrone;
 import org.droidplanner.core.parameters.Parameter;
 
 public class Speed extends DroneVariable {
@@ -12,7 +12,7 @@ public class Speed extends DroneVariable {
 	private double airSpeed = 0;
 	private double targetSpeed = 0;
 
-	public Speed(Drone myDrone) {
+	public Speed(MavLinkDrone myDrone) {
 		super(myDrone);
 	}
 

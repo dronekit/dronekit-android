@@ -1,11 +1,13 @@
 package org.droidplanner.core.gcs.follow;
 
+import android.os.Handler;
+
 import org.droidplanner.core.MAVLink.command.doCmd.MavLinkDoCmds;
 import org.droidplanner.core.drone.DroneInterfaces;
 import org.droidplanner.core.gcs.roi.ROIEstimator;
 import org.droidplanner.core.helpers.coordinates.Coord2D;
 import org.droidplanner.core.helpers.coordinates.Coord3D;
-import org.droidplanner.core.model.Drone;
+import org.droidplanner.services.android.drone.autopilot.MavLinkDrone;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,7 +31,7 @@ public class FollowGuidedScan extends FollowAbove {
         return FollowModes.GUIDED_SCAN;
     }
 
-    public FollowGuidedScan(Drone drone, DroneInterfaces.Handler handler) {
+    public FollowGuidedScan(MavLinkDrone drone, Handler handler) {
         super(drone, handler);
     }
 
@@ -50,7 +52,7 @@ public class FollowGuidedScan extends FollowAbove {
     }
 
     @Override
-    protected ROIEstimator initROIEstimator(Drone drone, DroneInterfaces.Handler handler) {
+    protected ROIEstimator initROIEstimator(MavLinkDrone drone, DroneInterfaces.Handler handler) {
         return new GuidedROIEstimator(drone, handler);
     }
 
@@ -70,7 +72,7 @@ public class FollowGuidedScan extends FollowAbove {
 
         private Coord3D roiTarget;
 
-        public GuidedROIEstimator(Drone drone, DroneInterfaces.Handler handler) {
+        public GuidedROIEstimator(MavLinkDrone drone, DroneInterfaces.Handler handler) {
             super(drone, handler);
         }
 

@@ -4,7 +4,7 @@ import org.droidplanner.core.drone.DroneInterfaces;
 import org.droidplanner.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.core.drone.DroneVariable;
 import org.droidplanner.core.helpers.math.MathUtil;
-import org.droidplanner.core.model.Drone;
+import org.droidplanner.services.android.drone.autopilot.MavLinkDrone;
 
 /**
  * Parses the mavlink radio messages.
@@ -29,7 +29,7 @@ public class Radio extends DroneVariable implements DroneInterfaces.OnDroneListe
 	private double noise = -1;
 	private double remnoise = -1;
 
-	public Radio(Drone myDrone) {
+	public Radio(MavLinkDrone myDrone) {
 		super(myDrone);
         myDrone.addDroneListener(this);
 	}
@@ -120,7 +120,7 @@ public class Radio extends DroneVariable implements DroneInterfaces.OnDroneListe
 	}
 
     @Override
-    public void onDroneEvent(DroneEventsType event, Drone drone) {
+    public void onDroneEvent(DroneEventsType event, MavLinkDrone drone) {
         switch(event){
             case DISCONNECTED:
                 isValid = false;

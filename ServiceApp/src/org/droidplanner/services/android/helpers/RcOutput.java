@@ -6,7 +6,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.droidplanner.core.MAVLink.MavLinkRC;
-import org.droidplanner.core.model.Drone;
+import org.droidplanner.services.android.drone.autopilot.MavLinkDrone;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -18,7 +18,7 @@ public class RcOutput {
 	private static final int RC_RANGE = 550;
 	private Context parrentContext;
 	private ScheduledExecutorService scheduleTaskExecutor;
-	private Drone drone;
+	private MavLinkDrone drone;
 	public int[] rcOutputs = new int[8];
 
 	public static final int AILERON = 0;
@@ -31,7 +31,7 @@ public class RcOutput {
 	public static final int RC7 = 6;
 	public static final int RC8 = 7;
 
-	public RcOutput(Drone drone, Context context) {
+	public RcOutput(MavLinkDrone drone, Context context) {
 		this.drone = drone;
 		parrentContext = context;
 	}

@@ -1,13 +1,15 @@
 package org.droidplanner.core.gcs.follow;
 
+import android.os.Handler;
+
 import org.droidplanner.core.drone.DroneInterfaces;
 import org.droidplanner.core.gcs.location.Location;
 import org.droidplanner.core.helpers.coordinates.Coord2D;
-import org.droidplanner.core.model.Drone;
+import org.droidplanner.services.android.drone.autopilot.MavLinkDrone;
 
 public class FollowAbove extends FollowAlgorithm {
 
-    public FollowAbove(Drone drone, DroneInterfaces.Handler handler) {
+    public FollowAbove(MavLinkDrone drone, Handler handler) {
         super(drone, handler);
     }
 

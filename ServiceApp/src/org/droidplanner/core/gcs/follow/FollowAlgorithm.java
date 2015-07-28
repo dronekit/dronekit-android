@@ -1,10 +1,12 @@
 package org.droidplanner.core.gcs.follow;
 
+import android.os.Handler;
+
 import org.droidplanner.core.drone.DroneInterfaces;
 import org.droidplanner.core.drone.variables.GuidedPoint;
 import org.droidplanner.core.gcs.location.Location;
 import org.droidplanner.core.gcs.roi.ROIEstimator;
-import org.droidplanner.core.model.Drone;
+import org.droidplanner.services.android.drone.autopilot.MavLinkDrone;
 
 import java.util.Collections;
 import java.util.Map;
@@ -12,11 +14,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class FollowAlgorithm {
 
-    protected final Drone drone;
+    protected final MavLinkDrone drone;
     private final ROIEstimator roiEstimator;
     private final AtomicBoolean isFollowEnabled = new AtomicBoolean(false);
 
-    public FollowAlgorithm(Drone drone, DroneInterfaces.Handler handler) {
+    public FollowAlgorithm(MavLinkDrone drone, Handler handler) {
         this.drone = drone;
         this.roiEstimator = initROIEstimator(drone, handler);
     }
@@ -43,7 +45,7 @@ public abstract class FollowAlgorithm {
     public void updateAlgorithmParams(Map<String, ?> paramsMap) {
     }
 
-    protected ROIEstimator initROIEstimator(Drone drone, DroneInterfaces.Handler handler) {
+    protected ROIEstimator initROIEstimator(MavLinkDrone drone, Handler handler) {
         return new ROIEstimator(drone, handler);
     }
 
@@ -93,7 +95,7 @@ public abstract class FollowAlgorithm {
             return values()[(ordinal() + 1) % values().length];
         }
 
-        public FollowAlgorithm getAlgorithmType(Drone drone, DroneInterfaces.Handler handler) {
+        public FollowAlgorithm getAlgorithmType(MavLinkDrone drone, Handler handler) {
             switch (this) {
                 case LEASH:
                 default:

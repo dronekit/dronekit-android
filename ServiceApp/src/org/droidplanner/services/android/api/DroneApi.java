@@ -8,6 +8,7 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.RemoteException;
 import android.text.TextUtils;
+import android.util.Pair;
 
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.ardupilotmega.msg_mag_cal_progress;
@@ -22,13 +23,13 @@ import com.o3dr.services.android.lib.drone.action.ParameterActions;
 import com.o3dr.services.android.lib.drone.action.StateActions;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
-import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.camera.action.CameraActions;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionResult;
 import com.o3dr.services.android.lib.drone.connection.DroneSharePrefs;
 import com.o3dr.services.android.lib.drone.mission.Mission;
 import com.o3dr.services.android.lib.drone.mission.action.MissionActions;
+import com.o3dr.services.android.lib.drone.property.DroneAttribute;
 import com.o3dr.services.android.lib.drone.property.Parameters;
 import com.o3dr.services.android.lib.drone.property.VehicleMode;
 import com.o3dr.services.android.lib.gcs.action.CalibrationActions;
@@ -50,10 +51,9 @@ import org.droidplanner.core.gcs.follow.Follow;
 import org.droidplanner.core.gcs.follow.FollowAlgorithm;
 import org.droidplanner.core.helpers.coordinates.Coord2D;
 import org.droidplanner.core.helpers.coordinates.Coord3D;
-import org.droidplanner.core.model.Drone;
 import org.droidplanner.core.parameters.Parameter;
-import org.droidplanner.core.util.Pair;
 import org.droidplanner.services.android.drone.DroneManager;
+import org.droidplanner.services.android.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.exception.ConnectionException;
 import org.droidplanner.services.android.interfaces.DroneEventsListener;
 
@@ -130,7 +130,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
         try {
             this.apiListener.asBinder().unlinkToDeath(this, 0);
-        }catch(NoSuchElementException e){
+        } catch (NoSuchElementException e) {
             Timber.e(e, e.getMessage());
         }
 
@@ -149,7 +149,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
         return this.droneMgr;
     }
 
-    private Drone getDrone() {
+    private MavLinkDrone getDrone() {
         if (this.droneMgr == null)
             return null;
 
@@ -165,62 +165,12 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
     @Override
     public Bundle getAttribute(String type) throws RemoteException {
+        final DroneAttribute attribute = droneMgr.getAttribute(type);
+        if (attribute == null)
+            return null;
+
         Bundle carrier = new Bundle();
-        final Drone drone = getDrone();
-
-        switch (type) {
-            case AttributeType.STATE:
-                carrier.putParcelable(type, CommonApiUtils.getState(drone, isConnected()));
-                break;
-            case AttributeType.GPS:
-                carrier.putParcelable(type, CommonApiUtils.getGps(drone));
-                break;
-            case AttributeType.PARAMETERS:
-                carrier.putParcelable(type, CommonApiUtils.getParameters(drone, context));
-                break;
-            case AttributeType.SPEED:
-                carrier.putParcelable(type, CommonApiUtils.getSpeed(drone));
-                break;
-            case AttributeType.ATTITUDE:
-                carrier.putParcelable(type, CommonApiUtils.getAttitude(drone));
-                break;
-            case AttributeType.HOME:
-                carrier.putParcelable(type, CommonApiUtils.getHome(drone));
-                break;
-            case AttributeType.BATTERY:
-                carrier.putParcelable(type, CommonApiUtils.getBattery(drone));
-                break;
-            case AttributeType.ALTITUDE:
-                carrier.putParcelable(type, CommonApiUtils.getAltitude(drone));
-                break;
-            case AttributeType.MISSION:
-                carrier.putParcelable(type, CommonApiUtils.getMission(drone));
-                break;
-            case AttributeType.SIGNAL:
-                carrier.putParcelable(type, CommonApiUtils.getSignal(drone));
-                break;
-            case AttributeType.TYPE:
-                carrier.putParcelable(type, CommonApiUtils.getType(drone));
-                break;
-            case AttributeType.GUIDED_STATE:
-                carrier.putParcelable(type, CommonApiUtils.getGuidedState(drone));
-                break;
-            case AttributeType.FOLLOW_STATE:
-                carrier.putParcelable(type, CommonApiUtils.getFollowState(getFollowMe()));
-                break;
-            case AttributeType.CAMERA:
-                carrier.putParcelable(type, CommonApiUtils.getCameraProxy(drone, service.getCameraDetails()));
-                break;
-
-            case AttributeType.GOPRO:
-                carrier.putParcelable(type, CommonApiUtils.getGoPro(drone));
-                break;
-
-            case AttributeType.MAGNETOMETER_CALIBRATION_STATUS:
-                carrier.putParcelable(type, CommonApiUtils.getMagnetometerCalibrationStatus(drone));
-                break;
-        }
-
+        carrier.putParcelable(type, attribute);
         return carrier;
     }
 
@@ -297,37 +247,6 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
         Bundle data = action.getData();
         switch (type) {
-            // MISSION ACTIONS
-            case MissionActions.ACTION_GENERATE_DRONIE:
-                final float bearing = CommonApiUtils.generateDronie(getDrone());
-                if (bearing != -1) {
-                    Bundle bundle = new Bundle(1);
-                    bundle.putFloat(AttributeEventExtra.EXTRA_MISSION_DRONIE_BEARING, bearing);
-                    notifyAttributeUpdate(AttributeEvent.MISSION_DRONIE_CREATED, bundle);
-                }
-                break;
-
-            case MissionActions.ACTION_LOAD_WAYPOINTS:
-                CommonApiUtils.loadWaypoints(getDrone());
-                break;
-
-            case MissionActions.ACTION_SET_MISSION:
-                data.setClassLoader(Mission.class.getClassLoader());
-                Mission mission = data.getParcelable(MissionActions.EXTRA_MISSION);
-                boolean pushToDrone = data.getBoolean(MissionActions.EXTRA_PUSH_TO_DRONE);
-                CommonApiUtils.setMission(getDrone(), mission, pushToDrone);
-                break;
-
-            case MissionActions.ACTION_START_MISSION:
-                boolean forceModeChange = data.getBoolean(MissionActions.EXTRA_FORCE_MODE_CHANGE);
-                boolean forceArm = data.getBoolean(MissionActions.EXTRA_FORCE_ARM);
-                CommonApiUtils.startMission(droneMgr, forceModeChange, forceArm, listener);
-                break;
-
-            case MissionActions.ACTION_BUILD_COMPLEX_MISSION_ITEM:
-                CommonApiUtils.buildComplexMissionItem(getDrone(), data);
-                break;
-
             //CONNECTION ACTIONS
             case ConnectionActions.ACTION_CONNECT:
                 data.setClassLoader(ConnectionParameter.class.getClassLoader());
@@ -337,153 +256,6 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
             case ConnectionActions.ACTION_DISCONNECT:
                 disconnect();
-                break;
-
-            //EXPERIMENTAL ACTIONS
-            case ExperimentalActions.ACTION_EPM_COMMAND:
-                boolean release = data.getBoolean(ExperimentalActions.EXTRA_EPM_RELEASE);
-                CommonApiUtils.epmCommand(getDrone(), release, listener);
-                break;
-
-            case ExperimentalActions.ACTION_TRIGGER_CAMERA:
-                CommonApiUtils.triggerCamera(getDrone());
-                break;
-
-            case ExperimentalActions.ACTION_SET_ROI:
-                LatLongAlt roi = data.getParcelable(ExperimentalActions.EXTRA_SET_ROI_LAT_LONG_ALT);
-                if(roi != null) {
-                    Coord3D coord3DRoi = new Coord3D(roi.getLatitude(), roi.getLongitude(), roi.getAltitude());
-                    MavLinkDoCmds.setROI(getDrone(), coord3DRoi, listener);
-                }
-                break;
-
-            case ExperimentalActions.ACTION_SEND_MAVLINK_MESSAGE:
-                data.setClassLoader(MavlinkMessageWrapper.class.getClassLoader());
-                MavlinkMessageWrapper messageWrapper = data.getParcelable(ExperimentalActions.EXTRA_MAVLINK_MESSAGE);
-                CommonApiUtils.sendMavlinkMessage(getDrone(), messageWrapper);
-                break;
-
-            case ExperimentalActions.ACTION_SET_RELAY:
-                if (droneMgr != null) {
-                    int relayNumber = data.getInt(ExperimentalActions.EXTRA_RELAY_NUMBER);
-                    boolean isOn = data.getBoolean(ExperimentalActions.EXTRA_IS_RELAY_ON);
-                    MavLinkDoCmds.setRelay(droneMgr.getDrone(), relayNumber, isOn, listener);
-                }
-            case ExperimentalActions.ACTION_SET_SERVO:
-                if (droneMgr != null) {
-                    int channel = data.getInt(ExperimentalActions.EXTRA_SERVO_CHANNEL);
-                    int pwm = data.getInt(ExperimentalActions.EXTRA_SERVO_PWM);
-                    MavLinkDoCmds.setServo(droneMgr.getDrone(), channel, pwm, listener);
-                }
-                break;
-
-            //GUIDED ACTIONS
-            case GuidedActions.ACTION_DO_GUIDED_TAKEOFF:
-                double takeoffAltitude = data.getDouble(GuidedActions.EXTRA_ALTITUDE);
-                CommonApiUtils.doGuidedTakeoff(getDrone(), takeoffAltitude, listener);
-                break;
-
-            case GuidedActions.ACTION_SEND_GUIDED_POINT:
-                data.setClassLoader(LatLong.class.getClassLoader());
-                boolean force = data.getBoolean(GuidedActions.EXTRA_FORCE_GUIDED_POINT);
-                LatLong guidedPoint = data.getParcelable(GuidedActions.EXTRA_GUIDED_POINT);
-                CommonApiUtils.sendGuidedPoint(getDrone(), guidedPoint, force, listener);
-                break;
-
-            case GuidedActions.ACTION_SET_GUIDED_ALTITUDE:
-                double guidedAltitude = data.getDouble(GuidedActions.EXTRA_ALTITUDE);
-                CommonApiUtils.setGuidedAltitude(getDrone(), guidedAltitude);
-                break;
-
-            //PARAMETER ACTIONS
-            case ParameterActions.ACTION_REFRESH_PARAMETERS:
-                CommonApiUtils.refreshParameters(getDrone());
-                break;
-
-            case ParameterActions.ACTION_WRITE_PARAMETERS:
-                data.setClassLoader(Parameters.class.getClassLoader());
-                Parameters parameters = data.getParcelable(ParameterActions.EXTRA_PARAMETERS);
-                CommonApiUtils.writeParameters(getDrone(), parameters);
-                break;
-
-            //DRONE STATE ACTIONS
-            case StateActions.ACTION_ARM:
-                boolean doArm = data.getBoolean(StateActions.EXTRA_ARM);
-                boolean emergencyDisarm = data.getBoolean(StateActions.EXTRA_EMERGENCY_DISARM);
-                CommonApiUtils.arm(getDrone(), doArm, emergencyDisarm, listener);
-                break;
-
-            case StateActions.ACTION_SET_VEHICLE_MODE:
-                data.setClassLoader(VehicleMode.class.getClassLoader());
-                VehicleMode newMode = data.getParcelable(StateActions.EXTRA_VEHICLE_MODE);
-                CommonApiUtils.changeVehicleMode(getDrone(), newMode, listener);
-                break;
-
-            //CALIBRATION ACTIONS
-            case CalibrationActions.ACTION_START_IMU_CALIBRATION:
-                CommonApiUtils.startIMUCalibration(getDrone(), listener);
-                break;
-
-            case CalibrationActions.ACTION_SEND_IMU_CALIBRATION_ACK:
-                int imuAck = data.getInt(CalibrationActions.EXTRA_IMU_STEP);
-                CommonApiUtils.sendIMUCalibrationAck(getDrone(), imuAck);
-                break;
-
-            case CalibrationActions.ACTION_START_MAGNETOMETER_CALIBRATION:
-                final boolean retryOnFailure = data.getBoolean(CalibrationActions.EXTRA_RETRY_ON_FAILURE, false);
-                final boolean saveAutomatically = data.getBoolean(CalibrationActions.EXTRA_SAVE_AUTOMATICALLY, true);
-                final int startDelay = data.getInt(CalibrationActions.EXTRA_START_DELAY, 0);
-                CommonApiUtils.startMagnetometerCalibration(getDrone(), retryOnFailure, saveAutomatically, startDelay);
-                break;
-
-            case CalibrationActions.ACTION_CANCEL_MAGNETOMETER_CALIBRATION:
-                CommonApiUtils.cancelMagnetometerCalibration(getDrone());
-                break;
-
-            case CalibrationActions.ACTION_ACCEPT_MAGNETOMETER_CALIBRATION:
-                CommonApiUtils.acceptMagnetometerCalibration(getDrone());
-                break;
-
-            //FOLLOW-ME ACTIONS
-            case FollowMeActions.ACTION_ENABLE_FOLLOW_ME:
-                data.setClassLoader(FollowType.class.getClassLoader());
-                FollowType followType = data.getParcelable(FollowMeActions.EXTRA_FOLLOW_TYPE);
-                CommonApiUtils.enableFollowMe(getDroneManager(), droneHandler, followType);
-                break;
-
-            case FollowMeActions.ACTION_UPDATE_FOLLOW_PARAMS:
-                if (droneMgr != null) {
-                    data.setClassLoader(LatLong.class.getClassLoader());
-
-                    final FollowAlgorithm followAlgorithm = this.droneMgr.getFollowMe().getFollowAlgorithm();
-                    if (followAlgorithm != null) {
-                        Map<String, Object> paramsMap = new HashMap<>();
-                        Set<String> dataKeys = data.keySet();
-
-                        for (String key : dataKeys) {
-                            if (FollowType.EXTRA_FOLLOW_ROI_TARGET.equals(key)) {
-                                LatLong target = data.getParcelable(key);
-                                if (target != null) {
-                                    final Coord2D roiTarget;
-                                    if (target instanceof LatLongAlt) {
-                                        roiTarget = new Coord3D(target.getLatitude(), target.getLongitude(),
-                                                ((LatLongAlt) target).getAltitude());
-                                    } else {
-                                        roiTarget = new Coord2D(target.getLatitude(), target.getLongitude());
-                                    }
-                                    paramsMap.put(key, roiTarget);
-                                }
-                            } else
-                                paramsMap.put(key, data.get(key));
-                        }
-
-                        followAlgorithm.updateAlgorithmParams(paramsMap);
-                    }
-                }
-                break;
-
-            case FollowMeActions.ACTION_DISABLE_FOLLOW_ME:
-                CommonApiUtils.disableFollowMe(getFollowMe());
                 break;
 
             //************ CAMERA ACTIONS *************//
@@ -500,6 +272,10 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 double roll = data.getDouble(GimbalActions.GIMBAL_ROLL);
                 double yaw = data.getDouble(GimbalActions.GIMBAL_YAW);
                 MavLinkDoCmds.setGimbalOrientation(getDrone(), pitch, roll, yaw, listener);
+                break;
+
+            default:
+                droneMgr.executeAsyncAction(action, listener);
                 break;
         }
     }
@@ -591,7 +367,15 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     }
 
     @Override
-    public void onDroneEvent(DroneInterfaces.DroneEventsType event, Drone drone) {
+    public void onAttributeEvent(String attributeEvent, Bundle eventInfo) {
+        if(TextUtils.isEmpty(attributeEvent))
+            return;
+
+        notifyAttributeUpdate(attributeEvent, eventInfo);
+    }
+
+    @Override
+    public void onDroneEvent(DroneInterfaces.DroneEventsType event, MavLinkDrone drone) {
         Bundle extrasBundle = null;
         String droneEvent = null;
         final List<Pair<String, Bundle>> attributesInfo = new ArrayList<>();

@@ -4,13 +4,13 @@ import org.droidplanner.core.MAVLink.MavLinkStreamRates;
 import org.droidplanner.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.core.drone.DroneInterfaces.OnDroneListener;
 import org.droidplanner.core.drone.DroneVariable;
-import org.droidplanner.core.model.Drone;
+import org.droidplanner.services.android.drone.autopilot.MavLinkDrone;
 
 public class StreamRates extends DroneVariable implements OnDroneListener {
 
     private Rates rates;
 
-	public StreamRates(Drone myDrone) {
+	public StreamRates(MavLinkDrone myDrone) {
 		super(myDrone);
 		myDrone.addDroneListener(this);
 	}
@@ -20,7 +20,7 @@ public class StreamRates extends DroneVariable implements OnDroneListener {
     }
 
     @Override
-	public void onDroneEvent(DroneEventsType event, Drone drone) {
+	public void onDroneEvent(DroneEventsType event, MavLinkDrone drone) {
 		switch (event) {
         case CONNECTED:
 		case HEARTBEAT_FIRST:

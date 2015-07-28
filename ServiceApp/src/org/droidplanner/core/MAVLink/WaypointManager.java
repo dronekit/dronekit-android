@@ -11,7 +11,7 @@ import com.MAVLink.common.msg_mission_request;
 import org.droidplanner.core.drone.DroneInterfaces;
 import org.droidplanner.core.drone.DroneInterfaces.OnWaypointManagerListener;
 import org.droidplanner.core.drone.DroneVariable;
-import org.droidplanner.core.model.Drone;
+import org.droidplanner.services.android.drone.autopilot.MavLinkDrone;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +58,7 @@ public class WaypointManager extends DroneVariable {
         }
     };
 
-    public WaypointManager(Drone drone, DroneInterfaces.Handler handler) {
+    public WaypointManager(MavLinkDrone drone, DroneInterfaces.Handler handler) {
         super(drone);
         this.watchdog = handler;
     }

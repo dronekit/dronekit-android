@@ -7,10 +7,10 @@ import com.o3dr.services.android.lib.model.ICommandListener;
 
 import org.droidplanner.core.helpers.coordinates.Coord3D;
 import org.droidplanner.core.mission.commands.EpmGripper;
-import org.droidplanner.core.model.Drone;
+import org.droidplanner.services.android.drone.autopilot.MavLinkDrone;
 
 public class MavLinkDoCmds {
-    public static void setROI(Drone drone, Coord3D coord, ICommandListener listener) {
+    public static void setROI(MavLinkDrone drone, Coord3D coord, ICommandListener listener) {
         if (drone == null)
             return;
 
@@ -26,14 +26,14 @@ public class MavLinkDoCmds {
         drone.getMavClient().sendMavMessage(msg, listener);
     }
 
-    public static void resetROI(Drone drone, ICommandListener listener) {
+    public static void resetROI(MavLinkDrone drone, ICommandListener listener) {
         if (drone == null)
             return;
 
         setROI(drone, new Coord3D(0, 0, 0), listener);
     }
 
-    public static void triggerCamera(Drone drone) {
+    public static void triggerCamera(MavLinkDrone drone) {
         if (drone == null)
             return;
 
@@ -44,7 +44,7 @@ public class MavLinkDoCmds {
         drone.getMavClient().sendMavMessage(msg, null);
     }
 
-    public static void empCommand(Drone drone, boolean release, ICommandListener listener) {
+    public static void empCommand(MavLinkDrone drone, boolean release, ICommandListener listener) {
         if (drone == null)
             return;
 
@@ -64,7 +64,7 @@ public class MavLinkDoCmds {
      * @param relayNumber
      * @param enabled     true for relay to be on, false for relay to be off.
      */
-    public static void setRelay(Drone drone, int relayNumber, boolean enabled, ICommandListener listener) {
+    public static void setRelay(MavLinkDrone drone, int relayNumber, boolean enabled, ICommandListener listener) {
         if (drone == null)
             return;
 
@@ -85,7 +85,7 @@ public class MavLinkDoCmds {
      * @param channel he output channel the servo is attached to
      * @param pwm     PWM value to output to the servo. Servo’s generally accept pwm values between 1000 and 2000
      */
-    public static void setServo(Drone drone, int channel, int pwm, ICommandListener listener) {
+    public static void setServo(MavLinkDrone drone, int channel, int pwm, ICommandListener listener) {
         if (drone == null)
             return;
 
@@ -108,7 +108,7 @@ public class MavLinkDoCmds {
      * @param yaw       the desired gimbal yaw in degrees
      * @param listener Register a callback to receive update of the command execution state.
      */
-    public static void setGimbalOrientation(Drone drone, double pitch, double roll, double yaw, ICommandListener
+    public static void setGimbalOrientation(MavLinkDrone drone, double pitch, double roll, double yaw, ICommandListener
             listener) {
         if (drone == null)
             return;

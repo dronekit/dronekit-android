@@ -9,7 +9,7 @@ import org.droidplanner.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.core.drone.DroneInterfaces.Handler;
 import org.droidplanner.core.drone.DroneInterfaces.OnDroneListener;
 import org.droidplanner.core.drone.DroneVariable;
-import org.droidplanner.core.model.Drone;
+import org.droidplanner.services.android.drone.autopilot.MavLinkDrone;
 import org.droidplanner.core.parameters.Parameter;
 
 import java.util.HashMap;
@@ -62,7 +62,7 @@ public class Parameters extends DroneVariable implements OnDroneListener {
 
     public final Handler watchdog;
 
-    public Parameters(Drone myDrone, Handler handler) {
+    public Parameters(MavLinkDrone myDrone, Handler handler) {
         super(myDrone);
         this.watchdog = handler;
         myDrone.addDroneListener(this);
@@ -182,7 +182,7 @@ public class Parameters extends DroneVariable implements OnDroneListener {
     }
 
     @Override
-    public void onDroneEvent(DroneEventsType event, Drone drone) {
+    public void onDroneEvent(DroneEventsType event, MavLinkDrone drone) {
         switch (event) {
             case HEARTBEAT_FIRST:
                 if (!drone.getState().isFlying()) {

@@ -1,7 +1,7 @@
 package org.droidplanner.core.firmware;
 
 public enum FirmwareType {
-	ARDU_PLANE("ArduPlane"), ARDU_COPTER("ArduCopter"), ARDU_ROVER("ArduRover");
+	ARDU_PLANE("ArduPlane"), ARDU_COPTER("ArduCopter"), ARDU_ROVER("ArduRover"), ARDU_SOLO("ArduSolo");
 
 	private final String type;
 

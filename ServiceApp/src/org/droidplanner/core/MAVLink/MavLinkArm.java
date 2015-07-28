@@ -1,6 +1,6 @@
 package org.droidplanner.core.MAVLink;
 
-import org.droidplanner.core.model.Drone;
+import org.droidplanner.services.android.drone.autopilot.MavLinkDrone;
 
 import com.MAVLink.common.msg_command_long;
 import com.MAVLink.enums.MAV_CMD;
@@ -10,7 +10,7 @@ public class MavLinkArm {
 
 public static final int EMERGENCY_DISARM_MAGIC_NUMBER = 21196;
 
-	public static void sendArmMessage(Drone drone, boolean arm, boolean emergencyDisarm, ICommandListener listener) {
+	public static void sendArmMessage(MavLinkDrone drone, boolean arm, boolean emergencyDisarm, ICommandListener listener) {
 		msg_command_long msg = new msg_command_long();
 		msg.target_system = drone.getSysid();
 		msg.target_component = drone.getCompid();

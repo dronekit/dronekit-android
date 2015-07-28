@@ -2,14 +2,14 @@ package org.droidplanner.core.drone.variables;
 
 import org.droidplanner.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.core.drone.DroneVariable;
-import org.droidplanner.core.model.Drone;
+import org.droidplanner.services.android.drone.autopilot.MavLinkDrone;
 
 public class Orientation extends DroneVariable {
 	private double roll = 0;
 	private double pitch = 0;
 	private double yaw = 0;
 
-	public Orientation(Drone myDrone) {
+	public Orientation(MavLinkDrone myDrone) {
 		super(myDrone);
 	}
 

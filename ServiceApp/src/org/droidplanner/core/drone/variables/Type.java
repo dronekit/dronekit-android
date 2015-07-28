@@ -4,7 +4,7 @@ import org.droidplanner.core.drone.DroneInterfaces;
 import org.droidplanner.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.core.drone.DroneVariable;
 import org.droidplanner.core.firmware.FirmwareType;
-import org.droidplanner.core.model.Drone;
+import org.droidplanner.services.android.drone.autopilot.MavLinkDrone;
 
 import com.MAVLink.enums.MAV_TYPE;
 
@@ -15,7 +15,7 @@ public class Type extends DroneVariable implements DroneInterfaces.OnDroneListen
 	private int type = DEFAULT_TYPE;
 	private String firmwareVersion = null;
 
-	public Type(Drone myDrone) {
+	public Type(MavLinkDrone myDrone) {
 		super(myDrone);
         myDrone.addDroneListener(this);
 	}
@@ -94,7 +94,7 @@ public class Type extends DroneVariable implements DroneInterfaces.OnDroneListen
     }
 
     @Override
-    public void onDroneEvent(DroneEventsType event, Drone drone) {
+    public void onDroneEvent(DroneEventsType event, MavLinkDrone drone) {
         switch(event){
             case DISCONNECTED:
                 setType(DEFAULT_TYPE);

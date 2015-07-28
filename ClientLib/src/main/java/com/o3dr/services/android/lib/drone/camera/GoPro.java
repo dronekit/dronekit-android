@@ -3,10 +3,12 @@ package com.o3dr.services.android.lib.drone.camera;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.o3dr.services.android.lib.drone.property.DroneAttribute;
+
 /**
  * Created by Fredia Huya-Kouadio on 4/7/15.
  */
-public class GoPro implements Parcelable {
+public class GoPro implements DroneAttribute {
 
     private boolean isConnected;
     private boolean isRecording;

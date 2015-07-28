@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
-import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
 import com.google.android.gms.analytics.HitBuilders;
@@ -94,8 +93,9 @@ public class DroidPlannerService extends Service {
 
     /**
      * Generate a drone api instance for the client denoted by the given app id.
+     *
      * @param listener Used to retrieve api information.
-     * @param appId Application id of the connecting client.
+     * @param appId    Application id of the connecting client.
      * @return a IDroneApi instance
      */
     DroneApi registerDroneApi(IApiListener listener, String appId) {
@@ -111,6 +111,7 @@ public class DroidPlannerService extends Service {
 
     /**
      * Release the drone api instance attached to the given app id.
+     *
      * @param appId Application id of the disconnecting client.
      */
     void releaseDroneApi(String appId) {
@@ -128,9 +129,10 @@ public class DroidPlannerService extends Service {
 
     /**
      * Establish a connection with a vehicle using the given connection parameter.
+     *
      * @param connParams Parameters used to connect to the vehicle.
-     * @param appId Application id of the connecting client.
-     * @param listener Callback to receive drone events.
+     * @param appId      Application id of the connecting client.
+     * @param listener   Callback to receive drone events.
      * @return A DroneManager instance which acts as router between the connected vehicle and the listeneing client(s).
      * @throws ConnectionException
      */
@@ -142,7 +144,7 @@ public class DroidPlannerService extends Service {
         if (droneMgr == null) {
             Timber.d("Generating new drone manager.");
             droneMgr = new DroneManager(getApplicationContext(), connParams, new Handler(Looper.getMainLooper()),
-                    mavlinkApi);
+                    mavlinkApi, getCameraDetails());
             droneManagers.put(connParams, droneMgr);
         }
 
@@ -153,8 +155,9 @@ public class DroidPlannerService extends Service {
 
     /**
      * Disconnect the given client from the vehicle managed by the given drone manager.
+     *
      * @param droneMgr Handler for the connected vehicle.
-     * @param appId Application id of the disconnecting client.
+     * @param appId    Application id of the disconnecting client.
      * @throws ConnectionException
      */
     void disconnectDroneManager(DroneManager droneMgr, String appId) throws ConnectionException {
@@ -172,9 +175,10 @@ public class DroidPlannerService extends Service {
 
     /**
      * Setup a MAVLink connection using the given parameter.
-     * @param connParams Parameter used to setup the MAVLink connection.
+     *
+     * @param connParams  Parameter used to setup the MAVLink connection.
      * @param listenerTag Used to identify the connection requester.
-     * @param listener Callback to receive the connection events.
+     * @param listener    Callback to receive the connection events.
      */
     void connectMAVConnection(ConnectionParameter connParams, String listenerTag, MavLinkConnectionListener listener) {
         AndroidMavLinkConnection conn = mavConnections.get(connParams.getUniqueId());
@@ -256,7 +260,8 @@ public class DroidPlannerService extends Service {
 
     /**
      * Disconnect the MAVLink connection for the given listener.
-     * @param connParams Connection parameters
+     *
+     * @param connParams  Connection parameters
      * @param listenerTag Listener to be disconnected.
      */
     void disconnectMAVConnection(ConnectionParameter connParams, String listenerTag) {
@@ -280,8 +285,9 @@ public class DroidPlannerService extends Service {
 
     /**
      * Register a log listener.
-     * @param connParams Parameters whose connection's data to log.
-     * @param tag Tag for the listener.
+     *
+     * @param connParams      Parameters whose connection's data to log.
+     * @param tag             Tag for the listener.
      * @param loggingFilePath File path for the logging file.
      */
     void addLoggingFile(ConnectionParameter connParams, String tag, String loggingFilePath) {
@@ -294,8 +300,9 @@ public class DroidPlannerService extends Service {
 
     /**
      * Unregister a log listener.
+     *
      * @param connParams Connection parameters from whom to stop the logging.
-     * @param tag Tag for the listener.
+     * @param tag        Tag for the listener.
      */
     void removeLoggingFile(ConnectionParameter connParams, String tag) {
         AndroidMavLinkConnection conn = mavConnections.get(connParams.getUniqueId());
@@ -307,6 +314,7 @@ public class DroidPlannerService extends Service {
 
     /**
      * Retrieves the set of camera info provided by the app.
+     *
      * @return a list of {@link CameraDetail} objects.
      */
     synchronized List<CameraDetail> getCameraDetails() {

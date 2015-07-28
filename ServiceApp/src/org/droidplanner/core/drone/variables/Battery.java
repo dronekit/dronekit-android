@@ -2,7 +2,7 @@ package org.droidplanner.core.drone.variables;
 
 import org.droidplanner.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.core.drone.DroneVariable;
-import org.droidplanner.core.model.Drone;
+import org.droidplanner.services.android.drone.autopilot.MavLinkDrone;
 import org.droidplanner.core.parameters.Parameter;
 
 public class Battery extends DroneVariable {
@@ -10,7 +10,7 @@ public class Battery extends DroneVariable {
 	private double battRemain = -1;
 	private double battCurrent = -1;
 
-	public Battery(Drone myDrone) {
+	public Battery(MavLinkDrone myDrone) {
 		super(myDrone);
 	}
 

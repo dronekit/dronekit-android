@@ -1,11 +1,13 @@
 package org.droidplanner.core.gcs.follow;
 
+import android.os.Handler;
+
 import org.droidplanner.core.drone.DroneInterfaces;
-import org.droidplanner.core.model.Drone;
+import org.droidplanner.services.android.drone.autopilot.MavLinkDrone;
 
 public class FollowLead extends FollowHeadingAngle {
 
-    public FollowLead(Drone drone, DroneInterfaces.Handler handler, double radius) {
+    public FollowLead(MavLinkDrone drone, Handler handler, double radius) {
         super(drone, handler, radius, 0.0);
     }
 

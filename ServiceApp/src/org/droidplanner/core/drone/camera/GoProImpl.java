@@ -13,7 +13,7 @@ import com.MAVLink.enums.GOPRO_HEARTBEAT_STATUS;
 import org.droidplanner.core.drone.DroneInterfaces;
 import org.droidplanner.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.core.drone.DroneInterfaces.Handler;
-import org.droidplanner.core.model.Drone;
+import org.droidplanner.services.android.drone.autopilot.MavLinkDrone;
 
 import java.util.HashMap;
 
@@ -40,10 +40,10 @@ public class GoProImpl implements DroneInterfaces.OnDroneListener {
     private final msg_gopro_get_request scratchGetRequest;
     private final msg_gopro_set_request scratchSetRequest;
 
-    private final Drone drone;
+    private final MavLinkDrone drone;
     private final Handler watchdog;
 
-    public GoProImpl(Drone drone, Handler handler) {
+    public GoProImpl(MavLinkDrone drone, Handler handler) {
         this.drone = drone;
         this.watchdog = handler;
 
@@ -191,7 +191,7 @@ public class GoProImpl implements DroneInterfaces.OnDroneListener {
     }
 
     @Override
-    public void onDroneEvent(DroneEventsType event, Drone drone) {
+    public void onDroneEvent(DroneEventsType event, MavLinkDrone drone) {
         switch (event) {
             case HEARTBEAT_FIRST:
             case HEARTBEAT_RESTORED:

@@ -1,13 +1,14 @@
 package org.droidplanner.core.gcs.roi;
 
+import android.os.Handler;
+
 import org.droidplanner.core.MAVLink.command.doCmd.MavLinkDoCmds;
-import org.droidplanner.core.drone.DroneInterfaces.Handler;
 import org.droidplanner.core.gcs.location.Location;
 import org.droidplanner.core.gcs.location.Location.LocationReceiver;
 import org.droidplanner.core.helpers.coordinates.Coord2D;
 import org.droidplanner.core.helpers.coordinates.Coord3D;
 import org.droidplanner.core.helpers.geoTools.GeoTools;
-import org.droidplanner.core.model.Drone;
+import org.droidplanner.services.android.drone.autopilot.MavLinkDrone;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -21,7 +22,7 @@ public class ROIEstimator implements LocationReceiver {
     protected Location realLocation;
     protected long timeOfLastLocation;
 
-    protected final Drone drone;
+    protected final MavLinkDrone drone;
     protected Handler watchdog;
     protected Runnable watchdogCallback = new Runnable() {
         @Override
@@ -33,7 +34,7 @@ public class ROIEstimator implements LocationReceiver {
 
     protected final AtomicBoolean isFollowEnabled = new AtomicBoolean(false);
 
-    public ROIEstimator(Drone drone, Handler handler) {
+    public ROIEstimator(MavLinkDrone drone, Handler handler) {
         this.watchdog = handler;
         this.drone = drone;
     }

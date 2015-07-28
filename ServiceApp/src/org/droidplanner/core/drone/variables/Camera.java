@@ -6,7 +6,7 @@ import java.util.List;
 import org.droidplanner.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.core.drone.DroneVariable;
 import org.droidplanner.core.helpers.coordinates.Coord2D;
-import org.droidplanner.core.model.Drone;
+import org.droidplanner.services.android.drone.autopilot.MavLinkDrone;
 import org.droidplanner.core.survey.CameraInfo;
 import org.droidplanner.core.survey.Footprint;
 
@@ -18,7 +18,7 @@ public class Camera extends DroneVariable {
 	private List<Footprint> footprints = new ArrayList<Footprint>();
 	private double gimbal_pitch;
 
-	public Camera(Drone myDrone) {
+	public Camera(MavLinkDrone myDrone) {
 		super(myDrone);
 	}
 

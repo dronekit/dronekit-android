@@ -1,11 +1,13 @@
 package org.droidplanner.core.gcs.follow;
 
+import android.os.Handler;
+
 import org.droidplanner.core.drone.DroneInterfaces;
 import org.droidplanner.core.gcs.location.Location;
 import org.droidplanner.core.helpers.coordinates.Coord2D;
 import org.droidplanner.core.helpers.geoTools.GeoTools;
 import org.droidplanner.core.helpers.math.MathUtil;
-import org.droidplanner.core.model.Drone;
+import org.droidplanner.services.android.drone.autopilot.MavLinkDrone;
 
 public class FollowCircle extends FollowWithRadiusAlgorithm {
 
@@ -15,7 +17,7 @@ public class FollowCircle extends FollowWithRadiusAlgorithm {
     private double circleStep = 2;
     private double circleAngle = 0.0;
 
-    public FollowCircle(Drone drone, DroneInterfaces.Handler handler, double radius, double rate) {
+    public FollowCircle(MavLinkDrone drone, Handler handler, double radius, double rate) {
         super(drone, handler, radius);
         circleStep = rate;
     }
