@@ -410,7 +410,7 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
 
         switch(attributeType){
             case AttributeType.FOLLOW_STATE:
-                return CommonApiUtils.getFollowState(getFollowMe());
+                return CommonApiUtils.getFollowState(followMe);
 
             case AttributeType.CAMERA:
                 return CommonApiUtils.getCameraProxy(drone, cameraDetails);
@@ -437,7 +437,7 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
                 break;
 
             case MissionActions.ACTION_BUILD_COMPLEX_MISSION_ITEM:
-                CommonApiUtils.buildComplexMissionItem(getDrone(), data);
+                CommonApiUtils.buildComplexMissionItem(drone, data);
                 break;
 
             //FOLLOW-ME ACTIONS
@@ -479,7 +479,7 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
                 break;
 
             case FollowMeActions.ACTION_DISABLE_FOLLOW_ME:
-                CommonApiUtils.disableFollowMe(getFollowMe());
+                CommonApiUtils.disableFollowMe(followMe);
                 break;
 
             default:

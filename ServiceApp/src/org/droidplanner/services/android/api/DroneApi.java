@@ -30,7 +30,6 @@ import com.o3dr.services.android.lib.model.action.Action;
 
 import org.droidplanner.core.drone.DroneInterfaces;
 import org.droidplanner.core.drone.variables.calibration.AccelCalibration;
-import org.droidplanner.core.gcs.follow.Follow;
 import org.droidplanner.core.parameters.Parameter;
 import org.droidplanner.services.android.drone.DroneManager;
 import org.droidplanner.services.android.drone.autopilot.MavLinkDrone;
@@ -107,22 +106,11 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
         return this.droneMgr;
     }
 
-    private MavLinkDrone getDrone() {
-        if (this.droneMgr == null)
-            return null;
-
-        return this.droneMgr.getDrone();
-    }
-
-    private Follow getFollowMe() {
-        if (this.droneMgr == null)
-            return null;
-
-        return this.droneMgr.getFollowMe();
-    }
-
     @Override
     public Bundle getAttribute(String type) throws RemoteException {
+        if(droneMgr == null)
+            return null;
+
         final DroneAttribute attribute = droneMgr.getAttribute(type);
         if (attribute == null)
             return null;
