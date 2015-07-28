@@ -34,12 +34,12 @@ import com.MAVLink.enums.MAV_SYS_STATUS_SENSOR;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.action.ExperimentalActions;
+import com.o3dr.services.android.lib.drone.action.GimbalActions;
 import com.o3dr.services.android.lib.drone.action.GuidedActions;
 import com.o3dr.services.android.lib.drone.action.ParameterActions;
 import com.o3dr.services.android.lib.drone.action.StateActions;
-import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
-import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
+import com.o3dr.services.android.lib.drone.camera.action.CameraActions;
 import com.o3dr.services.android.lib.drone.mission.action.MissionActions;
 import com.o3dr.services.android.lib.drone.property.DroneAttribute;
 import com.o3dr.services.android.lib.drone.property.VehicleMode;
@@ -82,7 +82,7 @@ import org.droidplanner.core.firmware.FirmwareType;
 import org.droidplanner.core.helpers.coordinates.Coord3D;
 import org.droidplanner.core.mission.Mission;
 import org.droidplanner.core.model.AutopilotWarningParser;
-import org.droidplanner.services.android.api.CommonApiUtils;
+import org.droidplanner.services.android.utils.CommonApiUtils;
 
 public abstract class ArduPilot implements MavLinkDrone {
 
@@ -122,7 +122,7 @@ public abstract class ArduPilot implements MavLinkDrone {
 
     private final Context context;
 
-    public ArduPilot(Context context, MAVLinkStreams.MAVLinkOutputStream mavClient, DroneInterfaces.Clock clock,
+    public ArduPilot(Context context, MAVLinkStreams.MAVLinkOutputStream mavClient,
                      DroneInterfaces.Handler handler, Preferences pref, AutopilotWarningParser warningParser,
                      LogMessageListener logListener) {
 
@@ -132,7 +132,7 @@ public abstract class ArduPilot implements MavLinkDrone {
         this.logListener = logListener;
 
         events = new DroneEvents(this, handler);
-        state = new State(this, clock, handler, warningParser);
+        state = new State(this, handler, warningParser);
         heartbeat = new HeartBeat(this, handler);
         parameters = new Parameters(this, handler);
         this.waypointManager = new WaypointManager(this, handler);
@@ -550,6 +550,22 @@ public abstract class ArduPilot implements MavLinkDrone {
 
             case CalibrationActions.ACTION_ACCEPT_MAGNETOMETER_CALIBRATION:
                 CommonApiUtils.acceptMagnetometerCalibration(this);
+                break;
+
+            //************ CAMERA ACTIONS *************//
+            case CameraActions.ACTION_START_VIDEO_RECORDING:
+                CommonApiUtils.startVideoRecording(this);
+                break;
+
+            case CameraActions.ACTION_STOP_VIDEO_RECORDING:
+                CommonApiUtils.stopVideoRecording(this);
+                break;
+
+            case GimbalActions.ACTION_SET_GIMBAL_ORIENTATION:
+                double pitch = data.getDouble(GimbalActions.GIMBAL_PITCH);
+                double roll = data.getDouble(GimbalActions.GIMBAL_ROLL);
+                double yaw = data.getDouble(GimbalActions.GIMBAL_YAW);
+                MavLinkDoCmds.setGimbalOrientation(this, pitch, roll, yaw, listener);
                 break;
         }
     }

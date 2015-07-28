@@ -3,7 +3,6 @@ package org.droidplanner.services.android.api;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.RemoteException;
@@ -13,29 +12,14 @@ import android.util.Pair;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.ardupilotmega.msg_mag_cal_progress;
 import com.MAVLink.ardupilotmega.msg_mag_cal_report;
-import com.o3dr.services.android.lib.coordinate.LatLong;
-import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.action.ConnectionActions;
-import com.o3dr.services.android.lib.drone.action.ExperimentalActions;
-import com.o3dr.services.android.lib.drone.action.GimbalActions;
-import com.o3dr.services.android.lib.drone.action.GuidedActions;
-import com.o3dr.services.android.lib.drone.action.ParameterActions;
-import com.o3dr.services.android.lib.drone.action.StateActions;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
-import com.o3dr.services.android.lib.drone.camera.action.CameraActions;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionResult;
 import com.o3dr.services.android.lib.drone.connection.DroneSharePrefs;
-import com.o3dr.services.android.lib.drone.mission.Mission;
-import com.o3dr.services.android.lib.drone.mission.action.MissionActions;
 import com.o3dr.services.android.lib.drone.property.DroneAttribute;
-import com.o3dr.services.android.lib.drone.property.Parameters;
-import com.o3dr.services.android.lib.drone.property.VehicleMode;
-import com.o3dr.services.android.lib.gcs.action.CalibrationActions;
-import com.o3dr.services.android.lib.gcs.action.FollowMeActions;
 import com.o3dr.services.android.lib.gcs.event.GCSEvent;
-import com.o3dr.services.android.lib.gcs.follow.FollowType;
 import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
 import com.o3dr.services.android.lib.model.IApiListener;
 import com.o3dr.services.android.lib.model.ICommandListener;
@@ -44,25 +28,19 @@ import com.o3dr.services.android.lib.model.IMavlinkObserver;
 import com.o3dr.services.android.lib.model.IObserver;
 import com.o3dr.services.android.lib.model.action.Action;
 
-import org.droidplanner.core.MAVLink.command.doCmd.MavLinkDoCmds;
 import org.droidplanner.core.drone.DroneInterfaces;
 import org.droidplanner.core.drone.variables.calibration.AccelCalibration;
 import org.droidplanner.core.gcs.follow.Follow;
-import org.droidplanner.core.gcs.follow.FollowAlgorithm;
-import org.droidplanner.core.helpers.coordinates.Coord2D;
-import org.droidplanner.core.helpers.coordinates.Coord3D;
 import org.droidplanner.core.parameters.Parameter;
 import org.droidplanner.services.android.drone.DroneManager;
 import org.droidplanner.services.android.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.exception.ConnectionException;
 import org.droidplanner.services.android.interfaces.DroneEventsListener;
+import org.droidplanner.services.android.utils.CommonApiUtils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import timber.log.Timber;
@@ -73,7 +51,6 @@ import timber.log.Timber;
 public final class DroneApi extends IDroneApi.Stub implements DroneEventsListener, IBinder.DeathRecipient {
 
     private final Context context;
-    private final DroneInterfaces.Handler droneHandler;
 
     private final ConcurrentLinkedQueue<IObserver> observersList;
     private final ConcurrentLinkedQueue<IMavlinkObserver> mavlinkObserversList;
@@ -88,25 +65,6 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
         this.service = dpService;
         this.context = dpService.getApplicationContext();
-
-        final Handler handler = new Handler(looper);
-
-        this.droneHandler = new DroneInterfaces.Handler() {
-            @Override
-            public void removeCallbacks(Runnable thread) {
-                handler.removeCallbacks(thread);
-            }
-
-            @Override
-            public void post(Runnable thread) {
-                handler.post(thread);
-            }
-
-            @Override
-            public void postDelayed(Runnable thread, long timeout) {
-                handler.postDelayed(thread, timeout);
-            }
-        };
 
         this.ownerId = ownerId;
 
@@ -217,7 +175,6 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     public void removeAttributesObserver(IObserver observer) throws RemoteException {
         if (observer != null) {
             observersList.remove(observer);
-
             checkForSelfRelease();
         }
     }
@@ -256,22 +213,6 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
             case ConnectionActions.ACTION_DISCONNECT:
                 disconnect();
-                break;
-
-            //************ CAMERA ACTIONS *************//
-            case CameraActions.ACTION_START_VIDEO_RECORDING:
-                CommonApiUtils.startVideoRecording(getDrone());
-                break;
-
-            case CameraActions.ACTION_STOP_VIDEO_RECORDING:
-                CommonApiUtils.stopVideoRecording(getDrone());
-                break;
-
-            case GimbalActions.ACTION_SET_GIMBAL_ORIENTATION:
-                double pitch = data.getDouble(GimbalActions.GIMBAL_PITCH);
-                double roll = data.getDouble(GimbalActions.GIMBAL_ROLL);
-                double yaw = data.getDouble(GimbalActions.GIMBAL_YAW);
-                MavLinkDoCmds.setGimbalOrientation(getDrone(), pitch, roll, yaw, listener);
                 break;
 
             default:
@@ -368,7 +309,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
     @Override
     public void onAttributeEvent(String attributeEvent, Bundle eventInfo) {
-        if(TextUtils.isEmpty(attributeEvent))
+        if (TextUtils.isEmpty(attributeEvent))
             return;
 
         notifyAttributeUpdate(attributeEvent, eventInfo);

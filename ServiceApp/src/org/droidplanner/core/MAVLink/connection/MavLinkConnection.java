@@ -1,10 +1,11 @@
 package org.droidplanner.core.MAVLink.connection;
 
+import android.support.v4.util.Pair;
+
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Parser;
 
 import org.droidplanner.core.model.Logger;
-import org.droidplanner.core.util.Pair;
 
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;

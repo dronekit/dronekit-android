@@ -13,6 +13,7 @@ import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 
 import org.droidplanner.core.MAVLink.MAVLinkStreams;
 import org.droidplanner.core.MAVLink.MavLinkArm;
+import org.droidplanner.services.android.drone.autopilot.ArduCopter;
 import org.droidplanner.services.android.drone.autopilot.ArduPilot;
 import org.droidplanner.core.drone.DroneInterfaces;
 import org.droidplanner.core.drone.LogMessageListener;
@@ -96,7 +97,7 @@ public class BasicTest {
         DroidPlannerPrefs dpPrefs = new DroidPlannerPrefs(context);
         MAVLinkClient mavClient = new MAVLinkClient(context, inputStreamListener, connParams, mavlinkApi);
 
-        drone = new ArduPilot(mavClient, clock, dpHandler, dpPrefs, new AndroidApWarningParser(), new LogMessageListener() {
+        drone = new ArduCopter(context, mavClient, dpHandler, dpPrefs, new AndroidApWarningParser(), new LogMessageListener() {
             @Override
             public void onMessageLogged(int mavSeverity, String message) {
 

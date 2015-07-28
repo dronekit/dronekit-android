@@ -41,7 +41,7 @@ import org.droidplanner.core.gcs.follow.FollowAlgorithm;
 import org.droidplanner.core.helpers.coordinates.Coord2D;
 import org.droidplanner.core.helpers.coordinates.Coord3D;
 import org.droidplanner.core.parameters.Parameter;
-import org.droidplanner.services.android.api.CommonApiUtils;
+import org.droidplanner.services.android.utils.CommonApiUtils;
 import org.droidplanner.services.android.api.MavLinkServiceApi;
 import org.droidplanner.services.android.communication.connection.DroneshareClient;
 import org.droidplanner.services.android.communication.service.MAVLinkClient;
@@ -113,13 +113,6 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
             return;
         }
 
-        final DroneInterfaces.Clock clock = new DroneInterfaces.Clock() {
-            @Override
-            public long elapsedRealtime() {
-                return SystemClock.elapsedRealtime();
-            }
-        };
-
         final DroidPlannerPrefs dpPrefs = new DroidPlannerPrefs(context);
 
         final DroneInterfaces.Handler dpHandler = new DroneInterfaces.Handler() {
@@ -141,19 +134,19 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
 
         switch (type) {
             case ARDU_COPTER:
-                this.drone = new ArduCopter(mavClient, clock, dpHandler, dpPrefs, new AndroidApWarningParser(), this);
+                this.drone = new ArduCopter(context, mavClient, dpHandler, dpPrefs, new AndroidApWarningParser(), this);
                 break;
 
             case ARDU_SOLO:
-                this.drone = new ArduSolo(mavClient, clock, dpHandler, dpPrefs, new AndroidApWarningParser(), this);
+                this.drone = new ArduSolo(context, mavClient, dpHandler, dpPrefs, new AndroidApWarningParser(), this);
                 break;
 
             case ARDU_PLANE:
-                this.drone = new ArduPlane(mavClient, clock, dpHandler, dpPrefs, new AndroidApWarningParser(), this);
+                this.drone = new ArduPlane(context, mavClient, dpHandler, dpPrefs, new AndroidApWarningParser(), this);
                 break;
 
             case ARDU_ROVER:
-                this.drone = new ArduRover(mavClient, clock, dpHandler, dpPrefs, new AndroidApWarningParser(), this);
+                this.drone = new ArduRover(context, mavClient, dpHandler, dpPrefs, new AndroidApWarningParser(), this);
                 break;
         }
 

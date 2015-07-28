@@ -1,8 +1,6 @@
 package org.droidplanner.services.android.drone.autopilot;
 
-import com.o3dr.services.android.lib.drone.property.DroneAttribute;
-import com.o3dr.services.android.lib.model.ICommandListener;
-import com.o3dr.services.android.lib.model.action.Action;
+import android.content.Context;
 
 import org.droidplanner.core.MAVLink.MAVLinkStreams;
 import org.droidplanner.core.drone.DroneInterfaces;
@@ -15,17 +13,8 @@ import org.droidplanner.core.model.AutopilotWarningParser;
  */
 public class ArduCopter extends ArduPilot {
 
-    public ArduCopter(MAVLinkStreams.MAVLinkOutputStream mavClient, DroneInterfaces.Clock clock, DroneInterfaces.Handler handler, Preferences pref, AutopilotWarningParser warningParser, LogMessageListener logListener) {
-        super(mavClient, clock, handler, pref, warningParser, logListener);
+    public ArduCopter(Context context, MAVLinkStreams.MAVLinkOutputStream mavClient, DroneInterfaces.Handler handler, Preferences pref, AutopilotWarningParser warningParser, LogMessageListener logListener) {
+        super(context, mavClient, handler, pref, warningParser, logListener);
     }
 
-    @Override
-    public DroneAttribute getAttribute(String attributeType) {
-        return null;
-    }
-
-    @Override
-    public void executeAsyncAction(Action action, ICommandListener listener) {
-
-    }
 }

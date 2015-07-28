@@ -1,4 +1,4 @@
-package org.droidplanner.services.android.api;
+package org.droidplanner.services.android.utils;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -51,7 +51,6 @@ import com.o3dr.services.android.lib.model.ICommandListener;
 
 import org.droidplanner.core.MAVLink.MavLinkArm;
 import org.droidplanner.core.MAVLink.command.doCmd.MavLinkDoCmds;
-import org.droidplanner.core.drone.DroneInterfaces;
 import org.droidplanner.core.drone.camera.GoProImpl;
 import org.droidplanner.core.drone.profiles.VehicleProfile;
 import org.droidplanner.core.drone.variables.ApmModes;
@@ -71,8 +70,6 @@ import org.droidplanner.core.mission.survey.SurveyImpl;
 import org.droidplanner.services.android.drone.autopilot.MavLinkDrone;
 import org.droidplanner.core.survey.Footprint;
 import org.droidplanner.services.android.drone.DroneManager;
-import org.droidplanner.services.android.utils.MathUtils;
-import org.droidplanner.services.android.utils.ProxyUtils;
 import org.droidplanner.services.android.utils.file.IO.ParameterMetadataLoader;
 import org.xmlpull.v1.XmlPullParserException;
 
