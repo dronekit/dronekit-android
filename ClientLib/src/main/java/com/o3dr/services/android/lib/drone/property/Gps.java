@@ -8,7 +8,7 @@ import com.o3dr.services.android.lib.coordinate.LatLong;
 /**
  * Stores GPS information.
  */
-public class Gps implements Parcelable {
+public class Gps implements DroneAttribute {
 
     public static final String LOCK_2D = "2D";
     public static final String LOCK_3D = "3D";

@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Created by fhuya on 10/28/14.
  */
-public class Parameters implements Parcelable {
+public class Parameters implements DroneAttribute {
 
     private List<Parameter> parametersList = new ArrayList<Parameter>();
 

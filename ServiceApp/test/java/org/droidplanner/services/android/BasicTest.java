@@ -11,12 +11,12 @@ import com.MAVLink.common.msg_command_long;
 import com.MAVLink.enums.MAV_CMD;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 
-import org.droidplanner.core.MAVLink.MAVLinkStreams;
-import org.droidplanner.core.MAVLink.MavLinkArm;
-import org.droidplanner.core.drone.DroneImpl;
-import org.droidplanner.core.drone.DroneInterfaces;
-import org.droidplanner.core.drone.LogMessageListener;
-import org.droidplanner.core.model.Drone;
+import org.droidplanner.services.android.core.MAVLink.MAVLinkStreams;
+import org.droidplanner.services.android.core.MAVLink.MavLinkArm;
+import org.droidplanner.services.android.core.drone.autopilot.ArduCopter;
+import org.droidplanner.services.android.core.drone.DroneInterfaces;
+import org.droidplanner.services.android.core.drone.LogMessageListener;
+import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.communication.service.MAVLinkClient;
 import org.droidplanner.services.android.mock.MockMavLinkServiceAPI;
 import org.droidplanner.services.android.utils.AndroidApWarningParser;
@@ -37,7 +37,7 @@ import org.robolectric.annotation.Config;
 @Config(emulateSdk = 18)
 public class BasicTest {
 
-    private Drone drone;
+    private MavLinkDrone drone;
     private MockMavLinkServiceAPI mavlinkApi;
 
     private final DroneInterfaces.Handler dpHandler = new DroneInterfaces.Handler() {
@@ -96,7 +96,7 @@ public class BasicTest {
         DroidPlannerPrefs dpPrefs = new DroidPlannerPrefs(context);
         MAVLinkClient mavClient = new MAVLinkClient(context, inputStreamListener, connParams, mavlinkApi);
 
-        drone = new DroneImpl(mavClient, clock, dpHandler, dpPrefs, new AndroidApWarningParser(), new LogMessageListener() {
+        drone = new ArduCopter(context, mavClient, dpHandler, dpPrefs, new AndroidApWarningParser(), new LogMessageListener() {
             @Override
             public void onMessageLogged(int mavSeverity, String message) {
 

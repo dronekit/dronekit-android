@@ -6,7 +6,7 @@ import android.os.Parcelable;
 /**
  * Created by fhuya on 10/28/14.
  */
-public class Attitude implements Parcelable {
+public class Attitude implements DroneAttribute {
 
     private  double roll;
     private  double pitch;

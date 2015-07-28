@@ -6,7 +6,7 @@ import android.os.Parcelable;
 /**
  * Stores information about the drone's type.
  */
-public class Type implements Parcelable {
+public class Type implements DroneAttribute {
 
     public static final int TYPE_UNKNOWN = -1;
     public static final int TYPE_PLANE = 1;
