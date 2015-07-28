@@ -7,11 +7,11 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.model.ICommandListener;
 
-import org.droidplanner.core.MAVLink.MAVLinkStreams;
-import org.droidplanner.core.MAVLink.connection.MavLinkConnection;
-import org.droidplanner.core.MAVLink.connection.MavLinkConnectionListener;
-import org.droidplanner.core.MAVLink.connection.MavLinkConnectionTypes;
-import org.droidplanner.core.drone.CommandTracker;
+import org.droidplanner.services.android.core.MAVLink.MAVLinkStreams;
+import org.droidplanner.services.android.core.MAVLink.connection.MavLinkConnection;
+import org.droidplanner.services.android.core.MAVLink.connection.MavLinkConnectionListener;
+import org.droidplanner.services.android.core.MAVLink.connection.MavLinkConnectionTypes;
+import org.droidplanner.services.android.core.drone.CommandTracker;
 import org.droidplanner.services.android.api.MavLinkServiceApi;
 import org.droidplanner.services.android.data.SessionDB;
 import org.droidplanner.services.android.utils.file.DirectoryPath;

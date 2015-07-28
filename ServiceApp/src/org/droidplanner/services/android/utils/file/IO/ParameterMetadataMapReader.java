@@ -7,7 +7,7 @@ import java.io.InputStream;
 import java.util.Map;
 
 import org.droidplanner.services.android.utils.file.DirectoryPath;
-import org.droidplanner.core.parameters.ParameterMetadata;
+import org.droidplanner.services.android.core.parameters.ParameterMetadata;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 

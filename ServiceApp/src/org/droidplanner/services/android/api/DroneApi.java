@@ -28,13 +28,13 @@ import com.o3dr.services.android.lib.model.IMavlinkObserver;
 import com.o3dr.services.android.lib.model.IObserver;
 import com.o3dr.services.android.lib.model.action.Action;
 
-import org.droidplanner.core.drone.DroneInterfaces;
-import org.droidplanner.core.drone.variables.calibration.AccelCalibration;
-import org.droidplanner.core.parameters.Parameter;
-import org.droidplanner.services.android.drone.DroneManager;
-import org.droidplanner.services.android.drone.autopilot.MavLinkDrone;
+import org.droidplanner.services.android.core.drone.DroneInterfaces;
+import org.droidplanner.services.android.core.drone.variables.calibration.AccelCalibration;
+import org.droidplanner.services.android.core.parameters.Parameter;
+import org.droidplanner.services.android.core.drone.DroneManager;
+import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.exception.ConnectionException;
-import org.droidplanner.services.android.interfaces.DroneEventsListener;
+import org.droidplanner.services.android.core.drone.DroneEventsListener;
 import org.droidplanner.services.android.utils.CommonApiUtils;
 
 import java.util.ArrayList;
