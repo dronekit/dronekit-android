@@ -511,12 +511,13 @@ public class DroneApiUtils {
             return proxyMission;
 
         org.droidplanner.core.mission.Mission droneMission = drone.getMission();
-        List<org.droidplanner.core.mission.MissionItem> droneMissionItems = droneMission.getItems();
+//        List<org.droidplanner.core.mission.MissionItem> droneMissionItems = droneMission.getItems();
+        List<org.droidplanner.core.mission.MissionItem> componentMissionItems = droneMission.getComponentItems();
 
 
         proxyMission.setCurrentMissionItem((short) drone.getMissionStats().getCurrentWP());
-        if (!droneMissionItems.isEmpty()) {
-            for (org.droidplanner.core.mission.MissionItem item : droneMissionItems) {
+        if (!componentMissionItems.isEmpty()) {
+            for (org.droidplanner.core.mission.MissionItem item : componentMissionItems) {
                 proxyMission.addMissionItem(ProxyUtils.getProxyMissionItem(item));
             }
         }
@@ -975,15 +976,14 @@ public class DroneApiUtils {
         }
     }
 
-    static void jumpToMissionItem(Drone drone, int missionItemIndex, ICommandListener listener){
+    static void gotoWaypoint(Drone drone, int waypoint, ICommandListener listener){
         if(drone == null)
             return;
-        int waypoint = drone.getMission().getWaypointFromMissionItemIndex(missionItemIndex);
-        if(waypoint == -1){
+        if(waypoint < 0){
             postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
             return;
         }
-        MavLinkDoCmds.jumpToWaypoint(drone, waypoint, listener);
+        MavLinkDoCmds.gotoWaypoint(drone, waypoint, listener);
     }
 
     static void buildComplexMissionItem(Drone drone, Bundle itemBundle) {

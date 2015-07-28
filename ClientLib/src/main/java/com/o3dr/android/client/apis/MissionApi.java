@@ -78,12 +78,12 @@ public class MissionApi implements Api {
 
     /**
      * Jump to the desired command in the mission list. Repeat this action only the specified number of times
-     * @param missionItemIndex command to jump to
+     * @param waypoint command to jump to
      * @param listener
      */
-    public void gotoMissionItem(int missionItemIndex, AbstractCommandListener listener){
+    public void gotoWaypoint(int waypoint, AbstractCommandListener listener){
         Bundle params = new Bundle();
-        params.putInt(EXTRA_MISSION_ITEM_INDEX, missionItemIndex);
+        params.putInt(EXTRA_MISSION_ITEM_INDEX, waypoint);
         drone.performAsyncActionOnDroneThread(new Action(ACTION_GOTO_MISSION_ITEM, params), listener);
     }
 

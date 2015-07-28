@@ -131,7 +131,7 @@ public class MavLinkDoCmds {
      * @param waypoint    command
      * @param listener            Register a callback to receive update of the command execution state.
      */
-    public static void jumpToWaypoint(Drone drone, int waypoint, ICommandListener listener){
+    public static void gotoWaypoint(Drone drone, int waypoint, ICommandListener listener){
         if (drone == null)
             return;
         msg_mission_set_current msg = new msg_mission_set_current();

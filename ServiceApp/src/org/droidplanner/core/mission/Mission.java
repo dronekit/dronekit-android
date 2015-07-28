@@ -38,6 +38,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import timber.log.Timber;
+
 /**
  * This implements a mavlink mission. A mavlink mission is a set of
  * commands/mission items to be carried out by the drone. TODO: rename the
@@ -49,9 +51,8 @@ public class Mission extends DroneVariable {
      * Stores the set of mission items belonging to this mission.
      */
     private List<MissionItem> items = new ArrayList<MissionItem>();
+    private List<MissionItem> componentItems = new ArrayList<>();
     private double defaultAlt = 20.0;
-    private final SparseIntArray waypointToMissionItem = new SparseIntArray();
-    private final SparseIntArray missionItemToWaypoint = new SparseIntArray();
 
     public Mission(Drone myDrone) {
         super(myDrone);
@@ -128,6 +129,7 @@ public class Mission extends DroneVariable {
      * of this class
      */
     public void notifyMissionUpdate() {
+        updateComponentItems();
         myDrone.notifyDroneEvent(DroneEventsType.MISSION_UPDATE);
     }
 
@@ -196,20 +198,18 @@ public class Mission extends DroneVariable {
         notifyMissionUpdate();
     }
 
-    public int getWaypointFromMissionItemIndex(int missionItemindex){
-        return missionItemToWaypoint.get(missionItemindex, -1);
-    }
-
-    public int getMissionItemIndexFromWaypoint(int waypoint){
-        return waypointToMissionItem.get(waypoint, -1);
-    }
-
     public void onWriteWaypoints(msg_mission_ack msg) {
         myDrone.notifyDroneEvent(DroneEventsType.MISSION_SENT);
     }
 
     public List<MissionItem> getItems() {
         return items;
+    }
+    public List<MissionItem> getComponentItems(){
+        if(componentItems == null || componentItems.size() == 0) {
+            updateComponentItems();
+        }
+        return componentItems;
     }
 
     public int getOrder(MissionItem waypoint) {
@@ -269,13 +269,8 @@ public class Mission extends DroneVariable {
     }
 
     private List<MissionItem> processMavLinkMessages(List<msg_mission_item> msgs) {
-        waypointToMissionItem.clear();
-        missionItemToWaypoint.clear();
         List<MissionItem> received = new ArrayList<MissionItem>();
-        int waypointCount = 0;
         for (msg_mission_item msg : msgs) {
-            missionItemToWaypoint.append(waypointCount, waypointCount);
-            waypointToMissionItem.append(waypointCount, waypointCount);
             switch (msg.command) {
                 case MAV_CMD.MAV_CMD_DO_SET_SERVO:
                     received.add(new SetServo(msg, this));
@@ -324,7 +319,6 @@ public class Mission extends DroneVariable {
                 default:
                     break;
             }
-            waypointCount++;
         }
         return received;
     }
@@ -333,12 +327,23 @@ public class Mission extends DroneVariable {
      * Sends the mission to the drone using the mavlink protocol.
      */
     public void sendMissionToAPM() {
-        myDrone.getWaypointManager().writeWaypoints(getMsgMissionItems());
+        List<msg_mission_item> msgMissionItems = getMsgMissionItems();
+        myDrone.getWaypointManager().writeWaypoints(msgMissionItems);
+        updateComponentItems(msgMissionItems);
+    }
+
+    private void updateComponentItems(){
+        List<msg_mission_item> msgMissionItems = getMsgMissionItems();
+        msgMissionItems.remove(0);
+        updateComponentItems(msgMissionItems);
+    }
+
+    private void updateComponentItems(List<msg_mission_item> msgMissionItems) {
+        componentItems.clear();
+        componentItems = processMavLinkMessages(msgMissionItems);
     }
 
     public List<msg_mission_item> getMsgMissionItems() {
-        waypointToMissionItem.clear();
-        missionItemToWaypoint.clear();
         final List<msg_mission_item> data = new ArrayList<msg_mission_item>();
 
         int waypointCount = 0;
@@ -349,9 +354,7 @@ public class Mission extends DroneVariable {
         int size = items.size();
         for (int i = 0; i < size; i++) {
             MissionItem item = items.get(i);
-            missionItemToWaypoint.append(i, waypointCount);
             for(msg_mission_item msg_item: item.packMissionItem()){
-                waypointToMissionItem.append(waypointCount, i);
                 msg_item.seq = waypointCount++;
                 data.add(msg_item);
             }
