@@ -39,6 +39,7 @@ import com.o3dr.services.android.lib.drone.action.GuidedActions;
 import com.o3dr.services.android.lib.drone.action.ParameterActions;
 import com.o3dr.services.android.lib.drone.action.StateActions;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
+import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.drone.camera.action.CameraActions;
 import com.o3dr.services.android.lib.drone.mission.action.MissionActions;
 import com.o3dr.services.android.lib.drone.property.DroneAttribute;
@@ -430,6 +431,7 @@ public abstract class ArduPilot implements MavLinkDrone {
     public void executeAsyncAction(Action action, ICommandListener listener) {
         final String type = action.getType();
         Bundle data = action.getData();
+
         switch(type){
             // MISSION ACTIONS
             case MissionActions.ACTION_LOAD_WAYPOINTS:
@@ -566,6 +568,10 @@ public abstract class ArduPilot implements MavLinkDrone {
                 double roll = data.getDouble(GimbalActions.GIMBAL_ROLL);
                 double yaw = data.getDouble(GimbalActions.GIMBAL_YAW);
                 MavLinkDoCmds.setGimbalOrientation(this, pitch, roll, yaw, listener);
+                break;
+
+            default:
+                CommonApiUtils.postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
                 break;
         }
     }
