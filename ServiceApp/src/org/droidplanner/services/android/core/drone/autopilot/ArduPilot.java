@@ -3,12 +3,14 @@ package org.droidplanner.services.android.core.drone.autopilot;
 import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.Surface;
 
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.ardupilotmega.msg_camera_feedback;
 import com.MAVLink.ardupilotmega.msg_ekf_status_report;
 import com.MAVLink.ardupilotmega.msg_mag_cal_progress;
 import com.MAVLink.ardupilotmega.msg_mag_cal_report;
+import com.MAVLink.ardupilotmega.msg_mount_configure;
 import com.MAVLink.ardupilotmega.msg_mount_status;
 import com.MAVLink.ardupilotmega.msg_radio;
 import com.MAVLink.common.msg_attitude;
@@ -31,8 +33,10 @@ import com.MAVLink.enums.MAV_MODE_FLAG;
 import com.MAVLink.enums.MAV_SEVERITY;
 import com.MAVLink.enums.MAV_STATE;
 import com.MAVLink.enums.MAV_SYS_STATUS_SENSOR;
+import com.o3dr.android.client.apis.CapabilityApi;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
+import com.o3dr.services.android.lib.drone.action.CapabilityActions;
 import com.o3dr.services.android.lib.drone.action.ExperimentalActions;
 import com.o3dr.services.android.lib.drone.action.GimbalActions;
 import com.o3dr.services.android.lib.drone.action.GuidedActions;
@@ -40,7 +44,10 @@ import com.o3dr.services.android.lib.drone.action.ParameterActions;
 import com.o3dr.services.android.lib.drone.action.StateActions;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
-import com.o3dr.services.android.lib.drone.camera.action.CameraActions;
+import com.o3dr.services.android.lib.drone.companion.solo.SoloControllerMode;
+import com.o3dr.services.android.lib.drone.companion.solo.action.SoloLinkActions;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSettingSetter;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
 import com.o3dr.services.android.lib.drone.mission.action.MissionActions;
 import com.o3dr.services.android.lib.drone.property.DroneAttribute;
 import com.o3dr.services.android.lib.drone.property.VehicleMode;
@@ -50,13 +57,13 @@ import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
 
 import org.droidplanner.services.android.core.MAVLink.MAVLinkStreams;
+import org.droidplanner.services.android.core.MAVLink.MavLinkParameters;
 import org.droidplanner.services.android.core.MAVLink.WaypointManager;
 import org.droidplanner.services.android.core.MAVLink.command.doCmd.MavLinkDoCmds;
 import org.droidplanner.services.android.core.drone.DroneEvents;
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
 import org.droidplanner.services.android.core.drone.LogMessageListener;
 import org.droidplanner.services.android.core.drone.Preferences;
-import org.droidplanner.services.android.core.drone.camera.GoProImpl;
 import org.droidplanner.services.android.core.drone.profiles.Parameters;
 import org.droidplanner.services.android.core.drone.profiles.VehicleProfile;
 import org.droidplanner.services.android.core.drone.variables.Altitude;
@@ -83,6 +90,7 @@ import org.droidplanner.services.android.core.firmware.FirmwareType;
 import org.droidplanner.services.android.core.helpers.coordinates.Coord3D;
 import org.droidplanner.services.android.core.mission.Mission;
 import org.droidplanner.services.android.core.model.AutopilotWarningParser;
+import org.droidplanner.services.android.core.parameters.Parameter;
 import org.droidplanner.services.android.utils.CommonApiUtils;
 
 public abstract class ArduPilot implements MavLinkDrone {
@@ -113,7 +121,6 @@ public abstract class ArduPilot implements MavLinkDrone {
     private final State state;
     private final HeartBeat heartbeat;
     private final Parameters parameters;
-    private final GoProImpl goProImpl;
 
     private final MAVLinkStreams.MAVLinkOutputStream MavClient;
     private final Preferences preferences;
@@ -156,7 +163,6 @@ public abstract class ArduPilot implements MavLinkDrone {
         this.magCalibration = new MagnetometerCalibrationImpl(this);
         this.mag = new Magnetometer(this);
         this.footprints = new Camera(this);
-        this.goProImpl = new GoProImpl(this, handler);
 
         loadVehicleProfile();
     }
@@ -370,10 +376,6 @@ public abstract class ArduPilot implements MavLinkDrone {
             logListener.onMessageLogged(mavSeverity, message);
     }
 
-    @Override
-    public GoProImpl getGoProImpl() {
-        return this.goProImpl;
-    }
 
     @Override
     public DroneAttribute getAttribute(String attributeType) {
@@ -416,9 +418,6 @@ public abstract class ArduPilot implements MavLinkDrone {
 
             case AttributeType.GUIDED_STATE:
                 return CommonApiUtils.getGuidedState(this);
-
-            case AttributeType.GOPRO:
-                return CommonApiUtils.getGoPro(this);
 
             case AttributeType.MAGNETOMETER_CALIBRATION_STATUS:
                 return CommonApiUtils.getMagnetometerCalibrationStatus(this);
@@ -554,20 +553,34 @@ public abstract class ArduPilot implements MavLinkDrone {
                 CommonApiUtils.acceptMagnetometerCalibration(this);
                 break;
 
-            //************ CAMERA ACTIONS *************//
-            case CameraActions.ACTION_START_VIDEO_RECORDING:
-                CommonApiUtils.startVideoRecording(this);
-                break;
-
-            case CameraActions.ACTION_STOP_VIDEO_RECORDING:
-                CommonApiUtils.stopVideoRecording(this);
-                break;
-
+            //************ Gimbal ACTIONS *************//
             case GimbalActions.ACTION_SET_GIMBAL_ORIENTATION:
                 double pitch = data.getDouble(GimbalActions.GIMBAL_PITCH);
                 double roll = data.getDouble(GimbalActions.GIMBAL_ROLL);
                 double yaw = data.getDouble(GimbalActions.GIMBAL_YAW);
                 MavLinkDoCmds.setGimbalOrientation(this, pitch, roll, yaw, listener);
+                break;
+
+            case GimbalActions.ACTION_RESET_GIMBAL_MOUNT_MODE:
+                MavLinkDoCmds.resetROI(this, listener);
+                break;
+
+            case GimbalActions.ACTION_SET_GIMBAL_MOUNT_MODE:
+                final int mountMode = data.getInt(GimbalActions.GIMBAL_MOUNT_MODE);
+
+                Parameter mountParam = getParameters().getParameter("MNT_MODE");
+                if (mountParam == null) {
+                    msg_mount_configure msg = new msg_mount_configure();
+                    msg.target_system = getSysid();
+                    msg.target_component = getCompid();
+                    msg.mount_mode = (byte) mountMode;
+                    msg.stab_pitch =  0;
+                    msg.stab_roll =  0;
+                    msg.stab_yaw =  0;
+                    getMavClient().sendMavMessage(msg, listener);
+                } else {
+                    MavLinkParameters.sendParameter(this, "MNT_MODE", 1, mountMode);
+                }
                 break;
 
             default:

@@ -7,6 +7,9 @@ import com.o3dr.services.android.lib.util.Utils;
  */
 public class CalibrationActions {
 
+    //Private to prevent instantiation
+    private CalibrationActions(){}
+
     public static final String ACTION_START_IMU_CALIBRATION = Utils.PACKAGE_NAME + ".action.START_IMU_CALIBRATION";
     public static final String ACTION_SEND_IMU_CALIBRATION_ACK = Utils.PACKAGE_NAME + ".action" +
             ".SEND_IMU_CALIBRATION_ACK";

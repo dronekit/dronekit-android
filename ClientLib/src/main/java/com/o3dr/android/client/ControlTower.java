@@ -94,8 +94,9 @@ public class ControlTower {
             try {
                 connectedApps = o3drServices.getConnectedApps(getApplicationId());
                 if (connectedApps != null) {
+                    final ClassLoader classLoader = ConnectionParameter.class.getClassLoader();
                     for (Bundle appInfo : connectedApps) {
-                        appInfo.setClassLoader(ConnectionParameter.class.getClassLoader());
+                        appInfo.setClassLoader(classLoader);
                     }
                 }
             } catch (RemoteException e) {

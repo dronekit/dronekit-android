@@ -2,6 +2,9 @@ package org.droidplanner.services.android.core.mission;
 
 import android.util.Pair;
 
+import android.util.SparseArray;
+import android.util.SparseIntArray;
+
 import com.MAVLink.common.msg_mission_ack;
 import com.MAVLink.common.msg_mission_item;
 import com.MAVLink.enums.MAV_CMD;
@@ -44,6 +47,8 @@ public class Mission extends DroneVariable {
      */
     private List<MissionItem> items = new ArrayList<MissionItem>();
     private double defaultAlt = 20.0;
+    private final SparseIntArray waypointToMissionItem = new SparseIntArray();
+    private final SparseIntArray missionItemToWaypoint = new SparseIntArray();
 
     public Mission(MavLinkDrone myDrone) {
         super(myDrone);
@@ -188,6 +193,14 @@ public class Mission extends DroneVariable {
         notifyMissionUpdate();
     }
 
+    public int getWaypointFromMissionItemIndex(int missionItemindex){
+        return missionItemToWaypoint.get(missionItemindex, -1);
+    }
+
+    public int getMissionItemIndexFromWaypoint(int waypoint){
+        return waypointToMissionItem.get(waypoint, -1);
+    }
+
     public void onWriteWaypoints(msg_mission_ack msg) {
         myDrone.notifyDroneEvent(DroneEventsType.MISSION_SENT);
     }
@@ -316,10 +329,24 @@ public class Mission extends DroneVariable {
     }
 
     public List<msg_mission_item> getMsgMissionItems() {
+        waypointToMissionItem.clear();
+        missionItemToWaypoint.clear();
         final List<msg_mission_item> data = new ArrayList<msg_mission_item>();
-        data.add(myDrone.getHome().packMavlink());
-        for (MissionItem item : items) {
-            data.addAll(item.packMissionItem());
+
+        int waypointCount = 0;
+        msg_mission_item home = myDrone.getHome().packMavlink();
+        home.seq = waypointCount++;
+        data.add(home);
+
+        int size = items.size();
+        for (int i = 0; i < size; i++) {
+            MissionItem item = items.get(i);
+            missionItemToWaypoint.append(i, waypointCount);
+            for(msg_mission_item msg_item: item.packMissionItem()){
+                waypointToMissionItem.append(waypointCount, i);
+                msg_item.seq = waypointCount++;
+                data.add(msg_item);
+            }
         }
         return data;
     }

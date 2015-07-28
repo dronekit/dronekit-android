@@ -111,7 +111,6 @@ public class WaypointManager extends DroneVariable {
 
         if ((mission != null)) {
             doBeginWaypointEvent(WaypointEvent_Type.WP_UPLOAD);
-            updateMsgIndexes(data);
             mission.clear();
             mission.addAll(data);
             writeIndex = 0;
@@ -119,13 +118,6 @@ public class WaypointManager extends DroneVariable {
             MavLinkWaypoint.sendWaypointCount(myDrone, mission.size());
 
             startWatchdog();
-        }
-    }
-
-    private void updateMsgIndexes(List<msg_mission_item> data) {
-        short index = 0;
-        for (msg_mission_item msg : data) {
-            msg.seq = index++;
         }
     }
 

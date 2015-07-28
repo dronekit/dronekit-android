@@ -2,6 +2,8 @@ package org.droidplanner.services.android.core.drone;
 
 import android.os.Bundle;
 
+import android.os.Bundle;
+
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.o3dr.services.android.lib.drone.connection.DroneSharePrefs;
 

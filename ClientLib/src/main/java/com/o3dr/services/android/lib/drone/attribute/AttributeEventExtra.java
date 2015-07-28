@@ -50,6 +50,8 @@ public class AttributeEventExtra {
 
     public static final String EXTRA_MISSION_LAST_REACHED_WAYPOINT = PACKAGE_NAME + "" +
             ".MISSION_REACHED_WAYPOINT";
+    public static final String EXTRA_MISSION_CURRENT_MISSION_ITEM = PACKAGE_NAME + "" +
+            ".MISSION_CURRENT_MISSION_ITEM";
 
     public static final String EXTRA_MISSION_DRONIE_BEARING = PACKAGE_NAME + "" +
             ".MISSION_DRONIE_BEARING";
@@ -77,4 +79,33 @@ public class AttributeEventExtra {
      * @see {@link AttributeEvent#PARAMETER_RECEIVED}
      */
     public static final String EXTRA_PARAMETER_VALUE = PACKAGE_NAME + ".PARAMETER_VALUE";
+
+    /**
+     * Used to retrieve the {@link com.o3dr.services.android.lib.drone.companion.solo.button.ButtonPacket} object describing the button event.
+     */
+    public static final String EXTRA_SOLOLINK_BUTTON_EVENT = PACKAGE_NAME + ".EXTRA_SOLOLINK_BUTTON_EVENT";
+
+    /**
+     * Used to retrieve the received sololink message data in bytes.
+     */
+    public static final String EXTRA_SOLOLINK_MESSAGE_DATA = PACKAGE_NAME + ".EXTRA_SOLOLINK_MESSAGE_DATA";
+
+    /**
+     * Used to retrieve the gimbal pitch angle in degree.
+     * @see {@link AttributeEvent#GIMBAL_ORIENTATION_UPDATED}
+     */
+    public static final String EXTRA_GIMBAL_ORIENTATION_PITCH = PACKAGE_NAME + ".EXTRA_GIMBAL_ORIENTATION_PITCH";
+
+    /**
+     * Used to retrieve the gimbal roll angle in degree.
+     * @see {@link AttributeEvent#GIMBAL_ORIENTATION_UPDATED}
+     */
+    public static final String EXTRA_GIMBAL_ORIENTATION_ROLL = PACKAGE_NAME + ".EXTRA_GIMBAL_ORIENTATION_ROLL";
+
+    /**
+     * Used to retrieve the gimbal yaw angle in degree.
+     * @see {@link AttributeEvent#GIMBAL_ORIENTATION_UPDATED}
+     */
+    public static final String EXTRA_GIMBAL_ORIENTATION_YAW = PACKAGE_NAME + ".EXTRA_GIMBAL_ORIENTATION_YAW";
+
 }

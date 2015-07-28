@@ -1,11 +1,16 @@
 package com.o3dr.android.client.apis;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 
 import com.o3dr.android.client.Drone;
+import com.o3dr.services.android.lib.model.AbstractCommandListener;
+import com.o3dr.services.android.lib.model.action.Action;
 
 import java.util.concurrent.ConcurrentHashMap;
+
+import static com.o3dr.services.android.lib.drone.action.CapabilityActions.*;
 
 /**
  * Allows to query the capabilities offered by the vehicle.
@@ -14,14 +19,19 @@ import java.util.concurrent.ConcurrentHashMap;
 public class CapabilityApi implements Api {
 
     /**
+     * Feature support check error. The drone is disconnected.
+     */
+    public static final int FEATURE_ERROR_DRONE_DISCONNECTED = -1;
+
+    /**
      * Feature support check result. Indicate the feature is supported.
      */
-    public static final int FEATURE_SUPPORTED = 1;
+    public static final int FEATURE_SUPPORTED = 0;
 
     /**
      * Feature support check result. Indicate the feature is not supported.
      */
-    public static final int FEATURE_UNSUPPORTED = 2;
+    public static final int FEATURE_UNSUPPORTED = 1;
 
     private static final ConcurrentHashMap<Drone, CapabilityApi> capabilityApiCache = new ConcurrentHashMap<>();
 
@@ -54,6 +64,16 @@ public class CapabilityApi implements Api {
         if(TextUtils.isEmpty(featureId) || resultListener == null)
             return;
 
+        if(!drone.isConnected()){
+            drone.post(new Runnable() {
+                @Override
+                public void run() {
+                    resultListener.onFeatureSupportResult(featureId, FEATURE_ERROR_DRONE_DISCONNECTED, null);
+                }
+            });
+            return;
+        }
+
         switch(featureId){
             case FeatureIds.IMU_CALIBRATION:
                     drone.post(new Runnable() {
@@ -62,6 +82,40 @@ public class CapabilityApi implements Api {
                             resultListener.onFeatureSupportResult(featureId, FEATURE_SUPPORTED, null);
                         }
                     });
+                break;
+
+            case FeatureIds.SOLOLINK_VIDEO_STREAMING:
+                if(Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2) {
+                    drone.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            resultListener.onFeatureSupportResult(featureId, FEATURE_UNSUPPORTED, null);
+                        }
+                    });
+                    break;
+                }
+            //********FALL THROUGH ***********//
+            case FeatureIds.COMPASS_CALIBRATION:
+                final Bundle params = new Bundle();
+                params.putString(EXTRA_FEATURE_ID, featureId);
+                drone.performAsyncActionOnDroneThread(new Action(ACTION_CHECK_FEATURE_SUPPORT, params),
+                        new AbstractCommandListener() {
+                    @Override
+                    public void onSuccess() {
+                        resultListener.onFeatureSupportResult(featureId, FEATURE_SUPPORTED, null);
+                    }
+
+                    @Override
+                    public void onError(int executionError) {
+                        resultListener.onFeatureSupportResult(featureId, FEATURE_UNSUPPORTED, null);
+                    }
+
+                    @Override
+                    public void onTimeout() {
+                        //TODO: figure out if that's the correct thing to do.
+                        resultListener.onFeatureSupportResult(featureId, FEATURE_UNSUPPORTED, null);
+                    }
+                });
                 break;
 
             default:
@@ -83,7 +137,7 @@ public class CapabilityApi implements Api {
         /**
          * Id for the video feature.
          */
-        public static final String VIDEO = "feature_video";
+        public static final String SOLOLINK_VIDEO_STREAMING = "feature_sololink_video_streaming";
 
         /**
          * Id for the compass calibration feature.

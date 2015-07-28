@@ -7,6 +7,9 @@ import com.o3dr.services.android.lib.util.Utils;
  */
 public class ConnectionActions {
 
+    //Private to prevent instantiation
+    private ConnectionActions(){}
+
     public static final String ACTION_CONNECT = Utils.PACKAGE_NAME + ".action.CONNECT";
     public static final String EXTRA_CONNECT_PARAMETER = "extra_connect_parameter";
 

@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Surface;
 
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
@@ -12,13 +13,22 @@ import com.MAVLink.ardupilotmega.msg_mag_cal_progress;
 import com.MAVLink.ardupilotmega.msg_mag_cal_report;
 import com.MAVLink.common.msg_command_ack;
 import com.MAVLink.enums.MAV_SEVERITY;
+import com.o3dr.android.client.apis.CapabilityApi;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
+import com.o3dr.services.android.lib.drone.action.CapabilityActions;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
+import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
+import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
+import com.o3dr.services.android.lib.drone.companion.solo.SoloControllerMode;
+import com.o3dr.services.android.lib.drone.companion.solo.action.SoloLinkActions;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSettingSetter;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
+import com.o3dr.services.android.lib.drone.connection.ConnectionType;
 import com.o3dr.services.android.lib.drone.connection.DroneSharePrefs;
 import com.o3dr.services.android.lib.drone.mission.action.MissionActions;
 import com.o3dr.services.android.lib.drone.mission.item.complex.CameraDetail;
@@ -43,6 +53,10 @@ import org.droidplanner.services.android.api.MavLinkServiceApi;
 import org.droidplanner.services.android.communication.connection.DroneshareClient;
 import org.droidplanner.services.android.communication.service.MAVLinkClient;
 import org.droidplanner.services.android.communication.service.UploaderService;
+import org.droidplanner.services.android.drone.companion.solo.SoloComp;
+import com.o3dr.services.android.lib.drone.companion.solo.button.ButtonPacket;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSetting;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
 import org.droidplanner.services.android.core.drone.autopilot.ArduCopter;
 import org.droidplanner.services.android.core.drone.autopilot.ArduPlane;
 import org.droidplanner.services.android.core.drone.autopilot.ArduRover;
@@ -83,6 +97,61 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
     private final DroneCommandTracker commandTracker;
     private final ConnectionParameter connectionParameter;
 
+    private final SoloComp soloComp;
+    private final SoloComp.SoloCompListener soloCompListener = new SoloComp.SoloCompListener() {
+        @Override
+        public void onConnected() {
+            if(isConnected()) {
+                drone.notifyDroneEvent(DroneInterfaces.DroneEventsType.CONNECTED);
+            }
+        }
+
+        @Override
+        public void onDisconnected() {
+            drone.notifyDroneEvent(DroneInterfaces.DroneEventsType.DISCONNECTED);
+        }
+
+        @Override
+        public void onTlvPacketReceived(TLVPacket packet) {
+            //TODO: filter the message that are broadcast.
+            switch(packet.getMessageType()){
+                case TLVMessageTypes.TYPE_ARTOO_INPUT_REPORT_MESSAGE:
+                    //Drop this message as only the battery info is enabled, and that info is already
+                    //available from the autopilot.
+                    break;
+
+                case TLVMessageTypes.TYPE_SOLO_GET_BUTTON_SETTING:
+                case TLVMessageTypes.TYPE_SOLO_SET_BUTTON_SETTING:
+                    //Drop these messages as they are already being handled by the 'onPresetButtonLoaded(...)' method.
+                    break;
+
+                default:
+                    final Bundle messageInfo = new Bundle();
+                    messageInfo.putParcelable(AttributeEventExtra.EXTRA_SOLOLINK_MESSAGE_DATA, packet);
+
+                    notifyDroneAttributeEvent(AttributeEvent.SOLOLINK_MESSAGE_RECEIVED, messageInfo);
+                    break;
+            }
+        }
+
+        @Override
+        public void onPresetButtonLoaded(int buttonType, SoloButtonSetting buttonSettings) {
+            notifyDroneAttributeEvent(AttributeEvent.SOLOLINK_BUTTON_SETTINGS_UPDATED, null);
+        }
+
+        @Override
+        public void onWifiInfoUpdated(String wifiName, String wifiPassword) {
+            notifyDroneAttributeEvent(AttributeEvent.SOLOLINK_WIFI_SETTINGS_UPDATED, null);
+        }
+
+        @Override
+        public void onButtonPacketReceived(ButtonPacket packet) {
+            final Bundle eventInfo = new Bundle();
+            eventInfo.putParcelable(AttributeEventExtra.EXTRA_SOLOLINK_BUTTON_EVENT, packet);
+            notifyDroneAttributeEvent(AttributeEvent.SOLOLINK_BUTTON_EVENT, eventInfo);
+        }
+    };
+
     private final GCSHeartbeat gcsHeartbeat;
 
     private final List<CameraDetail> cameraDetails;
@@ -102,6 +171,9 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
         this.gcsHeartbeat = new GCSHeartbeat(mavClient, 1);
 
         this.mavLinkMsgHandler = new MavLinkMsgHandler(this);
+
+        soloComp = new SoloComp(context, handler);
+        soloComp.setListener(soloCompListener);
     }
 
     public void onVehicleTypeReceived(FirmwareType type) {
@@ -155,6 +227,10 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
         drone.getMagnetometerCalibration().setListener(this);
     }
 
+    public SoloComp getSoloComp() {
+        return soloComp;
+    }
+    
     private void destroyAutopilot(){
         if(drone == null)
             return;
@@ -172,6 +248,8 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
         destroyAutopilot();
         disconnect();
 
+        soloComp.destroy();
+
         connectedApps.clear();
         tlogUploaders.clear();
 
@@ -185,17 +263,18 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
 
         connectedApps.put(appId, listener);
 
+        if(isCompanionComputerEnabled() && !soloComp.isConnected()){
+            soloComp.start();
+        }
+        
         if (!mavClient.isConnected()) {
             mavClient.openConnection();
         } else {
-            if (drone != null && drone.isConnected()) {
+            if (isConnected()) {
 
-                if (drone.isConnectionAlive())
-                    listener.onDroneEvent(DroneInterfaces.DroneEventsType.HEARTBEAT_FIRST, drone);
-                else {
-                    listener.onDroneEvent(DroneInterfaces.DroneEventsType.CONNECTED, drone);
+                listener.onDroneEvent(DroneInterfaces.DroneEventsType.CONNECTED, drone);
+                if (!drone.isConnectionAlive())
                     listener.onDroneEvent(DroneInterfaces.DroneEventsType.HEARTBEAT_TIMEOUT, drone);
-                }
 
                 notifyConnected(appId, listener);
             }
@@ -205,6 +284,9 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
     }
 
     private void disconnect() {
+        if(isCompanionComputerEnabled())
+            soloComp.stop();
+
         if (!connectedApps.isEmpty()) {
             for (String appId : connectedApps.keySet()) {
                 try {
@@ -214,6 +296,13 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
                 }
             }
         }
+    }
+
+    /**
+     * @return True if we can expect to find a companion computer on the connected channel.
+     */
+    public boolean isCompanionComputerEnabled(){
+        return this.connectionParameter.getConnectionType() == ConnectionType.TYPE_UDP && soloComp.isAvailable();
     }
 
     public int getConnectedAppsCount() {
@@ -396,7 +485,7 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
     }
 
     public boolean isConnected() {
-        return drone != null && drone.isConnected();
+        return drone != null && drone.isConnected() && (!isCompanionComputerEnabled() || soloComp.isConnected());
     }
 
     @Override
@@ -411,13 +500,16 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
             case AttributeType.CAMERA:
                 return CommonApiUtils.getCameraProxy(drone, cameraDetails);
 
+            case AttributeType.SOLOLINK_STATE:
+                return CommonApiUtils.getSoloLinkState(this);
+
             default:
                 return drone.getAttribute(attributeType);
         }
     }
 
     @Override
-    public void executeAsyncAction(Action action, ICommandListener listener) {
+    public void executeAsyncAction(Action action, final ICommandListener listener) {
         final String type = action.getType();
         Bundle data = action.getData();
 
@@ -478,6 +570,55 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
                 CommonApiUtils.disableFollowMe(followMe);
                 break;
 
+            //************ SOLOLINK ACTIONS *************//
+            case SoloLinkActions.ACTION_SEND_MESSAGE:
+                final TLVPacket messageData = data.getParcelable(SoloLinkActions.EXTRA_MESSAGE_DATA);
+                if (messageData != null) {
+                    CommonApiUtils.sendSoloLinkMessage(this, messageData, listener);
+                }
+                break;
+
+            case SoloLinkActions.ACTION_UPDATE_WIFI_SETTINGS:
+                final String wifiSsid = data.getString(SoloLinkActions.EXTRA_WIFI_SSID);
+                final String wifiPassword = data.getString(SoloLinkActions.EXTRA_WIFI_PASSWORD);
+                CommonApiUtils.updateSoloLinkWifiSettings(this, wifiSsid, wifiPassword, listener);
+                break;
+
+            case SoloLinkActions.ACTION_UPDATE_BUTTON_SETTINGS:
+                final SoloButtonSettingSetter buttonSettings = data.getParcelable(SoloLinkActions.EXTRA_BUTTON_SETTINGS);
+                if (buttonSettings != null) {
+                    CommonApiUtils.updateSoloLinkButtonSettings(this, buttonSettings, listener);
+                }
+                break;
+
+            case SoloLinkActions.ACTION_UPDATE_CONTROLLER_MODE:
+                final @SoloControllerMode.ControllerMode int mode = data.getInt(SoloLinkActions.EXTRA_CONTROLLER_MODE);
+                CommonApiUtils.updateSoloLinkControllerMode(this, mode, listener);
+                break;
+
+            //**************** CAPABILITY ACTIONS **************//
+            case CapabilityActions.ACTION_CHECK_FEATURE_SUPPORT:
+                if (listener != null) {
+                    final String featureId = data.getString(CapabilityActions.EXTRA_FEATURE_ID);
+                    if (!TextUtils.isEmpty(featureId)) {
+                        switch (featureId) {
+                            case CapabilityApi.FeatureIds.SOLOLINK_VIDEO_STREAMING:
+                            case CapabilityApi.FeatureIds.COMPASS_CALIBRATION:
+                                if (this.isCompanionComputerEnabled()) {
+                                    CommonApiUtils.postSuccessEvent(listener);
+                                } else {
+                                    CommonApiUtils.postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
+                                }
+                                break;
+
+                            default:
+                                CommonApiUtils.postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
+                                break;
+                        }
+                    }
+                }
+                break;
+
             default:
                 if(drone != null){
                     drone.executeAsyncAction(action, listener);
@@ -500,6 +641,30 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
 
     @Override
     public void onDroneEvent(DroneInterfaces.DroneEventsType event, MavLinkDrone drone) {
+        switch(event){
+            case HEARTBEAT_FIRST:
+            case CONNECTED:
+                if(isCompanionComputerEnabled()) {
+                    //Try connecting the companion computer
+                    if(!soloComp.isConnected()) {
+                        soloComp.start();
+                        return;
+                    }
+                }
+
+                event = DroneInterfaces.DroneEventsType.CONNECTED;
+                break;
+
+            case DISCONNECTED:
+                if(isCompanionComputerEnabled()){
+                    if(soloComp.isConnected()){
+                        soloComp.stop();
+                        return;
+                    }
+                }
+                break;
+        }
+
         if (connectedApps.isEmpty())
             return;
 

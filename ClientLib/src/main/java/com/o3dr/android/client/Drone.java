@@ -19,7 +19,6 @@ import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.calibration.magnetometer.MagnetometerCalibrationStatus;
-import com.o3dr.services.android.lib.drone.camera.GoPro;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionResult;
 import com.o3dr.services.android.lib.drone.mission.Mission;
@@ -110,6 +109,7 @@ public class Drone {
     private long elapsedFlightTime = 0;
 
     private final Context context;
+    private final ClassLoader contextClassLoader;
 
     /**
      * Creates a Drone instance.
@@ -118,6 +118,7 @@ public class Drone {
      */
     public Drone(Context context) {
         this.context = context;
+        this.contextClassLoader = context.getClassLoader();
     }
 
     void init(ControlTower controlTower, Handler handler) {
@@ -216,7 +217,7 @@ public class Drone {
      * @param action Runnabl that will be executed.
      */
     public void post(Runnable action) {
-        if (action == null)
+        if (handler == null || action == null)
             return;
 
         handler.post(action);
@@ -256,11 +257,8 @@ public class Drone {
         }
 
         if (carrier != null) {
-            ClassLoader classLoader = this.context.getClassLoader();
-            if (classLoader != null) {
-                carrier.setClassLoader(classLoader);
-                attribute = carrier.getParcelable(type);
-            }
+            carrier.setClassLoader(contextClassLoader);
+            attribute = carrier.getParcelable(type);
         }
 
         return attribute == null ? this.<T>getAttributeDefaultValue(type) : attribute;
@@ -343,13 +341,11 @@ public class Drone {
             case AttributeType.FOLLOW_STATE:
                 return (T) new FollowState();
 
-            case AttributeType.GOPRO:
-                return (T) new GoPro();
-
             case AttributeType.MAGNETOMETER_CALIBRATION_STATUS:
                 return (T) new MagnetometerCalibrationStatus();
 
             case AttributeType.CAMERA:
+            case AttributeType.SOLOLINK_STATE:
             default:
                 return null;
         }
@@ -673,7 +669,7 @@ public class Drone {
     void notifyAttributeUpdated(final String attributeEvent, final Bundle extras) {
         //Update the bundle classloader
         if (extras != null)
-            extras.setClassLoader(context.getClassLoader());
+            extras.setClassLoader(contextClassLoader);
 
         if (AttributeEvent.STATE_UPDATED.equals(attributeEvent)) {
             getAttributeAsync(AttributeType.STATE, new OnAttributeRetrievedCallback<State>() {
