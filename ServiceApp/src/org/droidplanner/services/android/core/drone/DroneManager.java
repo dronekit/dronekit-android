@@ -75,6 +75,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import timber.log.Timber;
+
 /**
  * Bridge between the communication channel, the drone instance(s), and the connected client(s).
  */
@@ -202,18 +204,28 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
 
         switch (type) {
             case ARDU_COPTER:
-                this.drone = new ArduCopter(context, mavClient, dpHandler, dpPrefs, new AndroidApWarningParser(), this);
+                if(isCompanionComputerEnabled()){
+                    Timber.d("Instantiating ArduSolo autopilot.");
+                    this.drone = new ArduSolo(context, mavClient, dpHandler, dpPrefs, new AndroidApWarningParser(), this);
+                }
+                else {
+                    Timber.d("Instantiating ArduCopter autopilot.");
+                    this.drone = new ArduCopter(context, mavClient, dpHandler, dpPrefs, new AndroidApWarningParser(), this);
+                }
                 break;
 
             case ARDU_SOLO:
+                Timber.d("Instantiating ArduCopter autopilot.");
                 this.drone = new ArduSolo(context, mavClient, dpHandler, dpPrefs, new AndroidApWarningParser(), this);
                 break;
 
             case ARDU_PLANE:
+                Timber.d("Instantiating ArduPlane autopilot.");
                 this.drone = new ArduPlane(context, mavClient, dpHandler, dpPrefs, new AndroidApWarningParser(), this);
                 break;
 
             case ARDU_ROVER:
+                Timber.d("Instantiating ArduPlane autopilot.");
                 this.drone = new ArduRover(context, mavClient, dpHandler, dpPrefs, new AndroidApWarningParser(), this);
                 break;
         }
