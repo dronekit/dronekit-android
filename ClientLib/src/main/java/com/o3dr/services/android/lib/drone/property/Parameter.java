@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * Created by fhuya on 10/28/14.
  */
-public class Parameter implements Parcelable, Comparable<Parameter> {
+public class Parameter implements DroneAttribute, Comparable<Parameter> {
 
     public static final int RANGE_LOW = 0;
     public static final int RANGE_HIGH = 1;

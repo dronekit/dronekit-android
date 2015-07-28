@@ -6,7 +6,7 @@ import android.os.Parcelable;
 /**
  * Created by fhuya on 10/28/14.
  */
-public class Speed implements Parcelable {
+public class Speed implements DroneAttribute {
 
     private double verticalSpeed; // m/s
     private double groundSpeed; // m/s

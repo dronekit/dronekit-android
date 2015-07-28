@@ -6,7 +6,7 @@ import android.os.Parcelable;
 /**
  * Created by fhuya on 11/4/14.
  */
-public class Signal implements Parcelable {
+public class Signal implements DroneAttribute {
 
     public static final int MAX_FADE_MARGIN = 50;
     public static final int MIN_FADE_MARGIN = 6;

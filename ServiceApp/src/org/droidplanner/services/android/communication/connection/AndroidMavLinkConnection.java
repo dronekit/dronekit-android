@@ -2,15 +2,9 @@ package org.droidplanner.services.android.communication.connection;
 
 import android.content.Context;
 
-import org.droidplanner.core.MAVLink.connection.MavLinkConnection;
-import org.droidplanner.core.MAVLink.connection.MavLinkConnectionTypes;
-import org.droidplanner.core.model.Logger;
-import org.droidplanner.services.android.data.SessionDB;
+import org.droidplanner.services.android.core.MAVLink.connection.MavLinkConnection;
+import org.droidplanner.services.android.core.model.Logger;
 import org.droidplanner.services.android.utils.AndroidLogger;
-import org.droidplanner.services.android.utils.file.FileUtils;
-
-import java.io.File;
-import java.util.Date;
 
 public abstract class AndroidMavLinkConnection extends MavLinkConnection {
 
