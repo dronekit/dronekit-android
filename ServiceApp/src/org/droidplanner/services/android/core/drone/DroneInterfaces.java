@@ -203,11 +203,6 @@ public class DroneInterfaces {
 		/**
 		 *
 		 */
-		PARAMETERS_DOWNLOADED,
-
-		/**
-		 *
-		 */
 		WARNING_SIGNAL_WEAK,
 		/**
 		 * Announces that a new version for the firmware has been received

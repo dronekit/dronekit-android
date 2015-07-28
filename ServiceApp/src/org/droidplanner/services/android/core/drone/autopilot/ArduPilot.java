@@ -10,6 +10,7 @@ import com.MAVLink.ardupilotmega.msg_camera_feedback;
 import com.MAVLink.ardupilotmega.msg_ekf_status_report;
 import com.MAVLink.ardupilotmega.msg_mag_cal_progress;
 import com.MAVLink.ardupilotmega.msg_mag_cal_report;
+import com.MAVLink.ardupilotmega.msg_mount_configure;
 import com.MAVLink.ardupilotmega.msg_mount_status;
 import com.MAVLink.ardupilotmega.msg_radio;
 import com.MAVLink.common.msg_attitude;
@@ -56,6 +57,7 @@ import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
 
 import org.droidplanner.services.android.core.MAVLink.MAVLinkStreams;
+import org.droidplanner.services.android.core.MAVLink.MavLinkParameters;
 import org.droidplanner.services.android.core.MAVLink.WaypointManager;
 import org.droidplanner.services.android.core.MAVLink.command.doCmd.MavLinkDoCmds;
 import org.droidplanner.services.android.core.drone.DroneEvents;
@@ -88,6 +90,7 @@ import org.droidplanner.services.android.core.firmware.FirmwareType;
 import org.droidplanner.services.android.core.helpers.coordinates.Coord3D;
 import org.droidplanner.services.android.core.mission.Mission;
 import org.droidplanner.services.android.core.model.AutopilotWarningParser;
+import org.droidplanner.services.android.core.parameters.Parameter;
 import org.droidplanner.services.android.utils.CommonApiUtils;
 
 public abstract class ArduPilot implements MavLinkDrone {
@@ -556,6 +559,28 @@ public abstract class ArduPilot implements MavLinkDrone {
                 double roll = data.getDouble(GimbalActions.GIMBAL_ROLL);
                 double yaw = data.getDouble(GimbalActions.GIMBAL_YAW);
                 MavLinkDoCmds.setGimbalOrientation(this, pitch, roll, yaw, listener);
+                break;
+
+            case GimbalActions.ACTION_RESET_GIMBAL_MOUNT_MODE:
+                MavLinkDoCmds.resetROI(this, listener);
+                break;
+
+            case GimbalActions.ACTION_SET_GIMBAL_MOUNT_MODE:
+                final int mountMode = data.getInt(GimbalActions.GIMBAL_MOUNT_MODE);
+
+                Parameter mountParam = getParameters().getParameter("MNT_MODE");
+                if (mountParam == null) {
+                    msg_mount_configure msg = new msg_mount_configure();
+                    msg.target_system = getSysid();
+                    msg.target_component = getCompid();
+                    msg.mount_mode = (byte) mountMode;
+                    msg.stab_pitch =  0;
+                    msg.stab_roll =  0;
+                    msg.stab_yaw =  0;
+                    getMavClient().sendMavMessage(msg, listener);
+                } else {
+                    MavLinkParameters.sendParameter(this, "MNT_MODE", 1, mountMode);
+                }
                 break;
 
             default:
