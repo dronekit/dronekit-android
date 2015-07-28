@@ -4,9 +4,8 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.RemoteException;
-import android.support.v4.util.Pair;
 import android.text.TextUtils;
-import android.util.Log;
+import android.util.Pair;
 import android.view.Surface;
 
 import com.MAVLink.Messages.MAVLinkMessage;
@@ -57,7 +56,8 @@ import com.o3dr.services.android.lib.model.ICommandListener;
 
 import org.droidplanner.services.android.core.MAVLink.MavLinkArm;
 import org.droidplanner.services.android.core.MAVLink.command.doCmd.MavLinkDoCmds;
-import org.droidplanner.services.android.core.drone.camera.GoProImpl;
+import org.droidplanner.services.android.core.drone.DroneManager;
+import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.core.drone.profiles.VehicleProfile;
 import org.droidplanner.services.android.core.drone.variables.ApmModes;
 import org.droidplanner.services.android.core.drone.variables.Camera;
@@ -73,9 +73,8 @@ import org.droidplanner.services.android.core.helpers.coordinates.Coord2D;
 import org.droidplanner.services.android.core.helpers.coordinates.Coord3D;
 import org.droidplanner.services.android.core.mission.survey.SplineSurveyImpl;
 import org.droidplanner.services.android.core.mission.survey.SurveyImpl;
-import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.core.survey.Footprint;
-import org.droidplanner.services.android.core.drone.DroneManager;
+import org.droidplanner.services.android.drone.companion.solo.SoloComp;
 import org.droidplanner.services.android.utils.file.IO.ParameterMetadataLoader;
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -955,7 +954,7 @@ public class CommonApiUtils {
 
         if (selectedMode != null) {
             final Follow followMe = droneMgr.getFollowMe();
-            if(followMe == null)
+            if (followMe == null)
                 return;
 
             if (!followMe.isEnabled())
@@ -968,11 +967,11 @@ public class CommonApiUtils {
         }
     }
 
-    static void jumpToMissionItem(Drone drone, int missionItemIndex, int repeatCount, ICommandListener listener){
-        if(drone == null)
+    public static void jumpToMissionItem(MavLinkDrone drone, int missionItemIndex, int repeatCount, ICommandListener listener) {
+        if (drone == null)
             return;
         int waypoint = drone.getMission().getWaypointFromMissionItemIndex(missionItemIndex);
-        if(waypoint == -1){
+        if (waypoint == -1) {
             postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
             return;
         }
@@ -1070,8 +1069,8 @@ public class CommonApiUtils {
                 msgReport.offdiag_x, msgReport.offdiag_y, msgReport.offdiag_z);
     }
 
-    static SoloLinkState getSoloLinkState(DroneManager droneManager) {
-        if(droneManager == null || !droneManager.isCompanionComputerEnabled())
+    public static SoloLinkState getSoloLinkState(DroneManager droneManager) {
+        if (droneManager == null || !droneManager.isCompanionComputerEnabled())
             return null;
 
         final SoloComp soloComp = droneManager.getSoloComp();
@@ -1081,12 +1080,12 @@ public class CommonApiUtils {
                 wifiSettings.second, wifiSettings.first, soloComp.getButtonSettings());
     }
 
-    private static boolean isSoloLinkFeatureAvailable(DroneManager droneManager, ICommandListener listener){
-        if(droneManager == null)
+    private static boolean isSoloLinkFeatureAvailable(DroneManager droneManager, ICommandListener listener) {
+        if (droneManager == null)
             return false;
 
-        if(!droneManager.isCompanionComputerEnabled()){
-            if(listener != null){
+        if (!droneManager.isCompanionComputerEnabled()) {
+            if (listener != null) {
                 try {
                     listener.onError(CommandExecutionError.COMMAND_UNSUPPORTED);
                 } catch (RemoteException e) {
@@ -1099,59 +1098,59 @@ public class CommonApiUtils {
         return true;
     }
 
-    static void sendSoloLinkMessage(DroneManager droneManager, TLVPacket messageData,
+    public static void sendSoloLinkMessage(DroneManager droneManager, TLVPacket messageData,
                                     ICommandListener listener) {
-        if(!isSoloLinkFeatureAvailable(droneManager, listener) || messageData == null)
+        if (!isSoloLinkFeatureAvailable(droneManager, listener) || messageData == null)
             return;
 
         final SoloComp soloComp = droneManager.getSoloComp();
         soloComp.sendSoloLinkMessage(messageData, listener);
     }
 
-    static void updateSoloLinkWifiSettings(DroneManager droneManager,
+    public static void updateSoloLinkWifiSettings(DroneManager droneManager,
                                            String wifiSsid, String wifiPassword,
                                            ICommandListener listener) {
-        if(!isSoloLinkFeatureAvailable(droneManager, listener))
+        if (!isSoloLinkFeatureAvailable(droneManager, listener))
             return;
 
-        if(TextUtils.isEmpty(wifiSsid) && TextUtils.isEmpty(wifiPassword))
+        if (TextUtils.isEmpty(wifiSsid) && TextUtils.isEmpty(wifiPassword))
             return;
 
         final SoloComp soloComp = droneManager.getSoloComp();
         soloComp.updateWifiSettings(wifiSsid, wifiPassword, listener);
     }
 
-    static void updateSoloLinkButtonSettings(DroneManager droneManager,
+    public static void updateSoloLinkButtonSettings(DroneManager droneManager,
                                              SoloButtonSettingSetter buttonSettings,
                                              ICommandListener listener) {
-        if(!isSoloLinkFeatureAvailable(droneManager, listener) || buttonSettings == null)
+        if (!isSoloLinkFeatureAvailable(droneManager, listener) || buttonSettings == null)
             return;
 
         final SoloComp soloComp = droneManager.getSoloComp();
         soloComp.pushButtonSettings(buttonSettings, listener);
     }
 
-    static void updateSoloLinkControllerMode(DroneManager droneManager,
+    public static void updateSoloLinkControllerMode(DroneManager droneManager,
                                              @SoloControllerMode.ControllerMode int mode,
                                              ICommandListener listener) {
-        if(!isSoloLinkFeatureAvailable(droneManager, listener))
+        if (!isSoloLinkFeatureAvailable(droneManager, listener))
             return;
 
         final SoloComp soloComp = droneManager.getSoloComp();
         soloComp.updateControllerMode(mode, listener);
     }
 
-    static void startVideoStream(DroneManager droneManager, String ownerId, Surface videoSurface,
+    public static void startVideoStream(DroneManager droneManager, String ownerId, Surface videoSurface,
                                  ICommandListener listener) {
-        if(!isSoloLinkFeatureAvailable(droneManager, listener))
+        if (!isSoloLinkFeatureAvailable(droneManager, listener))
             return;
 
         final SoloComp soloComp = droneManager.getSoloComp();
         soloComp.startVideoStream(ownerId, videoSurface, listener);
     }
 
-    static void stopVideoStream(DroneManager droneManager, String ownerId, ICommandListener listener){
-        if(!isSoloLinkFeatureAvailable(droneManager, listener))
+    public static void stopVideoStream(DroneManager droneManager, String ownerId, ICommandListener listener) {
+        if (!isSoloLinkFeatureAvailable(droneManager, listener))
             return;
 
         final SoloComp soloComp = droneManager.getSoloComp();

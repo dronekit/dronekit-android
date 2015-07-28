@@ -3,8 +3,8 @@ package org.droidplanner.services.android.drone.companion.solo.artoo;
 import android.content.Context;
 import android.os.Handler;
 import android.support.annotation.IntDef;
-import android.support.v4.util.Pair;
 import android.text.TextUtils;
+import android.util.Pair;
 import android.view.Surface;
 
 import org.droidplanner.services.android.drone.companion.solo.AbstractLinkManager;

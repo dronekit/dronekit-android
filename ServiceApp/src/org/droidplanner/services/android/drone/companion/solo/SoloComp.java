@@ -3,8 +3,8 @@ package org.droidplanner.services.android.drone.companion.solo;
 import android.content.Context;
 import android.os.Handler;
 import android.os.RemoteException;
-import android.support.v4.util.Pair;
 import android.text.TextUtils;
+import android.util.Pair;
 import android.util.SparseArray;
 import android.view.Surface;
 

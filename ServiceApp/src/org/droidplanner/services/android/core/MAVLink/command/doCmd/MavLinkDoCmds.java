@@ -131,7 +131,7 @@ public class MavLinkDoCmds {
      * @param repeatCount         number of times to repeat command
      * @param listener            Register a callback to receive update of the command execution state.
      */
-    public static void jumpToWaypoint(Drone drone, int waypoint, int repeatCount, ICommandListener listener){
+    public static void jumpToWaypoint(MavLinkDrone drone, int waypoint, int repeatCount, ICommandListener listener){
         if (drone == null)
             return;
         msg_command_long msg = new msg_command_long();

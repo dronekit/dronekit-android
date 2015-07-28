@@ -8,6 +8,7 @@ import android.os.Looper;
 import android.os.RemoteException;
 import android.text.TextUtils;
 import android.util.Pair;
+import android.view.Surface;
 
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.ardupilotmega.msg_mag_cal_progress;
@@ -15,6 +16,7 @@ import com.MAVLink.ardupilotmega.msg_mag_cal_report;
 import com.o3dr.services.android.lib.drone.action.ConnectionActions;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
+import com.o3dr.services.android.lib.drone.companion.solo.action.SoloLinkActions;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionResult;
 import com.o3dr.services.android.lib.drone.connection.DroneSharePrefs;
@@ -204,6 +206,19 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
             case ConnectionActions.ACTION_DISCONNECT:
                 disconnect();
                 break;
+
+            case SoloLinkActions.ACTION_START_VIDEO_STREAM: {
+                final Surface videoSurface = data.getParcelable(SoloLinkActions.EXTRA_VIDEO_DISPLAY);
+                final String videoTag = data.getString(SoloLinkActions.EXTRA_VIDEO_TAG, "");
+                CommonApiUtils.startVideoStream(getDroneManager(), ownerId + videoTag, videoSurface, listener);
+                break;
+            }
+
+            case SoloLinkActions.ACTION_STOP_VIDEO_STREAM: {
+                final String videoTag = data.getString(SoloLinkActions.EXTRA_VIDEO_TAG, "");
+                CommonApiUtils.stopVideoStream(getDroneManager(), ownerId + videoTag, listener);
+                break;
+            }
 
             default:
                 droneMgr.executeAsyncAction(action, listener);
