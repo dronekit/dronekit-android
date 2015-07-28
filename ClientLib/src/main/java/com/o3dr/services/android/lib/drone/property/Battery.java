@@ -6,7 +6,7 @@ import android.os.Parcelable;
 /**
  * Created by fhuya on 10/28/14.
  */
-public class Battery implements Parcelable {
+public class Battery implements DroneAttribute {
 
     private double batteryVoltage;
     private double batteryRemain;

@@ -7,7 +7,7 @@ import android.text.TextUtils;
 /**
  * Created by fhuya on 10/28/14.
  */
-public class State implements Parcelable {
+public class State implements DroneAttribute {
 
     public static final int INVALID_MAVLINK_VERSION = -1;
 
