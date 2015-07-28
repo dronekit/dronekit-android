@@ -97,6 +97,7 @@ import org.droidplanner.services.android.utils.CommonApiUtils;
 public abstract class ArduPilot implements MavLinkDrone {
 
     public static final int AUTOPILOT_COMPONENT_ID = 1;
+    public static final int ARTOO_COMPONENT_ID = 0;
 
     private final DroneEvents events;
     private final Type type;
@@ -592,7 +593,8 @@ public abstract class ArduPilot implements MavLinkDrone {
 
     @Override
     public void onMavLinkMessageReceived(MAVLinkMessage message) {
-        if (message.compid != AUTOPILOT_COMPONENT_ID) {
+        if (message.compid != AUTOPILOT_COMPONENT_ID
+                && message.compid != ARTOO_COMPONENT_ID) {
             return;
         }
 
