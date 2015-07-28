@@ -30,6 +30,7 @@ import com.MAVLink.common.msg_statustext;
 import com.MAVLink.common.msg_sys_status;
 import com.MAVLink.common.msg_vfr_hud;
 import com.MAVLink.enums.MAV_MODE_FLAG;
+import com.MAVLink.enums.MAV_MOUNT_MODE;
 import com.MAVLink.enums.MAV_SEVERITY;
 import com.MAVLink.enums.MAV_STATE;
 import com.MAVLink.enums.MAV_SYS_STATUS_SENSOR;
@@ -566,7 +567,7 @@ public abstract class ArduPilot implements MavLinkDrone {
                 break;
 
             case GimbalActions.ACTION_SET_GIMBAL_MOUNT_MODE:
-                final int mountMode = data.getInt(GimbalActions.GIMBAL_MOUNT_MODE);
+                final int mountMode = data.getInt(GimbalActions.GIMBAL_MOUNT_MODE, MAV_MOUNT_MODE.MAV_MOUNT_MODE_MAVLINK_TARGETING);
 
                 Parameter mountParam = getParameters().getParameter("MNT_MODE");
                 if (mountParam == null) {
