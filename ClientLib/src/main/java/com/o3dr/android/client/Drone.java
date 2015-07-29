@@ -257,8 +257,12 @@ public class Drone {
         }
 
         if (carrier != null) {
-            carrier.setClassLoader(contextClassLoader);
-            attribute = carrier.getParcelable(type);
+            try {
+                carrier.setClassLoader(contextClassLoader);
+                attribute = carrier.getParcelable(type);
+            }catch(Exception e){
+                Log.e(TAG, e.getMessage(), e);
+            }
         }
 
         return attribute == null ? this.<T>getAttributeDefaultValue(type) : attribute;
@@ -696,8 +700,13 @@ public class Drone {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                for (DroneListener listener : droneListeners)
-                    listener.onDroneEvent(attributeEvent, extras);
+                for (DroneListener listener : droneListeners) {
+                    try {
+                        listener.onDroneEvent(attributeEvent, extras);
+                    }catch(Exception e){
+                        Log.e(TAG, e.getMessage(), e);
+                    }
+                }
             }
         });
     }

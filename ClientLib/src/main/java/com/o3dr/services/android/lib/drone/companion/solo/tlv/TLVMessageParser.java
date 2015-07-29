@@ -117,6 +117,25 @@ public class TLVMessageParser {
                     return new ArtooMessageInputReport(timestamp, gimbalY, gimbalRate, battery);
                 }
 
+                case TYPE_SOLO_GOPRO_SET_REQUEST: {
+                    @SoloGoproSetRequest.RequestCommand final short command = packetBuffer.getShort();
+                    @SoloGoproSetRequest.RequestCommandValue final short value = packetBuffer.getShort();
+                    return new SoloGoproSetRequest(command, value);
+                }
+
+                case TYPE_SOLO_GOPRO_RECORD: {
+                    @SoloGoproRecord.RecordCommand final int command = packetBuffer.getInt();
+                    return new SoloGoproRecord(command);
+                }
+
+                case TYPE_SOLO_GOPRO_STATE: {
+                    return new SoloGoproState(packetBuffer);
+                }
+
+                case TYPE_SOLO_GOPRO_REQUEST_STATE: {
+                    return new SoloGoproRequestState();
+                }
+
                 default:
                     return null;
             }
