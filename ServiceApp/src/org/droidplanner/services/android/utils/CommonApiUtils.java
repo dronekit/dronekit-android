@@ -967,7 +967,7 @@ public class CommonApiUtils {
         }
     }
 
-    static void gotoWaypoint(MavLinkDrone drone, int waypoint, ICommandListener listener){
+    public static void gotoWaypoint(MavLinkDrone drone, int waypoint, ICommandListener listener){
         if(drone == null)
             return;
         if(waypoint < 0){
