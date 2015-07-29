@@ -1,4 +1,4 @@
-package org.droidplanner.services.android.core.drone.autopilot;
+package org.droidplanner.services.android.core.drone.autopilot.apm;
 
 import android.content.Context;
 import android.text.TextUtils;

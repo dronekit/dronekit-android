@@ -1,8 +1,9 @@
-package org.droidplanner.services.android.core.drone.autopilot;
+package org.droidplanner.services.android.core.drone.autopilot.apm;
 
 import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Surface;
 
 import com.MAVLink.Messages.MAVLinkMessage;
@@ -65,6 +66,7 @@ import org.droidplanner.services.android.core.drone.DroneEvents;
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
 import org.droidplanner.services.android.core.drone.LogMessageListener;
 import org.droidplanner.services.android.core.drone.Preferences;
+import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.core.drone.profiles.Parameters;
 import org.droidplanner.services.android.core.drone.profiles.VehicleProfile;
 import org.droidplanner.services.android.core.drone.variables.Altitude;
@@ -373,9 +375,9 @@ public abstract class ArduPilot implements MavLinkDrone {
     }
 
     @Override
-    public void logMessage(int mavSeverity, String message) {
+    public void logMessage(int logLevel, String message) {
         if (logListener != null)
-            logListener.onMessageLogged(mavSeverity, message);
+            logListener.onMessageLogged(logLevel, message);
     }
 
 
@@ -754,7 +756,7 @@ public abstract class ArduPilot implements MavLinkDrone {
                     final int value = message.value;
                     final boolean isReadyToArm = (value & (1 << vehicleMode.getNumber())) != 0;
                     final String armReadinessMsg = isReadyToArm ? "READY TO ARM" : "UNREADY FOR ARMING";
-                    logMessage(MAV_SEVERITY.MAV_SEVERITY_NOTICE, armReadinessMsg);
+                    logMessage(Log.INFO, armReadinessMsg);
                 }
                 break;
         }
@@ -801,10 +803,36 @@ public abstract class ArduPilot implements MavLinkDrone {
                 || message.startsWith("APM:Rover")) {
             setFirmwareVersion(message);
         } else {
+
             //Try parsing as an error.
             if (!getState().parseAutopilotError(message)) {
+
                 //Relay to the connected client.
-                logMessage(statusText.severity, message);
+                final int logLevel;
+                switch(statusText.severity){
+                    case APMConstants.Severity.SEVERITY_CRITICAL:
+                        logLevel = Log.ERROR;
+                        break;
+
+                    case APMConstants.Severity.SEVERITY_HIGH:
+                        logLevel = Log.WARN;
+                        break;
+
+                    case APMConstants.Severity.SEVERITY_MEDIUM:
+                        logLevel = Log.INFO;
+                        break;
+
+                    default:
+                    case APMConstants.Severity.SEVERITY_LOW:
+                        logLevel = Log.VERBOSE;
+                        break;
+
+                    case APMConstants.Severity.SEVERITY_USER_RESPONSE:
+                        logLevel = Log.DEBUG;
+                        break;
+                }
+
+                logMessage(logLevel, message);
             }
         }
     }
