@@ -315,7 +315,7 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
      * @return True if we can expect to find a companion computer on the connected channel.
      */
     public boolean isCompanionComputerEnabled() {
-        return this.connectionParameter.getConnectionType() == ConnectionType.TYPE_UDP && soloComp.isAvailable();
+        return this.connectionParameter.getConnectionType() == ConnectionType.TYPE_UDP && soloComp.isAvailable() && doAnyListenersSupportSoloLinkApi();
     }
 
     public int getConnectedAppsCount() {
@@ -661,11 +661,31 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
             return;
 
         for (DroneEventsListener listener : connectedApps.values()) {
-            if (checkForSoloLinkApi && listener.getApiVersionCode() < SOLOLINK_API_MIN_VERSION) {
+            if (checkForSoloLinkApi && !supportSoloLinkApi(listener)) {
                 continue;
             }
             listener.onAttributeEvent(attributeEvent, eventInfo);
         }
+    }
+
+    private boolean supportSoloLinkApi(DroneEventsListener listener){
+        return listener != null && listener.getApiVersionCode() >= SOLOLINK_API_MIN_VERSION;
+    }
+
+    /**
+     * FIXME: remove when android solo v2 is released.
+     * @return
+     */
+    private boolean doAnyListenersSupportSoloLinkApi(){
+        if(connectedApps.isEmpty())
+            return false;
+
+        for(DroneEventsListener listener: connectedApps.values()){
+            if(supportSoloLinkApi(listener))
+                return true;
+        }
+
+        return false;
     }
 
     @Override
