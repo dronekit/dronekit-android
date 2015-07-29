@@ -20,7 +20,6 @@ import org.droidplanner.services.android.core.drone.variables.MissionStats;
 import org.droidplanner.services.android.core.drone.variables.Navigation;
 import org.droidplanner.services.android.core.drone.variables.Orientation;
 import org.droidplanner.services.android.core.drone.variables.RC;
-import org.droidplanner.services.android.core.drone.variables.Radio;
 import org.droidplanner.services.android.core.drone.variables.Speed;
 import org.droidplanner.services.android.core.drone.variables.State;
 import org.droidplanner.services.android.core.drone.variables.StreamRates;
@@ -74,8 +73,6 @@ public interface MavLinkDrone extends Drone {
     public Speed getSpeed();
 
     public Battery getBattery();
-
-    public Radio getRadio();
 
     public Home getHome();
 

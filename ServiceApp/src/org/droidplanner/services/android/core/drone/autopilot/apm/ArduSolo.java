@@ -36,13 +36,17 @@ public class ArduSolo extends ArduCopter {
     }
 
     @Override
-    public DroneAttribute getAttribute(String attributeType){
-        if (TextUtils.isEmpty(attributeType))
-            return super.getAttribute(attributeType);
+    protected void processSignalUpdate(int rxerrors, int fixed, short rssi, short remrssi, short txbuf,
+                                       short noise, short remnoise){
+        signal.setValid(true);
+        signal.setRxerrors(rxerrors & 0xFFFF);
+        signal.setFixed(fixed & 0xFFFF);
+        signal.setRssi(rssi & 0xFF);
+        signal.setRemrssi(remrssi & 0xFF);
+        signal.setNoise(noise & 0xFF);
+        signal.setRemnoise(remnoise & 0xFF);
+        signal.setTxbuf(txbuf & 0xFF);
 
-        switch(attributeType) {
-            default:
-                return super.getAttribute(attributeType);
-        }
+        notifyDroneEvent(DroneInterfaces.DroneEventsType.RADIO);
     }
 }
