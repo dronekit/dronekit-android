@@ -7,6 +7,7 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.RemoteException;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.Pair;
 import android.view.Surface;
 
@@ -62,7 +63,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
     private ConnectionParameter connectionParams;
 
-    DroneApi(DroidPlannerService dpService, Looper looper, IApiListener listener, String ownerId) {
+    DroneApi(DroidPlannerService dpService, IApiListener listener, String ownerId) {
 
         this.service = dpService;
         this.context = dpService.getApplicationContext();
@@ -80,6 +81,27 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
             Timber.e(e, e.getMessage());
             dpService.releaseDroneApi(this.ownerId);
         }
+    }
+
+    @Override
+    public int getApiVersionCode(){
+        try {
+            return apiListener.getApiVersionCode();
+        } catch (RemoteException e) {
+            Timber.e(e, e.getMessage());
+        }
+
+        return -1;
+    }
+
+    @Override
+    public int getClientVersionCode(){
+        try {
+            return apiListener.getClientVersionCode();
+        } catch (RemoteException e) {
+            Timber.e(e, e.getMessage());
+        }
+        return -1;
     }
 
     void destroy() {

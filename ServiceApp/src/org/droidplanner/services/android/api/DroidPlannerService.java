@@ -103,7 +103,7 @@ public class DroidPlannerService extends Service {
         if (listener == null)
             return null;
 
-        DroneApi droneApi = new DroneApi(this, Looper.getMainLooper(), listener, appId);
+        DroneApi droneApi = new DroneApi(this, listener, appId);
         droneApiStore.put(appId, droneApi);
         lbm.sendBroadcast(new Intent(ACTION_DRONE_CREATED));
         updateForegroundNotification();

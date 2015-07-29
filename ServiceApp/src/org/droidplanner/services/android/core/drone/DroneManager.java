@@ -81,6 +81,8 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
 
     private static final String TAG = DroneManager.class.getSimpleName();
 
+    private static final int SOLOLINK_API_MIN_VERSION = 20410;
+
     private final ConcurrentHashMap<String, DroneEventsListener> connectedApps = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, DroneshareClient> tlogUploaders = new ConcurrentHashMap<>();
 
@@ -127,26 +129,26 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
                     final Bundle messageInfo = new Bundle();
                     messageInfo.putParcelable(AttributeEventExtra.EXTRA_SOLOLINK_MESSAGE_DATA, packet);
 
-                    notifyDroneAttributeEvent(AttributeEvent.SOLOLINK_MESSAGE_RECEIVED, messageInfo);
+                    notifyDroneAttributeEvent(AttributeEvent.SOLOLINK_MESSAGE_RECEIVED, messageInfo, true);
                     break;
             }
         }
 
         @Override
         public void onPresetButtonLoaded(int buttonType, SoloButtonSetting buttonSettings) {
-            notifyDroneAttributeEvent(AttributeEvent.SOLOLINK_BUTTON_SETTINGS_UPDATED, null);
+            notifyDroneAttributeEvent(AttributeEvent.SOLOLINK_BUTTON_SETTINGS_UPDATED, null, true);
         }
 
         @Override
         public void onWifiInfoUpdated(String wifiName, String wifiPassword) {
-            notifyDroneAttributeEvent(AttributeEvent.SOLOLINK_WIFI_SETTINGS_UPDATED, null);
+            notifyDroneAttributeEvent(AttributeEvent.SOLOLINK_WIFI_SETTINGS_UPDATED, null, true);
         }
 
         @Override
         public void onButtonPacketReceived(ButtonPacket packet) {
             final Bundle eventInfo = new Bundle();
             eventInfo.putParcelable(AttributeEventExtra.EXTRA_SOLOLINK_BUTTON_EVENT, packet);
-            notifyDroneAttributeEvent(AttributeEvent.SOLOLINK_BUTTON_EVENT, eventInfo);
+            notifyDroneAttributeEvent(AttributeEvent.SOLOLINK_BUTTON_EVENT, eventInfo, true);
         }
     };
 
@@ -636,11 +638,25 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
         }
     }
 
-    public void notifyDroneAttributeEvent(String attributeEvent, Bundle eventInfo) {
+    private void notifyDroneAttributeEvent(String attributeEvent, Bundle eventInfo) {
+        notifyDroneAttributeEvent(attributeEvent, eventInfo, false);
+    }
+
+    /**
+     * Temporary delegate to prevent sending of newly defined payload to older version of the api
+     * #FIXME: remove when old version of the api is phased out.
+     * @param attributeEvent
+     * @param eventInfo
+     * @param checkForSoloLinkApi
+     */
+    private void notifyDroneAttributeEvent(String attributeEvent, Bundle eventInfo, boolean checkForSoloLinkApi){
         if (TextUtils.isEmpty(attributeEvent) || connectedApps.isEmpty())
             return;
 
         for (DroneEventsListener listener : connectedApps.values()) {
+            if (checkForSoloLinkApi && listener.getApiVersionCode() < SOLOLINK_API_MIN_VERSION) {
+                continue;
+            }
             listener.onAttributeEvent(attributeEvent, eventInfo);
         }
     }
