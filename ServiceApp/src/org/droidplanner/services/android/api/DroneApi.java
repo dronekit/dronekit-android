@@ -37,6 +37,7 @@ import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.exception.ConnectionException;
 import org.droidplanner.services.android.core.drone.DroneEventsListener;
 import org.droidplanner.services.android.utils.CommonApiUtils;
+import org.droidplanner.services.android.utils.SoloLinkApiUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -230,13 +231,13 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
             case SoloLinkActions.ACTION_START_VIDEO_STREAM: {
                 final Surface videoSurface = data.getParcelable(SoloLinkActions.EXTRA_VIDEO_DISPLAY);
                 final String videoTag = data.getString(SoloLinkActions.EXTRA_VIDEO_TAG, "");
-                CommonApiUtils.startVideoStream(getDroneManager(), ownerId + videoTag, videoSurface, listener);
+                SoloLinkApiUtils.startVideoStream(getDroneManager(), ownerId + videoTag, videoSurface, listener);
                 break;
             }
 
             case SoloLinkActions.ACTION_STOP_VIDEO_STREAM: {
                 final String videoTag = data.getString(SoloLinkActions.EXTRA_VIDEO_TAG, "");
-                CommonApiUtils.stopVideoStream(getDroneManager(), ownerId + videoTag, listener);
+                SoloLinkApiUtils.stopVideoStream(getDroneManager(), ownerId + videoTag, listener);
                 break;
             }
 

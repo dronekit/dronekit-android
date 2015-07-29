@@ -46,4 +46,11 @@ public class SoloLinkActions {
     public static final String EXTRA_VIDEO_TAG = "extra_video_tag";
 
     public static final String ACTION_STOP_VIDEO_STREAM = Utils.PACKAGE_NAME + ".action.STOP_VIDEO_STREAM";
+
+    public static final String ACTION_UPDATE_EU_TX_POWER_COMPLIANCE = Utils.PACKAGE_NAME + ".action.sololink.UPDATE_EU_TX_POWER_COMPLIANCE";
+
+    /**
+     * Boolean value. true if the controller should be made compliant, false otherwise.
+     */
+    public static final String EXTRA_EU_TX_POWER_COMPLIANT = "extra_eu_tx_power_compliant";
 }

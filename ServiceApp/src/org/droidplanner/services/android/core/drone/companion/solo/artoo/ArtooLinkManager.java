@@ -55,6 +55,7 @@ public class ArtooLinkManager extends AbstractLinkManager<ArtooLinkListener> {
 
     private final AtomicReference<String> controllerVersion = new AtomicReference<>("");
     private final AtomicReference<String> stm32Version = new AtomicReference<>("");
+    private final AtomicBoolean isEUTxPowerCompliant = new AtomicBoolean(false);
 
     private final AtomicReference<Pair<String, String>> sololinkWifiInfo = new AtomicReference<>(Pair.create("", ""));
 
@@ -108,6 +109,45 @@ public class ArtooLinkManager extends AbstractLinkManager<ArtooLinkListener> {
                 stm32Version.set(version);
         }
     };
+
+    private final Runnable loadWifiInfo = new Runnable() {
+        @Override
+        public void run() {
+            try {
+                String wifiName = sshLink.execute(SOLOLINK_SSID_CONFIG_PATH + " --get-wifi-ssid");
+                String wifiPassword = sshLink.execute(SOLOLINK_SSID_CONFIG_PATH + " --get-wifi-password");
+
+                if (!TextUtils.isEmpty(wifiName) && !TextUtils.isEmpty(wifiPassword)) {
+                    Pair<String, String> wifiInfo = Pair.create(wifiName.trim(), wifiPassword.trim());
+                    sololinkWifiInfo.set(wifiInfo);
+
+                    if (linkListener != null)
+                        linkListener.onWifiInfoUpdated(wifiInfo.first, wifiInfo.second);
+                }
+
+            } catch (IOException e) {
+                Timber.e(e, "Unable to retrieve sololink wifi info.");
+            }
+        }
+    };
+
+    private final Runnable checkEUTxPowerCompliance = new Runnable() {
+        @Override
+        public void run() {
+            boolean isCompliant;
+            try {
+                isCompliant = !sshLink.execute("sololink_config --get-wifi-country").trim().equals("US");
+                if(linkListener != null)
+                    linkListener.onEUTxPowerComplianceUpdated(isCompliant);
+            } catch (IOException e) {
+                Timber.e(e, "Error occurred while querying wifi country.");
+                isCompliant = false; //because most users will have it disabled by default
+            }
+
+            isEUTxPowerCompliant.set(isCompliant);
+        }
+    };
+
     private ArtooLinkListener linkListener;
 
     public ArtooLinkManager(Context context, final Handler handler, ExecutorService asyncExecutor) {
@@ -192,6 +232,13 @@ public class ArtooLinkManager extends AbstractLinkManager<ArtooLinkListener> {
         return stm32Version.get();
     }
 
+    /**
+     * @return true if the controller is compliant to the EX tx power levels.
+     */
+    public boolean isEUTxPowerCompliant(){
+        return isEUTxPowerCompliant.get();
+    }
+
     public void startVideoManager() {
         handler.removeCallbacks(reconnectVideoHandshake);
         isVideoHandshakeStarted.set(true);
@@ -212,21 +259,7 @@ public class ArtooLinkManager extends AbstractLinkManager<ArtooLinkListener> {
     }
 
     private void loadSololinkWifiInfo() {
-        try {
-            String wifiName = sshLink.execute(SOLOLINK_SSID_CONFIG_PATH + " --get-wifi-ssid");
-            String wifiPassword = sshLink.execute(SOLOLINK_SSID_CONFIG_PATH + " --get-wifi-password");
-
-            if (!TextUtils.isEmpty(wifiName) && !TextUtils.isEmpty(wifiPassword)) {
-                Pair<String, String> wifiInfo = Pair.create(wifiName.trim(), wifiPassword.trim());
-                this.sololinkWifiInfo.set(wifiInfo);
-
-                if (linkListener != null)
-                    linkListener.onWifiInfoUpdated(wifiInfo.first, wifiInfo.second);
-            }
-
-        } catch (IOException e) {
-            Timber.e(e, "Unable to retrieve sololink wifi info.");
-        }
+        postAsyncTask(loadWifiInfo);
     }
 
     public boolean updateSololinkWifi(CharSequence wifiSsid, CharSequence password) {
@@ -235,7 +268,7 @@ public class ArtooLinkManager extends AbstractLinkManager<ArtooLinkListener> {
             String ssidUpdateResult = sshLink.execute(SOLOLINK_SSID_CONFIG_PATH + " --set-wifi-ssid " + wifiSsid);
             String passwordUpdateResult = sshLink.execute(SOLOLINK_SSID_CONFIG_PATH + " --set-wifi-password " +
                     password);
-            String restartResult = sshLink.execute(SOLOLINK_SSID_CONFIG_PATH + " --reboot");
+            restartHostapdService();
             return true;
         } catch (IOException e) {
             Timber.e(e, "Error occurred while updating the sololink wifi ssid.");
@@ -290,6 +323,10 @@ public class ArtooLinkManager extends AbstractLinkManager<ArtooLinkListener> {
         //Refresh the vehicle's components versions
         updateArtooVersion();
         updateStm32Version();
+
+        //Update the tx power compliance
+        loadCurrentEUTxPowerComplianceMode();
+
     }
 
     @Override
@@ -383,5 +420,52 @@ public class ArtooLinkManager extends AbstractLinkManager<ArtooLinkListener> {
             }
         });
 
+    }
+
+    public void setEUTxPowerCompliance(final boolean compliant, final ICommandListener listener){
+        postAsyncTask(new Runnable() {
+                @Override
+                public void run() {
+                    Timber.d("%s EU Tx power compliance mode", compliant?"Enabling":"Disabling");
+                    try {
+                        final boolean currentCompliance = !sshLink.execute("sololink_config --get-wifi-country").trim().equals("US");
+                        if(currentCompliance != compliant) {
+                            final String response;
+                            if (compliant) {
+                                response = sshLink.execute("sololink_config --set-wifi-country FR; echo $?");
+
+                            } else {
+                                response = sshLink.execute("sololink_config --set-wifi-country US; echo $?");
+                            }
+                            if (response.trim().equals("0")) {
+                                restartHostapdService();
+                                Timber.d("wifi country successfully set, rebooting artoo");
+
+                                isEUTxPowerCompliant.set(compliant);
+                                postSuccessEvent(listener);
+
+                            } else {
+                                Timber.d("wifi country set failed: %s", response);
+                                postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
+                            }
+                        }
+                    } catch (IOException e) {
+                        Timber.e(e, "Error occurred while changing wifi country.");
+                        postTimeoutEvent(listener);
+                    }
+                }
+            });
+    }
+
+    private void loadCurrentEUTxPowerComplianceMode(){
+        postAsyncTask(checkEUTxPowerCompliance);
+    }
+
+    private void restartHostapdService(){
+        try {
+            sshLink.execute("/etc/init.d/hostapd restart");
+        } catch (IOException e) {
+            Timber.e(e, "Error occurred while restarting hostpad service on Artoo.");
+        }
     }
 }

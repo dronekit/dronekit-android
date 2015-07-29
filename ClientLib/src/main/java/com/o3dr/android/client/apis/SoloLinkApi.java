@@ -95,6 +95,17 @@ public class SoloLinkApi implements Api {
     }
 
     /**
+     * Updates the EU tx power compliance.
+     * @param isCompliant true for the controller to be made compliant, false otherwise.
+     * @param listener Register a callback to receive update of the command execution status.
+     */
+    public void updateEUTxPowerCompliance(boolean isCompliant, AbstractCommandListener listener) {
+        Bundle params = new Bundle();
+        params.putBoolean(EXTRA_EU_TX_POWER_COMPLIANT, isCompliant);
+        drone.performAsyncActionOnDroneThread(new Action(ACTION_UPDATE_EU_TX_POWER_COMPLIANCE, params), listener);
+    }
+
+    /**
      * Take a photo with the connected gopro.
      * @param listener Register a callback to receive update of the command execution status.
      */

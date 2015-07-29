@@ -37,8 +37,6 @@ import timber.log.Timber;
  */
 public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
 
-    public static final String SOLO_LINK_DEFAULT_PASSWORD = "sololink";
-
     public static final String SOLO_LINK_IP = "10.1.1.10";
     public static final int SOLO_LINK_TCP_PORT = 5507;
 

@@ -62,6 +62,7 @@ import org.droidplanner.services.android.core.drone.companion.solo.SoloComp;
 import org.droidplanner.services.android.exception.ConnectionException;
 import org.droidplanner.services.android.utils.AndroidApWarningParser;
 import org.droidplanner.services.android.utils.CommonApiUtils;
+import org.droidplanner.services.android.utils.SoloLinkApiUtils;
 import org.droidplanner.services.android.utils.analytics.GAUtils;
 import org.droidplanner.services.android.utils.prefs.DroidPlannerPrefs;
 
@@ -81,7 +82,7 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
 
     private static final String TAG = DroneManager.class.getSimpleName();
 
-    private static final int SOLOLINK_API_MIN_VERSION = 20410;
+    private static final int SOLOLINK_API_MIN_VERSION = 20411;
 
     private final ConcurrentHashMap<String, DroneEventsListener> connectedApps = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, DroneshareClient> tlogUploaders = new ConcurrentHashMap<>();
@@ -153,6 +154,13 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
             final Bundle eventInfo = new Bundle();
             eventInfo.putParcelable(AttributeEventExtra.EXTRA_SOLOLINK_BUTTON_EVENT, packet);
             notifyDroneAttributeEvent(AttributeEvent.SOLOLINK_BUTTON_EVENT, eventInfo, true);
+        }
+
+        @Override
+        public void onEUTxPowerComplianceUpdated(boolean isCompliant) {
+            final Bundle eventInfo = new Bundle(1);
+            eventInfo.putBoolean(AttributeEventExtra.EXTRA_SOLOLINK_EU_TX_POWER_COMPLIANT, isCompliant);
+            notifyDroneAttributeEvent(AttributeEvent.SOLOLINK_EU_TX_POWER_COMPLIANCE_UPDATED, eventInfo, true);
         }
     };
 
@@ -514,7 +522,7 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
                 return CommonApiUtils.getCameraProxy(drone, cameraDetails);
 
             case AttributeType.SOLOLINK_STATE:
-                return CommonApiUtils.getSoloLinkState(this);
+                return SoloLinkApiUtils.getSoloLinkState(this);
 
             case AttributeType.SOLOLINK_GOPRO_STATE:
                 return soloComp.getGoproState();
@@ -590,26 +598,31 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
             case SoloLinkActions.ACTION_SEND_MESSAGE:
                 final TLVPacket messageData = data.getParcelable(SoloLinkActions.EXTRA_MESSAGE_DATA);
                 if (messageData != null) {
-                    CommonApiUtils.sendSoloLinkMessage(this, messageData, listener);
+                    SoloLinkApiUtils.sendSoloLinkMessage(this, messageData, listener);
                 }
                 break;
 
             case SoloLinkActions.ACTION_UPDATE_WIFI_SETTINGS:
                 final String wifiSsid = data.getString(SoloLinkActions.EXTRA_WIFI_SSID);
                 final String wifiPassword = data.getString(SoloLinkActions.EXTRA_WIFI_PASSWORD);
-                CommonApiUtils.updateSoloLinkWifiSettings(this, wifiSsid, wifiPassword, listener);
+                SoloLinkApiUtils.updateSoloLinkWifiSettings(this, wifiSsid, wifiPassword, listener);
                 break;
 
             case SoloLinkActions.ACTION_UPDATE_BUTTON_SETTINGS:
                 final SoloButtonSettingSetter buttonSettings = data.getParcelable(SoloLinkActions.EXTRA_BUTTON_SETTINGS);
                 if (buttonSettings != null) {
-                    CommonApiUtils.updateSoloLinkButtonSettings(this, buttonSettings, listener);
+                    SoloLinkApiUtils.updateSoloLinkButtonSettings(this, buttonSettings, listener);
                 }
                 break;
 
             case SoloLinkActions.ACTION_UPDATE_CONTROLLER_MODE:
                 final @SoloControllerMode.ControllerMode int mode = data.getInt(SoloLinkActions.EXTRA_CONTROLLER_MODE);
-                CommonApiUtils.updateSoloLinkControllerMode(this, mode, listener);
+                SoloLinkApiUtils.updateSoloLinkControllerMode(this, mode, listener);
+                break;
+
+            case SoloLinkActions.ACTION_UPDATE_EU_TX_POWER_COMPLIANCE:
+                final boolean isCompliant = data.getBoolean(SoloLinkActions.EXTRA_EU_TX_POWER_COMPLIANT, false);
+                SoloLinkApiUtils.updateSoloLinkEUTxPowerCompliance(this, isCompliant, listener);
                 break;
 
             //**************** CAPABILITY ACTIONS **************//

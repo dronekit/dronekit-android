@@ -14,4 +14,6 @@ public interface ArtooLinkListener extends AbstractLinkManager.LinkListener {
     void onWifiInfoUpdated(String wifiName, String wifiPassword);
 
     void onButtonPacketReceived(ButtonPacket packet);
+
+    void onEUTxPowerComplianceUpdated(boolean isCompliant);
 }
