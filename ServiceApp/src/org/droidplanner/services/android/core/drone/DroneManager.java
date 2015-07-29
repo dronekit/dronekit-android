@@ -104,13 +104,13 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
         @Override
         public void onConnected() {
             if(isConnected()) {
-                drone.notifyDroneEvent(DroneInterfaces.DroneEventsType.CONNECTED);
+                notifyDroneEvent(DroneInterfaces.DroneEventsType.CONNECTED);
             }
         }
 
         @Override
         public void onDisconnected() {
-            drone.notifyDroneEvent(DroneInterfaces.DroneEventsType.DISCONNECTED);
+            notifyDroneEvent(DroneInterfaces.DroneEventsType.DISCONNECTED);
         }
 
         @Override
