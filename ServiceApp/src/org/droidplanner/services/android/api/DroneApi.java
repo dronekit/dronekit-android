@@ -490,10 +490,8 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
             case MISSION_WP_REACHED:
                 final int lastReachedWaypoint = drone.getMissionStats().getLastReachedWP();
-                extrasBundle = new Bundle(2);
+                extrasBundle = new Bundle(1);
                 extrasBundle.putInt(AttributeEventExtra.EXTRA_MISSION_LAST_REACHED_WAYPOINT, lastReachedWaypoint);
-                extrasBundle.putInt(AttributeEventExtra.EXTRA_MISSION_CURRENT_MISSION_ITEM,
-                        drone.getMission().getMissionItemIndexFromWaypoint(lastReachedWaypoint));
                 droneEvent = AttributeEvent.MISSION_ITEM_REACHED;
                 break;
 

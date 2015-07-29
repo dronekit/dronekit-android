@@ -14,7 +14,7 @@ public class MissionActions {
 
     public static final String ACTION_SET_MISSION = Utils.PACKAGE_NAME + ".action.SET_MISSION";
     public static final String ACTION_START_MISSION = Utils.PACKAGE_NAME + ".action.START_MISSION";
-    public static final String ACTION_GOTO_MISSION_ITEM = Utils.PACKAGE_NAME + ".action.GOTO_MISSION_ITEM";
+    public static final String ACTION_GOTO_WAYPOINT = Utils.PACKAGE_NAME + ".action.GOTO_WAYPOINT";
 
     public static final String EXTRA_MISSION = "extra_mission";
     public static final String EXTRA_MISSION_ITEM_INDEX = "extra_mission_item_index";

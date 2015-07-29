@@ -501,7 +501,7 @@ public class CommonApiUtils {
             return proxyMission;
 
         org.droidplanner.services.android.core.mission.Mission droneMission = drone.getMission();
-        List<org.droidplanner.services.android.core.mission.MissionItem> droneMissionItems = droneMission.getItems();
+        List<org.droidplanner.services.android.core.mission.MissionItem> droneMissionItems = droneMission.getComponentItems();
 
 
         proxyMission.setCurrentMissionItem((short) drone.getMissionStats().getCurrentWP());
@@ -967,15 +967,14 @@ public class CommonApiUtils {
         }
     }
 
-    public static void jumpToMissionItem(MavLinkDrone drone, int missionItemIndex, int repeatCount, ICommandListener listener) {
-        if (drone == null)
+    public static void gotoWaypoint(MavLinkDrone drone, int waypoint, ICommandListener listener){
+        if(drone == null)
             return;
-        int waypoint = drone.getMission().getWaypointFromMissionItemIndex(missionItemIndex);
-        if (waypoint == -1) {
+        if(waypoint < 0){
             postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
             return;
         }
-        MavLinkDoCmds.jumpToWaypoint(drone, waypoint, repeatCount, listener);
+        MavLinkDoCmds.gotoWaypoint(drone, waypoint, listener);
     }
 
     public static void buildComplexMissionItem(MavLinkDrone drone, Bundle itemBundle) {

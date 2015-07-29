@@ -452,6 +452,11 @@ public abstract class ArduPilot implements MavLinkDrone {
                 CommonApiUtils.startMission(this, forceModeChange, forceArm, listener);
                 break;
 
+            case MissionActions.ACTION_GOTO_WAYPOINT:
+                int missionItemIndex = data.getInt(MissionActions.EXTRA_MISSION_ITEM_INDEX);
+                CommonApiUtils.gotoWaypoint(this, missionItemIndex, listener);
+                break;
+
             //EXPERIMENTAL ACTIONS
             case ExperimentalActions.ACTION_EPM_COMMAND:
                 boolean release = data.getBoolean(ExperimentalActions.EXTRA_EPM_RELEASE);
