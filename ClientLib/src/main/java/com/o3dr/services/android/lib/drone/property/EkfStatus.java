@@ -10,7 +10,7 @@ import java.util.BitSet;
 /**
  * Created by Fredia Huya-Kouadio on 5/22/15.
  */
-public class EkfStatus implements Parcelable {
+public class EkfStatus implements DroneAttribute {
 
     private static final String TAG = EkfStatus.class.getSimpleName();
     private static final int FLAGS_BIT_COUNT = 16;

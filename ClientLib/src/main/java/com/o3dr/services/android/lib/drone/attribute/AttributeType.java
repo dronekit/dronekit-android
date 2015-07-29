@@ -93,12 +93,6 @@ public class AttributeType {
     public static final String TYPE = PACKAGE_NAME + ".TYPE";
 
     /**
-     * Used to access the GoPro instance.
-     * @see {@link com.o3dr.services.android.lib.drone.camera.GoPro}
-     */
-    public static final String GOPRO = PACKAGE_NAME + ".GOPRO";
-
-    /**
      * Used to retrieve the status of the currently or last running magnetometer calibration.
      * @see {@link com.o3dr.services.android.lib.drone.calibration.magnetometer.MagnetometerCalibrationStatus}
      */

@@ -3,6 +3,8 @@ package com.o3dr.services.android.lib.drone.calibration.magnetometer;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.o3dr.services.android.lib.drone.property.DroneAttribute;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,7 +13,7 @@ import java.util.Map;
 /**
  * Created by Fredia Huya-Kouadio on 5/4/15.
  */
-public class MagnetometerCalibrationStatus implements Parcelable {
+public class MagnetometerCalibrationStatus implements DroneAttribute {
 
     private final Map<Integer, MagnetometerCalibrationProgress> calibrationProgressTracker = new HashMap<>();
     private final Map<Integer, MagnetometerCalibrationResult> calibrationResultTracker = new HashMap<>();

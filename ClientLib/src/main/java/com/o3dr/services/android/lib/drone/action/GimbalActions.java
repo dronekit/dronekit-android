@@ -14,4 +14,14 @@ public class GimbalActions {
     public static final String ACTION_SET_GIMBAL_ORIENTATION = Utils.PACKAGE_NAME + ".action.gimbal" +
             ".SET_GIMBAL_ORIENTATION";
 
+    public static final String ACTION_SET_GIMBAL_MOUNT_MODE = Utils.PACKAGE_NAME + ".action.gimbal.SET_GIMBAL_MOUNT_MODE";
+
+    /**
+     * Gimbal mount mode.
+     * @see {@link com.MAVLink.enums.MAV_MOUNT_MODE}
+     */
+    public static final String GIMBAL_MOUNT_MODE ="gimbal_mount_mode";
+
+    public static final String ACTION_RESET_GIMBAL_MOUNT_MODE = Utils.PACKAGE_NAME + ".action.gimbal.RESET_GIMBAL_MOUNT_MODE";
+
 }

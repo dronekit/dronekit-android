@@ -6,12 +6,13 @@ import android.util.SparseArray;
 
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSetting;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageParser;
+import com.o3dr.services.android.lib.drone.property.DroneAttribute;
 
 /**
  * Stores state information for the sololink companion computer.
  * Created by Fredia Huya-Kouadio on 7/10/15.
  */
-public class SoloLinkState implements Parcelable {
+public class SoloLinkState implements DroneAttribute {
 
     private String wifiSsid;
     private String wifiPassword;
