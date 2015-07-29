@@ -102,4 +102,9 @@ public class AttributeType {
      * Used to access the sololink state.
      */
     public static final String SOLOLINK_STATE = PACKAGE_NAME + ".SOLOLINK_STATE";
+
+    /**
+     * Used to access the sololink gopro state.
+     */
+    public static final String SOLOLINK_GOPRO_STATE = PACKAGE_NAME + ".SOLOLINK_GOPRO_STATE";
 }

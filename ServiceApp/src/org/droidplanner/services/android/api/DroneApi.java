@@ -4,10 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.Looper;
 import android.os.RemoteException;
 import android.text.TextUtils;
-import android.util.Log;
 import android.util.Pair;
 import android.view.Surface;
 
@@ -547,10 +545,6 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
             case FOOTPRINT:
                 droneEvent = AttributeEvent.CAMERA_FOOTPRINTS_UPDATED;
-                break;
-
-            case GOPRO_STATUS_UPDATE:
-                droneEvent = AttributeEvent.GOPRO_STATE_UPDATED;
                 break;
 
             case EKF_STATUS_UPDATE:

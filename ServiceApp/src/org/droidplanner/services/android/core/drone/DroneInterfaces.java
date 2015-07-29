@@ -224,11 +224,6 @@ public class DroneInterfaces {
 		 */
 		FOOTPRINT,
 
-        /**
-         * The gopro status was updated.
-         */
-        GOPRO_STATUS_UPDATE,
-
 		/**
 		 * The ekf status was updated.
 		 */

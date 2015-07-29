@@ -11,6 +11,7 @@ import com.o3dr.services.android.lib.drone.companion.solo.button.ButtonTypes;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSetting;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSettingGetter;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSettingSetter;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloGoproRequestState;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloMessageShotManagerError;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageParser;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes;
@@ -55,6 +56,8 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
 
     private final SoloButtonSettingGetter presetButtonBGetter = new SoloButtonSettingGetter(ButtonTypes.BUTTON_B,
             ButtonTypes.BUTTON_EVENT_PRESS);
+
+    private final SoloGoproRequestState goproStateGetter = new SoloGoproRequestState();
 
     private final AtomicReference<SoloButtonSetting> loadedPresetButtonA = new AtomicReference<>();
     private final AtomicReference<SoloButtonSetting> loadedPresetButtonB = new AtomicReference<>();
@@ -131,6 +134,7 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
         super.onIpConnected();
 
         loadPresetButtonSettings();
+        loadGoproState();
 
         //Refresh the vehicle's components versions
         updateSoloLinkVersion();
@@ -203,6 +207,10 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
                 sendTLVPacket(presetButtonBGetter, null);
             }
         });
+    }
+
+    private void loadGoproState(){
+        sendTLVPacket(goproStateGetter, null);
     }
 
     private void handleReceivedPresetButton(SoloButtonSetting presetButton) {

@@ -176,9 +176,9 @@ public class AttributeEvent {
 
     /**
      * Broadcasts updates to the GoPro state.
-     * @see {@link com.o3dr.services.android.lib.drone.camera.GoPro}
+     * @see {@link com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloGoproState}
      */
-    public static final String GOPRO_STATE_UPDATED = PACKAGE_NAME + ".GOPRO_STATE_UPDATED";
+    public static final String SOLOLINK_GOPRO_STATE_UPDATED = PACKAGE_NAME + ".GOPRO_STATE_UPDATED";
 
     /**
      * Signals update to the sololink wifi settings

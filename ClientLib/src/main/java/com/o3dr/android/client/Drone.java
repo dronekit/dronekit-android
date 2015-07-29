@@ -350,6 +350,7 @@ public class Drone {
 
             case AttributeType.CAMERA:
             case AttributeType.SOLOLINK_STATE:
+            case AttributeType.SOLOLINK_GOPRO_STATE:
             default:
                 return null;
         }

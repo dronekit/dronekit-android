@@ -3,6 +3,8 @@ package com.o3dr.services.android.lib.drone.companion.solo.tlv;
 import android.os.Parcel;
 import android.support.annotation.IntDef;
 
+import com.o3dr.services.android.lib.drone.property.DroneAttribute;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.nio.ByteBuffer;
@@ -10,7 +12,7 @@ import java.nio.ByteBuffer;
 /**
  * Created by Fredia Huya-Kouadio on 7/28/15.
  */
-public class SoloGoproState extends TLVPacket {
+public class SoloGoproState extends TLVPacket implements DroneAttribute {
 
     public static final int MESSAGE_LENGTH = 36;
 

@@ -125,6 +125,10 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
                     //Drop these messages as they are already being handled by the 'onPresetButtonLoaded(...)' method.
                     break;
 
+                case TLVMessageTypes.TYPE_SOLO_GOPRO_STATE:
+                    notifyDroneAttributeEvent(AttributeEvent.SOLOLINK_GOPRO_STATE_UPDATED, null);
+                    break;
+
                 default:
                     final Bundle messageInfo = new Bundle();
                     messageInfo.putParcelable(AttributeEventExtra.EXTRA_SOLOLINK_MESSAGE_DATA, packet);
@@ -511,6 +515,9 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
 
             case AttributeType.SOLOLINK_STATE:
                 return CommonApiUtils.getSoloLinkState(this);
+
+            case AttributeType.SOLOLINK_GOPRO_STATE:
+                return soloComp.getGoproState();
 
             default:
                 return drone.getAttribute(attributeType);

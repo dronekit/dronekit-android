@@ -14,6 +14,8 @@ import com.o3dr.services.android.lib.drone.companion.solo.button.ButtonPacket;
 import com.o3dr.services.android.lib.drone.companion.solo.button.ButtonTypes;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSetting;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSettingSetter;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloGoproState;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
 import com.o3dr.services.android.lib.model.ICommandListener;
 
@@ -69,6 +71,8 @@ public class SoloComp implements CompComp, SoloLinkListener, ArtooLinkListener {
 
     private SoloCompListener compListener;
 
+    private SoloGoproState goproState;
+
     /**
      * Solo companion computer implementation
      *
@@ -82,6 +86,10 @@ public class SoloComp implements CompComp, SoloLinkListener, ArtooLinkListener {
 
         this.artooMgr = new ArtooLinkManager(context, handler, asyncExecutor);
         this.soloLinkMgr = new SoloLinkManager(context, handler, asyncExecutor);
+    }
+
+    public SoloGoproState getGoproState() {
+        return goproState;
     }
 
     public void setListener(SoloCompListener listener) {
@@ -117,6 +125,15 @@ public class SoloComp implements CompComp, SoloLinkListener, ArtooLinkListener {
 
     @Override
     public void onTlvPacketReceived(TLVPacket packet) {
+        if(packet == null)
+            return;
+
+        switch(packet.getMessageType()){
+            case TLVMessageTypes.TYPE_SOLO_GOPRO_STATE:
+                goproState = (SoloGoproState) packet;
+                break;
+        }
+
         if (compListener != null)
             compListener.onTlvPacketReceived(packet);
     }
