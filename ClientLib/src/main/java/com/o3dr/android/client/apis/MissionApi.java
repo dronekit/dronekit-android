@@ -84,7 +84,7 @@ public class MissionApi implements Api {
     public void gotoWaypoint(int waypoint, AbstractCommandListener listener){
         Bundle params = new Bundle();
         params.putInt(EXTRA_MISSION_ITEM_INDEX, waypoint);
-        drone.performAsyncActionOnDroneThread(new Action(ACTION_GOTO_MISSION_ITEM, params), listener);
+        drone.performAsyncActionOnDroneThread(new Action(ACTION_GOTO_WAYPOINT, params), listener);
     }
 
     /**

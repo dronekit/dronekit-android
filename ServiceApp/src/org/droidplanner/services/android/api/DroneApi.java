@@ -338,7 +338,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 DroneApiUtils.startMission(droneMgr, forceModeChange, forceArm, listener);
                 break;
 
-            case MissionActions.ACTION_GOTO_MISSION_ITEM:
+            case MissionActions.ACTION_GOTO_WAYPOINT:
                 int missionItemIndex = data.getInt(MissionActions.EXTRA_MISSION_ITEM_INDEX);
                 DroneApiUtils.gotoWaypoint(getDrone(), missionItemIndex, listener);
                 break;

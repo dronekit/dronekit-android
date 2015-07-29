@@ -51,7 +51,7 @@ public class Mission extends DroneVariable {
      * Stores the set of mission items belonging to this mission.
      */
     private List<MissionItem> items = new ArrayList<MissionItem>();
-    private List<MissionItem> componentItems = new ArrayList<>();
+    private final List<MissionItem> componentItems = new ArrayList<>();
     private double defaultAlt = 20.0;
 
     public Mission(Drone myDrone) {
@@ -206,9 +206,6 @@ public class Mission extends DroneVariable {
         return items;
     }
     public List<MissionItem> getComponentItems(){
-        if(componentItems == null || componentItems.size() == 0) {
-            updateComponentItems();
-        }
         return componentItems;
     }
 
@@ -340,7 +337,7 @@ public class Mission extends DroneVariable {
 
     private void updateComponentItems(List<msg_mission_item> msgMissionItems) {
         componentItems.clear();
-        componentItems = processMavLinkMessages(msgMissionItems);
+        componentItems.addAll(processMavLinkMessages(msgMissionItems));
     }
 
     public List<msg_mission_item> getMsgMissionItems() {

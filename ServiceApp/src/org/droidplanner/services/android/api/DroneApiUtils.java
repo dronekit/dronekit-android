@@ -511,7 +511,6 @@ public class DroneApiUtils {
             return proxyMission;
 
         org.droidplanner.core.mission.Mission droneMission = drone.getMission();
-//        List<org.droidplanner.core.mission.MissionItem> droneMissionItems = droneMission.getItems();
         List<org.droidplanner.core.mission.MissionItem> componentMissionItems = droneMission.getComponentItems();
 
 
