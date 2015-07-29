@@ -176,7 +176,39 @@ public class AttributeEvent {
 
     /**
      * Broadcasts updates to the GoPro state.
-     * @see {@link com.o3dr.services.android.lib.drone.camera.GoPro}
+     * @see {@link com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloGoproState}
      */
-    public static final String GOPRO_STATE_UPDATED = PACKAGE_NAME + ".GOPRO_STATE_UPDATED";
+    public static final String SOLOLINK_GOPRO_STATE_UPDATED = PACKAGE_NAME + ".GOPRO_STATE_UPDATED";
+
+    /**
+     * Signals update to the sololink wifi settings
+     * @see {@link com.o3dr.services.android.lib.drone.companion.solo.SoloLinkState}
+     */
+    public static final String SOLOLINK_WIFI_SETTINGS_UPDATED = PACKAGE_NAME + ".SOLOLINK_WIFI_SETTINGS_UPDATED";
+
+    /**
+     * Signals update to the sololink button settings
+     * @see {@link com.o3dr.services.android.lib.drone.companion.solo.SoloLinkState}
+     */
+    public static final String SOLOLINK_BUTTON_SETTINGS_UPDATED = PACKAGE_NAME + ".SOLOLINK_BUTTON_SETTINGS_UPDATED";
+
+    /**
+     * Triggers every time a button event occurs.
+     * @see {@link AttributeEventExtra#EXTRA_SOLOLINK_BUTTON_EVENT}
+     */
+    public static final String SOLOLINK_BUTTON_EVENT = PACKAGE_NAME + ".SOLOLINK_BUTTON_EVENT";
+
+    /**
+     * Triggers upon receipt of a sololink message.
+     * @see {@link AttributeEventExtra#EXTRA_SOLOLINK_MESSAGE_DATA}
+     */
+    public static final String SOLOLINK_MESSAGE_RECEIVED = PACKAGE_NAME + ".SOLOLINK_MESSAGE_RECEIVED";
+
+    /**
+     * Signals the gimbal orientation was updated.
+     * @see {@link AttributeEventExtra#EXTRA_GIMBAL_ORIENTATION_PITCH}
+     * @see {@link AttributeEventExtra#EXTRA_GIMBAL_ORIENTATION_ROLL}
+     * @see {@link AttributeEventExtra#EXTRA_GIMBAL_ORIENTATION_YAW}
+     */
+    public static final String GIMBAL_ORIENTATION_UPDATED = PACKAGE_NAME + ".GIMBAL_ORIENTATION_UPDATED";
 }

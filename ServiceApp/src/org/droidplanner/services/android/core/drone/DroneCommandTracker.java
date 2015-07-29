@@ -19,7 +19,7 @@ import timber.log.Timber;
  */
 public class DroneCommandTracker implements CommandTracker {
 
-    private static final long COMMAND_TIMEOUT_PERIOD = 1000l; //1 seconds
+    private static final long COMMAND_TIMEOUT_PERIOD = 2000l; //2 seconds
 
     private final Handler handler;
 

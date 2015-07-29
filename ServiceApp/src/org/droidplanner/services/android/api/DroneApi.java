@@ -4,10 +4,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.Looper;
 import android.os.RemoteException;
 import android.text.TextUtils;
 import android.util.Pair;
+import android.view.Surface;
 
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.ardupilotmega.msg_mag_cal_progress;
@@ -15,6 +15,7 @@ import com.MAVLink.ardupilotmega.msg_mag_cal_report;
 import com.o3dr.services.android.lib.drone.action.ConnectionActions;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
+import com.o3dr.services.android.lib.drone.companion.solo.action.SoloLinkActions;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionResult;
 import com.o3dr.services.android.lib.drone.connection.DroneSharePrefs;
@@ -60,7 +61,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
     private ConnectionParameter connectionParams;
 
-    DroneApi(DroidPlannerService dpService, Looper looper, IApiListener listener, String ownerId) {
+    DroneApi(DroidPlannerService dpService, IApiListener listener, String ownerId) {
 
         this.service = dpService;
         this.context = dpService.getApplicationContext();
@@ -78,6 +79,27 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
             Timber.e(e, e.getMessage());
             dpService.releaseDroneApi(this.ownerId);
         }
+    }
+
+    @Override
+    public int getApiVersionCode(){
+        try {
+            return apiListener.getApiVersionCode();
+        } catch (RemoteException e) {
+            Timber.e(e, e.getMessage());
+        }
+
+        return -1;
+    }
+
+    @Override
+    public int getClientVersionCode(){
+        try {
+            return apiListener.getClientVersionCode();
+        } catch (RemoteException e) {
+            Timber.e(e, e.getMessage());
+        }
+        return -1;
     }
 
     void destroy() {
@@ -191,10 +213,12 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
             return;
 
         Bundle data = action.getData();
+        if (data != null)
+            data.setClassLoader(context.getClassLoader());
+
         switch (type) {
             //CONNECTION ACTIONS
             case ConnectionActions.ACTION_CONNECT:
-                data.setClassLoader(ConnectionParameter.class.getClassLoader());
                 ConnectionParameter parameter = data.getParcelable(ConnectionActions.EXTRA_CONNECT_PARAMETER);
                 connect(parameter);
                 break;
@@ -202,6 +226,19 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
             case ConnectionActions.ACTION_DISCONNECT:
                 disconnect();
                 break;
+
+            case SoloLinkActions.ACTION_START_VIDEO_STREAM: {
+                final Surface videoSurface = data.getParcelable(SoloLinkActions.EXTRA_VIDEO_DISPLAY);
+                final String videoTag = data.getString(SoloLinkActions.EXTRA_VIDEO_TAG, "");
+                CommonApiUtils.startVideoStream(getDroneManager(), ownerId + videoTag, videoSurface, listener);
+                break;
+            }
+
+            case SoloLinkActions.ACTION_STOP_VIDEO_STREAM: {
+                final String videoTag = data.getString(SoloLinkActions.EXTRA_VIDEO_TAG, "");
+                CommonApiUtils.stopVideoStream(getDroneManager(), ownerId + videoTag, listener);
+                break;
+            }
 
             default:
                 droneMgr.executeAsyncAction(action, listener);
@@ -508,10 +545,6 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
             case FOOTPRINT:
                 droneEvent = AttributeEvent.CAMERA_FOOTPRINTS_UPDATED;
-                break;
-
-            case GOPRO_STATUS_UPDATE:
-                droneEvent = AttributeEvent.GOPRO_STATE_UPDATED;
                 break;
 
             case EKF_STATUS_UPDATE:

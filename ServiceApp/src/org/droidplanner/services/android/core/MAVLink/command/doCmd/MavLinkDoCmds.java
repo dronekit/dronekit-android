@@ -1,7 +1,9 @@
 package org.droidplanner.services.android.core.MAVLink.command.doCmd;
 
 import com.MAVLink.ardupilotmega.msg_digicam_control;
+import com.MAVLink.ardupilotmega.msg_mount_control;
 import com.MAVLink.common.msg_command_long;
+import com.MAVLink.common.msg_mission_set_current;
 import com.MAVLink.enums.MAV_CMD;
 import com.o3dr.services.android.lib.model.ICommandListener;
 
@@ -113,14 +115,27 @@ public class MavLinkDoCmds {
         if (drone == null)
             return;
 
-        msg_command_long msg = new msg_command_long();
+        msg_mount_control msg = new msg_mount_control();
         msg.target_system = drone.getSysid();
         msg.target_component = drone.getCompid();
-        msg.command = MAV_CMD.MAV_CMD_DO_MOUNT_CONTROL;
-        msg.param1 = (int) (pitch * 100);
-        msg.param2 = (int) (roll * 100);
-        msg.param3 = (int) (yaw * 100);
+        msg.input_a = (int) (pitch * 100);
+        msg.input_b = (int) (roll * 100);
+        msg.input_c = (int) (yaw * 100);
 
+        drone.getMavClient().sendMavMessage(msg, listener);
+    }
+
+    /**
+     * Jump to the desired command in the mission list. Repeat this action only the specified number of times
+     * @param drone               target vehicle
+     * @param waypoint    command
+     * @param listener            Register a callback to receive update of the command execution state.
+     */
+    public static void gotoWaypoint(MavLinkDrone drone, int waypoint, ICommandListener listener){
+        if (drone == null)
+            return;
+        msg_mission_set_current msg = new msg_mission_set_current();
+        msg.seq = waypoint;
         drone.getMavClient().sendMavMessage(msg, listener);
     }
 

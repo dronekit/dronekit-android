@@ -7,7 +7,6 @@ import org.droidplanner.services.android.core.MAVLink.MAVLinkStreams;
 import org.droidplanner.services.android.core.MAVLink.WaypointManager;
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
 import org.droidplanner.services.android.core.drone.Preferences;
-import org.droidplanner.services.android.core.drone.camera.GoProImpl;
 import org.droidplanner.services.android.core.drone.profiles.Parameters;
 import org.droidplanner.services.android.core.drone.profiles.VehicleProfile;
 import org.droidplanner.services.android.core.drone.variables.Altitude;
@@ -114,8 +113,4 @@ public interface MavLinkDrone extends Drone {
 
     public void logMessage(int mavSeverity, String message);
 
-    /**
-     * @return the GoPro instance for the connected vehicle.
-     */
-    public GoProImpl getGoProImpl();
 }

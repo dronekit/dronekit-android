@@ -203,11 +203,6 @@ public class DroneInterfaces {
 		/**
 		 *
 		 */
-		PARAMETERS_DOWNLOADED,
-
-		/**
-		 *
-		 */
 		WARNING_SIGNAL_WEAK,
 		/**
 		 * Announces that a new version for the firmware has been received
@@ -228,11 +223,6 @@ public class DroneInterfaces {
 		 * The drone camera footprints has been updated
 		 */
 		FOOTPRINT,
-
-        /**
-         * The gopro status was updated.
-         */
-        GOPRO_STATUS_UPDATE,
 
 		/**
 		 * The ekf status was updated.

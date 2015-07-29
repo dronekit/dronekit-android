@@ -114,8 +114,6 @@ public class Parameters extends DroneVariable implements OnDroneListener {
             // update listener
             notifyParameterReceipt(param, 0, 1);
 
-            myDrone.notifyDroneEvent(DroneEventsType.PARAMETERS_DOWNLOADED);
-
             notifyParametersReceiptEnd();
             return;
         }
@@ -130,7 +128,6 @@ public class Parameters extends DroneVariable implements OnDroneListener {
         if (parameters.size() >= m_value.param_count) {
             killWatchdog();
             isRefreshing.set(false);
-            myDrone.notifyDroneEvent(DroneEventsType.PARAMETERS_DOWNLOADED);
 
             notifyParametersReceiptEnd();
         } else {
@@ -185,9 +182,7 @@ public class Parameters extends DroneVariable implements OnDroneListener {
     public void onDroneEvent(DroneEventsType event, MavLinkDrone drone) {
         switch (event) {
             case HEARTBEAT_FIRST:
-                if (!drone.getState().isFlying()) {
-                    refreshParameters();
-                }
+                refreshParameters();
                 break;
 
             case DISCONNECTED:

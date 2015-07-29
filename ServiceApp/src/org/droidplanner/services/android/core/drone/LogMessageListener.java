@@ -5,5 +5,5 @@ package org.droidplanner.services.android.core.drone;
  */
 public interface LogMessageListener {
 
-    void onMessageLogged(int mavSeverity, String message);
+    void onMessageLogged(int logLevel, String message);
 }
