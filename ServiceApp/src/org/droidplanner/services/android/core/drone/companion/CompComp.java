@@ -1,4 +1,4 @@
-package org.droidplanner.services.android.drone.companion;
+package org.droidplanner.services.android.core.drone.companion;
 
 /**
  * Interface for companion computer implementation.

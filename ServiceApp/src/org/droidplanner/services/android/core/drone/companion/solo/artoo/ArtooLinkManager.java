@@ -1,4 +1,4 @@
-package org.droidplanner.services.android.drone.companion.solo.artoo;
+package org.droidplanner.services.android.core.drone.companion.solo.artoo;
 
 import android.content.Context;
 import android.os.Handler;
@@ -13,8 +13,8 @@ import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageParser;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
 import com.o3dr.services.android.lib.model.ICommandListener;
 
-import org.droidplanner.services.android.drone.companion.solo.AbstractLinkManager;
-import org.droidplanner.services.android.drone.companion.solo.SoloComp;
+import org.droidplanner.services.android.core.drone.companion.solo.AbstractLinkManager;
+import org.droidplanner.services.android.core.drone.companion.solo.SoloComp;
 import org.droidplanner.services.android.utils.NetworkUtils;
 import org.droidplanner.services.android.utils.connection.IpConnectionListener;
 import org.droidplanner.services.android.utils.connection.SshConnection;

@@ -6,22 +6,7 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 
-import com.squareup.okhttp.Cache;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.OkUrlFactory;
-
-import org.apache.http.conn.scheme.PlainSocketFactory;
-import org.apache.http.conn.scheme.Scheme;
-import org.apache.http.conn.scheme.SchemeRegistry;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
-import org.apache.http.params.BasicHttpParams;
-import org.droidplanner.services.android.drone.companion.solo.SoloComp;
-
-import java.net.HttpURLConnection;
-import java.net.URL;
-
-import javax.net.ssl.SSLSocketFactory;
+import org.droidplanner.services.android.core.drone.companion.solo.SoloComp;
 
 /**
  * Created by Fredia Huya-Kouadio on 5/11/15.

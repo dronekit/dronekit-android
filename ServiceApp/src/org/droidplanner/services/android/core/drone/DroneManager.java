@@ -58,7 +58,7 @@ import org.droidplanner.services.android.core.gcs.location.FusedLocation;
 import org.droidplanner.services.android.core.helpers.coordinates.Coord2D;
 import org.droidplanner.services.android.core.helpers.coordinates.Coord3D;
 import org.droidplanner.services.android.core.parameters.Parameter;
-import org.droidplanner.services.android.drone.companion.solo.SoloComp;
+import org.droidplanner.services.android.core.drone.companion.solo.SoloComp;
 import org.droidplanner.services.android.exception.ConnectionException;
 import org.droidplanner.services.android.utils.AndroidApWarningParser;
 import org.droidplanner.services.android.utils.CommonApiUtils;

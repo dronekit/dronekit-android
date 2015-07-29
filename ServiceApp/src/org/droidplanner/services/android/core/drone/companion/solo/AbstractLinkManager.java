@@ -1,13 +1,11 @@
-package org.droidplanner.services.android.drone.companion.solo;
+package org.droidplanner.services.android.core.drone.companion.solo;
 
 import android.content.Context;
 import android.os.Handler;
 import android.os.RemoteException;
-import android.util.Log;
 
 import com.o3dr.services.android.lib.model.ICommandListener;
 
-import org.droidplanner.services.android.utils.Utils;
 import org.droidplanner.services.android.utils.connection.AbstractIpConnection;
 import org.droidplanner.services.android.utils.connection.IpConnectionListener;
 

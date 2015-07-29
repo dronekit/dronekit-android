@@ -1,4 +1,4 @@
-package org.droidplanner.services.android.drone.companion.solo;
+package org.droidplanner.services.android.core.drone.companion.solo;
 
 import android.content.Context;
 import android.os.Handler;
@@ -19,11 +19,11 @@ import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
 import com.o3dr.services.android.lib.model.ICommandListener;
 
-import org.droidplanner.services.android.drone.companion.CompComp;
-import org.droidplanner.services.android.drone.companion.solo.artoo.ArtooLinkListener;
-import org.droidplanner.services.android.drone.companion.solo.artoo.ArtooLinkManager;
-import org.droidplanner.services.android.drone.companion.solo.sololink.SoloLinkListener;
-import org.droidplanner.services.android.drone.companion.solo.sololink.SoloLinkManager;
+import org.droidplanner.services.android.core.drone.companion.CompComp;
+import org.droidplanner.services.android.core.drone.companion.solo.artoo.ArtooLinkListener;
+import org.droidplanner.services.android.core.drone.companion.solo.artoo.ArtooLinkManager;
+import org.droidplanner.services.android.core.drone.companion.solo.sololink.SoloLinkListener;
+import org.droidplanner.services.android.core.drone.companion.solo.sololink.SoloLinkManager;
 import org.droidplanner.services.android.utils.NetworkUtils;
 import org.droidplanner.services.android.utils.video.DecoderListener;
 
