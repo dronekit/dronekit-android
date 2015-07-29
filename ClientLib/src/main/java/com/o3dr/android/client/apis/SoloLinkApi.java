@@ -132,6 +132,26 @@ public class SoloLinkApi implements Api {
      * @param listener Register a callback to receive update of the command execution status.
      */
     public void toggleVideoRecording(final AbstractCommandListener listener){
+        sendVideoRecordingCommand(SoloGoproRecord.TOGGLE_RECORDING, listener);
+    }
+
+    /**
+     * Starts video recording on the connected gopro.
+     * @param listener Register a callback to receive update of the command execution status.
+     */
+    public void startVideoRecording(final AbstractCommandListener listener){
+        sendVideoRecordingCommand(SoloGoproRecord.START_RECORDING, listener);
+    }
+
+    /**
+     * Stops video recording on the connected gopro.
+     * @param listener Register a callback to receive update of the command execution status.
+     */
+    public void stopVideoRecording(final AbstractCommandListener listener){
+        sendVideoRecordingCommand(SoloGoproRecord.STOP_RECORDING, listener);
+    }
+
+    private void sendVideoRecordingCommand(@SoloGoproRecord.RecordCommand final int recordCommand, final AbstractCommandListener listener){
         //Set the gopro to video mode
         final SoloGoproSetRequest videoModeRequest = new SoloGoproSetRequest(SoloGoproSetRequest.CAPTURE_MODE,
                 SoloGoproSetRequest.CAPTURE_MODE_VIDEO);
@@ -140,20 +160,20 @@ public class SoloLinkApi implements Api {
             @Override
             public void onSuccess() {
                 //Send the command to toggle video recording
-                final SoloGoproRecord videoToggle = new SoloGoproRecord(SoloGoproRecord.TOGGLE_RECORDING);
+                final SoloGoproRecord videoToggle = new SoloGoproRecord(recordCommand);
                 sendMessage(videoToggle, listener);
             }
 
             @Override
             public void onError(int executionError) {
-                if(listener != null){
+                if (listener != null) {
                     listener.onError(executionError);
                 }
             }
 
             @Override
             public void onTimeout() {
-                if(listener != null){
+                if (listener != null) {
                     listener.onTimeout();
                 }
             }
