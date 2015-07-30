@@ -2,18 +2,13 @@ package org.droidplanner.services.android.core.mission;
 
 import android.util.Pair;
 
-import android.util.SparseArray;
-import android.util.SparseIntArray;
-
 import com.MAVLink.common.msg_mission_ack;
 import com.MAVLink.common.msg_mission_item;
 import com.MAVLink.enums.MAV_CMD;
-import com.google.android.gms.maps.model.LatLng;
-import com.o3dr.services.android.lib.coordinate.LatLong;
-import com.o3dr.services.android.lib.util.MathUtils;
 
 import org.droidplanner.services.android.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.services.android.core.drone.DroneVariable;
+import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.core.helpers.coordinates.Coord2D;
 import org.droidplanner.services.android.core.helpers.coordinates.Coord3D;
 import org.droidplanner.services.android.core.helpers.geoTools.GeoTools;
@@ -32,13 +27,10 @@ import org.droidplanner.services.android.core.mission.waypoints.RegionOfInterest
 import org.droidplanner.services.android.core.mission.waypoints.SpatialCoordItem;
 import org.droidplanner.services.android.core.mission.waypoints.SplineWaypoint;
 import org.droidplanner.services.android.core.mission.waypoints.Waypoint;
-import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import timber.log.Timber;
 
 /**
  * This implements a mavlink mission. A mavlink mission is a set of
