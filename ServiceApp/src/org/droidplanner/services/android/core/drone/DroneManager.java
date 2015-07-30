@@ -82,7 +82,7 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
 
     private static final String TAG = DroneManager.class.getSimpleName();
 
-    private static final int SOLOLINK_API_MIN_VERSION = 20411;
+    private static final int SOLOLINK_API_MIN_VERSION = 20412;
 
     private final ConcurrentHashMap<String, DroneEventsListener> connectedApps = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, DroneshareClient> tlogUploaders = new ConcurrentHashMap<>();

@@ -178,13 +178,16 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
     @Override
     public void addAttributesObserver(IObserver observer) throws RemoteException {
-        if (observer != null)
+        if (observer != null) {
+            Timber.d("Adding attributes observer.");
             observersList.add(observer);
+        }
     }
 
     @Override
     public void removeAttributesObserver(IObserver observer) throws RemoteException {
         if (observer != null) {
+            Timber.d("Removing attributes observer.");
             observersList.remove(observer);
             checkForSelfRelease();
         }
