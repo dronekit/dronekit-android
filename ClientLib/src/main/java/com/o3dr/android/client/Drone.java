@@ -151,7 +151,7 @@ public class Drone {
         if (asyncScheduler == null || asyncScheduler.isShutdown())
             asyncScheduler = Executors.newFixedThreadPool(1);
 
-        addAttributesObserver(this.droneObserver);
+        addAttributesObserver(droneApi, this.droneObserver);
         resetFlightTimer();
 
         droneApiRef.set(droneApi);
@@ -160,7 +160,7 @@ public class Drone {
     synchronized void destroy() {
         IDroneApi droneApi = droneApiRef.get();
 
-        removeAttributesObserver(this.droneObserver);
+        removeAttributesObserver(droneApi, this.droneObserver);
 
         try {
             if (isStarted(droneApi)) {
@@ -506,8 +506,7 @@ public class Drone {
             droneListeners.add(listener);
     }
 
-    private void addAttributesObserver(IObserver observer) {
-        final IDroneApi droneApi = droneApiRef.get();
+    private void addAttributesObserver(IDroneApi droneApi, IObserver observer) {
         if (isStarted(droneApi)) {
             try {
                 droneApi.addAttributesObserver(observer);
@@ -546,8 +545,7 @@ public class Drone {
         droneListeners.remove(listener);
     }
 
-    private void removeAttributesObserver(IObserver observer) {
-        final IDroneApi droneApi = droneApiRef.get();
+    private void removeAttributesObserver(IDroneApi droneApi, IObserver observer) {
         if (isStarted(droneApi)) {
             try {
                 droneApi.removeAttributesObserver(observer);
