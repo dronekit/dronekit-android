@@ -460,8 +460,12 @@ public class Drone {
         return false;
     }
 
-    public boolean isStarted(IDroneApi droneApi) {
+    private boolean isStarted(IDroneApi droneApi) {
         return droneApi != null && droneApi.asBinder().pingBinder();
+    }
+
+    public boolean isStarted(){
+        return isStarted(droneApiRef.get());
     }
 
     public boolean isConnected() {
