@@ -26,9 +26,15 @@ import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.EXT
 /**
  * Contains drone commands with no defined interaction model yet.
  */
-public class ExperimentalApi implements Api {
+public class ExperimentalApi extends Api {
 
     private static final ConcurrentHashMap<Drone, ExperimentalApi> experimentalApiCache = new ConcurrentHashMap<>();
+    private static final Builder<ExperimentalApi> apiBuilder = new Builder<ExperimentalApi>() {
+        @Override
+        public ExperimentalApi build(Drone drone) {
+            return new ExperimentalApi(drone);
+        }
+    };
 
     /**
      * Retrieves an ExperimentalApi instance.
@@ -37,12 +43,7 @@ public class ExperimentalApi implements Api {
      * @return a ExperimentalApi instance.
      */
     public static ExperimentalApi getApi(final Drone drone) {
-        return ApiUtils.getApi(drone, experimentalApiCache, new Builder<ExperimentalApi>() {
-            @Override
-            public ExperimentalApi build() {
-                return new ExperimentalApi(drone);
-            }
-        });
+        return getApi(drone, experimentalApiCache, apiBuilder);
     }
 
     private final Drone drone;

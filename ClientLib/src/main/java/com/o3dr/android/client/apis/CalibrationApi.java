@@ -22,9 +22,15 @@ import static com.o3dr.services.android.lib.gcs.action.CalibrationActions.EXTRA_
  * Provides access to the calibration specific functionality.
  * Created by Fredia Huya-Kouadio on 1/19/15.
  */
-public class CalibrationApi implements Api {
+public class CalibrationApi extends Api {
 
     private static final ConcurrentHashMap<Drone, CalibrationApi> calibrationApiCache = new ConcurrentHashMap<>();
+    private static final Builder<CalibrationApi> apiBuilder = new Builder<CalibrationApi>() {
+        @Override
+        public CalibrationApi build(Drone drone) {
+            return new CalibrationApi(drone);
+        }
+    };
 
     /**
      * Retrieves a CalibrationApi instance.
@@ -33,12 +39,7 @@ public class CalibrationApi implements Api {
      * @return a CalibrationApi instance.
      */
     public static CalibrationApi getApi(final Drone drone) {
-        return ApiUtils.getApi(drone, calibrationApiCache, new Api.Builder<CalibrationApi>() {
-            @Override
-            public CalibrationApi build() {
-                return new CalibrationApi(drone);
-            }
-        });
+        return getApi(drone, calibrationApiCache, apiBuilder);
     }
 
     private final Drone drone;

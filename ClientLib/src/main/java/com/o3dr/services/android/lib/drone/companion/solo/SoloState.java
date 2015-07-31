@@ -1,18 +1,16 @@
 package com.o3dr.services.android.lib.drone.companion.solo;
 
 import android.os.Parcel;
-import android.os.Parcelable;
 import android.util.SparseArray;
 
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSetting;
-import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageParser;
 import com.o3dr.services.android.lib.drone.property.DroneAttribute;
 
 /**
  * Stores state information for the sololink companion computer.
  * Created by Fredia Huya-Kouadio on 7/10/15.
  */
-public class SoloLinkState implements DroneAttribute {
+public class SoloState implements DroneAttribute {
 
     private String wifiSsid;
     private String wifiPassword;
@@ -27,12 +25,12 @@ public class SoloLinkState implements DroneAttribute {
 
     private SparseArray<SoloButtonSetting> buttonSettings;
 
-    public SoloLinkState(){}
+    public SoloState(){}
 
-    public SoloLinkState(String autopilotVersion, String controllerFirmwareVersion,
-                         String controllerVersion, String vehicleVersion,
-                         String wifiPassword, String wifiSsid, boolean isEUTxPowerCompliant,
-                         SparseArray<SoloButtonSetting> buttonSettings) {
+    public SoloState(String autopilotVersion, String controllerFirmwareVersion,
+                     String controllerVersion, String vehicleVersion,
+                     String wifiPassword, String wifiSsid, boolean isEUTxPowerCompliant,
+                     SparseArray<SoloButtonSetting> buttonSettings) {
         this.autopilotVersion = autopilotVersion;
         this.controllerFirmwareVersion = controllerFirmwareVersion;
         this.controllerVersion = controllerVersion;
@@ -92,7 +90,7 @@ public class SoloLinkState implements DroneAttribute {
         dest.writeSparseArray((SparseArray) this.buttonSettings);
     }
 
-    protected SoloLinkState(Parcel in) {
+    protected SoloState(Parcel in) {
         this.wifiSsid = in.readString();
         this.wifiPassword = in.readString();
         this.controllerVersion = in.readString();
@@ -103,13 +101,13 @@ public class SoloLinkState implements DroneAttribute {
         this.buttonSettings = in.readSparseArray(SparseArray.class.getClassLoader());
     }
 
-    public static final Creator<SoloLinkState> CREATOR = new Creator<SoloLinkState>() {
-        public SoloLinkState createFromParcel(Parcel source) {
-            return new SoloLinkState(source);
+    public static final Creator<SoloState> CREATOR = new Creator<SoloState>() {
+        public SoloState createFromParcel(Parcel source) {
+            return new SoloState(source);
         }
 
-        public SoloLinkState[] newArray(int size) {
-            return new SoloLinkState[size];
+        public SoloState[] newArray(int size) {
+            return new SoloState[size];
         }
     };
 }

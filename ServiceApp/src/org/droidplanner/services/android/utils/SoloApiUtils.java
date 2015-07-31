@@ -5,8 +5,8 @@ import android.util.Pair;
 import android.view.Surface;
 
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
-import com.o3dr.services.android.lib.drone.companion.solo.SoloControllerMode;
-import com.o3dr.services.android.lib.drone.companion.solo.SoloLinkState;
+import com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerMode;
+import com.o3dr.services.android.lib.drone.companion.solo.SoloState;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSettingSetter;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
 import com.o3dr.services.android.lib.model.ICommandListener;
@@ -19,19 +19,19 @@ import timber.log.Timber;
 /**
  * Created by Fredia Huya-Kouadio on 7/29/15.
  */
-public class SoloLinkApiUtils {
+public class SoloApiUtils {
 
     //Private to prevent instantiation.
-    private SoloLinkApiUtils() {
+    private SoloApiUtils() {
     }
 
-    public static SoloLinkState getSoloLinkState(DroneManager droneManager) {
+    public static SoloState getSoloLinkState(DroneManager droneManager) {
         if (droneManager == null || !droneManager.isCompanionComputerEnabled())
             return null;
 
         final SoloComp soloComp = droneManager.getSoloComp();
         final Pair<String, String> wifiSettings = soloComp.getWifiSettings();
-        return new SoloLinkState(soloComp.getAutopilotVersion(), soloComp.getControllerFirmwareVersion(),
+        return new SoloState(soloComp.getAutopilotVersion(), soloComp.getControllerFirmwareVersion(),
                 soloComp.getControllerVersion(), soloComp.getVehicleVersion(),
                 wifiSettings.second, wifiSettings.first, soloComp.isEUTxPowerCompliant(), soloComp.getButtonSettings());
     }

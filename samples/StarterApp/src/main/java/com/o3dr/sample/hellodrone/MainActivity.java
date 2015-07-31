@@ -18,7 +18,7 @@ import android.widget.Toast;
 
 import com.o3dr.android.client.ControlTower;
 import com.o3dr.android.client.Drone;
-import com.o3dr.android.client.apis.SoloLinkApi;
+import com.o3dr.android.client.apis.solo.SoloCameraApi;
 import com.o3dr.android.client.apis.VehicleApi;
 import com.o3dr.android.client.interfaces.DroneListener;
 import com.o3dr.android.client.interfaces.TowerListener;
@@ -440,7 +440,7 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
     }
 
     private void takePhoto() {
-        SoloLinkApi.getApi(drone).takePhoto(new AbstractCommandListener() {
+        SoloCameraApi.getApi(drone).takePhoto(new AbstractCommandListener() {
             @Override
             public void onSuccess() {
                 alertUser("Photo taken.");
@@ -459,7 +459,7 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
     }
 
     private void toggleVideoRecording() {
-        SoloLinkApi.getApi(drone).toggleVideoRecording(new AbstractCommandListener() {
+        SoloCameraApi.getApi(drone).toggleVideoRecording(new AbstractCommandListener() {
             @Override
             public void onSuccess() {
                 alertUser("Video recording toggled.");
@@ -478,7 +478,7 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
     }
 
     private void startVideoStream(Surface videoSurface){
-        SoloLinkApi.getApi(drone).startVideoStream(videoSurface, new AbstractCommandListener() {
+        SoloCameraApi.getApi(drone).startVideoStream(videoSurface, new AbstractCommandListener() {
             @Override
             public void onSuccess() {
                 if(stopVideoStream != null)
@@ -501,7 +501,7 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
     }
 
     private void stopVideoStream() {
-        SoloLinkApi.getApi(drone).stopVideoStream(new SimpleCommandListener() {
+        SoloCameraApi.getApi(drone).stopVideoStream(new SimpleCommandListener() {
             @Override
             public void onSuccess() {
                 if (stopVideoStream != null)

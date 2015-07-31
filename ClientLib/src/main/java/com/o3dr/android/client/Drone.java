@@ -19,6 +19,7 @@ import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.calibration.magnetometer.MagnetometerCalibrationStatus;
+import com.o3dr.services.android.lib.drone.companion.solo.SoloAttributes;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionResult;
 import com.o3dr.services.android.lib.drone.mission.Mission;
@@ -358,8 +359,8 @@ public class Drone {
                 return (T) new MagnetometerCalibrationStatus();
 
             case AttributeType.CAMERA:
-            case AttributeType.SOLOLINK_STATE:
-            case AttributeType.SOLOLINK_GOPRO_STATE:
+            case SoloAttributes.SOLO_STATE:
+            case SoloAttributes.SOLO_GOPRO_STATE:
             default:
                 return null;
         }

@@ -17,9 +17,15 @@ import static com.o3dr.services.android.lib.gcs.action.FollowMeActions.EXTRA_FOL
  * Provides access to the Follow me api.
  * Created by Fredia Huya-Kouadio on 1/19/15.
  */
-public class FollowApi implements Api {
+public class FollowApi extends Api {
 
     private static final ConcurrentHashMap<Drone, FollowApi> followApiCache = new ConcurrentHashMap<>();
+    private static final Builder<FollowApi> apiBuilder = new Builder<FollowApi>() {
+        @Override
+        public FollowApi build(Drone drone) {
+            return new FollowApi(drone);
+        }
+    };
 
     /**
      * Retrieves a FollowApi instance.
@@ -28,12 +34,7 @@ public class FollowApi implements Api {
      * @return a FollowApi instance.
      */
     public static FollowApi getApi(final Drone drone) {
-        return ApiUtils.getApi(drone, followApiCache, new Builder<FollowApi>() {
-            @Override
-            public FollowApi build() {
-                return new FollowApi(drone);
-            }
-        });
+        return getApi(drone, followApiCache, apiBuilder);
     }
 
     private final Drone drone;

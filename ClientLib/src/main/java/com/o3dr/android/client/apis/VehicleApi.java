@@ -35,22 +35,23 @@ import static com.o3dr.services.android.lib.drone.action.StateActions.EXTRA_VEHI
 /**
  * Provides access to the vehicle specific functionality.
  */
-public class VehicleApi implements Api {
+public class VehicleApi extends Api {
 
     private static final ConcurrentHashMap<Drone, VehicleApi> vehicleApiCache = new ConcurrentHashMap<>();
+    private static final Builder<VehicleApi> apiBuilder = new Builder<VehicleApi>() {
+        @Override
+        public VehicleApi build(Drone drone) {
+            return new VehicleApi(drone);
+        }
+    };
 
     /**
      * Retrieves a vehicle api instance.
      * @param drone target vehicle
      * @return a VehicleApi instance.
      */
-    public static VehicleApi getApi(final Drone drone){
-        return ApiUtils.getApi(drone, vehicleApiCache, new Builder<VehicleApi>() {
-            @Override
-            public VehicleApi build() {
-                return new VehicleApi(drone);
-            }
-        });
+    public static VehicleApi getApi(final Drone drone) {
+        return getApi(drone, vehicleApiCache, apiBuilder);
     }
 
     private final Drone drone;

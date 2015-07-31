@@ -17,22 +17,23 @@ import static com.o3dr.services.android.lib.drone.mission.action.MissionActions.
  * Provides access to missions specific functionality.
  * Created by Fredia Huya-Kouadio on 1/19/15.
  */
-public class MissionApi implements Api {
+public class MissionApi extends Api {
 
     private static final ConcurrentHashMap<Drone, MissionApi> missionApiCache = new ConcurrentHashMap<>();
+    private static final Builder<MissionApi> apiBuilder = new Builder<MissionApi>() {
+        @Override
+        public MissionApi build(Drone drone) {
+            return new MissionApi(drone);
+        }
+    };
 
     /**
      * Retrieves a MissionApi instance.
      * @param drone Target vehicle
      * @return a MissionApi instance.
      */
-    public static MissionApi getApi(final Drone drone){
-        return ApiUtils.getApi(drone, missionApiCache, new Builder<MissionApi>() {
-            @Override
-            public MissionApi build() {
-                return new MissionApi(drone);
-            }
-        });
+    public static MissionApi getApi(final Drone drone) {
+        return getApi(drone, missionApiCache, apiBuilder);
     }
 
     private final Drone drone;

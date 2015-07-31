@@ -7,6 +7,9 @@ public class AttributeType {
 
     private static final String PACKAGE_NAME = "com.o3dr.services.android.lib.attribute";
 
+    //Private to prevent instantiation
+    private AttributeType(){}
+
     /**
      * Used to access the vehicle's altitude state.
      * @see {@link com.o3dr.services.android.lib.drone.property.Altitude}
@@ -98,13 +101,4 @@ public class AttributeType {
      */
     public static final String MAGNETOMETER_CALIBRATION_STATUS = PACKAGE_NAME + ".MAGNETOMETER_CALIBRATION_STATUS";
 
-    /**
-     * Used to access the sololink state.
-     */
-    public static final String SOLOLINK_STATE = PACKAGE_NAME + ".SOLOLINK_STATE";
-
-    /**
-     * Used to access the sololink gopro state.
-     */
-    public static final String SOLOLINK_GOPRO_STATE = PACKAGE_NAME + ".SOLOLINK_GOPRO_STATE";
 }

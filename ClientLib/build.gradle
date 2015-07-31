@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 
 ext {
     PUBLISH_ARTIFACT_ID = 'dronekit-android'
-    PUBLISH_VERSION = '2.5.15'
+    PUBLISH_VERSION = '2.5.16'
     PROJECT_DESCRIPTION = "Android DroneKit client library."
     PROJECT_LABELS = ['3DR', '3DR Services', 'DroneAPI', 'Android', 'DroneKit']
     PROJECT_LICENSES = ['Apache-2.0']
@@ -17,7 +17,7 @@ android {
     defaultConfig {
         minSdkVersion Integer.parseInt(project.ANDROID_BUILD_MIN_SDK_VERSION)
         targetSdkVersion Integer.parseInt(project.ANDROID_BUILD_TARGET_SDK_VERSION)
-        versionCode 20515
+        versionCode 20516
         versionName PUBLISH_VERSION
     }
 

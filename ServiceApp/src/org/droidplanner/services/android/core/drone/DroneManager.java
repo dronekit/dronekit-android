@@ -19,8 +19,12 @@ import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
-import com.o3dr.services.android.lib.drone.companion.solo.SoloControllerMode;
-import com.o3dr.services.android.lib.drone.companion.solo.action.SoloLinkActions;
+import com.o3dr.services.android.lib.drone.companion.solo.SoloAttributes;
+import com.o3dr.services.android.lib.drone.companion.solo.SoloEventExtras;
+import com.o3dr.services.android.lib.drone.companion.solo.SoloEvents;
+import com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions;
+import com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerMode;
+import com.o3dr.services.android.lib.drone.companion.solo.action.SoloActions;
 import com.o3dr.services.android.lib.drone.companion.solo.button.ButtonPacket;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSetting;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSettingSetter;
@@ -62,7 +66,7 @@ import org.droidplanner.services.android.core.drone.companion.solo.SoloComp;
 import org.droidplanner.services.android.exception.ConnectionException;
 import org.droidplanner.services.android.utils.AndroidApWarningParser;
 import org.droidplanner.services.android.utils.CommonApiUtils;
-import org.droidplanner.services.android.utils.SoloLinkApiUtils;
+import org.droidplanner.services.android.utils.SoloApiUtils;
 import org.droidplanner.services.android.utils.analytics.GAUtils;
 import org.droidplanner.services.android.utils.prefs.DroidPlannerPrefs;
 
@@ -127,40 +131,40 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
                     break;
 
                 case TLVMessageTypes.TYPE_SOLO_GOPRO_STATE:
-                    notifyDroneAttributeEvent(AttributeEvent.SOLOLINK_GOPRO_STATE_UPDATED, null);
+                    notifyDroneAttributeEvent(SoloEvents.SOLO_GOPRO_STATE_UPDATED, null);
                     break;
 
                 default:
                     final Bundle messageInfo = new Bundle();
-                    messageInfo.putParcelable(AttributeEventExtra.EXTRA_SOLOLINK_MESSAGE_DATA, packet);
+                    messageInfo.putParcelable(SoloEventExtras.EXTRA_SOLOLINK_MESSAGE_DATA, packet);
 
-                    notifyDroneAttributeEvent(AttributeEvent.SOLOLINK_MESSAGE_RECEIVED, messageInfo, true);
+                    notifyDroneAttributeEvent(SoloEvents.SOLO_MESSAGE_RECEIVED, messageInfo, true);
                     break;
             }
         }
 
         @Override
         public void onPresetButtonLoaded(int buttonType, SoloButtonSetting buttonSettings) {
-            notifyDroneAttributeEvent(AttributeEvent.SOLOLINK_BUTTON_SETTINGS_UPDATED, null, true);
+            notifyDroneAttributeEvent(SoloEvents.SOLO_BUTTON_SETTINGS_UPDATED, null, true);
         }
 
         @Override
         public void onWifiInfoUpdated(String wifiName, String wifiPassword) {
-            notifyDroneAttributeEvent(AttributeEvent.SOLOLINK_WIFI_SETTINGS_UPDATED, null, true);
+            notifyDroneAttributeEvent(SoloEvents.SOLO_WIFI_SETTINGS_UPDATED, null, true);
         }
 
         @Override
         public void onButtonPacketReceived(ButtonPacket packet) {
             final Bundle eventInfo = new Bundle();
-            eventInfo.putParcelable(AttributeEventExtra.EXTRA_SOLOLINK_BUTTON_EVENT, packet);
-            notifyDroneAttributeEvent(AttributeEvent.SOLOLINK_BUTTON_EVENT, eventInfo, true);
+            eventInfo.putParcelable(SoloEventExtras.EXTRA_SOLOLINK_BUTTON_EVENT, packet);
+            notifyDroneAttributeEvent(SoloEvents.SOLO_BUTTON_EVENT, eventInfo, true);
         }
 
         @Override
         public void onEUTxPowerComplianceUpdated(boolean isCompliant) {
             final Bundle eventInfo = new Bundle(1);
-            eventInfo.putBoolean(AttributeEventExtra.EXTRA_SOLOLINK_EU_TX_POWER_COMPLIANT, isCompliant);
-            notifyDroneAttributeEvent(AttributeEvent.SOLOLINK_EU_TX_POWER_COMPLIANCE_UPDATED, eventInfo, true);
+            eventInfo.putBoolean(SoloEventExtras.EXTRA_SOLOLINK_EU_TX_POWER_COMPLIANT, isCompliant);
+            notifyDroneAttributeEvent(SoloEvents.SOLO_EU_TX_POWER_COMPLIANCE_UPDATED, eventInfo, true);
         }
     };
 
@@ -521,10 +525,10 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
             case AttributeType.CAMERA:
                 return CommonApiUtils.getCameraProxy(drone, cameraDetails);
 
-            case AttributeType.SOLOLINK_STATE:
-                return SoloLinkApiUtils.getSoloLinkState(this);
+            case SoloAttributes.SOLO_STATE:
+                return SoloApiUtils.getSoloLinkState(this);
 
-            case AttributeType.SOLOLINK_GOPRO_STATE:
+            case SoloAttributes.SOLO_GOPRO_STATE:
                 return soloComp.getGoproState();
 
             default:
@@ -595,34 +599,34 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
                 break;
 
             //************ SOLOLINK ACTIONS *************//
-            case SoloLinkActions.ACTION_SEND_MESSAGE:
-                final TLVPacket messageData = data.getParcelable(SoloLinkActions.EXTRA_MESSAGE_DATA);
+            case SoloActions.ACTION_SEND_MESSAGE:
+                final TLVPacket messageData = data.getParcelable(SoloActions.EXTRA_MESSAGE_DATA);
                 if (messageData != null) {
-                    SoloLinkApiUtils.sendSoloLinkMessage(this, messageData, listener);
+                    SoloApiUtils.sendSoloLinkMessage(this, messageData, listener);
                 }
                 break;
 
-            case SoloLinkActions.ACTION_UPDATE_WIFI_SETTINGS:
-                final String wifiSsid = data.getString(SoloLinkActions.EXTRA_WIFI_SSID);
-                final String wifiPassword = data.getString(SoloLinkActions.EXTRA_WIFI_PASSWORD);
-                SoloLinkApiUtils.updateSoloLinkWifiSettings(this, wifiSsid, wifiPassword, listener);
+            case SoloConfigActions.ACTION_UPDATE_WIFI_SETTINGS:
+                final String wifiSsid = data.getString(SoloConfigActions.EXTRA_WIFI_SSID);
+                final String wifiPassword = data.getString(SoloConfigActions.EXTRA_WIFI_PASSWORD);
+                SoloApiUtils.updateSoloLinkWifiSettings(this, wifiSsid, wifiPassword, listener);
                 break;
 
-            case SoloLinkActions.ACTION_UPDATE_BUTTON_SETTINGS:
-                final SoloButtonSettingSetter buttonSettings = data.getParcelable(SoloLinkActions.EXTRA_BUTTON_SETTINGS);
+            case SoloConfigActions.ACTION_UPDATE_BUTTON_SETTINGS:
+                final SoloButtonSettingSetter buttonSettings = data.getParcelable(SoloConfigActions.EXTRA_BUTTON_SETTINGS);
                 if (buttonSettings != null) {
-                    SoloLinkApiUtils.updateSoloLinkButtonSettings(this, buttonSettings, listener);
+                    SoloApiUtils.updateSoloLinkButtonSettings(this, buttonSettings, listener);
                 }
                 break;
 
-            case SoloLinkActions.ACTION_UPDATE_CONTROLLER_MODE:
-                final @SoloControllerMode.ControllerMode int mode = data.getInt(SoloLinkActions.EXTRA_CONTROLLER_MODE);
-                SoloLinkApiUtils.updateSoloLinkControllerMode(this, mode, listener);
+            case SoloConfigActions.ACTION_UPDATE_CONTROLLER_MODE:
+                final @SoloControllerMode.ControllerMode int mode = data.getInt(SoloConfigActions.EXTRA_CONTROLLER_MODE);
+                SoloApiUtils.updateSoloLinkControllerMode(this, mode, listener);
                 break;
 
-            case SoloLinkActions.ACTION_UPDATE_EU_TX_POWER_COMPLIANCE:
-                final boolean isCompliant = data.getBoolean(SoloLinkActions.EXTRA_EU_TX_POWER_COMPLIANT, false);
-                SoloLinkApiUtils.updateSoloLinkEUTxPowerCompliance(this, isCompliant, listener);
+            case SoloConfigActions.ACTION_UPDATE_EU_TX_POWER_COMPLIANCE:
+                final boolean isCompliant = data.getBoolean(SoloConfigActions.EXTRA_EU_TX_POWER_COMPLIANT, false);
+                SoloApiUtils.updateSoloLinkEUTxPowerCompliance(this, isCompliant, listener);
                 break;
 
             //**************** CAPABILITY ACTIONS **************//
@@ -631,7 +635,7 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
                     final String featureId = data.getString(CapabilityActions.EXTRA_FEATURE_ID);
                     if (!TextUtils.isEmpty(featureId)) {
                         switch (featureId) {
-                            case CapabilityApi.FeatureIds.SOLOLINK_VIDEO_STREAMING:
+                            case CapabilityApi.FeatureIds.SOLO_VIDEO_STREAMING:
                             case CapabilityApi.FeatureIds.COMPASS_CALIBRATION:
                                 if (this.isCompanionComputerEnabled()) {
                                     CommonApiUtils.postSuccessEvent(listener);
