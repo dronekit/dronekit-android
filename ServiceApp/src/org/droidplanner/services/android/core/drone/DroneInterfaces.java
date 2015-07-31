@@ -1,5 +1,7 @@
 package org.droidplanner.services.android.core.drone;
 
+import android.os.Bundle;
+
 import org.droidplanner.services.android.core.MAVLink.WaypointManager;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.core.parameters.Parameter;
@@ -242,6 +244,10 @@ public class DroneInterfaces {
 
 	public interface OnDroneListener {
 		public void onDroneEvent(DroneEventsType event, MavLinkDrone drone);
+	}
+
+	public interface AttributeEventListener {
+		void onAttributeEvent(String attributeEvent, Bundle eventInfo);
 	}
 
 	public interface OnParameterManagerListener {

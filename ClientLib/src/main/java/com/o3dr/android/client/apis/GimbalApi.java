@@ -32,7 +32,7 @@ public final class GimbalApi implements Api, DroneListener {
         });
     }
 
-    private interface GimbalOrientationListener {
+    public interface GimbalOrientationListener {
         /**
          * Called when the gimbal orientation is updated.
          * @param orientation GimbalOrientation object
@@ -88,7 +88,7 @@ public final class GimbalApi implements Api, DroneListener {
     }
 
     /**
-     * Enables control of the gimbal. After calling this method, use {@link GimbalApi#updateGimbalOrientation(double, double, double, GimbalOrientationListener)}
+     * Enables control of the gimbal. After calling this method, use {@link GimbalApi#updateGimbalOrientation(float, float, float, GimbalOrientationListener)}
      * to update the gimbal orientation.
      * @param listener non-null GimbalStatusListener callback.
      */
@@ -129,7 +129,7 @@ public final class GimbalApi implements Api, DroneListener {
     }
 
     /**
-     * Disables control of the gimbal. After calling this method, no call to {@link GimbalApi#updateGimbalOrientation(double, double, double, GimbalOrientationListener)}
+     * Disables control of the gimbal. After calling this method, no call to {@link GimbalApi#updateGimbalOrientation(float, float, float, GimbalOrientationListener)}
      * will be allowed.
      * @param listener non-null GimbalStatusListener callback.
      */
@@ -169,7 +169,7 @@ public final class GimbalApi implements Api, DroneListener {
      * @param yaw       the desired gimbal yaw in degrees
      * @param listener Register a callback to receive update of the command execution state. Must be non-null.
      */
-    public void updateGimbalOrientation(double pitch, double roll, double yaw, final GimbalOrientationListener listener){
+    public void updateGimbalOrientation(float pitch, float roll, float yaw, final GimbalOrientationListener listener){
         if(listener == null)
             throw new NullPointerException("Listener must be non-null.");
 
@@ -184,9 +184,9 @@ public final class GimbalApi implements Api, DroneListener {
         }
 
         Bundle params = new Bundle();
-        params.putDouble(GIMBAL_PITCH, pitch);
-        params.putDouble(GIMBAL_ROLL, roll);
-        params.putDouble(GIMBAL_YAW, yaw);
+        params.putFloat(GIMBAL_PITCH, pitch);
+        params.putFloat(GIMBAL_ROLL, roll);
+        params.putFloat(GIMBAL_YAW, yaw);
         drone.performAsyncActionOnDroneThread(new Action(ACTION_SET_GIMBAL_ORIENTATION, params), new SimpleCommandListener(){
             @Override
             public void onTimeout(){

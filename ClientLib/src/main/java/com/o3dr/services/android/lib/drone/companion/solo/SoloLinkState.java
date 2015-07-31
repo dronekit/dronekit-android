@@ -23,13 +23,15 @@ public class SoloLinkState implements DroneAttribute {
     private String vehicleVersion;
     private String autopilotVersion;
 
+    private boolean isEUTxPowerCompliant;
+
     private SparseArray<SoloButtonSetting> buttonSettings;
 
     public SoloLinkState(){}
 
     public SoloLinkState(String autopilotVersion, String controllerFirmwareVersion,
                          String controllerVersion, String vehicleVersion,
-                         String wifiPassword, String wifiSsid,
+                         String wifiPassword, String wifiSsid, boolean isEUTxPowerCompliant,
                          SparseArray<SoloButtonSetting> buttonSettings) {
         this.autopilotVersion = autopilotVersion;
         this.controllerFirmwareVersion = controllerFirmwareVersion;
@@ -37,6 +39,7 @@ public class SoloLinkState implements DroneAttribute {
         this.vehicleVersion = vehicleVersion;
         this.wifiPassword = wifiPassword;
         this.wifiSsid = wifiSsid;
+        this.isEUTxPowerCompliant = isEUTxPowerCompliant;
         this.buttonSettings = buttonSettings;
     }
 
@@ -64,6 +67,10 @@ public class SoloLinkState implements DroneAttribute {
         return wifiSsid;
     }
 
+    public boolean isEUTxPowerCompliant() {
+        return isEUTxPowerCompliant;
+    }
+
     public SoloButtonSetting getButtonSetting(int buttonType){
         return buttonSettings.get(buttonType);
     }
@@ -81,6 +88,7 @@ public class SoloLinkState implements DroneAttribute {
         dest.writeString(this.controllerFirmwareVersion);
         dest.writeString(this.vehicleVersion);
         dest.writeString(this.autopilotVersion);
+        dest.writeByte(isEUTxPowerCompliant ? (byte) 1 : (byte) 0);
         dest.writeSparseArray((SparseArray) this.buttonSettings);
     }
 
@@ -91,6 +99,7 @@ public class SoloLinkState implements DroneAttribute {
         this.controllerFirmwareVersion = in.readString();
         this.vehicleVersion = in.readString();
         this.autopilotVersion = in.readString();
+        this.isEUTxPowerCompliant = in.readByte() != 0;
         this.buttonSettings = in.readSparseArray(SparseArray.class.getClassLoader());
     }
 

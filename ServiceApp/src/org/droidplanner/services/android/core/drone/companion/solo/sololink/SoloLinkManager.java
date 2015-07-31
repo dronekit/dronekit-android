@@ -1,12 +1,12 @@
-package org.droidplanner.services.android.drone.companion.solo.sololink;
+package org.droidplanner.services.android.core.drone.companion.solo.sololink;
 
 import android.content.Context;
 import android.os.Handler;
 import android.text.TextUtils;
 
-import org.droidplanner.services.android.drone.companion.solo.AbstractLinkManager;
-import org.droidplanner.services.android.drone.companion.solo.SoloComp;
-import org.droidplanner.services.android.drone.companion.solo.artoo.ArtooLinkManager;
+import org.droidplanner.services.android.core.drone.companion.solo.AbstractLinkManager;
+import org.droidplanner.services.android.core.drone.companion.solo.SoloComp;
+import org.droidplanner.services.android.core.drone.companion.solo.artoo.ArtooLinkManager;
 import com.o3dr.services.android.lib.drone.companion.solo.button.ButtonTypes;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSetting;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSettingGetter;
@@ -36,8 +36,6 @@ import timber.log.Timber;
  * Handles solo link related logic.
  */
 public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
-
-    public static final String SOLO_LINK_DEFAULT_PASSWORD = "sololink";
 
     public static final String SOLO_LINK_IP = "10.1.1.10";
     public static final int SOLO_LINK_TCP_PORT = 5507;
