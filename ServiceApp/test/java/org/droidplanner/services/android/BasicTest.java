@@ -101,6 +101,11 @@ public class BasicTest {
             public void onMessageLogged(int logLevel, String message) {
 
             }
+        }, new DroneInterfaces.AttributeEventListener() {
+            @Override
+            public void onAttributeEvent(String attributeEvent, Bundle eventInfo) {
+
+            }
         });
     }
 
