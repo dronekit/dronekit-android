@@ -20,8 +20,8 @@ import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
 import com.o3dr.services.android.lib.model.ICommandListener;
 
 import org.droidplanner.services.android.core.drone.companion.CompComp;
-import org.droidplanner.services.android.core.drone.companion.solo.artoo.ControllerLinkListener;
-import org.droidplanner.services.android.core.drone.companion.solo.artoo.ControllerLinkManager;
+import org.droidplanner.services.android.core.drone.companion.solo.controller.ControllerLinkListener;
+import org.droidplanner.services.android.core.drone.companion.solo.controller.ControllerLinkManager;
 import org.droidplanner.services.android.core.drone.companion.solo.sololink.SoloLinkListener;
 import org.droidplanner.services.android.core.drone.companion.solo.sololink.SoloLinkManager;
 import org.droidplanner.services.android.utils.NetworkUtils;

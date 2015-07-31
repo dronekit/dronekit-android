@@ -6,7 +6,7 @@ import android.text.TextUtils;
 
 import org.droidplanner.services.android.core.drone.companion.solo.AbstractLinkManager;
 import org.droidplanner.services.android.core.drone.companion.solo.SoloComp;
-import org.droidplanner.services.android.core.drone.companion.solo.artoo.ControllerLinkManager;
+import org.droidplanner.services.android.core.drone.companion.solo.controller.ControllerLinkManager;
 import com.o3dr.services.android.lib.drone.companion.solo.button.ButtonTypes;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSetting;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSettingGetter;

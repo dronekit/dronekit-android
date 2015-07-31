@@ -1,4 +1,4 @@
-package org.droidplanner.services.android.core.drone.companion.solo.artoo;
+package org.droidplanner.services.android.core.drone.companion.solo.controller;
 
 import android.content.Context;
 import android.os.Handler;

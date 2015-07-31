@@ -1,4 +1,4 @@
-package org.droidplanner.services.android.core.drone.companion.solo.artoo;
+package org.droidplanner.services.android.core.drone.companion.solo.controller;
 
 import org.droidplanner.services.android.core.drone.companion.solo.AbstractLinkManager;
 import com.o3dr.services.android.lib.drone.companion.solo.button.ButtonPacket;
