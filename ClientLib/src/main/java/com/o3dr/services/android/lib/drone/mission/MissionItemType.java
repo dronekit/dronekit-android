@@ -7,6 +7,7 @@ import android.os.Parcelable.Creator;
 import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
 import com.o3dr.services.android.lib.drone.mission.item.command.CameraTrigger;
 import com.o3dr.services.android.lib.drone.mission.item.command.ChangeSpeed;
+import com.o3dr.services.android.lib.drone.mission.item.command.DoJump;
 import com.o3dr.services.android.lib.drone.mission.item.command.EpmGripper;
 import com.o3dr.services.android.lib.drone.mission.item.command.ReturnToLaunch;
 import com.o3dr.services.android.lib.drone.mission.item.command.SetRelay;
@@ -226,6 +227,17 @@ public enum MissionItemType {
         @Override
         protected Creator<DoLandStart> getMissionItemCreator() {
             return DoLandStart.CREATOR;
+        }
+    },
+    DO_JUMP("Do Jump") {
+        @Override
+        public MissionItem getNewItem() {
+            return new DoJump();
+        }
+
+        @Override
+        protected Creator<DoJump> getMissionItemCreator() {
+            return DoJump.CREATOR;
         }
     },
 

@@ -5,6 +5,7 @@ import org.droidplanner.services.android.core.mission.commands.CameraTrigger;
 import org.droidplanner.services.android.core.mission.commands.ChangeSpeed;
 import org.droidplanner.services.android.core.mission.commands.ConditionYaw;
 import org.droidplanner.services.android.core.mission.commands.EpmGripper;
+import org.droidplanner.services.android.core.mission.commands.DoJump;
 import org.droidplanner.services.android.core.mission.commands.ReturnToHome;
 import org.droidplanner.services.android.core.mission.commands.SetRelayImpl;
 import org.droidplanner.services.android.core.mission.commands.SetServo;
@@ -38,7 +39,8 @@ public enum MissionItemType {
     SET_SERVO("Set Servo"),
     CONDITION_YAW("Set Yaw"),
     SET_RELAY("Set Relay"),
-    DO_LAND_START("Do Land Start");
+    DO_LAND_START("Do Land Start"),
+    DO_JUMP("Do Jump");
 
     private final String name;
 
@@ -86,6 +88,8 @@ public enum MissionItemType {
                 return new SetRelayImpl(referenceItem);
             case DO_LAND_START:
                 return new DoLandStartImpl(referenceItem);
+            case DO_JUMP:
+                return new DoJump(referenceItem);
             default:
                 throw new IllegalArgumentException("Unrecognized mission item type (" + name + ")" + "");
         }
