@@ -32,7 +32,7 @@ public final class GimbalApi implements Api, DroneListener {
         });
     }
 
-    private interface GimbalOrientationListener {
+    public interface GimbalOrientationListener {
         /**
          * Called when the gimbal orientation is updated.
          * @param orientation GimbalOrientation object
@@ -169,7 +169,7 @@ public final class GimbalApi implements Api, DroneListener {
      * @param yaw       the desired gimbal yaw in degrees
      * @param listener Register a callback to receive update of the command execution state. Must be non-null.
      */
-    public void updateGimbalOrientation(double pitch, double roll, double yaw, final GimbalOrientationListener listener){
+    public void updateGimbalOrientation(float pitch, float roll, float yaw, final GimbalOrientationListener listener){
         if(listener == null)
             throw new NullPointerException("Listener must be non-null.");
 
