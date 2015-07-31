@@ -557,9 +557,9 @@ public abstract class ArduPilot implements MavLinkDrone {
 
             //************ Gimbal ACTIONS *************//
             case GimbalActions.ACTION_SET_GIMBAL_ORIENTATION:
-                double pitch = data.getDouble(GimbalActions.GIMBAL_PITCH);
-                double roll = data.getDouble(GimbalActions.GIMBAL_ROLL);
-                double yaw = data.getDouble(GimbalActions.GIMBAL_YAW);
+                float pitch = data.getFloat(GimbalActions.GIMBAL_PITCH);
+                float roll = data.getFloat(GimbalActions.GIMBAL_ROLL);
+                float yaw = data.getFloat(GimbalActions.GIMBAL_YAW);
                 MavLinkDoCmds.setGimbalOrientation(this, pitch, roll, yaw, listener);
                 break;
 
