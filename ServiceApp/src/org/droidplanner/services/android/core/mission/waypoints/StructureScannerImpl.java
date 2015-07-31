@@ -18,18 +18,18 @@ import org.droidplanner.services.android.core.survey.grid.GridBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StructureScanner extends SpatialCoordItem {
+public class StructureScannerImpl extends SpatialCoordItem {
     private double radius = (10.0);
     private double heightStep = (5);
     private int numberOfSteps = 2;
     private boolean crossHatch = false;
     SurveyData survey = new SurveyData();
 
-    public StructureScanner(Mission mission, Coord3D coord) {
+    public StructureScannerImpl(Mission mission, Coord3D coord) {
         super(mission, coord);
     }
 
-    public StructureScanner(MissionItem item) {
+    public StructureScannerImpl(MissionItem item) {
         super(item);
     }
 
@@ -45,16 +45,16 @@ public class StructureScanner extends SpatialCoordItem {
     }
 
     private void packROI(List<msg_mission_item> list) {
-        RegionOfInterest roi = new RegionOfInterest(mission, new Coord3D(
+        RegionOfInterestImpl roi = new RegionOfInterestImpl(mission, new Coord3D(
                 coordinate, (0.0)));
         list.addAll(roi.packMissionItem());
     }
 
     private void packCircles(List<msg_mission_item> list) {
         for (double altitude = coordinate.getAltitude(); altitude <= getTopHeight(); altitude += heightStep) {
-            Circle circle = new Circle(mission, new Coord3D(coordinate, (altitude)));
-            circle.setRadius(radius);
-            list.addAll(circle.packMissionItem());
+            CircleImpl circleImpl = new CircleImpl(mission, new Coord3D(coordinate, (altitude)));
+            circleImpl.setRadius(radius);
+            list.addAll(circleImpl.packMissionItem());
         }
     }
 

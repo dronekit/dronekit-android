@@ -10,21 +10,21 @@ import org.droidplanner.services.android.core.mission.MissionItemType;
 
 import java.util.List;
 
-public class ReturnToHome extends MissionCMD {
+public class ReturnToHomeImpl extends MissionCMD {
 
     private double returnAltitude;
 
-    public ReturnToHome(MissionItem item) {
+    public ReturnToHomeImpl(MissionItem item) {
         super(item);
         returnAltitude = (0);
     }
 
-    public ReturnToHome(msg_mission_item msg, Mission mission) {
+    public ReturnToHomeImpl(msg_mission_item msg, Mission mission) {
         super(mission);
         unpackMAVMessage(msg);
     }
 
-    public ReturnToHome(Mission mission) {
+    public ReturnToHomeImpl(Mission mission) {
         super(mission);
         returnAltitude = (0.0);
     }

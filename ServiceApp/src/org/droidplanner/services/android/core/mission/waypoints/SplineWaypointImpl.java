@@ -13,7 +13,7 @@ import com.MAVLink.enums.MAV_CMD;
 /**
  * Handle spline waypoint mavlink packet generation.
  */
-public class SplineWaypoint extends SpatialCoordItem {
+public class SplineWaypointImpl extends SpatialCoordItem {
 
 	/**
 	 * Hold time in decimal seconds. (ignored by fixed wing, time to stay at
@@ -21,15 +21,15 @@ public class SplineWaypoint extends SpatialCoordItem {
 	 */
 	private double delay;
 
-	public SplineWaypoint(MissionItem item) {
+	public SplineWaypointImpl(MissionItem item) {
 		super(item);
 	}
 
-	public SplineWaypoint(Mission mission, Coord3D coord) {
+	public SplineWaypointImpl(Mission mission, Coord3D coord) {
 		super(mission, coord);
 	}
 
-	public SplineWaypoint(msg_mission_item msg, Mission mission) {
+	public SplineWaypointImpl(msg_mission_item msg, Mission mission) {
 		super(mission, null);
 		unpackMAVMessage(msg);
 	}

@@ -8,7 +8,7 @@ import org.droidplanner.services.android.core.helpers.coordinates.Coord2D;
 import org.droidplanner.services.android.core.mission.Mission;
 import org.droidplanner.services.android.core.mission.MissionItem;
 import org.droidplanner.services.android.core.mission.MissionItemType;
-import org.droidplanner.services.android.core.mission.commands.CameraTrigger;
+import org.droidplanner.services.android.core.mission.commands.CameraTriggerImpl;
 import org.droidplanner.services.android.core.polygon.Polygon;
 import org.droidplanner.services.android.core.survey.CameraInfo;
 import org.droidplanner.services.android.core.survey.SurveyData;
@@ -51,9 +51,9 @@ public class SurveyImpl extends MissionItem {
             List<msg_mission_item> list = new ArrayList<msg_mission_item>();
             build();
 
-            list.addAll((new CameraTrigger(mission, surveyData.getLongitudinalPictureDistance())).packMissionItem());
+            list.addAll((new CameraTriggerImpl(mission, surveyData.getLongitudinalPictureDistance())).packMissionItem());
             packGridPoints(list);
-            list.addAll((new CameraTrigger(mission, (0.0)).packMissionItem()));
+            list.addAll((new CameraTriggerImpl(mission, (0.0)).packMissionItem()));
 
             return list;
         } catch (Exception e) {

@@ -12,20 +12,20 @@ import com.MAVLink.common.msg_mission_item;
 import com.MAVLink.enums.MAV_CMD;
 import com.MAVLink.enums.MAV_FRAME;
 
-public class Circle extends SpatialCoordItem {
+public class CircleImpl extends SpatialCoordItem {
 
 	private double radius = 10.0;
 	private int turns = 1;
 
-	public Circle(MissionItem item) {
+	public CircleImpl(MissionItem item) {
 		super(item);
 	}
 
-	public Circle(Mission mission, Coord3D coord) {
+	public CircleImpl(Mission mission, Coord3D coord) {
 		super(mission, coord);
 	}
 
-	public Circle(msg_mission_item msg, Mission mission) {
+	public CircleImpl(msg_mission_item msg, Mission mission) {
 		super(mission, null);
 		unpackMAVMessage(msg);
 	}

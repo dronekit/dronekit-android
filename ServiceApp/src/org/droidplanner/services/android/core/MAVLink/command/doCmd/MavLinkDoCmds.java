@@ -4,12 +4,12 @@ import com.MAVLink.ardupilotmega.msg_digicam_control;
 import com.MAVLink.ardupilotmega.msg_mount_control;
 import com.MAVLink.common.msg_command_long;
 import com.MAVLink.common.msg_mission_set_current;
+import com.MAVLink.enums.GRIPPER_ACTIONS;
 import com.MAVLink.enums.MAV_CMD;
 import com.o3dr.services.android.lib.model.ICommandListener;
 
-import org.droidplanner.services.android.core.helpers.coordinates.Coord3D;
-import org.droidplanner.services.android.core.mission.commands.EpmGripper;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
+import org.droidplanner.services.android.core.helpers.coordinates.Coord3D;
 
 public class MavLinkDoCmds {
     public static void setROI(MavLinkDrone drone, Coord3D coord, ICommandListener listener) {
@@ -53,8 +53,8 @@ public class MavLinkDoCmds {
         msg_command_long msg = new msg_command_long();
         msg.target_system = drone.getSysid();
         msg.target_component = drone.getCompid();
-        msg.command = EpmGripper.MAV_CMD_DO_GRIPPER;
-        msg.param2 = release ? EpmGripper.GRIPPER_ACTION_RELEASE : EpmGripper.GRIPPER_ACTION_GRAB;
+        msg.command = MAV_CMD.MAV_CMD_DO_GRIPPER;
+        msg.param2 = release ? GRIPPER_ACTIONS.GRIPPER_ACTION_RELEASE : GRIPPER_ACTIONS.GRIPPER_ACTION_GRAB;
 
         drone.getMavClient().sendMavMessage(msg, listener);
     }
@@ -104,10 +104,10 @@ public class MavLinkDoCmds {
     /**
      * Set the orientation of a gimbal
      *
-     * @param drone       target vehicle
-     * @param pitch       the desired gimbal pitch in degrees
-     * @param roll       the desired gimbal roll in degrees
-     * @param yaw       the desired gimbal yaw in degrees
+     * @param drone    target vehicle
+     * @param pitch    the desired gimbal pitch in degrees
+     * @param roll     the desired gimbal roll in degrees
+     * @param yaw      the desired gimbal yaw in degrees
      * @param listener Register a callback to receive update of the command execution state.
      */
     public static void setGimbalOrientation(MavLinkDrone drone, float pitch, float roll, float yaw, ICommandListener
@@ -127,11 +127,12 @@ public class MavLinkDoCmds {
 
     /**
      * Jump to the desired command in the mission list. Repeat this action only the specified number of times
-     * @param drone               target vehicle
-     * @param waypoint    command
-     * @param listener            Register a callback to receive update of the command execution state.
+     *
+     * @param drone    target vehicle
+     * @param waypoint command
+     * @param listener Register a callback to receive update of the command execution state.
      */
-    public static void gotoWaypoint(MavLinkDrone drone, int waypoint, ICommandListener listener){
+    public static void gotoWaypoint(MavLinkDrone drone, int waypoint, ICommandListener listener) {
         if (drone == null)
             return;
         msg_mission_set_current msg = new msg_mission_set_current();

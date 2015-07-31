@@ -11,22 +11,22 @@ import org.droidplanner.services.android.core.mission.MissionItemType;
 
 import java.util.List;
 
-public class Land extends SpatialCoordItem {
+public class LandImpl extends SpatialCoordItem {
 
-    public Land(MissionItem item) {
+    public LandImpl(MissionItem item) {
         super(item);
         setAltitude((0.0));
     }
 
-    public Land(Mission mission) {
+    public LandImpl(Mission mission) {
         this(mission, new Coord2D(0, 0));
     }
 
-    public Land(Mission mMission, Coord2D coord) {
+    public LandImpl(Mission mMission, Coord2D coord) {
         super(mMission, new Coord3D(coord, (0)));
     }
 
-    public Land(msg_mission_item msg, Mission mission) {
+    public LandImpl(msg_mission_item msg, Mission mission) {
         super(mission, null);
         unpackMAVMessage(msg);
     }

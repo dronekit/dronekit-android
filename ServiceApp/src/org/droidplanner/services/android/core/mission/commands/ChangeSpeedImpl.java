@@ -10,19 +10,19 @@ import com.MAVLink.common.msg_mission_item;
 import com.MAVLink.enums.MAV_CMD;
 import com.MAVLink.enums.MAV_FRAME;
 
-public class ChangeSpeed extends MissionCMD {
+public class ChangeSpeedImpl extends MissionCMD {
 	private double speed = 5; //meters per second
 
-	public ChangeSpeed(MissionItem item) {
+	public ChangeSpeedImpl(MissionItem item) {
 		super(item);
 	}
 
-	public ChangeSpeed(msg_mission_item msg, Mission mission) {
+	public ChangeSpeedImpl(msg_mission_item msg, Mission mission) {
 		super(mission);
 		unpackMAVMessage(msg);
 	}
 
-	public ChangeSpeed(Mission mission, double speed) {
+	public ChangeSpeedImpl(Mission mission, double speed) {
 		super(mission);
 		this.speed = speed;
 	}

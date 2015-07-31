@@ -10,7 +10,7 @@ import org.droidplanner.services.android.core.mission.MissionItemType;
 import com.MAVLink.common.msg_mission_item;
 import com.MAVLink.enums.MAV_CMD;
 
-public class Waypoint extends SpatialCoordItem {
+public class WaypointImpl extends SpatialCoordItem {
 
 	private double delay;
 	private double acceptanceRadius;
@@ -18,15 +18,15 @@ public class Waypoint extends SpatialCoordItem {
 	private double orbitalRadius;
 	private boolean orbitCCW;
 
-	public Waypoint(MissionItem item) {
+	public WaypointImpl(MissionItem item) {
 		super(item);
 	}
 
-	public Waypoint(Mission mission, Coord3D coord) {
+	public WaypointImpl(Mission mission, Coord3D coord) {
 		super(mission, coord);
 	}
 
-	public Waypoint(msg_mission_item msg, Mission mission) {
+	public WaypointImpl(msg_mission_item msg, Mission mission) {
 		super(mission, null);
 		unpackMAVMessage(msg);
 	}

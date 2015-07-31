@@ -10,18 +10,18 @@ import org.droidplanner.services.android.core.mission.MissionItemType;
 import com.MAVLink.common.msg_mission_item;
 import com.MAVLink.enums.MAV_CMD;
 
-public class RegionOfInterest extends SpatialCoordItem {
+public class RegionOfInterestImpl extends SpatialCoordItem {
 
-	public RegionOfInterest(MissionItem item) {
+	public RegionOfInterestImpl(MissionItem item) {
 		super(item);
 	}
 	
-	public RegionOfInterest(Mission mission,Coord3D coord) {
+	public RegionOfInterestImpl(Mission mission, Coord3D coord) {
 		super(mission,coord);
 	}
 	
 
-	public RegionOfInterest(msg_mission_item msg, Mission mission) {
+	public RegionOfInterestImpl(msg_mission_item msg, Mission mission) {
 		super(mission, null);
 		unpackMAVMessage(msg);
 	}

@@ -2,43 +2,35 @@ package org.droidplanner.services.android.core.mission;
 
 import android.util.Pair;
 
-import android.util.SparseArray;
-import android.util.SparseIntArray;
-
 import com.MAVLink.common.msg_mission_ack;
 import com.MAVLink.common.msg_mission_item;
 import com.MAVLink.enums.MAV_CMD;
-import com.google.android.gms.maps.model.LatLng;
-import com.o3dr.services.android.lib.coordinate.LatLong;
-import com.o3dr.services.android.lib.util.MathUtils;
 
 import org.droidplanner.services.android.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.services.android.core.drone.DroneVariable;
 import org.droidplanner.services.android.core.helpers.coordinates.Coord2D;
 import org.droidplanner.services.android.core.helpers.coordinates.Coord3D;
 import org.droidplanner.services.android.core.helpers.geoTools.GeoTools;
-import org.droidplanner.services.android.core.mission.commands.CameraTrigger;
-import org.droidplanner.services.android.core.mission.commands.ChangeSpeed;
-import org.droidplanner.services.android.core.mission.commands.ConditionYaw;
-import org.droidplanner.services.android.core.mission.commands.EpmGripper;
-import org.droidplanner.services.android.core.mission.commands.ReturnToHome;
+import org.droidplanner.services.android.core.mission.commands.CameraTriggerImpl;
+import org.droidplanner.services.android.core.mission.commands.ChangeSpeedImpl;
+import org.droidplanner.services.android.core.mission.commands.ConditionYawImpl;
+import org.droidplanner.services.android.core.mission.commands.EpmGripperImpl;
+import org.droidplanner.services.android.core.mission.commands.ReturnToHomeImpl;
 import org.droidplanner.services.android.core.mission.commands.SetRelayImpl;
-import org.droidplanner.services.android.core.mission.commands.SetServo;
-import org.droidplanner.services.android.core.mission.commands.Takeoff;
-import org.droidplanner.services.android.core.mission.waypoints.Circle;
+import org.droidplanner.services.android.core.mission.commands.SetServoImpl;
+import org.droidplanner.services.android.core.mission.commands.TakeoffImpl;
+import org.droidplanner.services.android.core.mission.waypoints.CircleImpl;
 import org.droidplanner.services.android.core.mission.waypoints.DoLandStartImpl;
-import org.droidplanner.services.android.core.mission.waypoints.Land;
-import org.droidplanner.services.android.core.mission.waypoints.RegionOfInterest;
+import org.droidplanner.services.android.core.mission.waypoints.LandImpl;
+import org.droidplanner.services.android.core.mission.waypoints.RegionOfInterestImpl;
 import org.droidplanner.services.android.core.mission.waypoints.SpatialCoordItem;
-import org.droidplanner.services.android.core.mission.waypoints.SplineWaypoint;
-import org.droidplanner.services.android.core.mission.waypoints.Waypoint;
+import org.droidplanner.services.android.core.mission.waypoints.SplineWaypointImpl;
+import org.droidplanner.services.android.core.mission.waypoints.WaypointImpl;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import timber.log.Timber;
 
 /**
  * This implements a mavlink mission. A mavlink mission is a set of
@@ -140,7 +132,7 @@ public class Mission extends DroneVariable {
         double alt = defaultAlt;
         try {
             SpatialCoordItem lastItem = (SpatialCoordItem) items.get(items.size() - 1);
-            if (!(lastItem instanceof RegionOfInterest)) {
+            if (!(lastItem instanceof RegionOfInterestImpl)) {
                 alt = lastItem.getCoordinate().getAltitude();
             }
         } catch (Exception e) {
@@ -270,43 +262,43 @@ public class Mission extends DroneVariable {
         for (msg_mission_item msg : msgs) {
             switch (msg.command) {
                 case MAV_CMD.MAV_CMD_DO_SET_SERVO:
-                    received.add(new SetServo(msg, this));
+                    received.add(new SetServoImpl(msg, this));
                     break;
                 case MAV_CMD.MAV_CMD_NAV_WAYPOINT:
-                    received.add(new Waypoint(msg, this));
+                    received.add(new WaypointImpl(msg, this));
                     break;
                 case MAV_CMD.MAV_CMD_NAV_SPLINE_WAYPOINT:
-                    received.add(new SplineWaypoint(msg, this));
+                    received.add(new SplineWaypointImpl(msg, this));
                     break;
                 case MAV_CMD.MAV_CMD_NAV_LAND:
-                    received.add(new Land(msg, this));
+                    received.add(new LandImpl(msg, this));
                     break;
                 case MAV_CMD.MAV_CMD_DO_LAND_START:
                     received.add(new DoLandStartImpl(msg, this));
                     break;
                 case MAV_CMD.MAV_CMD_NAV_TAKEOFF:
-                    received.add(new Takeoff(msg, this));
+                    received.add(new TakeoffImpl(msg, this));
                     break;
                 case MAV_CMD.MAV_CMD_DO_CHANGE_SPEED:
-                    received.add(new ChangeSpeed(msg, this));
+                    received.add(new ChangeSpeedImpl(msg, this));
                     break;
                 case MAV_CMD.MAV_CMD_DO_SET_CAM_TRIGG_DIST:
-                    received.add(new CameraTrigger(msg, this));
+                    received.add(new CameraTriggerImpl(msg, this));
                     break;
-                case EpmGripper.MAV_CMD_DO_GRIPPER:
-                    received.add(new EpmGripper(msg, this));
+                case MAV_CMD.MAV_CMD_DO_GRIPPER:
+                    received.add(new EpmGripperImpl(msg, this));
                     break;
                 case MAV_CMD.MAV_CMD_DO_SET_ROI:
-                    received.add(new RegionOfInterest(msg, this));
+                    received.add(new RegionOfInterestImpl(msg, this));
                     break;
                 case MAV_CMD.MAV_CMD_NAV_LOITER_TURNS:
-                    received.add(new Circle(msg, this));
+                    received.add(new CircleImpl(msg, this));
                     break;
                 case MAV_CMD.MAV_CMD_NAV_RETURN_TO_LAUNCH:
-                    received.add(new ReturnToHome(msg, this));
+                    received.add(new ReturnToHomeImpl(msg, this));
                     break;
                 case MAV_CMD.MAV_CMD_CONDITION_YAW:
-                    received.add(new ConditionYaw(msg, this));
+                    received.add(new ConditionYawImpl(msg, this));
                     break;
 
                 case MAV_CMD.MAV_CMD_DO_SET_RELAY:
@@ -392,16 +384,16 @@ public class Mission extends DroneVariable {
         }
 
         List<MissionItem> dronieItems = new ArrayList<MissionItem>();
-        dronieItems.add(new Takeoff(this, startAltitude));
-        dronieItems.add(new RegionOfInterest(this,
+        dronieItems.add(new TakeoffImpl(this, startAltitude));
+        dronieItems.add(new RegionOfInterestImpl(this,
                 new Coord3D(GeoTools.pointAlongTheLine(start, end, roiDistance), (1.0))));
-        dronieItems.add(new Waypoint(this, new Coord3D(end, (startAltitude + GeoTools.getDistance(start, end) / 2.0))));
-        dronieItems.add(new Waypoint(this,
+        dronieItems.add(new WaypointImpl(this, new Coord3D(end, (startAltitude + GeoTools.getDistance(start, end) / 2.0))));
+        dronieItems.add(new WaypointImpl(this,
                 new Coord3D(slowDownPoint, (startAltitude + GeoTools.getDistance(start, slowDownPoint) / 2.0))));
-        dronieItems.add(new ChangeSpeed(this, 1.0));
-        dronieItems.add(new Waypoint(this, new Coord3D(start, startAltitude)));
-        dronieItems.add(new ChangeSpeed(this, defaultSpeed));
-        dronieItems.add(new Land(this, start));
+        dronieItems.add(new ChangeSpeedImpl(this, 1.0));
+        dronieItems.add(new WaypointImpl(this, new Coord3D(start, startAltitude)));
+        dronieItems.add(new ChangeSpeedImpl(this, defaultSpeed));
+        dronieItems.add(new LandImpl(this, start));
         return dronieItems;
     }
 
@@ -415,7 +407,7 @@ public class Mission extends DroneVariable {
     }
 
     public boolean isFirstItemTakeoff() {
-        return !items.isEmpty() && items.get(0) instanceof Takeoff;
+        return !items.isEmpty() && items.get(0) instanceof TakeoffImpl;
     }
 
     public boolean isLastItemLandOrRTL() {
@@ -423,6 +415,6 @@ public class Mission extends DroneVariable {
             return false;
 
         MissionItem last = items.get(items.size() - 1);
-        return (last instanceof ReturnToHome) || (last instanceof Land);
+        return (last instanceof ReturnToHomeImpl) || (last instanceof LandImpl);
     }
 }

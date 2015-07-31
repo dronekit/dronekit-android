@@ -12,7 +12,7 @@ public class SpatialCoordItemTest extends TestCase {
 
     public void testPackMissionItem() {
         Mission mission = new Mission(null);
-        Waypoint item = new Waypoint(mission, new Coord3D(0.1, 1, (2)));
+        WaypointImpl item = new WaypointImpl(mission, new Coord3D(0.1, 1, (2)));
 
         msg_mission_item mavMsg = item.packMissionItem().get(0);
 

@@ -10,11 +10,11 @@ import org.droidplanner.services.android.core.mission.Mission;
 
 import java.util.List;
 
-public class WaypointTest extends TestCase {
+public class WaypointImplTest extends TestCase {
 
     public void testPackMissionItem() {
         Mission mission = new Mission(null);
-        Waypoint item = new Waypoint(mission, new Coord3D(0, 1, (2)));
+        WaypointImpl item = new WaypointImpl(mission, new Coord3D(0, 1, (2)));
 
         List<msg_mission_item> listOfMsg = item.packMissionItem();
         assertEquals(1, listOfMsg.size());

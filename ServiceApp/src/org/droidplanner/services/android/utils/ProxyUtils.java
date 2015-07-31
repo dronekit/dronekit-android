@@ -25,12 +25,23 @@ import com.o3dr.services.android.lib.drone.mission.item.spatial.Waypoint;
 
 import org.droidplanner.services.android.core.helpers.coordinates.Coord2D;
 import org.droidplanner.services.android.core.mission.Mission;
-import org.droidplanner.services.android.core.mission.commands.ConditionYaw;
-import org.droidplanner.services.android.core.mission.commands.ReturnToHome;
+import org.droidplanner.services.android.core.mission.commands.CameraTriggerImpl;
+import org.droidplanner.services.android.core.mission.commands.ChangeSpeedImpl;
+import org.droidplanner.services.android.core.mission.commands.ConditionYawImpl;
+import org.droidplanner.services.android.core.mission.commands.EpmGripperImpl;
+import org.droidplanner.services.android.core.mission.commands.ReturnToHomeImpl;
 import org.droidplanner.services.android.core.mission.commands.SetRelayImpl;
+import org.droidplanner.services.android.core.mission.commands.SetServoImpl;
+import org.droidplanner.services.android.core.mission.commands.TakeoffImpl;
 import org.droidplanner.services.android.core.mission.survey.SplineSurveyImpl;
 import org.droidplanner.services.android.core.mission.survey.SurveyImpl;
+import org.droidplanner.services.android.core.mission.waypoints.CircleImpl;
 import org.droidplanner.services.android.core.mission.waypoints.DoLandStartImpl;
+import org.droidplanner.services.android.core.mission.waypoints.LandImpl;
+import org.droidplanner.services.android.core.mission.waypoints.RegionOfInterestImpl;
+import org.droidplanner.services.android.core.mission.waypoints.SplineWaypointImpl;
+import org.droidplanner.services.android.core.mission.waypoints.StructureScannerImpl;
+import org.droidplanner.services.android.core.mission.waypoints.WaypointImpl;
 import org.droidplanner.services.android.core.survey.CameraInfo;
 import org.droidplanner.services.android.core.survey.SurveyData;
 
@@ -86,7 +97,7 @@ public class ProxyUtils {
             case CAMERA_TRIGGER: {
                 CameraTrigger proxy = (CameraTrigger) proxyItem;
 
-                org.droidplanner.services.android.core.mission.commands.CameraTrigger temp = new org.droidplanner.services.android.core.mission.commands.CameraTrigger(mission, (proxy.getTriggerDistance()));
+                CameraTriggerImpl temp = new CameraTriggerImpl(mission, (proxy.getTriggerDistance()));
 
                 missionItemImpl = temp;
                 break;
@@ -94,7 +105,7 @@ public class ProxyUtils {
             case CHANGE_SPEED: {
                 ChangeSpeed proxy = (ChangeSpeed) proxyItem;
 
-                org.droidplanner.services.android.core.mission.commands.ChangeSpeed temp = new org.droidplanner.services.android.core.mission.commands.ChangeSpeed(mission, proxy.getSpeed());
+                ChangeSpeedImpl temp = new ChangeSpeedImpl(mission, proxy.getSpeed());
 
                 missionItemImpl = temp;
                 break;
@@ -102,7 +113,7 @@ public class ProxyUtils {
             case EPM_GRIPPER: {
                 EpmGripper proxy = (EpmGripper) proxyItem;
 
-                org.droidplanner.services.android.core.mission.commands.EpmGripper temp = new org.droidplanner.services.android.core.mission.commands.EpmGripper(mission, proxy.isRelease());
+                EpmGripperImpl temp = new EpmGripperImpl(mission, proxy.isRelease());
 
                 missionItemImpl = temp;
                 break;
@@ -110,7 +121,7 @@ public class ProxyUtils {
             case RETURN_TO_LAUNCH: {
                 ReturnToLaunch proxy = (ReturnToLaunch) proxyItem;
 
-                ReturnToHome temp = new ReturnToHome(mission);
+                ReturnToHomeImpl temp = new ReturnToHomeImpl(mission);
                 temp.setHeight((proxy.getReturnAltitude()));
 
                 missionItemImpl = temp;
@@ -119,8 +130,7 @@ public class ProxyUtils {
             case SET_SERVO: {
                 SetServo proxy = (SetServo) proxyItem;
 
-                org.droidplanner.services.android.core.mission.commands.SetServo temp = new org.droidplanner.services.android.core
-                        .mission.commands.SetServo(mission, proxy.getChannel(), proxy.getPwm());
+                SetServoImpl temp = new SetServoImpl(mission, proxy.getChannel(), proxy.getPwm());
 
                 missionItemImpl = temp;
                 break;
@@ -128,8 +138,7 @@ public class ProxyUtils {
             case TAKEOFF: {
                 Takeoff proxy = (Takeoff) proxyItem;
 
-                org.droidplanner.services.android.core.mission.commands.Takeoff temp = new org.droidplanner.services.android.core
-                        .mission.commands.Takeoff(mission, (proxy.getTakeoffAltitude()));
+                TakeoffImpl temp = new TakeoffImpl(mission, (proxy.getTakeoffAltitude()));
 
                 missionItemImpl = temp;
                 break;
@@ -137,8 +146,7 @@ public class ProxyUtils {
             case CIRCLE: {
                 Circle proxy = (Circle) proxyItem;
 
-                org.droidplanner.services.android.core.mission.waypoints.Circle temp = new org.droidplanner.services.android.core
-                        .mission.waypoints.Circle(mission, MathUtils.latLongAltToCoord3D(proxy
+                CircleImpl temp = new CircleImpl(mission, MathUtils.latLongAltToCoord3D(proxy
                         .getCoordinate()));
                 temp.setRadius(proxy.getRadius());
                 temp.setTurns(proxy.getTurns());
@@ -149,8 +157,7 @@ public class ProxyUtils {
             case LAND: {
                 Land proxy = (Land) proxyItem;
 
-                org.droidplanner.services.android.core.mission.waypoints.Land temp = new org.droidplanner.services.android.core
-                        .mission.waypoints.Land(mission, MathUtils.latLongToCoord2D(proxy
+                LandImpl temp = new LandImpl(mission, MathUtils.latLongToCoord2D(proxy
                         .getCoordinate()));
 
                 missionItemImpl = temp;
@@ -168,7 +175,7 @@ public class ProxyUtils {
             case REGION_OF_INTEREST: {
                 RegionOfInterest proxy = (RegionOfInterest) proxyItem;
 
-                org.droidplanner.services.android.core.mission.waypoints.RegionOfInterest temp = new org.droidplanner.services.android.core.mission.waypoints.RegionOfInterest(mission,
+                RegionOfInterestImpl temp = new RegionOfInterestImpl(mission,
                         MathUtils.latLongAltToCoord3D(proxy.getCoordinate()));
 
                 missionItemImpl = temp;
@@ -177,7 +184,7 @@ public class ProxyUtils {
             case SPLINE_WAYPOINT: {
                 SplineWaypoint proxy = (SplineWaypoint) proxyItem;
 
-                org.droidplanner.services.android.core.mission.waypoints.SplineWaypoint temp = new org.droidplanner.services.android.core.mission.waypoints.SplineWaypoint(mission,
+                SplineWaypointImpl temp = new SplineWaypointImpl(mission,
                         MathUtils.latLongAltToCoord3D(proxy.getCoordinate()));
                 temp.setDelay(proxy.getDelay());
 
@@ -187,7 +194,7 @@ public class ProxyUtils {
             case STRUCTURE_SCANNER: {
                 StructureScanner proxy = (StructureScanner) proxyItem;
 
-                org.droidplanner.services.android.core.mission.waypoints.StructureScanner temp = new org.droidplanner.services.android.core.mission.waypoints.StructureScanner(mission,
+                StructureScannerImpl temp = new StructureScannerImpl(mission,
                         MathUtils.latLongAltToCoord3D(proxy.getCoordinate()));
                 temp.setRadius((int) proxy.getRadius());
                 temp.setNumberOfSteps(proxy.getStepsCount());
@@ -204,8 +211,7 @@ public class ProxyUtils {
             case WAYPOINT: {
                 Waypoint proxy = (Waypoint) proxyItem;
 
-                org.droidplanner.services.android.core.mission.waypoints.Waypoint temp = new org.droidplanner.services.android.core
-                        .mission.waypoints.Waypoint(mission, MathUtils.latLongAltToCoord3D(proxy
+                WaypointImpl temp = new WaypointImpl(mission, MathUtils.latLongAltToCoord3D(proxy
                         .getCoordinate()));
                 temp.setAcceptanceRadius(proxy.getAcceptanceRadius());
                 temp.setDelay(proxy.getDelay());
@@ -269,7 +275,7 @@ public class ProxyUtils {
             case YAW_CONDITION: {
                 YawCondition proxy = (YawCondition) proxyItem;
 
-                ConditionYaw temp = new ConditionYaw(mission, proxy.getAngle(), proxy.isRelative());
+                ConditionYawImpl temp = new ConditionYawImpl(mission, proxy.getAngle(), proxy.isRelative());
                 temp.setAngularSpeed(proxy.getAngularSpeed());
 
                 missionItemImpl = temp;
@@ -296,7 +302,7 @@ public class ProxyUtils {
         MissionItem proxyMissionItem;
         switch (itemImpl.getType()) {
             case WAYPOINT: {
-                org.droidplanner.services.android.core.mission.waypoints.Waypoint source = (org.droidplanner.services.android.core.mission.waypoints.Waypoint) itemImpl;
+                WaypointImpl source = (WaypointImpl) itemImpl;
 
                 Waypoint temp = new Waypoint();
                 temp.setCoordinate(MathUtils.coord3DToLatLongAlt(source.getCoordinate()));
@@ -311,7 +317,7 @@ public class ProxyUtils {
             }
 
             case SPLINE_WAYPOINT: {
-                org.droidplanner.services.android.core.mission.waypoints.SplineWaypoint source = (org.droidplanner.services.android.core.mission.waypoints.SplineWaypoint) itemImpl;
+                SplineWaypointImpl source = (SplineWaypointImpl) itemImpl;
 
                 SplineWaypoint temp = new SplineWaypoint();
                 temp.setCoordinate(MathUtils.coord3DToLatLongAlt(source.getCoordinate()));
@@ -322,7 +328,7 @@ public class ProxyUtils {
             }
 
             case TAKEOFF: {
-                org.droidplanner.services.android.core.mission.commands.Takeoff source = (org.droidplanner.services.android.core.mission.commands.Takeoff) itemImpl;
+                TakeoffImpl source = (TakeoffImpl) itemImpl;
 
                 Takeoff temp = new Takeoff();
                 temp.setTakeoffAltitude(source.getFinishedAlt());
@@ -331,7 +337,7 @@ public class ProxyUtils {
                 break;
             }
             case RTL: {
-                ReturnToHome source = (ReturnToHome) itemImpl;
+                ReturnToHomeImpl source = (ReturnToHomeImpl) itemImpl;
 
                 ReturnToLaunch temp = new ReturnToLaunch();
                 temp.setReturnAltitude(source.getHeight());
@@ -340,7 +346,7 @@ public class ProxyUtils {
                 break;
             }
             case LAND: {
-                org.droidplanner.services.android.core.mission.waypoints.Land source = (org.droidplanner.services.android.core.mission.waypoints.Land) itemImpl;
+                LandImpl source = (LandImpl) itemImpl;
 
                 Land temp = new Land();
                 temp.setCoordinate(MathUtils.coord3DToLatLongAlt(source.getCoordinate()));
@@ -358,7 +364,7 @@ public class ProxyUtils {
                 break;
             }
             case CIRCLE: {
-                org.droidplanner.services.android.core.mission.waypoints.Circle source = (org.droidplanner.services.android.core.mission.waypoints.Circle) itemImpl;
+                CircleImpl source = (CircleImpl) itemImpl;
 
                 Circle temp = new Circle();
                 temp.setCoordinate(MathUtils.coord3DToLatLongAlt(source.getCoordinate()));
@@ -370,7 +376,7 @@ public class ProxyUtils {
             }
 
             case ROI: {
-                org.droidplanner.services.android.core.mission.waypoints.RegionOfInterest source = (org.droidplanner.services.android.core.mission.waypoints.RegionOfInterest) itemImpl;
+                RegionOfInterestImpl source = (RegionOfInterestImpl) itemImpl;
 
                 RegionOfInterest temp = new RegionOfInterest();
                 temp.setCoordinate(MathUtils.coord3DToLatLongAlt(source.getCoordinate()));
@@ -432,7 +438,7 @@ public class ProxyUtils {
             }
 
             case CYLINDRICAL_SURVEY: {
-                org.droidplanner.services.android.core.mission.waypoints.StructureScanner source = (org.droidplanner.services.android.core.mission.waypoints.StructureScanner) itemImpl;
+                StructureScannerImpl source = (StructureScannerImpl) itemImpl;
 
                 StructureScanner temp = new StructureScanner();
                 temp.setSurveyDetail(getSurveyDetail(source.getSurveyData()));
@@ -448,7 +454,7 @@ public class ProxyUtils {
             }
 
             case CHANGE_SPEED: {
-                org.droidplanner.services.android.core.mission.commands.ChangeSpeed source = (org.droidplanner.services.android.core.mission.commands.ChangeSpeed) itemImpl;
+                ChangeSpeedImpl source = (ChangeSpeedImpl) itemImpl;
 
                 ChangeSpeed temp = new ChangeSpeed();
                 temp.setSpeed(source.getSpeed());
@@ -458,7 +464,7 @@ public class ProxyUtils {
             }
 
             case CAMERA_TRIGGER: {
-                org.droidplanner.services.android.core.mission.commands.CameraTrigger source = (org.droidplanner.services.android.core.mission.commands.CameraTrigger) itemImpl;
+                CameraTriggerImpl source = (CameraTriggerImpl) itemImpl;
 
                 CameraTrigger temp = new CameraTrigger();
                 temp.setTriggerDistance(source.getTriggerDistance());
@@ -467,7 +473,7 @@ public class ProxyUtils {
                 break;
             }
             case EPM_GRIPPER: {
-                org.droidplanner.services.android.core.mission.commands.EpmGripper source = (org.droidplanner.services.android.core.mission.commands.EpmGripper) itemImpl;
+                EpmGripperImpl source = (EpmGripperImpl) itemImpl;
 
                 EpmGripper temp = new EpmGripper();
                 temp.setRelease(source.isRelease());
@@ -477,7 +483,7 @@ public class ProxyUtils {
             }
 
             case SET_SERVO: {
-                org.droidplanner.services.android.core.mission.commands.SetServo source = (org.droidplanner.services.android.core.mission.commands.SetServo) itemImpl;
+                SetServoImpl source = (SetServoImpl) itemImpl;
 
                 SetServo temp = new SetServo();
                 temp.setChannel(source.getChannel());
@@ -487,7 +493,7 @@ public class ProxyUtils {
                 break;
             }
             case CONDITION_YAW: {
-                ConditionYaw source = (ConditionYaw) itemImpl;
+                ConditionYawImpl source = (ConditionYawImpl) itemImpl;
 
                 YawCondition temp = new YawCondition();
                 temp.setAngle(source.getAngle());

@@ -65,6 +65,7 @@ import org.droidplanner.services.android.core.helpers.coordinates.Coord2D;
 import org.droidplanner.services.android.core.helpers.coordinates.Coord3D;
 import org.droidplanner.services.android.core.mission.survey.SplineSurveyImpl;
 import org.droidplanner.services.android.core.mission.survey.SurveyImpl;
+import org.droidplanner.services.android.core.mission.waypoints.StructureScannerImpl;
 import org.droidplanner.services.android.core.survey.Footprint;
 import org.droidplanner.services.android.utils.file.IO.ParameterMetadataLoader;
 import org.xmlpull.v1.XmlPullParserException;
@@ -1007,7 +1008,7 @@ public class CommonApiUtils {
 
     public static StructureScanner buildStructureScanner(MavLinkDrone drone, StructureScanner item) {
         org.droidplanner.services.android.core.mission.Mission droneMission = drone == null ? null : drone.getMission();
-        org.droidplanner.services.android.core.mission.waypoints.StructureScanner updatedScan = (org.droidplanner.services.android.core.mission.waypoints.StructureScanner) ProxyUtils
+        StructureScannerImpl updatedScan = (StructureScannerImpl) ProxyUtils
                 .getMissionItemImpl(droneMission, item);
 
         StructureScanner proxyScanner = (StructureScanner) ProxyUtils.getProxyMissionItem(updatedScan);

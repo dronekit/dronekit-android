@@ -10,21 +10,21 @@ import org.droidplanner.services.android.core.mission.MissionItemType;
 import com.MAVLink.common.msg_mission_item;
 import com.MAVLink.enums.MAV_CMD;
 
-public class ConditionYaw extends MissionCMD {
+public class ConditionYawImpl extends MissionCMD {
 	private boolean isRelative = false; 
 	private double angle = 0;
 	private double angularSpeed = 0;
 
-	public ConditionYaw(MissionItem item) {
+	public ConditionYawImpl(MissionItem item) {
 		super(item);
 	}
 
-	public ConditionYaw(msg_mission_item msg, Mission mission) {
+	public ConditionYawImpl(msg_mission_item msg, Mission mission) {
 		super(mission);
 		unpackMAVMessage(msg);
 	}
 
-	public ConditionYaw(Mission mission, double angle, boolean isRelative) {
+	public ConditionYawImpl(Mission mission, double angle, boolean isRelative) {
 		super(mission);
 		setAngle(angle);
 		setRelative(isRelative);

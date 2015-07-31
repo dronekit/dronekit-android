@@ -6,15 +6,15 @@ import com.MAVLink.enums.MAV_CMD;
 import junit.framework.TestCase;
 
 import org.droidplanner.services.android.core.mission.Mission;
-import org.droidplanner.services.android.core.mission.commands.Takeoff;
+import org.droidplanner.services.android.core.mission.commands.TakeoffImpl;
 
 import java.util.List;
 
-public class TakeoffTest extends TestCase {
+public class TakeoffImplTest extends TestCase {
 
     public void testPackMissionItem() {
         Mission mission = new Mission(null);
-        Takeoff item = new Takeoff(mission, (50.0));
+        TakeoffImpl item = new TakeoffImpl(mission, (50.0));
 
         List<msg_mission_item> listOfMsg = item.packMissionItem();
         assertEquals(1, listOfMsg.size());
