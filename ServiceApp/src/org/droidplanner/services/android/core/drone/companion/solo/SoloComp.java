@@ -20,8 +20,8 @@ import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
 import com.o3dr.services.android.lib.model.ICommandListener;
 
 import org.droidplanner.services.android.core.drone.companion.CompComp;
-import org.droidplanner.services.android.core.drone.companion.solo.artoo.ArtooLinkListener;
-import org.droidplanner.services.android.core.drone.companion.solo.artoo.ArtooLinkManager;
+import org.droidplanner.services.android.core.drone.companion.solo.artoo.ControllerLinkListener;
+import org.droidplanner.services.android.core.drone.companion.solo.artoo.ControllerLinkManager;
 import org.droidplanner.services.android.core.drone.companion.solo.sololink.SoloLinkListener;
 import org.droidplanner.services.android.core.drone.companion.solo.sololink.SoloLinkManager;
 import org.droidplanner.services.android.utils.NetworkUtils;
@@ -37,7 +37,7 @@ import timber.log.Timber;
  * Sololink companion computer implementation
  * Created by Fredia Huya-Kouadio on 7/9/15.
  */
-public class SoloComp implements CompComp, SoloLinkListener, ArtooLinkListener {
+public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListener {
 
     public interface SoloCompListener {
         void onConnected();
@@ -62,7 +62,7 @@ public class SoloComp implements CompComp, SoloLinkListener, ArtooLinkListener {
     public static final String SSH_USERNAME = "root";
     public static final String SSH_PASSWORD = "TjSDBkAu";
 
-    private final ArtooLinkManager artooMgr;
+    private final ControllerLinkManager artooMgr;
     private final SoloLinkManager soloLinkMgr;
 
     private final Context context;
@@ -86,7 +86,7 @@ public class SoloComp implements CompComp, SoloLinkListener, ArtooLinkListener {
         this.handler = handler;
         asyncExecutor = Executors.newCachedThreadPool();
 
-        this.artooMgr = new ArtooLinkManager(context, handler, asyncExecutor);
+        this.artooMgr = new ControllerLinkManager(context, handler, asyncExecutor);
         this.soloLinkMgr = new SoloLinkManager(context, handler, asyncExecutor);
     }
 

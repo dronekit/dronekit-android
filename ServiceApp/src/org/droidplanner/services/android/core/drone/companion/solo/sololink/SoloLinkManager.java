@@ -6,7 +6,7 @@ import android.text.TextUtils;
 
 import org.droidplanner.services.android.core.drone.companion.solo.AbstractLinkManager;
 import org.droidplanner.services.android.core.drone.companion.solo.SoloComp;
-import org.droidplanner.services.android.core.drone.companion.solo.artoo.ArtooLinkManager;
+import org.droidplanner.services.android.core.drone.companion.solo.artoo.ControllerLinkManager;
 import com.o3dr.services.android.lib.drone.companion.solo.button.ButtonTypes;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSetting;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSettingGetter;
@@ -277,11 +277,11 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
     public boolean updateSololinkWifi(CharSequence wifiSsid, CharSequence password) {
         Timber.d(String.format(Locale.US, "Updating solo wifi ssid to %s with password %s", wifiSsid, password));
         try {
-            String ssidUpdateResult = sshLink.execute(ArtooLinkManager.SOLOLINK_SSID_CONFIG_PATH + " --set-wifi-ssid " +
+            String ssidUpdateResult = sshLink.execute(ControllerLinkManager.SOLOLINK_SSID_CONFIG_PATH + " --set-wifi-ssid " +
                     wifiSsid);
-            String passwordUpdateResult = sshLink.execute(ArtooLinkManager.SOLOLINK_SSID_CONFIG_PATH + " --set-wifi-password " +
+            String passwordUpdateResult = sshLink.execute(ControllerLinkManager.SOLOLINK_SSID_CONFIG_PATH + " --set-wifi-password " +
                     password);
-            String restartResult = sshLink.execute(ArtooLinkManager.SOLOLINK_SSID_CONFIG_PATH + " --reboot");
+            String restartResult = sshLink.execute(ControllerLinkManager.SOLOLINK_SSID_CONFIG_PATH + " --reboot");
             return true;
         } catch (IOException e) {
             Timber.e(e, "Error occurred while updating the sololink wifi ssid.");

@@ -114,7 +114,7 @@ public class TLVMessageParser {
                     final short gimbalRate = packetBuffer.getShort();
                     final short battery = packetBuffer.getShort();
 
-                    return new ArtooMessageInputReport(timestamp, gimbalY, gimbalRate, battery);
+                    return new ControllerMessageInputReport(timestamp, gimbalY, gimbalRate, battery);
                 }
 
                 case TYPE_SOLO_GOPRO_SET_REQUEST: {

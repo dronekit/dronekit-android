@@ -33,7 +33,7 @@ import timber.log.Timber;
 /**
  * Handles artoo link related logic.
  */
-public class ArtooLinkManager extends AbstractLinkManager<ArtooLinkListener> {
+public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkListener> {
 
     private static final long RECONNECT_COUNTDOWN = 1000l; //ms
 
@@ -148,9 +148,9 @@ public class ArtooLinkManager extends AbstractLinkManager<ArtooLinkListener> {
         }
     };
 
-    private ArtooLinkListener linkListener;
+    private ControllerLinkListener linkListener;
 
-    public ArtooLinkManager(Context context, final Handler handler, ExecutorService asyncExecutor) {
+    public ControllerLinkManager(Context context, final Handler handler, ExecutorService asyncExecutor) {
         super(context, new TcpConnection(handler, ARTOO_IP, ARTOO_BUTTON_PORT), handler, asyncExecutor);
 
         this.videoMgr = new VideoManager(context, handler, asyncExecutor);
@@ -281,7 +281,7 @@ public class ArtooLinkManager extends AbstractLinkManager<ArtooLinkListener> {
     }
 
     @Override
-    public void start(ArtooLinkListener listener) {
+    public void start(ControllerLinkListener listener) {
         this.linkListener = listener;
 
         Timber.d("Starting artoo link manager");

@@ -7,7 +7,7 @@ import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
 /**
  * Created by Fredia Huya-Kouadio on 7/10/15.
  */
-public interface ArtooLinkListener extends AbstractLinkManager.LinkListener {
+public interface ControllerLinkListener extends AbstractLinkManager.LinkListener {
 
     void onTlvPacketReceived(TLVPacket packet);
 

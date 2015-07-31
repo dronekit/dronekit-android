@@ -7,14 +7,14 @@ import java.nio.ByteBuffer;
 /**
  * Created by djmedina on 4/15/15.
  */
-public class ArtooMessageInputReport extends TLVPacket {
+public class ControllerMessageInputReport extends TLVPacket {
 
     private double timestamp;
     private short gimbalY;
     private short gimbalRate;
     private short battery;
 
-    public ArtooMessageInputReport(double timestamp, short gimbalY, short gimbalRate, short battery) {
+    public ControllerMessageInputReport(double timestamp, short gimbalY, short gimbalRate, short battery) {
         super(TLVMessageTypes.TYPE_ARTOO_INPUT_REPORT_MESSAGE, 14);
         this.timestamp = timestamp;
         this.gimbalY = gimbalY;
@@ -55,7 +55,7 @@ public class ArtooMessageInputReport extends TLVPacket {
         dest.writeInt(this.battery);
     }
 
-    protected ArtooMessageInputReport(Parcel in) {
+    protected ControllerMessageInputReport(Parcel in) {
         super(in);
         this.timestamp = in.readDouble();
         this.gimbalY = (short) in.readInt();
@@ -63,13 +63,13 @@ public class ArtooMessageInputReport extends TLVPacket {
         this.battery = (short) in.readInt();
     }
 
-    public static final Creator<ArtooMessageInputReport> CREATOR = new Creator<ArtooMessageInputReport>() {
-        public ArtooMessageInputReport createFromParcel(Parcel source) {
-            return new ArtooMessageInputReport(source);
+    public static final Creator<ControllerMessageInputReport> CREATOR = new Creator<ControllerMessageInputReport>() {
+        public ControllerMessageInputReport createFromParcel(Parcel source) {
+            return new ControllerMessageInputReport(source);
         }
 
-        public ArtooMessageInputReport[] newArray(int size) {
-            return new ArtooMessageInputReport[size];
+        public ControllerMessageInputReport[] newArray(int size) {
+            return new ControllerMessageInputReport[size];
         }
     };
 }
