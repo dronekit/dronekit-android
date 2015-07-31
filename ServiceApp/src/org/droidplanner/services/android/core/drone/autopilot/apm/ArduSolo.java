@@ -18,8 +18,8 @@ import org.droidplanner.services.android.core.model.AutopilotWarningParser;
  */
 public class ArduSolo extends ArduCopter {
 
-    public ArduSolo(Context context, MAVLinkStreams.MAVLinkOutputStream mavClient, DroneInterfaces.Handler handler, Preferences pref, AutopilotWarningParser warningParser, LogMessageListener logListener) {
-        super(context, mavClient, handler, pref, warningParser, logListener);
+    public ArduSolo(Context context, MAVLinkStreams.MAVLinkOutputStream mavClient, DroneInterfaces.Handler handler, Preferences pref, AutopilotWarningParser warningParser, LogMessageListener logListener, DroneInterfaces.AttributeEventListener listener) {
+        super(context, mavClient, handler, pref, warningParser, logListener, listener);
     }
 
     @Override

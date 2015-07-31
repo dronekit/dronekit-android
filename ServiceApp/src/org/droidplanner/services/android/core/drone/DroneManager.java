@@ -78,7 +78,7 @@ import timber.log.Timber;
  * Bridge between the communication channel, the drone instance(s), and the connected client(s).
  */
 public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, DroneInterfaces.OnDroneListener,
-        DroneInterfaces.OnParameterManagerListener, LogMessageListener, MagnetometerCalibrationImpl.OnMagnetometerCalibrationListener {
+        DroneInterfaces.OnParameterManagerListener, LogMessageListener, MagnetometerCalibrationImpl.OnMagnetometerCalibrationListener, DroneInterfaces.AttributeEventListener {
 
     private static final String TAG = DroneManager.class.getSimpleName();
 
@@ -216,26 +216,26 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
             case ARDU_COPTER:
                 if (isCompanionComputerEnabled()) {
                     Timber.d("Instantiating ArduSolo autopilot.");
-                    this.drone = new ArduSolo(context, mavClient, dpHandler, dpPrefs, new AndroidApWarningParser(), this);
+                    this.drone = new ArduSolo(context, mavClient, dpHandler, dpPrefs, new AndroidApWarningParser(), this, this);
                 } else {
                     Timber.d("Instantiating ArduCopter autopilot.");
-                    this.drone = new ArduCopter(context, mavClient, dpHandler, dpPrefs, new AndroidApWarningParser(), this);
+                    this.drone = new ArduCopter(context, mavClient, dpHandler, dpPrefs, new AndroidApWarningParser(), this, this);
                 }
                 break;
 
             case ARDU_SOLO:
                 Timber.d("Instantiating ArduCopter autopilot.");
-                this.drone = new ArduSolo(context, mavClient, dpHandler, dpPrefs, new AndroidApWarningParser(), this);
+                this.drone = new ArduSolo(context, mavClient, dpHandler, dpPrefs, new AndroidApWarningParser(), this, this);
                 break;
 
             case ARDU_PLANE:
                 Timber.d("Instantiating ArduPlane autopilot.");
-                this.drone = new ArduPlane(context, mavClient, dpHandler, dpPrefs, new AndroidApWarningParser(), this);
+                this.drone = new ArduPlane(context, mavClient, dpHandler, dpPrefs, new AndroidApWarningParser(), this, this);
                 break;
 
             case ARDU_ROVER:
                 Timber.d("Instantiating ArduPlane autopilot.");
-                this.drone = new ArduRover(context, mavClient, dpHandler, dpPrefs, new AndroidApWarningParser(), this);
+                this.drone = new ArduRover(context, mavClient, dpHandler, dpPrefs, new AndroidApWarningParser(), this, this);
                 break;
         }
 
@@ -804,5 +804,10 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
 
         for (DroneEventsListener listener : connectedApps.values())
             listener.onCalibrationCompleted(report);
+    }
+
+    @Override
+    public void onAttributeEvent(String attributeEvent, Bundle eventInfo) {
+        notifyDroneAttributeEvent(attributeEvent, eventInfo);
     }
 }

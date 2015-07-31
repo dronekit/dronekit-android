@@ -176,8 +176,6 @@ public class Drone {
             asyncScheduler = null;
         }
 
-        droneListeners.clear();
-
         droneApiRef.set(null);
     }
 

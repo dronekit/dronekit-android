@@ -40,6 +40,8 @@ import com.o3dr.services.android.lib.drone.action.GimbalActions;
 import com.o3dr.services.android.lib.drone.action.GuidedActions;
 import com.o3dr.services.android.lib.drone.action.ParameterActions;
 import com.o3dr.services.android.lib.drone.action.StateActions;
+import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
+import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.drone.mission.action.MissionActions;
@@ -120,6 +122,7 @@ public abstract class ArduPilot implements MavLinkDrone {
     private final MAVLinkStreams.MAVLinkOutputStream MavClient;
     private final Preferences preferences;
 
+    private final DroneInterfaces.AttributeEventListener attributeListener;
     private final LogMessageListener logListener;
     private final MagnetometerCalibrationImpl magCalibration;
 
@@ -129,12 +132,13 @@ public abstract class ArduPilot implements MavLinkDrone {
 
     public ArduPilot(Context context, MAVLinkStreams.MAVLinkOutputStream mavClient,
                      DroneInterfaces.Handler handler, Preferences pref, AutopilotWarningParser warningParser,
-                     LogMessageListener logListener) {
+                     LogMessageListener logListener, DroneInterfaces.AttributeEventListener listener) {
 
         this.context = context;
         this.MavClient = mavClient;
         this.preferences = pref;
         this.logListener = logListener;
+        this.attributeListener = listener;
 
         events = new DroneEvents(this, handler);
         state = new State(this, handler, warningParser);
@@ -699,7 +703,7 @@ public abstract class ArduPilot implements MavLinkDrone {
                 break;
 
             case msg_mount_status.MAVLINK_MSG_ID_MOUNT_STATUS:
-                getCamera().updateMountOrientation(((msg_mount_status) message));
+                processMountStatus((msg_mount_status) message);
                 break;
 
             case msg_named_value_int.MAVLINK_MSG_ID_NAMED_VALUE_INT:
@@ -726,6 +730,18 @@ public abstract class ArduPilot implements MavLinkDrone {
 
             default:
                 break;
+        }
+    }
+
+    protected void processMountStatus(msg_mount_status mountStatus){
+        footprints.updateMountOrientation(mountStatus);
+
+        if(attributeListener != null){
+            final Bundle eventInfo = new Bundle(3);
+            eventInfo.putFloat(AttributeEventExtra.EXTRA_GIMBAL_ORIENTATION_PITCH, mountStatus.pointing_a / 100f);
+            eventInfo.putFloat(AttributeEventExtra.EXTRA_GIMBAL_ORIENTATION_ROLL, mountStatus.pointing_b / 100f);
+            eventInfo.putFloat(AttributeEventExtra.EXTRA_GIMBAL_ORIENTATION_YAW, mountStatus.pointing_c / 100f);
+            attributeListener.onAttributeEvent(AttributeEvent.GIMBAL_ORIENTATION_UPDATED, eventInfo);
         }
     }
 
