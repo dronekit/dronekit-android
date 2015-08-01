@@ -33,13 +33,13 @@ public class SoloEvents {
     /**
      * Triggers every time a button event occurs.
      *
-     * @see {@link SoloEventExtras#EXTRA_SOLOLINK_BUTTON_EVENT}
+     * @see {@link SoloEventExtras#EXTRA_SOLO_BUTTON_EVENT}
      */
-    public static final String SOLO_BUTTON_EVENT = PACKAGE_NAME + ".SOLO_BUTTON_EVENT";
+    public static final String SOLO_BUTTON_EVENT_RECEIVED = PACKAGE_NAME + ".SOLO_BUTTON_EVENT_RECEIVED";
     /**
      * Triggers upon receipt of a sololink message.
      *
-     * @see {@link SoloEventExtras#EXTRA_SOLOLINK_MESSAGE_DATA}
+     * @see {@link SoloEventExtras#EXTRA_SOLO_MESSAGE_DATA}
      */
     public static final String SOLO_MESSAGE_RECEIVED = PACKAGE_NAME + ".SOLO_MESSAGE_RECEIVED";
     /**

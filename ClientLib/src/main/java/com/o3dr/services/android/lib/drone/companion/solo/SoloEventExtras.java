@@ -16,14 +16,14 @@ public class SoloEventExtras {
     /**
      * Used to retrieve the {@link com.o3dr.services.android.lib.drone.companion.solo.button.ButtonPacket} object describing the button event.
      */
-    public static final String EXTRA_SOLOLINK_BUTTON_EVENT = PACKAGE_NAME + ".EXTRA_SOLOLINK_BUTTON_EVENT";
+    public static final String EXTRA_SOLO_BUTTON_EVENT = PACKAGE_NAME + ".EXTRA_SOLO_BUTTON_EVENT";
     /**
      * Used to retrieve the received sololink message data in bytes.
      */
-    public static final String EXTRA_SOLOLINK_MESSAGE_DATA = PACKAGE_NAME + ".EXTRA_SOLOLINK_MESSAGE_DATA";
+    public static final String EXTRA_SOLO_MESSAGE_DATA = PACKAGE_NAME + ".EXTRA_SOLO_MESSAGE_DATA";
     /**
      * Used to retrieve the boolean value specifying whether the controller is compliant with the EU tx power levels.
      * @see {@link SoloEvents#SOLO_EU_TX_POWER_COMPLIANCE_UPDATED}
      */
-    public static final String EXTRA_SOLOLINK_EU_TX_POWER_COMPLIANT = PACKAGE_NAME + ".EXTRA_SOLOLINK_EU_TX_POWER_COMPLIANT";
+    public static final String EXTRA_SOLO_EU_TX_POWER_COMPLIANT = PACKAGE_NAME + ".EXTRA_SOLO_EU_TX_POWER_COMPLIANT";
 }

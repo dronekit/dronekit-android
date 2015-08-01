@@ -136,7 +136,7 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
 
                 default:
                     final Bundle messageInfo = new Bundle();
-                    messageInfo.putParcelable(SoloEventExtras.EXTRA_SOLOLINK_MESSAGE_DATA, packet);
+                    messageInfo.putParcelable(SoloEventExtras.EXTRA_SOLO_MESSAGE_DATA, packet);
 
                     notifyDroneAttributeEvent(SoloEvents.SOLO_MESSAGE_RECEIVED, messageInfo, true);
                     break;
@@ -156,14 +156,14 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
         @Override
         public void onButtonPacketReceived(ButtonPacket packet) {
             final Bundle eventInfo = new Bundle();
-            eventInfo.putParcelable(SoloEventExtras.EXTRA_SOLOLINK_BUTTON_EVENT, packet);
-            notifyDroneAttributeEvent(SoloEvents.SOLO_BUTTON_EVENT, eventInfo, true);
+            eventInfo.putParcelable(SoloEventExtras.EXTRA_SOLO_BUTTON_EVENT, packet);
+            notifyDroneAttributeEvent(SoloEvents.SOLO_BUTTON_EVENT_RECEIVED, eventInfo, true);
         }
 
         @Override
         public void onEUTxPowerComplianceUpdated(boolean isCompliant) {
             final Bundle eventInfo = new Bundle(1);
-            eventInfo.putBoolean(SoloEventExtras.EXTRA_SOLOLINK_EU_TX_POWER_COMPLIANT, isCompliant);
+            eventInfo.putBoolean(SoloEventExtras.EXTRA_SOLO_EU_TX_POWER_COMPLIANT, isCompliant);
             notifyDroneAttributeEvent(SoloEvents.SOLO_EU_TX_POWER_COMPLIANCE_UPDATED, eventInfo, true);
         }
     };
