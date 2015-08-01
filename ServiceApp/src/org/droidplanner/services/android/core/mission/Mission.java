@@ -331,9 +331,10 @@ public class Mission extends DroneVariable {
     }
 
     private void updateComponentItems(List<msg_mission_item> msgMissionItems) {
-        if(msgMissionItems == null)
-            return;
         componentItems.clear();
+        if(msgMissionItems == null) {
+            return;
+        }
         msg_mission_item firstItem = msgMissionItems.get(0);
         if(firstItem.seq == Home.HOME_WAYPOINT_INDEX) {
             msgMissionItems.remove(0); // Remove Home waypoint
