@@ -22,10 +22,6 @@ public class DoJump extends MissionItem implements MissionItem.Command, android.
         this.repeatCount = copy.repeatCount;
     }
 
-    protected DoJump(MissionItemType type) {
-        super(type);
-    }
-
     protected DoJump(Parcel in) {
         super(in);
         waypoint = in.readInt();

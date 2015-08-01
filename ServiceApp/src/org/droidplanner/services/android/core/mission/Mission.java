@@ -16,7 +16,7 @@ import org.droidplanner.services.android.core.mission.commands.CameraTrigger;
 import org.droidplanner.services.android.core.mission.commands.ChangeSpeed;
 import org.droidplanner.services.android.core.mission.commands.ConditionYaw;
 import org.droidplanner.services.android.core.mission.commands.EpmGripper;
-import org.droidplanner.services.android.core.mission.commands.DoJump;
+import org.droidplanner.services.android.core.mission.commands.DoJumpImpl;
 import org.droidplanner.services.android.core.mission.commands.ReturnToHome;
 import org.droidplanner.services.android.core.mission.commands.SetRelayImpl;
 import org.droidplanner.services.android.core.mission.commands.SetServo;
@@ -306,7 +306,7 @@ public class Mission extends DroneVariable {
                     received.add(new SetRelayImpl(msg, this));
                     break;
                 case MAV_CMD.MAV_CMD_DO_JUMP:
-                    received.add(new DoJump(msg, this));
+                    received.add(new DoJumpImpl(msg, this));
                     break;
 
                 default:

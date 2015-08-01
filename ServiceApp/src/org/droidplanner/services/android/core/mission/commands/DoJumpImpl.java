@@ -12,24 +12,24 @@ import java.util.List;
 /**
  * Created by Toby on 7/31/2015.
  */
-public class DoJump extends MissionCMD{
+public class DoJumpImpl extends MissionCMD{
     private int waypoint;
     private int repeatCount;
 
-    public DoJump(MissionItem item){
+    public DoJumpImpl(MissionItem item){
         super(item);
     }
 
-    public DoJump(Mission mission) {
+    public DoJumpImpl(Mission mission) {
         super(mission);
     }
 
-    public DoJump(msg_mission_item mavMsg, Mission mission){
+    public DoJumpImpl(msg_mission_item mavMsg, Mission mission){
         super(mission);
         unpackMAVMessage(mavMsg);
     }
 
-    public DoJump(Mission mission, int waypoint, int repeatCount){
+    public DoJumpImpl(Mission mission, int waypoint, int repeatCount){
         super(mission);
         this.waypoint = waypoint;
         this.repeatCount  = repeatCount;

@@ -229,17 +229,6 @@ public enum MissionItemType {
             return DoLandStart.CREATOR;
         }
     },
-    DO_JUMP("Do Jump") {
-        @Override
-        public MissionItem getNewItem() {
-            return new DoJump();
-        }
-
-        @Override
-        protected Creator<DoJump> getMissionItemCreator() {
-            return DoJump.CREATOR;
-        }
-    },
 
     SPLINE_SURVEY("Spline Survey") {
         @Override
@@ -250,6 +239,17 @@ public enum MissionItemType {
         @Override
         protected Creator<SplineSurvey> getMissionItemCreator() {
             return SplineSurvey.CREATOR;
+        }
+    },
+    DO_JUMP("Do Jump") {
+        @Override
+        public MissionItem getNewItem() {
+            return new DoJump();
+        }
+
+        @Override
+        protected Creator<DoJump> getMissionItemCreator() {
+            return DoJump.CREATOR;
         }
     };
 

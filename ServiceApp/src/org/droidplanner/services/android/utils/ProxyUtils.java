@@ -27,6 +27,7 @@ import com.o3dr.services.android.lib.drone.mission.item.spatial.Waypoint;
 import org.droidplanner.services.android.core.helpers.coordinates.Coord2D;
 import org.droidplanner.services.android.core.mission.Mission;
 import org.droidplanner.services.android.core.mission.commands.ConditionYaw;
+import org.droidplanner.services.android.core.mission.commands.DoJumpImpl;
 import org.droidplanner.services.android.core.mission.commands.ReturnToHome;
 import org.droidplanner.services.android.core.mission.commands.SetRelayImpl;
 import org.droidplanner.services.android.core.mission.survey.SplineSurveyImpl;
@@ -285,7 +286,7 @@ public class ProxyUtils {
 
             case DO_JUMP: {
                 DoJump proxy = (DoJump) proxyItem;
-                missionItemImpl = new org.droidplanner.services.android.core.mission.commands.DoJump(mission, proxy.getWaypoint(), proxy.getRepeatCount());
+                missionItemImpl = new DoJumpImpl(mission, proxy.getWaypoint(), proxy.getRepeatCount());
                 break;
             }
 
@@ -518,7 +519,7 @@ public class ProxyUtils {
             }
 
             case DO_JUMP: {
-                org.droidplanner.services.android.core.mission.commands.DoJump source = (org.droidplanner.services.android.core.mission.commands.DoJump) itemImpl;
+                DoJumpImpl source = (DoJumpImpl) itemImpl;
 
                 DoJump proxy = new DoJump();
                 proxy.setWaypoint(source.getWaypoint());
