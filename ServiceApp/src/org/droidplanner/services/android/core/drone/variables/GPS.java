@@ -8,6 +8,8 @@ import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 public class GPS extends DroneVariable {
 	public final static int LOCK_2D = 2;
 	public final static int LOCK_3D = 3;
+	public final static int LOCK_3D_DGPS = 4;
+	public final static int LOCK_3D_RTK = 5;
 
 	private double gps_eph = -1;
 	private int satCount = -1;
@@ -43,6 +45,12 @@ public class GPS extends DroneVariable {
 		case LOCK_3D:
 			gpsFix = ("3D");
 			break;
+		case LOCK_3D_DGPS:
+			gpsFix = ("3D+DGPS");
+			break;
+		case LOCK_3D_RTK:
+			gpsFix = ("3D+RTK");
+			break;
 		default:
 			gpsFix = ("NoFix");
 			break;
@@ -51,7 +59,7 @@ public class GPS extends DroneVariable {
 	}
 
 	public boolean hasGpsLock(){
-		return fixType == LOCK_3D;
+		return (fixType == LOCK_3D) || (fixType == LOCK_3D_DGPS) || (fixType == LOCK_3D_RTK);
 	}
 
 	public int getFixTypeNumeric() {
