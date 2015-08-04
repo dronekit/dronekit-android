@@ -107,9 +107,9 @@ public enum FollowType implements Parcelable {
         followTypes.add(ABOVE);
         followTypes.add(GUIDED_SCAN);
         followTypes.add(LOOK_AT_ME);
-        followTypes.add(SOLO_SHOT);
 
         if (includeAdvanced) {
+            followTypes.add(SOLO_SHOT);
             followTypes.add(SPLINE_LEASH);
             followTypes.add(SPLINE_ABOVE);
         }
