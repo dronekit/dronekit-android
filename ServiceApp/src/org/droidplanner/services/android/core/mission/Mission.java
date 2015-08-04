@@ -332,7 +332,7 @@ public class Mission extends DroneVariable {
 
     private void updateComponentItems(List<msg_mission_item> msgMissionItems) {
         componentItems.clear();
-        if(msgMissionItems == null) {
+        if(msgMissionItems == null || msgMissionItems.isEmpty()) {
             return;
         }
         msg_mission_item firstItem = msgMissionItems.get(0);
