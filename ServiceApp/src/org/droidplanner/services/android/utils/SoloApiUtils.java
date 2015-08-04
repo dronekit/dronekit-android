@@ -36,7 +36,7 @@ public class SoloApiUtils {
                 wifiSettings.second, wifiSettings.first, soloComp.isEUTxPowerCompliant(), soloComp.getButtonSettings());
     }
 
-    private static boolean isSoloLinkFeatureAvailable(DroneManager droneManager, ICommandListener listener) {
+    static boolean isSoloLinkFeatureAvailable(DroneManager droneManager, ICommandListener listener) {
         if (droneManager == null)
             return false;
 

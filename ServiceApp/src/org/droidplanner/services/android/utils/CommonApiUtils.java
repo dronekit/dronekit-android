@@ -928,7 +928,7 @@ public class CommonApiUtils {
         drone.getGuidedPoint().changeGuidedAltitude(altitude);
     }
 
-    public static void enableFollowMe(DroneManager droneMgr, Handler droneHandler, FollowType followType) {
+    public static void enableFollowMe(DroneManager droneMgr, Handler droneHandler, FollowType followType, ICommandListener listener) {
         if (droneMgr == null)
             return;
 
@@ -944,7 +944,11 @@ public class CommonApiUtils {
 
             FollowAlgorithm currentAlg = followMe.getFollowAlgorithm();
             if (currentAlg.getType() != selectedMode) {
+                if(selectedMode == FollowAlgorithm.FollowModes.SOLO_SHOT && !SoloApiUtils.isSoloLinkFeatureAvailable(droneMgr, listener))
+                    return;
+
                 followMe.setAlgorithm(selectedMode.getAlgorithmType(droneMgr, droneHandler));
+                postSuccessEvent(listener);
             }
         }
     }

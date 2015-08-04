@@ -560,7 +560,7 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
             case FollowMeActions.ACTION_ENABLE_FOLLOW_ME:
                 data.setClassLoader(FollowType.class.getClassLoader());
                 FollowType followType = data.getParcelable(FollowMeActions.EXTRA_FOLLOW_TYPE);
-                CommonApiUtils.enableFollowMe(this, handler, followType);
+                CommonApiUtils.enableFollowMe(this, handler, followType, listener);
                 break;
 
             case FollowMeActions.ACTION_UPDATE_FOLLOW_PARAMS:
