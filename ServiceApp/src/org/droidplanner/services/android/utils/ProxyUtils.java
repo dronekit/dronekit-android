@@ -5,6 +5,7 @@ import android.util.Log;
 import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
 import com.o3dr.services.android.lib.drone.mission.item.command.CameraTrigger;
 import com.o3dr.services.android.lib.drone.mission.item.command.ChangeSpeed;
+import com.o3dr.services.android.lib.drone.mission.item.command.DoJump;
 import com.o3dr.services.android.lib.drone.mission.item.command.EpmGripper;
 import com.o3dr.services.android.lib.drone.mission.item.command.ReturnToLaunch;
 import com.o3dr.services.android.lib.drone.mission.item.command.SetRelay;
@@ -26,6 +27,7 @@ import com.o3dr.services.android.lib.drone.mission.item.spatial.Waypoint;
 import org.droidplanner.services.android.core.helpers.coordinates.Coord2D;
 import org.droidplanner.services.android.core.mission.Mission;
 import org.droidplanner.services.android.core.mission.commands.ConditionYaw;
+import org.droidplanner.services.android.core.mission.commands.DoJumpImpl;
 import org.droidplanner.services.android.core.mission.commands.ReturnToHome;
 import org.droidplanner.services.android.core.mission.commands.SetRelayImpl;
 import org.droidplanner.services.android.core.mission.survey.SplineSurveyImpl;
@@ -276,10 +278,17 @@ public class ProxyUtils {
                 break;
             }
 
-            case SET_RELAY:
+            case SET_RELAY: {
                 SetRelay proxy = (SetRelay) proxyItem;
                 missionItemImpl = new SetRelayImpl(mission, proxy.getRelayNumber(), proxy.isEnabled());
                 break;
+            }
+
+            case DO_JUMP: {
+                DoJump proxy = (DoJump) proxyItem;
+                missionItemImpl = new DoJumpImpl(mission, proxy.getWaypoint(), proxy.getRepeatCount());
+                break;
+            }
 
             default:
                 missionItemImpl = null;
@@ -504,6 +513,17 @@ public class ProxyUtils {
                 SetRelay proxy = new SetRelay();
                 proxy.setRelayNumber(impl.getRelayNumber());
                 proxy.setEnabled(impl.isEnabled());
+
+                proxyMissionItem = proxy;
+                break;
+            }
+
+            case DO_JUMP: {
+                DoJumpImpl source = (DoJumpImpl) itemImpl;
+
+                DoJump proxy = new DoJump();
+                proxy.setWaypoint(source.getWaypoint());
+                proxy.setRepeatCount(source.getRepeatCount());
 
                 proxyMissionItem = proxy;
                 break;

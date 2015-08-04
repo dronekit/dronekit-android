@@ -2,18 +2,13 @@ package org.droidplanner.services.android.core.mission;
 
 import android.util.Pair;
 
-import android.util.SparseArray;
-import android.util.SparseIntArray;
-
 import com.MAVLink.common.msg_mission_ack;
 import com.MAVLink.common.msg_mission_item;
 import com.MAVLink.enums.MAV_CMD;
-import com.google.android.gms.maps.model.LatLng;
-import com.o3dr.services.android.lib.coordinate.LatLong;
-import com.o3dr.services.android.lib.util.MathUtils;
 
 import org.droidplanner.services.android.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.services.android.core.drone.DroneVariable;
+import org.droidplanner.services.android.core.drone.variables.Home;
 import org.droidplanner.services.android.core.helpers.coordinates.Coord2D;
 import org.droidplanner.services.android.core.helpers.coordinates.Coord3D;
 import org.droidplanner.services.android.core.helpers.geoTools.GeoTools;
@@ -21,6 +16,7 @@ import org.droidplanner.services.android.core.mission.commands.CameraTrigger;
 import org.droidplanner.services.android.core.mission.commands.ChangeSpeed;
 import org.droidplanner.services.android.core.mission.commands.ConditionYaw;
 import org.droidplanner.services.android.core.mission.commands.EpmGripper;
+import org.droidplanner.services.android.core.mission.commands.DoJumpImpl;
 import org.droidplanner.services.android.core.mission.commands.ReturnToHome;
 import org.droidplanner.services.android.core.mission.commands.SetRelayImpl;
 import org.droidplanner.services.android.core.mission.commands.SetServo;
@@ -37,8 +33,6 @@ import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import timber.log.Timber;
 
 /**
  * This implements a mavlink mission. A mavlink mission is a set of
@@ -308,9 +302,11 @@ public class Mission extends DroneVariable {
                 case MAV_CMD.MAV_CMD_CONDITION_YAW:
                     received.add(new ConditionYaw(msg, this));
                     break;
-
                 case MAV_CMD.MAV_CMD_DO_SET_RELAY:
                     received.add(new SetRelayImpl(msg, this));
+                    break;
+                case MAV_CMD.MAV_CMD_DO_JUMP:
+                    received.add(new DoJumpImpl(msg, this));
                     break;
 
                 default:
@@ -331,18 +327,23 @@ public class Mission extends DroneVariable {
 
     private void updateComponentItems(){
         List<msg_mission_item> msgMissionItems = getMsgMissionItems();
-        msgMissionItems.remove(0);
         updateComponentItems(msgMissionItems);
     }
 
     private void updateComponentItems(List<msg_mission_item> msgMissionItems) {
         componentItems.clear();
+        if(msgMissionItems == null || msgMissionItems.isEmpty()) {
+            return;
+        }
+        msg_mission_item firstItem = msgMissionItems.get(0);
+        if(firstItem.seq == Home.HOME_WAYPOINT_INDEX) {
+            msgMissionItems.remove(0); // Remove Home waypoint
+        }
         componentItems.addAll(processMavLinkMessages(msgMissionItems));
     }
 
     public List<msg_mission_item> getMsgMissionItems() {
         final List<msg_mission_item> data = new ArrayList<msg_mission_item>();
-
         int waypointCount = 0;
         msg_mission_item home = myDrone.getHome().packMavlink();
         home.seq = waypointCount++;
