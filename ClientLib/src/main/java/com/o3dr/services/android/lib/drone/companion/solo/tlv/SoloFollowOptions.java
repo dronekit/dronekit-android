@@ -22,7 +22,7 @@ public class SoloFollowOptions extends SoloShotOptions {
     }
 
     public SoloFollowOptions(){
-        this(PAUSED_CRUISE_SPEED, false);
+        this(PAUSED_CRUISE_SPEED, true);
     }
 
     SoloFollowOptions(float cruiseSpeed, int lookAtValue){

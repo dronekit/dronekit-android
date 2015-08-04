@@ -47,6 +47,13 @@ public enum FollowType implements Parcelable {
         public boolean hasParam(String paramKey) {
             return false;
         }
+    },
+
+    SOLO_SHOT("Solo Follow Shot"){
+        @Override
+        public boolean hasParam(String paramKey){
+            return false;
+        }
     };
 
     public static final String EXTRA_FOLLOW_RADIUS = "extra_follow_radius";
@@ -100,6 +107,7 @@ public enum FollowType implements Parcelable {
         followTypes.add(ABOVE);
         followTypes.add(GUIDED_SCAN);
         followTypes.add(LOOK_AT_ME);
+        followTypes.add(SOLO_SHOT);
 
         if (includeAdvanced) {
             followTypes.add(SPLINE_LEASH);

@@ -2,14 +2,18 @@ package org.droidplanner.services.android.core.gcs.follow;
 
 import android.os.Handler;
 
+import org.droidplanner.services.android.core.drone.DroneManager;
 import org.droidplanner.services.android.core.gcs.location.Location;
 import org.droidplanner.services.android.core.helpers.coordinates.Coord2D;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 
 public class FollowAbove extends FollowAlgorithm {
 
-    public FollowAbove(MavLinkDrone drone, Handler handler) {
-        super(drone, handler);
+    protected final MavLinkDrone drone;
+
+    public FollowAbove(DroneManager droneMgr, Handler handler) {
+        super(droneMgr, handler);
+        this.drone = droneMgr.getDrone();
     }
 
     @Override

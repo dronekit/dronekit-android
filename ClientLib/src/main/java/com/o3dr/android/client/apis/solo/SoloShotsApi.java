@@ -5,9 +5,10 @@ import com.o3dr.android.client.Drone;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
+ * //TODO: Complete solo shot api. Made invisible to api users until then.
  * Created by Fredia Huya-Kouadio on 7/31/15.
  */
-public class SoloShotsApi extends SoloApi {
+ class SoloShotsApi extends SoloApi {
 
     private static final ConcurrentHashMap<Drone, SoloShotsApi> soloShotsApiCache = new ConcurrentHashMap<>();
     private static final Builder<SoloShotsApi> apiBuilder = new Builder<SoloShotsApi>() {

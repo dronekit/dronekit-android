@@ -245,7 +245,7 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
 
         this.drone.getStreamRates().setRates(dpPrefs.getRates());
 
-        this.followMe = new Follow(this.drone, handler, new FusedLocation(context, handler));
+        this.followMe = new Follow(this, handler, new FusedLocation(context, handler));
 
         drone.addDroneListener(this);
         drone.getParameters().setParameterListener(this);

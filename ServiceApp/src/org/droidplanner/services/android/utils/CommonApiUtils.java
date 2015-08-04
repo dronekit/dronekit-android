@@ -944,7 +944,7 @@ public class CommonApiUtils {
 
             FollowAlgorithm currentAlg = followMe.getFollowAlgorithm();
             if (currentAlg.getType() != selectedMode) {
-                followMe.setAlgorithm(selectedMode.getAlgorithmType(droneMgr.getDrone(), droneHandler));
+                followMe.setAlgorithm(selectedMode.getAlgorithmType(droneMgr, droneHandler));
             }
         }
     }

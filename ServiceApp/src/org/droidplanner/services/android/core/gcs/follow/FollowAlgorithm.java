@@ -2,6 +2,7 @@ package org.droidplanner.services.android.core.gcs.follow;
 
 import android.os.Handler;
 
+import org.droidplanner.services.android.core.drone.DroneManager;
 import org.droidplanner.services.android.core.drone.variables.GuidedPoint;
 import org.droidplanner.services.android.core.gcs.location.Location;
 import org.droidplanner.services.android.core.gcs.roi.ROIEstimator;
@@ -13,12 +14,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class FollowAlgorithm {
 
-    protected final MavLinkDrone drone;
+    protected final DroneManager droneMgr;
     private final ROIEstimator roiEstimator;
     private final AtomicBoolean isFollowEnabled = new AtomicBoolean(false);
 
-    public FollowAlgorithm(MavLinkDrone drone, Handler handler) {
-        this.drone = drone;
+    public FollowAlgorithm(DroneManager droneMgr, Handler handler) {
+        this.droneMgr = droneMgr;
+
+        final MavLinkDrone drone = droneMgr.getDrone();
         this.roiEstimator = initROIEstimator(drone, handler);
     }
 
@@ -28,16 +31,19 @@ public abstract class FollowAlgorithm {
 
     public void enableFollow() {
         isFollowEnabled.set(true);
-        roiEstimator.enableFollow();
+        if(roiEstimator != null)
+            roiEstimator.enableFollow();
     }
 
     public void disableFollow() {
         if(isFollowEnabled.compareAndSet(true, false)) {
+            final MavLinkDrone drone = droneMgr.getDrone();
             if (GuidedPoint.isGuidedMode(drone)) {
                 drone.getGuidedPoint().pauseAtCurrentLocation(null);
             }
 
-            roiEstimator.disableFollow();
+            if(roiEstimator != null)
+                roiEstimator.disableFollow();
         }
     }
 
@@ -54,7 +60,8 @@ public abstract class FollowAlgorithm {
 
     public final void onLocationReceived(Location location) {
         if (isFollowEnabled.get()) {
-            roiEstimator.onLocationUpdate(location);
+            if(roiEstimator != null)
+                roiEstimator.onLocationUpdate(location);
             processNewLocation(location);
         }
     }
@@ -77,7 +84,8 @@ public abstract class FollowAlgorithm {
         SPLINE_LEASH("Vector Leash"),
         SPLINE_ABOVE("Vector Above"),
         GUIDED_SCAN("Guided Scan"),
-        LOOK_AT_ME("Look At Me");
+        LOOK_AT_ME("Look At Me"),
+        SOLO_SHOT("Solo Follow Shot");
 
         private String name;
 
@@ -94,29 +102,31 @@ public abstract class FollowAlgorithm {
             return values()[(ordinal() + 1) % values().length];
         }
 
-        public FollowAlgorithm getAlgorithmType(MavLinkDrone drone, Handler handler) {
+        public FollowAlgorithm getAlgorithmType(DroneManager droneMgr, Handler handler) {
             switch (this) {
                 case LEASH:
                 default:
-                    return new FollowLeash(drone, handler, 8.0);
+                    return new FollowLeash(droneMgr, handler, 8.0);
                 case LEAD:
-                    return new FollowLead(drone, handler, 15.0);
+                    return new FollowLead(droneMgr, handler, 15.0);
                 case RIGHT:
-                    return new FollowRight(drone, handler, 10.0);
+                    return new FollowRight(droneMgr, handler, 10.0);
                 case LEFT:
-                    return new FollowLeft(drone, handler, 10.0);
+                    return new FollowLeft(droneMgr, handler, 10.0);
                 case CIRCLE:
-                    return new FollowCircle(drone, handler, 15.0, 10.0);
+                    return new FollowCircle(droneMgr, handler, 15.0, 10.0);
                 case ABOVE:
-                    return new FollowAbove(drone, handler);
+                    return new FollowAbove(droneMgr, handler);
                 case SPLINE_LEASH:
-                    return new FollowSplineLeash(drone, handler, 8.0);
+                    return new FollowSplineLeash(droneMgr, handler, 8.0);
                 case SPLINE_ABOVE:
-                    return new FollowSplineAbove(drone, handler);
+                    return new FollowSplineAbove(droneMgr, handler);
                 case GUIDED_SCAN:
-                    return new FollowGuidedScan(drone, handler);
+                    return new FollowGuidedScan(droneMgr, handler);
                 case LOOK_AT_ME:
-                    return new FollowLookAtMe(drone, handler);
+                    return new FollowLookAtMe(droneMgr, handler);
+                case SOLO_SHOT:
+                    return new FollowSoloShot(droneMgr, handler);
             }
         }
     }

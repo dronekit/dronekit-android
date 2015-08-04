@@ -15,6 +15,7 @@ import com.o3dr.services.android.lib.drone.companion.solo.button.ButtonTypes;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSetting;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSettingSetter;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloGoproState;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloMessageLocation;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
 import com.o3dr.services.android.lib.model.ICommandListener;
@@ -330,7 +331,8 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
             Timber.d("Stopping video decoding. Current owner is %s.", videoOwnerId.get());
             artooMgr.stopDecoding(new DecoderListener() {
                 @Override
-                public void onDecodingStarted() {}
+                public void onDecodingStarted() {
+                }
 
                 @Override
                 public void onDecodingError() {
@@ -405,6 +407,18 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
                 }
             });
         }
+    }
+
+    public void enableFollowDataConnection(){
+        soloLinkMgr.enableFollowDataConnection();
+    }
+
+    public void disableFollowDataConnection(){
+        soloLinkMgr.disableFollowDataConnection();
+    }
+
+    public void updateFollowCenter(SoloMessageLocation location){
+        soloLinkMgr.sendTLVPacket(location, true, null);
     }
 
 }

@@ -519,19 +519,6 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 droneEvent = AttributeEvent.MISSION_ITEM_REACHED;
                 break;
 
-            case FOLLOW_START:
-                droneEvent = AttributeEvent.FOLLOW_START;
-                break;
-
-            case FOLLOW_STOP:
-                droneEvent = AttributeEvent.FOLLOW_STOP;
-                break;
-
-            case FOLLOW_UPDATE:
-            case FOLLOW_CHANGE_TYPE:
-                droneEvent = AttributeEvent.FOLLOW_UPDATE;
-                break;
-
             case ALTITUDE:
                 droneEvent = AttributeEvent.ALTITUDE_UPDATED;
                 break;
