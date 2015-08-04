@@ -26,6 +26,7 @@ import java.nio.ByteBuffer;
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import timber.log.Timber;
@@ -56,6 +57,7 @@ public class ArtooLinkManager extends AbstractLinkManager<ArtooLinkListener> {
     private final AtomicReference<String> controllerVersion = new AtomicReference<>("");
     private final AtomicReference<String> stm32Version = new AtomicReference<>("");
     private final AtomicBoolean isEUTxPowerCompliant = new AtomicBoolean(false);
+    private final AtomicInteger controllerMode = new AtomicInteger(SoloControllerMode.MODE_2);
 
     private final AtomicReference<Pair<String, String>> sololinkWifiInfo = new AtomicReference<>(Pair.create("", ""));
 
@@ -239,6 +241,15 @@ public class ArtooLinkManager extends AbstractLinkManager<ArtooLinkListener> {
         return isEUTxPowerCompliant.get();
     }
 
+    /**
+     * Return the current controller mode
+     * @return MODE_1 or MODE_2
+     */
+    public @SoloControllerMode.ControllerMode int getControllerMode(){
+        final @SoloControllerMode.ControllerMode int mode = controllerMode.get();
+        return mode;
+    }
+
     public void startVideoManager() {
         handler.removeCallbacks(reconnectVideoHandshake);
         isVideoHandshakeStarted.set(true);
@@ -327,6 +338,9 @@ public class ArtooLinkManager extends AbstractLinkManager<ArtooLinkListener> {
         //Update the tx power compliance
         loadCurrentEUTxPowerComplianceMode();
 
+        //load current controller mode
+        loadCurrentControllerMode();
+
     }
 
     @Override
@@ -397,12 +411,12 @@ public class ArtooLinkManager extends AbstractLinkManager<ArtooLinkListener> {
                     final String response;
                     switch (mode) {
                         case SoloControllerMode.MODE_1:
-                            response = sshLink.execute("runStickMapperMode1.sh");
+                            response = sshLink.execute("sololink_config --set-ui-mode 1");
                             postSuccessEvent(listener);
                             break;
 
                         case SoloControllerMode.MODE_2:
-                            response = sshLink.execute("runStickMapperMode2.sh");
+                            response = sshLink.execute("sololink_config --set-ui-mode 2");
                             postSuccessEvent(listener);
                             break;
 
@@ -412,6 +426,7 @@ public class ArtooLinkManager extends AbstractLinkManager<ArtooLinkListener> {
                             break;
                     }
                     Timber.d("Response from switch mode command was: %s", response);
+                    controllerMode.set(mode);
                 } catch (IOException e) {
                     Timber.e(e, "Error occurred while changing artoo modes.");
                     postTimeoutEvent(listener);
@@ -420,6 +435,25 @@ public class ArtooLinkManager extends AbstractLinkManager<ArtooLinkListener> {
             }
         });
 
+    }
+
+    private final Runnable getArtooMode(){
+        return new Runnable() {
+            @Override
+            public void run() {
+                Timber.d("Retrieving Artoo controller mode");
+                try{
+                    final String response = sshLink.execute("sololink_config --get-ui-mode");
+                    if (response.trim().equals("1")){
+                        controllerMode.set(SoloControllerMode.MODE_1);
+                    } else {
+                        controllerMode.set(SoloControllerMode.MODE_2);
+                    }
+                } catch (IOException e){
+                    Timber.e(e, "Error occurred while getting controller mode.");
+                }
+            }
+        };
     }
 
     public void setEUTxPowerCompliance(final boolean compliant, final ICommandListener listener){
@@ -459,6 +493,9 @@ public class ArtooLinkManager extends AbstractLinkManager<ArtooLinkListener> {
 
     private void loadCurrentEUTxPowerComplianceMode(){
         postAsyncTask(checkEUTxPowerCompliance);
+    }
+    private void loadCurrentControllerMode(){
+        postAsyncTask(getArtooMode());
     }
 
     private void restartHostapdService(){
