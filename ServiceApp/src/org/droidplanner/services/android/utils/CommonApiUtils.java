@@ -297,6 +297,10 @@ public class CommonApiUtils {
             case LOOK_AT_ME:
                 followMode = FollowAlgorithm.FollowModes.LOOK_AT_ME;
                 break;
+
+            case SOLO_SHOT:
+                followMode = FollowAlgorithm.FollowModes.SOLO_SHOT;
+                break;
         }
         return followMode;
     }
@@ -344,6 +348,10 @@ public class CommonApiUtils {
 
             case LOOK_AT_ME:
                 followType = FollowType.LOOK_AT_ME;
+                break;
+
+            case SOLO_SHOT:
+                followType = FollowType.SOLO_SHOT;
                 break;
         }
 
