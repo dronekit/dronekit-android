@@ -548,10 +548,6 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
                 }
                 break;
 
-            case MissionActions.ACTION_BUILD_COMPLEX_MISSION_ITEM:
-                CommonApiUtils.buildComplexMissionItem(drone, data);
-                break;
-
             //FOLLOW-ME ACTIONS
             case FollowMeActions.ACTION_ENABLE_FOLLOW_ME:
                 data.setClassLoader(FollowType.class.getClassLoader());
