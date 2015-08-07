@@ -19,6 +19,7 @@ import com.o3dr.services.android.lib.drone.companion.solo.action.SoloCameraActio
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionResult;
 import com.o3dr.services.android.lib.drone.connection.DroneSharePrefs;
+import com.o3dr.services.android.lib.drone.mission.action.MissionActions;
 import com.o3dr.services.android.lib.drone.property.DroneAttribute;
 import com.o3dr.services.android.lib.gcs.event.GCSEvent;
 import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
@@ -243,6 +244,12 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 SoloApiUtils.stopVideoStream(getDroneManager(), ownerId + videoTag, listener);
                 break;
             }
+
+            // MISSION ACTIONS
+            case MissionActions.ACTION_BUILD_COMPLEX_MISSION_ITEM:
+                final MavLinkDrone drone = droneMgr == null ? null : droneMgr.getDrone();
+                CommonApiUtils.buildComplexMissionItem(drone, data);
+                break;
 
             default:
                 droneMgr.executeAsyncAction(action, listener);

@@ -15,6 +15,7 @@ public class TakeoffImpl extends MissionCMD {
     public static final double DEFAULT_TAKEOFF_ALTITUDE = 10.0;
 
     private double finishedAlt = 10;
+    private double pitch = 0;
 
     public TakeoffImpl(MissionItem item) {
         super(item);
@@ -27,7 +28,14 @@ public class TakeoffImpl extends MissionCMD {
 
     public TakeoffImpl(Mission mission, double altitude) {
         super(mission);
-        finishedAlt = altitude;
+        this.finishedAlt = altitude;
+        this.pitch = 0;
+    }
+
+    public Takeoff(Mission mission, double altitude, double pitch) {
+        super(mission);
+        this.finishedAlt = altitude;
+        this.pitch = pitch;
     }
 
     @Override
@@ -37,12 +45,15 @@ public class TakeoffImpl extends MissionCMD {
         mavMsg.command = MAV_CMD.MAV_CMD_NAV_TAKEOFF;
         mavMsg.frame = MAV_FRAME.MAV_FRAME_GLOBAL_RELATIVE_ALT;
         mavMsg.z = (float) finishedAlt;
+        if (pitch > 0)
+            mavMsg.param1 = (float) pitch;
         return list;
     }
 
     @Override
     public void unpackMAVMessage(msg_mission_item mavMsg) {
-        finishedAlt = (mavMsg.z);
+        finishedAlt = mavMsg.z;
+        pitch = mavMsg.param1;
     }
 
     @Override
@@ -56,5 +67,13 @@ public class TakeoffImpl extends MissionCMD {
 
     public void setFinishedAlt(double finishedAlt) {
         this.finishedAlt = finishedAlt;
+    }
+
+    public double getPitch() {
+        return pitch;
+    }
+
+    public void setPitch(double pitch) {
+        this.pitch = pitch;
     }
 }

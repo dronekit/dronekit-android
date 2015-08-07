@@ -8,6 +8,8 @@ import com.MAVLink.enums.MAV_CMD;
 
 import org.droidplanner.services.android.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.services.android.core.drone.DroneVariable;
+import org.droidplanner.services.android.core.drone.variables.Home;
+import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.core.helpers.coordinates.Coord2D;
 import org.droidplanner.services.android.core.helpers.coordinates.Coord3D;
 import org.droidplanner.services.android.core.helpers.geoTools.GeoTools;
@@ -300,9 +302,11 @@ public class Mission extends DroneVariable {
                 case MAV_CMD.MAV_CMD_CONDITION_YAW:
                     received.add(new ConditionYawImpl(msg, this));
                     break;
-
                 case MAV_CMD.MAV_CMD_DO_SET_RELAY:
                     received.add(new SetRelayImpl(msg, this));
+                    break;
+                case MAV_CMD.MAV_CMD_DO_JUMP:
+                    received.add(new DoJumpImpl(msg, this));
                     break;
 
                 default:
@@ -323,18 +327,23 @@ public class Mission extends DroneVariable {
 
     private void updateComponentItems(){
         List<msg_mission_item> msgMissionItems = getMsgMissionItems();
-        msgMissionItems.remove(0);
         updateComponentItems(msgMissionItems);
     }
 
     private void updateComponentItems(List<msg_mission_item> msgMissionItems) {
         componentItems.clear();
+        if(msgMissionItems == null || msgMissionItems.isEmpty()) {
+            return;
+        }
+        msg_mission_item firstItem = msgMissionItems.get(0);
+        if(firstItem.seq == Home.HOME_WAYPOINT_INDEX) {
+            msgMissionItems.remove(0); // Remove Home waypoint
+        }
         componentItems.addAll(processMavLinkMessages(msgMissionItems));
     }
 
     public List<msg_mission_item> getMsgMissionItems() {
         final List<msg_mission_item> data = new ArrayList<msg_mission_item>();
-
         int waypointCount = 0;
         msg_mission_item home = myDrone.getHome().packMavlink();
         home.seq = waypointCount++;

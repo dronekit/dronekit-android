@@ -38,7 +38,8 @@ public enum MissionItemType {
     SET_SERVO("Set Servo"),
     CONDITION_YAW("Set Yaw"),
     SET_RELAY("Set Relay"),
-    DO_LAND_START("Do Land Start");
+    DO_LAND_START("Do Land Start"),
+    DO_JUMP("Do Jump");
 
     private final String name;
 
@@ -86,6 +87,8 @@ public enum MissionItemType {
                 return new SetRelayImpl(referenceItem);
             case DO_LAND_START:
                 return new DoLandStartImpl(referenceItem);
+            case DO_JUMP:
+                return new DoJumpImpl(referenceItem);
             default:
                 throw new IllegalArgumentException("Unrecognized mission item type (" + name + ")" + "");
         }
