@@ -32,7 +32,7 @@ public class TakeoffImpl extends MissionCMD {
         this.pitch = 0;
     }
 
-    public Takeoff(Mission mission, double altitude, double pitch) {
+    public TakeoffImpl(Mission mission, double altitude, double pitch) {
         super(mission);
         this.finishedAlt = altitude;
         this.pitch = pitch;

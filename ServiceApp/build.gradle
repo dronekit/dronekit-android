@@ -33,6 +33,12 @@ dependencies {
     testCompile 'org.robolectric:robolectric:2.4'
 }
 
+//Decomposed version name and code (https://plus.google.com/+JakeWharton/posts/6f5TcVPRZij)
+def versionMajor = 1
+def versionMinor = 3
+def versionPatch = 2
+def versionBuild = 1 //bump for dogfood builds, public betas, etc.
+
 android {
     compileSdkVersion Integer.parseInt(project.ANDROID_BUILD_SDK_VERSION)
     buildToolsVersion project.ANDROID_BUILD_TOOLS_VERSION
@@ -41,8 +47,9 @@ android {
         applicationId 'org.droidplanner.services.android'
         minSdkVersion Integer.parseInt(project.ANDROID_BUILD_MIN_SDK_VERSION)
         targetSdkVersion Integer.parseInt(project.ANDROID_BUILD_TARGET_SDK_VERSION)
-        versionCode 10302
-        versionName getGitVersion()
+
+        versionCode versionMajor * 10000 + versionMinor * 1000 + versionPatch * 100 + versionBuild
+        versionName "3DR Services v${versionMajor}.${versionMinor}.${versionPatch}"
     }
 
     compileOptions {
@@ -97,6 +104,10 @@ android {
     }
 
     buildTypes {
+        debug {
+            versionNameSuffix ".${versionBuild} dev-${getGitShortHash()}"
+        }
+
         release {
             signingConfig signingConfigs.release
         }
@@ -119,6 +130,17 @@ def getGitVersion() {
     } catch (IOException e) {
         //Unable to find 'git'
         return "please update version name manually"
+    }
+}
+
+def getGitShortHash(){
+    def cmd = "git rev-parse --short HEAD"
+    try{
+        def proc = cmd.execute()
+        return proc.text.trim()
+    } catch(IOException e){
+        //Unable to find git
+        return ""
     }
 }
 
