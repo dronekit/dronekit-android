@@ -1,10 +1,10 @@
-package org.droidplanner.services.android.drone.companion.solo.artoo;
+package org.droidplanner.services.android.core.drone.companion.solo.artoo;
 
 import android.content.Context;
 import android.os.Handler;
 import android.view.Surface;
 
-import org.droidplanner.services.android.drone.companion.solo.AbstractLinkManager;
+import org.droidplanner.services.android.core.drone.companion.solo.AbstractLinkManager;
 import org.droidplanner.services.android.utils.connection.UdpConnection;
 import org.droidplanner.services.android.utils.video.DecoderListener;
 import org.droidplanner.services.android.utils.video.MediaCodecManager;

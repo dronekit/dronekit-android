@@ -19,6 +19,7 @@ import com.o3dr.services.android.lib.drone.companion.solo.action.SoloLinkActions
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionResult;
 import com.o3dr.services.android.lib.drone.connection.DroneSharePrefs;
+import com.o3dr.services.android.lib.drone.mission.action.MissionActions;
 import com.o3dr.services.android.lib.drone.property.DroneAttribute;
 import com.o3dr.services.android.lib.gcs.event.GCSEvent;
 import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
@@ -37,6 +38,7 @@ import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.exception.ConnectionException;
 import org.droidplanner.services.android.core.drone.DroneEventsListener;
 import org.droidplanner.services.android.utils.CommonApiUtils;
+import org.droidplanner.services.android.utils.SoloLinkApiUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -177,13 +179,16 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
     @Override
     public void addAttributesObserver(IObserver observer) throws RemoteException {
-        if (observer != null)
+        if (observer != null) {
+            Timber.d("Adding attributes observer.");
             observersList.add(observer);
+        }
     }
 
     @Override
     public void removeAttributesObserver(IObserver observer) throws RemoteException {
         if (observer != null) {
+            Timber.d("Removing attributes observer.");
             observersList.remove(observer);
             checkForSelfRelease();
         }
@@ -230,15 +235,21 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
             case SoloLinkActions.ACTION_START_VIDEO_STREAM: {
                 final Surface videoSurface = data.getParcelable(SoloLinkActions.EXTRA_VIDEO_DISPLAY);
                 final String videoTag = data.getString(SoloLinkActions.EXTRA_VIDEO_TAG, "");
-                CommonApiUtils.startVideoStream(getDroneManager(), ownerId + videoTag, videoSurface, listener);
+                SoloLinkApiUtils.startVideoStream(getDroneManager(), ownerId + videoTag, videoSurface, listener);
                 break;
             }
 
             case SoloLinkActions.ACTION_STOP_VIDEO_STREAM: {
                 final String videoTag = data.getString(SoloLinkActions.EXTRA_VIDEO_TAG, "");
-                CommonApiUtils.stopVideoStream(getDroneManager(), ownerId + videoTag, listener);
+                SoloLinkApiUtils.stopVideoStream(getDroneManager(), ownerId + videoTag, listener);
                 break;
             }
+
+            // MISSION ACTIONS
+            case MissionActions.ACTION_BUILD_COMPLEX_MISSION_ITEM:
+                final MavLinkDrone drone = droneMgr == null ? null : droneMgr.getDrone();
+                CommonApiUtils.buildComplexMissionItem(drone, data);
+                break;
 
             default:
                 droneMgr.executeAsyncAction(action, listener);

@@ -110,7 +110,7 @@ public class MavLinkDoCmds {
      * @param yaw       the desired gimbal yaw in degrees
      * @param listener Register a callback to receive update of the command execution state.
      */
-    public static void setGimbalOrientation(MavLinkDrone drone, double pitch, double roll, double yaw, ICommandListener
+    public static void setGimbalOrientation(MavLinkDrone drone, float pitch, float roll, float yaw, ICommandListener
             listener) {
         if (drone == null)
             return;

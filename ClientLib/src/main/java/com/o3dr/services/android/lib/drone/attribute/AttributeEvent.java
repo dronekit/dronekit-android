@@ -205,10 +205,16 @@ public class AttributeEvent {
     public static final String SOLOLINK_MESSAGE_RECEIVED = PACKAGE_NAME + ".SOLOLINK_MESSAGE_RECEIVED";
 
     /**
+     * Triggers upon updates to the EU tx power compliance.
+     */
+    public static final String SOLOLINK_EU_TX_POWER_COMPLIANCE_UPDATED = PACKAGE_NAME + ".SOLOLINK_EU_TX_POWER_COMPLIANCE_UPDATED";
+
+    /**
      * Signals the gimbal orientation was updated.
      * @see {@link AttributeEventExtra#EXTRA_GIMBAL_ORIENTATION_PITCH}
      * @see {@link AttributeEventExtra#EXTRA_GIMBAL_ORIENTATION_ROLL}
      * @see {@link AttributeEventExtra#EXTRA_GIMBAL_ORIENTATION_YAW}
      */
     public static final String GIMBAL_ORIENTATION_UPDATED = PACKAGE_NAME + ".GIMBAL_ORIENTATION_UPDATED";
+
 }

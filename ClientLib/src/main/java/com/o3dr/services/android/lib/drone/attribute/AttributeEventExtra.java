@@ -106,4 +106,9 @@ public class AttributeEventExtra {
      */
     public static final String EXTRA_GIMBAL_ORIENTATION_YAW = PACKAGE_NAME + ".EXTRA_GIMBAL_ORIENTATION_YAW";
 
+    /**
+     * Used to retrieve the boolean value specifying whether the controller is compliant with the EU tx power levels.
+     * @see {@link AttributeEvent#SOLOLINK_EU_TX_POWER_COMPLIANCE_UPDATED}
+     */
+    public static final String EXTRA_SOLOLINK_EU_TX_POWER_COMPLIANT = PACKAGE_NAME + ".EXTRA_SOLOLINK_EU_TX_POWER_COMPLIANT";
 }

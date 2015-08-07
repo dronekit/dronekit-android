@@ -1,4 +1,4 @@
-package org.droidplanner.services.android.drone.companion.solo;
+package org.droidplanner.services.android.core.drone.companion.solo;
 
 import android.content.Context;
 import android.os.Handler;
@@ -19,11 +19,11 @@ import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
 import com.o3dr.services.android.lib.model.ICommandListener;
 
-import org.droidplanner.services.android.drone.companion.CompComp;
-import org.droidplanner.services.android.drone.companion.solo.artoo.ArtooLinkListener;
-import org.droidplanner.services.android.drone.companion.solo.artoo.ArtooLinkManager;
-import org.droidplanner.services.android.drone.companion.solo.sololink.SoloLinkListener;
-import org.droidplanner.services.android.drone.companion.solo.sololink.SoloLinkManager;
+import org.droidplanner.services.android.core.drone.companion.CompComp;
+import org.droidplanner.services.android.core.drone.companion.solo.artoo.ArtooLinkListener;
+import org.droidplanner.services.android.core.drone.companion.solo.artoo.ArtooLinkManager;
+import org.droidplanner.services.android.core.drone.companion.solo.sololink.SoloLinkListener;
+import org.droidplanner.services.android.core.drone.companion.solo.sololink.SoloLinkManager;
 import org.droidplanner.services.android.utils.NetworkUtils;
 import org.droidplanner.services.android.utils.video.DecoderListener;
 
@@ -51,6 +51,8 @@ public class SoloComp implements CompComp, SoloLinkListener, ArtooLinkListener {
         void onWifiInfoUpdated(String wifiName, String wifiPassword);
 
         void onButtonPacketReceived(ButtonPacket packet);
+
+        void onEUTxPowerComplianceUpdated(boolean isCompliant);
     }
 
     private static final String NO_VIDEO_OWNER = "no_video_owner";
@@ -151,6 +153,12 @@ public class SoloComp implements CompComp, SoloLinkListener, ArtooLinkListener {
     }
 
     @Override
+    public void onEUTxPowerComplianceUpdated(boolean isCompliant) {
+        if(compListener != null)
+            compListener.onEUTxPowerComplianceUpdated(isCompliant);
+    }
+
+    @Override
     public void onPresetButtonLoaded(int buttonType, SoloButtonSetting buttonSettings) {
         if (compListener != null)
             compListener.onPresetButtonLoaded(buttonType, buttonSettings);
@@ -195,6 +203,10 @@ public class SoloComp implements CompComp, SoloLinkListener, ArtooLinkListener {
         return artooMgr.getStm32Version();
     }
 
+    public boolean isEUTxPowerCompliant() {
+        return artooMgr.isEUTxPowerCompliant();
+    }
+
     public String getVehicleVersion() {
         return soloLinkMgr.getVehicleVersion();
     }
@@ -220,27 +232,24 @@ public class SoloComp implements CompComp, SoloLinkListener, ArtooLinkListener {
 
     public void updateWifiSettings(final String wifiSsid, final String wifiPassword,
                                    final ICommandListener listener){
-        if(asyncExecutor != null && !asyncExecutor.isShutdown()){
             postAsyncTask(new Runnable() {
                 @Override
                 public void run() {
-                    if(soloLinkMgr.updateSololinkWifi(wifiSsid, wifiPassword)
-                            && artooMgr.updateSololinkWifi(wifiSsid, wifiPassword)){
+                    if (soloLinkMgr.updateSololinkWifi(wifiSsid, wifiPassword)
+                            && artooMgr.updateSololinkWifi(wifiSsid, wifiPassword)) {
                         Timber.d("Sololink wifi update successful.");
 
-                        if(listener != null) {
+                        if (listener != null) {
                             postSuccessEvent(listener);
                         }
-                    }
-                    else{
+                    } else {
                         Timber.d("Sololink wifi update failed.");
-                        if(listener != null){
+                        if (listener != null) {
                             postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
                         }
                     }
                 }
             });
-        }
     }
 
     public void pushButtonSettings(SoloButtonSettingSetter buttonSettings, ICommandListener listener){
@@ -249,6 +258,10 @@ public class SoloComp implements CompComp, SoloLinkListener, ArtooLinkListener {
 
     public void updateControllerMode(@SoloControllerMode.ControllerMode final int selectedMode, ICommandListener listener){
         artooMgr.updateArtooMode(selectedMode, listener);
+    }
+
+    public void updateEUTxPowerCompliance(boolean isCompliant, ICommandListener listener) {
+        artooMgr.setEUTxPowerCompliance(isCompliant, listener);
     }
 
     public void startVideoStream(String ownerId, Surface videoSurface, final ICommandListener listener){
