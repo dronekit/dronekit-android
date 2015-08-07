@@ -1,15 +1,19 @@
 apply plugin: 'com.android.library'
 
 ext {
+    VERSION_MAJOR = 2
+    VERSION_MINOR = 5
+    VERSION_PATCH = 20
+    VERSION_BUILD = 0
+
     PUBLISH_ARTIFACT_ID = 'dronekit-android'
-    PUBLISH_VERSION = '2.5.19'
+    PUBLISH_VERSION = generateVersionName("", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH)
+    PUBLISH_VERSION_CODE = computeVersionCode(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH, VERSION_BUILD)
     PROJECT_DESCRIPTION = "Android DroneKit client library."
     PROJECT_LABELS = ['3DR', '3DR Services', 'DroneAPI', 'Android', 'DroneKit']
     PROJECT_LICENSES = ['Apache-2.0']
 }
-/* Every time something is changed in the client library the versionCode and
- PUBLISH_VERSION must be incremented.
- */
+
 android {
     compileSdkVersion Integer.parseInt(project.ANDROID_BUILD_SDK_VERSION)
     buildToolsVersion project.ANDROID_BUILD_TOOLS_VERSION
@@ -17,7 +21,7 @@ android {
     defaultConfig {
         minSdkVersion Integer.parseInt(project.ANDROID_BUILD_MIN_SDK_VERSION)
         targetSdkVersion Integer.parseInt(project.ANDROID_BUILD_TARGET_SDK_VERSION)
-        versionCode 20519
+        versionCode PUBLISH_VERSION_CODE
         versionName PUBLISH_VERSION
     }
 

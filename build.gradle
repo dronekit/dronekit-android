@@ -13,6 +13,43 @@ buildscript {
     }
 }
 
+def computeVersionCode(int versionMajor, int versionMinor, int versionPatch, int versionBuild){
+    return versionMajor * 10000 + versionMinor * 1000 + versionPatch * 100 + versionBuild
+}
+
+def generateVersionName(String versionPrefix, int versionMajor, int versionMinor, int versionPatch){
+    return "${versionPrefix}${versionMajor}.${versionMinor}.${versionPatch}"
+}
+
+def generateVersionNameSuffix(int versionBuild, String releaseType){
+    return ".${versionBuild} ${releaseType}-${getGitShortHash()}"
+}
+
+/**
+ * @return The most recent git tag to be used as version name for the app.
+ */
+def getGitVersion() {
+    def cmd = "git describe --tag"
+    try {
+        def proc = cmd.execute()
+        return proc.text.trim()
+    } catch (IOException e) {
+        //Unable to find 'git'
+        return "please update version name manually"
+    }
+}
+
+def getGitShortHash(){
+    def cmd = "git rev-parse --short HEAD"
+    try{
+        def proc = cmd.execute()
+        return proc.text.trim()
+    } catch(IOException e){
+        //Unable to find git
+        return ""
+    }
+}
+
 allprojects {
     repositories {
         jcenter()

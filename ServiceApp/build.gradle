@@ -37,7 +37,8 @@ dependencies {
 def versionMajor = 1
 def versionMinor = 3
 def versionPatch = 2
-def versionBuild = 1 //bump for dogfood builds, public betas, etc.
+def versionBuild = 3 //bump for dogfood builds, public betas, etc.
+def versionPrefix = "3DR Services v"
 
 android {
     compileSdkVersion Integer.parseInt(project.ANDROID_BUILD_SDK_VERSION)
@@ -48,8 +49,8 @@ android {
         minSdkVersion Integer.parseInt(project.ANDROID_BUILD_MIN_SDK_VERSION)
         targetSdkVersion Integer.parseInt(project.ANDROID_BUILD_TARGET_SDK_VERSION)
 
-        versionCode versionMajor * 10000 + versionMinor * 1000 + versionPatch * 100 + versionBuild
-        versionName "3DR Services v${versionMajor}.${versionMinor}.${versionPatch}"
+        versionCode computeVersionCode(versionMajor, versionMinor, versionPatch, versionBuild)
+        versionName generateVersionName(versionPrefix, versionMajor, versionMinor, versionPatch)
     }
 
     compileOptions {
@@ -105,7 +106,7 @@ android {
 
     buildTypes {
         debug {
-            versionNameSuffix ".${versionBuild} dev-${getGitShortHash()}"
+            versionNameSuffix generateVersionNameSuffix(versionBuild, "dev")
         }
 
         release {
@@ -116,31 +117,6 @@ android {
     //FIXME: Remove when lint errors are taken care of.
     lintOptions {
         abortOnError false
-    }
-}
-
-/**
- * @return The most recent git tag to be used as version name for the app.
- */
-def getGitVersion() {
-    def cmd = "git describe --tag"
-    try {
-        def proc = cmd.execute()
-        return proc.text.trim()
-    } catch (IOException e) {
-        //Unable to find 'git'
-        return "please update version name manually"
-    }
-}
-
-def getGitShortHash(){
-    def cmd = "git rev-parse --short HEAD"
-    try{
-        def proc = cmd.execute()
-        return proc.text.trim()
-    } catch(IOException e){
-        //Unable to find git
-        return ""
     }
 }
 
