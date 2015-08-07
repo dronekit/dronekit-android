@@ -131,7 +131,7 @@ public class ProxyUtils {
                 Takeoff proxy = (Takeoff) proxyItem;
 
                 org.droidplanner.services.android.core.mission.commands.Takeoff temp = new org.droidplanner.services.android.core
-                        .mission.commands.Takeoff(mission, (proxy.getTakeoffAltitude()));
+                        .mission.commands.Takeoff(mission, proxy.getTakeoffAltitude(), proxy.getTakeoffPitch());
 
                 missionItemImpl = temp;
                 break;
@@ -335,6 +335,7 @@ public class ProxyUtils {
 
                 Takeoff temp = new Takeoff();
                 temp.setTakeoffAltitude(source.getFinishedAlt());
+                temp.setTakeoffPitch(source.getPitch());
 
                 proxyMissionItem = temp;
                 break;

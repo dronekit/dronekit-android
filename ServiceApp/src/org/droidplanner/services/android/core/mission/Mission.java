@@ -9,6 +9,7 @@ import com.MAVLink.enums.MAV_CMD;
 import org.droidplanner.services.android.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.services.android.core.drone.DroneVariable;
 import org.droidplanner.services.android.core.drone.variables.Home;
+import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.core.helpers.coordinates.Coord2D;
 import org.droidplanner.services.android.core.helpers.coordinates.Coord3D;
 import org.droidplanner.services.android.core.helpers.geoTools.GeoTools;
@@ -28,7 +29,6 @@ import org.droidplanner.services.android.core.mission.waypoints.RegionOfInterest
 import org.droidplanner.services.android.core.mission.waypoints.SpatialCoordItem;
 import org.droidplanner.services.android.core.mission.waypoints.SplineWaypoint;
 import org.droidplanner.services.android.core.mission.waypoints.Waypoint;
-import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 
 import java.util.ArrayList;
 import java.util.Collections;
