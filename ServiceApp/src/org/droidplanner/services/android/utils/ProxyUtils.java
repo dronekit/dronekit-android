@@ -29,6 +29,7 @@ import org.droidplanner.services.android.core.mission.Mission;
 import org.droidplanner.services.android.core.mission.commands.CameraTriggerImpl;
 import org.droidplanner.services.android.core.mission.commands.ChangeSpeedImpl;
 import org.droidplanner.services.android.core.mission.commands.ConditionYawImpl;
+import org.droidplanner.services.android.core.mission.commands.DoJumpImpl;
 import org.droidplanner.services.android.core.mission.commands.EpmGripperImpl;
 import org.droidplanner.services.android.core.mission.commands.ReturnToHomeImpl;
 import org.droidplanner.services.android.core.mission.commands.SetRelayImpl;
