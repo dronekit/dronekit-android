@@ -5,6 +5,10 @@ package com.o3dr.services.android.lib.drone.attribute;
  */
 public class AttributeEvent {
 
+    //Private to prevent instantiation
+    private AttributeEvent() {
+    }
+
     private static final String PACKAGE_NAME = "com.o3dr.services.android.lib.attribute.event";
 
     /**
@@ -14,6 +18,7 @@ public class AttributeEvent {
 
     /**
      * Signals an autopilot error.
+     *
      * @see {@link com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra#EXTRA_AUTOPILOT_ERROR_ID}
      */
     public static final String AUTOPILOT_ERROR = PACKAGE_NAME + ".AUTOPILOT_ERROR";
@@ -32,12 +37,14 @@ public class AttributeEvent {
 
     /**
      * Signals completion of the magnetometer calibration.
+     *
      * @see {@link AttributeEventExtra#EXTRA_CALIBRATION_MAG_RESULT}
      */
     public static final String CALIBRATION_MAG_COMPLETED = PACKAGE_NAME + ".CALIBRATION_MAG_COMPLETED";
 
     /**
      * Provides progress updates for the magnetometer calibration.
+     *
      * @see {@link AttributeEventExtra#EXTRA_CALIBRATION_MAG_PROGRESS}
      */
     public static final String CALIBRATION_MAG_PROGRESS = PACKAGE_NAME + ".CALIBRATION_MAG_PROGRESS";
@@ -64,8 +71,7 @@ public class AttributeEvent {
      * Mission attribute events.
      */
     public static final String MISSION_UPDATED = PACKAGE_NAME + ".MISSION_UPDATED";
-    public static final String MISSION_DRONIE_CREATED = PACKAGE_NAME + "" +
-            ".MISSION_DRONIE_CREATED";
+    public static final String MISSION_DRONIE_CREATED = PACKAGE_NAME + ".MISSION_DRONIE_CREATED";
     public static final String MISSION_SENT = PACKAGE_NAME + ".MISSION_SENT";
     public static final String MISSION_RECEIVED = PACKAGE_NAME + ".MISSION_RECEIVED";
     public static final String MISSION_ITEM_UPDATED = PACKAGE_NAME + ".MISSION_ITEM_UPDATED";
@@ -77,6 +83,7 @@ public class AttributeEvent {
 
     /**
      * Event to signal the start of parameters refresh from the vehicle.
+     *
      * @see {@link com.o3dr.services.android.lib.drone.property.Parameters}
      * @see {@link com.o3dr.services.android.lib.drone.property.Parameter}
      */
@@ -84,6 +91,7 @@ public class AttributeEvent {
 
     /**
      * Event to signal the completion of the parameters refresh from the vehicle.
+     *
      * @see {@link com.o3dr.services.android.lib.drone.property.Parameters}
      * @see {@link com.o3dr.services.android.lib.drone.property.Parameter}
      */
@@ -93,6 +101,7 @@ public class AttributeEvent {
      * Event to signal receipt of a single parameter from the vehicle. During a parameters refresh, this event will
      * fire as many times as the count of the set of parameters being refreshed.
      * Allows listeners to keep track of the parameters refresh progress.
+     *
      * @see {@link AttributeEventExtra#EXTRA_PARAMETER_INDEX}
      * @see {@link AttributeEventExtra#EXTRA_PARAMETERS_COUNT}
      * @see {@link AttributeEventExtra#EXTRA_PARAMETER_NAME}
@@ -175,42 +184,8 @@ public class AttributeEvent {
     public static final String ALTITUDE_UPDATED = PACKAGE_NAME + ".ALTITUDE_UPDATED";
 
     /**
-     * Broadcasts updates to the GoPro state.
-     * @see {@link com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloGoproState}
-     */
-    public static final String SOLOLINK_GOPRO_STATE_UPDATED = PACKAGE_NAME + ".GOPRO_STATE_UPDATED";
-
-    /**
-     * Signals update to the sololink wifi settings
-     * @see {@link com.o3dr.services.android.lib.drone.companion.solo.SoloLinkState}
-     */
-    public static final String SOLOLINK_WIFI_SETTINGS_UPDATED = PACKAGE_NAME + ".SOLOLINK_WIFI_SETTINGS_UPDATED";
-
-    /**
-     * Signals update to the sololink button settings
-     * @see {@link com.o3dr.services.android.lib.drone.companion.solo.SoloLinkState}
-     */
-    public static final String SOLOLINK_BUTTON_SETTINGS_UPDATED = PACKAGE_NAME + ".SOLOLINK_BUTTON_SETTINGS_UPDATED";
-
-    /**
-     * Triggers every time a button event occurs.
-     * @see {@link AttributeEventExtra#EXTRA_SOLOLINK_BUTTON_EVENT}
-     */
-    public static final String SOLOLINK_BUTTON_EVENT = PACKAGE_NAME + ".SOLOLINK_BUTTON_EVENT";
-
-    /**
-     * Triggers upon receipt of a sololink message.
-     * @see {@link AttributeEventExtra#EXTRA_SOLOLINK_MESSAGE_DATA}
-     */
-    public static final String SOLOLINK_MESSAGE_RECEIVED = PACKAGE_NAME + ".SOLOLINK_MESSAGE_RECEIVED";
-
-    /**
-     * Triggers upon updates to the EU tx power compliance.
-     */
-    public static final String SOLOLINK_EU_TX_POWER_COMPLIANCE_UPDATED = PACKAGE_NAME + ".SOLOLINK_EU_TX_POWER_COMPLIANCE_UPDATED";
-
-    /**
      * Signals the gimbal orientation was updated.
+     *
      * @see {@link AttributeEventExtra#EXTRA_GIMBAL_ORIENTATION_PITCH}
      * @see {@link AttributeEventExtra#EXTRA_GIMBAL_ORIENTATION_ROLL}
      * @see {@link AttributeEventExtra#EXTRA_GIMBAL_ORIENTATION_YAW}

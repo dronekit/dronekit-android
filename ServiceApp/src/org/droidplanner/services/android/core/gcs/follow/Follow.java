@@ -2,8 +2,11 @@ package org.droidplanner.services.android.core.gcs.follow;
 
 import android.os.Handler;
 
+import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
+
 import org.droidplanner.services.android.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.services.android.core.drone.DroneInterfaces.OnDroneListener;
+import org.droidplanner.services.android.core.drone.DroneManager;
 import org.droidplanner.services.android.core.drone.variables.GuidedPoint;
 import org.droidplanner.services.android.core.drone.variables.State;
 import org.droidplanner.services.android.core.gcs.location.Location;
@@ -23,23 +26,26 @@ public class Follow implements OnDroneListener, LocationReceiver {
     }
 
     private FollowStates state = FollowStates.FOLLOW_INVALID_STATE;
-    private MavLinkDrone drone;
+    private final DroneManager droneMgr;
 
-    private LocationFinder locationFinder;
+    private final LocationFinder locationFinder;
     private FollowAlgorithm followAlgorithm;
 
-    public Follow(MavLinkDrone drone, Handler handler, LocationFinder locationFinder) {
-        this.drone = drone;
-        drone.addDroneListener(this);
+    public Follow(DroneManager droneMgr, Handler handler, LocationFinder locationFinder) {
+        this.droneMgr = droneMgr;
+        final MavLinkDrone drone = droneMgr.getDrone();
+        if(drone != null)
+            drone.addDroneListener(this);
 
-        followAlgorithm = FollowAlgorithm.FollowModes.LEASH.getAlgorithmType(drone, handler);
+        followAlgorithm = FollowAlgorithm.FollowModes.LEASH.getAlgorithmType(droneMgr, handler);
 
         this.locationFinder = locationFinder;
         locationFinder.setLocationListener(this);
     }
 
     public void toggleFollowMeState() {
-        final State droneState = drone.getState();
+        final MavLinkDrone drone = droneMgr.getDrone();
+        final State droneState = drone == null ? null : drone.getState();
         if (droneState == null) {
             state = FollowStates.FOLLOW_INVALID_STATE;
             return;
@@ -48,7 +54,7 @@ public class Follow implements OnDroneListener, LocationReceiver {
         if (isEnabled()) {
             disableFollowMe();
         } else {
-            if (drone.isConnected()) {
+            if (droneMgr.isConnected()) {
                 if (droneState.isArmed()) {
                     GuidedPoint.changeToGuidedMode(drone, null);
                     enableFollowMe();
@@ -68,7 +74,7 @@ public class Follow implements OnDroneListener, LocationReceiver {
         locationFinder.enableLocationUpdates();
         followAlgorithm.enableFollow();
 
-        drone.notifyDroneEvent(DroneEventsType.FOLLOW_START);
+        droneMgr.onAttributeEvent(AttributeEvent.FOLLOW_START, null);
     }
 
     private void disableFollowMe() {
@@ -79,7 +85,7 @@ public class Follow implements OnDroneListener, LocationReceiver {
 
         if (isEnabled()) {
             state = FollowStates.FOLLOW_END;
-            drone.notifyDroneEvent(DroneEventsType.FOLLOW_STOP);
+            droneMgr.onAttributeEvent(AttributeEvent.FOLLOW_STOP, null);
         }
     }
 
@@ -115,7 +121,7 @@ public class Follow implements OnDroneListener, LocationReceiver {
             state = FollowStates.FOLLOW_START;
         }
 
-        drone.notifyDroneEvent(DroneEventsType.FOLLOW_UPDATE);
+        droneMgr.onAttributeEvent(AttributeEvent.FOLLOW_UPDATE, null);
     }
 
     @Override
@@ -135,7 +141,8 @@ public class Follow implements OnDroneListener, LocationReceiver {
             if(lastLocation != null)
                 followAlgorithm.onLocationReceived(lastLocation);
         }
-        drone.notifyDroneEvent(DroneEventsType.FOLLOW_CHANGE_TYPE);
+
+        droneMgr.onAttributeEvent(AttributeEvent.FOLLOW_UPDATE, null);
     }
 
     public FollowAlgorithm getFollowAlgorithm() {

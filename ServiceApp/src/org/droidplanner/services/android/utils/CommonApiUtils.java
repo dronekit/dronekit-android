@@ -5,8 +5,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.RemoteException;
 import android.text.TextUtils;
-import android.util.Pair;
-import android.view.Surface;
 
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.ardupilotmega.msg_ekf_status_report;
@@ -22,10 +20,6 @@ import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError
 import com.o3dr.services.android.lib.drone.calibration.magnetometer.MagnetometerCalibrationProgress;
 import com.o3dr.services.android.lib.drone.calibration.magnetometer.MagnetometerCalibrationResult;
 import com.o3dr.services.android.lib.drone.calibration.magnetometer.MagnetometerCalibrationStatus;
-import com.o3dr.services.android.lib.drone.companion.solo.SoloControllerMode;
-import com.o3dr.services.android.lib.drone.companion.solo.SoloLinkState;
-import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSettingSetter;
-import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
 import com.o3dr.services.android.lib.drone.mission.Mission;
 import com.o3dr.services.android.lib.drone.mission.MissionItemType;
 import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
@@ -57,7 +51,6 @@ import org.droidplanner.services.android.core.MAVLink.MavLinkArm;
 import org.droidplanner.services.android.core.MAVLink.command.doCmd.MavLinkDoCmds;
 import org.droidplanner.services.android.core.drone.DroneManager;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
-import org.droidplanner.services.android.core.drone.companion.solo.SoloComp;
 import org.droidplanner.services.android.core.drone.profiles.VehicleProfile;
 import org.droidplanner.services.android.core.drone.variables.ApmModes;
 import org.droidplanner.services.android.core.drone.variables.Camera;
@@ -72,6 +65,7 @@ import org.droidplanner.services.android.core.helpers.coordinates.Coord2D;
 import org.droidplanner.services.android.core.helpers.coordinates.Coord3D;
 import org.droidplanner.services.android.core.mission.survey.SplineSurveyImpl;
 import org.droidplanner.services.android.core.mission.survey.SurveyImpl;
+import org.droidplanner.services.android.core.mission.waypoints.StructureScannerImpl;
 import org.droidplanner.services.android.core.survey.Footprint;
 import org.droidplanner.services.android.utils.file.IO.ParameterMetadataLoader;
 import org.xmlpull.v1.XmlPullParserException;
@@ -303,6 +297,10 @@ public class CommonApiUtils {
             case LOOK_AT_ME:
                 followMode = FollowAlgorithm.FollowModes.LOOK_AT_ME;
                 break;
+
+            case SOLO_SHOT:
+                followMode = FollowAlgorithm.FollowModes.SOLO_SHOT;
+                break;
         }
         return followMode;
     }
@@ -350,6 +348,10 @@ public class CommonApiUtils {
 
             case LOOK_AT_ME:
                 followType = FollowType.LOOK_AT_ME;
+                break;
+
+            case SOLO_SHOT:
+                followType = FollowType.SOLO_SHOT;
                 break;
         }
 
@@ -934,7 +936,7 @@ public class CommonApiUtils {
         drone.getGuidedPoint().changeGuidedAltitude(altitude);
     }
 
-    public static void enableFollowMe(DroneManager droneMgr, Handler droneHandler, FollowType followType) {
+    public static void enableFollowMe(DroneManager droneMgr, Handler droneHandler, FollowType followType, ICommandListener listener) {
         if (droneMgr == null)
             return;
 
@@ -950,7 +952,11 @@ public class CommonApiUtils {
 
             FollowAlgorithm currentAlg = followMe.getFollowAlgorithm();
             if (currentAlg.getType() != selectedMode) {
-                followMe.setAlgorithm(selectedMode.getAlgorithmType(droneMgr.getDrone(), droneHandler));
+                if(selectedMode == FollowAlgorithm.FollowModes.SOLO_SHOT && !SoloApiUtils.isSoloLinkFeatureAvailable(droneMgr, listener))
+                    return;
+
+                followMe.setAlgorithm(selectedMode.getAlgorithmType(droneMgr, droneHandler));
+                postSuccessEvent(listener);
             }
         }
     }
@@ -1014,7 +1020,7 @@ public class CommonApiUtils {
 
     public static StructureScanner buildStructureScanner(MavLinkDrone drone, StructureScanner item) {
         org.droidplanner.services.android.core.mission.Mission droneMission = drone == null ? null : drone.getMission();
-        org.droidplanner.services.android.core.mission.waypoints.StructureScanner updatedScan = (org.droidplanner.services.android.core.mission.waypoints.StructureScanner) ProxyUtils
+        StructureScannerImpl updatedScan = (StructureScannerImpl) ProxyUtils
                 .getMissionItemImpl(droneMission, item);
 
         StructureScanner proxyScanner = (StructureScanner) ProxyUtils.getProxyMissionItem(updatedScan);

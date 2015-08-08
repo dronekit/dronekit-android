@@ -2,6 +2,7 @@ package org.droidplanner.services.android.core.gcs.follow;
 
 import android.os.Handler;
 
+import org.droidplanner.services.android.core.drone.DroneManager;
 import org.droidplanner.services.android.core.gcs.location.Location;
 import org.droidplanner.services.android.core.helpers.coordinates.Coord2D;
 import org.droidplanner.services.android.core.helpers.coordinates.Coord3D;
@@ -40,7 +41,7 @@ public class FollowSplineLeash extends FollowWithRadiusAlgorithm {
         return FollowModes.SPLINE_LEASH;
     }
 
-    public FollowSplineLeash(MavLinkDrone drone, Handler handler, double length) {
-        super(drone, handler, length);
+    public FollowSplineLeash(DroneManager droneMgr, Handler handler, double length) {
+        super(droneMgr, handler, length);
     }
 }

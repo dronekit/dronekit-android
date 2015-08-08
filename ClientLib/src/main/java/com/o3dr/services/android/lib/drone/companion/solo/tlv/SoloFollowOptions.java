@@ -9,8 +9,6 @@ import java.nio.ByteBuffer;
  */
 public class SoloFollowOptions extends SoloShotOptions {
 
-    private static final String TAG = SoloFollowOptions.class.getSimpleName();
-
     private static final int LOOK_AT_ENABLED_VALUE = 1;
     private static final int LOOK_AT_DISABLED_VALUE = 0;
 
@@ -22,7 +20,7 @@ public class SoloFollowOptions extends SoloShotOptions {
     }
 
     public SoloFollowOptions(){
-        this(PAUSED_CRUISE_SPEED, false);
+        this(PAUSED_CRUISE_SPEED, true);
     }
 
     SoloFollowOptions(float cruiseSpeed, int lookAtValue){

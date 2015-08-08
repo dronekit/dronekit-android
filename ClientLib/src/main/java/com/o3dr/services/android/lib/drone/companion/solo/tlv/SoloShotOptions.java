@@ -55,4 +55,17 @@ public class SoloShotOptions extends TLVPacket {
         this.cruiseSpeed = in.readFloat();
     }
 
+    public static final Creator<SoloShotOptions> CREATOR = new Creator<SoloShotOptions>(){
+
+        @Override
+        public SoloShotOptions createFromParcel(Parcel source) {
+            return new SoloShotOptions(source);
+        }
+
+        @Override
+        public SoloShotOptions[] newArray(int size) {
+            return new SoloShotOptions[size];
+        }
+    };
+
 }

@@ -16,7 +16,7 @@ import static com.o3dr.services.android.lib.drone.action.CapabilityActions.*;
  * Allows to query the capabilities offered by the vehicle.
  * Created by Fredia Huya-Kouadio on 7/5/15.
  */
-public class CapabilityApi implements Api {
+public class CapabilityApi extends Api {
 
     /**
      * Feature support check error. The drone is disconnected.
@@ -34,6 +34,12 @@ public class CapabilityApi implements Api {
     public static final int FEATURE_UNSUPPORTED = 1;
 
     private static final ConcurrentHashMap<Drone, CapabilityApi> capabilityApiCache = new ConcurrentHashMap<>();
+    private static final Builder<CapabilityApi> apiBuilder = new Builder<CapabilityApi>() {
+        @Override
+        public CapabilityApi build(Drone drone) {
+            return new CapabilityApi(drone);
+        }
+    };
 
     /**
      * Retrieves a capability api instance.
@@ -41,12 +47,7 @@ public class CapabilityApi implements Api {
      * @return a CapabilityApi instance.
      */
     public static CapabilityApi getApi(final Drone drone){
-        return ApiUtils.getApi(drone, capabilityApiCache, new Builder<CapabilityApi>() {
-            @Override
-            public CapabilityApi build() {
-                return new CapabilityApi(drone);
-            }
-        });
+        return getApi(drone, capabilityApiCache, apiBuilder);
     }
 
     private final Drone drone;
@@ -84,7 +85,7 @@ public class CapabilityApi implements Api {
                     });
                 break;
 
-            case FeatureIds.SOLOLINK_VIDEO_STREAMING:
+            case FeatureIds.SOLO_VIDEO_STREAMING:
                 if(Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2) {
                     drone.post(new Runnable() {
                         @Override
@@ -137,7 +138,7 @@ public class CapabilityApi implements Api {
         /**
          * Id for the video feature.
          */
-        public static final String SOLOLINK_VIDEO_STREAMING = "feature_sololink_video_streaming";
+        public static final String SOLO_VIDEO_STREAMING = "feature_solo_video_streaming";
 
         /**
          * Id for the compass calibration feature.
