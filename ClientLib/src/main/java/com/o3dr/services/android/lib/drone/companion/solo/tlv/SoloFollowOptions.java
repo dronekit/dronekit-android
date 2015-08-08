@@ -9,8 +9,6 @@ import java.nio.ByteBuffer;
  */
 public class SoloFollowOptions extends SoloShotOptions {
 
-    private static final String TAG = SoloFollowOptions.class.getSimpleName();
-
     private static final int LOOK_AT_ENABLED_VALUE = 1;
     private static final int LOOK_AT_DISABLED_VALUE = 0;
 
