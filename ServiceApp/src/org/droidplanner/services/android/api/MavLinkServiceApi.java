@@ -14,18 +14,14 @@ import java.lang.ref.SoftReference;
  */
 public class MavLinkServiceApi {
 
-    private final SoftReference<DroidPlannerService> mServiceRef;
+    private final DroidPlannerService mService;
 
     public MavLinkServiceApi(DroidPlannerService service) {
-        mServiceRef = new SoftReference<>(service);
+        mService = service;
     }
 
     private DroidPlannerService getService() {
-        DroidPlannerService service = mServiceRef.get();
-        if (service == null)
-            throw new IllegalStateException("Lost reference to parent service.");
-
-        return service;
+        return mService;
     }
 
     public boolean sendData(ConnectionParameter connParams, MAVLinkPacket packet) {

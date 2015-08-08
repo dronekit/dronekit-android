@@ -4,7 +4,10 @@ import android.os.Parcel;
 import android.util.SparseArray;
 
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSetting;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageParser;
 import com.o3dr.services.android.lib.drone.property.DroneAttribute;
+
+import java.nio.ByteBuffer;
 
 /**
  * Stores state information for the sololink companion computer.
@@ -87,7 +90,21 @@ public class SoloState implements DroneAttribute {
         dest.writeString(this.vehicleVersion);
         dest.writeString(this.autopilotVersion);
         dest.writeByte(isEUTxPowerCompliant ? (byte) 1 : (byte) 0);
-        dest.writeSparseArray((SparseArray) this.buttonSettings);
+
+        final int buttonCount = buttonSettings.size();
+        dest.writeInt(buttonCount);
+
+        for(int i = 0; i < buttonCount; i++){
+            final SoloButtonSetting buttonSetting = buttonSettings.valueAt(i);
+            if(buttonSetting == null){
+                dest.writeInt(0);
+                continue;
+            }
+
+            final byte[] buttonData = buttonSetting.toBytes();
+            dest.writeInt(buttonData.length);
+            dest.writeByteArray(buttonData);
+        }
     }
 
     protected SoloState(Parcel in) {
@@ -98,7 +115,21 @@ public class SoloState implements DroneAttribute {
         this.vehicleVersion = in.readString();
         this.autopilotVersion = in.readString();
         this.isEUTxPowerCompliant = in.readByte() != 0;
-        this.buttonSettings = in.readSparseArray(SparseArray.class.getClassLoader());
+
+        final int buttonCount = in.readInt();
+
+        this.buttonSettings = new SparseArray<>(buttonCount);
+        for(int i = 0; i < buttonCount; i++){
+            final int dataSize = in.readInt();
+            if(dataSize == 0)
+                continue;
+
+            final ByteBuffer dataBuffer = ByteBuffer.allocate(dataSize);
+            in.readByteArray(dataBuffer.array());
+
+            final SoloButtonSetting button = (SoloButtonSetting) TLVMessageParser.parseTLVPacket(dataBuffer);
+            buttonSettings.put(button.getButton(), button);
+        }
     }
 
     public static final Creator<SoloState> CREATOR = new Creator<SoloState>() {

@@ -14,7 +14,7 @@ buildscript {
 }
 
 def computeVersionCode(int versionMajor, int versionMinor, int versionPatch, int versionBuild){
-    return versionMajor * 10000 + versionMinor * 1000 + versionPatch * 100 + versionBuild
+    return versionMajor * 100000 + versionMinor * 1000 + versionPatch * 10 + versionBuild
 }
 
 def generateVersionName(String versionPrefix, int versionMajor, int versionMinor, int versionPatch){
