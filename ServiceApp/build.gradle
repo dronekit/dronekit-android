@@ -48,6 +48,8 @@ android {
         applicationId 'org.droidplanner.services.android'
         minSdkVersion Integer.parseInt(project.ANDROID_BUILD_MIN_SDK_VERSION)
         targetSdkVersion Integer.parseInt(project.ANDROID_BUILD_TARGET_SDK_VERSION)
+        buildConfigField "boolean", "SITL_DEBUG", "false"
+        buildConfigField "String", "SOLO_LINK_LOCAL_IP" , getLocalIp()
 
         versionCode computeVersionCode(versionMajor, versionMinor, versionPatch, versionBuild)
         versionName generateVersionName(versionPrefix, versionMajor, versionMinor, versionPatch)
@@ -109,6 +111,12 @@ android {
             versionNameSuffix generateVersionNameSuffix(versionBuild, "dev")
         }
 
+        sitl {
+            signingConfig signingConfigs.debug
+            buildConfigField "boolean", "SITL_DEBUG", "true"
+            debuggable true
+        }
+
         release {
             signingConfig signingConfigs.release
         }
@@ -135,4 +143,8 @@ def getAppKeyPassword() {
 
 def getAppKey() {
     return hasProperty('COM_O3DR_SERVICES_KEY_ALIAS') ? COM_O3DR_SERVICES_KEY_ALIAS : ''
+}
+
+def getLocalIp() {
+    return '\"' + InetAddress.getLocalHost().getCanonicalHostName() +'\"'
 }
