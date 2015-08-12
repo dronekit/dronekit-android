@@ -110,6 +110,7 @@ android {
         }
 
         beta {
+            signingConfig signingConfigs.release
             versionNameSuffix generateVersionNameSuffix(versionBuild, "beta")
         }
 
