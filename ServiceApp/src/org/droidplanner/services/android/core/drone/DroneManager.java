@@ -170,14 +170,11 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
 
     private final GCSHeartbeat gcsHeartbeat;
 
-    private final List<CameraDetail> cameraDetails;
-
     public DroneManager(Context context, ConnectionParameter connParams, final Handler handler,
-                        MavLinkServiceApi mavlinkApi, List<CameraDetail> cameraDetails) {
+                        MavLinkServiceApi mavlinkApi) {
         this.context = context;
         this.handler = handler;
         this.connectionParameter = connParams;
-        this.cameraDetails = cameraDetails;
 
         commandTracker = new DroneCommandTracker(handler);
 
@@ -521,9 +518,6 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
         switch (attributeType) {
             case AttributeType.FOLLOW_STATE:
                 return CommonApiUtils.getFollowState(followMe);
-
-            case AttributeType.CAMERA:
-                return CommonApiUtils.getCameraProxy(drone, cameraDetails);
 
             case SoloAttributes.SOLO_STATE:
                 return SoloApiUtils.getSoloLinkState(this);

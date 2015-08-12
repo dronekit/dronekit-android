@@ -145,7 +145,7 @@ public class DroidPlannerService extends Service {
         if (droneMgr == null) {
             Timber.d("Generating new drone manager.");
             droneMgr = new DroneManager(getApplicationContext(), connParams, new Handler(Looper.getMainLooper()),
-                    mavlinkApi, getCameraDetails());
+                    mavlinkApi);
             droneManagers.put(connParams, droneMgr);
         }
 

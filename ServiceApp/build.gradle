@@ -37,7 +37,7 @@ dependencies {
 def versionMajor = 1
 def versionMinor = 3
 def versionPatch = 3
-def versionBuild = 0 //bump for dogfood builds, public betas, etc.
+def versionBuild = 1 //bump for dogfood builds, public betas, etc.
 def versionPrefix = "3DR Services v"
 
 android {
@@ -107,6 +107,10 @@ android {
     buildTypes {
         debug {
             versionNameSuffix generateVersionNameSuffix(versionBuild, "dev")
+        }
+
+        beta {
+            versionNameSuffix generateVersionNameSuffix(versionBuild, "beta")
         }
 
         release {
