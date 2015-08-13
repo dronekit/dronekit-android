@@ -3,6 +3,8 @@
 [![Issue Stats](http://issuestats.com/github/DroidPlanner/DroneKit-Android/badge/issue)](http://issuestats.com/github/DroidPlanner/DroneKit-Android)
 
 # DroneKit-Android
+
+[![Join the chat at https://gitter.im/dronekit/dronekit-android](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/dronekit/dronekit-android?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 **DroneKit-Android** is the implementation of [DroneKit](https://android.dronekit.io) on Android.
 
 DroneKit-Android provides interfaces for Android applications to control 3DR-powered vehicles. We
