@@ -216,6 +216,10 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
         return soloLinkMgr.getPixhawkVersion();
     }
 
+    public String getGimbalVersion(){
+        return soloLinkMgr.getGimbalVersion();
+    }
+
     public SoloButtonSetting getButtonSetting(int buttonType) {
         return soloLinkMgr.getLoadedPresetButton(buttonType);
     }

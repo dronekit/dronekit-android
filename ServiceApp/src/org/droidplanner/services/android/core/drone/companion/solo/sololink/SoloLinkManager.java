@@ -44,6 +44,7 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
 
     private static final String SOLO_VERSION_FILENAME = "/VERSION";
     private static final String PIXHAWK_VERSION_FILENAME = "/PIX_VERSION";
+    private static final String GIMBAL_VERSION_FILENAME = "/AXON_VERSION";
 
     private final UdpConnection followDataConn;
 
@@ -62,6 +63,7 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
 
     private final AtomicReference<String> vehicleVersion = new AtomicReference<>("");
     private final AtomicReference<String> pixhawkVersion = new AtomicReference<>("");
+    private final AtomicReference<String> gimbalVersion = new AtomicReference<>("");
 
     private final Runnable soloLinkVersionRetriever = new Runnable() {
         @Override
@@ -78,6 +80,15 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
             final String version = retrieveVersion(PIXHAWK_VERSION_FILENAME);
             if (version != null)
                 pixhawkVersion.set(version);
+        }
+    };
+
+    private final Runnable gimbalVersionRetriever = new Runnable() {
+        @Override
+        public void run() {
+            final String version = retrieveVersion(GIMBAL_VERSION_FILENAME);
+            if(version != null)
+                gimbalVersion.set(version);
         }
     };
 
@@ -113,6 +124,10 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
         return pixhawkVersion.get();
     }
 
+    public String getGimbalVersion(){
+        return gimbalVersion.get();
+    }
+
     @Override
     public void start(SoloLinkListener listener) {
         Timber.d("Starting solo link manager");
@@ -137,6 +152,7 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
         //Refresh the vehicle's components versions
         updateSoloLinkVersion();
         updatePixhawkVersion();
+        updateGimbalVersion();
     }
 
     @Override
@@ -295,6 +311,10 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
 
     private void updatePixhawkVersion() {
         postAsyncTask(pixhawkVersionRetriever);
+    }
+
+    private void updateGimbalVersion(){
+        postAsyncTask(gimbalVersionRetriever);
     }
 
     private String retrieveVersion(String versionFile) {
