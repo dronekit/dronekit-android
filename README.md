@@ -1,6 +1,6 @@
-[![Build Status](https://travis-ci.org/DroidPlanner/DroneKit-Android.svg?branch=develop)](https://travis-ci.org/DroidPlanner/DroneKit-Android)
-[![Issue Stats](http://issuestats.com/github/DroidPlanner/DroneKit-Android/badge/pr)](http://issuestats.com/github/DroidPlanner/DroneKit-Android)
-[![Issue Stats](http://issuestats.com/github/DroidPlanner/DroneKit-Android/badge/issue)](http://issuestats.com/github/DroidPlanner/DroneKit-Android)
+[![Build Status](https://travis-ci.org/dronekit/DroneKit-Android.svg?branch=develop)](https://travis-ci.org/dronekit/DroneKit-Android)
+[![Issue Stats](http://issuestats.com/github/dronekit/DroneKit-Android/badge/pr)](http://issuestats.com/github/dronekit/DroneKit-Android)
+[![Issue Stats](http://issuestats.com/github/dronekit/DroneKit-Android/badge/issue)](http://issuestats.com/github/dronekit/DroneKit-Android)
 [![Join the chat at https://gitter.im/dronekit/dronekit-android](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/dronekit/dronekit-android?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 # DroneKit-Android
