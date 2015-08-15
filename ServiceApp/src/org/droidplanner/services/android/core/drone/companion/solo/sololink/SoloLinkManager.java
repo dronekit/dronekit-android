@@ -163,10 +163,7 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
         loadPresetButtonSettings();
         loadGoproState();
 
-        //Refresh the vehicle's components versions
-        updateSoloLinkVersion();
-        updatePixhawkVersion();
-        updateGimbalVersion();
+        refreshSoloLinkVersions();
     }
 
     @Override
@@ -347,4 +344,12 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
         return null;
     }
 
+    /**
+     * Refresh the vehicle's components versions
+     */
+    public void refreshSoloLinkVersions() {
+        updateSoloLinkVersion();
+        updatePixhawkVersion();
+        updateGimbalVersion();
+    }
 }

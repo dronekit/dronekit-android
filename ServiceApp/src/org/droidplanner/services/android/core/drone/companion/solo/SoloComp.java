@@ -204,16 +204,21 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
         return artooMgr.getSoloLinkWifiInfo();
     }
 
+    public boolean isEUTxPowerCompliant() {
+        return artooMgr.isEUTxPowerCompliant();
+    }
+
+    public void refreshSoloVersions(){
+        soloLinkMgr.refreshSoloLinkVersions();
+        artooMgr.refreshControllerVersions();
+    }
+
     public String getControllerVersion() {
         return artooMgr.getArtooVersion();
     }
 
     public String getControllerFirmwareVersion() {
         return artooMgr.getStm32Version();
-    }
-
-    public boolean isEUTxPowerCompliant() {
-        return artooMgr.isEUTxPowerCompliant();
     }
 
     public String getVehicleVersion() {

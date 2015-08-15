@@ -331,9 +331,7 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
         //Update sololink wifi
         loadSololinkWifiInfo();
 
-        //Refresh the vehicle's components versions
-        updateArtooVersion();
-        updateStm32Version();
+        refreshControllerVersions();
 
         //Update the tx power compliance
         loadCurrentEUTxPowerComplianceMode();
@@ -478,5 +476,13 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
         } catch (IOException e) {
             Timber.e(e, "Error occurred while restarting hostpad service on Artoo.");
         }
+    }
+
+    /**
+     * Refresh the vehicle's components versions
+     */
+    public void refreshControllerVersions() {
+        updateArtooVersion();
+        updateStm32Version();
     }
 }

@@ -637,6 +637,10 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
                 SoloApiUtils.updateSoloLinkEUTxPowerCompliance(this, isCompliant, listener);
                 break;
 
+            case SoloConfigActions.ACTION_REFRESH_SOLO_VERSIONS:
+                soloComp.refreshSoloVersions();
+                break;
+
             //**************** CAPABILITY ACTIONS **************//
             case CapabilityActions.ACTION_CHECK_FEATURE_SUPPORT:
                 if (listener != null) {
