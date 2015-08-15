@@ -54,6 +54,8 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
         void onButtonPacketReceived(ButtonPacket packet);
 
         void onEUTxPowerComplianceUpdated(boolean isCompliant);
+
+        void onVersionsUpdated();
     }
 
     private static final String NO_VIDEO_OWNER = "no_video_owner";
@@ -186,6 +188,12 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
 
         artooMgr.stopVideoManager();
         soloLinkMgr.stop();
+    }
+
+    @Override
+    public void onVersionsUpdated() {
+        if(compListener != null)
+            compListener.onVersionsUpdated();
     }
 
     public boolean isConnected() {

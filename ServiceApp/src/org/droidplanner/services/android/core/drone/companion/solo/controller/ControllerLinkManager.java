@@ -55,6 +55,7 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
 
     private final AtomicReference<String> controllerVersion = new AtomicReference<>("");
     private final AtomicReference<String> stm32Version = new AtomicReference<>("");
+
     private final AtomicBoolean isEUTxPowerCompliant = new AtomicBoolean(false);
 
     private final AtomicReference<Pair<String, String>> sololinkWifiInfo = new AtomicReference<>(Pair.create("", ""));
@@ -98,6 +99,9 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
             final String version = retrieveVersion(ARTOO_VERSION_FILENAME);
             if (version != null)
                 controllerVersion.set(version);
+
+            if(linkListener != null && areVersionsSet())
+                linkListener.onVersionsUpdated();
         }
     };
 
@@ -107,6 +111,9 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
             final String version = retrieveVersion(STM32_VERSION_FILENAME);
             if (version != null)
                 stm32Version.set(version);
+
+            if(linkListener != null && areVersionsSet())
+                linkListener.onVersionsUpdated();
         }
     };
 
@@ -216,6 +223,10 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
             }
         });
 
+    }
+
+    public boolean areVersionsSet(){
+        return !TextUtils.isEmpty(controllerVersion.get()) && !TextUtils.isEmpty(stm32Version.get());
     }
 
     /**

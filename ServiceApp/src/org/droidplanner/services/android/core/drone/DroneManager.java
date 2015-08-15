@@ -166,6 +166,18 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
             eventInfo.putBoolean(SoloEventExtras.EXTRA_SOLO_EU_TX_POWER_COMPLIANT, isCompliant);
             notifyDroneAttributeEvent(SoloEvents.SOLO_EU_TX_POWER_COMPLIANCE_UPDATED, eventInfo, true);
         }
+
+        @Override
+        public void onVersionsUpdated() {
+            final Bundle eventInfo = new Bundle();
+            eventInfo.putString(SoloEventExtras.EXTRA_SOLO_VEHICLE_VERSION, soloComp.getVehicleVersion());
+            eventInfo.putString(SoloEventExtras.EXTRA_SOLO_AUTOPILOT_VERSION, soloComp.getAutopilotVersion());
+            eventInfo.putString(SoloEventExtras.EXTRA_SOLO_GIMBAL_VERSION, soloComp.getGimbalVersion());
+            eventInfo.putString(SoloEventExtras.EXTRA_SOLO_CONTROLLER_VERSION, soloComp.getControllerVersion());
+            eventInfo.putString(SoloEventExtras.EXTRA_SOLO_CONTROLLER_FIRMWARE_VERSION, soloComp.getControllerFirmwareVersion());
+
+            notifyDroneAttributeEvent(SoloEvents.SOLO_VERSIONS_UPDATED, eventInfo, true);
+        }
     };
 
     private final GCSHeartbeat gcsHeartbeat;

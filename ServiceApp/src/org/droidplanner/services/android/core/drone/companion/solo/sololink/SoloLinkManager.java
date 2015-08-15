@@ -71,6 +71,9 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
             final String version = retrieveVersion(SOLO_VERSION_FILENAME);
             if (version != null)
                 vehicleVersion.set(version);
+
+            if(linkListener != null && areVersionsSet())
+                linkListener.onVersionsUpdated();
         }
     };
 
@@ -80,6 +83,9 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
             final String version = retrieveVersion(PIXHAWK_VERSION_FILENAME);
             if (version != null)
                 pixhawkVersion.set(version);
+
+            if(linkListener != null && areVersionsSet())
+                linkListener.onVersionsUpdated();
         }
     };
 
@@ -89,6 +95,9 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
             final String version = retrieveVersion(GIMBAL_VERSION_FILENAME);
             if(version != null)
                 gimbalVersion.set(version);
+
+            if(linkListener != null && areVersionsSet())
+                linkListener.onVersionsUpdated();
         }
     };
 
@@ -126,6 +135,11 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
 
     public String getGimbalVersion(){
         return gimbalVersion.get();
+    }
+
+    public boolean areVersionsSet(){
+        return !TextUtils.isEmpty(vehicleVersion.get()) && !TextUtils.isEmpty(pixhawkVersion.get())
+                && !TextUtils.isEmpty(gimbalVersion.get());
     }
 
     @Override
