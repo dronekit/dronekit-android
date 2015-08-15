@@ -104,20 +104,20 @@ public class SoloApiUtils {
         soloComp.updateEUTxPowerCompliance(isCompliant, listener);
     }
 
-    public static void startVideoStream(DroneManager droneManager, String ownerId, Surface videoSurface,
+    public static void startVideoStream(DroneManager droneManager, String appId, String videoTag, Surface videoSurface,
                                         ICommandListener listener) {
         if (!isSoloLinkFeatureAvailable(droneManager, listener))
             return;
 
         final SoloComp soloComp = droneManager.getSoloComp();
-        soloComp.startVideoStream(ownerId, videoSurface, listener);
+        soloComp.startVideoStream(appId, videoTag, videoSurface, listener);
     }
 
-    public static void stopVideoStream(DroneManager droneManager, String ownerId, ICommandListener listener) {
+    public static void stopVideoStream(DroneManager droneManager, String appId, String videoTag, ICommandListener listener) {
         if (!isSoloLinkFeatureAvailable(droneManager, listener))
             return;
 
         final SoloComp soloComp = droneManager.getSoloComp();
-        soloComp.stopVideoStream(ownerId, listener);
+        soloComp.stopVideoStream(appId, videoTag, listener);
     }
 }

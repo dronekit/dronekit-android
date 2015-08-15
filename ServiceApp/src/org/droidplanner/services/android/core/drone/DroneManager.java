@@ -335,6 +335,9 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
         if (TextUtils.isEmpty(appId))
             return;
 
+        if(isCompanionComputerEnabled())
+            soloComp.tryStoppingVideoStream(appId);
+
         Log.d(TAG, "Disconnecting client " + appId);
         DroneEventsListener listener = connectedApps.remove(appId);
 
