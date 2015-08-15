@@ -33,7 +33,8 @@ public class SoloApiUtils {
         final Pair<String, String> wifiSettings = soloComp.getWifiSettings();
         return new SoloState(soloComp.getAutopilotVersion(), soloComp.getControllerFirmwareVersion(),
                 soloComp.getControllerVersion(), soloComp.getVehicleVersion(),
-                wifiSettings.second, wifiSettings.first, soloComp.isEUTxPowerCompliant(), soloComp.getButtonSettings());
+                wifiSettings.second, wifiSettings.first, soloComp.isEUTxPowerCompliant(),
+                soloComp.getButtonSettings(), soloComp.getGimbalVersion());
     }
 
     static boolean isSoloLinkFeatureAvailable(DroneManager droneManager, ICommandListener listener) {

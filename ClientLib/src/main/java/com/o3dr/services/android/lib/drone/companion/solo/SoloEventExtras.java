@@ -26,4 +26,34 @@ public class SoloEventExtras {
      * @see {@link SoloEvents#SOLO_EU_TX_POWER_COMPLIANCE_UPDATED}
      */
     public static final String EXTRA_SOLO_EU_TX_POWER_COMPLIANT = PACKAGE_NAME + ".EXTRA_SOLO_EU_TX_POWER_COMPLIANT";
+
+    /**
+     * Used to retrieve the solo controller version.
+     * @see {@link SoloEvents#SOLO_VERSIONS_UPDATED}
+     */
+    public static final String EXTRA_SOLO_CONTROLLER_VERSION = PACKAGE_NAME + ".EXTRA_SOLO_CONTROLLER_VERSION";
+
+    /**
+     * Used to retrieve the solo controller firmware version.
+     * @see {@link SoloEvents#SOLO_VERSIONS_UPDATED}
+     */
+    public static final String EXTRA_SOLO_CONTROLLER_FIRMWARE_VERSION = PACKAGE_NAME + ".EXTRA_SOLO_CONTROLLER_FIRMWARE_VERSION";
+
+    /**
+     * Used to retrieve the solo vehicle version.
+     * @see {@link SoloEvents#SOLO_VERSIONS_UPDATED}
+     */
+    public static final String EXTRA_SOLO_VEHICLE_VERSION = PACKAGE_NAME + ".EXTRA_SOLO_VEHICLE_VERSION";
+
+    /**
+     * Used to retrieve the solo autopilot version.
+     * @see {@link SoloEvents#SOLO_VERSIONS_UPDATED}
+     */
+    public static final String EXTRA_SOLO_AUTOPILOT_VERSION = PACKAGE_NAME + ".EXTRA_SOLO_AUTOPILOT_VERSION";
+
+    /**
+     * Used to retrieve the solo gimbal version.
+     * @see {@link SoloEvents#SOLO_VERSIONS_UPDATED}
+     */
+    public static final String EXTRA_SOLO_GIMBAL_VERSION = PACKAGE_NAME + ".EXTRA_SOLO_GIMBAL_VERSION";
 }

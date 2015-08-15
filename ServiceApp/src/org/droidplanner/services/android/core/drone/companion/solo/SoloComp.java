@@ -54,6 +54,8 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
         void onButtonPacketReceived(ButtonPacket packet);
 
         void onEUTxPowerComplianceUpdated(boolean isCompliant);
+
+        void onVersionsUpdated();
     }
 
     private static final String NO_VIDEO_OWNER = "no_video_owner";
@@ -192,12 +194,27 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
         soloLinkMgr.stop();
     }
 
+    @Override
+    public void onVersionsUpdated() {
+        if(compListener != null)
+            compListener.onVersionsUpdated();
+    }
+
     public boolean isConnected() {
         return artooMgr.isLinkConnected() && soloLinkMgr.isLinkConnected();
     }
 
     public Pair<String, String> getWifiSettings() {
         return artooMgr.getSoloLinkWifiInfo();
+    }
+
+    public boolean isEUTxPowerCompliant() {
+        return artooMgr.isEUTxPowerCompliant();
+    }
+
+    public void refreshSoloVersions(){
+        soloLinkMgr.refreshSoloLinkVersions();
+        artooMgr.refreshControllerVersions();
     }
 
     public String getControllerVersion() {
@@ -208,16 +225,16 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
         return artooMgr.getStm32Version();
     }
 
-    public boolean isEUTxPowerCompliant() {
-        return artooMgr.isEUTxPowerCompliant();
-    }
-
     public String getVehicleVersion() {
         return soloLinkMgr.getVehicleVersion();
     }
 
     public String getAutopilotVersion() {
         return soloLinkMgr.getPixhawkVersion();
+    }
+
+    public String getGimbalVersion(){
+        return soloLinkMgr.getGimbalVersion();
     }
 
     public SoloButtonSetting getButtonSetting(int buttonType) {

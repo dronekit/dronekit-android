@@ -23,6 +23,7 @@ public class SoloState implements DroneAttribute {
 
     private String vehicleVersion;
     private String autopilotVersion;
+    private String gimbalVersion;
 
     private boolean isEUTxPowerCompliant;
 
@@ -33,7 +34,7 @@ public class SoloState implements DroneAttribute {
     public SoloState(String autopilotVersion, String controllerFirmwareVersion,
                      String controllerVersion, String vehicleVersion,
                      String wifiPassword, String wifiSsid, boolean isEUTxPowerCompliant,
-                     SparseArray<SoloButtonSetting> buttonSettings) {
+                     SparseArray<SoloButtonSetting> buttonSettings, String gimbalVersion) {
         this.autopilotVersion = autopilotVersion;
         this.controllerFirmwareVersion = controllerFirmwareVersion;
         this.controllerVersion = controllerVersion;
@@ -42,6 +43,7 @@ public class SoloState implements DroneAttribute {
         this.wifiSsid = wifiSsid;
         this.isEUTxPowerCompliant = isEUTxPowerCompliant;
         this.buttonSettings = buttonSettings;
+        this.gimbalVersion = gimbalVersion;
     }
 
     public String getAutopilotVersion() {
@@ -76,6 +78,10 @@ public class SoloState implements DroneAttribute {
         return buttonSettings.get(buttonType);
     }
 
+    public String getGimbalVersion(){
+        return gimbalVersion;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -105,6 +111,8 @@ public class SoloState implements DroneAttribute {
             dest.writeInt(buttonData.length);
             dest.writeByteArray(buttonData);
         }
+
+        dest.writeString(this.gimbalVersion);
     }
 
     protected SoloState(Parcel in) {
@@ -130,6 +138,8 @@ public class SoloState implements DroneAttribute {
             final SoloButtonSetting button = (SoloButtonSetting) TLVMessageParser.parseTLVPacket(dataBuffer);
             buttonSettings.put(button.getButton(), button);
         }
+
+        this.gimbalVersion = in.readString();
     }
 
     public static final Creator<SoloState> CREATOR = new Creator<SoloState>() {

@@ -25,6 +25,8 @@ public abstract class AbstractLinkManager<T extends AbstractLinkManager.LinkList
         void onLinkConnected();
 
         void onLinkDisconnected();
+
+        void onVersionsUpdated();
     }
 
     private final Runnable reconnectTask = new Runnable() {
