@@ -90,10 +90,13 @@ import org.droidplanner.services.android.core.model.AutopilotWarningParser;
 import org.droidplanner.services.android.core.parameters.Parameter;
 import org.droidplanner.services.android.utils.CommonApiUtils;
 
+import timber.log.Timber;
+
 public abstract class ArduPilot implements MavLinkDrone {
 
     public static final int AUTOPILOT_COMPONENT_ID = 1;
     public static final int ARTOO_COMPONENT_ID = 0;
+    public static final int TELEMETRY_RADIO_COMPONENT_ID = 68;
 
     private final DroneEvents events;
     private final Type type;
@@ -597,8 +600,11 @@ public abstract class ArduPilot implements MavLinkDrone {
 
     @Override
     public void onMavLinkMessageReceived(MAVLinkMessage message) {
-        if (message.compid != AUTOPILOT_COMPONENT_ID
-                && message.compid != ARTOO_COMPONENT_ID) {
+        final int compId = message.compid;
+        if (compId != AUTOPILOT_COMPONENT_ID
+                && compId != ARTOO_COMPONENT_ID
+                && compId != TELEMETRY_RADIO_COMPONENT_ID) {
+            Timber.d("Received unsupported component id: %d", compId);
             return;
         }
 
