@@ -132,11 +132,20 @@ public class CommonApiUtils {
             case FIXED_WING_TRAINING:
                 return VehicleMode.PLANE_TRAINING;
 
+            case FIXED_WING_ACRO:
+                return VehicleMode.PLANE_ACRO;
+
             case FIXED_WING_FLY_BY_WIRE_A:
                 return VehicleMode.PLANE_FLY_BY_WIRE_A;
 
             case FIXED_WING_FLY_BY_WIRE_B:
                 return VehicleMode.PLANE_FLY_BY_WIRE_B;
+
+            case FIXED_WING_CRUISE:
+                return VehicleMode.PLANE_CRUISE;
+
+            case FIXED_WING_AUTOTUNE:
+                return VehicleMode.PLANE_AUTOTUNE;
 
             case FIXED_WING_AUTO:
                 return VehicleMode.PLANE_AUTO;
