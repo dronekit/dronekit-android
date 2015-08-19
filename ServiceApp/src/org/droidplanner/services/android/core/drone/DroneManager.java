@@ -644,11 +644,21 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
                     final String featureId = data.getString(CapabilityActions.EXTRA_FEATURE_ID);
                     if (!TextUtils.isEmpty(featureId)) {
                         switch (featureId) {
+
                             case CapabilityApi.FeatureIds.SOLO_VIDEO_STREAMING:
                             case CapabilityApi.FeatureIds.COMPASS_CALIBRATION:
                                 if (this.isCompanionComputerEnabled()) {
                                     CommonApiUtils.postSuccessEvent(listener);
                                 } else {
+                                    CommonApiUtils.postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
+                                }
+                                break;
+
+                            case CapabilityApi.FeatureIds.KILL_SWITCH:
+                                if(CommonApiUtils.isKillSwitchSupported(drone)){
+                                    CommonApiUtils.postSuccessEvent(listener);
+                                }
+                                else{
                                     CommonApiUtils.postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
                                 }
                                 break;
