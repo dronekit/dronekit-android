@@ -190,7 +190,7 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
         if (compListener != null)
             compListener.onDisconnected();
 
-        artooMgr.stopVideoManager();
+        artooMgr.stop();
         soloLinkMgr.stop();
     }
 
@@ -315,8 +315,6 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
         if (videoOwnerId.compareAndSet(NO_VIDEO_OWNER, appId)){
             videoTagRef.set(newVideoTag);
 
-            artooMgr.startVideoManager();
-
             Timber.d("Setting video surface layer.");
             artooMgr.startDecoding(videoSurface, new DecoderListener() {
                 @Override
@@ -383,7 +381,6 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
                 }
             });
 
-            artooMgr.stopVideoManager();
         }
         else{
             postErrorEvent(CommandExecutionError.COMMAND_DENIED, listener);
