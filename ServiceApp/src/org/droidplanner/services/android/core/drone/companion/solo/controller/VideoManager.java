@@ -20,8 +20,6 @@ import timber.log.Timber;
  */
 public class VideoManager extends AbstractLinkManager {
 
-    private static final String TAG = VideoManager.class.getSimpleName();
-
     private static final int UDP_BUFFER_SIZE = 1500;
 
     private final MediaCodecManager mediaCodecManager;

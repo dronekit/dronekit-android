@@ -117,10 +117,6 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
 
     }
 
-    public static SshConnection getSshLink() {
-        return sshLink;
-    }
-
     public static String getSoloLinkIp() {
         return SOLO_LINK_IP;
     }

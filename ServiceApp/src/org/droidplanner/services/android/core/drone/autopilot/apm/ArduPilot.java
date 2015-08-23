@@ -604,7 +604,7 @@ public abstract class ArduPilot implements MavLinkDrone {
         if (compId != AUTOPILOT_COMPONENT_ID
                 && compId != ARTOO_COMPONENT_ID
                 && compId != TELEMETRY_RADIO_COMPONENT_ID) {
-            Timber.d("Received unsupported component id: %d", compId);
+//            Timber.d("Received unsupported component id: %d", compId);
             return;
         }
 

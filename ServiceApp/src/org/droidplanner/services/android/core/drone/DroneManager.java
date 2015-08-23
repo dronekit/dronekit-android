@@ -22,10 +22,10 @@ import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError
 import com.o3dr.services.android.lib.drone.companion.solo.SoloAttributes;
 import com.o3dr.services.android.lib.drone.companion.solo.SoloEventExtras;
 import com.o3dr.services.android.lib.drone.companion.solo.SoloEvents;
-import com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions;
-import com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerMode;
 import com.o3dr.services.android.lib.drone.companion.solo.action.SoloActions;
+import com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions;
 import com.o3dr.services.android.lib.drone.companion.solo.button.ButtonPacket;
+import com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerMode;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSetting;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSettingSetter;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes;
@@ -34,7 +34,6 @@ import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionType;
 import com.o3dr.services.android.lib.drone.connection.DroneSharePrefs;
 import com.o3dr.services.android.lib.drone.mission.action.MissionActions;
-import com.o3dr.services.android.lib.drone.mission.item.complex.CameraDetail;
 import com.o3dr.services.android.lib.drone.property.DroneAttribute;
 import com.o3dr.services.android.lib.gcs.action.FollowMeActions;
 import com.o3dr.services.android.lib.gcs.follow.FollowType;
@@ -53,6 +52,8 @@ import org.droidplanner.services.android.core.drone.autopilot.apm.ArduCopter;
 import org.droidplanner.services.android.core.drone.autopilot.apm.ArduPlane;
 import org.droidplanner.services.android.core.drone.autopilot.apm.ArduRover;
 import org.droidplanner.services.android.core.drone.autopilot.apm.ArduSolo;
+import org.droidplanner.services.android.core.drone.companion.solo.SoloComp;
+import org.droidplanner.services.android.core.drone.variables.HeartBeat;
 import org.droidplanner.services.android.core.drone.variables.calibration.MagnetometerCalibrationImpl;
 import org.droidplanner.services.android.core.firmware.FirmwareType;
 import org.droidplanner.services.android.core.gcs.GCSHeartbeat;
@@ -62,7 +63,6 @@ import org.droidplanner.services.android.core.gcs.location.FusedLocation;
 import org.droidplanner.services.android.core.helpers.coordinates.Coord2D;
 import org.droidplanner.services.android.core.helpers.coordinates.Coord3D;
 import org.droidplanner.services.android.core.parameters.Parameter;
-import org.droidplanner.services.android.core.drone.companion.solo.SoloComp;
 import org.droidplanner.services.android.exception.ConnectionException;
 import org.droidplanner.services.android.utils.AndroidApWarningParser;
 import org.droidplanner.services.android.utils.CommonApiUtils;
@@ -71,7 +71,6 @@ import org.droidplanner.services.android.utils.analytics.GAUtils;
 import org.droidplanner.services.android.utils.prefs.DroidPlannerPrefs;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -177,6 +176,17 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
             eventInfo.putString(SoloEventExtras.EXTRA_SOLO_CONTROLLER_FIRMWARE_VERSION, soloComp.getControllerFirmwareVersion());
 
             notifyDroneAttributeEvent(SoloEvents.SOLO_VERSIONS_UPDATED, eventInfo, true);
+        }
+    };
+
+    private final Runnable disconnectSoloCompTask = new Runnable() {
+        @Override
+        public void run() {
+            if(soloComp != null && soloComp.isConnected()){
+                soloComp.stop();
+            }
+
+            handler.removeCallbacks(disconnectSoloCompTask);
         }
     };
 
@@ -738,6 +748,22 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
                 }
 
                 event = DroneInterfaces.DroneEventsType.CONNECTED;
+                break;
+
+            case HEARTBEAT_TIMEOUT:
+                if (isCompanionComputerEnabled() && soloComp.isConnected()) {
+                    //Start a countdown at the conclusion of which, disconnect the solo companion computer.
+                    handler.postDelayed(disconnectSoloCompTask, HeartBeat.HEARTBEAT_NORMAL_TIMEOUT);
+                }
+                break;
+
+            case HEARTBEAT_RESTORED:
+                if (isCompanionComputerEnabled()) {
+                    //Dismiss the countdown to disconnect the solo companion computer.
+                    handler.removeCallbacks(disconnectSoloCompTask);
+                    if (!soloComp.isConnected())
+                        soloComp.start();
+                }
                 break;
 
             case DISCONNECTED:
