@@ -42,4 +42,6 @@ public class SoloConfigActions {
      */
     public static final String EXTRA_EU_TX_POWER_COMPLIANT = "extra_eu_tx_power_compliant";
 
+    public static final String ACTION_REFRESH_SOLO_VERSIONS = PACKAGE_NAME + ".REFRESH_SOLO_VERSIONS";
+
 }

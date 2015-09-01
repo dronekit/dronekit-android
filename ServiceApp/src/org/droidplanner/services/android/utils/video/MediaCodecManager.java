@@ -133,8 +133,9 @@ public class MediaCodecManager {
         }
         else {
             if(decodedFirstFrame.get()) {
-                if (processInputData.compareAndSet(true, false))
-                    sendCompletionFlag.set(true);
+                if (processInputData.compareAndSet(true, false)) {
+                    sendCompletionFlag.set(!processNALUChunk(naluChunkAssembler.getEndOfStream()));
+                }
             }
             else{
                 handler.post(stopSafely);

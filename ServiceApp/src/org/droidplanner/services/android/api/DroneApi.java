@@ -15,6 +15,7 @@ import com.MAVLink.ardupilotmega.msg_mag_cal_report;
 import com.o3dr.services.android.lib.drone.action.ConnectionActions;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
+import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.companion.solo.action.SoloCameraActions;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionResult;
@@ -130,17 +131,30 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
         return this.droneMgr;
     }
 
+    private MavLinkDrone getDrone(){
+        if(this.droneMgr == null)
+            return null;
+
+        return this.droneMgr.getDrone();
+    }
+
     @Override
     public Bundle getAttribute(String type) throws RemoteException {
-        if(droneMgr == null)
-            return null;
+        final Bundle carrier = new Bundle();
 
-        final DroneAttribute attribute = droneMgr.getAttribute(type);
-        if (attribute == null)
-            return null;
+        switch(type){
+            case AttributeType.CAMERA:
+                carrier.putParcelable(type, CommonApiUtils.getCameraProxy(getDrone(), service.getCameraDetails()));
+            break;
 
-        Bundle carrier = new Bundle();
-        carrier.putParcelable(type, attribute);
+            default:
+                if(droneMgr != null) {
+                    final DroneAttribute attribute = droneMgr.getAttribute(type);
+                    if (attribute != null)
+                        carrier.putParcelable(type, attribute);
+                }
+                break;
+        }
         return carrier;
     }
 
@@ -235,13 +249,13 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
             case SoloCameraActions.ACTION_START_VIDEO_STREAM: {
                 final Surface videoSurface = data.getParcelable(SoloCameraActions.EXTRA_VIDEO_DISPLAY);
                 final String videoTag = data.getString(SoloCameraActions.EXTRA_VIDEO_TAG, "");
-                SoloApiUtils.startVideoStream(getDroneManager(), ownerId + videoTag, videoSurface, listener);
+                SoloApiUtils.startVideoStream(getDroneManager(), ownerId, videoTag, videoSurface, listener);
                 break;
             }
 
             case SoloCameraActions.ACTION_STOP_VIDEO_STREAM: {
                 final String videoTag = data.getString(SoloCameraActions.EXTRA_VIDEO_TAG, "");
-                SoloApiUtils.stopVideoStream(getDroneManager(), ownerId + videoTag, listener);
+                SoloApiUtils.stopVideoStream(getDroneManager(), ownerId, videoTag, listener);
                 break;
             }
 

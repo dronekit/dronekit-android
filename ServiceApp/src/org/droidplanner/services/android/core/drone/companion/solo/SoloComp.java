@@ -54,6 +54,8 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
         void onButtonPacketReceived(ButtonPacket packet);
 
         void onEUTxPowerComplianceUpdated(boolean isCompliant);
+
+        void onVersionsUpdated();
     }
 
     private static final String NO_VIDEO_OWNER = "no_video_owner";
@@ -71,6 +73,7 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
     private final ExecutorService asyncExecutor;
 
     private final AtomicReference<String> videoOwnerId = new AtomicReference<>(NO_VIDEO_OWNER);
+    private final AtomicReference<String> videoTagRef = new AtomicReference<>("");
 
     private SoloCompListener compListener;
 
@@ -109,11 +112,14 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
             return;
         }
 
+        resetVideoOwner();
+
         artooMgr.start(this);
         soloLinkMgr.start(this);
     }
 
     public void stop() {
+        resetVideoOwner();
         artooMgr.stop();
         soloLinkMgr.stop();
     }
@@ -184,8 +190,14 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
         if (compListener != null)
             compListener.onDisconnected();
 
-        artooMgr.stopVideoManager();
+        artooMgr.stop();
         soloLinkMgr.stop();
+    }
+
+    @Override
+    public void onVersionsUpdated() {
+        if(compListener != null)
+            compListener.onVersionsUpdated();
     }
 
     public boolean isConnected() {
@@ -196,6 +208,15 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
         return artooMgr.getSoloLinkWifiInfo();
     }
 
+    public boolean isEUTxPowerCompliant() {
+        return artooMgr.isEUTxPowerCompliant();
+    }
+
+    public void refreshSoloVersions(){
+        soloLinkMgr.refreshSoloLinkVersions();
+        artooMgr.refreshControllerVersions();
+    }
+
     public String getControllerVersion() {
         return artooMgr.getArtooVersion();
     }
@@ -204,16 +225,16 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
         return artooMgr.getStm32Version();
     }
 
-    public boolean isEUTxPowerCompliant() {
-        return artooMgr.isEUTxPowerCompliant();
-    }
-
     public String getVehicleVersion() {
         return soloLinkMgr.getVehicleVersion();
     }
 
     public String getAutopilotVersion() {
         return soloLinkMgr.getPixhawkVersion();
+    }
+
+    public String getGimbalVersion(){
+        return soloLinkMgr.getGimbalVersion();
     }
 
     public SoloButtonSetting getButtonSetting(int buttonType) {
@@ -265,9 +286,9 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
         artooMgr.setEUTxPowerCompliance(isCompliant, listener);
     }
 
-    public void startVideoStream(String ownerId, Surface videoSurface, final ICommandListener listener){
-        Timber.d("Video stream start request from %s. Video owner is %s.", ownerId, videoOwnerId.get());
-        if(TextUtils.isEmpty(ownerId)){
+    public void startVideoStream(String appId, String newVideoTag, Surface videoSurface, final ICommandListener listener){
+        Timber.d("Video stream start request from %s. Video owner is %s.", appId, videoOwnerId.get());
+        if(TextUtils.isEmpty(appId)){
             postErrorEvent(CommandExecutionError.COMMAND_DENIED, listener);
             return;
         }
@@ -277,13 +298,22 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
             return;
         }
 
-        if(ownerId.equals(videoOwnerId.get())){
-            postSuccessEvent(listener);
-            return;
+        if(newVideoTag == null)
+            newVideoTag = "";
+
+        if(appId.equals(videoOwnerId.get())){
+            String currentVideoTag = videoTagRef.get();
+            if(currentVideoTag == null)
+                currentVideoTag = "";
+
+            if(newVideoTag.equals(currentVideoTag)){
+                postSuccessEvent(listener);
+                return;
+            }
         }
 
-        if(videoOwnerId.compareAndSet(NO_VIDEO_OWNER, ownerId)){
-            artooMgr.startVideoManager();
+        if (videoOwnerId.compareAndSet(NO_VIDEO_OWNER, appId)){
+            videoTagRef.set(newVideoTag);
 
             Timber.d("Setting video surface layer.");
             artooMgr.startDecoding(videoSurface, new DecoderListener() {
@@ -312,9 +342,9 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
         }
     }
 
-    public void stopVideoStream(String ownerId, final ICommandListener listener){
-        Timber.d("Video stream stop request from %s. Video owner is %s.", ownerId, videoOwnerId.get());
-        if(TextUtils.isEmpty(ownerId)){
+    public void stopVideoStream(String appId, String currentVideoTag, final ICommandListener listener){
+        Timber.d("Video stream stop request from %s. Video owner is %s.", appId, videoOwnerId.get());
+        if(TextUtils.isEmpty(appId)){
             Timber.w("Owner id is empty.");
             postErrorEvent(CommandExecutionError.COMMAND_DENIED, listener);
             return;
@@ -327,8 +357,14 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
             return;
         }
 
-        if(ownerId.equals(currentVideoOwner) && videoOwnerId.compareAndSet(currentVideoOwner, NO_VIDEO_OWNER)){
-            Timber.d("Stopping video decoding. Current owner is %s.", videoOwnerId.get());
+        if(currentVideoTag == null)
+            currentVideoTag = "";
+
+        if(appId.equals(currentVideoOwner) && currentVideoTag.equals(videoTagRef.get())
+                && videoOwnerId.compareAndSet(currentVideoOwner, NO_VIDEO_OWNER)){
+            videoTagRef.set("");
+
+            Timber.d("Stopping video decoding. Current owner is %s.", currentVideoOwner);
             artooMgr.stopDecoding(new DecoderListener() {
                 @Override
                 public void onDecodingStarted() {
@@ -345,15 +381,29 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
                 }
             });
 
-            artooMgr.stopVideoManager();
         }
         else{
             postErrorEvent(CommandExecutionError.COMMAND_DENIED, listener);
         }
     }
 
+    public void tryStoppingVideoStream(String parentId){
+        if(TextUtils.isEmpty(parentId))
+            return;
+
+        final String videoOwner = videoOwnerId.get();
+        if(NO_VIDEO_OWNER.equals(videoOwner))
+            return;
+
+        if(videoOwner.equals(parentId)){
+            Timber.d("Stopping video owned by %s", parentId);
+            stopVideoStream(parentId, videoTagRef.get(), null);
+        }
+    }
+
     private void resetVideoOwner(){
-        Timber.d("Resetting video owner from %s", videoOwnerId.get());
+        Timber.d("Resetting video tag (%s) and owner id (%s)", videoTagRef.get(), videoOwnerId.get());
+        videoTagRef.set("");
         videoOwnerId.set(NO_VIDEO_OWNER);
         artooMgr.stopDecoding(null);
     }

@@ -19,17 +19,20 @@ import timber.log.Timber;
  */
 public abstract class AbstractLinkManager<T extends AbstractLinkManager.LinkListener> implements IpConnectionListener {
 
-    private static final long RECONNECT_COUNTDOWN = 1000l; //ms
+    protected static final long RECONNECT_COUNTDOWN = 1000l; //ms
 
     public interface LinkListener {
         void onLinkConnected();
 
         void onLinkDisconnected();
+
+        void onVersionsUpdated();
     }
 
     private final Runnable reconnectTask = new Runnable() {
         @Override
         public void run() {
+            handler.removeCallbacks(reconnectTask);
             linkConn.connect();
         }
     };
@@ -41,7 +44,6 @@ public abstract class AbstractLinkManager<T extends AbstractLinkManager.LinkList
     protected final Context context;
     protected final AbstractIpConnection linkConn;
 
-    private int disconnectTracker = 0;
     private T linkListener;
 
     public AbstractLinkManager(Context context, AbstractIpConnection ipConn, Handler handler, ExecutorService asyncExecutor) {
@@ -109,7 +111,6 @@ public abstract class AbstractLinkManager<T extends AbstractLinkManager.LinkList
     }
 
     public void start(T listener) {
-        disconnectTracker = 0;
         handler.removeCallbacks(reconnectTask);
 
         isStarted.set(true);
@@ -129,7 +130,6 @@ public abstract class AbstractLinkManager<T extends AbstractLinkManager.LinkList
 
     @Override
     public void onIpConnected() {
-        disconnectTracker = 0;
         handler.removeCallbacks(reconnectTask);
         if (linkListener != null)
             linkListener.onLinkConnected();
@@ -140,7 +140,7 @@ public abstract class AbstractLinkManager<T extends AbstractLinkManager.LinkList
         if (isStarted.get()) {
             if(shouldReconnect()) {
                 //Try to reconnect
-                handler.postDelayed(reconnectTask, ++disconnectTracker * RECONNECT_COUNTDOWN);
+                handler.postDelayed(reconnectTask, RECONNECT_COUNTDOWN);
             }
 
             if (linkListener != null)

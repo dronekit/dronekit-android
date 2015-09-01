@@ -10,6 +10,7 @@ import com.o3dr.services.android.lib.model.action.Action;
 
 import java.util.concurrent.ConcurrentHashMap;
 
+import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.ACTION_REFRESH_SOLO_VERSIONS;
 import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.ACTION_UPDATE_BUTTON_SETTINGS;
 import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.ACTION_UPDATE_CONTROLLER_MODE;
 import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.ACTION_UPDATE_EU_TX_POWER_COMPLIANCE;
@@ -95,5 +96,12 @@ public class SoloConfigApi extends SoloApi {
         Bundle params = new Bundle();
         params.putBoolean(EXTRA_EU_TX_POWER_COMPLIANT, isCompliant);
         drone.performAsyncActionOnDroneThread(new Action(ACTION_UPDATE_EU_TX_POWER_COMPLIANCE, params), listener);
+    }
+
+    /**
+     * Refresh the solo versions info.
+     */
+    public void refreshSoloVersions(){
+        drone.performAsyncActionOnDroneThread(new Action(ACTION_REFRESH_SOLO_VERSIONS), null);
     }
 }
