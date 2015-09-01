@@ -3,6 +3,7 @@ package org.droidplanner.services.android.core.gcs.follow;
 import android.os.Handler;
 
 import org.droidplanner.services.android.core.MAVLink.command.doCmd.MavLinkDoCmds;
+import org.droidplanner.services.android.core.drone.DroneManager;
 import org.droidplanner.services.android.core.gcs.roi.ROIEstimator;
 import org.droidplanner.services.android.core.helpers.coordinates.Coord2D;
 import org.droidplanner.services.android.core.helpers.coordinates.Coord3D;
@@ -30,8 +31,8 @@ public class FollowGuidedScan extends FollowAbove {
         return FollowModes.GUIDED_SCAN;
     }
 
-    public FollowGuidedScan(MavLinkDrone drone, Handler handler) {
-        super(drone, handler);
+    public FollowGuidedScan(DroneManager droneMgr, Handler handler) {
+        super(droneMgr, handler);
     }
 
     @Override

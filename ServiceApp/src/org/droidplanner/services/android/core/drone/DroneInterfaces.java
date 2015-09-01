@@ -183,26 +183,6 @@ public class DroneInterfaces {
 		MISSION_WP_UPDATE,
 
 		/**
-		 * 'Follow' mode has been enabled.
-		 */
-		FOLLOW_START,
-
-		/**
-		 * 'Follow' mode has been disabled.
-		 */
-		FOLLOW_STOP,
-		
-		/**
-		 * 'Follow' state has been updated.
-		 */
-		FOLLOW_UPDATE,
-
-		/**
-         * 
-         */
-		FOLLOW_CHANGE_TYPE,
-
-		/**
 		 *
 		 */
 		WARNING_SIGNAL_WEAK,

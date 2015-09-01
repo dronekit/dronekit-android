@@ -9,19 +9,20 @@ import android.util.SparseArray;
 import android.view.Surface;
 
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
-import com.o3dr.services.android.lib.drone.companion.solo.SoloControllerMode;
+import com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerMode;
 import com.o3dr.services.android.lib.drone.companion.solo.button.ButtonPacket;
 import com.o3dr.services.android.lib.drone.companion.solo.button.ButtonTypes;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSetting;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSettingSetter;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloGoproState;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloMessageLocation;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
 import com.o3dr.services.android.lib.model.ICommandListener;
 
 import org.droidplanner.services.android.core.drone.companion.CompComp;
-import org.droidplanner.services.android.core.drone.companion.solo.artoo.ArtooLinkListener;
-import org.droidplanner.services.android.core.drone.companion.solo.artoo.ArtooLinkManager;
+import org.droidplanner.services.android.core.drone.companion.solo.controller.ControllerLinkListener;
+import org.droidplanner.services.android.core.drone.companion.solo.controller.ControllerLinkManager;
 import org.droidplanner.services.android.core.drone.companion.solo.sololink.SoloLinkListener;
 import org.droidplanner.services.android.core.drone.companion.solo.sololink.SoloLinkManager;
 import org.droidplanner.services.android.utils.NetworkUtils;
@@ -37,7 +38,7 @@ import timber.log.Timber;
  * Sololink companion computer implementation
  * Created by Fredia Huya-Kouadio on 7/9/15.
  */
-public class SoloComp implements CompComp, SoloLinkListener, ArtooLinkListener {
+public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListener {
 
     public interface SoloCompListener {
         void onConnected();
@@ -62,7 +63,7 @@ public class SoloComp implements CompComp, SoloLinkListener, ArtooLinkListener {
     public static final String SSH_USERNAME = "root";
     public static final String SSH_PASSWORD = "TjSDBkAu";
 
-    private final ArtooLinkManager artooMgr;
+    private final ControllerLinkManager artooMgr;
     private final SoloLinkManager soloLinkMgr;
 
     private final Context context;
@@ -86,7 +87,7 @@ public class SoloComp implements CompComp, SoloLinkListener, ArtooLinkListener {
         this.handler = handler;
         asyncExecutor = Executors.newCachedThreadPool();
 
-        this.artooMgr = new ArtooLinkManager(context, handler, asyncExecutor);
+        this.artooMgr = new ControllerLinkManager(context, handler, asyncExecutor);
         this.soloLinkMgr = new SoloLinkManager(context, handler, asyncExecutor);
     }
 
@@ -330,7 +331,8 @@ public class SoloComp implements CompComp, SoloLinkListener, ArtooLinkListener {
             Timber.d("Stopping video decoding. Current owner is %s.", videoOwnerId.get());
             artooMgr.stopDecoding(new DecoderListener() {
                 @Override
-                public void onDecodingStarted() {}
+                public void onDecodingStarted() {
+                }
 
                 @Override
                 public void onDecodingError() {
@@ -405,6 +407,18 @@ public class SoloComp implements CompComp, SoloLinkListener, ArtooLinkListener {
                 }
             });
         }
+    }
+
+    public void enableFollowDataConnection(){
+        soloLinkMgr.enableFollowDataConnection();
+    }
+
+    public void disableFollowDataConnection(){
+        soloLinkMgr.disableFollowDataConnection();
+    }
+
+    public void updateFollowCenter(SoloMessageLocation location){
+        soloLinkMgr.sendTLVPacket(location, true, null);
     }
 
 }

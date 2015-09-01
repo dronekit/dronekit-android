@@ -19,17 +19,18 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import static com.o3dr.services.android.lib.drone.action.GimbalActions.*;
 
-public final class GimbalApi implements Api, DroneListener {
+public final class GimbalApi extends Api implements DroneListener {
 
     private static final ConcurrentHashMap<Drone, GimbalApi> gimbalApiCache = new ConcurrentHashMap<>();
+    private static final Builder<GimbalApi> apiBuilder = new Builder<GimbalApi>() {
+        @Override
+        public GimbalApi build(Drone drone) {
+            return new GimbalApi(drone);
+        }
+    };
 
     public static GimbalApi getApi(final Drone drone){
-        return ApiUtils.getApi(drone, gimbalApiCache, new Builder<GimbalApi>() {
-            @Override
-            public GimbalApi build() {
-                return new GimbalApi(drone);
-            }
-        });
+        return getApi(drone, gimbalApiCache, apiBuilder);
     }
 
     public interface GimbalOrientationListener {

@@ -12,10 +12,14 @@ public class Gps implements DroneAttribute {
 
     public static final String LOCK_2D = "2D";
     public static final String LOCK_3D = "3D";
+    public static final String LOCK_3D_DGPS = "3D+DGPS";
+    public static final String LOCK_3D_RTK = "3D+RTK";
     public static final String NO_FIX = "NoFix";
 
     private final static int LOCK_2D_TYPE = 2;
     private final static int LOCK_3D_TYPE = 3;
+    private final static int LOCK_3D_DGPS_TYPE = 4;
+    private final static int LOCK_3D_RTK_TYPE = 5;
 
     private double mGpsEph;
     private int mSatCount;
@@ -58,6 +62,12 @@ public class Gps implements DroneAttribute {
 
             case LOCK_3D_TYPE:
                 return LOCK_3D;
+
+            case LOCK_3D_DGPS_TYPE:
+                return LOCK_3D_DGPS;
+
+            case LOCK_3D_RTK_TYPE:
+                return LOCK_3D_RTK;
 
             default:
                 return NO_FIX;

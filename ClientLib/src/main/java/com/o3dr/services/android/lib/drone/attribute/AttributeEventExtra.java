@@ -5,10 +5,15 @@ package com.o3dr.services.android.lib.drone.attribute;
  */
 public class AttributeEventExtra {
 
+    //Private to prevent instantiation
+    private AttributeEventExtra() {
+    }
+
     private static final String PACKAGE_NAME = "com.o3dr.services.android.lib.attribute.event.extra";
 
     /**
      * Used to access autopilot error type.
+     *
      * @see {@link com.o3dr.services.android.lib.drone.attribute.error.ErrorType}
      * @see {@link com.o3dr.services.android.lib.drone.attribute.AttributeEvent#AUTOPILOT_ERROR}
      */
@@ -16,6 +21,7 @@ public class AttributeEventExtra {
 
     /**
      * Used to access autopilot messages.
+     *
      * @see {@link com.o3dr.services.android.lib.drone.attribute.AttributeEvent#AUTOPILOT_MESSAGE}
      */
     public static final String EXTRA_AUTOPILOT_MESSAGE = PACKAGE_NAME + ".AUTOPILOT_MESSAGE";
@@ -29,12 +35,14 @@ public class AttributeEventExtra {
 
     /**
      * Used to access the magnetometer calibration progress.
+     *
      * @see {@link com.o3dr.services.android.lib.drone.calibration.magnetometer.MagnetometerCalibrationProgress}
      */
     public static final String EXTRA_CALIBRATION_MAG_PROGRESS = PACKAGE_NAME + ".CALIBRATION_MAG_PROGRESS";
 
     /**
      * Used to access the result from the magnetometer calibration.
+     *
      * @see {@link com.o3dr.services.android.lib.drone.calibration.magnetometer.MagnetometerCalibrationResult}
      */
     public static final String EXTRA_CALIBRATION_MAG_RESULT = PACKAGE_NAME + ".CALIBRATION_MAG_RESULT";
@@ -51,64 +59,55 @@ public class AttributeEventExtra {
     public static final String EXTRA_MISSION_LAST_REACHED_WAYPOINT = PACKAGE_NAME + "" +
             ".MISSION_REACHED_WAYPOINT";
 
-    public static final String EXTRA_MISSION_DRONIE_BEARING = PACKAGE_NAME + "" +
-            ".MISSION_DRONIE_BEARING";
+    public static final String EXTRA_MISSION_DRONIE_BEARING = PACKAGE_NAME + ".MISSION_DRONIE_BEARING";
 
     /**
      * Used to retrieve the count of the set of parameters being refreshed.
+     *
      * @see {@link AttributeEvent#PARAMETER_RECEIVED}
      */
     public static final String EXTRA_PARAMETERS_COUNT = PACKAGE_NAME + ".PARAMETERS_COUNT";
 
     /**
      * Used to retrieve the index of the received parameter.
+     *
      * @see {@link AttributeEvent#PARAMETER_RECEIVED}
      */
     public static final String EXTRA_PARAMETER_INDEX = PACKAGE_NAME + ".PARAMETER_INDEX";
 
     /**
      * Used to retrieve the name of the received parameter.
+     *
      * @see {@link AttributeEvent#PARAMETER_RECEIVED}
      */
     public static final String EXTRA_PARAMETER_NAME = PACKAGE_NAME + ".PARAMETER_NAME";
 
     /**
      * Used to retrieve the value of the received parameter.
+     *
      * @see {@link AttributeEvent#PARAMETER_RECEIVED}
      */
     public static final String EXTRA_PARAMETER_VALUE = PACKAGE_NAME + ".PARAMETER_VALUE";
 
     /**
-     * Used to retrieve the {@link com.o3dr.services.android.lib.drone.companion.solo.button.ButtonPacket} object describing the button event.
-     */
-    public static final String EXTRA_SOLOLINK_BUTTON_EVENT = PACKAGE_NAME + ".EXTRA_SOLOLINK_BUTTON_EVENT";
-
-    /**
-     * Used to retrieve the received sololink message data in bytes.
-     */
-    public static final String EXTRA_SOLOLINK_MESSAGE_DATA = PACKAGE_NAME + ".EXTRA_SOLOLINK_MESSAGE_DATA";
-
-    /**
      * Used to retrieve the gimbal pitch angle in degree.
+     *
      * @see {@link AttributeEvent#GIMBAL_ORIENTATION_UPDATED}
      */
     public static final String EXTRA_GIMBAL_ORIENTATION_PITCH = PACKAGE_NAME + ".EXTRA_GIMBAL_ORIENTATION_PITCH";
 
     /**
      * Used to retrieve the gimbal roll angle in degree.
+     *
      * @see {@link AttributeEvent#GIMBAL_ORIENTATION_UPDATED}
      */
     public static final String EXTRA_GIMBAL_ORIENTATION_ROLL = PACKAGE_NAME + ".EXTRA_GIMBAL_ORIENTATION_ROLL";
 
     /**
      * Used to retrieve the gimbal yaw angle in degree.
+     *
      * @see {@link AttributeEvent#GIMBAL_ORIENTATION_UPDATED}
      */
     public static final String EXTRA_GIMBAL_ORIENTATION_YAW = PACKAGE_NAME + ".EXTRA_GIMBAL_ORIENTATION_YAW";
 
-    /**
-     * Used to retrieve the boolean value specifying whether the controller is compliant with the EU tx power levels.
-     * @see {@link AttributeEvent#SOLOLINK_EU_TX_POWER_COMPLIANCE_UPDATED}
-     */
-    public static final String EXTRA_SOLOLINK_EU_TX_POWER_COMPLIANT = PACKAGE_NAME + ".EXTRA_SOLOLINK_EU_TX_POWER_COMPLIANT";
 }

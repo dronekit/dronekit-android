@@ -60,6 +60,9 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener {
     }
 
     public static boolean isGuidedMode(MavLinkDrone drone) {
+        if(drone == null)
+            return false;
+
         final int droneType = drone.getType();
         final ApmModes droneMode = drone.getState().getMode();
 

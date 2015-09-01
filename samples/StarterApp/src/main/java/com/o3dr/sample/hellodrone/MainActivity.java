@@ -18,7 +18,7 @@ import android.widget.Toast;
 
 import com.o3dr.android.client.ControlTower;
 import com.o3dr.android.client.Drone;
-import com.o3dr.android.client.apis.SoloLinkApi;
+import com.o3dr.android.client.apis.solo.SoloCameraApi;
 import com.o3dr.android.client.apis.VehicleApi;
 import com.o3dr.android.client.interfaces.DroneListener;
 import com.o3dr.android.client.interfaces.TowerListener;
@@ -26,6 +26,8 @@ import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
+import com.o3dr.services.android.lib.drone.companion.solo.SoloAttributes;
+import com.o3dr.services.android.lib.drone.companion.solo.SoloState;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionResult;
 import com.o3dr.services.android.lib.drone.connection.ConnectionType;
@@ -187,6 +189,7 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
                 alertUser("Drone Connected");
                 updateConnectedButton(this.drone.isConnected());
                 updateArmButton();
+                checkSoloState();
                 break;
 
             case AttributeEvent.STATE_DISCONNECTED:
@@ -230,6 +233,16 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
                 break;
         }
 
+    }
+
+    private void checkSoloState() {
+        final SoloState soloState = drone.getAttribute(SoloAttributes.SOLO_STATE);
+        if(soloState == null){
+            alertUser("Unable to retrieve the solo state.");
+        }
+        else{
+            alertUser("Solo state is up to date.");
+        }
     }
 
     @Override
@@ -425,7 +438,7 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
     // ==========================================================
 
     protected void alertUser(String message) {
-        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
         Log.d(TAG, message);
     }
 
@@ -440,7 +453,7 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
     }
 
     private void takePhoto() {
-        SoloLinkApi.getApi(drone).takePhoto(new AbstractCommandListener() {
+        SoloCameraApi.getApi(drone).takePhoto(new AbstractCommandListener() {
             @Override
             public void onSuccess() {
                 alertUser("Photo taken.");
@@ -459,7 +472,7 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
     }
 
     private void toggleVideoRecording() {
-        SoloLinkApi.getApi(drone).toggleVideoRecording(new AbstractCommandListener() {
+        SoloCameraApi.getApi(drone).toggleVideoRecording(new AbstractCommandListener() {
             @Override
             public void onSuccess() {
                 alertUser("Video recording toggled.");
@@ -478,7 +491,7 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
     }
 
     private void startVideoStream(Surface videoSurface){
-        SoloLinkApi.getApi(drone).startVideoStream(videoSurface, new AbstractCommandListener() {
+        SoloCameraApi.getApi(drone).startVideoStream(videoSurface, new AbstractCommandListener() {
             @Override
             public void onSuccess() {
                 if(stopVideoStream != null)
@@ -501,7 +514,7 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
     }
 
     private void stopVideoStream() {
-        SoloLinkApi.getApi(drone).stopVideoStream(new SimpleCommandListener() {
+        SoloCameraApi.getApi(drone).stopVideoStream(new SimpleCommandListener() {
             @Override
             public void onSuccess() {
                 if (stopVideoStream != null)
