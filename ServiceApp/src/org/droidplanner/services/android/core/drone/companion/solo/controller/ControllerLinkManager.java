@@ -424,6 +424,7 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
                     }
                     Timber.d("Response from switch mode command was: %s", response);
                     controllerMode.set(mode);
+                    linkListener.onControllerModeUpdated();
                 } catch (IOException e) {
                     Timber.e(e, "Error occurred while changing artoo modes.");
                     postTimeoutEvent(listener);

@@ -20,6 +20,7 @@ public class SoloState implements DroneAttribute {
 
     private String controllerVersion;
     private String controllerFirmwareVersion;
+    private int controllerMode;
 
     private String vehicleVersion;
     private String autopilotVersion;
@@ -32,12 +33,13 @@ public class SoloState implements DroneAttribute {
     public SoloState(){}
 
     public SoloState(String autopilotVersion, String controllerFirmwareVersion,
-                     String controllerVersion, String vehicleVersion,
+                     String controllerVersion, int controllerMode, String vehicleVersion,
                      String wifiPassword, String wifiSsid, boolean isEUTxPowerCompliant,
                      SparseArray<SoloButtonSetting> buttonSettings, String gimbalVersion) {
         this.autopilotVersion = autopilotVersion;
         this.controllerFirmwareVersion = controllerFirmwareVersion;
         this.controllerVersion = controllerVersion;
+        this.controllerMode = controllerMode;
         this.vehicleVersion = vehicleVersion;
         this.wifiPassword = wifiPassword;
         this.wifiSsid = wifiSsid;
@@ -56,6 +58,10 @@ public class SoloState implements DroneAttribute {
 
     public String getControllerVersion() {
         return controllerVersion;
+    }
+
+    public int getControllerMode(){
+        return controllerMode;
     }
 
     public String getVehicleVersion() {
@@ -92,6 +98,7 @@ public class SoloState implements DroneAttribute {
         dest.writeString(this.wifiSsid);
         dest.writeString(this.wifiPassword);
         dest.writeString(this.controllerVersion);
+        dest.writeInt(this.controllerMode);
         dest.writeString(this.controllerFirmwareVersion);
         dest.writeString(this.vehicleVersion);
         dest.writeString(this.autopilotVersion);
@@ -119,6 +126,7 @@ public class SoloState implements DroneAttribute {
         this.wifiSsid = in.readString();
         this.wifiPassword = in.readString();
         this.controllerVersion = in.readString();
+        this.controllerMode = in.readInt();
         this.controllerFirmwareVersion = in.readString();
         this.vehicleVersion = in.readString();
         this.autopilotVersion = in.readString();

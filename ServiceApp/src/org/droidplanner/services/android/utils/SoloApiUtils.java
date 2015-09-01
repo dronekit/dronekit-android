@@ -32,7 +32,7 @@ public class SoloApiUtils {
         final SoloComp soloComp = droneManager.getSoloComp();
         final Pair<String, String> wifiSettings = soloComp.getWifiSettings();
         return new SoloState(soloComp.getAutopilotVersion(), soloComp.getControllerFirmwareVersion(),
-                soloComp.getControllerVersion(), soloComp.getVehicleVersion(),
+                soloComp.getControllerVersion(), soloComp.getControllerMode(), soloComp.getVehicleVersion(),
                 wifiSettings.second, wifiSettings.first, soloComp.isEUTxPowerCompliant(),
                 soloComp.getButtonSettings(), soloComp.getGimbalVersion());
     }

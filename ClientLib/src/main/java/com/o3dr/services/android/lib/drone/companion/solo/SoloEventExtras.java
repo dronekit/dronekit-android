@@ -56,4 +56,10 @@ public class SoloEventExtras {
      * @see {@link SoloEvents#SOLO_VERSIONS_UPDATED}
      */
     public static final String EXTRA_SOLO_GIMBAL_VERSION = PACKAGE_NAME + ".EXTRA_SOLO_GIMBAL_VERSION";
+
+    /**
+     * Used to retreive the controller mode.
+     * @see {@link SoloEvents#SOLO_CONTROLLER_MODE}
+     */
+    public static final String EXTRA_SOLO_CONTROLLER_MODE = PACKAGE_NAME + ".EXTRA_SOLO_CONTROLLER_MODE";
 }
