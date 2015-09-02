@@ -1,7 +1,5 @@
 package com.o3dr.services.android.lib.drone.companion.solo;
 
-import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
-
 /**
  * Holds handles used to retrieve additional information broadcast along a drone event.
  * Created by Fredia Huya-Kouadio on 7/31/15.
@@ -58,8 +56,9 @@ public class SoloEventExtras {
     public static final String EXTRA_SOLO_GIMBAL_VERSION = PACKAGE_NAME + ".EXTRA_SOLO_GIMBAL_VERSION";
 
     /**
-     * Used to retreive the controller mode.
-     * @see {@link SoloEvents#SOLO_CONTROLLER_MODE}
+     * Used to retrieve the controller mode.
+     * @see {@link com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerMode.ControllerMode}
+     * @see {@link SoloEvents#SOLO_CONTROLLER_MODE_UPDATED}
      */
     public static final String EXTRA_SOLO_CONTROLLER_MODE = PACKAGE_NAME + ".EXTRA_SOLO_CONTROLLER_MODE";
 }

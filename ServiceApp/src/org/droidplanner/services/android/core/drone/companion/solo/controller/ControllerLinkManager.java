@@ -157,6 +157,23 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
         }
     };
 
+    private final Runnable artooModeRetriever = new Runnable(){
+            @Override
+            public void run() {
+                Timber.d("Retrieving Artoo controller mode");
+                try{
+                    final String response = sshLink.execute("sololink_config --get-ui-mode");
+                    if (response.trim().equals("1")){
+                        controllerMode.set(SoloControllerMode.MODE_1);
+                    } else {
+                        controllerMode.set(SoloControllerMode.MODE_2);
+                    }
+                } catch (IOException e){
+                    Timber.e(e, "Error occurred while getting controller mode.");
+                }
+            }
+        };
+
     private ControllerLinkListener linkListener;
 
     public ControllerLinkManager(Context context, final Handler handler, ExecutorService asyncExecutor) {
@@ -435,25 +452,6 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
 
     }
 
-    private final Runnable getArtooMode(){
-        return new Runnable() {
-            @Override
-            public void run() {
-                Timber.d("Retrieving Artoo controller mode");
-                try{
-                    final String response = sshLink.execute("sololink_config --get-ui-mode");
-                    if (response.trim().equals("1")){
-                        controllerMode.set(SoloControllerMode.MODE_1);
-                    } else {
-                        controllerMode.set(SoloControllerMode.MODE_2);
-                    }
-                } catch (IOException e){
-                    Timber.e(e, "Error occurred while getting controller mode.");
-                }
-            }
-        };
-    }
-
     public void setEUTxPowerCompliance(final boolean compliant, final ICommandListener listener){
         postAsyncTask(new Runnable() {
                 @Override
@@ -493,7 +491,7 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
         postAsyncTask(checkEUTxPowerCompliance);
     }
     private void loadCurrentControllerMode(){
-        postAsyncTask(getArtooMode());
+        postAsyncTask(artooModeRetriever);
     }
 
     private void restartHostapdService(){

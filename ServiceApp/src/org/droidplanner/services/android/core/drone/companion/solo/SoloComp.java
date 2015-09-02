@@ -238,6 +238,7 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
         return soloLinkMgr.getVehicleVersion();
     }
 
+    @SoloControllerMode.ControllerMode
     public int getControllerMode(){
         return  artooMgr.getControllerMode();
     }
