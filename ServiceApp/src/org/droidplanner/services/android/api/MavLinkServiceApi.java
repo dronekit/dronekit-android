@@ -3,30 +3,25 @@ package org.droidplanner.services.android.api;
 import com.MAVLink.MAVLinkPacket;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 
-import org.droidplanner.core.MAVLink.connection.MavLinkConnection;
-import org.droidplanner.core.MAVLink.connection.MavLinkConnectionListener;
+import org.droidplanner.services.android.core.MAVLink.connection.MavLinkConnection;
+import org.droidplanner.services.android.core.MAVLink.connection.MavLinkConnectionListener;
 import org.droidplanner.services.android.communication.connection.AndroidMavLinkConnection;
 
 import java.lang.ref.SoftReference;
-import java.lang.ref.WeakReference;
 
 /**
  * MavLinkService app api.
  */
 public class MavLinkServiceApi {
 
-    private final SoftReference<DroidPlannerService> mServiceRef;
+    private final DroidPlannerService mService;
 
     public MavLinkServiceApi(DroidPlannerService service) {
-        mServiceRef = new SoftReference<>(service);
+        mService = service;
     }
 
     private DroidPlannerService getService() {
-        DroidPlannerService service = mServiceRef.get();
-        if (service == null)
-            throw new IllegalStateException("Lost reference to parent service.");
-
-        return service;
+        return mService;
     }
 
     public boolean sendData(ConnectionParameter connParams, MAVLinkPacket packet) {

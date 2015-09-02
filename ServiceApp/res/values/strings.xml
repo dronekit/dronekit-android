@@ -5,7 +5,6 @@
     <string name="navigation_settings_label">Settings</string>
     <string name="navigation_account_label">Account</string>
     <string name="app_title" translatable="false">3DR Services</string>
-    <string name="failed_start_calibration_message">Unable to start calibration!</string>
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
     <string name="warning_arm_thr_below_fs">Arm: Throttle below failsafe</string>
@@ -26,7 +25,9 @@
     <string name="pref_mavlink_stream_rate_rc_channels">RC Channel Data</string>
     <string name="pref_mavlink_stream_rate_raw_sensors">Raw Sensors</string>
     <string name="pref_mavlink_stream_rate_raw_controller">Raw Controller</string>
+
     <string name="app_connections_default_message">NO ACTIVE APPS</string>
+
     <string name="label_learn_more">Learn more</string>
     <string name="label_action_button_install">Install</string>
     <string name="label_action_button_open">Open</string>

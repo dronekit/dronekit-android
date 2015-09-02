@@ -4,6 +4,7 @@ package com.o3dr.services.android.lib.model;
 import com.o3dr.services.android.lib.model.IObserver;
 import com.o3dr.services.android.lib.model.IMavlinkObserver;
 import com.o3dr.services.android.lib.model.action.Action;
+import com.o3dr.services.android.lib.model.ICommandListener;
 
 /**
 * Interface used to access the drone properties.
@@ -20,6 +21,7 @@ interface IDroneApi {
 
     /**
     * Performs an action among the set exposed by the api.
+    * @param action Action to perform.
     */
     void performAction(inout Action action);
 
@@ -27,6 +29,7 @@ interface IDroneApi {
 
     /**
     * Performs asynchronously an action among the set exposed by the api.
+    * @param action Action to perform.
     */
     oneway void performAsyncAction(in Action action);
 
@@ -53,5 +56,20 @@ interface IDroneApi {
     * @param observer the observer to remove.
     */
     oneway void removeMavlinkObserver(IMavlinkObserver observer);
+
+    /**
+    * Performs an action among the set exposed by the api.
+    * @param action Action to perform.
+    */
+    void executeAction(inout Action action, ICommandListener listener);
+
+    /*** Oneway method calls ***/
+
+    /**
+    * Performs asynchronously an action among the set exposed by the api.
+    * @param action Action to perform.
+    * @param listener Register a callback to be invoken when the action is executed.
+    */
+    oneway void executeAsyncAction(in Action action, ICommandListener listener);
 
 }

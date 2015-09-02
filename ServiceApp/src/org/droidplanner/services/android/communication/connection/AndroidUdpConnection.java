@@ -3,8 +3,8 @@ package org.droidplanner.services.android.communication.connection;
 import android.content.Context;
 import android.util.Log;
 
-import org.droidplanner.core.MAVLink.connection.UdpConnection;
-import org.droidplanner.core.model.Logger;
+import org.droidplanner.services.android.core.MAVLink.connection.UdpConnection;
+import org.droidplanner.services.android.core.model.Logger;
 
 import java.io.IOException;
 import java.net.InetAddress;

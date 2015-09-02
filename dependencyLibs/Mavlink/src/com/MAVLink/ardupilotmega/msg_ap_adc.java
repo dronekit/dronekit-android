@@ -9,7 +9,7 @@ package com.MAVLink.ardupilotmega;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-        
+
 /**
 * raw ADC output
 */
@@ -20,32 +20,32 @@ public class msg_ap_adc extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_AP_ADC;
 
 
-      
+    
     /**
     * ADC output 1
     */
     public int adc1;
-      
+    
     /**
     * ADC output 2
     */
     public int adc2;
-      
+    
     /**
     * ADC output 3
     */
     public int adc3;
-      
+    
     /**
     * ADC output 4
     */
     public int adc4;
-      
+    
     /**
     * ADC output 5
     */
     public int adc5;
-      
+    
     /**
     * ADC output 6
     */
@@ -62,17 +62,17 @@ public class msg_ap_adc extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_AP_ADC;
-              
+        
         packet.payload.putUnsignedShort(adc1);
-              
+        
         packet.payload.putUnsignedShort(adc2);
-              
+        
         packet.payload.putUnsignedShort(adc3);
-              
+        
         packet.payload.putUnsignedShort(adc4);
-              
+        
         packet.payload.putUnsignedShort(adc5);
-              
+        
         packet.payload.putUnsignedShort(adc6);
         
         return packet;
@@ -85,17 +85,17 @@ public class msg_ap_adc extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-              
+        
         this.adc1 = payload.getUnsignedShort();
-              
+        
         this.adc2 = payload.getUnsignedShort();
-              
+        
         this.adc3 = payload.getUnsignedShort();
-              
+        
         this.adc4 = payload.getUnsignedShort();
-              
+        
         this.adc5 = payload.getUnsignedShort();
-              
+        
         this.adc6 = payload.getUnsignedShort();
         
     }
@@ -116,7 +116,7 @@ public class msg_ap_adc extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_AP_ADC;
-        unpack(mavLinkPacket.payload);        
+        unpack(mavLinkPacket.payload);
     }
 
                 

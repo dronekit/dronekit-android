@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Created by fhuya on 11/30/14.
  */
-public class CameraProxy implements Parcelable {
+public class CameraProxy implements DroneAttribute {
 
     private CameraDetail cameraDetail;
     private List<FootPrint> footPrints = new ArrayList<FootPrint>();

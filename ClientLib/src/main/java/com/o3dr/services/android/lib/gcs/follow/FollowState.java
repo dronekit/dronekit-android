@@ -4,10 +4,12 @@ import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.o3dr.services.android.lib.drone.property.DroneAttribute;
+
 /**
  * Created by fhuya on 11/5/14.
  */
-public class FollowState implements Parcelable {
+public class FollowState implements DroneAttribute {
 
     public static final int STATE_INVALID = 0;
     public static final int STATE_DRONE_NOT_ARMED = 1;

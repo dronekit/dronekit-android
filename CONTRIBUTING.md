@@ -10,6 +10,8 @@ Make your change. Compile and test the results ([help?](https://github.com/Droid
 
     ./gradlew clean build
 
+Make sure your classpath is pointing to Java 1.7. 
+
 Push to your fork and [submit a pull request][pr].
 
 [pr]: https://github.com/Droidplanner/DroneKit-Android/compare/

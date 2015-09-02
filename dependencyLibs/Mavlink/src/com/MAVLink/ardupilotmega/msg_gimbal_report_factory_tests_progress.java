@@ -9,7 +9,7 @@ package com.MAVLink.ardupilotmega;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-        
+
 /**
 * 
             Reports the current status of a section of a running factory test
@@ -22,22 +22,22 @@ public class msg_gimbal_report_factory_tests_progress extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_GIMBAL_REPORT_FACTORY_TESTS_PROGRESS;
 
 
-      
+    
     /**
     * Which factory test is currently running
     */
     public short test;
-      
+    
     /**
     * Which section of the test is currently running.  The meaning of this is test-dependent
     */
     public short test_section;
-      
+    
     /**
     * The progress of the current test section, 0x64=100%
     */
     public short test_section_progress;
-      
+    
     /**
     * The status of the currently executing test section.  The meaning of this is test and section-dependent
     */
@@ -54,13 +54,13 @@ public class msg_gimbal_report_factory_tests_progress extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_GIMBAL_REPORT_FACTORY_TESTS_PROGRESS;
-              
+        
         packet.payload.putUnsignedByte(test);
-              
+        
         packet.payload.putUnsignedByte(test_section);
-              
+        
         packet.payload.putUnsignedByte(test_section_progress);
-              
+        
         packet.payload.putUnsignedByte(test_status);
         
         return packet;
@@ -73,13 +73,13 @@ public class msg_gimbal_report_factory_tests_progress extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-              
+        
         this.test = payload.getUnsignedByte();
-              
+        
         this.test_section = payload.getUnsignedByte();
-              
+        
         this.test_section_progress = payload.getUnsignedByte();
-              
+        
         this.test_status = payload.getUnsignedByte();
         
     }
@@ -100,7 +100,7 @@ public class msg_gimbal_report_factory_tests_progress extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_GIMBAL_REPORT_FACTORY_TESTS_PROGRESS;
-        unpack(mavLinkPacket.payload);        
+        unpack(mavLinkPacket.payload);
     }
 
             

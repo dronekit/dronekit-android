@@ -3,8 +3,8 @@ package org.droidplanner.services.android.utils;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 
-import org.droidplanner.core.helpers.coordinates.Coord2D;
-import org.droidplanner.core.helpers.coordinates.Coord3D;
+import org.droidplanner.services.android.core.helpers.coordinates.Coord2D;
+import org.droidplanner.services.android.core.helpers.coordinates.Coord3D;
 
 import java.util.ArrayList;
 import java.util.List;

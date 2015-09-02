@@ -18,26 +18,39 @@ dependencies {
     compile files('libs/protobuf-java-2.5.0.jar')
 
     compile project(':ClientLib')
-    compile project(':dependencyLibs:Core')
     compile project(':dependencyLibs:usb-serial-for-android:UsbSerialLibrary')
     compile('com.crashlytics.sdk.android:crashlytics:2.2.2@aar') {
         transitive = true;
     }
 
+    compile 'com.jakewharton.timber:timber:3.1.0'
+    compile 'com.jcraft:jsch:0.1.51'
+
+    compile 'com.squareup.okhttp:okhttp:2.3.0'
+    compile 'com.squareup.okhttp:okhttp-urlconnection:2.3.0'
+
     testCompile 'junit:junit:4.12'
     testCompile 'org.robolectric:robolectric:2.4'
 }
 
+//Decomposed version name and code (https://plus.google.com/+JakeWharton/posts/6f5TcVPRZij)
+def versionMajor = 1
+def versionMinor = 3
+def versionPatch = 3
+def versionBuild = 4 //bump for dogfood builds, public betas, etc.
+def versionPrefix = "3DR Services v"
+
 android {
-    compileSdkVersion 21
-    buildToolsVersion "21.1.2"
+    compileSdkVersion Integer.parseInt(project.ANDROID_BUILD_SDK_VERSION)
+    buildToolsVersion project.ANDROID_BUILD_TOOLS_VERSION
 
     defaultConfig {
         applicationId 'org.droidplanner.services.android'
-        minSdkVersion 14
-        targetSdkVersion 21
-        versionCode 10220
-        versionName getGitVersion()
+        minSdkVersion Integer.parseInt(project.ANDROID_BUILD_MIN_SDK_VERSION)
+        targetSdkVersion Integer.parseInt(project.ANDROID_BUILD_TARGET_SDK_VERSION)
+
+        versionCode computeVersionCode(versionMajor, versionMinor, versionPatch, versionBuild)
+        versionName generateVersionName(versionPrefix, versionMajor, versionMinor, versionPatch)
     }
 
     compileOptions {
@@ -92,6 +105,15 @@ android {
     }
 
     buildTypes {
+        debug {
+            versionNameSuffix generateVersionNameSuffix(versionBuild, "dev")
+        }
+
+        beta {
+            signingConfig signingConfigs.release
+            versionNameSuffix generateVersionNameSuffix(versionBuild, "beta")
+        }
+
         release {
             signingConfig signingConfigs.release
         }
@@ -100,20 +122,6 @@ android {
     //FIXME: Remove when lint errors are taken care of.
     lintOptions {
         abortOnError false
-    }
-}
-
-/**
- * @return The most recent git tag to be used as version name for the app.
- */
-def getGitVersion() {
-    def cmd = "git describe --tag"
-    try {
-        def proc = cmd.execute()
-        return proc.text.trim()
-    } catch (IOException e) {
-        //Unable to find 'git'
-        return "please update version name manually"
     }
 }
 

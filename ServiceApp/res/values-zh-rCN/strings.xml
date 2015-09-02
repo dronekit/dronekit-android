@@ -5,7 +5,6 @@
     <string name="uploader_notification_title">上传至Droneshare</string>
     <string name="drawer_open">打开导航抽屉</string>
     <string name="drawer_close">关闭导航抽屉</string>
-    <string name="failed_start_calibration_message">无法启动校准！</string>
 
     <string name="pref_mavlink_rates">流速</string>
     <string name="pref_mavlink_rates_summary">接收无人机飞行数据的速率（以Hz为单位）</string>

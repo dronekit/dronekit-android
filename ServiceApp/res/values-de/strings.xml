@@ -10,7 +10,6 @@
     <string name="warning_arm_thr_below_fs">Entsichern: Schub unterhalb Failsafe</string>
     <string name="drawer_close">Navigationsleiste ausblenden</string>
     <string name="drawer_open">Navigationsleiste anzeigen</string>
-    <string name="failed_start_calibration_message">Kann Kalibrierung nicht starten!</string>
 
     <string name="pref_mavlink_rates">Datenraten</string>
     <string name="pref_mavlink_rates_summary">Rate (in Hz), mit welcher die Flugdaten von der Drohne empfangen werden</string>

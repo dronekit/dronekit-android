@@ -8,7 +8,7 @@ import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 /**
  * Location from which the drone took off.
  */
-public class Home implements Parcelable {
+public class Home implements DroneAttribute {
 
     /**
      * Lauch pad 3D coordinate.

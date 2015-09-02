@@ -7,6 +7,9 @@ import com.o3dr.services.android.lib.util.Utils;
  */
 public class GuidedActions {
 
+    //Private to prevent instantiation
+    private GuidedActions(){}
+
     public static final String ACTION_DO_GUIDED_TAKEOFF = Utils.PACKAGE_NAME + ".action.DO_GUIDED_TAKEOFF";
     public static final String EXTRA_ALTITUDE = "extra_altitude";
 

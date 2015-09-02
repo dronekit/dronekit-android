@@ -9,7 +9,7 @@ package com.MAVLink.ardupilotmega;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-        
+
 /**
 * 
     		Reports the calibration status for each gimbal axis (whether the axis requires calibration or not)
@@ -22,17 +22,17 @@ public class msg_gimbal_report_axis_calibration_status extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_GIMBAL_REPORT_AXIS_CALIBRATION_STATUS;
 
 
-      
+    
     /**
     * Whether or not the yaw axis requires calibration, see GIMBAL_AXIS_CALIBRATION_REQUIRED enumeration
     */
     public short yaw_requires_calibration;
-      
+    
     /**
     * Whether or not the pitch axis requires calibration, see GIMBAL_AXIS_CALIBRATION_REQUIRED enumeration
     */
     public short pitch_requires_calibration;
-      
+    
     /**
     * Whether or not the roll axis requires calibration, see GIMBAL_AXIS_CALIBRATION_REQUIRED enumeration
     */
@@ -49,11 +49,11 @@ public class msg_gimbal_report_axis_calibration_status extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_GIMBAL_REPORT_AXIS_CALIBRATION_STATUS;
-              
+        
         packet.payload.putUnsignedByte(yaw_requires_calibration);
-              
+        
         packet.payload.putUnsignedByte(pitch_requires_calibration);
-              
+        
         packet.payload.putUnsignedByte(roll_requires_calibration);
         
         return packet;
@@ -66,11 +66,11 @@ public class msg_gimbal_report_axis_calibration_status extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-              
+        
         this.yaw_requires_calibration = payload.getUnsignedByte();
-              
+        
         this.pitch_requires_calibration = payload.getUnsignedByte();
-              
+        
         this.roll_requires_calibration = payload.getUnsignedByte();
         
     }
@@ -91,7 +91,7 @@ public class msg_gimbal_report_axis_calibration_status extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_GIMBAL_REPORT_AXIS_CALIBRATION_STATUS;
-        unpack(mavLinkPacket.payload);        
+        unpack(mavLinkPacket.payload);
     }
 
           

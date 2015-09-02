@@ -1,6 +1,6 @@
 # 3DR Services App
 
-### 3DR Services App
+### [3DR Services App](https://play.google.com/store/apps/details?id=org.droidplanner.services.android)
 The app is currently under development, and we would love your help for beta testing.
 To join the beta:
  1. Join the [3DR Services Google+ community](https://plus.google.com/communities/109484130178804610965) or the [3DR Services mailing list](https://groups.google.com/forum/#!forum/3dr-services) (this is required to download the beta from the Google Play store)

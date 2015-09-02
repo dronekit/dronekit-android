@@ -9,7 +9,7 @@ package com.MAVLink.common;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-        
+
 /**
 * This message is emitted as response to MISSION_REQUEST_LIST by the MAV and to initiate a write transaction. The GCS can then request the individual mission item based on the knowledge of the total number of MISSIONs.
 */
@@ -20,17 +20,17 @@ public class msg_mission_count extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_MISSION_COUNT;
 
 
-      
+    
     /**
     * Number of mission items in the sequence
     */
     public int count;
-      
+    
     /**
     * System ID
     */
     public short target_system;
-      
+    
     /**
     * Component ID
     */
@@ -47,11 +47,11 @@ public class msg_mission_count extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_MISSION_COUNT;
-              
+        
         packet.payload.putUnsignedShort(count);
-              
+        
         packet.payload.putUnsignedByte(target_system);
-              
+        
         packet.payload.putUnsignedByte(target_component);
         
         return packet;
@@ -64,11 +64,11 @@ public class msg_mission_count extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-              
+        
         this.count = payload.getUnsignedShort();
-              
+        
         this.target_system = payload.getUnsignedByte();
-              
+        
         this.target_component = payload.getUnsignedByte();
         
     }
@@ -89,7 +89,7 @@ public class msg_mission_count extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_MISSION_COUNT;
-        unpack(mavLinkPacket.payload);        
+        unpack(mavLinkPacket.payload);
     }
 
           

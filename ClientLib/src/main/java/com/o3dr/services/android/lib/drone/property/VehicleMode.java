@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Created by fhuya on 10/28/14.
  */
-public enum VehicleMode implements Parcelable {
+public enum VehicleMode implements DroneAttribute {
 
     PLANE_MANUAL(0, Type.TYPE_PLANE, "Manual"),
     PLANE_CIRCLE(1, Type.TYPE_PLANE, "Circle"),

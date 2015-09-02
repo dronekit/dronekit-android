@@ -9,7 +9,7 @@ package com.MAVLink.common;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-        
+
 /**
 * Request a partial list of mission items from the system/component. http://qgroundcontrol.org/mavlink/waypoint_protocol. If start and end index are the same, just send one waypoint.
 */
@@ -20,22 +20,22 @@ public class msg_mission_request_partial_list extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_MISSION_REQUEST_PARTIAL_LIST;
 
 
-      
+    
     /**
     * Start index, 0 by default
     */
     public short start_index;
-      
+    
     /**
     * End index, -1 by default (-1: send list to end). Else a valid index of the list
     */
     public short end_index;
-      
+    
     /**
     * System ID
     */
     public short target_system;
-      
+    
     /**
     * Component ID
     */
@@ -52,13 +52,13 @@ public class msg_mission_request_partial_list extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_MISSION_REQUEST_PARTIAL_LIST;
-              
+        
         packet.payload.putShort(start_index);
-              
+        
         packet.payload.putShort(end_index);
-              
+        
         packet.payload.putUnsignedByte(target_system);
-              
+        
         packet.payload.putUnsignedByte(target_component);
         
         return packet;
@@ -71,13 +71,13 @@ public class msg_mission_request_partial_list extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-              
+        
         this.start_index = payload.getShort();
-              
+        
         this.end_index = payload.getShort();
-              
+        
         this.target_system = payload.getUnsignedByte();
-              
+        
         this.target_component = payload.getUnsignedByte();
         
     }
@@ -98,7 +98,7 @@ public class msg_mission_request_partial_list extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_MISSION_REQUEST_PARTIAL_LIST;
-        unpack(mavLinkPacket.payload);        
+        unpack(mavLinkPacket.payload);
     }
 
             

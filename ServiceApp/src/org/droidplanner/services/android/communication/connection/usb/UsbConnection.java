@@ -6,8 +6,8 @@ import java.util.Map.Entry;
 
 import org.droidplanner.services.android.communication.connection.AndroidMavLinkConnection;
 import org.droidplanner.services.android.utils.AndroidLogger;
-import org.droidplanner.core.MAVLink.connection.MavLinkConnectionTypes;
-import org.droidplanner.core.model.Logger;
+import org.droidplanner.services.android.core.MAVLink.connection.MavLinkConnectionTypes;
+import org.droidplanner.services.android.core.model.Logger;
 
 import android.content.Context;
 import android.hardware.usb.UsbDevice;

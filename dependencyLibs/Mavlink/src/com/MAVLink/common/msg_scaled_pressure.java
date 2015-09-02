@@ -9,7 +9,7 @@ package com.MAVLink.common;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-        
+
 /**
 * The pressure readings for the typical setup of one absolute and differential pressure sensor. The units are as specified in each field.
 */
@@ -20,22 +20,22 @@ public class msg_scaled_pressure extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_SCALED_PRESSURE;
 
 
-      
+    
     /**
     * Timestamp (milliseconds since system boot)
     */
     public long time_boot_ms;
-      
+    
     /**
     * Absolute pressure (hectopascal)
     */
     public float press_abs;
-      
+    
     /**
     * Differential pressure 1 (hectopascal)
     */
     public float press_diff;
-      
+    
     /**
     * Temperature measurement (0.01 degrees celsius)
     */
@@ -52,13 +52,13 @@ public class msg_scaled_pressure extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_SCALED_PRESSURE;
-              
+        
         packet.payload.putUnsignedInt(time_boot_ms);
-              
+        
         packet.payload.putFloat(press_abs);
-              
+        
         packet.payload.putFloat(press_diff);
-              
+        
         packet.payload.putShort(temperature);
         
         return packet;
@@ -71,13 +71,13 @@ public class msg_scaled_pressure extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-              
+        
         this.time_boot_ms = payload.getUnsignedInt();
-              
+        
         this.press_abs = payload.getFloat();
-              
+        
         this.press_diff = payload.getFloat();
-              
+        
         this.temperature = payload.getShort();
         
     }
@@ -98,7 +98,7 @@ public class msg_scaled_pressure extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_SCALED_PRESSURE;
-        unpack(mavLinkPacket.payload);        
+        unpack(mavLinkPacket.payload);
     }
 
             

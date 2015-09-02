@@ -9,7 +9,7 @@ package com.MAVLink.common;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-        
+
 /**
 * Time synchronization message.
 */
@@ -20,12 +20,12 @@ public class msg_timesync extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_TIMESYNC;
 
 
-      
+    
     /**
     * Time sync timestamp 1
     */
     public long tc1;
-      
+    
     /**
     * Time sync timestamp 2
     */
@@ -42,9 +42,9 @@ public class msg_timesync extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_TIMESYNC;
-              
+        
         packet.payload.putLong(tc1);
-              
+        
         packet.payload.putLong(ts1);
         
         return packet;
@@ -57,9 +57,9 @@ public class msg_timesync extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-              
+        
         this.tc1 = payload.getLong();
-              
+        
         this.ts1 = payload.getLong();
         
     }
@@ -80,7 +80,7 @@ public class msg_timesync extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_TIMESYNC;
-        unpack(mavLinkPacket.payload);        
+        unpack(mavLinkPacket.payload);
     }
 
         

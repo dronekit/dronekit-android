@@ -9,7 +9,7 @@ package com.MAVLink.ardupilotmega;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-        
+
 /**
 * Request a current rally point from MAV. MAV should respond with a RALLY_POINT message. MAV should not respond if the request is invalid.
 */
@@ -20,17 +20,17 @@ public class msg_rally_fetch_point extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_RALLY_FETCH_POINT;
 
 
-      
+    
     /**
     * System ID
     */
     public short target_system;
-      
+    
     /**
     * Component ID
     */
     public short target_component;
-      
+    
     /**
     * point index (first point is 0)
     */
@@ -47,11 +47,11 @@ public class msg_rally_fetch_point extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_RALLY_FETCH_POINT;
-              
+        
         packet.payload.putUnsignedByte(target_system);
-              
+        
         packet.payload.putUnsignedByte(target_component);
-              
+        
         packet.payload.putUnsignedByte(idx);
         
         return packet;
@@ -64,11 +64,11 @@ public class msg_rally_fetch_point extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-              
+        
         this.target_system = payload.getUnsignedByte();
-              
+        
         this.target_component = payload.getUnsignedByte();
-              
+        
         this.idx = payload.getUnsignedByte();
         
     }
@@ -89,7 +89,7 @@ public class msg_rally_fetch_point extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_RALLY_FETCH_POINT;
-        unpack(mavLinkPacket.payload);        
+        unpack(mavLinkPacket.payload);
     }
 
           

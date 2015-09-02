@@ -5,6 +5,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
+import com.o3dr.services.android.lib.drone.property.DroneAttribute;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -13,7 +14,7 @@ import java.util.List;
 /**
  * Holds a set of mission items.
  */
-public class Mission implements Parcelable {
+public class Mission implements DroneAttribute {
 
     private int currentMissionItem;
     private final List<MissionItem> missionItemsList = new ArrayList<MissionItem>();

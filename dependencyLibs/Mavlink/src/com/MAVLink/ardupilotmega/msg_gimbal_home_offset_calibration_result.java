@@ -9,7 +9,7 @@ package com.MAVLink.ardupilotmega;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-        
+
 /**
 * 
             Sent by the gimbal after it receives a SET_HOME_OFFSETS message to indicate the result of the home offset calibration
@@ -22,7 +22,7 @@ public class msg_gimbal_home_offset_calibration_result extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_GIMBAL_HOME_OFFSET_CALIBRATION_RESULT;
 
 
-      
+    
     /**
     * The result of the home offset calibration
     */
@@ -39,7 +39,7 @@ public class msg_gimbal_home_offset_calibration_result extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_GIMBAL_HOME_OFFSET_CALIBRATION_RESULT;
-              
+        
         packet.payload.putUnsignedByte(calibration_result);
         
         return packet;
@@ -52,7 +52,7 @@ public class msg_gimbal_home_offset_calibration_result extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-              
+        
         this.calibration_result = payload.getUnsignedByte();
         
     }
@@ -73,7 +73,7 @@ public class msg_gimbal_home_offset_calibration_result extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_GIMBAL_HOME_OFFSET_CALIBRATION_RESULT;
-        unpack(mavLinkPacket.payload);        
+        unpack(mavLinkPacket.payload);
     }
 
       

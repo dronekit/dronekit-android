@@ -4,10 +4,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-import org.droidplanner.core.drone.profiles.VehicleProfile;
-import org.droidplanner.core.drone.variables.StreamRates.Rates;
-import org.droidplanner.core.firmware.FirmwareType;
-import org.droidplanner.services.android.R;
+import org.droidplanner.services.android.core.drone.profiles.VehicleProfile;
+import org.droidplanner.services.android.core.drone.variables.StreamRates.Rates;
+import org.droidplanner.services.android.core.firmware.FirmwareType;
 import org.droidplanner.services.android.utils.file.IO.VehicleProfileReader;
 
 import java.util.UUID;
@@ -21,7 +20,7 @@ import java.util.UUID;
  * This is called the DRY (don't repeat yourself) principle of software
  * development.
  */
-public class DroidPlannerPrefs implements org.droidplanner.core.drone.Preferences {
+public class DroidPlannerPrefs implements org.droidplanner.services.android.core.drone.Preferences {
 
     // Public for legacy usage
     public SharedPreferences prefs;

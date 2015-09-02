@@ -7,12 +7,14 @@ import android.os.Parcelable.Creator;
 import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
 import com.o3dr.services.android.lib.drone.mission.item.command.CameraTrigger;
 import com.o3dr.services.android.lib.drone.mission.item.command.ChangeSpeed;
+import com.o3dr.services.android.lib.drone.mission.item.command.DoJump;
 import com.o3dr.services.android.lib.drone.mission.item.command.EpmGripper;
 import com.o3dr.services.android.lib.drone.mission.item.command.ReturnToLaunch;
 import com.o3dr.services.android.lib.drone.mission.item.command.SetRelay;
 import com.o3dr.services.android.lib.drone.mission.item.command.SetServo;
 import com.o3dr.services.android.lib.drone.mission.item.command.Takeoff;
 import com.o3dr.services.android.lib.drone.mission.item.command.YawCondition;
+import com.o3dr.services.android.lib.drone.mission.item.complex.SplineSurvey;
 import com.o3dr.services.android.lib.drone.mission.item.complex.StructureScanner;
 import com.o3dr.services.android.lib.drone.mission.item.complex.Survey;
 import com.o3dr.services.android.lib.drone.mission.item.spatial.Circle;
@@ -225,6 +227,29 @@ public enum MissionItemType {
         @Override
         protected Creator<DoLandStart> getMissionItemCreator() {
             return DoLandStart.CREATOR;
+        }
+    },
+
+    SPLINE_SURVEY("Spline Survey") {
+        @Override
+        public MissionItem getNewItem() {
+            return new SplineSurvey();
+        }
+
+        @Override
+        protected Creator<SplineSurvey> getMissionItemCreator() {
+            return SplineSurvey.CREATOR;
+        }
+    },
+    DO_JUMP("Do Jump") {
+        @Override
+        public MissionItem getNewItem() {
+            return new DoJump();
+        }
+
+        @Override
+        protected Creator<DoJump> getMissionItemCreator() {
+            return DoJump.CREATOR;
         }
     };
 

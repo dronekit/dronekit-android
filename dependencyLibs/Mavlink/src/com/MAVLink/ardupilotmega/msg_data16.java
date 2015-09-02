@@ -9,7 +9,7 @@ package com.MAVLink.ardupilotmega;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-        
+
 /**
 * Data packet, size 16
 */
@@ -20,17 +20,17 @@ public class msg_data16 extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_DATA16;
 
 
-      
+    
     /**
     * data type
     */
     public short type;
-      
+    
     /**
     * data length
     */
     public short len;
-      
+    
     /**
     * raw data
     */
@@ -47,11 +47,11 @@ public class msg_data16 extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_DATA16;
-              
+        
         packet.payload.putUnsignedByte(type);
-              
+        
         packet.payload.putUnsignedByte(len);
-              
+        
         
         for (int i = 0; i < data.length; i++) {
             packet.payload.putUnsignedByte(data[i]);
@@ -68,12 +68,12 @@ public class msg_data16 extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-              
+        
         this.type = payload.getUnsignedByte();
-              
+        
         this.len = payload.getUnsignedByte();
-              
-         
+        
+        
         for (int i = 0; i < this.data.length; i++) {
             this.data[i] = payload.getUnsignedByte();
         }
@@ -97,7 +97,7 @@ public class msg_data16 extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_DATA16;
-        unpack(mavLinkPacket.payload);        
+        unpack(mavLinkPacket.payload);
     }
 
           

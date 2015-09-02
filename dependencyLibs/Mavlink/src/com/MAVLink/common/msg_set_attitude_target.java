@@ -9,7 +9,7 @@ package com.MAVLink.common;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-        
+
 /**
 * Set the vehicle attitude and body angular rates.
 */
@@ -20,47 +20,47 @@ public class msg_set_attitude_target extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_SET_ATTITUDE_TARGET;
 
 
-      
+    
     /**
     * Timestamp in milliseconds since system boot
     */
     public long time_boot_ms;
-      
+    
     /**
     * Attitude quaternion (w, x, y, z order, zero-rotation is 1, 0, 0, 0)
     */
     public float q[] = new float[4];
-      
+    
     /**
     * Body roll rate in radians per second
     */
     public float body_roll_rate;
-      
+    
     /**
     * Body roll rate in radians per second
     */
     public float body_pitch_rate;
-      
+    
     /**
     * Body roll rate in radians per second
     */
     public float body_yaw_rate;
-      
+    
     /**
     * Collective thrust, normalized to 0 .. 1 (-1 .. 1 for vehicles capable of reverse trust)
     */
     public float thrust;
-      
+    
     /**
     * System ID
     */
     public short target_system;
-      
+    
     /**
     * Component ID
     */
     public short target_component;
-      
+    
     /**
     * Mappings: If any of these bits are set, the corresponding input should be ignored: bit 1: body roll rate, bit 2: body pitch rate, bit 3: body yaw rate. bit 4-bit 6: reserved, bit 7: throttle, bit 8: attitude
     */
@@ -77,27 +77,27 @@ public class msg_set_attitude_target extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_SET_ATTITUDE_TARGET;
-              
+        
         packet.payload.putUnsignedInt(time_boot_ms);
-              
+        
         
         for (int i = 0; i < q.length; i++) {
             packet.payload.putFloat(q[i]);
         }
                     
-              
+        
         packet.payload.putFloat(body_roll_rate);
-              
+        
         packet.payload.putFloat(body_pitch_rate);
-              
+        
         packet.payload.putFloat(body_yaw_rate);
-              
+        
         packet.payload.putFloat(thrust);
-              
+        
         packet.payload.putUnsignedByte(target_system);
-              
+        
         packet.payload.putUnsignedByte(target_component);
-              
+        
         packet.payload.putUnsignedByte(type_mask);
         
         return packet;
@@ -110,27 +110,27 @@ public class msg_set_attitude_target extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-              
+        
         this.time_boot_ms = payload.getUnsignedInt();
-              
-         
+        
+        
         for (int i = 0; i < this.q.length; i++) {
             this.q[i] = payload.getFloat();
         }
                 
-              
+        
         this.body_roll_rate = payload.getFloat();
-              
+        
         this.body_pitch_rate = payload.getFloat();
-              
+        
         this.body_yaw_rate = payload.getFloat();
-              
+        
         this.thrust = payload.getFloat();
-              
+        
         this.target_system = payload.getUnsignedByte();
-              
+        
         this.target_component = payload.getUnsignedByte();
-              
+        
         this.type_mask = payload.getUnsignedByte();
         
     }
@@ -151,7 +151,7 @@ public class msg_set_attitude_target extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_SET_ATTITUDE_TARGET;
-        unpack(mavLinkPacket.payload);        
+        unpack(mavLinkPacket.payload);
     }
 
                       

@@ -9,7 +9,7 @@ package com.MAVLink.common;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-        
+
 /**
 * 
 */
@@ -20,27 +20,27 @@ public class msg_debug_vect extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_DEBUG_VECT;
 
 
-      
+    
     /**
     * Timestamp
     */
     public long time_usec;
-      
+    
     /**
     * x
     */
     public float x;
-      
+    
     /**
     * y
     */
     public float y;
-      
+    
     /**
     * z
     */
     public float z;
-      
+    
     /**
     * Name
     */
@@ -57,15 +57,15 @@ public class msg_debug_vect extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_DEBUG_VECT;
-              
+        
         packet.payload.putUnsignedLong(time_usec);
-              
+        
         packet.payload.putFloat(x);
-              
+        
         packet.payload.putFloat(y);
-              
+        
         packet.payload.putFloat(z);
-              
+        
         
         for (int i = 0; i < name.length; i++) {
             packet.payload.putByte(name[i]);
@@ -82,16 +82,16 @@ public class msg_debug_vect extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-              
+        
         this.time_usec = payload.getUnsignedLong();
-              
+        
         this.x = payload.getFloat();
-              
+        
         this.y = payload.getFloat();
-              
+        
         this.z = payload.getFloat();
-              
-         
+        
+        
         for (int i = 0; i < this.name.length; i++) {
             this.name[i] = payload.getByte();
         }
@@ -115,7 +115,7 @@ public class msg_debug_vect extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_DEBUG_VECT;
-        unpack(mavLinkPacket.payload);        
+        unpack(mavLinkPacket.payload);
     }
 
              

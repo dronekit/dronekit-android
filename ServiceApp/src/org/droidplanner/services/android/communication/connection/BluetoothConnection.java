@@ -7,7 +7,7 @@ import java.net.UnknownHostException;
 import java.util.Set;
 import java.util.UUID;
 
-import org.droidplanner.core.MAVLink.connection.MavLinkConnectionTypes;
+import org.droidplanner.services.android.core.MAVLink.connection.MavLinkConnectionTypes;
 
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;

@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Created by fhuya on 11/11/14.
  */
-public class FootPrint implements Parcelable {
+public class FootPrint implements DroneAttribute {
 
     private double meanGSD;
     private List<LatLong> vertex = new ArrayList<LatLong>();

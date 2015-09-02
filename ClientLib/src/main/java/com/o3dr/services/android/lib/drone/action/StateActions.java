@@ -13,4 +13,7 @@ public class StateActions {
 
     public static final String ACTION_SET_VEHICLE_MODE = Utils.PACKAGE_NAME + ".action.SET_VEHICLE_MODE";
     public static final String EXTRA_VEHICLE_MODE = "extra_vehicle_mode";
+
+    //Private to prevent instantiation
+    private StateActions(){}
 }

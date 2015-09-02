@@ -7,6 +7,9 @@ import com.o3dr.services.android.lib.util.Utils;
  */
 public class ExperimentalActions {
 
+    //Private to prevent instantiation
+    private ExperimentalActions(){}
+
     public static final String ACTION_TRIGGER_CAMERA = Utils.PACKAGE_NAME + ".action.TRIGGER_CAMERA";
 
     public static final String ACTION_SET_ROI = Utils.PACKAGE_NAME + ".action.SET_ROI";

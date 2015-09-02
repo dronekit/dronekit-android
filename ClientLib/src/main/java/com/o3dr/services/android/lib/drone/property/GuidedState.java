@@ -8,7 +8,7 @@ import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 /**
  * Created by fhuya on 11/5/14.
  */
-public class GuidedState implements Parcelable {
+public class GuidedState implements DroneAttribute {
 
     public static final int STATE_UNINITIALIZED = 0;
     public static final int STATE_IDLE = 1;

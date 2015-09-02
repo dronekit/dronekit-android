@@ -9,7 +9,7 @@ package com.MAVLink.ardupilotmega;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-        
+
 /**
 * 2nd Battery status
 */
@@ -20,12 +20,12 @@ public class msg_battery2 extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_BATTERY2;
 
 
-      
+    
     /**
     * voltage in millivolts
     */
     public int voltage;
-      
+    
     /**
     * Battery current, in 10*milliamperes (1 = 10 milliampere), -1: autopilot does not measure the current
     */
@@ -42,9 +42,9 @@ public class msg_battery2 extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_BATTERY2;
-              
+        
         packet.payload.putUnsignedShort(voltage);
-              
+        
         packet.payload.putShort(current_battery);
         
         return packet;
@@ -57,9 +57,9 @@ public class msg_battery2 extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-              
+        
         this.voltage = payload.getUnsignedShort();
-              
+        
         this.current_battery = payload.getShort();
         
     }
@@ -80,7 +80,7 @@ public class msg_battery2 extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_BATTERY2;
-        unpack(mavLinkPacket.payload);        
+        unpack(mavLinkPacket.payload);
     }
 
         

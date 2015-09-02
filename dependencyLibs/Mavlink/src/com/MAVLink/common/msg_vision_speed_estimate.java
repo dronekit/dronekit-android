@@ -9,7 +9,7 @@ package com.MAVLink.common;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-        
+
 /**
 * 
 */
@@ -20,22 +20,22 @@ public class msg_vision_speed_estimate extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_VISION_SPEED_ESTIMATE;
 
 
-      
+    
     /**
     * Timestamp (microseconds, synced to UNIX time or since system boot)
     */
     public long usec;
-      
+    
     /**
     * Global X speed
     */
     public float x;
-      
+    
     /**
     * Global Y speed
     */
     public float y;
-      
+    
     /**
     * Global Z speed
     */
@@ -52,13 +52,13 @@ public class msg_vision_speed_estimate extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_VISION_SPEED_ESTIMATE;
-              
+        
         packet.payload.putUnsignedLong(usec);
-              
+        
         packet.payload.putFloat(x);
-              
+        
         packet.payload.putFloat(y);
-              
+        
         packet.payload.putFloat(z);
         
         return packet;
@@ -71,13 +71,13 @@ public class msg_vision_speed_estimate extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-              
+        
         this.usec = payload.getUnsignedLong();
-              
+        
         this.x = payload.getFloat();
-              
+        
         this.y = payload.getFloat();
-              
+        
         this.z = payload.getFloat();
         
     }
@@ -98,7 +98,7 @@ public class msg_vision_speed_estimate extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_VISION_SPEED_ESTIMATE;
-        unpack(mavLinkPacket.payload);        
+        unpack(mavLinkPacket.payload);
     }
 
             

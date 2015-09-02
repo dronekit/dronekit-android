@@ -9,7 +9,7 @@ package com.MAVLink.common;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-        
+
 /**
 * Send a key-value pair as float. The use of this message is discouraged for normal packets, but a quite efficient way for testing new messages and getting experimental debug output.
 */
@@ -20,17 +20,17 @@ public class msg_named_value_float extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_NAMED_VALUE_FLOAT;
 
 
-      
+    
     /**
     * Timestamp (milliseconds since system boot)
     */
     public long time_boot_ms;
-      
+    
     /**
     * Floating point value
     */
     public float value;
-      
+    
     /**
     * Name of the debug variable
     */
@@ -47,11 +47,11 @@ public class msg_named_value_float extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_NAMED_VALUE_FLOAT;
-              
+        
         packet.payload.putUnsignedInt(time_boot_ms);
-              
+        
         packet.payload.putFloat(value);
-              
+        
         
         for (int i = 0; i < name.length; i++) {
             packet.payload.putByte(name[i]);
@@ -68,12 +68,12 @@ public class msg_named_value_float extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-              
+        
         this.time_boot_ms = payload.getUnsignedInt();
-              
+        
         this.value = payload.getFloat();
-              
-         
+        
+        
         for (int i = 0; i < this.name.length; i++) {
             this.name[i] = payload.getByte();
         }
@@ -97,7 +97,7 @@ public class msg_named_value_float extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_NAMED_VALUE_FLOAT;
-        unpack(mavLinkPacket.payload);        
+        unpack(mavLinkPacket.payload);
     }
 
          

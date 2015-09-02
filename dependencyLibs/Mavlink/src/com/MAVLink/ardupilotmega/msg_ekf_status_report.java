@@ -9,7 +9,7 @@ package com.MAVLink.ardupilotmega;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-        
+
 /**
 * EKF Status message including flags and variances
 */
@@ -20,32 +20,32 @@ public class msg_ekf_status_report extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_EKF_STATUS_REPORT;
 
 
-      
+    
     /**
     * Velocity variance
     */
     public float velocity_variance;
-      
+    
     /**
     * Horizontal Position variance
     */
     public float pos_horiz_variance;
-      
+    
     /**
     * Vertical Position variance
     */
     public float pos_vert_variance;
-      
+    
     /**
     * Compass variance
     */
     public float compass_variance;
-      
+    
     /**
     * Terrain Altitude variance
     */
     public float terrain_alt_variance;
-      
+    
     /**
     * Flags
     */
@@ -62,17 +62,17 @@ public class msg_ekf_status_report extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_EKF_STATUS_REPORT;
-              
+        
         packet.payload.putFloat(velocity_variance);
-              
+        
         packet.payload.putFloat(pos_horiz_variance);
-              
+        
         packet.payload.putFloat(pos_vert_variance);
-              
+        
         packet.payload.putFloat(compass_variance);
-              
+        
         packet.payload.putFloat(terrain_alt_variance);
-              
+        
         packet.payload.putUnsignedShort(flags);
         
         return packet;
@@ -85,17 +85,17 @@ public class msg_ekf_status_report extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-              
+        
         this.velocity_variance = payload.getFloat();
-              
+        
         this.pos_horiz_variance = payload.getFloat();
-              
+        
         this.pos_vert_variance = payload.getFloat();
-              
+        
         this.compass_variance = payload.getFloat();
-              
+        
         this.terrain_alt_variance = payload.getFloat();
-              
+        
         this.flags = payload.getUnsignedShort();
         
     }
@@ -116,7 +116,7 @@ public class msg_ekf_status_report extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_EKF_STATUS_REPORT;
-        unpack(mavLinkPacket.payload);        
+        unpack(mavLinkPacket.payload);
     }
 
                 

@@ -12,9 +12,8 @@ import com.o3dr.services.android.lib.model.IDroneApi;
 import com.o3dr.services.android.lib.util.version.VersionUtils;
 
 import org.droidplanner.services.android.BuildConfig;
-import org.droidplanner.services.android.drone.DroneManager;
+import org.droidplanner.services.android.core.drone.DroneManager;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,7 +41,7 @@ final class DPServices extends IDroidPlannerServices.Stub {
 
     @Override
     public int getApiVersionCode() throws RemoteException {
-        return VersionUtils.LIB_VERSION;
+        return VersionUtils.getCoreLibVersion(serviceRef.getApplicationContext());
     }
 
     @Override

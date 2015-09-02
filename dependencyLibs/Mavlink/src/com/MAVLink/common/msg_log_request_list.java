@@ -9,7 +9,7 @@ package com.MAVLink.common;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-        
+
 /**
 * Request a list of available logs. On some systems calling this may stop on-board logging until LOG_REQUEST_END is called.
 */
@@ -20,22 +20,22 @@ public class msg_log_request_list extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_LOG_REQUEST_LIST;
 
 
-      
+    
     /**
     * First log id (0 for first available)
     */
     public int start;
-      
+    
     /**
     * Last log id (0xffff for last available)
     */
     public int end;
-      
+    
     /**
     * System ID
     */
     public short target_system;
-      
+    
     /**
     * Component ID
     */
@@ -52,13 +52,13 @@ public class msg_log_request_list extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_LOG_REQUEST_LIST;
-              
+        
         packet.payload.putUnsignedShort(start);
-              
+        
         packet.payload.putUnsignedShort(end);
-              
+        
         packet.payload.putUnsignedByte(target_system);
-              
+        
         packet.payload.putUnsignedByte(target_component);
         
         return packet;
@@ -71,13 +71,13 @@ public class msg_log_request_list extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-              
+        
         this.start = payload.getUnsignedShort();
-              
+        
         this.end = payload.getUnsignedShort();
-              
+        
         this.target_system = payload.getUnsignedByte();
-              
+        
         this.target_component = payload.getUnsignedByte();
         
     }
@@ -98,7 +98,7 @@ public class msg_log_request_list extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_LOG_REQUEST_LIST;
-        unpack(mavLinkPacket.payload);        
+        unpack(mavLinkPacket.payload);
     }
 
             

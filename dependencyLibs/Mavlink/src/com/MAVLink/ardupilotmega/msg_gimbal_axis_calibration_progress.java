@@ -9,7 +9,7 @@ package com.MAVLink.ardupilotmega;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-        
+
 /**
 * 
             Reports progress and success or failure of gimbal axis calibration procedure
@@ -22,17 +22,17 @@ public class msg_gimbal_axis_calibration_progress extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_GIMBAL_AXIS_CALIBRATION_PROGRESS;
 
 
-      
+    
     /**
     * Which gimbal axis we're reporting calibration progress for
     */
     public short calibration_axis;
-      
+    
     /**
     * The current calibration progress for this axis, 0x64=100%
     */
     public short calibration_progress;
-      
+    
     /**
     * The status of the running calibration
     */
@@ -49,11 +49,11 @@ public class msg_gimbal_axis_calibration_progress extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_GIMBAL_AXIS_CALIBRATION_PROGRESS;
-              
+        
         packet.payload.putUnsignedByte(calibration_axis);
-              
+        
         packet.payload.putUnsignedByte(calibration_progress);
-              
+        
         packet.payload.putUnsignedByte(calibration_status);
         
         return packet;
@@ -66,11 +66,11 @@ public class msg_gimbal_axis_calibration_progress extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-              
+        
         this.calibration_axis = payload.getUnsignedByte();
-              
+        
         this.calibration_progress = payload.getUnsignedByte();
-              
+        
         this.calibration_status = payload.getUnsignedByte();
         
     }
@@ -91,7 +91,7 @@ public class msg_gimbal_axis_calibration_progress extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_GIMBAL_AXIS_CALIBRATION_PROGRESS;
-        unpack(mavLinkPacket.payload);        
+        unpack(mavLinkPacket.payload);
     }
 
           

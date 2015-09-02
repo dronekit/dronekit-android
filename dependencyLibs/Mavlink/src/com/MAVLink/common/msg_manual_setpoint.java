@@ -9,7 +9,7 @@ package com.MAVLink.common;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-        
+
 /**
 * Setpoint in roll, pitch, yaw and thrust from the operator
 */
@@ -20,37 +20,37 @@ public class msg_manual_setpoint extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_MANUAL_SETPOINT;
 
 
-      
+    
     /**
     * Timestamp in milliseconds since system boot
     */
     public long time_boot_ms;
-      
+    
     /**
     * Desired roll rate in radians per second
     */
     public float roll;
-      
+    
     /**
     * Desired pitch rate in radians per second
     */
     public float pitch;
-      
+    
     /**
     * Desired yaw rate in radians per second
     */
     public float yaw;
-      
+    
     /**
     * Collective thrust, normalized to 0 .. 1
     */
     public float thrust;
-      
+    
     /**
     * Flight mode switch position, 0.. 255
     */
     public short mode_switch;
-      
+    
     /**
     * Override mode switch position, 0.. 255
     */
@@ -67,19 +67,19 @@ public class msg_manual_setpoint extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_MANUAL_SETPOINT;
-              
+        
         packet.payload.putUnsignedInt(time_boot_ms);
-              
+        
         packet.payload.putFloat(roll);
-              
+        
         packet.payload.putFloat(pitch);
-              
+        
         packet.payload.putFloat(yaw);
-              
+        
         packet.payload.putFloat(thrust);
-              
+        
         packet.payload.putUnsignedByte(mode_switch);
-              
+        
         packet.payload.putUnsignedByte(manual_override_switch);
         
         return packet;
@@ -92,19 +92,19 @@ public class msg_manual_setpoint extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-              
+        
         this.time_boot_ms = payload.getUnsignedInt();
-              
+        
         this.roll = payload.getFloat();
-              
+        
         this.pitch = payload.getFloat();
-              
+        
         this.yaw = payload.getFloat();
-              
+        
         this.thrust = payload.getFloat();
-              
+        
         this.mode_switch = payload.getUnsignedByte();
-              
+        
         this.manual_override_switch = payload.getUnsignedByte();
         
     }
@@ -125,7 +125,7 @@ public class msg_manual_setpoint extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_MANUAL_SETPOINT;
-        unpack(mavLinkPacket.payload);        
+        unpack(mavLinkPacket.payload);
     }
 
                   

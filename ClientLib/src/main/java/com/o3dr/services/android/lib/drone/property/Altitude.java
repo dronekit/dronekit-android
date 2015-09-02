@@ -6,7 +6,7 @@ import android.os.Parcelable;
 /**
  * Created by fhuya on 10/28/14.
  */
-public class Altitude implements Parcelable {
+public class Altitude implements DroneAttribute {
 
     private double altitude;
     private double targetAltitude;

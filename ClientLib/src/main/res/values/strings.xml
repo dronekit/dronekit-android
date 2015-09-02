@@ -47,4 +47,22 @@
     <string name="error_ekf_variance">EKF Variance</string>
     <string name="error_no_dataflash">No inserted dataflash</string>
     <string name="error_rc_failsafe">RC Failsafe</string>
+
+    <string name="label_free_flight">Free Flight</string>
+    <string name="label_selfie">Selfie</string>
+    <string name="label_cable_cam">Cable Cam</string>
+    <string name="label_preset_cable_cam">Cable Cam</string>
+    <string name="label_preset_orbit">Orbit</string>
+    <string name="label_orbit">Orbit</string>
+    <string name="label_preset_selfie">Selfie</string>
+    <string name="label_follow">Follow</string>
+
+    <!-- Shot type indicator -->
+    <string name="copter_alt_hold_label">FLY: Manual</string>
+    <string name="copter_loiter_label">FLY</string>
+    <string name="copter_rtl_label">Return Home</string>
+    <string name="copter_guided_label">Take off</string>
+    <string name="copter_auto_tune_label">Auto-tune</string>
+    <string name="copter_pos_hold_label">Position Hold</string>
+    <string name="copter_auto_label">Mission</string>
 </resources>
