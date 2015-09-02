@@ -12,7 +12,7 @@ import timber.log.Timber;
 
 public class HeartBeat extends DroneVariable implements OnDroneListener {
 
-    private static final long HEARTBEAT_NORMAL_TIMEOUT = 5000; //ms
+    public static final long HEARTBEAT_NORMAL_TIMEOUT = 5000; //ms
     private static final long HEARTBEAT_LOST_TIMEOUT = 15000; //ms
     private static final long HEARTBEAT_IMU_CALIBRATION_TIMEOUT = 35000; //ms
 

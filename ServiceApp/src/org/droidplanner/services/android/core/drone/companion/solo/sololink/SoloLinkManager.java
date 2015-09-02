@@ -44,6 +44,7 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
 
     private static final String SOLO_VERSION_FILENAME = "/VERSION";
     private static final String PIXHAWK_VERSION_FILENAME = "/PIX_VERSION";
+    private static final String GIMBAL_VERSION_FILENAME = "/AXON_VERSION";
 
     private final UdpConnection followDataConn;
 
@@ -62,6 +63,7 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
 
     private final AtomicReference<String> vehicleVersion = new AtomicReference<>("");
     private final AtomicReference<String> pixhawkVersion = new AtomicReference<>("");
+    private final AtomicReference<String> gimbalVersion = new AtomicReference<>("");
 
     private final Runnable soloLinkVersionRetriever = new Runnable() {
         @Override
@@ -69,6 +71,9 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
             final String version = retrieveVersion(SOLO_VERSION_FILENAME);
             if (version != null)
                 vehicleVersion.set(version);
+
+            if(linkListener != null && areVersionsSet())
+                linkListener.onVersionsUpdated();
         }
     };
 
@@ -78,6 +83,21 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
             final String version = retrieveVersion(PIXHAWK_VERSION_FILENAME);
             if (version != null)
                 pixhawkVersion.set(version);
+
+            if(linkListener != null && areVersionsSet())
+                linkListener.onVersionsUpdated();
+        }
+    };
+
+    private final Runnable gimbalVersionRetriever = new Runnable() {
+        @Override
+        public void run() {
+            final String version = retrieveVersion(GIMBAL_VERSION_FILENAME);
+            if(version != null)
+                gimbalVersion.set(version);
+
+            if(linkListener != null && areVersionsSet())
+                linkListener.onVersionsUpdated();
         }
     };
 
@@ -97,10 +117,6 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
 
     }
 
-    public static SshConnection getSshLink() {
-        return sshLink;
-    }
-
     public static String getSoloLinkIp() {
         return SOLO_LINK_IP;
     }
@@ -111,6 +127,15 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
 
     public String getPixhawkVersion(){
         return pixhawkVersion.get();
+    }
+
+    public String getGimbalVersion(){
+        return gimbalVersion.get();
+    }
+
+    public boolean areVersionsSet(){
+        return !TextUtils.isEmpty(vehicleVersion.get()) && !TextUtils.isEmpty(pixhawkVersion.get())
+                && !TextUtils.isEmpty(gimbalVersion.get());
     }
 
     @Override
@@ -134,9 +159,7 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
         loadPresetButtonSettings();
         loadGoproState();
 
-        //Refresh the vehicle's components versions
-        updateSoloLinkVersion();
-        updatePixhawkVersion();
+        refreshSoloLinkVersions();
     }
 
     @Override
@@ -297,6 +320,10 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
         postAsyncTask(pixhawkVersionRetriever);
     }
 
+    private void updateGimbalVersion(){
+        postAsyncTask(gimbalVersionRetriever);
+    }
+
     private String retrieveVersion(String versionFile) {
         try {
             String version = sshLink.execute("cat " + versionFile);
@@ -313,4 +340,12 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
         return null;
     }
 
+    /**
+     * Refresh the vehicle's components versions
+     */
+    public void refreshSoloLinkVersions() {
+        updateSoloLinkVersion();
+        updatePixhawkVersion();
+        updateGimbalVersion();
+    }
 }

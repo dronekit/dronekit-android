@@ -22,7 +22,7 @@ def generateVersionName(String versionPrefix, int versionMajor, int versionMinor
 }
 
 def generateVersionNameSuffix(int versionBuild, String releaseType){
-    return ".${versionBuild} ${releaseType}-${getGitShortHash()}"
+    return ".${releaseType}.${versionBuild} (${getGitShortHash()})"
 }
 
 /**

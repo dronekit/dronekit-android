@@ -97,6 +97,7 @@ public class CapabilityApi extends Api {
                 }
             //********FALL THROUGH ***********//
             case FeatureIds.COMPASS_CALIBRATION:
+            case FeatureIds.KILL_SWITCH:
                 final Bundle params = new Bundle();
                 params.putString(EXTRA_FEATURE_ID, featureId);
                 drone.performAsyncActionOnDroneThread(new Action(ACTION_CHECK_FEATURE_SUPPORT, params),
@@ -149,6 +150,11 @@ public class CapabilityApi extends Api {
          * Id for the imu calibration feature.
          */
         public static final String IMU_CALIBRATION = "feature_imu_calibration";
+
+        /**
+         * Id for the kill switch feature.
+         */
+        public static final String KILL_SWITCH = "feature_kill_switch";
 
         //Private to prevent instantiation.
         private FeatureIds(){}
