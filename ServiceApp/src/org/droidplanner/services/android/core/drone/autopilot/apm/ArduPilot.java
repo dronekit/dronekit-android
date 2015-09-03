@@ -52,6 +52,7 @@ import com.o3dr.services.android.lib.gcs.action.CalibrationActions;
 import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
 import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
+import com.o3dr.services.android.lib.util.MathUtils;
 
 import org.droidplanner.services.android.core.MAVLink.MAVLinkStreams;
 import org.droidplanner.services.android.core.MAVLink.MavLinkParameters;
@@ -90,10 +91,13 @@ import org.droidplanner.services.android.core.model.AutopilotWarningParser;
 import org.droidplanner.services.android.core.parameters.Parameter;
 import org.droidplanner.services.android.utils.CommonApiUtils;
 
+import timber.log.Timber;
+
 public abstract class ArduPilot implements MavLinkDrone {
 
     public static final int AUTOPILOT_COMPONENT_ID = 1;
     public static final int ARTOO_COMPONENT_ID = 0;
+    public static final int TELEMETRY_RADIO_COMPONENT_ID = 68;
 
     private final DroneEvents events;
     private final Type type;
@@ -597,8 +601,11 @@ public abstract class ArduPilot implements MavLinkDrone {
 
     @Override
     public void onMavLinkMessageReceived(MAVLinkMessage message) {
-        if (message.compid != AUTOPILOT_COMPONENT_ID
-                && message.compid != ARTOO_COMPONENT_ID) {
+        final int compId = message.compid;
+        if (compId != AUTOPILOT_COMPONENT_ID
+                && compId != ARTOO_COMPONENT_ID
+                && compId != TELEMETRY_RADIO_COMPONENT_ID) {
+//            Timber.d("Received unsupported component id: %d", compId);
             return;
         }
 
@@ -638,8 +645,7 @@ public abstract class ArduPilot implements MavLinkDrone {
                 break;
 
             case msg_vfr_hud.MAVLINK_MSG_ID_VFR_HUD:
-                msg_vfr_hud m_hud = (msg_vfr_hud) message;
-                setAltitudeGroundAndAirSpeeds(m_hud.alt, m_hud.groundspeed, m_hud.airspeed, m_hud.climb);
+                processVfrHud((msg_vfr_hud) message);
                 break;
 
             case msg_mission_current.MAVLINK_MSG_ID_MISSION_CURRENT:
@@ -662,8 +668,7 @@ public abstract class ArduPilot implements MavLinkDrone {
                 break;
 
             case msg_global_position_int.MAVLINK_MSG_ID_GLOBAL_POSITION_INT:
-                getGps().setPosition(((msg_global_position_int) message).lat / 1E7,
-                        ((msg_global_position_int) message).lon / 1E7);
+                processGlobalPositionInt((msg_global_position_int) message);
                 break;
 
             case msg_sys_status.MAVLINK_MSG_ID_SYS_STATUS:
@@ -731,6 +736,24 @@ public abstract class ArduPilot implements MavLinkDrone {
             default:
                 break;
         }
+    }
+
+    /**
+     * Used to update the vehicle location.
+     * @param gpi
+     */
+    protected void processGlobalPositionInt(msg_global_position_int gpi){
+        if(gpi == null)
+            return;
+
+        GPS.setPosition(gpi.lat / 1E7, gpi.lon / 1E7);
+    }
+
+    protected void processVfrHud(msg_vfr_hud vfrHud){
+        if(vfrHud == null)
+            return;
+
+        setAltitudeGroundAndAirSpeeds(vfrHud.alt, vfrHud.groundspeed, vfrHud.airspeed, vfrHud.climb);
     }
 
     protected void processMountStatus(msg_mount_status mountStatus){
@@ -856,6 +879,8 @@ public abstract class ArduPilot implements MavLinkDrone {
         signal.setNoise(SikValueToDB(noise & 0xFF));
         signal.setRemnoise(SikValueToDB(remnoise & 0xFF));
         signal.setTxbuf(txbuf & 0xFF);
+
+        signal.setSignalStrength(MathUtils.getSignalStrength(signal.getFadeMargin(), signal.getRemFadeMargin()));
 
         notifyDroneEvent(DroneInterfaces.DroneEventsType.RADIO);
     }

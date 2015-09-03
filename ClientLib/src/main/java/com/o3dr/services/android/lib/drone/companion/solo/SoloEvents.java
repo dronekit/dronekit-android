@@ -46,4 +46,20 @@ public class SoloEvents {
      * Triggers upon updates to the EU tx power compliance.
      */
     public static final String SOLO_EU_TX_POWER_COMPLIANCE_UPDATED = PACKAGE_NAME + ".SOLO_EU_TX_POWER_COMPLIANCE_UPDATED";
+
+    /**
+     * Triggers upon updates of the solo versions
+     * @see {@link SoloEventExtras#EXTRA_SOLO_CONTROLLER_VERSION}
+     * @see {@link SoloEventExtras#EXTRA_SOLO_CONTROLLER_FIRMWARE_VERSION}
+     * @see {@link SoloEventExtras#EXTRA_SOLO_AUTOPILOT_VERSION}
+     * @see {@link SoloEventExtras#EXTRA_SOLO_VEHICLE_VERSION}
+     * @see {@link SoloEventExtras#EXTRA_SOLO_GIMBAL_VERSION}
+     */
+    public static final String SOLO_VERSIONS_UPDATED = PACKAGE_NAME + ".SOLO_VERSIONS_UPDATED";
+
+    /**
+     * Triggers upon updates to the controller mode
+     * @see {@link SoloEventExtras#EXTRA_SOLO_CONTROLLER_MODE}
+     */
+    public static final String SOLO_CONTROLLER_MODE_UPDATED = PACKAGE_NAME + ".SOLO_CONTROLLER_MODE_UPDATED";
 }

@@ -6,9 +6,10 @@ import android.text.TextUtils;
 import android.util.Pair;
 import android.view.Surface;
 
+import com.github.zafarkhaja.semver.Version;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
-import com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerMode;
 import com.o3dr.services.android.lib.drone.companion.solo.button.ButtonPacket;
+import com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerMode;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageParser;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
 import com.o3dr.services.android.lib.model.ICommandListener;
@@ -26,6 +27,7 @@ import java.nio.ByteBuffer;
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import timber.log.Timber;
@@ -35,7 +37,10 @@ import timber.log.Timber;
  */
 public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkListener> {
 
-    private static final long RECONNECT_COUNTDOWN = 1000l; //ms
+    /**
+     * This is the minimum version that provides an api for the controller mode update.
+     */
+    private static final Version CONTROLLER_MODE_MIN_VERSION = Version.forIntegers(1, 1, 13);
 
     public static final String SOLOLINK_SSID_CONFIG_PATH = "/usr/bin/sololink_config";
 
@@ -55,7 +60,9 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
 
     private final AtomicReference<String> controllerVersion = new AtomicReference<>("");
     private final AtomicReference<String> stm32Version = new AtomicReference<>("");
+
     private final AtomicBoolean isEUTxPowerCompliant = new AtomicBoolean(false);
+    private final AtomicInteger controllerMode = new AtomicInteger(SoloControllerMode.UNKNOWN_MODE);
 
     private final AtomicReference<Pair<String, String>> sololinkWifiInfo = new AtomicReference<>(Pair.create("", ""));
 
@@ -69,6 +76,7 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
     private final Runnable reconnectBatteryTask = new Runnable() {
         @Override
         public void run() {
+            handler.removeCallbacks(this);
             batteryConnection.connect();
         }
     };
@@ -76,6 +84,7 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
     private final Runnable reconnectVideoHandshake = new Runnable() {
         @Override
         public void run() {
+            handler.removeCallbacks(this);
             videoHandshake.connect();
         }
     };
@@ -98,6 +107,8 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
             final String version = retrieveVersion(ARTOO_VERSION_FILENAME);
             if (version != null)
                 controllerVersion.set(version);
+
+            onVersionsUpdated();
         }
     };
 
@@ -107,6 +118,8 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
             final String version = retrieveVersion(STM32_VERSION_FILENAME);
             if (version != null)
                 stm32Version.set(version);
+
+            onVersionsUpdated();
         }
     };
 
@@ -148,6 +161,23 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
         }
     };
 
+    private final Runnable artooModeRetriever = new Runnable(){
+            @Override
+            public void run() {
+                Timber.d("Retrieving Artoo controller mode");
+                try{
+                    final String response = sshLink.execute("sololink_config --get-ui-mode");
+                    if (response.trim().equals("1")){
+                        controllerMode.set(SoloControllerMode.MODE_1);
+                    } else {
+                        controllerMode.set(SoloControllerMode.MODE_2);
+                    }
+                } catch (IOException e){
+                    Timber.e(e, "Error occurred while getting controller mode.");
+                }
+            }
+        };
+
     private ControllerLinkListener linkListener;
 
     public ControllerLinkManager(Context context, final Handler handler, ExecutorService asyncExecutor) {
@@ -158,11 +188,8 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
         videoHandshake = new TcpConnection(handler, ARTOO_IP, ARTOO_VIDEO_HANDSHAKE_PORT);
         videoHandshake.setIpConnectionListener(new IpConnectionListener() {
 
-            private int disconnectTracker = 0;
-
             @Override
             public void onIpConnected() {
-                disconnectTracker = 0;
                 handler.removeCallbacks(reconnectVideoHandshake);
 
                 Timber.d("Artoo link connected. Starting video stream...");
@@ -173,7 +200,7 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
             @Override
             public void onIpDisconnected() {
                 if (isVideoHandshakeStarted.get())
-                    handler.postDelayed(reconnectVideoHandshake, ++disconnectTracker * RECONNECT_COUNTDOWN);
+                    handler.postDelayed(reconnectVideoHandshake, RECONNECT_COUNTDOWN);
             }
 
             @Override
@@ -184,11 +211,8 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
         batteryConnection = new TcpConnection(handler, ARTOO_IP, ARTOO_BATTERY_PORT);
         batteryConnection.setIpConnectionListener(new IpConnectionListener() {
 
-            private int disconnectTracker = 0;
-
             @Override
             public void onIpConnected() {
-                disconnectTracker = 0;
                 handler.removeCallbacks(reconnectBatteryTask);
             }
 
@@ -196,7 +220,7 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
             public void onIpDisconnected() {
                 //Try to connect
                 if (isBatteryStarted.get()) {
-                    handler.postDelayed(reconnectBatteryTask, ++disconnectTracker * RECONNECT_COUNTDOWN);
+                    handler.postDelayed(reconnectBatteryTask, RECONNECT_COUNTDOWN);
 
                 }
             }
@@ -216,6 +240,10 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
             }
         });
 
+    }
+
+    public boolean areVersionsSet(){
+        return !TextUtils.isEmpty(controllerVersion.get()) && !TextUtils.isEmpty(stm32Version.get());
     }
 
     /**
@@ -239,23 +267,28 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
         return isEUTxPowerCompliant.get();
     }
 
-    public void startVideoManager() {
+    /**
+     * Return the current controller mode
+     * @return MODE_1 or MODE_2
+     */
+    public @SoloControllerMode.ControllerMode int getControllerMode() {
+        final @SoloControllerMode.ControllerMode int mode = controllerMode.get();
+        return mode;
+    }
+
+    private void startVideoManager() {
         handler.removeCallbacks(reconnectVideoHandshake);
         isVideoHandshakeStarted.set(true);
         videoHandshake.connect();
     }
 
-    public void stopVideoManager() {
+    private void stopVideoManager() {
         handler.removeCallbacks(startVideoMgr);
         this.videoMgr.stop();
 
         handler.removeCallbacks(reconnectVideoHandshake);
         isVideoHandshakeStarted.set(false);
         videoHandshake.disconnect();
-    }
-
-    public static SshConnection getSshLink() {
-        return sshLink;
     }
 
     private void loadSololinkWifiInfo() {
@@ -287,8 +320,8 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
         Timber.d("Starting artoo link manager");
         super.start(listener);
 
-        handler.removeCallbacks(reconnectBatteryTask);
-        //TODO: Connect to battery when available
+        //TODO: update when battery info is available
+//        handler.removeCallbacks(reconnectBatteryTask);
         //isBatteryStarted.set(true);
         //batteryConnection.connect();
 
@@ -299,9 +332,10 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
 
         stopVideoManager();
 
-        handler.removeCallbacks(reconnectBatteryTask);
+        //TODO: update when battery info is available
+        /*handler.removeCallbacks(reconnectBatteryTask);
         isBatteryStarted.set(false);
-        batteryConnection.disconnect();
+        batteryConnection.disconnect();*/
 
         super.stop();
     }
@@ -317,28 +351,55 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
 
         Timber.d("Artoo link connected.");
 
+        startVideoManager();
+
         //Update sololink wifi
         loadSololinkWifiInfo();
 
-        //Refresh the vehicle's components versions
-        updateArtooVersion();
-        updateStm32Version();
+        refreshControllerVersions();
 
         //Update the tx power compliance
         loadCurrentEUTxPowerComplianceMode();
 
+        updateControllerModeIfPossible();
+    }
+
+    private void onVersionsUpdated(){
+        if(linkListener != null && areVersionsSet())
+            linkListener.onVersionsUpdated();
+
+        updateControllerModeIfPossible();
+    }
+
+    private void updateControllerModeIfPossible() {
+        if (doesSupportControllerMode()) {
+            //load current controller mode
+            Timber.d("Updating current controller mode.");
+            loadCurrentControllerMode();
+        } else {
+            Timber.w("This controller version doesn't support controller mode retrieval.");
+        }
+    }
+
+    private boolean doesSupportControllerMode(){
+        final String version = controllerVersion.get();
+        if(TextUtils.isEmpty(version))
+            return false;
+
+        try {
+            final Version currentVersion = Version.valueOf(version);
+            return CONTROLLER_MODE_MIN_VERSION.lessThanOrEqualTo(currentVersion);
+        }catch(Exception e){
+            Timber.e(e, "Unable to parse controller version.");
+            return false;
+        }
     }
 
     @Override
     public void onIpDisconnected() {
         Timber.d("Artoo link disconnected.");
 
-        handler.removeCallbacks(startVideoMgr);
-        this.videoMgr.stop();
-
-        handler.removeCallbacks(reconnectVideoHandshake);
-        isVideoHandshakeStarted.set(false);
-        videoHandshake.disconnect();
+        stopVideoManager();
 
         super.onIpDisconnected();
     }
@@ -394,15 +455,19 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
             public void run() {
                 Timber.d("Switching controller to mode %n", mode);
                 try {
+                    final boolean supportControllerMode = doesSupportControllerMode();
+                    final String command = supportControllerMode
+                            ? "sololink_config --set-ui-mode %d"
+                            : "runStickMapperMode%d.sh";
                     final String response;
                     switch (mode) {
                         case SoloControllerMode.MODE_1:
-                            response = sshLink.execute("runStickMapperMode1.sh");
+                            response = sshLink.execute(String.format(Locale.US, command, mode));
                             postSuccessEvent(listener);
                             break;
 
                         case SoloControllerMode.MODE_2:
-                            response = sshLink.execute("runStickMapperMode2.sh");
+                            response = sshLink.execute(String.format(Locale.US, command, mode));
                             postSuccessEvent(listener);
                             break;
 
@@ -412,6 +477,11 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
                             break;
                     }
                     Timber.d("Response from switch mode command was: %s", response);
+
+                    if(supportControllerMode) {
+                        controllerMode.set(mode);
+                        linkListener.onControllerModeUpdated();
+                    }
                 } catch (IOException e) {
                     Timber.e(e, "Error occurred while changing artoo modes.");
                     postTimeoutEvent(listener);
@@ -460,6 +530,9 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
     private void loadCurrentEUTxPowerComplianceMode(){
         postAsyncTask(checkEUTxPowerCompliance);
     }
+    private void loadCurrentControllerMode(){
+        postAsyncTask(artooModeRetriever);
+    }
 
     private void restartHostapdService(){
         try {
@@ -467,5 +540,13 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
         } catch (IOException e) {
             Timber.e(e, "Error occurred while restarting hostpad service on Artoo.");
         }
+    }
+
+    /**
+     * Refresh the vehicle's components versions
+     */
+    public void refreshControllerVersions() {
+        updateArtooVersion();
+        updateStm32Version();
     }
 }

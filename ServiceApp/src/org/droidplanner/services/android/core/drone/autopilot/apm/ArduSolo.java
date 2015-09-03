@@ -38,14 +38,19 @@ public class ArduSolo extends ArduCopter {
     @Override
     protected void processSignalUpdate(int rxerrors, int fixed, short rssi, short remrssi, short txbuf,
                                        short noise, short remnoise){
+        final double unsignedRemRssi = remrssi & 0xFF;
+
         signal.setValid(true);
         signal.setRxerrors(rxerrors & 0xFFFF);
         signal.setFixed(fixed & 0xFFFF);
         signal.setRssi(rssi & 0xFF);
-        signal.setRemrssi(remrssi & 0xFF);
+        signal.setRemrssi(unsignedRemRssi);
         signal.setNoise(noise & 0xFF);
         signal.setRemnoise(remnoise & 0xFF);
         signal.setTxbuf(txbuf & 0xFF);
+
+        final double signalStrength = unsignedRemRssi <= 127 ? unsignedRemRssi : unsignedRemRssi - 256;
+        signal.setSignalStrength(signalStrength);
 
         notifyDroneEvent(DroneInterfaces.DroneEventsType.RADIO);
     }

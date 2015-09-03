@@ -22,10 +22,10 @@ import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError
 import com.o3dr.services.android.lib.drone.companion.solo.SoloAttributes;
 import com.o3dr.services.android.lib.drone.companion.solo.SoloEventExtras;
 import com.o3dr.services.android.lib.drone.companion.solo.SoloEvents;
-import com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions;
-import com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerMode;
 import com.o3dr.services.android.lib.drone.companion.solo.action.SoloActions;
+import com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions;
 import com.o3dr.services.android.lib.drone.companion.solo.button.ButtonPacket;
+import com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerMode;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSetting;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSettingSetter;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes;
@@ -34,7 +34,6 @@ import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionType;
 import com.o3dr.services.android.lib.drone.connection.DroneSharePrefs;
 import com.o3dr.services.android.lib.drone.mission.action.MissionActions;
-import com.o3dr.services.android.lib.drone.mission.item.complex.CameraDetail;
 import com.o3dr.services.android.lib.drone.property.DroneAttribute;
 import com.o3dr.services.android.lib.gcs.action.FollowMeActions;
 import com.o3dr.services.android.lib.gcs.follow.FollowType;
@@ -53,6 +52,8 @@ import org.droidplanner.services.android.core.drone.autopilot.apm.ArduCopter;
 import org.droidplanner.services.android.core.drone.autopilot.apm.ArduPlane;
 import org.droidplanner.services.android.core.drone.autopilot.apm.ArduRover;
 import org.droidplanner.services.android.core.drone.autopilot.apm.ArduSolo;
+import org.droidplanner.services.android.core.drone.companion.solo.SoloComp;
+import org.droidplanner.services.android.core.drone.variables.HeartBeat;
 import org.droidplanner.services.android.core.drone.variables.calibration.MagnetometerCalibrationImpl;
 import org.droidplanner.services.android.core.firmware.FirmwareType;
 import org.droidplanner.services.android.core.gcs.GCSHeartbeat;
@@ -62,7 +63,6 @@ import org.droidplanner.services.android.core.gcs.location.FusedLocation;
 import org.droidplanner.services.android.core.helpers.coordinates.Coord2D;
 import org.droidplanner.services.android.core.helpers.coordinates.Coord3D;
 import org.droidplanner.services.android.core.parameters.Parameter;
-import org.droidplanner.services.android.core.drone.companion.solo.SoloComp;
 import org.droidplanner.services.android.exception.ConnectionException;
 import org.droidplanner.services.android.utils.AndroidApWarningParser;
 import org.droidplanner.services.android.utils.CommonApiUtils;
@@ -71,7 +71,6 @@ import org.droidplanner.services.android.utils.analytics.GAUtils;
 import org.droidplanner.services.android.utils.prefs.DroidPlannerPrefs;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -166,18 +165,45 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
             eventInfo.putBoolean(SoloEventExtras.EXTRA_SOLO_EU_TX_POWER_COMPLIANT, isCompliant);
             notifyDroneAttributeEvent(SoloEvents.SOLO_EU_TX_POWER_COMPLIANCE_UPDATED, eventInfo, true);
         }
+
+        @Override
+        public void onVersionsUpdated() {
+            final Bundle eventInfo = new Bundle();
+            eventInfo.putString(SoloEventExtras.EXTRA_SOLO_VEHICLE_VERSION, soloComp.getVehicleVersion());
+            eventInfo.putString(SoloEventExtras.EXTRA_SOLO_AUTOPILOT_VERSION, soloComp.getAutopilotVersion());
+            eventInfo.putString(SoloEventExtras.EXTRA_SOLO_GIMBAL_VERSION, soloComp.getGimbalVersion());
+            eventInfo.putString(SoloEventExtras.EXTRA_SOLO_CONTROLLER_VERSION, soloComp.getControllerVersion());
+            eventInfo.putString(SoloEventExtras.EXTRA_SOLO_CONTROLLER_FIRMWARE_VERSION, soloComp.getControllerFirmwareVersion());
+
+            notifyDroneAttributeEvent(SoloEvents.SOLO_VERSIONS_UPDATED, eventInfo, true);
+        }
+
+        @Override
+        public void onControllerModeUpdated(){
+            final Bundle eventInfo = new Bundle();
+            eventInfo.putInt(SoloEventExtras.EXTRA_SOLO_CONTROLLER_MODE, soloComp.getControllerMode());
+            notifyDroneAttributeEvent(SoloEvents.SOLO_CONTROLLER_MODE_UPDATED, eventInfo, true);
+        }
+    };
+
+    private final Runnable disconnectSoloCompTask = new Runnable() {
+        @Override
+        public void run() {
+            if(soloComp != null && soloComp.isConnected()){
+                soloComp.stop();
+            }
+
+            handler.removeCallbacks(disconnectSoloCompTask);
+        }
     };
 
     private final GCSHeartbeat gcsHeartbeat;
 
-    private final List<CameraDetail> cameraDetails;
-
     public DroneManager(Context context, ConnectionParameter connParams, final Handler handler,
-                        MavLinkServiceApi mavlinkApi, List<CameraDetail> cameraDetails) {
+                        MavLinkServiceApi mavlinkApi) {
         this.context = context;
         this.handler = handler;
         this.connectionParameter = connParams;
-        this.cameraDetails = cameraDetails;
 
         commandTracker = new DroneCommandTracker(handler);
 
@@ -337,6 +363,9 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
     public void disconnect(String appId) throws ConnectionException {
         if (TextUtils.isEmpty(appId))
             return;
+
+        if(isCompanionComputerEnabled())
+            soloComp.tryStoppingVideoStream(appId);
 
         Log.d(TAG, "Disconnecting client " + appId);
         DroneEventsListener listener = connectedApps.remove(appId);
@@ -522,9 +551,6 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
             case AttributeType.FOLLOW_STATE:
                 return CommonApiUtils.getFollowState(followMe);
 
-            case AttributeType.CAMERA:
-                return CommonApiUtils.getCameraProxy(drone, cameraDetails);
-
             case SoloAttributes.SOLO_STATE:
                 return SoloApiUtils.getSoloLinkState(this);
 
@@ -625,17 +651,31 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
                 SoloApiUtils.updateSoloLinkEUTxPowerCompliance(this, isCompliant, listener);
                 break;
 
+            case SoloConfigActions.ACTION_REFRESH_SOLO_VERSIONS:
+                soloComp.refreshSoloVersions();
+                break;
+
             //**************** CAPABILITY ACTIONS **************//
             case CapabilityActions.ACTION_CHECK_FEATURE_SUPPORT:
                 if (listener != null) {
                     final String featureId = data.getString(CapabilityActions.EXTRA_FEATURE_ID);
                     if (!TextUtils.isEmpty(featureId)) {
                         switch (featureId) {
+
                             case CapabilityApi.FeatureIds.SOLO_VIDEO_STREAMING:
                             case CapabilityApi.FeatureIds.COMPASS_CALIBRATION:
                                 if (this.isCompanionComputerEnabled()) {
                                     CommonApiUtils.postSuccessEvent(listener);
                                 } else {
+                                    CommonApiUtils.postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
+                                }
+                                break;
+
+                            case CapabilityApi.FeatureIds.KILL_SWITCH:
+                                if(CommonApiUtils.isKillSwitchSupported(drone)){
+                                    CommonApiUtils.postSuccessEvent(listener);
+                                }
+                                else{
                                     CommonApiUtils.postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
                                 }
                                 break;
@@ -715,6 +755,22 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
                 }
 
                 event = DroneInterfaces.DroneEventsType.CONNECTED;
+                break;
+
+            case HEARTBEAT_TIMEOUT:
+                if (isCompanionComputerEnabled() && soloComp.isConnected()) {
+                    //Start a countdown at the conclusion of which, disconnect the solo companion computer.
+                    handler.postDelayed(disconnectSoloCompTask, HeartBeat.HEARTBEAT_NORMAL_TIMEOUT);
+                }
+                break;
+
+            case HEARTBEAT_RESTORED:
+                if (isCompanionComputerEnabled()) {
+                    //Dismiss the countdown to disconnect the solo companion computer.
+                    handler.removeCallbacks(disconnectSoloCompTask);
+                    if (!soloComp.isConnected())
+                        soloComp.start();
+                }
                 break;
 
             case DISCONNECTED:

@@ -3,6 +3,8 @@ package com.o3dr.services.android.lib.drone.companion.solo;
 import android.os.Parcel;
 import android.util.SparseArray;
 
+import com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerMode;
+import com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerMode.ControllerMode;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSetting;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageParser;
 import com.o3dr.services.android.lib.drone.property.DroneAttribute;
@@ -23,17 +25,21 @@ public class SoloState implements DroneAttribute {
 
     private String vehicleVersion;
     private String autopilotVersion;
+    private String gimbalVersion;
 
     private boolean isEUTxPowerCompliant;
 
     private SparseArray<SoloButtonSetting> buttonSettings;
+
+    @ControllerMode
+    private int controllerMode;
 
     public SoloState(){}
 
     public SoloState(String autopilotVersion, String controllerFirmwareVersion,
                      String controllerVersion, String vehicleVersion,
                      String wifiPassword, String wifiSsid, boolean isEUTxPowerCompliant,
-                     SparseArray<SoloButtonSetting> buttonSettings) {
+                     SparseArray<SoloButtonSetting> buttonSettings, String gimbalVersion, @ControllerMode int controllerMode) {
         this.autopilotVersion = autopilotVersion;
         this.controllerFirmwareVersion = controllerFirmwareVersion;
         this.controllerVersion = controllerVersion;
@@ -42,6 +48,8 @@ public class SoloState implements DroneAttribute {
         this.wifiSsid = wifiSsid;
         this.isEUTxPowerCompliant = isEUTxPowerCompliant;
         this.buttonSettings = buttonSettings;
+        this.gimbalVersion = gimbalVersion;
+        this.controllerMode = controllerMode;
     }
 
     public String getAutopilotVersion() {
@@ -54,6 +62,11 @@ public class SoloState implements DroneAttribute {
 
     public String getControllerVersion() {
         return controllerVersion;
+    }
+
+    @ControllerMode
+    public int getControllerMode(){
+        return controllerMode;
     }
 
     public String getVehicleVersion() {
@@ -74,6 +87,10 @@ public class SoloState implements DroneAttribute {
 
     public SoloButtonSetting getButtonSetting(int buttonType){
         return buttonSettings.get(buttonType);
+    }
+
+    public String getGimbalVersion(){
+        return gimbalVersion;
     }
 
     @Override
@@ -105,6 +122,9 @@ public class SoloState implements DroneAttribute {
             dest.writeInt(buttonData.length);
             dest.writeByteArray(buttonData);
         }
+
+        dest.writeString(this.gimbalVersion);
+        dest.writeInt(this.controllerMode);
     }
 
     protected SoloState(Parcel in) {
@@ -130,6 +150,11 @@ public class SoloState implements DroneAttribute {
             final SoloButtonSetting button = (SoloButtonSetting) TLVMessageParser.parseTLVPacket(dataBuffer);
             buttonSettings.put(button.getButton(), button);
         }
+
+        this.gimbalVersion = in.readString();
+
+        @ControllerMode final int tempMode = in.readInt();
+        this.controllerMode = tempMode;
     }
 
     public static final Creator<SoloState> CREATOR = new Creator<SoloState>() {
