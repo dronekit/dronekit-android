@@ -6,9 +6,10 @@ import android.text.TextUtils;
 import android.util.Pair;
 import android.view.Surface;
 
+import com.github.zafarkhaja.semver.Version;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
-import com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerMode;
 import com.o3dr.services.android.lib.drone.companion.solo.button.ButtonPacket;
+import com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerMode;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageParser;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
 import com.o3dr.services.android.lib.model.ICommandListener;
@@ -36,6 +37,11 @@ import timber.log.Timber;
  */
 public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkListener> {
 
+    /**
+     * This is the minimum version that provides an api for the controller mode update.
+     */
+    private static final Version CONTROLLER_MODE_MIN_VERSION = Version.forIntegers(1, 1, 13);
+
     public static final String SOLOLINK_SSID_CONFIG_PATH = "/usr/bin/sololink_config";
 
     private static final String ARTOO_VERSION_FILENAME = "/VERSION";
@@ -56,7 +62,7 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
     private final AtomicReference<String> stm32Version = new AtomicReference<>("");
 
     private final AtomicBoolean isEUTxPowerCompliant = new AtomicBoolean(false);
-    private final AtomicInteger controllerMode = new AtomicInteger(SoloControllerMode.MODE_2);
+    private final AtomicInteger controllerMode = new AtomicInteger(SoloControllerMode.UNKNOWN_MODE);
 
     private final AtomicReference<Pair<String, String>> sololinkWifiInfo = new AtomicReference<>(Pair.create("", ""));
 
@@ -102,8 +108,7 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
             if (version != null)
                 controllerVersion.set(version);
 
-            if(linkListener != null && areVersionsSet())
-                linkListener.onVersionsUpdated();
+            onVersionsUpdated();
         }
     };
 
@@ -114,8 +119,7 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
             if (version != null)
                 stm32Version.set(version);
 
-            if(linkListener != null && areVersionsSet())
-                linkListener.onVersionsUpdated();
+            onVersionsUpdated();
         }
     };
 
@@ -357,9 +361,38 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
         //Update the tx power compliance
         loadCurrentEUTxPowerComplianceMode();
 
-        //load current controller mode
-        loadCurrentControllerMode();
+        updateControllerModeIfPossible();
+    }
 
+    private void onVersionsUpdated(){
+        if(linkListener != null && areVersionsSet())
+            linkListener.onVersionsUpdated();
+
+        updateControllerModeIfPossible();
+    }
+
+    private void updateControllerModeIfPossible() {
+        if (doesSupportControllerMode()) {
+            //load current controller mode
+            Timber.d("Updating current controller mode.");
+            loadCurrentControllerMode();
+        } else {
+            Timber.w("This controller version doesn't support controller mode retrieval.");
+        }
+    }
+
+    private boolean doesSupportControllerMode(){
+        final String version = controllerVersion.get();
+        if(TextUtils.isEmpty(version))
+            return false;
+
+        try {
+            final Version currentVersion = Version.valueOf(version);
+            return CONTROLLER_MODE_MIN_VERSION.lessThanOrEqualTo(currentVersion);
+        }catch(Exception e){
+            Timber.e(e, "Unable to parse controller version.");
+            return false;
+        }
     }
 
     @Override
@@ -422,15 +455,19 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
             public void run() {
                 Timber.d("Switching controller to mode %n", mode);
                 try {
+                    final boolean supportControllerMode = doesSupportControllerMode();
+                    final String command = supportControllerMode
+                            ? "sololink_config --set-ui-mode %d"
+                            : "runStickMapperMode%d.sh";
                     final String response;
                     switch (mode) {
                         case SoloControllerMode.MODE_1:
-                            response = sshLink.execute("sololink_config --set-ui-mode 1");
+                            response = sshLink.execute(String.format(Locale.US, command, mode));
                             postSuccessEvent(listener);
                             break;
 
                         case SoloControllerMode.MODE_2:
-                            response = sshLink.execute("sololink_config --set-ui-mode 2");
+                            response = sshLink.execute(String.format(Locale.US, command, mode));
                             postSuccessEvent(listener);
                             break;
 
@@ -440,8 +477,11 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
                             break;
                     }
                     Timber.d("Response from switch mode command was: %s", response);
-                    controllerMode.set(mode);
-                    linkListener.onControllerModeUpdated();
+
+                    if(supportControllerMode) {
+                        controllerMode.set(mode);
+                        linkListener.onControllerModeUpdated();
+                    }
                 } catch (IOException e) {
                     Timber.e(e, "Error occurred while changing artoo modes.");
                     postTimeoutEvent(listener);
