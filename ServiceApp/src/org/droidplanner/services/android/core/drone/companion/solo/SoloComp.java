@@ -56,6 +56,8 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
         void onEUTxPowerComplianceUpdated(boolean isCompliant);
 
         void onVersionsUpdated();
+
+        void onControllerModeUpdated();
     }
 
     private static final String NO_VIDEO_OWNER = "no_video_owner";
@@ -166,6 +168,13 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
     }
 
     @Override
+    public void onControllerModeUpdated() {
+        if (compListener != null){
+            compListener.onControllerModeUpdated();
+        }
+    }
+
+    @Override
     public void onPresetButtonLoaded(int buttonType, SoloButtonSetting buttonSettings) {
         if (compListener != null)
             compListener.onPresetButtonLoaded(buttonType, buttonSettings);
@@ -227,6 +236,11 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
 
     public String getVehicleVersion() {
         return soloLinkMgr.getVehicleVersion();
+    }
+
+    @SoloControllerMode.ControllerMode
+    public int getControllerMode(){
+        return  artooMgr.getControllerMode();
     }
 
     public String getAutopilotVersion() {
