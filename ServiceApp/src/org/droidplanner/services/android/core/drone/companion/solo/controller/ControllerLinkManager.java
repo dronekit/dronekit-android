@@ -346,9 +346,7 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
     }
 
     @Override
-    public void onIpConnected() {
-        super.onIpConnected();
-
+    public void refreshState(){
         Timber.d("Artoo link connected.");
 
         startVideoManager();

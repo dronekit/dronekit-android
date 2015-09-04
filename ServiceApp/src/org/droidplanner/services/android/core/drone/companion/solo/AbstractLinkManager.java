@@ -21,6 +21,8 @@ public abstract class AbstractLinkManager<T extends AbstractLinkManager.LinkList
 
     protected static final long RECONNECT_COUNTDOWN = 1000l; //ms
 
+    public abstract void refreshState();
+
     public interface LinkListener {
         void onLinkConnected();
 
@@ -133,6 +135,9 @@ public abstract class AbstractLinkManager<T extends AbstractLinkManager.LinkList
     public void onIpConnected() {
         handler.removeCallbacks(reconnectTask);
         wasConnected.set(true);
+
+        refreshState();
+
         if (linkListener != null)
             linkListener.onLinkConnected();
     }

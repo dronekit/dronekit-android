@@ -126,6 +126,11 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
         soloLinkMgr.stop();
     }
 
+    public void refreshState() {
+        soloLinkMgr.refreshState();
+        artooMgr.refreshState();
+    }
+
     /**
      * Terminates and releases resources used by this companion computer instance. The instance should no longer be used after calling this method.
      */
