@@ -45,6 +45,14 @@ def versionPatch = 4
 def versionBuild = 2 //bump for dogfood builds, public betas, etc.
 def versionPrefix = "3DR Services v"
 
+//Log levels values
+def logLevelVerbose = 2;
+def logLevelDebug = 3;
+def logLevelInfo = 4;
+def logLevelWarn = 5;
+def logLevelError = 6;
+def logLevelAssert = 7;
+
 android {
     compileSdkVersion Integer.parseInt(project.ANDROID_BUILD_SDK_VERSION)
     buildToolsVersion project.ANDROID_BUILD_TOOLS_VERSION
@@ -56,6 +64,10 @@ android {
 
         versionCode computeVersionCode(versionMajor, versionMinor, versionPatch, versionBuild)
         versionName generateVersionName(versionPrefix, versionMajor, versionMinor, versionPatch)
+
+        //Write logs to file preferences
+        buildConfigField "boolean", "WRITE_LOG_FILE", "false"
+        buildConfigField "int", "LOG_FILE_LEVEL", "$logLevelDebug"
     }
 
     compileOptions {
@@ -112,6 +124,7 @@ android {
     buildTypes {
         debug {
             versionNameSuffix generateVersionNameSuffix(versionBuild, "dev")
+            buildConfigField "boolean", "WRITE_LOG_FILE", "true"
         }
 
         beta {
