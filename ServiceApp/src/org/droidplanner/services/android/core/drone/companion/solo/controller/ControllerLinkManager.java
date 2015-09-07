@@ -108,6 +108,7 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
             if (version != null)
                 controllerVersion.set(version);
 
+            updateControllerModeIfPossible();
             onVersionsUpdated();
         }
     };
@@ -346,7 +347,7 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
     }
 
     @Override
-    public void refreshState(){
+    public void refreshState() {
         Timber.d("Artoo link connected.");
 
         startVideoManager();
@@ -358,15 +359,11 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
 
         //Update the tx power compliance
         loadCurrentEUTxPowerComplianceMode();
-
-        updateControllerModeIfPossible();
     }
 
     private void onVersionsUpdated(){
         if(linkListener != null && areVersionsSet())
             linkListener.onVersionsUpdated();
-
-        updateControllerModeIfPossible();
     }
 
     private void updateControllerModeIfPossible() {
@@ -451,7 +448,7 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
         postAsyncTask(new Runnable() {
             @Override
             public void run() {
-                Timber.d("Switching controller to mode %n", mode);
+                Timber.d("Switching controller to mode %d", mode);
                 try {
                     final boolean supportControllerMode = doesSupportControllerMode();
                     final String command = supportControllerMode
