@@ -135,27 +135,6 @@ public class VehicleApi extends Api {
     }
 
     /**
-     * Perform a guided take off.
-     *
-     * @param altitude altitude in meters
-     */
-    public void takeoff(double altitude) {
-        takeoff(altitude, null);
-    }
-
-    /**
-     * Perform a guided take off.
-     *
-     * @param altitude altitude in meters
-     * @param listener Register a callback to receive update of the command execution state.
-     */
-    public void takeoff(double altitude, AbstractCommandListener listener) {
-        Bundle params = new Bundle();
-        params.putDouble(EXTRA_ALTITUDE, altitude);
-        drone.performAsyncActionOnDroneThread(new Action(ACTION_DO_GUIDED_TAKEOFF, params), listener);
-    }
-
-    /**
      * Send a guided point to the connected drone.
      *
      * @param point guided point location

@@ -1,8 +1,15 @@
 package com.o3dr.android.client.apis;
 
+import android.os.Bundle;
+
 import com.o3dr.android.client.Drone;
+import com.o3dr.services.android.lib.model.AbstractCommandListener;
+import com.o3dr.services.android.lib.model.action.Action;
 
 import java.util.concurrent.ConcurrentHashMap;
+
+import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_DO_GUIDED_TAKEOFF;
+import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_ALTITUDE;
 
 /**
  * Provides access to the vehicle control functionality.
@@ -31,5 +38,26 @@ public class ControlApi extends Api {
 
     private ControlApi(Drone drone){
         this.drone = drone;
+    }
+
+    /**
+     * Perform a guided take off.
+     *
+     * @param altitude altitude in meters
+     */
+    public void takeoff(double altitude) {
+        takeoff(altitude, null);
+    }
+
+    /**
+     * Perform a guided take off.
+     *
+     * @param altitude altitude in meters
+     * @param listener Register a callback to receive update of the command execution state.
+     */
+    public void takeoff(double altitude, AbstractCommandListener listener) {
+        Bundle params = new Bundle();
+        params.putDouble(EXTRA_ALTITUDE, altitude);
+        drone.performAsyncActionOnDroneThread(new Action(ACTION_DO_GUIDED_TAKEOFF, params), listener);
     }
 }
