@@ -135,30 +135,6 @@ public class VehicleApi extends Api {
     }
 
     /**
-     * Send a guided point to the connected drone.
-     *
-     * @param point guided point location
-     * @param force true to enable guided mode is required.
-     */
-    public void sendGuidedPoint(LatLong point, boolean force) {
-        sendGuidedPoint(point, force, null);
-    }
-
-    /**
-     * Send a guided point to the connected drone.
-     *
-     * @param point    guided point location
-     * @param force    true to enable guided mode is required.
-     * @param listener Register a callback to receive update of the command execution state.
-     */
-    public void sendGuidedPoint(LatLong point, boolean force, AbstractCommandListener listener) {
-        Bundle params = new Bundle();
-        params.putBoolean(EXTRA_FORCE_GUIDED_POINT, force);
-        params.putParcelable(EXTRA_GUIDED_POINT, point);
-        drone.performAsyncActionOnDroneThread(new Action(ACTION_SEND_GUIDED_POINT, params), listener);
-    }
-
-    /**
      * Set the altitude for the guided point.
      *
      * @param altitude altitude in meters

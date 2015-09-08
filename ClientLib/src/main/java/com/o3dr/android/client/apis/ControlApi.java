@@ -3,6 +3,7 @@ package com.o3dr.android.client.apis;
 import android.os.Bundle;
 
 import com.o3dr.android.client.Drone;
+import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.property.Gps;
 import com.o3dr.services.android.lib.model.AbstractCommandListener;
@@ -11,7 +12,10 @@ import com.o3dr.services.android.lib.model.action.Action;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_DO_GUIDED_TAKEOFF;
+import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_SEND_GUIDED_POINT;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_ALTITUDE;
+import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_FORCE_GUIDED_POINT;
+import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_GUIDED_POINT;
 
 /**
  * Provides access to the vehicle control functionality.
@@ -82,5 +86,29 @@ public class ControlApi extends Api {
                 sendGuidedPoint(gps.getPosition(), true, listener);
             }
         });
+    }
+
+    /**
+     * Send a guided point to the connected drone.
+     *
+     * @param point guided point location
+     * @param force true to enable guided mode is required.
+     */
+    public void sendGuidedPoint(LatLong point, boolean force) {
+        sendGuidedPoint(point, force, null);
+    }
+
+    /**
+     * Send a guided point to the connected drone.
+     *
+     * @param point    guided point location
+     * @param force    true to enable guided mode is required.
+     * @param listener Register a callback to receive update of the command execution state.
+     */
+    public void sendGuidedPoint(LatLong point, boolean force, AbstractCommandListener listener) {
+        Bundle params = new Bundle();
+        params.putBoolean(EXTRA_FORCE_GUIDED_POINT, force);
+        params.putParcelable(EXTRA_GUIDED_POINT, point);
+        drone.performAsyncActionOnDroneThread(new Action(ACTION_SEND_GUIDED_POINT, params), listener);
     }
 }
