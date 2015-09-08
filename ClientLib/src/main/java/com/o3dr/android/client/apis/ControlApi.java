@@ -3,6 +3,8 @@ package com.o3dr.android.client.apis;
 import android.os.Bundle;
 
 import com.o3dr.android.client.Drone;
+import com.o3dr.services.android.lib.drone.attribute.AttributeType;
+import com.o3dr.services.android.lib.drone.property.Gps;
 import com.o3dr.services.android.lib.model.AbstractCommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
 
@@ -59,5 +61,26 @@ public class ControlApi extends Api {
         Bundle params = new Bundle();
         params.putDouble(EXTRA_ALTITUDE, altitude);
         drone.performAsyncActionOnDroneThread(new Action(ACTION_DO_GUIDED_TAKEOFF, params), listener);
+    }
+
+    /**
+     * Pause the vehicle at its current location.
+     */
+    public void pauseAtCurrentLocation() {
+        pauseAtCurrentLocation(null);
+    }
+
+    /**
+     * Pause the vehicle at its current location.
+     *
+     * @param listener Register a callback to receive update of the command execution state.
+     */
+    public void pauseAtCurrentLocation(final AbstractCommandListener listener) {
+        drone.getAttributeAsync(AttributeType.GPS, new Drone.AttributeRetrievedListener<Gps>() {
+            @Override
+            public void onRetrievalSucceed(Gps gps) {
+                sendGuidedPoint(gps.getPosition(), true, listener);
+            }
+        });
     }
 }

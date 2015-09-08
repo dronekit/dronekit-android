@@ -170,27 +170,6 @@ public class VehicleApi extends Api {
     }
 
     /**
-     * Pause the vehicle at its current location.
-     */
-    public void pauseAtCurrentLocation() {
-        pauseAtCurrentLocation(null);
-    }
-
-    /**
-     * Pause the vehicle at its current location.
-     *
-     * @param listener Register a callback to receive update of the command execution state.
-     */
-    public void pauseAtCurrentLocation(final AbstractCommandListener listener) {
-        drone.getAttributeAsync(AttributeType.GPS, new Drone.AttributeRetrievedListener<Gps>() {
-            @Override
-            public void onRetrievalSucceed(Gps gps) {
-                sendGuidedPoint(gps.getPosition(), true, listener);
-            }
-        });
-    }
-
-    /**
      * Generate action used to refresh the parameters for the connected drone.
      */
     public void refreshParameters(){
