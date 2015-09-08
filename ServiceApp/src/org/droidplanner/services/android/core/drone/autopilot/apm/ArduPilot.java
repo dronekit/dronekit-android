@@ -55,6 +55,7 @@ import com.o3dr.services.android.lib.model.action.Action;
 import com.o3dr.services.android.lib.util.MathUtils;
 
 import org.droidplanner.services.android.core.MAVLink.MAVLinkStreams;
+import org.droidplanner.services.android.core.MAVLink.MavLinkModes;
 import org.droidplanner.services.android.core.MAVLink.MavLinkParameters;
 import org.droidplanner.services.android.core.MAVLink.WaypointManager;
 import org.droidplanner.services.android.core.MAVLink.command.doCmd.MavLinkDoCmds;
@@ -494,22 +495,30 @@ public abstract class ArduPilot implements MavLinkDrone {
                 MavLinkDoCmds.setServo(this, channel, pwm, listener);
                 break;
 
-            //GUIDED ACTIONS
-            case ACTION_DO_GUIDED_TAKEOFF:
+            //CONTROL ACTIONS
+            case ControlActions.ACTION_DO_GUIDED_TAKEOFF:
                 double takeoffAltitude = data.getDouble(ControlActions.EXTRA_ALTITUDE);
                 CommonApiUtils.doGuidedTakeoff(this, takeoffAltitude, listener);
                 break;
 
-            case ACTION_SEND_GUIDED_POINT:
+            case ControlActions.ACTION_SEND_GUIDED_POINT:
                 data.setClassLoader(LatLong.class.getClassLoader());
                 boolean force = data.getBoolean(ControlActions.EXTRA_FORCE_GUIDED_POINT);
                 LatLong guidedPoint = data.getParcelable(ControlActions.EXTRA_GUIDED_POINT);
                 CommonApiUtils.sendGuidedPoint(this, guidedPoint, force, listener);
                 break;
 
-            case ACTION_SET_GUIDED_ALTITUDE:
+            case ControlActions.ACTION_SET_GUIDED_ALTITUDE:
                 double guidedAltitude = data.getDouble(ControlActions.EXTRA_ALTITUDE);
                 CommonApiUtils.setGuidedAltitude(this, guidedAltitude);
+                break;
+
+            case ControlActions.ACTION_SET_CONDITION_YAW:
+                final float targetAngle = data.getFloat(ControlActions.EXTRA_YAW_TARGET_ANGLE);
+                final float yawRate = data.getFloat(ControlActions.EXTRA_YAW_CHANGE_RATE);
+                final boolean isClockwise = data.getBoolean(ControlActions.EXTRA_YAW_IS_CLOCKWISE);
+                final boolean isRelative = data.getBoolean(ControlActions.EXTRA_YAW_IS_RELATIVE);
+                MavLinkModes.setConditionYaw(this, targetAngle, yawRate, isClockwise, isRelative, listener);
                 break;
 
             //PARAMETER ACTIONS

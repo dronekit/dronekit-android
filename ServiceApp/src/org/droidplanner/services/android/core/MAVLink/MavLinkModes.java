@@ -1,6 +1,8 @@
 package org.droidplanner.services.android.core.MAVLink;
 
 import org.droidplanner.services.android.core.drone.variables.ApmModes;
+
+import com.MAVLink.common.msg_command_long;
 import com.MAVLink.common.msg_mission_item;
 import com.MAVLink.common.msg_set_position_target_global_int;
 import com.MAVLink.common.msg_set_mode;
@@ -80,6 +82,21 @@ public class MavLinkModes {
         msg.target_system = drone.getSysid();
         msg.base_mode = 1; // TODO use meaningful constant
         msg.custom_mode = mode.getNumber();
+        drone.getMavClient().sendMavMessage(msg, listener);
+    }
+
+    public static void setConditionYaw(MavLinkDrone drone, float targetAngle, float yawRate, boolean isClockwise,
+                                       boolean isRelative, ICommandListener listener){
+        msg_command_long msg = new msg_command_long();
+        msg.target_system = drone.getSysid();
+        msg.target_component = drone.getCompid();
+
+        msg.command = MAV_CMD.MAV_CMD_CONDITION_YAW;
+        msg.param1 = targetAngle;
+        msg.param2 = yawRate;
+        msg.param3 = isClockwise ? 1 : -1;
+        msg.param4 = isRelative ? 1 : 0;
+
         drone.getMavClient().sendMavMessage(msg, listener);
     }
 }

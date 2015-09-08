@@ -13,10 +13,15 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_DO_GUIDED_TAKEOFF;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_SEND_GUIDED_POINT;
+import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_SET_CONDITION_YAW;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_SET_GUIDED_ALTITUDE;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_ALTITUDE;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_FORCE_GUIDED_POINT;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_GUIDED_POINT;
+import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_YAW_CHANGE_RATE;
+import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_YAW_IS_CLOCKWISE;
+import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_YAW_IS_RELATIVE;
+import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_YAW_TARGET_ANGLE;
 
 /**
  * Provides access to the vehicle control functionality.
@@ -122,5 +127,22 @@ public class ControlApi extends Api {
         Bundle params = new Bundle();
         params.putDouble(EXTRA_ALTITUDE, altitude);
         drone.performAsyncAction(new Action(ACTION_SET_GUIDED_ALTITUDE, params));
+    }
+
+    /**
+     * Instructs the vehicle to turn to the specified target angle
+     * @param targetAngle Target angle in degrees [0-360], with 0 == north.
+     * @param turnSpeed Speed during turn in degrees per second
+     * @param isClockwise True for clockwise turn, false for counter clockwise turn
+     * @param isRelative True is the target angle is relative to the current vehicle attitude, false otherwise if it's absolute.
+     * @param listener Register a callback to receive update of the command execution state.
+     */
+    public void turnTo(float targetAngle, float turnSpeed, boolean isClockwise, boolean isRelative, AbstractCommandListener listener){
+        Bundle params = new Bundle();
+        params.putFloat(EXTRA_YAW_TARGET_ANGLE, targetAngle);
+        params.putFloat(EXTRA_YAW_CHANGE_RATE, turnSpeed);
+        params.putBoolean(EXTRA_YAW_IS_CLOCKWISE, isClockwise);
+        params.putBoolean(EXTRA_YAW_IS_RELATIVE, isRelative);
+        drone.performAsyncActionOnDroneThread(new Action(ACTION_SET_CONDITION_YAW, params), listener);
     }
 }
