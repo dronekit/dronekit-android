@@ -3,7 +3,9 @@ package com.o3dr.android.client.apis.solo;
 import android.os.Bundle;
 
 import com.o3dr.android.client.Drone;
+import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerMode;
+import com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerUnits;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSettingSetter;
 import com.o3dr.services.android.lib.model.AbstractCommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
@@ -20,6 +22,8 @@ import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConf
 import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.EXTRA_EU_TX_POWER_COMPLIANT;
 import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.EXTRA_WIFI_PASSWORD;
 import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.EXTRA_WIFI_SSID;
+import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.ACTION_UPDATE_CONTROLLER_UNIT;
+import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.EXTRA_CONTROLLER_UNIT;
 
 /**
  * Created by Fredia Huya-Kouadio on 7/31/15.
@@ -77,7 +81,7 @@ public class SoloConfigApi extends SoloApi {
     /**
      * Updates the controller mode (joystick mapping)
      *
-     * @param controllerMode Controller mode. @see {@link SoloControllerMode}
+     * @param controllerMode Controller mode. @see {@link com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerMode.ControllerMode}
      * @param listener       Register a callback to receive update of the command execution status.
      */
     public void updateControllerMode(@SoloControllerMode.ControllerMode int controllerMode, AbstractCommandListener listener) {
@@ -103,5 +107,28 @@ public class SoloConfigApi extends SoloApi {
      */
     public void refreshSoloVersions(){
         drone.performAsyncActionOnDroneThread(new Action(ACTION_REFRESH_SOLO_VERSIONS), null);
+    }
+
+    /**
+     *  Updates the controller unit system.
+     * @param controllerUnit Controller unit system. @see {@link com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerUnits.ControllerUnit}
+     * @param listener Register a callback that receive update of the command execution status.
+     */
+    public void updateControllerUnit(@SoloControllerUnits.ControllerUnit String controllerUnit, final AbstractCommandListener listener){
+        if(SoloControllerUnits.UNKNOWN.equals(controllerUnit)){
+            if(listener != null) {
+                drone.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        listener.onError(CommandExecutionError.COMMAND_DENIED);
+                    }
+                });
+            }
+            return;
+        }
+
+        Bundle params = new Bundle();
+        params.putString(EXTRA_CONTROLLER_UNIT, controllerUnit);
+        drone.performAsyncActionOnDroneThread(new Action(ACTION_UPDATE_CONTROLLER_UNIT, params), listener);
     }
 }

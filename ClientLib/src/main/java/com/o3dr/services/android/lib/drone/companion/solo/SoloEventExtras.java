@@ -61,4 +61,11 @@ public class SoloEventExtras {
      * @see {@link SoloEvents#SOLO_CONTROLLER_MODE_UPDATED}
      */
     public static final String EXTRA_SOLO_CONTROLLER_MODE = PACKAGE_NAME + ".EXTRA_SOLO_CONTROLLER_MODE";
+
+    /**
+     * Used to retrieve the controller unit system.
+     * @see {@link com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerUnits.ControllerUnit}
+     * @see {@link SoloEvents#SOLO_CONTROLLER_UNIT_UPDATED}
+     */
+    public static final String EXTRA_SOLO_CONTROLLER_UNIT = PACKAGE_NAME + ".EXTRA_SOLO_CONTROLLER_UNIT";
 }
