@@ -3,10 +3,7 @@ package com.o3dr.android.client.apis;
 import android.os.Bundle;
 
 import com.o3dr.android.client.Drone;
-import com.o3dr.services.android.lib.coordinate.LatLong;
-import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
-import com.o3dr.services.android.lib.drone.property.Gps;
 import com.o3dr.services.android.lib.drone.property.Parameters;
 import com.o3dr.services.android.lib.drone.property.VehicleMode;
 import com.o3dr.services.android.lib.model.AbstractCommandListener;
@@ -17,12 +14,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import static com.o3dr.services.android.lib.drone.action.ConnectionActions.ACTION_CONNECT;
 import static com.o3dr.services.android.lib.drone.action.ConnectionActions.ACTION_DISCONNECT;
 import static com.o3dr.services.android.lib.drone.action.ConnectionActions.EXTRA_CONNECT_PARAMETER;
-import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_DO_GUIDED_TAKEOFF;
-import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_SEND_GUIDED_POINT;
-import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_SET_GUIDED_ALTITUDE;
-import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_ALTITUDE;
-import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_FORCE_GUIDED_POINT;
-import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_GUIDED_POINT;
 import static com.o3dr.services.android.lib.drone.action.ParameterActions.ACTION_REFRESH_PARAMETERS;
 import static com.o3dr.services.android.lib.drone.action.ParameterActions.ACTION_WRITE_PARAMETERS;
 import static com.o3dr.services.android.lib.drone.action.ParameterActions.EXTRA_PARAMETERS;
@@ -47,6 +38,7 @@ public class VehicleApi extends Api {
 
     /**
      * Retrieves a vehicle api instance.
+     *
      * @param drone target vehicle
      * @return a VehicleApi instance.
      */
@@ -56,7 +48,7 @@ public class VehicleApi extends Api {
 
     private final Drone drone;
 
-    private VehicleApi(Drone drone){
+    private VehicleApi(Drone drone) {
         this.drone = drone;
     }
 
@@ -65,7 +57,7 @@ public class VehicleApi extends Api {
      *
      * @param parameter parameter for the connection.
      */
-    public void connect(ConnectionParameter parameter){
+    public void connect(ConnectionParameter parameter) {
         Bundle params = new Bundle();
         params.putParcelable(EXTRA_CONNECT_PARAMETER, parameter);
         Action connectAction = new Action(ACTION_CONNECT, params);
@@ -75,7 +67,7 @@ public class VehicleApi extends Api {
     /**
      * Break connection with the vehicle.
      */
-    public void disconnect(){
+    public void disconnect() {
         drone.performAsyncAction(new Action(ACTION_DISCONNECT));
     }
 
@@ -91,10 +83,10 @@ public class VehicleApi extends Api {
     /**
      * Arm or disarm the connected drone.
      *
-     * @param arm             true to arm, false to disarm.
+     * @param arm      true to arm, false to disarm.
      * @param listener Register a callback to receive update of the command execution state.
      */
-    public void arm(boolean arm, AbstractCommandListener listener){
+    public void arm(boolean arm, AbstractCommandListener listener) {
         arm(arm, false, listener);
     }
 
@@ -104,7 +96,7 @@ public class VehicleApi extends Api {
      * @param arm             true to arm, false to disarm.
      * @param emergencyDisarm true to skip landing check and disarm immediately,
      *                        false to disarm only if it is safe to do so.
-     * @param listener Register a callback to receive update of the command execution state.
+     * @param listener        Register a callback to receive update of the command execution state.
      */
     public void arm(boolean arm, boolean emergencyDisarm, AbstractCommandListener listener) {
         Bundle params = new Bundle();
@@ -137,16 +129,17 @@ public class VehicleApi extends Api {
     /**
      * Generate action used to refresh the parameters for the connected drone.
      */
-    public void refreshParameters(){
+    public void refreshParameters() {
         drone.performAsyncAction(new Action(ACTION_REFRESH_PARAMETERS));
     }
 
     /**
      * Generate action used to write the given parameters to the connected drone.
+     *
      * @param parameters parameters to write to the drone.
      * @return
      */
-    public void writeParameters(Parameters parameters){
+    public void writeParameters(Parameters parameters) {
         Bundle params = new Bundle();
         params.putParcelable(EXTRA_PARAMETERS, parameters);
         drone.performAsyncAction(new Action(ACTION_WRITE_PARAMETERS, params));

@@ -114,11 +114,11 @@ public class ControlApi extends Api {
     }
 
     /**
-     * Set the altitude for the guided point.
+     * Instructs the vehicle to climb to the specified altitude.
      *
      * @param altitude altitude in meters
      */
-    public void setGuidedAltitude(double altitude) {
+    public void climbTo(double altitude) {
         Bundle params = new Bundle();
         params.putDouble(EXTRA_ALTITUDE, altitude);
         drone.performAsyncAction(new Action(ACTION_SET_GUIDED_ALTITUDE, params));
