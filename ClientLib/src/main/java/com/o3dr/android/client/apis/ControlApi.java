@@ -13,6 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_DO_GUIDED_TAKEOFF;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_SEND_GUIDED_POINT;
+import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_SET_GUIDED_ALTITUDE;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_ALTITUDE;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_FORCE_GUIDED_POINT;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_GUIDED_POINT;
@@ -110,5 +111,16 @@ public class ControlApi extends Api {
         params.putBoolean(EXTRA_FORCE_GUIDED_POINT, force);
         params.putParcelable(EXTRA_GUIDED_POINT, point);
         drone.performAsyncActionOnDroneThread(new Action(ACTION_SEND_GUIDED_POINT, params), listener);
+    }
+
+    /**
+     * Set the altitude for the guided point.
+     *
+     * @param altitude altitude in meters
+     */
+    public void setGuidedAltitude(double altitude) {
+        Bundle params = new Bundle();
+        params.putDouble(EXTRA_ALTITUDE, altitude);
+        drone.performAsyncAction(new Action(ACTION_SET_GUIDED_ALTITUDE, params));
     }
 }
