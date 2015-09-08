@@ -35,9 +35,9 @@ import com.MAVLink.enums.MAV_STATE;
 import com.MAVLink.enums.MAV_SYS_STATUS_SENSOR;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
+import com.o3dr.services.android.lib.drone.action.ControlActions;
 import com.o3dr.services.android.lib.drone.action.ExperimentalActions;
 import com.o3dr.services.android.lib.drone.action.GimbalActions;
-import com.o3dr.services.android.lib.drone.action.GuidedActions;
 import com.o3dr.services.android.lib.drone.action.ParameterActions;
 import com.o3dr.services.android.lib.drone.action.StateActions;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
@@ -90,8 +90,6 @@ import org.droidplanner.services.android.core.mission.Mission;
 import org.droidplanner.services.android.core.model.AutopilotWarningParser;
 import org.droidplanner.services.android.core.parameters.Parameter;
 import org.droidplanner.services.android.utils.CommonApiUtils;
-
-import timber.log.Timber;
 
 public abstract class ArduPilot implements MavLinkDrone {
 
@@ -497,20 +495,20 @@ public abstract class ArduPilot implements MavLinkDrone {
                 break;
 
             //GUIDED ACTIONS
-            case GuidedActions.ACTION_DO_GUIDED_TAKEOFF:
-                double takeoffAltitude = data.getDouble(GuidedActions.EXTRA_ALTITUDE);
+            case ACTION_DO_GUIDED_TAKEOFF:
+                double takeoffAltitude = data.getDouble(ControlActions.EXTRA_ALTITUDE);
                 CommonApiUtils.doGuidedTakeoff(this, takeoffAltitude, listener);
                 break;
 
-            case GuidedActions.ACTION_SEND_GUIDED_POINT:
+            case ACTION_SEND_GUIDED_POINT:
                 data.setClassLoader(LatLong.class.getClassLoader());
-                boolean force = data.getBoolean(GuidedActions.EXTRA_FORCE_GUIDED_POINT);
-                LatLong guidedPoint = data.getParcelable(GuidedActions.EXTRA_GUIDED_POINT);
+                boolean force = data.getBoolean(ControlActions.EXTRA_FORCE_GUIDED_POINT);
+                LatLong guidedPoint = data.getParcelable(ControlActions.EXTRA_GUIDED_POINT);
                 CommonApiUtils.sendGuidedPoint(this, guidedPoint, force, listener);
                 break;
 
-            case GuidedActions.ACTION_SET_GUIDED_ALTITUDE:
-                double guidedAltitude = data.getDouble(GuidedActions.EXTRA_ALTITUDE);
+            case ACTION_SET_GUIDED_ALTITUDE:
+                double guidedAltitude = data.getDouble(ControlActions.EXTRA_ALTITUDE);
                 CommonApiUtils.setGuidedAltitude(this, guidedAltitude);
                 break;
 
