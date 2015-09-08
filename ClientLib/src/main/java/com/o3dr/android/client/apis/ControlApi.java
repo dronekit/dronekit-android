@@ -83,29 +83,29 @@ public class ControlApi extends Api {
         drone.getAttributeAsync(AttributeType.GPS, new Drone.AttributeRetrievedListener<Gps>() {
             @Override
             public void onRetrievalSucceed(Gps gps) {
-                sendGuidedPoint(gps.getPosition(), true, listener);
+                goTo(gps.getPosition(), true, listener);
             }
         });
     }
 
     /**
-     * Send a guided point to the connected drone.
+     * Instructs the vehicle to go to the specified location.
      *
-     * @param point guided point location
+     * @param point target location
      * @param force true to enable guided mode is required.
      */
-    public void sendGuidedPoint(LatLong point, boolean force) {
-        sendGuidedPoint(point, force, null);
+    public void goTo(LatLong point, boolean force) {
+        goTo(point, force, null);
     }
 
     /**
-     * Send a guided point to the connected drone.
+     * Instructs the vehicle to go to the specified location.
      *
-     * @param point    guided point location
+     * @param point    target location
      * @param force    true to enable guided mode is required.
      * @param listener Register a callback to receive update of the command execution state.
      */
-    public void sendGuidedPoint(LatLong point, boolean force, AbstractCommandListener listener) {
+    public void goTo(LatLong point, boolean force, AbstractCommandListener listener) {
         Bundle params = new Bundle();
         params.putBoolean(EXTRA_FORCE_GUIDED_POINT, force);
         params.putParcelable(EXTRA_GUIDED_POINT, point);
