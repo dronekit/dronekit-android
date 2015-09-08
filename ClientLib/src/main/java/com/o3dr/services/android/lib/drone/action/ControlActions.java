@@ -24,6 +24,23 @@ public class ControlActions {
     public static final String EXTRA_YAW_IS_CLOCKWISE = "extra_yaw_is_clockwise";
     public static final String EXTRA_YAW_IS_RELATIVE = "extra_yaw_is_relative";
 
+    public static final String ACTION_SET_VELOCITY = PACKAGE_NAME + ".SET_VELOCITY";
+
+    /**
+     * X velocity in meters per second.
+     */
+    public static final String EXTRA_VELOCITY_X = "extra_velocity_x";
+
+    /**
+     * Y velocity in meters per second.
+     */
+    public static final String EXTRA_VELOCITY_Y = "extra_velocity_y";
+
+    /**
+     * Z velocity in meters per second.
+     */
+    public static final String EXTRA_VELOCITY_Z = "extra_velocity_z";
+
     //Private to prevent instantiation
     private ControlActions(){}
 

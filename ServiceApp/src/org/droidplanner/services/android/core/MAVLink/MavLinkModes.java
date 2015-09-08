@@ -6,6 +6,7 @@ import com.MAVLink.common.msg_command_long;
 import com.MAVLink.common.msg_mission_item;
 import com.MAVLink.common.msg_set_position_target_global_int;
 import com.MAVLink.common.msg_set_mode;
+import com.MAVLink.common.msg_set_position_target_local_ned;
 import com.MAVLink.enums.MAV_CMD;
 import com.MAVLink.enums.MAV_FRAME;
 import com.o3dr.services.android.lib.model.ICommandListener;
@@ -59,6 +60,17 @@ public class MavLinkModes {
         msg.target_system = drone.getSysid();
         msg.target_component = drone.getCompid();
         drone.getMavClient().sendMavMessage(msg, null);
+    }
+
+    public static void setVelocityInLocalFrame(MavLinkDrone drone, float xVel, float yVel, float zVel, ICommandListener listener){
+        msg_set_position_target_local_ned msg = new msg_set_position_target_local_ned();
+        msg.type_mask = MAVLINK_SET_POS_TYPE_MASK_ACC_IGNORE | MAVLINK_SET_POS_TYPE_MASK_POS_IGNORE;
+        msg.vx = xVel;
+        msg.vy = yVel;
+        msg.vz = zVel;
+        msg.target_system = drone.getSysid();
+        msg.target_component = drone.getCompid();
+        drone.getMavClient().sendMavMessage(msg, listener);
     }
 
     public static void sendGuidedPositionAndVelocity(MavLinkDrone drone, double latitude, double longitude, double altitude,

@@ -15,9 +15,13 @@ import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_D
 import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_SEND_GUIDED_POINT;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_SET_CONDITION_YAW;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_SET_GUIDED_ALTITUDE;
+import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_SET_VELOCITY;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_ALTITUDE;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_FORCE_GUIDED_POINT;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_GUIDED_POINT;
+import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_VELOCITY_X;
+import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_VELOCITY_Y;
+import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_VELOCITY_Z;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_YAW_CHANGE_RATE;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_YAW_IS_CLOCKWISE;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_YAW_IS_RELATIVE;
@@ -144,5 +148,20 @@ public class ControlApi extends Api {
         params.putBoolean(EXTRA_YAW_IS_CLOCKWISE, isClockwise);
         params.putBoolean(EXTRA_YAW_IS_RELATIVE, isRelative);
         drone.performAsyncActionOnDroneThread(new Action(ACTION_SET_CONDITION_YAW, params), listener);
+    }
+
+    /**
+     * Set the vehicle velocity vector.
+     * @param vx x velocity in meter / s
+     * @param vy y velocity in meter / s
+     * @param vz z velocity in meter / s
+     * @param listener Register a callback to receive update of the command execution state.
+     */
+    public void setVelocity(float vx, float vy, float vz, AbstractCommandListener listener){
+        Bundle params = new Bundle();
+        params.putFloat(EXTRA_VELOCITY_X, vx);
+        params.putFloat(EXTRA_VELOCITY_Y, vy);
+        params.putFloat(EXTRA_VELOCITY_Z, vz);
+        drone.performAsyncActionOnDroneThread(new Action(ACTION_SET_VELOCITY, params), listener);
     }
 }

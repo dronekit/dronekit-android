@@ -521,6 +521,13 @@ public abstract class ArduPilot implements MavLinkDrone {
                 MavLinkModes.setConditionYaw(this, targetAngle, yawRate, isClockwise, isRelative, listener);
                 break;
 
+            case ControlActions.ACTION_SET_VELOCITY:
+                final float xVel = data.getFloat(ControlActions.EXTRA_VELOCITY_X);
+                final float yVel = data.getFloat(ControlActions.EXTRA_VELOCITY_Y);
+                final float zVel = data.getFloat(ControlActions.EXTRA_VELOCITY_Z);
+                MavLinkModes.setVelocityInLocalFrame(this, xVel, yVel, zVel, listener);
+                break;
+
             //PARAMETER ACTIONS
             case ParameterActions.ACTION_REFRESH_PARAMETERS:
                 CommonApiUtils.refreshParameters(this);
