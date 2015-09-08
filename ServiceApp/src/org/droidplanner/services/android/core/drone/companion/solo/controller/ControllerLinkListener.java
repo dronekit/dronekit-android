@@ -2,6 +2,7 @@ package org.droidplanner.services.android.core.drone.companion.solo.controller;
 
 import org.droidplanner.services.android.core.drone.companion.solo.AbstractLinkManager;
 import com.o3dr.services.android.lib.drone.companion.solo.button.ButtonPacket;
+import com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerUnits;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
 
 /**
@@ -18,4 +19,6 @@ public interface ControllerLinkListener extends AbstractLinkManager.LinkListener
     void onEUTxPowerComplianceUpdated(boolean isCompliant);
 
     void onControllerModeUpdated();
+
+    void onControllerUnitUpdated(@SoloControllerUnits.ControllerUnit String trimmedResponse);
 }

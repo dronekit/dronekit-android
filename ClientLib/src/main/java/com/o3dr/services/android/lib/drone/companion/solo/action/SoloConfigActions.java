@@ -31,7 +31,7 @@ public class SoloConfigActions {
     /**
      * Controller mode to apply.
      *
-     * @see {@link SoloControllerMode}
+     * @see {@link com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerMode.ControllerMode}
      */
     public static final String EXTRA_CONTROLLER_MODE = "extra_controller_mode";
 
@@ -43,5 +43,13 @@ public class SoloConfigActions {
     public static final String EXTRA_EU_TX_POWER_COMPLIANT = "extra_eu_tx_power_compliant";
 
     public static final String ACTION_REFRESH_SOLO_VERSIONS = PACKAGE_NAME + ".REFRESH_SOLO_VERSIONS";
+
+    public static final String ACTION_UPDATE_CONTROLLER_UNIT = PACKAGE_NAME + ".UPDATE_CONTROLLER_UNIT";
+
+    /**
+     * Controller unit system to apply.
+     * @see {@link com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerUnits.ControllerUnit}
+     */
+    public static final String EXTRA_CONTROLLER_UNIT = "extra_controller_unit";
 
 }

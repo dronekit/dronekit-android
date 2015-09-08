@@ -1,6 +1,7 @@
 package org.droidplanner.services.android.core.drone.companion.solo;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.RemoteException;
 import android.text.TextUtils;
@@ -9,9 +10,12 @@ import android.util.SparseArray;
 import android.view.Surface;
 
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
+import com.o3dr.services.android.lib.drone.companion.solo.SoloEventExtras;
+import com.o3dr.services.android.lib.drone.companion.solo.SoloEvents;
 import com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerMode;
 import com.o3dr.services.android.lib.drone.companion.solo.button.ButtonPacket;
 import com.o3dr.services.android.lib.drone.companion.solo.button.ButtonTypes;
+import com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerUnits;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSetting;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSettingSetter;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloGoproState;
@@ -57,7 +61,7 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
 
         void onVersionsUpdated();
 
-        void onControllerModeUpdated();
+        void onControllerEvent(String event, Bundle eventInfo);
     }
 
     private static final String NO_VIDEO_OWNER = "no_video_owner";
@@ -147,6 +151,7 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
         switch(packet.getMessageType()){
             case TLVMessageTypes.TYPE_SOLO_GOPRO_STATE:
                 goproState = (SoloGoproState) packet;
+                Timber.d("Updated gopro state.");
                 break;
         }
 
@@ -175,7 +180,18 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
     @Override
     public void onControllerModeUpdated() {
         if (compListener != null){
-            compListener.onControllerModeUpdated();
+            final Bundle eventInfo = new Bundle();
+            eventInfo.putInt(SoloEventExtras.EXTRA_SOLO_CONTROLLER_MODE, getControllerMode());
+            compListener.onControllerEvent(SoloEvents.SOLO_CONTROLLER_MODE_UPDATED, eventInfo);
+        }
+    }
+
+    @Override
+    public void onControllerUnitUpdated(String trimmedResponse) {
+        if(compListener != null){
+            final Bundle eventInfo = new Bundle();
+            eventInfo.putString(SoloEventExtras.EXTRA_SOLO_CONTROLLER_UNIT, trimmedResponse);
+            compListener.onControllerEvent(SoloEvents.SOLO_CONTROLLER_UNIT_UPDATED, eventInfo);
         }
     }
 
@@ -248,6 +264,11 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
         return  artooMgr.getControllerMode();
     }
 
+    @SoloControllerUnits.ControllerUnit
+    public String getControllerUnit(){
+        return artooMgr.getControllerUnit();
+    }
+
     public String getAutopilotVersion() {
         return soloLinkMgr.getPixhawkVersion();
     }
@@ -298,7 +319,11 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
     }
 
     public void updateControllerMode(@SoloControllerMode.ControllerMode final int selectedMode, ICommandListener listener){
-        artooMgr.updateArtooMode(selectedMode, listener);
+        artooMgr.updateControllerMode(selectedMode, listener);
+    }
+
+    public void updateControllerUnit(@SoloControllerUnits.ControllerUnit final String selectedUnit, ICommandListener listener){
+        artooMgr.updateControllerUnit(selectedUnit, listener);
     }
 
     public void updateEUTxPowerCompliance(boolean isCompliant, ICommandListener listener) {

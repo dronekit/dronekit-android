@@ -26,6 +26,7 @@ import com.o3dr.services.android.lib.drone.companion.solo.action.SoloActions;
 import com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions;
 import com.o3dr.services.android.lib.drone.companion.solo.button.ButtonPacket;
 import com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerMode;
+import com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerUnits;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSetting;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSettingSetter;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes;
@@ -179,10 +180,8 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
         }
 
         @Override
-        public void onControllerModeUpdated(){
-            final Bundle eventInfo = new Bundle();
-            eventInfo.putInt(SoloEventExtras.EXTRA_SOLO_CONTROLLER_MODE, soloComp.getControllerMode());
-            notifyDroneAttributeEvent(SoloEvents.SOLO_CONTROLLER_MODE_UPDATED, eventInfo, true);
+        public void onControllerEvent(String event, Bundle eventInfo){
+            notifyDroneAttributeEvent(event, eventInfo, true);
         }
     };
 
@@ -653,6 +652,11 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
 
             case SoloConfigActions.ACTION_REFRESH_SOLO_VERSIONS:
                 soloComp.refreshSoloVersions();
+                break;
+
+            case SoloConfigActions.ACTION_UPDATE_CONTROLLER_UNIT:
+                final @SoloControllerUnits.ControllerUnit String unit = data.getString(SoloConfigActions.EXTRA_CONTROLLER_UNIT);
+                SoloApiUtils.updateSoloControllerUnit(this, unit, listener);
                 break;
 
             //**************** CAPABILITY ACTIONS **************//
