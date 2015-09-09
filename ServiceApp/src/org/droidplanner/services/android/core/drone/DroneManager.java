@@ -770,6 +770,9 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
                     handler.removeCallbacks(disconnectSoloCompTask);
                     if (!soloComp.isConnected())
                         soloComp.start();
+                    else{
+                        soloComp.refreshState();
+                    }
                 }
                 break;
 

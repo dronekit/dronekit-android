@@ -152,9 +152,8 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
     }
 
     @Override
-    public void onIpConnected() {
+    public void refreshState(){
         Timber.d("Connected to sololink.");
-        super.onIpConnected();
 
         loadPresetButtonSettings();
         loadGoproState();
@@ -348,4 +347,6 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
         updatePixhawkVersion();
         updateGimbalVersion();
     }
+
+
 }

@@ -7,7 +7,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 
@@ -57,11 +56,11 @@ public class FileUtils {
 	}
 
     public static FileOutputStream getExceptionFileStream(Context context) throws FileNotFoundException {
-        File myDir = new File(DirectoryPath.getLogCatPath(context));
+        File myDir = new File(DirectoryPath.getCrashLogPath(context));
         if (!myDir.exists())
             myDir.mkdirs();
 
-        File file = new File(myDir, getTimeStamp() + ".txt");
+        File file = new File(myDir, getTimeStamp() + ".log");
         if (file.exists())
             file.delete();
         return new FileOutputStream(file);
