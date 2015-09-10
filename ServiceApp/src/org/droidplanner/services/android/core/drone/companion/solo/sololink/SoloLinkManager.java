@@ -4,9 +4,11 @@ import android.content.Context;
 import android.os.Handler;
 import android.text.TextUtils;
 
+import org.droidplanner.services.android.BuildConfig;
 import org.droidplanner.services.android.core.drone.companion.solo.AbstractLinkManager;
 import org.droidplanner.services.android.core.drone.companion.solo.SoloComp;
 import org.droidplanner.services.android.core.drone.companion.solo.controller.ControllerLinkManager;
+
 import com.o3dr.services.android.lib.drone.companion.solo.button.ButtonTypes;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSetting;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSettingGetter;
@@ -51,10 +53,10 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
     private static final SshConnection sshLink = new SshConnection(getSoloLinkIp(), SoloComp.SSH_USERNAME, SoloComp.SSH_PASSWORD);
 
     private final SoloButtonSettingGetter presetButtonAGetter = new SoloButtonSettingGetter(ButtonTypes.BUTTON_A,
-            ButtonTypes.BUTTON_EVENT_PRESS);
+        ButtonTypes.BUTTON_EVENT_PRESS);
 
     private final SoloButtonSettingGetter presetButtonBGetter = new SoloButtonSettingGetter(ButtonTypes.BUTTON_B,
-            ButtonTypes.BUTTON_EVENT_PRESS);
+        ButtonTypes.BUTTON_EVENT_PRESS);
 
     private final SoloGoproRequestState goproStateGetter = new SoloGoproRequestState();
 
@@ -69,8 +71,9 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
         @Override
         public void run() {
             final String version = retrieveVersion(SOLO_VERSION_FILENAME);
-            if (version != null)
+            if (version != null) {
                 vehicleVersion.set(version);
+            }
 
             if(linkListener != null && areVersionsSet())
                 linkListener.onVersionsUpdated();
@@ -81,8 +84,9 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
         @Override
         public void run() {
             final String version = retrieveVersion(PIXHAWK_VERSION_FILENAME);
-            if (version != null)
+            if (version != null) {
                 pixhawkVersion.set(version);
+            }
 
             if(linkListener != null && areVersionsSet())
                 linkListener.onVersionsUpdated();
@@ -118,14 +122,18 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
     }
 
     public static String getSoloLinkIp() {
-        return SOLO_LINK_IP;
+        if (!BuildConfig.SITL_DEBUG) {
+            return SOLO_LINK_IP;
+        } else {
+            return BuildConfig.SOLO_LINK_LOCAL_IP;
+        }
     }
 
-    public String getVehicleVersion(){
+    public String getVehicleVersion() {
         return vehicleVersion.get();
     }
 
-    public String getPixhawkVersion(){
+    public String getPixhawkVersion() {
         return pixhawkVersion.get();
     }
 
@@ -170,8 +178,9 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
     @Override
     public void onPacketReceived(ByteBuffer packetBuffer) {
         TLVPacket tlvMsg = TLVMessageParser.parseTLVPacket(packetBuffer);
-        if (tlvMsg == null)
+        if (tlvMsg == null) {
             return;
+        }
 
         final int messageType = tlvMsg.getMessageType();
         Timber.d("Received tlv message: " + messageType);
@@ -188,8 +197,9 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
                 break;
         }
 
-        if (linkListener != null)
+        if (linkListener != null) {
             linkListener.onTlvPacketReceived(tlvMsg);
+        }
     }
 
     private void sendPacket(byte[] payload, int payloadSize, ICommandListener listener) {
@@ -209,8 +219,9 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
     }
 
     public void sendTLVPacket(TLVPacket packet, boolean useFollowLink, ICommandListener listener) {
-        if (packet == null)
+        if (packet == null) {
             return;
+        }
 
         final byte[] messagePayload = packet.toBytes();
         if (useFollowLink) {
@@ -221,15 +232,15 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
     }
 
     public void loadPresetButtonSettings() {
-        sendTLVPacket(presetButtonAGetter, new SimpleCommandListener(){
+        sendTLVPacket(presetButtonAGetter, new SimpleCommandListener() {
             @Override
-            public void onSuccess(){
+            public void onSuccess() {
                 sendTLVPacket(presetButtonBGetter, null);
             }
         });
     }
 
-    private void loadGoproState(){
+    private void loadGoproState() {
         sendTLVPacket(goproStateGetter, null);
     }
 
@@ -269,8 +280,9 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
      * Update the vehicle preset button settings
      */
     public void pushPresetButtonSettings(final SoloButtonSettingSetter buttonSetter, final ICommandListener listener) {
-        if (!isLinkConnected() || buttonSetter == null)
+        if (!isLinkConnected() || buttonSetter == null) {
             return;
+        }
 
         sendTLVPacket(buttonSetter, new SimpleCommandListener() {
             @Override
@@ -287,22 +299,24 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
     }
 
     public void disableFollowDataConnection() {
-        if (followDataConn != null)
+        if (followDataConn != null) {
             followDataConn.disconnect();
+        }
     }
 
     public void enableFollowDataConnection() {
-        if (followDataConn != null)
+        if (followDataConn != null) {
             followDataConn.connect();
+        }
     }
 
     public boolean updateSololinkWifi(CharSequence wifiSsid, CharSequence password) {
         Timber.d(String.format(Locale.US, "Updating solo wifi ssid to %s with password %s", wifiSsid, password));
         try {
             String ssidUpdateResult = sshLink.execute(ControllerLinkManager.SOLOLINK_SSID_CONFIG_PATH + " --set-wifi-ssid " +
-                    wifiSsid);
+                wifiSsid);
             String passwordUpdateResult = sshLink.execute(ControllerLinkManager.SOLOLINK_SSID_CONFIG_PATH + " --set-wifi-password " +
-                    password);
+                password);
             String restartResult = sshLink.execute(ControllerLinkManager.SOLOLINK_SSID_CONFIG_PATH + " --reboot");
             return true;
         } catch (IOException e) {
