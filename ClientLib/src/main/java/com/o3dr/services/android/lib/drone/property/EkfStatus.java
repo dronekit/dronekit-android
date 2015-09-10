@@ -15,7 +15,7 @@ public class EkfStatus implements DroneAttribute {
     private static final String TAG = EkfStatus.class.getSimpleName();
     private static final int FLAGS_BIT_COUNT = 16;
 
-    private enum EkfFlags {
+    public enum EkfFlags {
         EKF_ATTITUDE(EKF_STATUS_FLAGS.EKF_ATTITUDE),
         EKF_VELOCITY_HORIZ(EKF_STATUS_FLAGS.EKF_VELOCITY_HORIZ),
         EKF_VELOCITY_VERT(EKF_STATUS_FLAGS.EKF_VELOCITY_VERT),
@@ -107,6 +107,10 @@ public class EkfStatus implements DroneAttribute {
 
     public void setCompassVariance(float compassVariance) {
         this.compassVariance = compassVariance;
+    }
+
+    public boolean isEkfFlagSet(EkfFlags flag){
+        return flags.get(flag.ordinal());
     }
 
     /**

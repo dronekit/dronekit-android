@@ -52,6 +52,7 @@ import com.o3dr.services.android.lib.gcs.action.CalibrationActions;
 import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
 import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
+import com.o3dr.services.android.lib.util.MathUtils;
 
 import org.droidplanner.services.android.core.MAVLink.MAVLinkStreams;
 import org.droidplanner.services.android.core.MAVLink.MavLinkParameters;
@@ -878,6 +879,8 @@ public abstract class ArduPilot implements MavLinkDrone {
         signal.setNoise(SikValueToDB(noise & 0xFF));
         signal.setRemnoise(SikValueToDB(remnoise & 0xFF));
         signal.setTxbuf(txbuf & 0xFF);
+
+        signal.setSignalStrength(MathUtils.getSignalStrength(signal.getFadeMargin(), signal.getRemFadeMargin()));
 
         notifyDroneEvent(DroneInterfaces.DroneEventsType.RADIO);
     }
