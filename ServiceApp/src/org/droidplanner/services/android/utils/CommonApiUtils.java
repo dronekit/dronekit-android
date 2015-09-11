@@ -27,7 +27,6 @@ import com.o3dr.services.android.lib.drone.mission.item.complex.CameraDetail;
 import com.o3dr.services.android.lib.drone.mission.item.complex.StructureScanner;
 import com.o3dr.services.android.lib.drone.mission.item.complex.Survey;
 import com.o3dr.services.android.lib.drone.property.Altitude;
-import com.o3dr.services.android.lib.drone.property.Attitude;
 import com.o3dr.services.android.lib.drone.property.Battery;
 import com.o3dr.services.android.lib.drone.property.CameraProxy;
 import com.o3dr.services.android.lib.drone.property.EkfStatus;
@@ -56,7 +55,6 @@ import org.droidplanner.services.android.core.drone.variables.ApmModes;
 import org.droidplanner.services.android.core.drone.variables.Camera;
 import org.droidplanner.services.android.core.drone.variables.GPS;
 import org.droidplanner.services.android.core.drone.variables.GuidedPoint;
-import org.droidplanner.services.android.core.drone.variables.Orientation;
 import org.droidplanner.services.android.core.drone.variables.calibration.AccelCalibration;
 import org.droidplanner.services.android.core.drone.variables.calibration.MagnetometerCalibrationImpl;
 import org.droidplanner.services.android.core.gcs.follow.Follow;
@@ -465,13 +463,12 @@ public class CommonApiUtils {
         return new Speed(droneSpeed.getVerticalSpeed(), droneSpeed.getGroundSpeed(), droneSpeed.getAirSpeed());
     }
 
-    public static Attitude getAttitude(MavLinkDrone drone) {
-        if (drone == null)
-            return new Attitude();
+    public static float fromRadToDeg(float rad){
+        return (float) (rad * 180f / Math.PI);
+    }
 
-        Orientation droneOrientation = drone.getOrientation();
-        return new Attitude(droneOrientation.getRoll(), droneOrientation.getPitch(),
-                droneOrientation.getYaw());
+    public static float fromDegToRad(float deg){
+        return (float) (deg * Math.PI / 180f);
     }
 
     public static Home getHome(MavLinkDrone drone) {
