@@ -14,7 +14,6 @@ import com.o3dr.services.android.lib.util.MathUtils;
 import org.droidplanner.services.android.core.MAVLink.MAVLinkStreams;
 import org.droidplanner.services.android.core.drone.DroneEvents;
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
-import org.droidplanner.services.android.utils.CommonApiUtils;
 
 /**
  * Base drone implementation. Supports mavlink messages belonging to the common set: https://pixhawk.ethz.ch/mavlink/
@@ -29,7 +28,7 @@ public abstract class CommonMavLinkDrone implements MavLinkDrone {
     protected final Battery battery = new Battery();
     protected final Signal signal = new Signal();
 
-    protected CommonMavLinkDrone(DroneInterfaces.Handler handler, MAVLinkStreams.MAVLinkOutputStream mavClient){
+    protected CommonMavLinkDrone(DroneInterfaces.Handler handler, MAVLinkStreams.MAVLinkOutputStream mavClient) {
         this.MavClient = mavClient;
         events = new DroneEvents(this, handler);
     }
@@ -86,7 +85,7 @@ public abstract class CommonMavLinkDrone implements MavLinkDrone {
 
     @Override
     public void onMavLinkMessageReceived(MAVLinkMessage message) {
-        switch(message.msgid){
+        switch (message.msgid) {
             case msg_radio_status.MAVLINK_MSG_ID_RADIO_STATUS:
                 msg_radio_status m_radio_status = (msg_radio_status) message;
                 processSignalUpdate(m_radio_status.rxerrors, m_radio_status.fixed, m_radio_status.rssi,
