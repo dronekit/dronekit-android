@@ -22,13 +22,7 @@ public enum FollowType implements Parcelable {
             return false;
         }
     },
-    SPLINE_LEASH("Vector Leash"),
-    SPLINE_ABOVE("Vector Above") {
-        @Override
-        public boolean hasParam(String paramKey) {
-            return false;
-        }
-    },
+
     GUIDED_SCAN("Guided Scan") {
         @Override
         public boolean hasParam(String paramKey) {
@@ -107,12 +101,6 @@ public enum FollowType implements Parcelable {
         followTypes.add(ABOVE);
         followTypes.add(GUIDED_SCAN);
         followTypes.add(LOOK_AT_ME);
-
-        if (includeAdvanced) {
-            followTypes.add(SOLO_SHOT);
-            followTypes.add(SPLINE_LEASH);
-            followTypes.add(SPLINE_ABOVE);
-        }
 
         return followTypes;
     }

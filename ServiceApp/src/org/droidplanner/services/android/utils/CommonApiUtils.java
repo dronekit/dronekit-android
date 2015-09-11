@@ -54,6 +54,7 @@ import org.droidplanner.services.android.core.drone.variables.GPS;
 import org.droidplanner.services.android.core.drone.variables.GuidedPoint;
 import org.droidplanner.services.android.core.drone.variables.calibration.AccelCalibration;
 import org.droidplanner.services.android.core.drone.variables.calibration.MagnetometerCalibrationImpl;
+import org.droidplanner.services.android.core.firmware.FirmwareType;
 import org.droidplanner.services.android.core.gcs.follow.Follow;
 import org.droidplanner.services.android.core.gcs.follow.FollowAlgorithm;
 import org.droidplanner.services.android.core.helpers.coordinates.Coord2D;
@@ -257,12 +258,14 @@ public class CommonApiUtils {
                 MathUtils.coord2DToLatLong(footprint.getVertexInGlobalFrame()));
     }
 
-    public static FollowAlgorithm.FollowModes followTypeToMode(FollowType followType) {
+    public static FollowAlgorithm.FollowModes followTypeToMode(MavLinkDrone drone, FollowType followType) {
         final FollowAlgorithm.FollowModes followMode;
 
         switch (followType) {
             case ABOVE:
-                followMode = FollowAlgorithm.FollowModes.ABOVE;
+                followMode = (drone.getFirmwareType() == FirmwareType.ARDU_SOLO)
+                        ? FollowAlgorithm.FollowModes.SPLINE_ABOVE
+                        : FollowAlgorithm.FollowModes.ABOVE;
                 break;
 
             case LEAD:
@@ -271,7 +274,9 @@ public class CommonApiUtils {
 
             default:
             case LEASH:
-                followMode = FollowAlgorithm.FollowModes.LEASH;
+                followMode =  (drone.getFirmwareType() == FirmwareType.ARDU_SOLO)
+                        ? FollowAlgorithm.FollowModes.SPLINE_LEASH
+                        : FollowAlgorithm.FollowModes.LEASH;
                 break;
 
             case CIRCLE:
@@ -284,14 +289,6 @@ public class CommonApiUtils {
 
             case RIGHT:
                 followMode = FollowAlgorithm.FollowModes.RIGHT;
-                break;
-
-            case SPLINE_LEASH:
-                followMode = FollowAlgorithm.FollowModes.SPLINE_LEASH;
-                break;
-
-            case SPLINE_ABOVE:
-                followMode = FollowAlgorithm.FollowModes.SPLINE_ABOVE;
                 break;
 
             case GUIDED_SCAN:
@@ -315,6 +312,7 @@ public class CommonApiUtils {
         switch (followMode) {
             default:
             case LEASH:
+            case SPLINE_LEASH:
                 followType = FollowType.LEASH;
                 break;
 
@@ -335,15 +333,8 @@ public class CommonApiUtils {
                 break;
 
             case ABOVE:
-                followType = FollowType.ABOVE;
-                break;
-
-            case SPLINE_LEASH:
-                followType = FollowType.SPLINE_LEASH;
-                break;
-
             case SPLINE_ABOVE:
-                followType = FollowType.SPLINE_ABOVE;
+                followType = FollowType.ABOVE;
                 break;
 
             case GUIDED_SCAN:
@@ -918,7 +909,7 @@ public class CommonApiUtils {
         if (droneMgr == null)
             return;
 
-        final FollowAlgorithm.FollowModes selectedMode = CommonApiUtils.followTypeToMode(followType);
+        final FollowAlgorithm.FollowModes selectedMode = CommonApiUtils.followTypeToMode(droneMgr.getDrone(), followType);
 
         if (selectedMode != null) {
             final Follow followMe = droneMgr.getFollowMe();
