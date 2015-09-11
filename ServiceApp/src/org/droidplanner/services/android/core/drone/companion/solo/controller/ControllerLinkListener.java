@@ -16,4 +16,6 @@ public interface ControllerLinkListener extends AbstractLinkManager.LinkListener
     void onButtonPacketReceived(ButtonPacket packet);
 
     void onEUTxPowerComplianceUpdated(boolean isCompliant);
+
+    void onControllerModeUpdated();
 }

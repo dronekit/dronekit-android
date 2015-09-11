@@ -1,4 +1,6 @@
 apply plugin: 'com.android.application'
+// This does not break the build when Android Studio is missing the JRebel for Android plugin.
+apply plugin: 'com.zeroturnaround.jrebel.android'
 apply plugin: 'io.fabric'
 apply plugin: 'org.robolectric'
 
@@ -29,6 +31,9 @@ dependencies {
     compile 'com.squareup.okhttp:okhttp:2.3.0'
     compile 'com.squareup.okhttp:okhttp-urlconnection:2.3.0'
 
+    //Java semver library
+    compile 'com.github.zafarkhaja:java-semver:0.9.0'
+
     testCompile 'junit:junit:4.12'
     testCompile 'org.robolectric:robolectric:2.4'
 }
@@ -36,9 +41,17 @@ dependencies {
 //Decomposed version name and code (https://plus.google.com/+JakeWharton/posts/6f5TcVPRZij)
 def versionMajor = 1
 def versionMinor = 3
-def versionPatch = 3
-def versionBuild = 4 //bump for dogfood builds, public betas, etc.
+def versionPatch = 4
+def versionBuild = 2 //bump for dogfood builds, public betas, etc.
 def versionPrefix = "3DR Services v"
+
+//Log levels values
+def logLevelVerbose = 2;
+def logLevelDebug = 3;
+def logLevelInfo = 4;
+def logLevelWarn = 5;
+def logLevelError = 6;
+def logLevelAssert = 7;
 
 android {
     compileSdkVersion Integer.parseInt(project.ANDROID_BUILD_SDK_VERSION)
@@ -48,9 +61,15 @@ android {
         applicationId 'org.droidplanner.services.android'
         minSdkVersion Integer.parseInt(project.ANDROID_BUILD_MIN_SDK_VERSION)
         targetSdkVersion Integer.parseInt(project.ANDROID_BUILD_TARGET_SDK_VERSION)
+        buildConfigField "boolean", "SITL_DEBUG", "false"
+        buildConfigField "String", "SOLO_LINK_LOCAL_IP" , getLocalIp()
 
         versionCode computeVersionCode(versionMajor, versionMinor, versionPatch, versionBuild)
         versionName generateVersionName(versionPrefix, versionMajor, versionMinor, versionPatch)
+
+        //Write logs to file preferences
+        buildConfigField "boolean", "WRITE_LOG_FILE", "false"
+        buildConfigField "int", "LOG_FILE_LEVEL", "$logLevelDebug"
     }
 
     compileOptions {
@@ -107,11 +126,18 @@ android {
     buildTypes {
         debug {
             versionNameSuffix generateVersionNameSuffix(versionBuild, "dev")
+            buildConfigField "boolean", "WRITE_LOG_FILE", "true"
         }
 
         beta {
             signingConfig signingConfigs.release
             versionNameSuffix generateVersionNameSuffix(versionBuild, "beta")
+        }
+
+        sitl {
+            signingConfig signingConfigs.debug
+            buildConfigField "boolean", "SITL_DEBUG", "true"
+            debuggable true
         }
 
         release {
@@ -140,4 +166,8 @@ def getAppKeyPassword() {
 
 def getAppKey() {
     return hasProperty('COM_O3DR_SERVICES_KEY_ALIAS') ? COM_O3DR_SERVICES_KEY_ALIAS : ''
+}
+
+def getLocalIp() {
+    return '\"' + InetAddress.getLocalHost().getCanonicalHostName() +'\"'
 }

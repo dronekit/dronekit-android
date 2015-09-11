@@ -6,10 +6,13 @@ import com.crashlytics.android.Crashlytics;
 import io.fabric.sdk.android.Fabric;
 import timber.log.Timber;
 
+import org.droidplanner.services.android.utils.LogToFileTree;
 import org.droidplanner.services.android.utils.analytics.GAUtils;
 import org.droidplanner.services.android.utils.file.IO.ExceptionWriter;
 
 public class DroidPlannerServicesApp extends Application {
+
+    private LogToFileTree logToFileTree;
 
     @Override
     public void onCreate() {
@@ -17,7 +20,13 @@ public class DroidPlannerServicesApp extends Application {
         Fabric.with(this, new Crashlytics());
 
         if (BuildConfig.DEBUG) {
-            Timber.plant(new Timber.DebugTree());
+            if(BuildConfig.WRITE_LOG_FILE){
+                logToFileTree = new LogToFileTree();
+                Timber.plant(logToFileTree);
+            }
+            else {
+                Timber.plant(new Timber.DebugTree());
+            }
         }
 
         final ExceptionWriter exceptionWriter = new ExceptionWriter(getApplicationContext());
@@ -35,5 +44,17 @@ public class DroidPlannerServicesApp extends Application {
 
         GAUtils.initGATracker(this);
         GAUtils.startNewSession(null);
+    }
+
+    public void createFileStartLogging() {
+        if (logToFileTree != null) {
+            logToFileTree.createFileStartLogging(getApplicationContext());
+        }
+    }
+
+    public void closeLogFile() {
+        if(logToFileTree != null) {
+            logToFileTree.stopLoggingThread();
+        }
     }
 }
