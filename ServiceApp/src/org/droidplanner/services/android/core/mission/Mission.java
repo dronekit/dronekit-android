@@ -30,6 +30,7 @@ import org.droidplanner.services.android.core.mission.waypoints.SpatialCoordItem
 import org.droidplanner.services.android.core.mission.waypoints.SplineWaypointImpl;
 import org.droidplanner.services.android.core.mission.waypoints.WaypointImpl;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
+import org.droidplanner.services.android.core.parameters.Parameter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -383,12 +384,22 @@ public class Mission extends DroneVariable {
         return bearing;
     }
 
+    private double getSpeedParameter(){
+        Parameter param = myDrone.getParameters().getParameter("WPNAV_SPEED");
+        if (param == null ) {
+            return -1;
+        }else{
+            return (param.value/100);
+        }
+
+    }
+
     public List<MissionItem> createDronie(Coord2D start, Coord2D end) {
         final int startAltitude = 4;
         final int roiDistance = -8;
         Coord2D slowDownPoint = GeoTools.pointAlongTheLine(start, end, 5);
 
-        double defaultSpeed = myDrone.getSpeed().getSpeedParameter();
+        double defaultSpeed = getSpeedParameter();
         if (defaultSpeed == -1) {
             defaultSpeed = 5;
         }

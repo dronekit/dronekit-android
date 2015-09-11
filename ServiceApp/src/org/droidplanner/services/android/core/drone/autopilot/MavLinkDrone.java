@@ -10,7 +10,6 @@ import org.droidplanner.services.android.core.drone.Preferences;
 import org.droidplanner.services.android.core.drone.profiles.Parameters;
 import org.droidplanner.services.android.core.drone.profiles.VehicleProfile;
 import org.droidplanner.services.android.core.drone.variables.Altitude;
-import org.droidplanner.services.android.core.drone.variables.Battery;
 import org.droidplanner.services.android.core.drone.variables.Camera;
 import org.droidplanner.services.android.core.drone.variables.GPS;
 import org.droidplanner.services.android.core.drone.variables.GuidedPoint;
@@ -20,7 +19,6 @@ import org.droidplanner.services.android.core.drone.variables.MissionStats;
 import org.droidplanner.services.android.core.drone.variables.Navigation;
 import org.droidplanner.services.android.core.drone.variables.Orientation;
 import org.droidplanner.services.android.core.drone.variables.RC;
-import org.droidplanner.services.android.core.drone.variables.Speed;
 import org.droidplanner.services.android.core.drone.variables.State;
 import org.droidplanner.services.android.core.drone.variables.StreamRates;
 import org.droidplanner.services.android.core.drone.variables.calibration.AccelCalibration;
@@ -69,10 +67,6 @@ public interface MavLinkDrone extends Drone {
     public Preferences getPreferences();
 
     public WaypointManager getWaypointManager();
-
-    public Speed getSpeed();
-
-    public Battery getBattery();
 
     public Home getHome();
 

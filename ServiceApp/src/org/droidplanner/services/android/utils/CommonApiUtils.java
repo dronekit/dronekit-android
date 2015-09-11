@@ -457,14 +457,6 @@ public class CommonApiUtils {
         return new Parameters(new ArrayList<>(proxyParams.values()));
     }
 
-    public static Speed getSpeed(MavLinkDrone drone) {
-        if (drone == null)
-            return new Speed();
-
-        org.droidplanner.services.android.core.drone.variables.Speed droneSpeed = drone.getSpeed();
-        return new Speed(droneSpeed.getVerticalSpeed(), droneSpeed.getGroundSpeed(), droneSpeed.getAirSpeed());
-    }
-
     public static Attitude getAttitude(MavLinkDrone drone) {
         if (drone == null)
             return new Attitude();
@@ -485,15 +477,6 @@ public class CommonApiUtils {
                 : null;
 
         return new Home(homePosition);
-    }
-
-    public static Battery getBattery(MavLinkDrone drone) {
-        if (drone == null)
-            return new Battery();
-
-        org.droidplanner.services.android.core.drone.variables.Battery droneBattery = drone.getBattery();
-        return new Battery(droneBattery.getBattVolt(), droneBattery.getBattRemain(),
-                droneBattery.getBattCurrent(), droneBattery.getBattDischarge());
     }
 
     public static Altitude getAltitude(MavLinkDrone drone) {
