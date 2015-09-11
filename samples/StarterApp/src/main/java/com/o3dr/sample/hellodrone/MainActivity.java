@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.o3dr.android.client.ControlTower;
 import com.o3dr.android.client.Drone;
+import com.o3dr.android.client.apis.ControlApi;
 import com.o3dr.android.client.apis.solo.SoloCameraApi;
 import com.o3dr.android.client.apis.VehicleApi;
 import com.o3dr.android.client.interfaces.DroneListener;
@@ -317,7 +318,7 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
             });
         } else if (vehicleState.isArmed()) {
             // Take off
-            VehicleApi.getApi(this.drone).takeoff(10, new AbstractCommandListener() {
+            ControlApi.getApi(this.drone).takeoff(10, new AbstractCommandListener() {
 
                 @Override
                 public void onSuccess() {

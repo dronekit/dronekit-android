@@ -7,6 +7,7 @@ import android.view.Surface;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerMode;
 import com.o3dr.services.android.lib.drone.companion.solo.SoloState;
+import com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerUnits;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSettingSetter;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
 import com.o3dr.services.android.lib.model.ICommandListener;
@@ -34,7 +35,8 @@ public class SoloApiUtils {
         return new SoloState(soloComp.getAutopilotVersion(), soloComp.getControllerFirmwareVersion(),
                 soloComp.getControllerVersion(), soloComp.getVehicleVersion(),
                 wifiSettings.second, wifiSettings.first, soloComp.isEUTxPowerCompliant(),
-                soloComp.getButtonSettings(), soloComp.getGimbalVersion(), soloComp.getControllerMode());
+                soloComp.getButtonSettings(), soloComp.getGimbalVersion(),
+                soloComp.getControllerMode(), soloComp.getControllerUnit());
     }
 
     static boolean isSoloLinkFeatureAvailable(DroneManager droneManager, ICommandListener listener) {
@@ -95,6 +97,14 @@ public class SoloApiUtils {
 
         final SoloComp soloComp = droneManager.getSoloComp();
         soloComp.updateControllerMode(mode, listener);
+    }
+
+    public static void updateSoloControllerUnit(DroneManager droneManager, @SoloControllerUnits.ControllerUnit String unit, ICommandListener listener){
+        if(!isSoloLinkFeatureAvailable(droneManager, listener))
+            return;
+
+        final SoloComp soloComp = droneManager.getSoloComp();
+        soloComp.updateControllerUnit(unit, listener);
     }
 
     public static void updateSoloLinkEUTxPowerCompliance(DroneManager droneManager, boolean isCompliant, ICommandListener listener){

@@ -35,9 +35,9 @@ import com.MAVLink.enums.MAV_STATE;
 import com.MAVLink.enums.MAV_SYS_STATUS_SENSOR;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
+import com.o3dr.services.android.lib.drone.action.ControlActions;
 import com.o3dr.services.android.lib.drone.action.ExperimentalActions;
 import com.o3dr.services.android.lib.drone.action.GimbalActions;
-import com.o3dr.services.android.lib.drone.action.GuidedActions;
 import com.o3dr.services.android.lib.drone.action.ParameterActions;
 import com.o3dr.services.android.lib.drone.action.StateActions;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
@@ -55,6 +55,7 @@ import com.o3dr.services.android.lib.model.action.Action;
 import com.o3dr.services.android.lib.util.MathUtils;
 
 import org.droidplanner.services.android.core.MAVLink.MAVLinkStreams;
+import org.droidplanner.services.android.core.MAVLink.MavLinkModes;
 import org.droidplanner.services.android.core.MAVLink.MavLinkParameters;
 import org.droidplanner.services.android.core.MAVLink.WaypointManager;
 import org.droidplanner.services.android.core.MAVLink.command.doCmd.MavLinkDoCmds;
@@ -90,8 +91,6 @@ import org.droidplanner.services.android.core.mission.Mission;
 import org.droidplanner.services.android.core.model.AutopilotWarningParser;
 import org.droidplanner.services.android.core.parameters.Parameter;
 import org.droidplanner.services.android.utils.CommonApiUtils;
-
-import timber.log.Timber;
 
 public abstract class ArduPilot implements MavLinkDrone {
 
@@ -496,22 +495,37 @@ public abstract class ArduPilot implements MavLinkDrone {
                 MavLinkDoCmds.setServo(this, channel, pwm, listener);
                 break;
 
-            //GUIDED ACTIONS
-            case GuidedActions.ACTION_DO_GUIDED_TAKEOFF:
-                double takeoffAltitude = data.getDouble(GuidedActions.EXTRA_ALTITUDE);
+            //CONTROL ACTIONS
+            case ControlActions.ACTION_DO_GUIDED_TAKEOFF:
+                double takeoffAltitude = data.getDouble(ControlActions.EXTRA_ALTITUDE);
                 CommonApiUtils.doGuidedTakeoff(this, takeoffAltitude, listener);
                 break;
 
-            case GuidedActions.ACTION_SEND_GUIDED_POINT:
+            case ControlActions.ACTION_SEND_GUIDED_POINT:
                 data.setClassLoader(LatLong.class.getClassLoader());
-                boolean force = data.getBoolean(GuidedActions.EXTRA_FORCE_GUIDED_POINT);
-                LatLong guidedPoint = data.getParcelable(GuidedActions.EXTRA_GUIDED_POINT);
+                boolean force = data.getBoolean(ControlActions.EXTRA_FORCE_GUIDED_POINT);
+                LatLong guidedPoint = data.getParcelable(ControlActions.EXTRA_GUIDED_POINT);
                 CommonApiUtils.sendGuidedPoint(this, guidedPoint, force, listener);
                 break;
 
-            case GuidedActions.ACTION_SET_GUIDED_ALTITUDE:
-                double guidedAltitude = data.getDouble(GuidedActions.EXTRA_ALTITUDE);
+            case ControlActions.ACTION_SET_GUIDED_ALTITUDE:
+                double guidedAltitude = data.getDouble(ControlActions.EXTRA_ALTITUDE);
                 CommonApiUtils.setGuidedAltitude(this, guidedAltitude);
+                break;
+
+            case ControlActions.ACTION_SET_CONDITION_YAW:
+                final float targetAngle = data.getFloat(ControlActions.EXTRA_YAW_TARGET_ANGLE);
+                final float yawRate = data.getFloat(ControlActions.EXTRA_YAW_CHANGE_RATE);
+                final boolean isClockwise = data.getBoolean(ControlActions.EXTRA_YAW_IS_CLOCKWISE);
+                final boolean isRelative = data.getBoolean(ControlActions.EXTRA_YAW_IS_RELATIVE);
+                MavLinkModes.setConditionYaw(this, targetAngle, yawRate, isClockwise, isRelative, listener);
+                break;
+
+            case ControlActions.ACTION_SET_VELOCITY:
+                final float xVel = data.getFloat(ControlActions.EXTRA_VELOCITY_X);
+                final float yVel = data.getFloat(ControlActions.EXTRA_VELOCITY_Y);
+                final float zVel = data.getFloat(ControlActions.EXTRA_VELOCITY_Z);
+                MavLinkModes.setVelocityInLocalFrame(this, xVel, yVel, zVel, listener);
                 break;
 
             //PARAMETER ACTIONS

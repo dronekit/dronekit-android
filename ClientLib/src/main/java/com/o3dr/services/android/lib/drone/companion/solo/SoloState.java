@@ -3,8 +3,8 @@ package com.o3dr.services.android.lib.drone.companion.solo;
 import android.os.Parcel;
 import android.util.SparseArray;
 
-import com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerMode;
 import com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerMode.ControllerMode;
+import com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerUnits.ControllerUnit;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSetting;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageParser;
 import com.o3dr.services.android.lib.drone.property.DroneAttribute;
@@ -34,12 +34,16 @@ public class SoloState implements DroneAttribute {
     @ControllerMode
     private int controllerMode;
 
+    @ControllerUnit
+    private String controllerUnit;
+
     public SoloState(){}
 
     public SoloState(String autopilotVersion, String controllerFirmwareVersion,
                      String controllerVersion, String vehicleVersion,
                      String wifiPassword, String wifiSsid, boolean isEUTxPowerCompliant,
-                     SparseArray<SoloButtonSetting> buttonSettings, String gimbalVersion, @ControllerMode int controllerMode) {
+                     SparseArray<SoloButtonSetting> buttonSettings, String gimbalVersion,
+                     @ControllerMode int controllerMode, @ControllerUnit String controllerUnit) {
         this.autopilotVersion = autopilotVersion;
         this.controllerFirmwareVersion = controllerFirmwareVersion;
         this.controllerVersion = controllerVersion;
@@ -50,6 +54,7 @@ public class SoloState implements DroneAttribute {
         this.buttonSettings = buttonSettings;
         this.gimbalVersion = gimbalVersion;
         this.controllerMode = controllerMode;
+        this.controllerUnit = controllerUnit;
     }
 
     public String getAutopilotVersion() {
@@ -93,6 +98,10 @@ public class SoloState implements DroneAttribute {
         return gimbalVersion;
     }
 
+    @ControllerUnit public String getControllerUnit(){
+        return controllerUnit;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -125,6 +134,7 @@ public class SoloState implements DroneAttribute {
 
         dest.writeString(this.gimbalVersion);
         dest.writeInt(this.controllerMode);
+        dest.writeString(this.controllerUnit);
     }
 
     protected SoloState(Parcel in) {
@@ -155,6 +165,9 @@ public class SoloState implements DroneAttribute {
 
         @ControllerMode final int tempMode = in.readInt();
         this.controllerMode = tempMode;
+
+        @ControllerUnit final String tempUnit = in.readString();
+        this.controllerUnit = tempUnit;
     }
 
     public static final Creator<SoloState> CREATOR = new Creator<SoloState>() {

@@ -10,6 +10,7 @@ import android.os.SystemClock;
 import android.util.Log;
 
 import com.o3dr.android.client.apis.CalibrationApi;
+import com.o3dr.android.client.apis.ControlApi;
 import com.o3dr.android.client.apis.ExperimentalApi;
 import com.o3dr.android.client.apis.FollowApi;
 import com.o3dr.android.client.apis.MissionApi;
@@ -615,24 +616,24 @@ public class Drone {
     }
 
     /**
-     * @deprecated Use {@link VehicleApi#takeoff(double)} instead.
+     * @deprecated Use {@link ControlApi#takeoff(double)} instead.
      */
     public void doGuidedTakeoff(double altitude) {
-        VehicleApi.getApi(this).takeoff(altitude);
+        ControlApi.getApi(this).takeoff(altitude);
     }
 
     /**
-     * @deprecated Use {@link VehicleApi#pauseAtCurrentLocation()} instead.
+     * @deprecated Use {@link ControlApi#pauseAtCurrentLocation()} instead.
      */
     public void pauseAtCurrentLocation() {
-        VehicleApi.getApi(this).pauseAtCurrentLocation();
+        ControlApi.getApi(this).pauseAtCurrentLocation();
     }
 
     /**
-     * @deprecated Use {@link VehicleApi#sendGuidedPoint(LatLong, boolean)} instead.
+     * @deprecated Use {@link ControlApi#goTo(LatLong, boolean)} instead.
      */
     public void sendGuidedPoint(LatLong point, boolean force) {
-        VehicleApi.getApi(this).sendGuidedPoint(point, force);
+        ControlApi.getApi(this).goTo(point, force);
     }
 
     /**
@@ -643,10 +644,10 @@ public class Drone {
     }
 
     /**
-     * @deprecated Use {@link VehicleApi#setGuidedAltitude(double)} instead.
+     * @deprecated Use {@link ControlApi#climbTo(double)} instead.
      */
     public void setGuidedAltitude(double altitude) {
-        VehicleApi.getApi(this).setGuidedAltitude(altitude);
+        ControlApi.getApi(this).climbTo(altitude);
     }
 
     /**
