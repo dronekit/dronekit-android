@@ -13,7 +13,6 @@ import com.MAVLink.ardupilotmega.msg_mag_cal_report;
 import com.MAVLink.ardupilotmega.msg_mount_configure;
 import com.MAVLink.ardupilotmega.msg_mount_status;
 import com.MAVLink.ardupilotmega.msg_radio;
-import com.MAVLink.common.msg_attitude;
 import com.MAVLink.common.msg_global_position_int;
 import com.MAVLink.common.msg_gps_raw_int;
 import com.MAVLink.common.msg_heartbeat;
@@ -44,7 +43,6 @@ import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.drone.mission.action.MissionActions;
-import com.o3dr.services.android.lib.drone.property.Attitude;
 import com.o3dr.services.android.lib.drone.property.DroneAttribute;
 import com.o3dr.services.android.lib.drone.property.VehicleMode;
 import com.o3dr.services.android.lib.gcs.action.CalibrationActions;
@@ -122,8 +120,6 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
     private final MagnetometerCalibrationImpl magCalibration;
 
     private final Context context;
-
-    protected final Attitude attitude = new Attitude();
 
     public ArduPilot(Context context, MAVLinkStreams.MAVLinkOutputStream mavClient,
                      DroneInterfaces.Handler handler, Preferences pref, AutopilotWarningParser warningParser,
@@ -349,9 +345,6 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
 
             case AttributeType.PARAMETERS:
                 return CommonApiUtils.getParameters(this, context);
-
-            case AttributeType.ATTITUDE:
-                return attitude;
 
             case AttributeType.HOME:
                 return CommonApiUtils.getHome(this);
@@ -597,11 +590,6 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
                 processStatusText(msg_statustext);
                 break;
 
-            case msg_attitude.MAVLINK_MSG_ID_ATTITUDE:
-                msg_attitude m_att = (msg_attitude) message;
-                processAttitude(m_att);
-                break;
-
             case msg_vfr_hud.MAVLINK_MSG_ID_VFR_HUD:
                 processVfrHud((msg_vfr_hud) message);
                 break;
@@ -690,19 +678,6 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
         }
 
         super.onMavLinkMessageReceived(message);
-    }
-
-    private void processAttitude(msg_attitude m_att) {
-        attitude.setRoll(CommonApiUtils.fromRadToDeg(m_att.roll));
-        attitude.setRollSpeed(CommonApiUtils.fromRadToDeg(m_att.rollspeed));
-
-        attitude.setPitch(CommonApiUtils.fromRadToDeg(m_att.pitch));
-        attitude.setPitchSpeed(CommonApiUtils.fromRadToDeg(m_att.pitchspeed));
-
-        attitude.setYaw(CommonApiUtils.fromRadToDeg(m_att.yaw));
-        attitude.setYawSpeed(CommonApiUtils.fromRadToDeg(m_att.yawspeed));
-
-        notifyDroneEvent(DroneInterfaces.DroneEventsType.ATTITUDE);
     }
 
     /**

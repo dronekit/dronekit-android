@@ -1,8 +1,6 @@
 package org.droidplanner.services.android.core.drone.autopilot.px4;
 
-import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.common.msg_heartbeat;
-import com.o3dr.services.android.lib.drone.property.DroneAttribute;
 import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
 
@@ -11,7 +9,6 @@ import org.droidplanner.services.android.core.MAVLink.WaypointManager;
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
 import org.droidplanner.services.android.core.drone.Preferences;
 import org.droidplanner.services.android.core.drone.autopilot.CommonMavLinkDrone;
-import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.core.drone.profiles.Parameters;
 import org.droidplanner.services.android.core.drone.profiles.VehicleProfile;
 import org.droidplanner.services.android.core.drone.variables.Altitude;
@@ -22,7 +19,6 @@ import org.droidplanner.services.android.core.drone.variables.Home;
 import org.droidplanner.services.android.core.drone.variables.Magnetometer;
 import org.droidplanner.services.android.core.drone.variables.MissionStats;
 import org.droidplanner.services.android.core.drone.variables.Navigation;
-import org.droidplanner.services.android.core.drone.variables.Orientation;
 import org.droidplanner.services.android.core.drone.variables.RC;
 import org.droidplanner.services.android.core.drone.variables.State;
 import org.droidplanner.services.android.core.drone.variables.StreamRates;
@@ -122,11 +118,6 @@ public class Px4Native extends CommonMavLinkDrone {
 
     @Override
     public Altitude getAltitude() {
-        return null;
-    }
-
-    @Override
-    public Orientation getOrientation() {
         return null;
     }
 
