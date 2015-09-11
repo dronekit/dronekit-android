@@ -2,7 +2,9 @@ package org.droidplanner.services.android.core.drone.variables;
 
 import android.os.RemoteException;
 
+import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
+import com.o3dr.services.android.lib.drone.property.Altitude;
 import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.model.SimpleCommandListener;
 
@@ -317,7 +319,8 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener {
     }
 
     private static double getDroneAltConstrained(MavLinkDrone drone) {
-        double alt = Math.floor(drone.getAltitude().getAltitude());
+        final Altitude droneAltitude = (Altitude) drone.getAttribute(AttributeType.ALTITUDE);
+        double alt = Math.floor(droneAltitude.getAltitude());
         return Math.max(alt, getDefaultMinAltitude(drone));
     }
 

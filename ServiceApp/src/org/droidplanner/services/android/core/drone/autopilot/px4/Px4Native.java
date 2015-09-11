@@ -11,14 +11,12 @@ import org.droidplanner.services.android.core.drone.Preferences;
 import org.droidplanner.services.android.core.drone.autopilot.CommonMavLinkDrone;
 import org.droidplanner.services.android.core.drone.profiles.Parameters;
 import org.droidplanner.services.android.core.drone.profiles.VehicleProfile;
-import org.droidplanner.services.android.core.drone.variables.Altitude;
 import org.droidplanner.services.android.core.drone.variables.Camera;
 import org.droidplanner.services.android.core.drone.variables.GPS;
 import org.droidplanner.services.android.core.drone.variables.GuidedPoint;
 import org.droidplanner.services.android.core.drone.variables.Home;
 import org.droidplanner.services.android.core.drone.variables.Magnetometer;
 import org.droidplanner.services.android.core.drone.variables.MissionStats;
-import org.droidplanner.services.android.core.drone.variables.Navigation;
 import org.droidplanner.services.android.core.drone.variables.RC;
 import org.droidplanner.services.android.core.drone.variables.State;
 import org.droidplanner.services.android.core.drone.variables.StreamRates;
@@ -113,16 +111,6 @@ public class Px4Native extends CommonMavLinkDrone {
 
     @Override
     public Home getHome() {
-        return null;
-    }
-
-    @Override
-    public Altitude getAltitude() {
-        return null;
-    }
-
-    @Override
-    public Navigation getNavigation() {
         return null;
     }
 

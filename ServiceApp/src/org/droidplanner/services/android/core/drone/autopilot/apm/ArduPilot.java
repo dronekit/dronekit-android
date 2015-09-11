@@ -61,7 +61,6 @@ import org.droidplanner.services.android.core.drone.Preferences;
 import org.droidplanner.services.android.core.drone.autopilot.CommonMavLinkDrone;
 import org.droidplanner.services.android.core.drone.profiles.Parameters;
 import org.droidplanner.services.android.core.drone.profiles.VehicleProfile;
-import org.droidplanner.services.android.core.drone.variables.Altitude;
 import org.droidplanner.services.android.core.drone.variables.ApmModes;
 import org.droidplanner.services.android.core.drone.variables.Camera;
 import org.droidplanner.services.android.core.drone.variables.GPS;
@@ -70,7 +69,6 @@ import org.droidplanner.services.android.core.drone.variables.HeartBeat;
 import org.droidplanner.services.android.core.drone.variables.Home;
 import org.droidplanner.services.android.core.drone.variables.Magnetometer;
 import org.droidplanner.services.android.core.drone.variables.MissionStats;
-import org.droidplanner.services.android.core.drone.variables.Navigation;
 import org.droidplanner.services.android.core.drone.variables.RC;
 import org.droidplanner.services.android.core.drone.variables.State;
 import org.droidplanner.services.android.core.drone.variables.StreamRates;
@@ -102,8 +100,6 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
     private final Mission mission;
     private final MissionStats missionStats;
     private final StreamRates streamRates;
-    private final Altitude altitude;
-    private final Navigation navigation;
     private final GuidedPoint guidedPoint;
     private final AccelCalibration accelCalibrationSetup;
     private final WaypointManager waypointManager;
@@ -144,8 +140,6 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
         this.mission = new Mission(this);
         this.missionStats = new MissionStats(this);
         this.streamRates = new StreamRates(this);
-        this.altitude = new Altitude(this);
-        this.navigation = new Navigation(this);
         this.guidedPoint = new GuidedPoint(this, handler);
         this.accelCalibrationSetup = new AccelCalibration(this, handler);
         this.magCalibration = new MagnetometerCalibrationImpl(this);
@@ -157,7 +151,10 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
 
     @Override
     public void setAltitudeGroundAndAirSpeeds(double altitude, double groundSpeed, double airSpeed, double climb) {
-        this.altitude.setAltitude(altitude);
+        if(this.altitude.getAltitude() != altitude) {
+            this.altitude.setAltitude(altitude);
+            notifyDroneEvent(DroneInterfaces.DroneEventsType.ALTITUDE);
+        }
 
         if (speed.getGroundSpeed() != groundSpeed || speed.getAirSpeed() != airSpeed || speed.getVerticalSpeed() != climb) {
             speed.setGroundSpeed(groundSpeed);
@@ -171,7 +168,8 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
     @Override
     public void setDisttowpAndSpeedAltErrors(double disttowp, double alt_error, double aspd_error) {
         missionStats.setDistanceToWp(disttowp);
-        altitude.setAltitudeError(alt_error);
+
+        this.altitude.setTargetAltitude(this.altitude.getAltitude() + alt_error);
         notifyDroneEvent(DroneInterfaces.DroneEventsType.ORIENTATION);
     }
 
@@ -281,16 +279,6 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
     }
 
     @Override
-    public Altitude getAltitude() {
-        return altitude;
-    }
-
-    @Override
-    public Navigation getNavigation() {
-        return navigation;
-    }
-
-    @Override
     public GuidedPoint getGuidedPoint() {
         return guidedPoint;
     }
@@ -348,9 +336,6 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
 
             case AttributeType.HOME:
                 return CommonApiUtils.getHome(this);
-
-            case AttributeType.ALTITUDE:
-                return CommonApiUtils.getAltitude(this);
 
             case AttributeType.MISSION:
                 return CommonApiUtils.getMission(this);
@@ -605,7 +590,6 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
             case msg_nav_controller_output.MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT:
                 msg_nav_controller_output m_nav = (msg_nav_controller_output) message;
                 setDisttowpAndSpeedAltErrors(m_nav.wp_dist, m_nav.alt_error, m_nav.aspd_error);
-                getNavigation().setNavPitchRollYaw(m_nav.nav_pitch, m_nav.nav_roll, m_nav.nav_bearing);
                 break;
 
             case msg_raw_imu.MAVLINK_MSG_ID_RAW_IMU:

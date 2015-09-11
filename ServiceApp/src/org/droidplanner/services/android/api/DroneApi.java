@@ -408,7 +408,6 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 droneEvent = AttributeEvent.STATE_VEHICLE_MODE;
                 break;
 
-            case NAVIGATION:
             case ATTITUDE:
             case ORIENTATION:
                 droneEvent = AttributeEvent.ATTITUDE_UPDATED;

@@ -38,11 +38,6 @@ public class DroneInterfaces {
 		GUIDEDPOINT,
 
 		/**
-         *
-         */
-		NAVIGATION,
-
-		/**
          * Denotes vehicle attitude change event.
          */
 		ATTITUDE,

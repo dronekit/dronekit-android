@@ -476,14 +476,6 @@ public class CommonApiUtils {
         return new Home(homePosition);
     }
 
-    public static Altitude getAltitude(MavLinkDrone drone) {
-        if (drone == null)
-            return new Altitude();
-
-        org.droidplanner.services.android.core.drone.variables.Altitude droneAltitude = drone.getAltitude();
-        return new Altitude(droneAltitude.getAltitude(), droneAltitude.getTargetAltitude());
-    }
-
     public static Mission getMission(MavLinkDrone drone) {
         Mission proxyMission = new Mission();
         if (drone == null)

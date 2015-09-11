@@ -6,6 +6,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.common.msg_attitude;
 import com.MAVLink.common.msg_radio_status;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
+import com.o3dr.services.android.lib.drone.property.Altitude;
 import com.o3dr.services.android.lib.drone.property.Attitude;
 import com.o3dr.services.android.lib.drone.property.Battery;
 import com.o3dr.services.android.lib.drone.property.DroneAttribute;
@@ -27,6 +28,7 @@ public abstract class CommonMavLinkDrone implements MavLinkDrone {
     private final MAVLinkStreams.MAVLinkOutputStream MavClient;
     private final DroneEvents events;
 
+    protected final Altitude altitude = new Altitude();
     protected final Speed speed = new Speed();
     protected final Battery battery = new Battery();
     protected final Signal signal = new Signal();
@@ -85,6 +87,9 @@ public abstract class CommonMavLinkDrone implements MavLinkDrone {
 
             case AttributeType.ATTITUDE:
                 return attitude;
+
+            case AttributeType.ALTITUDE:
+                return altitude;
         }
 
         return null;
