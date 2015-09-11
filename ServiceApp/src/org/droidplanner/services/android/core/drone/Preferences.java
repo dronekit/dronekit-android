@@ -6,8 +6,6 @@ import org.droidplanner.services.android.core.firmware.FirmwareType;
 
 public interface Preferences {
 
-	public abstract FirmwareType getVehicleType();
-
 	public abstract VehicleProfile loadVehicleProfile(FirmwareType firmwareType);
 
     public StreamRates.Rates getRates();

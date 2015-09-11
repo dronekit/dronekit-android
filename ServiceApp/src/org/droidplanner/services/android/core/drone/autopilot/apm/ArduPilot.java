@@ -13,7 +13,6 @@ import com.MAVLink.ardupilotmega.msg_mag_cal_report;
 import com.MAVLink.ardupilotmega.msg_mount_configure;
 import com.MAVLink.ardupilotmega.msg_mount_status;
 import com.MAVLink.ardupilotmega.msg_radio;
-import com.MAVLink.common.msg_attitude;
 import com.MAVLink.common.msg_global_position_int;
 import com.MAVLink.common.msg_gps_raw_int;
 import com.MAVLink.common.msg_heartbeat;
@@ -22,7 +21,6 @@ import com.MAVLink.common.msg_mission_item;
 import com.MAVLink.common.msg_mission_item_reached;
 import com.MAVLink.common.msg_named_value_int;
 import com.MAVLink.common.msg_nav_controller_output;
-import com.MAVLink.common.msg_radio_status;
 import com.MAVLink.common.msg_raw_imu;
 import com.MAVLink.common.msg_rc_channels_raw;
 import com.MAVLink.common.msg_servo_output_raw;
@@ -45,31 +43,25 @@ import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.drone.mission.action.MissionActions;
-import com.o3dr.services.android.lib.drone.property.Attitude;
 import com.o3dr.services.android.lib.drone.property.DroneAttribute;
-import com.o3dr.services.android.lib.drone.property.Signal;
 import com.o3dr.services.android.lib.drone.property.VehicleMode;
 import com.o3dr.services.android.lib.gcs.action.CalibrationActions;
 import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
 import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
-import com.o3dr.services.android.lib.util.MathUtils;
 
 import org.droidplanner.services.android.core.MAVLink.MAVLinkStreams;
 import org.droidplanner.services.android.core.MAVLink.MavLinkModes;
 import org.droidplanner.services.android.core.MAVLink.MavLinkParameters;
 import org.droidplanner.services.android.core.MAVLink.WaypointManager;
 import org.droidplanner.services.android.core.MAVLink.command.doCmd.MavLinkDoCmds;
-import org.droidplanner.services.android.core.drone.DroneEvents;
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
 import org.droidplanner.services.android.core.drone.LogMessageListener;
 import org.droidplanner.services.android.core.drone.Preferences;
-import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
+import org.droidplanner.services.android.core.drone.autopilot.CommonMavLinkDrone;
 import org.droidplanner.services.android.core.drone.profiles.Parameters;
 import org.droidplanner.services.android.core.drone.profiles.VehicleProfile;
-import org.droidplanner.services.android.core.drone.variables.Altitude;
 import org.droidplanner.services.android.core.drone.variables.ApmModes;
-import org.droidplanner.services.android.core.drone.variables.Battery;
 import org.droidplanner.services.android.core.drone.variables.Camera;
 import org.droidplanner.services.android.core.drone.variables.GPS;
 import org.droidplanner.services.android.core.drone.variables.GuidedPoint;
@@ -77,41 +69,35 @@ import org.droidplanner.services.android.core.drone.variables.HeartBeat;
 import org.droidplanner.services.android.core.drone.variables.Home;
 import org.droidplanner.services.android.core.drone.variables.Magnetometer;
 import org.droidplanner.services.android.core.drone.variables.MissionStats;
-import org.droidplanner.services.android.core.drone.variables.Navigation;
 import org.droidplanner.services.android.core.drone.variables.RC;
-import org.droidplanner.services.android.core.drone.variables.Speed;
 import org.droidplanner.services.android.core.drone.variables.State;
 import org.droidplanner.services.android.core.drone.variables.StreamRates;
 import org.droidplanner.services.android.core.drone.variables.Type;
 import org.droidplanner.services.android.core.drone.variables.calibration.AccelCalibration;
 import org.droidplanner.services.android.core.drone.variables.calibration.MagnetometerCalibrationImpl;
-import org.droidplanner.services.android.core.firmware.FirmwareType;
 import org.droidplanner.services.android.core.helpers.coordinates.Coord3D;
 import org.droidplanner.services.android.core.mission.Mission;
 import org.droidplanner.services.android.core.model.AutopilotWarningParser;
 import org.droidplanner.services.android.core.parameters.Parameter;
 import org.droidplanner.services.android.utils.CommonApiUtils;
 
-public abstract class ArduPilot implements MavLinkDrone {
+/**
+ * Base class for the ArduPilot autopilots
+ */
+public abstract class ArduPilot extends CommonMavLinkDrone {
 
     public static final int AUTOPILOT_COMPONENT_ID = 1;
     public static final int ARTOO_COMPONENT_ID = 0;
     public static final int TELEMETRY_RADIO_COMPONENT_ID = 68;
 
-    private final DroneEvents events;
-    private final Type type;
     private VehicleProfile profile;
     private final org.droidplanner.services.android.core.drone.variables.GPS GPS;
 
-    private final org.droidplanner.services.android.core.drone.variables.RC RC;
-    private final Speed speed;
-    private final Battery battery;
+    private final org.droidplanner.services.android.core.drone.variables.RC rc;
     private final Home home;
     private final Mission mission;
     private final MissionStats missionStats;
     private final StreamRates streamRates;
-    private final Altitude altitude;
-    private final Navigation navigation;
     private final GuidedPoint guidedPoint;
     private final AccelCalibration accelCalibrationSetup;
     private final WaypointManager waypointManager;
@@ -121,7 +107,6 @@ public abstract class ArduPilot implements MavLinkDrone {
     private final HeartBeat heartbeat;
     private final Parameters parameters;
 
-    private final MAVLinkStreams.MAVLinkOutputStream MavClient;
     private final Preferences preferences;
 
     private final DroneInterfaces.AttributeEventListener attributeListener;
@@ -130,36 +115,28 @@ public abstract class ArduPilot implements MavLinkDrone {
 
     private final Context context;
 
-    protected final Attitude attitude = new Attitude();
-    protected final Signal signal = new Signal();
-
     public ArduPilot(Context context, MAVLinkStreams.MAVLinkOutputStream mavClient,
                      DroneInterfaces.Handler handler, Preferences pref, AutopilotWarningParser warningParser,
                      LogMessageListener logListener, DroneInterfaces.AttributeEventListener listener) {
 
+        super(handler, mavClient);
+
         this.context = context;
-        this.MavClient = mavClient;
         this.preferences = pref;
         this.logListener = logListener;
         this.attributeListener = listener;
 
-        events = new DroneEvents(this, handler);
         state = new State(this, handler, warningParser);
         heartbeat = new HeartBeat(this, handler);
         parameters = new Parameters(this, handler);
         this.waypointManager = new WaypointManager(this, handler);
 
-        RC = new RC(this);
+        rc = new RC(this);
         GPS = new GPS(this);
-        this.type = new Type(this);
-        this.speed = new Speed(this);
-        this.battery = new Battery(this);
         this.home = new Home(this);
         this.mission = new Mission(this);
         this.missionStats = new MissionStats(this);
         this.streamRates = new StreamRates(this);
-        this.altitude = new Altitude(this);
-        this.navigation = new Navigation(this);
         this.guidedPoint = new GuidedPoint(this, handler);
         this.accelCalibrationSetup = new AccelCalibration(this, handler);
         this.magCalibration = new MagnetometerCalibrationImpl(this);
@@ -169,49 +146,36 @@ public abstract class ArduPilot implements MavLinkDrone {
         loadVehicleProfile();
     }
 
-    @Override
-    public void setAltitudeGroundAndAirSpeeds(double altitude, double groundSpeed, double airSpeed, double climb) {
-        this.altitude.setAltitude(altitude);
-        speed.setGroundAndAirSpeeds(groundSpeed, airSpeed, climb);
+    protected void setAltitudeGroundAndAirSpeeds(double altitude, double groundSpeed, double airSpeed, double climb) {
+        if (this.altitude.getAltitude() != altitude) {
+            this.altitude.setAltitude(altitude);
+            notifyDroneEvent(DroneInterfaces.DroneEventsType.ALTITUDE);
+        }
+
+        if (speed.getGroundSpeed() != groundSpeed || speed.getAirSpeed() != airSpeed || speed.getVerticalSpeed() != climb) {
+            speed.setGroundSpeed(groundSpeed);
+            speed.setAirSpeed(airSpeed);
+            speed.setVerticalSpeed(climb);
+
+            notifyDroneEvent(DroneInterfaces.DroneEventsType.SPEED);
+        }
     }
 
-    @Override
-    public void setDisttowpAndSpeedAltErrors(double disttowp, double alt_error, double aspd_error) {
+    protected void setDisttowpAndSpeedAltErrors(double disttowp, double alt_error, double aspd_error) {
         missionStats.setDistanceToWp(disttowp);
-        altitude.setAltitudeError(alt_error);
-        speed.setSpeedError(aspd_error);
+
+        this.altitude.setTargetAltitude(this.altitude.getAltitude() + alt_error);
         notifyDroneEvent(DroneInterfaces.DroneEventsType.ORIENTATION);
     }
 
     @Override
     public boolean isConnected() {
-        return MavClient.isConnected() && heartbeat.hasHeartbeat();
+        return super.isConnected() && heartbeat.hasHeartbeat();
     }
 
     @Override
     public boolean isConnectionAlive() {
         return heartbeat.isConnectionAlive();
-    }
-
-    @Override
-    public void addDroneListener(DroneInterfaces.OnDroneListener listener) {
-        events.addDroneListener(listener);
-    }
-
-    @Override
-    public void removeDroneListener(DroneInterfaces.OnDroneListener listener) {
-        events.removeDroneListener(listener);
-    }
-
-    @Override
-    public void notifyDroneEvent(final DroneInterfaces.DroneEventsType event) {
-        switch(event){
-            case DISCONNECTED:
-                signal.setValid(false);
-                break;
-        }
-
-        events.notifyDroneEvent(event);
     }
 
     @Override
@@ -234,8 +198,7 @@ public abstract class ArduPilot implements MavLinkDrone {
         return heartbeat.getMavlinkVersion();
     }
 
-    @Override
-    public void onHeartbeat(msg_heartbeat msg) {
+    protected void onHeartbeat(msg_heartbeat msg) {
         heartbeat.onHeartbeat(msg);
     }
 
@@ -250,21 +213,6 @@ public abstract class ArduPilot implements MavLinkDrone {
     }
 
     @Override
-    public void setType(int type) {
-        this.type.setType(type);
-    }
-
-    @Override
-    public int getType() {
-        return type.getType();
-    }
-
-    @Override
-    public FirmwareType getFirmwareType() {
-        return type.getFirmwareType();
-    }
-
-    @Override
     public void loadVehicleProfile() {
         profile = preferences.loadVehicleProfile(getFirmwareType());
     }
@@ -275,11 +223,6 @@ public abstract class ArduPilot implements MavLinkDrone {
     }
 
     @Override
-    public MAVLinkStreams.MAVLinkOutputStream getMavClient() {
-        return MavClient;
-    }
-
-    @Override
     public Preferences getPreferences() {
         return preferences;
     }
@@ -287,21 +230,6 @@ public abstract class ArduPilot implements MavLinkDrone {
     @Override
     public WaypointManager getWaypointManager() {
         return waypointManager;
-    }
-
-    @Override
-    public RC getRC() {
-        return RC;
-    }
-
-    @Override
-    public Speed getSpeed() {
-        return speed;
-    }
-
-    @Override
-    public Battery getBattery() {
-        return battery;
     }
 
     @Override
@@ -325,16 +253,6 @@ public abstract class ArduPilot implements MavLinkDrone {
     }
 
     @Override
-    public Altitude getAltitude() {
-        return altitude;
-    }
-
-    @Override
-    public Navigation getNavigation() {
-        return navigation;
-    }
-
-    @Override
     public GuidedPoint getGuidedPoint() {
         return guidedPoint;
     }
@@ -354,8 +272,7 @@ public abstract class ArduPilot implements MavLinkDrone {
         return type.getFirmwareVersion();
     }
 
-    @Override
-    public void setFirmwareVersion(String message) {
+    protected void setFirmwareVersion(String message) {
         type.setFirmwareVersion(message);
     }
 
@@ -390,26 +307,11 @@ public abstract class ArduPilot implements MavLinkDrone {
             case AttributeType.PARAMETERS:
                 return CommonApiUtils.getParameters(this, context);
 
-            case AttributeType.SPEED:
-                return CommonApiUtils.getSpeed(this);
-
-            case AttributeType.ATTITUDE:
-                return attitude;
-
             case AttributeType.HOME:
                 return CommonApiUtils.getHome(this);
 
-            case AttributeType.BATTERY:
-                return CommonApiUtils.getBattery(this);
-
-            case AttributeType.ALTITUDE:
-                return CommonApiUtils.getAltitude(this);
-
             case AttributeType.MISSION:
                 return CommonApiUtils.getMission(this);
-
-            case AttributeType.SIGNAL:
-                return signal;
 
             case AttributeType.TYPE:
                 return CommonApiUtils.getType(this);
@@ -421,7 +323,7 @@ public abstract class ArduPilot implements MavLinkDrone {
                 return CommonApiUtils.getMagnetometerCalibrationStatus(this);
         }
 
-        return null;
+        return super.getAttribute(attributeType);
     }
 
     @Override
@@ -627,7 +529,6 @@ public abstract class ArduPilot implements MavLinkDrone {
         switch (message.msgid) {
             case msg_heartbeat.MAVLINK_MSG_ID_HEARTBEAT:
                 msg_heartbeat msg_heart = (msg_heartbeat) message;
-                setType(msg_heart.type);
                 checkIfFlying(msg_heart);
                 processState(msg_heart);
                 ApmModes newMode = ApmModes.getMode(msg_heart.custom_mode, getType());
@@ -646,11 +547,6 @@ public abstract class ArduPilot implements MavLinkDrone {
                 processStatusText(msg_statustext);
                 break;
 
-            case msg_attitude.MAVLINK_MSG_ID_ATTITUDE:
-                msg_attitude m_att = (msg_attitude) message;
-                processAttitude(m_att);
-                break;
-
             case msg_vfr_hud.MAVLINK_MSG_ID_VFR_HUD:
                 processVfrHud((msg_vfr_hud) message);
                 break;
@@ -666,7 +562,6 @@ public abstract class ArduPilot implements MavLinkDrone {
             case msg_nav_controller_output.MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT:
                 msg_nav_controller_output m_nav = (msg_nav_controller_output) message;
                 setDisttowpAndSpeedAltErrors(m_nav.wp_dist, m_nav.alt_error, m_nav.aspd_error);
-                getNavigation().setNavPitchRollYaw(m_nav.nav_pitch, m_nav.nav_roll, m_nav.nav_bearing);
                 break;
 
             case msg_raw_imu.MAVLINK_MSG_ID_RAW_IMU:
@@ -680,8 +575,8 @@ public abstract class ArduPilot implements MavLinkDrone {
 
             case msg_sys_status.MAVLINK_MSG_ID_SYS_STATUS:
                 msg_sys_status m_sys = (msg_sys_status) message;
-                getBattery().setBatteryState(m_sys.voltage_battery / 1000.0,
-                        m_sys.battery_remaining, m_sys.current_battery / 100.0);
+                processBatteryUpdate(m_sys.voltage_battery / 1000.0, m_sys.battery_remaining,
+                        m_sys.current_battery / 100.0);
                 checkControlSensorsHealth(m_sys);
                 break;
 
@@ -691,23 +586,17 @@ public abstract class ArduPilot implements MavLinkDrone {
                         m_radio.remrssi, m_radio.txbuf, m_radio.noise, m_radio.remnoise);
                 break;
 
-            case msg_radio_status.MAVLINK_MSG_ID_RADIO_STATUS:
-                msg_radio_status m_radio_status = (msg_radio_status) message;
-                processSignalUpdate(m_radio_status.rxerrors, m_radio_status.fixed, m_radio_status.rssi,
-                        m_radio_status.remrssi, m_radio_status.txbuf, m_radio_status.noise, m_radio_status.remnoise);
-                break;
-
             case msg_gps_raw_int.MAVLINK_MSG_ID_GPS_RAW_INT:
                 getGps().setGpsState(((msg_gps_raw_int) message).fix_type,
                         ((msg_gps_raw_int) message).satellites_visible, ((msg_gps_raw_int) message).eph);
                 break;
 
             case msg_rc_channels_raw.MAVLINK_MSG_ID_RC_CHANNELS_RAW:
-                getRC().setRcInputValues((msg_rc_channels_raw) message);
+                rc.setRcInputValues((msg_rc_channels_raw) message);
                 break;
 
             case msg_servo_output_raw.MAVLINK_MSG_ID_SERVO_OUTPUT_RAW:
-                getRC().setRcOutputValues((msg_servo_output_raw) message);
+                rc.setRcOutputValues((msg_servo_output_raw) message);
                 break;
 
             case msg_camera_feedback.MAVLINK_MSG_ID_CAMERA_FEEDBACK:
@@ -743,43 +632,33 @@ public abstract class ArduPilot implements MavLinkDrone {
             default:
                 break;
         }
-    }
 
-    private void processAttitude(msg_attitude m_att) {
-        attitude.setRoll(CommonApiUtils.fromRadToDeg(m_att.roll));
-        attitude.setRollSpeed(CommonApiUtils.fromRadToDeg(m_att.rollspeed));
-
-        attitude.setPitch(CommonApiUtils.fromRadToDeg(m_att.pitch));
-        attitude.setPitchSpeed(CommonApiUtils.fromRadToDeg(m_att.pitchspeed));
-
-        attitude.setYaw(CommonApiUtils.fromRadToDeg(m_att.yaw));
-        attitude.setYawSpeed(CommonApiUtils.fromRadToDeg(m_att.yawspeed));
-
-        notifyDroneEvent(DroneInterfaces.DroneEventsType.ATTITUDE);
+        super.onMavLinkMessageReceived(message);
     }
 
     /**
      * Used to update the vehicle location.
+     *
      * @param gpi
      */
-    protected void processGlobalPositionInt(msg_global_position_int gpi){
-        if(gpi == null)
+    protected void processGlobalPositionInt(msg_global_position_int gpi) {
+        if (gpi == null)
             return;
 
         GPS.setPosition(gpi.lat / 1E7, gpi.lon / 1E7);
     }
 
-    protected void processVfrHud(msg_vfr_hud vfrHud){
-        if(vfrHud == null)
+    protected void processVfrHud(msg_vfr_hud vfrHud) {
+        if (vfrHud == null)
             return;
 
         setAltitudeGroundAndAirSpeeds(vfrHud.alt, vfrHud.groundspeed, vfrHud.airspeed, vfrHud.climb);
     }
 
-    protected void processMountStatus(msg_mount_status mountStatus){
+    protected void processMountStatus(msg_mount_status mountStatus) {
         footprints.updateMountOrientation(mountStatus);
 
-        if(attributeListener != null){
+        if (attributeListener != null) {
             final Bundle eventInfo = new Bundle(3);
             eventInfo.putFloat(AttributeEventExtra.EXTRA_GIMBAL_ORIENTATION_PITCH, mountStatus.pointing_a / 100f);
             eventInfo.putFloat(AttributeEventExtra.EXTRA_GIMBAL_ORIENTATION_ROLL, mountStatus.pointing_b / 100f);
@@ -889,27 +768,22 @@ public abstract class ArduPilot implements MavLinkDrone {
         }
     }
 
-    protected void processSignalUpdate(int rxerrors, int fixed, short rssi, short remrssi, short txbuf,
-                                       short noise, short remnoise) {
-        signal.setValid(true);
-        signal.setRxerrors(rxerrors & 0xFFFF);
-        signal.setFixed(fixed & 0xFFFF);
-        signal.setRssi(SikValueToDB(rssi & 0xFF));
-        signal.setRemrssi(SikValueToDB(remrssi & 0xFF));
-        signal.setNoise(SikValueToDB(noise & 0xFF));
-        signal.setRemnoise(SikValueToDB(remnoise & 0xFF));
-        signal.setTxbuf(txbuf & 0xFF);
-
-        signal.setSignalStrength(MathUtils.getSignalStrength(signal.getFadeMargin(), signal.getRemFadeMargin()));
-
-        notifyDroneEvent(DroneInterfaces.DroneEventsType.RADIO);
+    public Double getBattDischarge(double battRemain) {
+        Parameter battCap = getParameters().getParameter("BATT_CAPACITY");
+        if (battCap == null || battRemain == -1) {
+            return null;
+        }
+        return (1 - battRemain / 100.0) * battCap.value;
     }
 
-    /**
-     * Scalling done at the Si1000 radio More info can be found at:
-     * http://copter.ardupilot.com/wiki/common-using-the-3dr-radio-for-telemetry-with-apm-and-px4/#Power_levels
-     */
-    private double SikValueToDB(int value) {
-        return (value / 1.9) - 127;
+    protected void processBatteryUpdate(double voltage, double remain, double current) {
+        if (battery.getBatteryVoltage() != voltage || battery.getBatteryRemain() != remain || battery.getBatteryCurrent() != current) {
+            battery.setBatteryVoltage(voltage);
+            battery.setBatteryRemain(remain);
+            battery.setBatteryCurrent(current);
+            battery.setBatteryDischarge(getBattDischarge(remain));
+
+            notifyDroneEvent(DroneInterfaces.DroneEventsType.BATTERY);
+        }
     }
 }

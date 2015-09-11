@@ -26,8 +26,6 @@ import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
 import com.o3dr.services.android.lib.drone.mission.item.complex.CameraDetail;
 import com.o3dr.services.android.lib.drone.mission.item.complex.StructureScanner;
 import com.o3dr.services.android.lib.drone.mission.item.complex.Survey;
-import com.o3dr.services.android.lib.drone.property.Altitude;
-import com.o3dr.services.android.lib.drone.property.Battery;
 import com.o3dr.services.android.lib.drone.property.CameraProxy;
 import com.o3dr.services.android.lib.drone.property.EkfStatus;
 import com.o3dr.services.android.lib.drone.property.FootPrint;
@@ -36,7 +34,6 @@ import com.o3dr.services.android.lib.drone.property.GuidedState;
 import com.o3dr.services.android.lib.drone.property.Home;
 import com.o3dr.services.android.lib.drone.property.Parameter;
 import com.o3dr.services.android.lib.drone.property.Parameters;
-import com.o3dr.services.android.lib.drone.property.Speed;
 import com.o3dr.services.android.lib.drone.property.State;
 import com.o3dr.services.android.lib.drone.property.Type;
 import com.o3dr.services.android.lib.drone.property.VehicleMode;
@@ -455,19 +452,11 @@ public class CommonApiUtils {
         return new Parameters(new ArrayList<>(proxyParams.values()));
     }
 
-    public static Speed getSpeed(MavLinkDrone drone) {
-        if (drone == null)
-            return new Speed();
-
-        org.droidplanner.services.android.core.drone.variables.Speed droneSpeed = drone.getSpeed();
-        return new Speed(droneSpeed.getVerticalSpeed(), droneSpeed.getGroundSpeed(), droneSpeed.getAirSpeed());
-    }
-
-    public static float fromRadToDeg(float rad){
+    public static float fromRadToDeg(float rad) {
         return (float) (rad * 180f / Math.PI);
     }
 
-    public static float fromDegToRad(float deg){
+    public static float fromDegToRad(float deg) {
         return (float) (deg * Math.PI / 180f);
     }
 
@@ -482,23 +471,6 @@ public class CommonApiUtils {
                 : null;
 
         return new Home(homePosition);
-    }
-
-    public static Battery getBattery(MavLinkDrone drone) {
-        if (drone == null)
-            return new Battery();
-
-        org.droidplanner.services.android.core.drone.variables.Battery droneBattery = drone.getBattery();
-        return new Battery(droneBattery.getBattVolt(), droneBattery.getBattRemain(),
-                droneBattery.getBattCurrent(), droneBattery.getBattDischarge());
-    }
-
-    public static Altitude getAltitude(MavLinkDrone drone) {
-        if (drone == null)
-            return new Altitude();
-
-        org.droidplanner.services.android.core.drone.variables.Altitude droneAltitude = drone.getAltitude();
-        return new Altitude(droneAltitude.getAltitude(), droneAltitude.getTargetAltitude());
     }
 
     public static Mission getMission(MavLinkDrone drone) {
@@ -958,7 +930,7 @@ public class CommonApiUtils {
 
             FollowAlgorithm currentAlg = followMe.getFollowAlgorithm();
             if (currentAlg.getType() != selectedMode) {
-                if(selectedMode == FollowAlgorithm.FollowModes.SOLO_SHOT && !SoloApiUtils.isSoloLinkFeatureAvailable(droneMgr, listener))
+                if (selectedMode == FollowAlgorithm.FollowModes.SOLO_SHOT && !SoloApiUtils.isSoloLinkFeatureAvailable(droneMgr, listener))
                     return;
 
                 followMe.setAlgorithm(selectedMode.getAlgorithmType(droneMgr, droneHandler));

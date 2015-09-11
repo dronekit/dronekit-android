@@ -1,28 +1,23 @@
 package org.droidplanner.services.android.core.firmware;
 
 public enum FirmwareType {
-	ARDU_PLANE("ArduPlane"), ARDU_COPTER("ArduCopter"), ARDU_ROVER("ArduRover"), ARDU_SOLO("ArduSolo");
+    /* APM firmware types */
+    ARDU_PLANE("ArduPlane"),
+    ARDU_COPTER("ArduCopter"),
+    ARDU_ROVER("ArduRover"),
+    ARDU_SOLO("ArduSolo"),
 
-	private final String type;
+    /* PX4 firmware type */
+    PX4_NATIVE("PX4 Native");
 
-	FirmwareType(String type) {
-		this.type = type;
-	}
+    private final String type;
 
-	@Override
-	public String toString() {
-		return type;
-	}
+    FirmwareType(String type) {
+        this.type = type;
+    }
 
-	public static FirmwareType firmwareFromString(String str) {
-		if (str.equalsIgnoreCase(ARDU_PLANE.type)) {
-			return ARDU_PLANE;
-		}
-
-		if (str.equalsIgnoreCase(ARDU_ROVER.type)) {
-			return ARDU_ROVER;
-		} else {
-			return ARDU_COPTER;
-		}
-	}
+    @Override
+    public String toString() {
+        return type;
+    }
 }

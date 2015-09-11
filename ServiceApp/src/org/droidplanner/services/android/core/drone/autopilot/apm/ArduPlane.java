@@ -28,7 +28,7 @@ public class ArduPlane extends ArduPilot {
     }
 
     @Override
-    public void setType(int type){}
+    protected void setType(int type){}
 
     @Override
     public FirmwareType getFirmwareType() {

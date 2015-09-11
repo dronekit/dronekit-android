@@ -13,6 +13,7 @@ import org.droidplanner.services.android.core.survey.Footprint;
 import com.MAVLink.ardupilotmega.msg_camera_feedback;
 import com.MAVLink.ardupilotmega.msg_mount_status;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
+import com.o3dr.services.android.lib.drone.property.Altitude;
 import com.o3dr.services.android.lib.drone.property.Attitude;
 
 public class Camera extends DroneVariable {
@@ -42,7 +43,8 @@ public class Camera extends DroneVariable {
 	}
 
 	public Footprint getCurrentFieldOfView() {
-		double altitude = myDrone.getAltitude().getAltitude();
+		final Altitude droneAltitude = (Altitude) myDrone.getAttribute(AttributeType.ALTITUDE);
+		double altitude = droneAltitude.getAltitude();
 		Coord2D position = myDrone.getGps().getPosition();
 		//double pitch = myDrone.getOrientation().getPitch() - gimbal_pitch;
 

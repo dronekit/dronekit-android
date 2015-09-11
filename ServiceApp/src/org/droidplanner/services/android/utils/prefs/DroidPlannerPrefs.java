@@ -48,12 +48,6 @@ public class DroidPlannerPrefs implements org.droidplanner.services.android.core
     }
 
     @Override
-    public FirmwareType getVehicleType() {
-        String str = prefs.getString("pref_vehicle_type", FirmwareType.ARDU_COPTER.toString());
-        return FirmwareType.firmwareFromString(str);
-    }
-
-    @Override
     public VehicleProfile loadVehicleProfile(FirmwareType firmwareType) {
         return VehicleProfileReader.load(context, firmwareType);
     }
