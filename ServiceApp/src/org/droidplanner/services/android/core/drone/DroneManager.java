@@ -53,6 +53,7 @@ import org.droidplanner.services.android.core.drone.autopilot.apm.ArduCopter;
 import org.droidplanner.services.android.core.drone.autopilot.apm.ArduPlane;
 import org.droidplanner.services.android.core.drone.autopilot.apm.ArduRover;
 import org.droidplanner.services.android.core.drone.autopilot.apm.ArduSolo;
+import org.droidplanner.services.android.core.drone.autopilot.px4.Px4Native;
 import org.droidplanner.services.android.core.drone.companion.solo.SoloComp;
 import org.droidplanner.services.android.core.drone.variables.HeartBeat;
 import org.droidplanner.services.android.core.drone.variables.calibration.MagnetometerCalibrationImpl;
@@ -244,27 +245,32 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
         switch (type) {
             case ARDU_COPTER:
                 if (isCompanionComputerEnabled()) {
-                    Timber.d("Instantiating ArduSolo autopilot.");
+                    Timber.i("Instantiating ArduSolo autopilot.");
                     this.drone = new ArduSolo(context, mavClient, dpHandler, dpPrefs, new AndroidApWarningParser(), this, this);
                 } else {
-                    Timber.d("Instantiating ArduCopter autopilot.");
+                    Timber.i("Instantiating ArduCopter autopilot.");
                     this.drone = new ArduCopter(context, mavClient, dpHandler, dpPrefs, new AndroidApWarningParser(), this, this);
                 }
                 break;
 
             case ARDU_SOLO:
-                Timber.d("Instantiating ArduCopter autopilot.");
+                Timber.i("Instantiating ArduCopter autopilot.");
                 this.drone = new ArduSolo(context, mavClient, dpHandler, dpPrefs, new AndroidApWarningParser(), this, this);
                 break;
 
             case ARDU_PLANE:
-                Timber.d("Instantiating ArduPlane autopilot.");
+                Timber.i("Instantiating ArduPlane autopilot.");
                 this.drone = new ArduPlane(context, mavClient, dpHandler, dpPrefs, new AndroidApWarningParser(), this, this);
                 break;
 
             case ARDU_ROVER:
-                Timber.d("Instantiating ArduPlane autopilot.");
+                Timber.i("Instantiating ArduPlane autopilot.");
                 this.drone = new ArduRover(context, mavClient, dpHandler, dpPrefs, new AndroidApWarningParser(), this, this);
+                break;
+
+            case PX4_NATIVE:
+                Timber.i("Instantiating PX4 Native autopilot.");
+                this.drone = new Px4Native(dpHandler, mavClient);
                 break;
         }
 

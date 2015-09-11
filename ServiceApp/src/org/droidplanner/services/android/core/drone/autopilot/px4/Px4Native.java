@@ -1,6 +1,5 @@
 package org.droidplanner.services.android.core.drone.autopilot.px4;
 
-import com.MAVLink.common.msg_heartbeat;
 import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
 
@@ -17,7 +16,6 @@ import org.droidplanner.services.android.core.drone.variables.GuidedPoint;
 import org.droidplanner.services.android.core.drone.variables.Home;
 import org.droidplanner.services.android.core.drone.variables.Magnetometer;
 import org.droidplanner.services.android.core.drone.variables.MissionStats;
-import org.droidplanner.services.android.core.drone.variables.RC;
 import org.droidplanner.services.android.core.drone.variables.State;
 import org.droidplanner.services.android.core.drone.variables.StreamRates;
 import org.droidplanner.services.android.core.drone.variables.calibration.AccelCalibration;
@@ -60,11 +58,6 @@ public class Px4Native extends CommonMavLinkDrone {
     }
 
     @Override
-    public void onHeartbeat(msg_heartbeat msg_heart) {
-
-    }
-
-    @Override
     public State getState() {
         return null;
     }
@@ -75,18 +68,8 @@ public class Px4Native extends CommonMavLinkDrone {
     }
 
     @Override
-    public void setType(int type) {
-
-    }
-
-    @Override
-    public int getType() {
-        return 0;
-    }
-
-    @Override
     public FirmwareType getFirmwareType() {
-        return null;
+        return FirmwareType.PX4_NATIVE;
     }
 
     @Override
@@ -145,33 +128,13 @@ public class Px4Native extends CommonMavLinkDrone {
     }
 
     @Override
-    public RC getRC() {
-        return null;
-    }
-
-    @Override
     public Magnetometer getMagnetometer() {
         return null;
     }
 
     @Override
-    public void setAltitudeGroundAndAirSpeeds(double altitude, double groundSpeed, double airSpeed, double climb) {
-
-    }
-
-    @Override
-    public void setDisttowpAndSpeedAltErrors(double disttowp, double alt_error, double aspd_error) {
-
-    }
-
-    @Override
     public String getFirmwareVersion() {
         return null;
-    }
-
-    @Override
-    public void setFirmwareVersion(String message) {
-
     }
 
     @Override

@@ -75,7 +75,6 @@ import org.droidplanner.services.android.core.drone.variables.StreamRates;
 import org.droidplanner.services.android.core.drone.variables.Type;
 import org.droidplanner.services.android.core.drone.variables.calibration.AccelCalibration;
 import org.droidplanner.services.android.core.drone.variables.calibration.MagnetometerCalibrationImpl;
-import org.droidplanner.services.android.core.firmware.FirmwareType;
 import org.droidplanner.services.android.core.helpers.coordinates.Coord3D;
 import org.droidplanner.services.android.core.mission.Mission;
 import org.droidplanner.services.android.core.model.AutopilotWarningParser;
@@ -91,7 +90,6 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
     public static final int ARTOO_COMPONENT_ID = 0;
     public static final int TELEMETRY_RADIO_COMPONENT_ID = 68;
 
-    private final Type type;
     private VehicleProfile profile;
     private final org.droidplanner.services.android.core.drone.variables.GPS GPS;
 
@@ -135,7 +133,6 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
 
         rc = new RC(this);
         GPS = new GPS(this);
-        this.type = new Type(this);
         this.home = new Home(this);
         this.mission = new Mission(this);
         this.missionStats = new MissionStats(this);
@@ -149,9 +146,8 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
         loadVehicleProfile();
     }
 
-    @Override
-    public void setAltitudeGroundAndAirSpeeds(double altitude, double groundSpeed, double airSpeed, double climb) {
-        if(this.altitude.getAltitude() != altitude) {
+    protected void setAltitudeGroundAndAirSpeeds(double altitude, double groundSpeed, double airSpeed, double climb) {
+        if (this.altitude.getAltitude() != altitude) {
             this.altitude.setAltitude(altitude);
             notifyDroneEvent(DroneInterfaces.DroneEventsType.ALTITUDE);
         }
@@ -165,8 +161,7 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
         }
     }
 
-    @Override
-    public void setDisttowpAndSpeedAltErrors(double disttowp, double alt_error, double aspd_error) {
+    protected void setDisttowpAndSpeedAltErrors(double disttowp, double alt_error, double aspd_error) {
         missionStats.setDistanceToWp(disttowp);
 
         this.altitude.setTargetAltitude(this.altitude.getAltitude() + alt_error);
@@ -203,8 +198,7 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
         return heartbeat.getMavlinkVersion();
     }
 
-    @Override
-    public void onHeartbeat(msg_heartbeat msg) {
+    protected void onHeartbeat(msg_heartbeat msg) {
         heartbeat.onHeartbeat(msg);
     }
 
@@ -216,21 +210,6 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
     @Override
     public Parameters getParameters() {
         return parameters;
-    }
-
-    @Override
-    public void setType(int type) {
-        this.type.setType(type);
-    }
-
-    @Override
-    public int getType() {
-        return type.getType();
-    }
-
-    @Override
-    public FirmwareType getFirmwareType() {
-        return type.getFirmwareType();
     }
 
     @Override
@@ -251,11 +230,6 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
     @Override
     public WaypointManager getWaypointManager() {
         return waypointManager;
-    }
-
-    @Override
-    public RC getRC() {
-        return rc;
     }
 
     @Override
@@ -298,8 +272,7 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
         return type.getFirmwareVersion();
     }
 
-    @Override
-    public void setFirmwareVersion(String message) {
+    protected void setFirmwareVersion(String message) {
         type.setFirmwareVersion(message);
     }
 
@@ -556,7 +529,6 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
         switch (message.msgid) {
             case msg_heartbeat.MAVLINK_MSG_ID_HEARTBEAT:
                 msg_heartbeat msg_heart = (msg_heartbeat) message;
-                setType(msg_heart.type);
                 checkIfFlying(msg_heart);
                 processState(msg_heart);
                 ApmModes newMode = ApmModes.getMode(msg_heart.custom_mode, getType());

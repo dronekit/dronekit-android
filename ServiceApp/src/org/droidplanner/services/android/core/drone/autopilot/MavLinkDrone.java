@@ -1,7 +1,6 @@
 package org.droidplanner.services.android.core.drone.autopilot;
 
 import com.MAVLink.Messages.MAVLinkMessage;
-import com.MAVLink.common.msg_heartbeat;
 
 import org.droidplanner.services.android.core.MAVLink.MAVLinkStreams;
 import org.droidplanner.services.android.core.MAVLink.WaypointManager;
@@ -15,7 +14,6 @@ import org.droidplanner.services.android.core.drone.variables.GuidedPoint;
 import org.droidplanner.services.android.core.drone.variables.Home;
 import org.droidplanner.services.android.core.drone.variables.Magnetometer;
 import org.droidplanner.services.android.core.drone.variables.MissionStats;
-import org.droidplanner.services.android.core.drone.variables.RC;
 import org.droidplanner.services.android.core.drone.variables.State;
 import org.droidplanner.services.android.core.drone.variables.StreamRates;
 import org.droidplanner.services.android.core.drone.variables.calibration.AccelCalibration;
@@ -43,13 +41,9 @@ public interface MavLinkDrone extends Drone {
 
     public byte getCompid();
 
-    public void onHeartbeat(msg_heartbeat msg_heart);
-
     public State getState();
 
     public Parameters getParameters();
-
-    public void setType(int type);
 
     public int getType();
 
@@ -79,17 +73,9 @@ public interface MavLinkDrone extends Drone {
 
     public MagnetometerCalibrationImpl getMagnetometerCalibration();
 
-    public RC getRC();
-
     public Magnetometer getMagnetometer();
 
-    public void setAltitudeGroundAndAirSpeeds(double altitude, double groundSpeed, double airSpeed, double climb);
-
-    public void setDisttowpAndSpeedAltErrors(double disttowp, double alt_error, double aspd_error);
-
     public String getFirmwareVersion();
-
-    public void setFirmwareVersion(String message);
 
     public Camera getCamera();
 

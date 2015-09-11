@@ -4,6 +4,7 @@ import android.text.TextUtils;
 
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.common.msg_attitude;
+import com.MAVLink.common.msg_heartbeat;
 import com.MAVLink.common.msg_radio_status;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.property.Altitude;
@@ -17,16 +18,20 @@ import com.o3dr.services.android.lib.util.MathUtils;
 import org.droidplanner.services.android.core.MAVLink.MAVLinkStreams;
 import org.droidplanner.services.android.core.drone.DroneEvents;
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
+import org.droidplanner.services.android.core.drone.variables.Type;
 import org.droidplanner.services.android.utils.CommonApiUtils;
 
 /**
- * Base drone implementation. Supports mavlink messages belonging to the common set: https://pixhawk.ethz.ch/mavlink/
+ * Base drone implementation.
+ * Supports mavlink messages belonging to the common set: https://pixhawk.ethz.ch/mavlink/
+ *
  * Created by Fredia Huya-Kouadio on 9/10/15.
  */
 public abstract class CommonMavLinkDrone implements MavLinkDrone {
 
     private final MAVLinkStreams.MAVLinkOutputStream MavClient;
     private final DroneEvents events;
+    protected final Type type;
 
     protected final Altitude altitude = new Altitude();
     protected final Speed speed = new Speed();
@@ -36,7 +41,9 @@ public abstract class CommonMavLinkDrone implements MavLinkDrone {
 
     protected CommonMavLinkDrone(DroneInterfaces.Handler handler, MAVLinkStreams.MAVLinkOutputStream mavClient) {
         this.MavClient = mavClient;
+
         events = new DroneEvents(this, handler);
+        this.type = new Type(this);
     }
 
     @Override
@@ -108,7 +115,21 @@ public abstract class CommonMavLinkDrone implements MavLinkDrone {
                 msg_attitude m_att = (msg_attitude) message;
                 processAttitude(m_att);
                 break;
+
+            case msg_heartbeat.MAVLINK_MSG_ID_HEARTBEAT:
+                msg_heartbeat msg_heart = (msg_heartbeat) message;
+                setType(msg_heart.type);
+                break;
         }
+    }
+
+    protected void setType(int type) {
+        this.type.setType(type);
+    }
+
+    @Override
+    public int getType() {
+        return type.getType();
     }
 
     private void processAttitude(msg_attitude m_att) {

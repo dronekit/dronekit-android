@@ -33,7 +33,7 @@ public class MavLinkMsgHandler {
                 break;
 
             /*
-            TODO: find more reliable method to better determine the vehicle firmware.
+            TODO: find more reliable method to determine the vehicle firmware.
             case msg_statustext.MAVLINK_MSG_ID_STATUSTEXT:
                 msg_statustext msg_statustext = (msg_statustext) msg;
                 handleStatusText(msg_statustext.getText());
@@ -72,6 +72,7 @@ public class MavLinkMsgHandler {
                 break;
 
             case MAV_AUTOPILOT.MAV_AUTOPILOT_PX4:
+                droneMgr.onVehicleTypeReceived(FirmwareType.PX4_NATIVE);
                 break;
         }
 
