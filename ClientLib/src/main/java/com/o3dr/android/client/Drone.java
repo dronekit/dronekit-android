@@ -616,24 +616,24 @@ public class Drone {
     }
 
     /**
-     * @deprecated Use {@link ControlApi#takeoff(double)} instead.
+     * @deprecated Use {@link ControlApi#takeoff(double, AbstractCommandListener)} instead.
      */
     public void doGuidedTakeoff(double altitude) {
-        ControlApi.getApi(this).takeoff(altitude);
+        ControlApi.getApi(this).takeoff(altitude, null);
     }
 
     /**
-     * @deprecated Use {@link ControlApi#pauseAtCurrentLocation()} instead.
+     * @deprecated Use {@link ControlApi#pauseAtCurrentLocation(AbstractCommandListener)} instead.
      */
     public void pauseAtCurrentLocation() {
-        ControlApi.getApi(this).pauseAtCurrentLocation();
+        ControlApi.getApi(this).pauseAtCurrentLocation(null);
     }
 
     /**
-     * @deprecated Use {@link ControlApi#goTo(LatLong, boolean)} instead.
+     * @deprecated Use {@link ControlApi#goTo(LatLong, boolean, AbstractCommandListener)} instead.
      */
     public void sendGuidedPoint(LatLong point, boolean force) {
-        ControlApi.getApi(this).goTo(point, force);
+        ControlApi.getApi(this).goTo(point, force, null);
     }
 
     /**

@@ -44,6 +44,7 @@ import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.drone.mission.action.MissionActions;
+import com.o3dr.services.android.lib.drone.property.Attitude;
 import com.o3dr.services.android.lib.drone.property.DroneAttribute;
 import com.o3dr.services.android.lib.drone.property.VehicleMode;
 import com.o3dr.services.android.lib.gcs.action.CalibrationActions;
@@ -72,7 +73,6 @@ import org.droidplanner.services.android.core.drone.variables.Home;
 import org.droidplanner.services.android.core.drone.variables.Magnetometer;
 import org.droidplanner.services.android.core.drone.variables.MissionStats;
 import org.droidplanner.services.android.core.drone.variables.Navigation;
-import org.droidplanner.services.android.core.drone.variables.Orientation;
 import org.droidplanner.services.android.core.drone.variables.RC;
 import org.droidplanner.services.android.core.drone.variables.State;
 import org.droidplanner.services.android.core.drone.variables.StreamRates;
@@ -105,7 +105,6 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
     private final MissionStats missionStats;
     private final StreamRates streamRates;
     private final Altitude altitude;
-    private final Orientation orientation;
     private final Navigation navigation;
     private final GuidedPoint guidedPoint;
     private final AccelCalibration accelCalibrationSetup;
@@ -123,6 +122,8 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
     private final MagnetometerCalibrationImpl magCalibration;
 
     private final Context context;
+
+    protected final Attitude attitude = new Attitude();
 
     public ArduPilot(Context context, MAVLinkStreams.MAVLinkOutputStream mavClient,
                      DroneInterfaces.Handler handler, Preferences pref, AutopilotWarningParser warningParser,
@@ -148,7 +149,6 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
         this.missionStats = new MissionStats(this);
         this.streamRates = new StreamRates(this);
         this.altitude = new Altitude(this);
-        this.orientation = new Orientation(this);
         this.navigation = new Navigation(this);
         this.guidedPoint = new GuidedPoint(this, handler);
         this.accelCalibrationSetup = new AccelCalibration(this, handler);
@@ -290,11 +290,6 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
     }
 
     @Override
-    public Orientation getOrientation() {
-        return orientation;
-    }
-
-    @Override
     public Navigation getNavigation() {
         return navigation;
     }
@@ -356,7 +351,7 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
                 return CommonApiUtils.getParameters(this, context);
 
             case AttributeType.ATTITUDE:
-                return CommonApiUtils.getAttitude(this);
+                return attitude;
 
             case AttributeType.HOME:
                 return CommonApiUtils.getHome(this);
@@ -604,8 +599,7 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
 
             case msg_attitude.MAVLINK_MSG_ID_ATTITUDE:
                 msg_attitude m_att = (msg_attitude) message;
-                getOrientation().setRollPitchYaw(m_att.roll * 180.0 / Math.PI,
-                        m_att.pitch * 180.0 / Math.PI, m_att.yaw * 180.0 / Math.PI);
+                processAttitude(m_att);
                 break;
 
             case msg_vfr_hud.MAVLINK_MSG_ID_VFR_HUD:
@@ -696,6 +690,19 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
         }
 
         super.onMavLinkMessageReceived(message);
+    }
+
+    private void processAttitude(msg_attitude m_att) {
+        attitude.setRoll(CommonApiUtils.fromRadToDeg(m_att.roll));
+        attitude.setRollSpeed(CommonApiUtils.fromRadToDeg(m_att.rollspeed));
+
+        attitude.setPitch(CommonApiUtils.fromRadToDeg(m_att.pitch));
+        attitude.setPitchSpeed(CommonApiUtils.fromRadToDeg(m_att.pitchspeed));
+
+        attitude.setYaw(CommonApiUtils.fromRadToDeg(m_att.yaw));
+        attitude.setYawSpeed(CommonApiUtils.fromRadToDeg(m_att.yawspeed));
+
+        notifyDroneEvent(DroneInterfaces.DroneEventsType.ATTITUDE);
     }
 
     /**

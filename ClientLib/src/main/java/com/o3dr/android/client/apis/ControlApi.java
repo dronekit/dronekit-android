@@ -60,28 +60,12 @@ public class ControlApi extends Api {
      * Perform a guided take off.
      *
      * @param altitude altitude in meters
-     */
-    public void takeoff(double altitude) {
-        takeoff(altitude, null);
-    }
-
-    /**
-     * Perform a guided take off.
-     *
-     * @param altitude altitude in meters
      * @param listener Register a callback to receive update of the command execution state.
      */
     public void takeoff(double altitude, AbstractCommandListener listener) {
         Bundle params = new Bundle();
         params.putDouble(EXTRA_ALTITUDE, altitude);
         drone.performAsyncActionOnDroneThread(new Action(ACTION_DO_GUIDED_TAKEOFF, params), listener);
-    }
-
-    /**
-     * Pause the vehicle at its current location.
-     */
-    public void pauseAtCurrentLocation() {
-        pauseAtCurrentLocation(null);
     }
 
     /**
@@ -96,16 +80,6 @@ public class ControlApi extends Api {
                 goTo(gps.getPosition(), true, listener);
             }
         });
-    }
-
-    /**
-     * Instructs the vehicle to go to the specified location.
-     *
-     * @param point target location
-     * @param force true to enable guided mode is required.
-     */
-    public void goTo(LatLong point, boolean force) {
-        goTo(point, force, null);
     }
 
     /**

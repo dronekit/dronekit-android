@@ -5,6 +5,8 @@ import android.util.Pair;
 import com.MAVLink.common.msg_mission_ack;
 import com.MAVLink.common.msg_mission_item;
 import com.MAVLink.enums.MAV_CMD;
+import com.o3dr.services.android.lib.drone.attribute.AttributeType;
+import com.o3dr.services.android.lib.drone.property.Attitude;
 
 import org.droidplanner.services.android.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.services.android.core.drone.DroneVariable;
@@ -374,7 +376,8 @@ public class Mission extends DroneVariable {
             return -1;
         }
 
-        final double bearing = 180 + myDrone.getOrientation().getYaw();
+        final Attitude attitude = (Attitude) myDrone.getAttribute(AttributeType.ATTITUDE);
+        final double bearing = 180 + attitude.getYaw();
         items.clear();
         items.addAll(createDronie(currentPosition,
                 GeoTools.newCoordFromBearingAndDistance(currentPosition, bearing, 50.0)));
