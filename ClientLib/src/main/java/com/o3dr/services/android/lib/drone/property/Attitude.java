@@ -8,16 +8,45 @@ import android.os.Parcelable;
  */
 public class Attitude implements DroneAttribute {
 
-    private  double roll;
+    /**
+     * Roll angle (deg, -180..+180)
+     */
+    private double roll;
+
+    /**
+     * Roll angular speed (deg/s)
+     */
+    private float rollSpeed;
+
+    /**
+     * Pitch angle (deg, -180 to 180)
+     */
     private  double pitch;
+
+    /**
+     * Pitch angular speed (deg / s)
+     */
+    private float pitchSpeed;
+
+    /**
+     * Yaw angle (deg, -180 to 180)
+     */
     private  double yaw;
+
+    /**
+     * Yaw angular speed (deg/ s)
+     */
+    private float yawSpeed;
 
     public Attitude(){}
 
-    public Attitude(double roll, double pitch, double yaw) {
+    public Attitude(double roll, double pitch, double yaw, float rollSpeed, float pitchSpeed, float yawSpeed) {
         this.roll = roll;
         this.pitch = pitch;
         this.yaw = yaw;
+        this.rollSpeed = rollSpeed;
+        this.pitchSpeed = pitchSpeed;
+        this.yawSpeed = yawSpeed;
     }
 
     public void setRoll(double roll) {
@@ -44,6 +73,42 @@ public class Attitude implements DroneAttribute {
         return yaw;
     }
 
+    public float getPitchSpeed() {
+        return pitchSpeed;
+    }
+
+    public void setPitchSpeed(float pitchSpeed) {
+        this.pitchSpeed = pitchSpeed;
+    }
+
+    public float getRollSpeed() {
+        return rollSpeed;
+    }
+
+    public void setRollSpeed(float rollSpeed) {
+        this.rollSpeed = rollSpeed;
+    }
+
+    public float getYawSpeed() {
+        return yawSpeed;
+    }
+
+    public void setYawSpeed(float yawSpeed) {
+        this.yawSpeed = yawSpeed;
+    }
+
+    @Override
+    public String toString() {
+        return "Attitude{" +
+                "pitch=" + pitch +
+                ", roll=" + roll +
+                ", rollSpeed=" + rollSpeed +
+                ", pitchSpeed=" + pitchSpeed +
+                ", yaw=" + yaw +
+                ", yawSpeed=" + yawSpeed +
+                '}';
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -51,11 +116,13 @@ public class Attitude implements DroneAttribute {
 
         Attitude attitude = (Attitude) o;
 
-        if (Double.compare(attitude.pitch, pitch) != 0) return false;
         if (Double.compare(attitude.roll, roll) != 0) return false;
+        if (Float.compare(attitude.rollSpeed, rollSpeed) != 0) return false;
+        if (Double.compare(attitude.pitch, pitch) != 0) return false;
+        if (Float.compare(attitude.pitchSpeed, pitchSpeed) != 0) return false;
         if (Double.compare(attitude.yaw, yaw) != 0) return false;
+        return Float.compare(attitude.yawSpeed, yawSpeed) == 0;
 
-        return true;
     }
 
     @Override
@@ -64,20 +131,14 @@ public class Attitude implements DroneAttribute {
         long temp;
         temp = Double.doubleToLongBits(roll);
         result = (int) (temp ^ (temp >>> 32));
+        result = 31 * result + (rollSpeed != +0.0f ? Float.floatToIntBits(rollSpeed) : 0);
         temp = Double.doubleToLongBits(pitch);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
+        result = 31 * result + (pitchSpeed != +0.0f ? Float.floatToIntBits(pitchSpeed) : 0);
         temp = Double.doubleToLongBits(yaw);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
+        result = 31 * result + (yawSpeed != +0.0f ? Float.floatToIntBits(yawSpeed) : 0);
         return result;
-    }
-
-    @Override
-    public String toString() {
-        return "Attitude{" +
-                "roll=" + roll +
-                ", pitch=" + pitch +
-                ", yaw=" + yaw +
-                '}';
     }
 
 
@@ -91,12 +152,18 @@ public class Attitude implements DroneAttribute {
         dest.writeDouble(this.roll);
         dest.writeDouble(this.pitch);
         dest.writeDouble(this.yaw);
+        dest.writeFloat(this.rollSpeed);
+        dest.writeFloat(this.pitchSpeed);
+        dest.writeFloat(this.yawSpeed);
     }
 
     private Attitude(Parcel in) {
         this.roll = in.readDouble();
         this.pitch = in.readDouble();
         this.yaw = in.readDouble();
+        this.rollSpeed = in.readFloat();
+        this.pitchSpeed = in.readFloat();
+        this.yawSpeed = in.readFloat();
     }
 
     public static final Parcelable.Creator<Attitude> CREATOR = new Parcelable.Creator<Attitude>() {
