@@ -56,6 +56,8 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
         void onEUTxPowerComplianceUpdated(boolean isCompliant);
 
         void onVersionsUpdated();
+
+        void onControllerModeUpdated();
     }
 
     private static final String NO_VIDEO_OWNER = "no_video_owner";
@@ -124,6 +126,11 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
         soloLinkMgr.stop();
     }
 
+    public void refreshState() {
+        soloLinkMgr.refreshState();
+        artooMgr.refreshState();
+    }
+
     /**
      * Terminates and releases resources used by this companion computer instance. The instance should no longer be used after calling this method.
      */
@@ -163,6 +170,13 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
     public void onEUTxPowerComplianceUpdated(boolean isCompliant) {
         if(compListener != null)
             compListener.onEUTxPowerComplianceUpdated(isCompliant);
+    }
+
+    @Override
+    public void onControllerModeUpdated() {
+        if (compListener != null){
+            compListener.onControllerModeUpdated();
+        }
     }
 
     @Override
@@ -227,6 +241,11 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
 
     public String getVehicleVersion() {
         return soloLinkMgr.getVehicleVersion();
+    }
+
+    @SoloControllerMode.ControllerMode
+    public int getControllerMode(){
+        return  artooMgr.getControllerMode();
     }
 
     public String getAutopilotVersion() {

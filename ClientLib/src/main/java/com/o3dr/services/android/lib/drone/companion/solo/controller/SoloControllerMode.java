@@ -11,9 +11,14 @@ import java.lang.annotation.RetentionPolicy;
  */
 public class SoloControllerMode {
 
-    @IntDef({MODE_1, MODE_2})
+    @IntDef({UNKNOWN_MODE, MODE_1, MODE_2})
     @Retention(RetentionPolicy.SOURCE)
     public @interface ControllerMode {}
+
+    /**
+     * Unknown controller mode.
+     */
+    public static final int UNKNOWN_MODE = 0;
 
     /**
      * Controller mode 1:

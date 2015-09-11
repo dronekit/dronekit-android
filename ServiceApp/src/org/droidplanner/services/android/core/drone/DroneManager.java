@@ -177,6 +177,13 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
 
             notifyDroneAttributeEvent(SoloEvents.SOLO_VERSIONS_UPDATED, eventInfo, true);
         }
+
+        @Override
+        public void onControllerModeUpdated(){
+            final Bundle eventInfo = new Bundle();
+            eventInfo.putInt(SoloEventExtras.EXTRA_SOLO_CONTROLLER_MODE, soloComp.getControllerMode());
+            notifyDroneAttributeEvent(SoloEvents.SOLO_CONTROLLER_MODE_UPDATED, eventInfo, true);
+        }
     };
 
     private final Runnable disconnectSoloCompTask = new Runnable() {
@@ -763,6 +770,9 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
                     handler.removeCallbacks(disconnectSoloCompTask);
                     if (!soloComp.isConnected())
                         soloComp.start();
+                    else{
+                        soloComp.refreshState();
+                    }
                 }
                 break;
 

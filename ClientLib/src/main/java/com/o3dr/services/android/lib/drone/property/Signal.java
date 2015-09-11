@@ -19,10 +19,11 @@ public class Signal implements DroneAttribute {
     private double remrssi;
     private double noise;
     private double remnoise;
+    private double signalStrength;
 
     public Signal(){}
 
-    public Signal(boolean isValid, int rxerrors, int fixed, int txbuf, double rssi, double remrssi, double noise, double remnoise) {
+    public Signal(boolean isValid, int rxerrors, int fixed, int txbuf, double rssi, double remrssi, double noise, double remnoise, double signalStrength) {
         this.isValid = isValid;
         this.rxerrors = rxerrors;
         this.fixed = fixed;
@@ -31,6 +32,15 @@ public class Signal implements DroneAttribute {
         this.remrssi = remrssi;
         this.noise = noise;
         this.remnoise = remnoise;
+        this.signalStrength = signalStrength;
+    }
+
+    public double getSignalStrength() {
+        return signalStrength;
+    }
+
+    public void setSignalStrength(double signalStrength) {
+        this.signalStrength = signalStrength;
     }
 
     public void setValid(boolean isValid) {
@@ -120,6 +130,7 @@ public class Signal implements DroneAttribute {
         dest.writeDouble(this.remrssi);
         dest.writeDouble(this.noise);
         dest.writeDouble(this.remnoise);
+        dest.writeDouble(this.signalStrength);
     }
 
     private Signal(Parcel in) {
@@ -131,6 +142,7 @@ public class Signal implements DroneAttribute {
         this.remrssi = in.readDouble();
         this.noise = in.readDouble();
         this.remnoise = in.readDouble();
+        this.signalStrength = in.readDouble();
     }
 
     public static final Parcelable.Creator<Signal> CREATOR = new Parcelable.Creator<Signal>() {
