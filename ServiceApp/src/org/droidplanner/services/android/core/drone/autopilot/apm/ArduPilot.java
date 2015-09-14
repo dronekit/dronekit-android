@@ -315,7 +315,7 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
     }
 
     @Override
-    public void executeAsyncAction(Action action, ICommandListener listener) {
+    public boolean executeAsyncAction(Action action, ICommandListener listener) {
         final String type = action.getType();
         Bundle data = action.getData();
 
@@ -323,35 +323,30 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
             // MISSION ACTIONS
             case MissionActions.ACTION_LOAD_WAYPOINTS:
                 CommonApiUtils.loadWaypoints(this);
-                break;
+                return true;
 
             case MissionActions.ACTION_SET_MISSION:
                 data.setClassLoader(com.o3dr.services.android.lib.drone.mission.Mission.class.getClassLoader());
                 com.o3dr.services.android.lib.drone.mission.Mission mission = data.getParcelable(MissionActions.EXTRA_MISSION);
                 boolean pushToDrone = data.getBoolean(MissionActions.EXTRA_PUSH_TO_DRONE);
                 CommonApiUtils.setMission(this, mission, pushToDrone);
-                break;
+                return true;
 
             case MissionActions.ACTION_START_MISSION:
                 boolean forceModeChange = data.getBoolean(MissionActions.EXTRA_FORCE_MODE_CHANGE);
                 boolean forceArm = data.getBoolean(MissionActions.EXTRA_FORCE_ARM);
                 CommonApiUtils.startMission(this, forceModeChange, forceArm, listener);
-                break;
-
-            case MissionActions.ACTION_GOTO_WAYPOINT:
-                int missionItemIndex = data.getInt(MissionActions.EXTRA_MISSION_ITEM_INDEX);
-                CommonApiUtils.gotoWaypoint(this, missionItemIndex, listener);
-                break;
+                return true;
 
             //EXPERIMENTAL ACTIONS
             case ExperimentalActions.ACTION_EPM_COMMAND:
                 boolean release = data.getBoolean(ExperimentalActions.EXTRA_EPM_RELEASE);
                 CommonApiUtils.epmCommand(this, release, listener);
-                break;
+                return true;
 
             case ExperimentalActions.ACTION_TRIGGER_CAMERA:
                 CommonApiUtils.triggerCamera(this);
-                break;
+                return true;
 
             case ExperimentalActions.ACTION_SET_ROI:
                 LatLongAlt roi = data.getParcelable(ExperimentalActions.EXTRA_SET_ROI_LAT_LONG_ALT);
@@ -359,43 +354,43 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
                     Coord3D coord3DRoi = new Coord3D(roi.getLatitude(), roi.getLongitude(), roi.getAltitude());
                     MavLinkDoCmds.setROI(this, coord3DRoi, listener);
                 }
-                break;
+                return true;
 
             case ExperimentalActions.ACTION_SEND_MAVLINK_MESSAGE:
                 data.setClassLoader(MavlinkMessageWrapper.class.getClassLoader());
                 MavlinkMessageWrapper messageWrapper = data.getParcelable(ExperimentalActions.EXTRA_MAVLINK_MESSAGE);
                 CommonApiUtils.sendMavlinkMessage(this, messageWrapper);
-                break;
+                return true;
 
             case ExperimentalActions.ACTION_SET_RELAY:
                 int relayNumber = data.getInt(ExperimentalActions.EXTRA_RELAY_NUMBER);
                 boolean isOn = data.getBoolean(ExperimentalActions.EXTRA_IS_RELAY_ON);
                 MavLinkDoCmds.setRelay(this, relayNumber, isOn, listener);
-                break;
+                return true;
 
             case ExperimentalActions.ACTION_SET_SERVO:
                 int channel = data.getInt(ExperimentalActions.EXTRA_SERVO_CHANNEL);
                 int pwm = data.getInt(ExperimentalActions.EXTRA_SERVO_PWM);
                 MavLinkDoCmds.setServo(this, channel, pwm, listener);
-                break;
+                return true;
 
             //CONTROL ACTIONS
             case ControlActions.ACTION_DO_GUIDED_TAKEOFF:
                 double takeoffAltitude = data.getDouble(ControlActions.EXTRA_ALTITUDE);
                 CommonApiUtils.doGuidedTakeoff(this, takeoffAltitude, listener);
-                break;
+                return true;
 
             case ControlActions.ACTION_SEND_GUIDED_POINT:
                 data.setClassLoader(LatLong.class.getClassLoader());
                 boolean force = data.getBoolean(ControlActions.EXTRA_FORCE_GUIDED_POINT);
                 LatLong guidedPoint = data.getParcelable(ControlActions.EXTRA_GUIDED_POINT);
                 CommonApiUtils.sendGuidedPoint(this, guidedPoint, force, listener);
-                break;
+                return true;
 
             case ControlActions.ACTION_SET_GUIDED_ALTITUDE:
                 double guidedAltitude = data.getDouble(ControlActions.EXTRA_ALTITUDE);
                 CommonApiUtils.setGuidedAltitude(this, guidedAltitude);
-                break;
+                return true;
 
             case ControlActions.ACTION_SET_CONDITION_YAW:
                 final float targetAngle = data.getFloat(ControlActions.EXTRA_YAW_TARGET_ANGLE);
@@ -403,63 +398,57 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
                 final boolean isClockwise = data.getBoolean(ControlActions.EXTRA_YAW_IS_CLOCKWISE);
                 final boolean isRelative = data.getBoolean(ControlActions.EXTRA_YAW_IS_RELATIVE);
                 MavLinkModes.setConditionYaw(this, targetAngle, yawRate, isClockwise, isRelative, listener);
-                break;
+                return true;
 
             case ControlActions.ACTION_SET_VELOCITY:
                 final float xVel = data.getFloat(ControlActions.EXTRA_VELOCITY_X);
                 final float yVel = data.getFloat(ControlActions.EXTRA_VELOCITY_Y);
                 final float zVel = data.getFloat(ControlActions.EXTRA_VELOCITY_Z);
                 MavLinkModes.setVelocityInLocalFrame(this, xVel, yVel, zVel, listener);
-                break;
+                return true;
 
             //PARAMETER ACTIONS
             case ParameterActions.ACTION_REFRESH_PARAMETERS:
                 CommonApiUtils.refreshParameters(this);
-                break;
+                return true;
 
             case ParameterActions.ACTION_WRITE_PARAMETERS:
                 data.setClassLoader(com.o3dr.services.android.lib.drone.property.Parameters.class.getClassLoader());
                 com.o3dr.services.android.lib.drone.property.Parameters parameters = data.getParcelable(ParameterActions.EXTRA_PARAMETERS);
                 CommonApiUtils.writeParameters(this, parameters);
-                break;
+                return true;
 
             //DRONE STATE ACTIONS
             case StateActions.ACTION_ARM:
                 boolean doArm = data.getBoolean(StateActions.EXTRA_ARM);
                 boolean emergencyDisarm = data.getBoolean(StateActions.EXTRA_EMERGENCY_DISARM);
                 CommonApiUtils.arm(this, doArm, emergencyDisarm, listener);
-                break;
-
-            case StateActions.ACTION_SET_VEHICLE_MODE:
-                data.setClassLoader(VehicleMode.class.getClassLoader());
-                VehicleMode newMode = data.getParcelable(StateActions.EXTRA_VEHICLE_MODE);
-                CommonApiUtils.changeVehicleMode(this, newMode, listener);
-                break;
+                return true;
 
             //CALIBRATION ACTIONS
             case CalibrationActions.ACTION_START_IMU_CALIBRATION:
                 CommonApiUtils.startIMUCalibration(this, listener);
-                break;
+                return true;
 
             case CalibrationActions.ACTION_SEND_IMU_CALIBRATION_ACK:
                 int imuAck = data.getInt(CalibrationActions.EXTRA_IMU_STEP);
                 CommonApiUtils.sendIMUCalibrationAck(this, imuAck);
-                break;
+                return true;
 
             case CalibrationActions.ACTION_START_MAGNETOMETER_CALIBRATION:
                 final boolean retryOnFailure = data.getBoolean(CalibrationActions.EXTRA_RETRY_ON_FAILURE, false);
                 final boolean saveAutomatically = data.getBoolean(CalibrationActions.EXTRA_SAVE_AUTOMATICALLY, true);
                 final int startDelay = data.getInt(CalibrationActions.EXTRA_START_DELAY, 0);
                 CommonApiUtils.startMagnetometerCalibration(this, retryOnFailure, saveAutomatically, startDelay);
-                break;
+                return true;
 
             case CalibrationActions.ACTION_CANCEL_MAGNETOMETER_CALIBRATION:
                 CommonApiUtils.cancelMagnetometerCalibration(this);
-                break;
+                return true;
 
             case CalibrationActions.ACTION_ACCEPT_MAGNETOMETER_CALIBRATION:
                 CommonApiUtils.acceptMagnetometerCalibration(this);
-                break;
+                return true;
 
             //************ Gimbal ACTIONS *************//
             case GimbalActions.ACTION_SET_GIMBAL_ORIENTATION:
@@ -467,11 +456,11 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
                 float roll = data.getFloat(GimbalActions.GIMBAL_ROLL);
                 float yaw = data.getFloat(GimbalActions.GIMBAL_YAW);
                 MavLinkDoCmds.setGimbalOrientation(this, pitch, roll, yaw, listener);
-                break;
+                return true;
 
             case GimbalActions.ACTION_RESET_GIMBAL_MOUNT_MODE:
                 MavLinkDoCmds.resetROI(this, listener);
-                break;
+                return true;
 
             case GimbalActions.ACTION_SET_GIMBAL_MOUNT_MODE:
                 final int mountMode = data.getInt(GimbalActions.GIMBAL_MOUNT_MODE, MAV_MOUNT_MODE.MAV_MOUNT_MODE_MAVLINK_TARGETING);
@@ -489,11 +478,10 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
                 } else {
                     MavLinkParameters.sendParameter(this, "MNT_MODE", 1, mountMode);
                 }
-                break;
+                return true;
 
             default:
-                CommonApiUtils.postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
-                break;
+                return super.executeAsyncAction(action, listener);
         }
     }
 

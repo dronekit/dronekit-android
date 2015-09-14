@@ -141,9 +141,4 @@ public class Px4Native extends CommonMavLinkDrone {
     public void logMessage(int mavSeverity, String message) {
 
     }
-
-    @Override
-    public void executeAsyncAction(Action action, ICommandListener listener) {
-
-    }
 }

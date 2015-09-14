@@ -568,7 +568,7 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
     }
 
     @Override
-    public void executeAsyncAction(Action action, final ICommandListener listener) {
+    public boolean executeAsyncAction(Action action, final ICommandListener listener) {
         final String type = action.getType();
         Bundle data = action.getData();
 
@@ -581,14 +581,14 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
                     bundle.putFloat(AttributeEventExtra.EXTRA_MISSION_DRONIE_BEARING, bearing);
                     notifyDroneAttributeEvent(AttributeEvent.MISSION_DRONIE_CREATED, bundle);
                 }
-                break;
+                return true;
 
             //FOLLOW-ME ACTIONS
             case FollowMeActions.ACTION_ENABLE_FOLLOW_ME:
                 data.setClassLoader(FollowType.class.getClassLoader());
                 FollowType followType = data.getParcelable(FollowMeActions.EXTRA_FOLLOW_TYPE);
                 CommonApiUtils.enableFollowMe(this, handler, followType, listener);
-                break;
+                return true;
 
             case FollowMeActions.ACTION_UPDATE_FOLLOW_PARAMS:
                 if (followMe != null) {
@@ -619,11 +619,11 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
                         followAlgorithm.updateAlgorithmParams(paramsMap);
                     }
                 }
-                break;
+                return true;
 
             case FollowMeActions.ACTION_DISABLE_FOLLOW_ME:
                 CommonApiUtils.disableFollowMe(followMe);
-                break;
+                return true;
 
             //************ SOLOLINK ACTIONS *************//
             case SoloActions.ACTION_SEND_MESSAGE:
@@ -631,39 +631,39 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
                 if (messageData != null) {
                     SoloApiUtils.sendSoloLinkMessage(this, messageData, listener);
                 }
-                break;
+                return true;
 
             case SoloConfigActions.ACTION_UPDATE_WIFI_SETTINGS:
                 final String wifiSsid = data.getString(SoloConfigActions.EXTRA_WIFI_SSID);
                 final String wifiPassword = data.getString(SoloConfigActions.EXTRA_WIFI_PASSWORD);
                 SoloApiUtils.updateSoloLinkWifiSettings(this, wifiSsid, wifiPassword, listener);
-                break;
+                return true;
 
             case SoloConfigActions.ACTION_UPDATE_BUTTON_SETTINGS:
                 final SoloButtonSettingSetter buttonSettings = data.getParcelable(SoloConfigActions.EXTRA_BUTTON_SETTINGS);
                 if (buttonSettings != null) {
                     SoloApiUtils.updateSoloLinkButtonSettings(this, buttonSettings, listener);
                 }
-                break;
+                return true;
 
             case SoloConfigActions.ACTION_UPDATE_CONTROLLER_MODE:
                 final @SoloControllerMode.ControllerMode int mode = data.getInt(SoloConfigActions.EXTRA_CONTROLLER_MODE);
                 SoloApiUtils.updateSoloLinkControllerMode(this, mode, listener);
-                break;
+                return true;
 
             case SoloConfigActions.ACTION_UPDATE_EU_TX_POWER_COMPLIANCE:
                 final boolean isCompliant = data.getBoolean(SoloConfigActions.EXTRA_EU_TX_POWER_COMPLIANT, false);
                 SoloApiUtils.updateSoloLinkEUTxPowerCompliance(this, isCompliant, listener);
-                break;
+                return true;
 
             case SoloConfigActions.ACTION_REFRESH_SOLO_VERSIONS:
                 soloComp.refreshSoloVersions();
-                break;
+                return true;
 
             case SoloConfigActions.ACTION_UPDATE_CONTROLLER_UNIT:
                 final @SoloControllerUnits.ControllerUnit String unit = data.getString(SoloConfigActions.EXTRA_CONTROLLER_UNIT);
                 SoloApiUtils.updateSoloControllerUnit(this, unit, listener);
-                break;
+                return true;
 
             //**************** CAPABILITY ACTIONS **************//
             case CapabilityActions.ACTION_CHECK_FEATURE_SUPPORT:
@@ -696,15 +696,15 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
                         }
                     }
                 }
-                break;
+                return true;
 
             default:
                 if (drone != null) {
-                    drone.executeAsyncAction(action, listener);
+                    return drone.executeAsyncAction(action, listener);
                 } else {
                     CommonApiUtils.postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
+                    return true;
                 }
-                break;
         }
     }
 
