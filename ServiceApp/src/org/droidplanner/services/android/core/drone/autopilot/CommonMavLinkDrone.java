@@ -1,5 +1,6 @@
 package org.droidplanner.services.android.core.drone.autopilot;
 
+import android.os.Bundle;
 import android.text.TextUtils;
 
 import com.MAVLink.Messages.MAVLinkMessage;
@@ -8,18 +9,26 @@ import com.MAVLink.common.msg_attitude;
 import com.MAVLink.common.msg_heartbeat;
 import com.MAVLink.common.msg_radio_status;
 import com.MAVLink.common.msg_vibration;
+import com.o3dr.services.android.lib.coordinate.LatLongAlt;
+import com.o3dr.services.android.lib.drone.action.StateActions;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
+import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
+import com.o3dr.services.android.lib.drone.mission.action.MissionActions;
 import com.o3dr.services.android.lib.drone.property.Altitude;
 import com.o3dr.services.android.lib.drone.property.Attitude;
 import com.o3dr.services.android.lib.drone.property.Battery;
 import com.o3dr.services.android.lib.drone.property.DroneAttribute;
 import com.o3dr.services.android.lib.drone.property.Signal;
 import com.o3dr.services.android.lib.drone.property.Speed;
+import com.o3dr.services.android.lib.drone.property.VehicleMode;
 import com.o3dr.services.android.lib.drone.property.Vibration;
+import com.o3dr.services.android.lib.model.ICommandListener;
+import com.o3dr.services.android.lib.model.action.Action;
 import com.o3dr.services.android.lib.util.MathUtils;
 
 import org.droidplanner.services.android.core.MAVLink.MAVLinkStreams;
+import org.droidplanner.services.android.core.MAVLink.command.doCmd.MavLinkDoCmds;
 import org.droidplanner.services.android.core.drone.DroneEvents;
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
 import org.droidplanner.services.android.core.drone.variables.State;
@@ -94,6 +103,38 @@ public abstract class CommonMavLinkDrone implements MavLinkDrone {
     @Override
     public MAVLinkStreams.MAVLinkOutputStream getMavClient() {
         return MavClient;
+    }
+
+    @Override
+    public boolean executeAsyncAction(Action action, ICommandListener listener){
+        final String type = action.getType();
+        Bundle data = action.getData();
+
+        switch(type){
+            //MISSION ACTIONS
+            case MissionActions.ACTION_GOTO_WAYPOINT:
+                int missionItemIndex = data.getInt(MissionActions.EXTRA_MISSION_ITEM_INDEX);
+                CommonApiUtils.gotoWaypoint(this, missionItemIndex, listener);
+                return true;
+
+            //STATE ACTIONS
+            case StateActions.ACTION_SET_VEHICLE_MODE:
+                data.setClassLoader(VehicleMode.class.getClassLoader());
+                VehicleMode newMode = data.getParcelable(StateActions.EXTRA_VEHICLE_MODE);
+                CommonApiUtils.changeVehicleMode(this, newMode, listener);
+                return true;
+
+            case StateActions.ACTION_SET_VEHICLE_HOME:
+                final LatLongAlt homeLoc = data.getParcelable(StateActions.EXTRA_VEHICLE_HOME_LOCATION);
+                if(homeLoc != null){
+                    MavLinkDoCmds.setVehicleHome(this, homeLoc, listener);
+                }
+                return true;
+
+            default:
+                CommonApiUtils.postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
+                return true;
+        }
     }
 
     @Override
