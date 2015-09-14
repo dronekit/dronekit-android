@@ -436,6 +436,9 @@ public class MAVLinkPacket implements Serializable {
             case msg_gps_global_origin.MAVLINK_MSG_ID_GPS_GLOBAL_ORIGIN:
                 return  new msg_gps_global_origin(this);
             
+            case msg_param_map_rc.MAVLINK_MSG_ID_PARAM_MAP_RC:
+                return  new msg_param_map_rc(this);
+            
             case msg_safety_set_allowed_area.MAVLINK_MSG_ID_SAFETY_SET_ALLOWED_AREA:
                 return  new msg_safety_set_allowed_area(this);
             
@@ -601,6 +604,9 @@ public class MAVLinkPacket implements Serializable {
             case msg_gps2_rtk.MAVLINK_MSG_ID_GPS2_RTK:
                 return  new msg_gps2_rtk(this);
             
+            case msg_scaled_imu3.MAVLINK_MSG_ID_SCALED_IMU3:
+                return  new msg_scaled_imu3(this);
+            
             case msg_data_transmission_handshake.MAVLINK_MSG_ID_DATA_TRANSMISSION_HANDSHAKE:
                 return  new msg_data_transmission_handshake(this);
             
@@ -622,11 +628,32 @@ public class MAVLinkPacket implements Serializable {
             case msg_terrain_report.MAVLINK_MSG_ID_TERRAIN_REPORT:
                 return  new msg_terrain_report(this);
             
+            case msg_scaled_pressure2.MAVLINK_MSG_ID_SCALED_PRESSURE2:
+                return  new msg_scaled_pressure2(this);
+            
+            case msg_att_pos_mocap.MAVLINK_MSG_ID_ATT_POS_MOCAP:
+                return  new msg_att_pos_mocap(this);
+            
+            case msg_set_actuator_control_target.MAVLINK_MSG_ID_SET_ACTUATOR_CONTROL_TARGET:
+                return  new msg_set_actuator_control_target(this);
+            
+            case msg_actuator_control_target.MAVLINK_MSG_ID_ACTUATOR_CONTROL_TARGET:
+                return  new msg_actuator_control_target(this);
+            
+            case msg_scaled_pressure3.MAVLINK_MSG_ID_SCALED_PRESSURE3:
+                return  new msg_scaled_pressure3(this);
+            
             case msg_battery_status.MAVLINK_MSG_ID_BATTERY_STATUS:
                 return  new msg_battery_status(this);
             
             case msg_autopilot_version.MAVLINK_MSG_ID_AUTOPILOT_VERSION:
                 return  new msg_autopilot_version(this);
+            
+            case msg_landing_target.MAVLINK_MSG_ID_LANDING_TARGET:
+                return  new msg_landing_target(this);
+            
+            case msg_vibration.MAVLINK_MSG_ID_VIBRATION:
+                return  new msg_vibration(this);
             
             case msg_v2_extension.MAVLINK_MSG_ID_V2_EXTENSION:
                 return  new msg_v2_extension(this);

@@ -32,6 +32,12 @@ public class MAV_TYPE {
    public static final int MAV_TYPE_ONBOARD_CONTROLLER = 18; /* Onboard companion controller | */
    public static final int MAV_TYPE_VTOL_DUOROTOR = 19; /* Two-rotor VTOL using control surfaces in vertical operation in addition. Tailsitter. | */
    public static final int MAV_TYPE_VTOL_QUADROTOR = 20; /* Quad-rotor VTOL using a V-shaped quad config in vertical operation. Tailsitter. | */
-   public static final int MAV_TYPE_ENUM_END = 21; /*  | */
+   public static final int MAV_TYPE_VTOL_RESERVED1 = 21; /* VTOL reserved 1 | */
+   public static final int MAV_TYPE_VTOL_RESERVED2 = 22; /* VTOL reserved 2 | */
+   public static final int MAV_TYPE_VTOL_RESERVED3 = 23; /* VTOL reserved 3 | */
+   public static final int MAV_TYPE_VTOL_RESERVED4 = 24; /* VTOL reserved 4 | */
+   public static final int MAV_TYPE_VTOL_RESERVED5 = 25; /* VTOL reserved 5 | */
+   public static final int MAV_TYPE_GIMBAL = 26; /* Onboard gimbal | */
+   public static final int MAV_TYPE_ENUM_END = 27; /*  | */
 }
             

@@ -32,7 +32,7 @@ public class msg_set_gps_global_origin extends MAVLinkMessage{
     public int longitude;
     
     /**
-    * Altitude (WGS84), in meters * 1000 (positive for up)
+    * Altitude (AMSL), in meters * 1000 (positive for up)
     */
     public int altitude;
     

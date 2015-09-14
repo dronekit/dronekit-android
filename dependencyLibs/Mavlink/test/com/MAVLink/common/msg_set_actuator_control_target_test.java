@@ -4,7 +4,7 @@
  * java mavlink generator tool. It should not be modified by hand.
  */
          
-// MESSAGE GPS_RAW_INT PACKING
+// MESSAGE SET_ACTUATOR_CONTROL_TARGET PACKING
 package com.MAVLink.common;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Parser;
@@ -15,14 +15,13 @@ import org.junit.Test;
 import static org.junit.Assert.assertArrayEquals;
 
 /**
-* The global position, as returned by the Global Positioning System (GPS). This is
-                NOT the global position estimate of the system, but rather a RAW sensor value. See message GLOBAL_POSITION for the global position estimate. Coordinate frame is right-handed, Z-axis up (GPS frame).
+* Set the vehicle attitude and body angular rates.
 */
-public class msg_gps_raw_int_test{
+public class msg_set_actuator_control_target_test{
 
-public static final int MAVLINK_MSG_ID_GPS_RAW_INT = 24;
-public static final int MAVLINK_MSG_LENGTH = 30;
-private static final long serialVersionUID = MAVLINK_MSG_ID_GPS_RAW_INT;
+public static final int MAVLINK_MSG_ID_SET_ACTUATOR_CONTROL_TARGET = 139;
+public static final int MAVLINK_MSG_LENGTH = 43;
+private static final long serialVersionUID = MAVLINK_MSG_ID_SET_ACTUATOR_CONTROL_TARGET;
 
 private Parser parser = new Parser();
 
@@ -31,7 +30,7 @@ public CRC generateCRC(byte[] packet){
     for (int i = 1; i < packet.length - 2; i++) {
         crc.update_checksum(packet[i] & 0xFF);
     }
-    crc.finish_checksum(MAVLINK_MSG_ID_GPS_RAW_INT);
+    crc.finish_checksum(MAVLINK_MSG_ID_SET_ACTUATOR_CONTROL_TARGET);
     return crc;
 }
 
@@ -42,17 +41,20 @@ public byte[] generateTestPacket(){
     payload.put((byte)0); //seq
     payload.put((byte)255); //sysid
     payload.put((byte)190); //comp id
-    payload.put((byte)MAVLINK_MSG_ID_GPS_RAW_INT); //msg id
+    payload.put((byte)MAVLINK_MSG_ID_SET_ACTUATOR_CONTROL_TARGET); //msg id
     payload.putLong((long)93372036854775807L); //time_usec
-    payload.putInt((int)963497880); //lat
-    payload.putInt((int)963498088); //lon
-    payload.putInt((int)963498296); //alt
-    payload.putShort((short)18275); //eph
-    payload.putShort((short)18379); //epv
-    payload.putShort((short)18483); //vel
-    payload.putShort((short)18587); //cog
-    payload.put((byte)89); //fix_type
-    payload.put((byte)156); //satellites_visible
+    //controls
+    payload.putFloat((float)73.0);
+    payload.putFloat((float)74.0);
+    payload.putFloat((float)75.0);
+    payload.putFloat((float)76.0);
+    payload.putFloat((float)77.0);
+    payload.putFloat((float)78.0);
+    payload.putFloat((float)79.0);
+    payload.putFloat((float)80.0);
+    payload.put((byte)125); //group_mlx
+    payload.put((byte)192); //target_system
+    payload.put((byte)3); //target_component
     
     CRC crc = generateCRC(payload.array());
     payload.put((byte)crc.getLSB());
@@ -68,7 +70,7 @@ public void test(){
     }
     MAVLinkPacket m = parser.mavlink_parse_char(packet[packet.length - 1] & 0xFF);
     byte[] processedPacket = m.encodePacket();
-    assertArrayEquals("msg_gps_raw_int", processedPacket, packet);
+    assertArrayEquals("msg_set_actuator_control_target", processedPacket, packet);
 }
 }
         
