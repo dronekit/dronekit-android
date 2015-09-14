@@ -13,5 +13,5 @@ public interface Drone {
 
     DroneAttribute getAttribute(String attributeType);
 
-    void executeAsyncAction(Action action, ICommandListener listener);
+    boolean executeAsyncAction(Action action, ICommandListener listener);
 }
