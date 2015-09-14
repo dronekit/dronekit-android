@@ -132,11 +132,14 @@ android {
         beta {
             signingConfig signingConfigs.release
             versionNameSuffix generateVersionNameSuffix(versionBuild, "beta")
+            buildConfigField "boolean", "WRITE_LOG_FILE", "true"
+            debuggable true
         }
 
         sitl {
             signingConfig signingConfigs.debug
             buildConfigField "boolean", "SITL_DEBUG", "true"
+            buildConfigField "boolean", "WRITE_LOG_FILE", "true"
             debuggable true
         }
 
