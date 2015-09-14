@@ -410,7 +410,9 @@ public class CommonApiUtils {
 
         return new State(isConnected, CommonApiUtils.getVehicleMode(droneMode), droneState.isArmed(), droneState.isFlying(),
                 droneState.getErrorId(), drone.getMavlinkVersion(), calibrationMessage,
-                droneState.getFlightStartTime(), proxyEkfStatus, isConnected && drone.isConnectionAlive());
+                droneState.getFlightStartTime(), proxyEkfStatus,
+                isConnected && drone.isConnectionAlive(),
+                vibration);
     }
 
     public static Parameters getParameters(MavLinkDrone drone, Context context) {
