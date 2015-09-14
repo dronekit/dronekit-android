@@ -38,7 +38,7 @@ public class msg_global_position_int extends MAVLinkMessage{
     public int lon;
     
     /**
-    * Altitude in meters, expressed as * 1000 (millimeters), WGS84 (not AMSL)
+    * Altitude in meters, expressed as * 1000 (millimeters), AMSL (not WGS84 - note that virtually all GPS modules provide the AMSL as well)
     */
     public int alt;
     

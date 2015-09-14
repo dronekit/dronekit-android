@@ -148,18 +148,27 @@ public class AttributeEvent {
 
     /**
      * Signals updates of the ekf status.
+     * @see {@link com.o3dr.services.android.lib.drone.property.State}
      */
     public static final String STATE_EKF_REPORT = PACKAGE_NAME + ".STATE_EKF_REPORT";
 
     /**
      * Signals updates to the ekf position state.
+     * @see {@link com.o3dr.services.android.lib.drone.property.State}
      */
     public static final String STATE_EKF_POSITION = PACKAGE_NAME + ".STATE_EKF_POSITION";
 
     /**
      * Signals update of the vehicle mode.
+     * @see {@link com.o3dr.services.android.lib.drone.property.State}
      */
     public static final String STATE_VEHICLE_MODE = PACKAGE_NAME + ".STATE_VEHICLE_MODE";
+
+    /**
+     * Signals vehicle vibration updates.
+     * @see {@link com.o3dr.services.android.lib.drone.property.State}
+     */
+    public static final String STATE_VEHICLE_VIBRATION = PACKAGE_NAME + ".STATE_VEHICLE_VIBRATION";
 
     /**
      * Home attribute events.

@@ -103,13 +103,11 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
     private final WaypointManager waypointManager;
     private final Magnetometer mag;
     private final Camera footprints;
-    private final State state;
     private final HeartBeat heartbeat;
     private final Parameters parameters;
 
     private final Preferences preferences;
 
-    private final DroneInterfaces.AttributeEventListener attributeListener;
     private final LogMessageListener logListener;
     private final MagnetometerCalibrationImpl magCalibration;
 
@@ -119,14 +117,12 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
                      DroneInterfaces.Handler handler, Preferences pref, AutopilotWarningParser warningParser,
                      LogMessageListener logListener, DroneInterfaces.AttributeEventListener listener) {
 
-        super(handler, mavClient);
+        super(handler, mavClient, warningParser, listener);
 
         this.context = context;
         this.preferences = pref;
         this.logListener = logListener;
-        this.attributeListener = listener;
 
-        state = new State(this, handler, warningParser);
         heartbeat = new HeartBeat(this, handler);
         parameters = new Parameters(this, handler);
         this.waypointManager = new WaypointManager(this, handler);
@@ -200,11 +196,6 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
 
     protected void onHeartbeat(msg_heartbeat msg) {
         heartbeat.onHeartbeat(msg);
-    }
-
-    @Override
-    public State getState() {
-        return state;
     }
 
     @Override
@@ -298,9 +289,6 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
             return null;
 
         switch (attributeType) {
-            case AttributeType.STATE:
-                return CommonApiUtils.getState(this, isConnected());
-
             case AttributeType.GPS:
                 return CommonApiUtils.getGps(this);
 
@@ -615,11 +603,6 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
             case msg_mag_cal_progress.MAVLINK_MSG_ID_MAG_CAL_PROGRESS:
             case msg_mag_cal_report.MAVLINK_MSG_ID_MAG_CAL_REPORT:
                 getMagnetometerCalibration().processCalibrationMessage(message);
-                break;
-
-            //*************** EKF State handling ******************//
-            case msg_ekf_status_report.MAVLINK_MSG_ID_EKF_STATUS_REPORT:
-                getState().setEkfStatus((msg_ekf_status_report) message);
                 break;
 
             case msg_mission_item.MAVLINK_MSG_ID_MISSION_ITEM:

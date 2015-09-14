@@ -16,7 +16,7 @@ import com.MAVLink.Messages.MAVLinkPayload;
 public class msg_autopilot_version extends MAVLinkMessage{
 
     public static final int MAVLINK_MSG_ID_AUTOPILOT_VERSION = 148;
-    public static final int MAVLINK_MSG_LENGTH = 20;
+    public static final int MAVLINK_MSG_LENGTH = 60;
     private static final long serialVersionUID = MAVLINK_MSG_ID_AUTOPILOT_VERSION;
 
 
@@ -27,14 +27,54 @@ public class msg_autopilot_version extends MAVLinkMessage{
     public long capabilities;
     
     /**
-    * Firmware version number
+    * UID if provided by hardware
     */
-    public long version;
+    public long uid;
     
     /**
-    * Custom version field, commonly the first 8 bytes (16 characters) of the git hash. This is not an unique identifier, but should allow to identify the commit using the main version number even for very large code bases.
+    * Firmware version number
     */
-    public short custom_version[] = new short[8];
+    public long flight_sw_version;
+    
+    /**
+    * Middleware version number
+    */
+    public long middleware_sw_version;
+    
+    /**
+    * Operating system version number
+    */
+    public long os_sw_version;
+    
+    /**
+    * HW / board version (last 8 bytes should be silicon ID, if any)
+    */
+    public long board_version;
+    
+    /**
+    * ID of the board vendor
+    */
+    public int vendor_id;
+    
+    /**
+    * ID of the product
+    */
+    public int product_id;
+    
+    /**
+    * Custom version field, commonly the first 8 bytes of the git hash. This is not an unique identifier, but should allow to identify the commit using the main version number even for very large code bases.
+    */
+    public short flight_custom_version[] = new short[8];
+    
+    /**
+    * Custom version field, commonly the first 8 bytes of the git hash. This is not an unique identifier, but should allow to identify the commit using the main version number even for very large code bases.
+    */
+    public short middleware_custom_version[] = new short[8];
+    
+    /**
+    * Custom version field, commonly the first 8 bytes of the git hash. This is not an unique identifier, but should allow to identify the commit using the main version number even for very large code bases.
+    */
+    public short os_custom_version[] = new short[8];
     
 
     /**
@@ -50,11 +90,35 @@ public class msg_autopilot_version extends MAVLinkMessage{
         
         packet.payload.putUnsignedLong(capabilities);
         
-        packet.payload.putUnsignedInt(version);
+        packet.payload.putUnsignedLong(uid);
+        
+        packet.payload.putUnsignedInt(flight_sw_version);
+        
+        packet.payload.putUnsignedInt(middleware_sw_version);
+        
+        packet.payload.putUnsignedInt(os_sw_version);
+        
+        packet.payload.putUnsignedInt(board_version);
+        
+        packet.payload.putUnsignedShort(vendor_id);
+        
+        packet.payload.putUnsignedShort(product_id);
         
         
-        for (int i = 0; i < custom_version.length; i++) {
-            packet.payload.putUnsignedByte(custom_version[i]);
+        for (int i = 0; i < flight_custom_version.length; i++) {
+            packet.payload.putUnsignedByte(flight_custom_version[i]);
+        }
+                    
+        
+        
+        for (int i = 0; i < middleware_custom_version.length; i++) {
+            packet.payload.putUnsignedByte(middleware_custom_version[i]);
+        }
+                    
+        
+        
+        for (int i = 0; i < os_custom_version.length; i++) {
+            packet.payload.putUnsignedByte(os_custom_version[i]);
         }
                     
         
@@ -71,11 +135,35 @@ public class msg_autopilot_version extends MAVLinkMessage{
         
         this.capabilities = payload.getUnsignedLong();
         
-        this.version = payload.getUnsignedInt();
+        this.uid = payload.getUnsignedLong();
+        
+        this.flight_sw_version = payload.getUnsignedInt();
+        
+        this.middleware_sw_version = payload.getUnsignedInt();
+        
+        this.os_sw_version = payload.getUnsignedInt();
+        
+        this.board_version = payload.getUnsignedInt();
+        
+        this.vendor_id = payload.getUnsignedShort();
+        
+        this.product_id = payload.getUnsignedShort();
         
         
-        for (int i = 0; i < this.custom_version.length; i++) {
-            this.custom_version[i] = payload.getUnsignedByte();
+        for (int i = 0; i < this.flight_custom_version.length; i++) {
+            this.flight_custom_version[i] = payload.getUnsignedByte();
+        }
+                
+        
+        
+        for (int i = 0; i < this.middleware_custom_version.length; i++) {
+            this.middleware_custom_version[i] = payload.getUnsignedByte();
+        }
+                
+        
+        
+        for (int i = 0; i < this.os_custom_version.length; i++) {
+            this.os_custom_version[i] = payload.getUnsignedByte();
         }
                 
         
@@ -100,12 +188,12 @@ public class msg_autopilot_version extends MAVLinkMessage{
         unpack(mavLinkPacket.payload);
     }
 
-          
+                          
     /**
     * Returns a string with the MSG name and data
     */
     public String toString(){
-        return "MAVLINK_MSG_ID_AUTOPILOT_VERSION -"+" capabilities:"+capabilities+" version:"+version+" custom_version:"+custom_version+"";
+        return "MAVLINK_MSG_ID_AUTOPILOT_VERSION -"+" capabilities:"+capabilities+" uid:"+uid+" flight_sw_version:"+flight_sw_version+" middleware_sw_version:"+middleware_sw_version+" os_sw_version:"+os_sw_version+" board_version:"+board_version+" vendor_id:"+vendor_id+" product_id:"+product_id+" flight_custom_version:"+flight_custom_version+" middleware_custom_version:"+middleware_custom_version+" os_custom_version:"+os_custom_version+"";
     }
 }
         

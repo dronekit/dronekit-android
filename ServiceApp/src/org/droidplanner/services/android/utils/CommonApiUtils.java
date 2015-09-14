@@ -37,6 +37,7 @@ import com.o3dr.services.android.lib.drone.property.Parameters;
 import com.o3dr.services.android.lib.drone.property.State;
 import com.o3dr.services.android.lib.drone.property.Type;
 import com.o3dr.services.android.lib.drone.property.VehicleMode;
+import com.o3dr.services.android.lib.drone.property.Vibration;
 import com.o3dr.services.android.lib.gcs.follow.FollowState;
 import com.o3dr.services.android.lib.gcs.follow.FollowType;
 import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
@@ -393,7 +394,7 @@ public class CommonApiUtils {
                 droneGps.getFixTypeNumeric());
     }
 
-    public static State getState(MavLinkDrone drone, boolean isConnected) {
+    public static State getState(MavLinkDrone drone, boolean isConnected, Vibration vibration) {
         if (drone == null)
             return new State();
 
@@ -409,7 +410,9 @@ public class CommonApiUtils {
 
         return new State(isConnected, CommonApiUtils.getVehicleMode(droneMode), droneState.isArmed(), droneState.isFlying(),
                 droneState.getErrorId(), drone.getMavlinkVersion(), calibrationMessage,
-                droneState.getFlightStartTime(), proxyEkfStatus, isConnected && drone.isConnectionAlive());
+                droneState.getFlightStartTime(), proxyEkfStatus,
+                isConnected && drone.isConnectionAlive(),
+                vibration);
     }
 
     public static Parameters getParameters(MavLinkDrone drone, Context context) {

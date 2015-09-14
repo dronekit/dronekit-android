@@ -270,7 +270,7 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
 
             case PX4_NATIVE:
                 Timber.i("Instantiating PX4 Native autopilot.");
-                this.drone = new Px4Native(dpHandler, mavClient);
+                this.drone = new Px4Native(dpHandler, mavClient, new AndroidApWarningParser(), this);
                 break;
         }
 
