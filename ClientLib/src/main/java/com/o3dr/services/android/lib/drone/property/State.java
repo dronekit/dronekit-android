@@ -23,11 +23,15 @@ public class State implements DroneAttribute {
     private EkfStatus ekfStatus = new EkfStatus();
     private boolean isTelemetryLive;
 
+    private Vibration vehicleVibration = new Vibration();
+
     public State() {
     }
 
     public State(boolean isConnected, VehicleMode mode, boolean armed, boolean flying,
-                 String autopilotErrorId, int mavlinkVersion, String calibrationStatus, long flightStartTime, EkfStatus ekfStatus, boolean isTelemetryLive) {
+                 String autopilotErrorId, int mavlinkVersion, String calibrationStatus,
+                 long flightStartTime, EkfStatus ekfStatus, boolean isTelemetryLive,
+                 Vibration vibration) {
         this.isConnected = isConnected;
         this.armed = armed;
         this.isFlying = flying;
@@ -43,6 +47,9 @@ public class State implements DroneAttribute {
             this.vehicleMode = mode;
 
         this.isTelemetryLive = isTelemetryLive;
+
+        if(vibration != null)
+            this.vehicleVibration = vibration;
     }
 
     public boolean isConnected() {
@@ -133,6 +140,10 @@ public class State implements DroneAttribute {
         return ekfStatus;
     }
 
+    public Vibration getVehicleVibration() {
+        return vehicleVibration;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -150,6 +161,7 @@ public class State implements DroneAttribute {
         dest.writeLong(this.flightStartTime);
         dest.writeParcelable(this.ekfStatus, 0);
         dest.writeByte(isTelemetryLive ? (byte) 1 : (byte) 0);
+        dest.writeParcelable(this.vehicleVibration, 0);
     }
 
     private State(Parcel in) {
@@ -163,6 +175,7 @@ public class State implements DroneAttribute {
         this.flightStartTime = in.readLong();
         this.ekfStatus = in.readParcelable(EkfStatus.class.getClassLoader());
         this.isTelemetryLive = in.readByte() != 0;
+        this.vehicleVibration = in.readParcelable(Vibration.class.getClassLoader());
     }
 
     public static final Creator<State> CREATOR = new Creator<State>() {

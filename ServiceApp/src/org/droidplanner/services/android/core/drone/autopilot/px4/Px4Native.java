@@ -22,14 +22,15 @@ import org.droidplanner.services.android.core.drone.variables.calibration.AccelC
 import org.droidplanner.services.android.core.drone.variables.calibration.MagnetometerCalibrationImpl;
 import org.droidplanner.services.android.core.firmware.FirmwareType;
 import org.droidplanner.services.android.core.mission.Mission;
+import org.droidplanner.services.android.core.model.AutopilotWarningParser;
 
 /**
  * Created by Fredia Huya-Kouadio on 9/10/15.
  */
 public class Px4Native extends CommonMavLinkDrone {
 
-    public Px4Native(DroneInterfaces.Handler handler, MAVLinkStreams.MAVLinkOutputStream mavClient) {
-        super(handler, mavClient);
+    public Px4Native(DroneInterfaces.Handler handler, MAVLinkStreams.MAVLinkOutputStream mavClient, AutopilotWarningParser warningParser, DroneInterfaces.AttributeEventListener listener) {
+        super(handler, mavClient, warningParser, listener);
     }
 
     @Override
@@ -55,11 +56,6 @@ public class Px4Native extends CommonMavLinkDrone {
     @Override
     public byte getCompid() {
         return 0;
-    }
-
-    @Override
-    public State getState() {
-        return null;
     }
 
     @Override
