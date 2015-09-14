@@ -38,7 +38,7 @@ public class msg_hil_gps extends MAVLinkMessage{
     public int lon;
     
     /**
-    * Altitude (WGS84), in meters * 1000 (positive for up)
+    * Altitude (AMSL, not WGS84), in meters * 1000 (positive for up)
     */
     public int alt;
     

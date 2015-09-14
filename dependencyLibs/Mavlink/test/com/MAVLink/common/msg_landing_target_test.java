@@ -4,7 +4,7 @@
  * java mavlink generator tool. It should not be modified by hand.
  */
          
-// MESSAGE GPS_RAW_INT PACKING
+// MESSAGE LANDING_TARGET PACKING
 package com.MAVLink.common;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Parser;
@@ -15,14 +15,13 @@ import org.junit.Test;
 import static org.junit.Assert.assertArrayEquals;
 
 /**
-* The global position, as returned by the Global Positioning System (GPS). This is
-                NOT the global position estimate of the system, but rather a RAW sensor value. See message GLOBAL_POSITION for the global position estimate. Coordinate frame is right-handed, Z-axis up (GPS frame).
+* The location of a landing area captured from a downward facing camera
 */
-public class msg_gps_raw_int_test{
+public class msg_landing_target_test{
 
-public static final int MAVLINK_MSG_ID_GPS_RAW_INT = 24;
+public static final int MAVLINK_MSG_ID_LANDING_TARGET = 149;
 public static final int MAVLINK_MSG_LENGTH = 30;
-private static final long serialVersionUID = MAVLINK_MSG_ID_GPS_RAW_INT;
+private static final long serialVersionUID = MAVLINK_MSG_ID_LANDING_TARGET;
 
 private Parser parser = new Parser();
 
@@ -31,7 +30,7 @@ public CRC generateCRC(byte[] packet){
     for (int i = 1; i < packet.length - 2; i++) {
         crc.update_checksum(packet[i] & 0xFF);
     }
-    crc.finish_checksum(MAVLINK_MSG_ID_GPS_RAW_INT);
+    crc.finish_checksum(MAVLINK_MSG_ID_LANDING_TARGET);
     return crc;
 }
 
@@ -42,17 +41,15 @@ public byte[] generateTestPacket(){
     payload.put((byte)0); //seq
     payload.put((byte)255); //sysid
     payload.put((byte)190); //comp id
-    payload.put((byte)MAVLINK_MSG_ID_GPS_RAW_INT); //msg id
+    payload.put((byte)MAVLINK_MSG_ID_LANDING_TARGET); //msg id
     payload.putLong((long)93372036854775807L); //time_usec
-    payload.putInt((int)963497880); //lat
-    payload.putInt((int)963498088); //lon
-    payload.putInt((int)963498296); //alt
-    payload.putShort((short)18275); //eph
-    payload.putShort((short)18379); //epv
-    payload.putShort((short)18483); //vel
-    payload.putShort((short)18587); //cog
-    payload.put((byte)89); //fix_type
-    payload.put((byte)156); //satellites_visible
+    payload.putFloat((float)73.0); //angle_x
+    payload.putFloat((float)101.0); //angle_y
+    payload.putFloat((float)129.0); //distance
+    payload.putFloat((float)157.0); //size_x
+    payload.putFloat((float)185.0); //size_y
+    payload.put((byte)89); //target_num
+    payload.put((byte)156); //frame
     
     CRC crc = generateCRC(payload.array());
     payload.put((byte)crc.getLSB());
@@ -68,7 +65,7 @@ public void test(){
     }
     MAVLinkPacket m = parser.mavlink_parse_char(packet[packet.length - 1] & 0xFF);
     byte[] processedPacket = m.encodePacket();
-    assertArrayEquals("msg_gps_raw_int", processedPacket, packet);
+    assertArrayEquals("msg_landing_target", processedPacket, packet);
 }
 }
         

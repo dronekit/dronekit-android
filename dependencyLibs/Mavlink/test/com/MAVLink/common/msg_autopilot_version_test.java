@@ -20,7 +20,7 @@ import static org.junit.Assert.assertArrayEquals;
 public class msg_autopilot_version_test{
 
 public static final int MAVLINK_MSG_ID_AUTOPILOT_VERSION = 148;
-public static final int MAVLINK_MSG_LENGTH = 20;
+public static final int MAVLINK_MSG_LENGTH = 60;
 private static final long serialVersionUID = MAVLINK_MSG_ID_AUTOPILOT_VERSION;
 
 private Parser parser = new Parser();
@@ -43,16 +43,40 @@ public byte[] generateTestPacket(){
     payload.put((byte)190); //comp id
     payload.put((byte)MAVLINK_MSG_ID_AUTOPILOT_VERSION); //msg id
     payload.putLong((long)93372036854775807L); //capabilities
-    payload.putInt((int)963497880); //version
-    //custom_version
-    payload.put((byte)41);
-    payload.put((byte)42);
-    payload.put((byte)43);
-    payload.put((byte)44);
-    payload.put((byte)45);
-    payload.put((byte)46);
-    payload.put((byte)47);
-    payload.put((byte)48);
+    payload.putLong((long)93372036854776311L); //uid
+    payload.putInt((int)963498296); //flight_sw_version
+    payload.putInt((int)963498504); //middleware_sw_version
+    payload.putInt((int)963498712); //os_sw_version
+    payload.putInt((int)963498920); //board_version
+    payload.putShort((short)18899); //vendor_id
+    payload.putShort((short)19003); //product_id
+    //flight_custom_version
+    payload.put((byte)113);
+    payload.put((byte)114);
+    payload.put((byte)115);
+    payload.put((byte)116);
+    payload.put((byte)117);
+    payload.put((byte)118);
+    payload.put((byte)119);
+    payload.put((byte)120);
+    //middleware_custom_version
+    payload.put((byte)137);
+    payload.put((byte)138);
+    payload.put((byte)139);
+    payload.put((byte)140);
+    payload.put((byte)141);
+    payload.put((byte)142);
+    payload.put((byte)143);
+    payload.put((byte)144);
+    //os_custom_version
+    payload.put((byte)161);
+    payload.put((byte)162);
+    payload.put((byte)163);
+    payload.put((byte)164);
+    payload.put((byte)165);
+    payload.put((byte)166);
+    payload.put((byte)167);
+    payload.put((byte)168);
     
     CRC crc = generateCRC(payload.array());
     payload.put((byte)crc.getLSB());

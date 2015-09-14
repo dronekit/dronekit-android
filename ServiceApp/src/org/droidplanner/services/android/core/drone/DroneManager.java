@@ -270,7 +270,7 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
 
             case PX4_NATIVE:
                 Timber.i("Instantiating PX4 Native autopilot.");
-                this.drone = new Px4Native(dpHandler, mavClient);
+                this.drone = new Px4Native(dpHandler, mavClient, new AndroidApWarningParser(), this);
                 break;
         }
 
@@ -756,6 +756,7 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
         switch (event) {
             case HEARTBEAT_FIRST:
             case CONNECTED:
+                Timber.i("Vehicle " + event.name().toLowerCase());
                 if (isCompanionComputerEnabled()) {
                     //Try connecting the companion computer
                     if (!soloComp.isConnected()) {
@@ -768,6 +769,7 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
                 break;
 
             case HEARTBEAT_TIMEOUT:
+                Timber.i("Vehicle heartbeat timed out.");
                 if (isCompanionComputerEnabled() && soloComp.isConnected()) {
                     //Start a countdown at the conclusion of which, disconnect the solo companion computer.
                     handler.postDelayed(disconnectSoloCompTask, HeartBeat.HEARTBEAT_NORMAL_TIMEOUT);
@@ -775,6 +777,7 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
                 break;
 
             case HEARTBEAT_RESTORED:
+                Timber.i("Vehicle heartbeat restored.");
                 if (isCompanionComputerEnabled()) {
                     //Dismiss the countdown to disconnect the solo companion computer.
                     handler.removeCallbacks(disconnectSoloCompTask);
@@ -787,6 +790,7 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
                 break;
 
             case DISCONNECTED:
+                Timber.i("Vehicle disconnected.");
                 if (isCompanionComputerEnabled()) {
                     if (soloComp.isConnected()) {
                         soloComp.stop();
