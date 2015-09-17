@@ -37,7 +37,7 @@ public class msg_position_target_global_int extends MAVLinkMessage{
     public int lon_int;
     
     /**
-    * Altitude in meters in WGS84 altitude, not AMSL if absolute or relative, above terrain if GLOBAL_TERRAIN_ALT_INT
+    * Altitude in meters in AMSL altitude, not WGS84 if absolute or relative, above terrain if GLOBAL_TERRAIN_ALT_INT
     */
     public float alt;
     

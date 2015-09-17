@@ -12,7 +12,7 @@ import com.MAVLink.Messages.MAVLinkPayload;
 
 /**
 * The global position, as returned by the Global Positioning System (GPS). This is
-                NOT the global position estimate of the sytem, but rather a RAW sensor value. See message GLOBAL_POSITION for the global position estimate. Coordinate frame is right-handed, Z-axis up (GPS frame).
+                NOT the global position estimate of the system, but rather a RAW sensor value. See message GLOBAL_POSITION for the global position estimate. Coordinate frame is right-handed, Z-axis up (GPS frame).
 */
 public class msg_gps_raw_int extends MAVLinkMessage{
 
@@ -38,7 +38,7 @@ public class msg_gps_raw_int extends MAVLinkMessage{
     public int lon;
     
     /**
-    * Altitude (WGS84), in meters * 1000 (positive for up)
+    * Altitude (AMSL, NOT WGS84), in meters * 1000 (positive for up). Note that virtually all GPS modules provide the AMSL altitude in addition to the WGS84 altitude.
     */
     public int alt;
     

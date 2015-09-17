@@ -27,6 +27,7 @@ public class MAV_COMPONENT {
    public static final int MAV_COMP_ID_SERVO12 = 151; /*  | */
    public static final int MAV_COMP_ID_SERVO13 = 152; /*  | */
    public static final int MAV_COMP_ID_SERVO14 = 153; /*  | */
+   public static final int MAV_COMP_ID_GIMBAL = 154; /*  | */
    public static final int MAV_COMP_ID_MAPPER = 180; /*  | */
    public static final int MAV_COMP_ID_MISSIONPLANNER = 190; /*  | */
    public static final int MAV_COMP_ID_PATHPLANNER = 195; /*  | */

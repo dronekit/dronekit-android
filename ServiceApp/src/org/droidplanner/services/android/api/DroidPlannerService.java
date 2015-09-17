@@ -4,8 +4,13 @@ import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.NetworkInfo;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -52,6 +57,8 @@ import timber.log.Timber;
  */
 public class DroidPlannerService extends Service {
 
+    private static final String TAG = DroidPlannerService.class.getName();
+
     /**
      * Status bar notification id
      */
@@ -66,10 +73,58 @@ public class DroidPlannerService extends Service {
     public static final String ACTION_RELEASE_API_INSTANCE = Utils.PACKAGE_NAME + ".action.RELEASE_API_INSTANCE";
     public static final String EXTRA_API_INSTANCE_APP_ID = "extra_api_instance_app_id";
 
+    private static final IntentFilter networkFilter = new IntentFilter();
+
+    static {
+        networkFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
+        networkFilter.addAction(WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION);
+    }
+
+    private final BroadcastReceiver networkReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final String action = intent.getAction();
+            switch(action){
+                case WifiManager.NETWORK_STATE_CHANGED_ACTION:
+                    NetworkInfo netInfo = intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
+                    NetworkInfo.State networkState = netInfo == null
+                            ? NetworkInfo.State.DISCONNECTED
+                            : netInfo.getState();
+
+                    switch (networkState) {
+                        case CONNECTED:
+                            final WifiInfo wifiInfo = intent.getParcelableExtra(WifiManager.EXTRA_WIFI_INFO);
+                            final String wifiSSID = wifiInfo.getSSID();
+                            Timber.i("Connected to " + wifiSSID);
+                            break;
+
+                        case DISCONNECTED:
+                            Timber.i("Disconnected from wifi network.");
+                            break;
+
+                        case CONNECTING:
+                            Timber.i( "Connecting to wifi network.");
+                            break;
+                    }
+                    break;
+
+                case WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION:
+                    final boolean isConnected = intent.getBooleanExtra(WifiManager.EXTRA_SUPPLICANT_CONNECTED, false);
+                    Timber.i("Supplicant connection " + (isConnected ? "established" : "broken"));
+                    break;
+            }
+        }
+    };
+
     /**
      * Used to broadcast service events.
      */
     private LocalBroadcastManager lbm;
+
+    /**
+     * Wifi wake lock.
+     */
+    private WifiManager.WifiLock wifiLock;
 
     /**
      * Stores drone api instances per connected client. The client are denoted by their app id.
@@ -370,6 +425,12 @@ public class DroidPlannerService extends Service {
 
         final Context context = getApplicationContext();
 
+        final WifiManager wifiMgr = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        wifiLock = wifiMgr.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, TAG);
+
+        Timber.i("Acquiring wifi wake lock.");
+        wifiLock.acquire();
+
         mavlinkApi = new MavLinkServiceApi(this);
         droneAccess = new DroneAccess(this);
         dpServices = new DPServices(this);
@@ -377,6 +438,8 @@ public class DroidPlannerService extends Service {
         this.cameraInfoLoader = new CameraInfoLoader(context);
 
         updateForegroundNotification();
+
+        registerReceiver(networkReceiver, networkFilter);
     }
 
     @SuppressLint("NewApi")
@@ -410,6 +473,8 @@ public class DroidPlannerService extends Service {
         super.onDestroy();
         Timber.d("Destroying 3DR Services.");
 
+        unregisterReceiver(networkReceiver);
+
         for (DroneApi droneApi : droneApiStore.values()) {
             droneApi.destroy();
         }
@@ -424,6 +489,12 @@ public class DroidPlannerService extends Service {
         dpServices.destroy();
 
         stopForeground(true);
+
+        if(wifiLock != null){
+            Timber.i("Releasing wifi wake lock.");
+            wifiLock.release();
+            wifiLock = null;
+        }
 
         final DroidPlannerServicesApp dpApp = (DroidPlannerServicesApp) getApplication();
         dpApp.closeLogFile();
