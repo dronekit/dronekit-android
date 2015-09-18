@@ -194,7 +194,7 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
         return heartbeat.getMavlinkVersion();
     }
 
-    protected void onHeartbeat(msg_heartbeat msg) {
+    protected void onHeartbeat(MAVLinkMessage msg) {
         heartbeat.onHeartbeat(msg);
     }
 
@@ -491,9 +491,10 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
         if (compId != AUTOPILOT_COMPONENT_ID
                 && compId != ARTOO_COMPONENT_ID
                 && compId != TELEMETRY_RADIO_COMPONENT_ID) {
-//            Timber.d("Received unsupported component id: %d", compId);
             return;
         }
+
+        onHeartbeat(message);
 
         if (getParameters().processMessage(message)) {
             return;
@@ -509,7 +510,6 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
                 processState(msg_heart);
                 ApmModes newMode = ApmModes.getMode(msg_heart.custom_mode, getType());
                 getState().setMode(newMode);
-                onHeartbeat(msg_heart);
                 break;
 
             case msg_statustext.MAVLINK_MSG_ID_STATUSTEXT:

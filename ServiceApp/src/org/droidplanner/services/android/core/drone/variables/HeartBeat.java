@@ -1,5 +1,6 @@
 package org.droidplanner.services.android.core.drone.variables;
 
+import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.common.msg_heartbeat;
 
 import org.droidplanner.services.android.core.drone.DroneInterfaces.DroneEventsType;
@@ -60,25 +61,35 @@ public class HeartBeat extends DroneVariable implements OnDroneListener {
         return mMavlinkVersion;
     }
 
-    public void onHeartbeat(msg_heartbeat msg) {
-        sysid = (byte) msg.sysid;
-        compid = (byte) msg.compid;
-        mMavlinkVersion = msg.mavlink_version;
+    public void onHeartbeat(MAVLinkMessage msg) {
+        msg_heartbeat heartBeatMsg = msg instanceof msg_heartbeat ? (msg_heartbeat) msg : null;
+        if(heartBeatMsg != null){
+            sysid = (byte) msg.sysid;
+            compid = (byte) msg.compid;
+            mMavlinkVersion = heartBeatMsg.mavlink_version;
+        }
 
         switch (heartbeatState) {
             case FIRST_HEARTBEAT:
-                notifyConnected();
-                Timber.d("Received first heartbeat.");
-                myDrone.notifyDroneEvent(DroneEventsType.HEARTBEAT_FIRST);
+                if(heartBeatMsg != null) {
+                    Timber.i("Received first heartbeat.");
+
+                    heartbeatState = HeartbeatState.NORMAL_HEARTBEAT;
+                    restartWatchdog(HEARTBEAT_NORMAL_TIMEOUT);
+
+                    myDrone.notifyDroneEvent(DroneEventsType.HEARTBEAT_FIRST);
+                }
                 break;
 
             case LOST_HEARTBEAT:
                 myDrone.notifyDroneEvent(DroneEventsType.HEARTBEAT_RESTORED);
+            // FALL THROUGH
+
+            default:
+                heartbeatState = HeartbeatState.NORMAL_HEARTBEAT;
+                restartWatchdog(HEARTBEAT_NORMAL_TIMEOUT);
                 break;
         }
-
-        heartbeatState = HeartbeatState.NORMAL_HEARTBEAT;
-        restartWatchdog(HEARTBEAT_NORMAL_TIMEOUT);
     }
 
     public boolean hasHeartbeat() {
@@ -108,10 +119,6 @@ public class HeartBeat extends DroneVariable implements OnDroneListener {
         }
     }
 
-    private void notifyConnected() {
-        restartWatchdog(HEARTBEAT_NORMAL_TIMEOUT);
-    }
-
     private void notifyDisconnected() {
         watchdog.removeCallbacks(watchdogCallback);
         heartbeatState = HeartbeatState.FIRST_HEARTBEAT;
@@ -126,7 +133,7 @@ public class HeartBeat extends DroneVariable implements OnDroneListener {
                 break;
 
             case FIRST_HEARTBEAT:
-                Timber.d("First heartbeat timeout.");
+                Timber.i("First heartbeat timeout.");
                 myDrone.notifyDroneEvent(DroneEventsType.CONNECTION_FAILED);
                 break;
 
