@@ -5,6 +5,7 @@ import android.text.TextUtils;
 
 import com.MAVLink.common.msg_statustext;
 import com.MAVLink.enums.MAV_TYPE;
+import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.property.DroneAttribute;
 import com.o3dr.services.android.lib.drone.property.State;
 
@@ -92,7 +93,8 @@ public class ArduSolo extends ArduCopter {
                 final String serialNumber = matcher.group(2) + matcher.group(3) + matcher.group(4);
                 if(!serialNumber.equalsIgnoreCase(pixhawkSerialNumber)){
                     pixhawkSerialNumber = serialNumber;
-                    notifyDroneEvent(DroneInterfaces.DroneEventsType.STATE);
+
+                    notifyAttributeListener(AttributeEvent.STATE_VEHICLE_UID);
                 }
             }
         }
