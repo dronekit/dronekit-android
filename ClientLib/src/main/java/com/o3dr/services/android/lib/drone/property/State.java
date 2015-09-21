@@ -25,6 +25,8 @@ public class State implements DroneAttribute {
 
     private Vibration vehicleVibration = new Vibration();
 
+    private String vehicleUid;
+
     public State() {
     }
 
@@ -144,6 +146,14 @@ public class State implements DroneAttribute {
         return vehicleVibration;
     }
 
+    public String getVehicleUid() {
+        return vehicleUid;
+    }
+
+    public void setVehicleUid(String vehicleUid) {
+        this.vehicleUid = vehicleUid;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -162,6 +172,7 @@ public class State implements DroneAttribute {
         dest.writeParcelable(this.ekfStatus, 0);
         dest.writeByte(isTelemetryLive ? (byte) 1 : (byte) 0);
         dest.writeParcelable(this.vehicleVibration, 0);
+        dest.writeString(this.vehicleUid);
     }
 
     private State(Parcel in) {
@@ -176,6 +187,7 @@ public class State implements DroneAttribute {
         this.ekfStatus = in.readParcelable(EkfStatus.class.getClassLoader());
         this.isTelemetryLive = in.readByte() != 0;
         this.vehicleVibration = in.readParcelable(Vibration.class.getClassLoader());
+        this.vehicleUid = in.readString();
     }
 
     public static final Creator<State> CREATOR = new Creator<State>() {

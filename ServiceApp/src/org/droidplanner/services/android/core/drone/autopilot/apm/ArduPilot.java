@@ -285,30 +285,29 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
 
     @Override
     public DroneAttribute getAttribute(String attributeType) {
-        if (TextUtils.isEmpty(attributeType))
-            return null;
+        if (!TextUtils.isEmpty(attributeType)) {
+            switch (attributeType) {
+                case AttributeType.GPS:
+                    return CommonApiUtils.getGps(this);
 
-        switch (attributeType) {
-            case AttributeType.GPS:
-                return CommonApiUtils.getGps(this);
+                case AttributeType.PARAMETERS:
+                    return CommonApiUtils.getParameters(this, context);
 
-            case AttributeType.PARAMETERS:
-                return CommonApiUtils.getParameters(this, context);
+                case AttributeType.HOME:
+                    return CommonApiUtils.getHome(this);
 
-            case AttributeType.HOME:
-                return CommonApiUtils.getHome(this);
+                case AttributeType.MISSION:
+                    return CommonApiUtils.getMission(this);
 
-            case AttributeType.MISSION:
-                return CommonApiUtils.getMission(this);
+                case AttributeType.TYPE:
+                    return CommonApiUtils.getType(this);
 
-            case AttributeType.TYPE:
-                return CommonApiUtils.getType(this);
+                case AttributeType.GUIDED_STATE:
+                    return CommonApiUtils.getGuidedState(this);
 
-            case AttributeType.GUIDED_STATE:
-                return CommonApiUtils.getGuidedState(this);
-
-            case AttributeType.MAGNETOMETER_CALIBRATION_STATUS:
-                return CommonApiUtils.getMagnetometerCalibrationStatus(this);
+                case AttributeType.MAGNETOMETER_CALIBRATION_STATUS:
+                    return CommonApiUtils.getMagnetometerCalibrationStatus(this);
+            }
         }
 
         return super.getAttribute(attributeType);
@@ -694,7 +693,7 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
                 (msg_heart.base_mode & MAV_MODE_FLAG.MAV_MODE_FLAG_SAFETY_ARMED) == MAV_MODE_FLAG.MAV_MODE_FLAG_SAFETY_ARMED);
     }
 
-    private void processStatusText(msg_statustext statusText) {
+    protected void processStatusText(msg_statustext statusText) {
         String message = statusText.getText();
         if (TextUtils.isEmpty(message))
             return;
