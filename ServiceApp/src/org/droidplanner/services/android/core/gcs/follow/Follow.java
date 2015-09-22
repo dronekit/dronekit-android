@@ -16,6 +16,7 @@ import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 
 public class Follow implements OnDroneListener, LocationReceiver {
 
+    private static final String TAG = Follow.class.getSimpleName();
     private Location lastLocation;
 
     /**
@@ -40,7 +41,7 @@ public class Follow implements OnDroneListener, LocationReceiver {
         followAlgorithm = FollowAlgorithm.FollowModes.LEASH.getAlgorithmType(droneMgr, handler);
 
         this.locationFinder = locationFinder;
-        locationFinder.setLocationListener(this);
+        locationFinder.addLocationListener(TAG, this);
     }
 
     public void toggleFollowMeState() {

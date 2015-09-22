@@ -110,4 +110,10 @@ public class AttributeEventExtra {
      */
     public static final String EXTRA_GIMBAL_ORIENTATION_YAW = PACKAGE_NAME + ".EXTRA_GIMBAL_ORIENTATION_YAW";
 
+    /**
+     * Used to retrieve the return to me state.
+     * @see {@link AttributeEvent#RETURN_TO_ME_STATE_UPDATE}
+     */
+    public static final String EXTRA_RETURN_TO_ME_STATE = PACKAGE_NAME + ".EXTRA_RETURN_TO_ME_STATE";
+
 }

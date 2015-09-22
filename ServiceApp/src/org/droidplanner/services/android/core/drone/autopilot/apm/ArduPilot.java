@@ -590,7 +590,7 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
             case msg_mission_item.MAVLINK_MSG_ID_MISSION_ITEM:
                 msg_mission_item missionItem = (msg_mission_item) message;
                 if (missionItem.seq == Home.HOME_WAYPOINT_INDEX) {
-                    getHome().setHome(missionItem);
+                    home.setHome(missionItem);
                 }
                 break;
 
