@@ -6,12 +6,30 @@ import com.MAVLink.common.msg_command_long;
 import com.MAVLink.common.msg_mission_set_current;
 import com.MAVLink.enums.GRIPPER_ACTIONS;
 import com.MAVLink.enums.MAV_CMD;
+import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.model.ICommandListener;
 
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.core.helpers.coordinates.Coord3D;
 
 public class MavLinkDoCmds {
+
+    public static void setVehicleHome(MavLinkDrone drone, LatLongAlt location, ICommandListener listener){
+        if(drone == null || location == null)
+            return;
+
+        msg_command_long msg = new msg_command_long();
+        msg.target_system = drone.getSysid();
+        msg.target_component = drone.getCompid();
+        msg.command = MAV_CMD.MAV_CMD_DO_SET_HOME;
+
+        msg.param5 = (float) location.getLatitude();
+        msg.param6 = (float) location.getLongitude();
+        msg.param7 = (float) location.getAltitude();
+
+        drone.getMavClient().sendMavMessage(msg, listener);
+    }
+
     public static void setROI(MavLinkDrone drone, Coord3D coord, ICommandListener listener) {
         if (drone == null)
             return;

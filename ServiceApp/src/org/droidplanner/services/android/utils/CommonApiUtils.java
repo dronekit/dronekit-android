@@ -26,9 +26,6 @@ import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
 import com.o3dr.services.android.lib.drone.mission.item.complex.CameraDetail;
 import com.o3dr.services.android.lib.drone.mission.item.complex.StructureScanner;
 import com.o3dr.services.android.lib.drone.mission.item.complex.Survey;
-import com.o3dr.services.android.lib.drone.property.Altitude;
-import com.o3dr.services.android.lib.drone.property.Attitude;
-import com.o3dr.services.android.lib.drone.property.Battery;
 import com.o3dr.services.android.lib.drone.property.CameraProxy;
 import com.o3dr.services.android.lib.drone.property.EkfStatus;
 import com.o3dr.services.android.lib.drone.property.FootPrint;
@@ -37,10 +34,10 @@ import com.o3dr.services.android.lib.drone.property.GuidedState;
 import com.o3dr.services.android.lib.drone.property.Home;
 import com.o3dr.services.android.lib.drone.property.Parameter;
 import com.o3dr.services.android.lib.drone.property.Parameters;
-import com.o3dr.services.android.lib.drone.property.Speed;
 import com.o3dr.services.android.lib.drone.property.State;
 import com.o3dr.services.android.lib.drone.property.Type;
 import com.o3dr.services.android.lib.drone.property.VehicleMode;
+import com.o3dr.services.android.lib.drone.property.Vibration;
 import com.o3dr.services.android.lib.gcs.follow.FollowState;
 import com.o3dr.services.android.lib.gcs.follow.FollowType;
 import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
@@ -56,9 +53,9 @@ import org.droidplanner.services.android.core.drone.variables.ApmModes;
 import org.droidplanner.services.android.core.drone.variables.Camera;
 import org.droidplanner.services.android.core.drone.variables.GPS;
 import org.droidplanner.services.android.core.drone.variables.GuidedPoint;
-import org.droidplanner.services.android.core.drone.variables.Orientation;
 import org.droidplanner.services.android.core.drone.variables.calibration.AccelCalibration;
 import org.droidplanner.services.android.core.drone.variables.calibration.MagnetometerCalibrationImpl;
+import org.droidplanner.services.android.core.firmware.FirmwareType;
 import org.droidplanner.services.android.core.gcs.follow.Follow;
 import org.droidplanner.services.android.core.gcs.follow.FollowAlgorithm;
 import org.droidplanner.services.android.core.helpers.coordinates.Coord2D;
@@ -262,12 +259,14 @@ public class CommonApiUtils {
                 MathUtils.coord2DToLatLong(footprint.getVertexInGlobalFrame()));
     }
 
-    public static FollowAlgorithm.FollowModes followTypeToMode(FollowType followType) {
+    public static FollowAlgorithm.FollowModes followTypeToMode(MavLinkDrone drone, FollowType followType) {
         final FollowAlgorithm.FollowModes followMode;
 
         switch (followType) {
             case ABOVE:
-                followMode = FollowAlgorithm.FollowModes.ABOVE;
+                followMode = (drone.getFirmwareType() == FirmwareType.ARDU_SOLO)
+                        ? FollowAlgorithm.FollowModes.SPLINE_ABOVE
+                        : FollowAlgorithm.FollowModes.ABOVE;
                 break;
 
             case LEAD:
@@ -276,7 +275,9 @@ public class CommonApiUtils {
 
             default:
             case LEASH:
-                followMode = FollowAlgorithm.FollowModes.LEASH;
+                followMode =  (drone.getFirmwareType() == FirmwareType.ARDU_SOLO)
+                        ? FollowAlgorithm.FollowModes.SPLINE_LEASH
+                        : FollowAlgorithm.FollowModes.LEASH;
                 break;
 
             case CIRCLE:
@@ -289,14 +290,6 @@ public class CommonApiUtils {
 
             case RIGHT:
                 followMode = FollowAlgorithm.FollowModes.RIGHT;
-                break;
-
-            case SPLINE_LEASH:
-                followMode = FollowAlgorithm.FollowModes.SPLINE_LEASH;
-                break;
-
-            case SPLINE_ABOVE:
-                followMode = FollowAlgorithm.FollowModes.SPLINE_ABOVE;
                 break;
 
             case GUIDED_SCAN:
@@ -320,6 +313,7 @@ public class CommonApiUtils {
         switch (followMode) {
             default:
             case LEASH:
+            case SPLINE_LEASH:
                 followType = FollowType.LEASH;
                 break;
 
@@ -340,15 +334,8 @@ public class CommonApiUtils {
                 break;
 
             case ABOVE:
-                followType = FollowType.ABOVE;
-                break;
-
-            case SPLINE_LEASH:
-                followType = FollowType.SPLINE_LEASH;
-                break;
-
             case SPLINE_ABOVE:
-                followType = FollowType.SPLINE_ABOVE;
+                followType = FollowType.ABOVE;
                 break;
 
             case GUIDED_SCAN:
@@ -407,7 +394,7 @@ public class CommonApiUtils {
                 droneGps.getFixTypeNumeric());
     }
 
-    public static State getState(MavLinkDrone drone, boolean isConnected) {
+    public static State getState(MavLinkDrone drone, boolean isConnected, Vibration vibration) {
         if (drone == null)
             return new State();
 
@@ -423,7 +410,9 @@ public class CommonApiUtils {
 
         return new State(isConnected, CommonApiUtils.getVehicleMode(droneMode), droneState.isArmed(), droneState.isFlying(),
                 droneState.getErrorId(), drone.getMavlinkVersion(), calibrationMessage,
-                droneState.getFlightStartTime(), proxyEkfStatus, isConnected && drone.isConnectionAlive());
+                droneState.getFlightStartTime(), proxyEkfStatus,
+                isConnected && drone.isConnectionAlive(),
+                vibration);
     }
 
     public static Parameters getParameters(MavLinkDrone drone, Context context) {
@@ -457,21 +446,12 @@ public class CommonApiUtils {
         return new Parameters(new ArrayList<>(proxyParams.values()));
     }
 
-    public static Speed getSpeed(MavLinkDrone drone) {
-        if (drone == null)
-            return new Speed();
-
-        org.droidplanner.services.android.core.drone.variables.Speed droneSpeed = drone.getSpeed();
-        return new Speed(droneSpeed.getVerticalSpeed(), droneSpeed.getGroundSpeed(), droneSpeed.getAirSpeed());
+    public static float fromRadToDeg(float rad) {
+        return (float) (rad * 180f / Math.PI);
     }
 
-    public static Attitude getAttitude(MavLinkDrone drone) {
-        if (drone == null)
-            return new Attitude();
-
-        Orientation droneOrientation = drone.getOrientation();
-        return new Attitude(droneOrientation.getRoll(), droneOrientation.getPitch(),
-                droneOrientation.getYaw());
+    public static float fromDegToRad(float deg) {
+        return (float) (deg * Math.PI / 180f);
     }
 
     public static Home getHome(MavLinkDrone drone) {
@@ -485,23 +465,6 @@ public class CommonApiUtils {
                 : null;
 
         return new Home(homePosition);
-    }
-
-    public static Battery getBattery(MavLinkDrone drone) {
-        if (drone == null)
-            return new Battery();
-
-        org.droidplanner.services.android.core.drone.variables.Battery droneBattery = drone.getBattery();
-        return new Battery(droneBattery.getBattVolt(), droneBattery.getBattRemain(),
-                droneBattery.getBattCurrent(), droneBattery.getBattDischarge());
-    }
-
-    public static Altitude getAltitude(MavLinkDrone drone) {
-        if (drone == null)
-            return new Altitude();
-
-        org.droidplanner.services.android.core.drone.variables.Altitude droneAltitude = drone.getAltitude();
-        return new Altitude(droneAltitude.getAltitude(), droneAltitude.getTargetAltitude());
     }
 
     public static Mission getMission(MavLinkDrone drone) {
@@ -949,7 +912,7 @@ public class CommonApiUtils {
         if (droneMgr == null)
             return;
 
-        final FollowAlgorithm.FollowModes selectedMode = CommonApiUtils.followTypeToMode(followType);
+        final FollowAlgorithm.FollowModes selectedMode = CommonApiUtils.followTypeToMode(droneMgr.getDrone(), followType);
 
         if (selectedMode != null) {
             final Follow followMe = droneMgr.getFollowMe();
@@ -961,7 +924,7 @@ public class CommonApiUtils {
 
             FollowAlgorithm currentAlg = followMe.getFollowAlgorithm();
             if (currentAlg.getType() != selectedMode) {
-                if(selectedMode == FollowAlgorithm.FollowModes.SOLO_SHOT && !SoloApiUtils.isSoloLinkFeatureAvailable(droneMgr, listener))
+                if (selectedMode == FollowAlgorithm.FollowModes.SOLO_SHOT && !SoloApiUtils.isSoloLinkFeatureAvailable(droneMgr, listener))
                     return;
 
                 followMe.setAlgorithm(selectedMode.getAlgorithmType(droneMgr, droneHandler));

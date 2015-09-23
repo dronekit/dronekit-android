@@ -5,6 +5,8 @@ import android.util.Pair;
 import com.MAVLink.common.msg_mission_ack;
 import com.MAVLink.common.msg_mission_item;
 import com.MAVLink.enums.MAV_CMD;
+import com.o3dr.services.android.lib.drone.attribute.AttributeType;
+import com.o3dr.services.android.lib.drone.property.Attitude;
 
 import org.droidplanner.services.android.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.services.android.core.drone.DroneVariable;
@@ -30,6 +32,7 @@ import org.droidplanner.services.android.core.mission.waypoints.SpatialCoordItem
 import org.droidplanner.services.android.core.mission.waypoints.SplineWaypointImpl;
 import org.droidplanner.services.android.core.mission.waypoints.WaypointImpl;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
+import org.droidplanner.services.android.core.parameters.Parameter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -373,7 +376,8 @@ public class Mission extends DroneVariable {
             return -1;
         }
 
-        final double bearing = 180 + myDrone.getOrientation().getYaw();
+        final Attitude attitude = (Attitude) myDrone.getAttribute(AttributeType.ATTITUDE);
+        final double bearing = 180 + attitude.getYaw();
         items.clear();
         items.addAll(createDronie(currentPosition,
                 GeoTools.newCoordFromBearingAndDistance(currentPosition, bearing, 50.0)));
@@ -383,12 +387,22 @@ public class Mission extends DroneVariable {
         return bearing;
     }
 
+    private double getSpeedParameter(){
+        Parameter param = myDrone.getParameters().getParameter("WPNAV_SPEED");
+        if (param == null ) {
+            return -1;
+        }else{
+            return (param.value/100);
+        }
+
+    }
+
     public List<MissionItem> createDronie(Coord2D start, Coord2D end) {
         final int startAltitude = 4;
         final int roiDistance = -8;
         Coord2D slowDownPoint = GeoTools.pointAlongTheLine(start, end, 5);
 
-        double defaultSpeed = myDrone.getSpeed().getSpeedParameter();
+        double defaultSpeed = getSpeedParameter();
         if (defaultSpeed == -1) {
             defaultSpeed = 5;
         }

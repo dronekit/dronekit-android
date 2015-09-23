@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import com.o3dr.android.client.Drone;
 import com.o3dr.services.android.lib.coordinate.LatLong;
+import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.property.Gps;
@@ -17,19 +18,15 @@ import java.util.concurrent.ConcurrentHashMap;
 import static com.o3dr.services.android.lib.drone.action.ConnectionActions.ACTION_CONNECT;
 import static com.o3dr.services.android.lib.drone.action.ConnectionActions.ACTION_DISCONNECT;
 import static com.o3dr.services.android.lib.drone.action.ConnectionActions.EXTRA_CONNECT_PARAMETER;
-import static com.o3dr.services.android.lib.drone.action.GuidedActions.ACTION_DO_GUIDED_TAKEOFF;
-import static com.o3dr.services.android.lib.drone.action.GuidedActions.ACTION_SEND_GUIDED_POINT;
-import static com.o3dr.services.android.lib.drone.action.GuidedActions.ACTION_SET_GUIDED_ALTITUDE;
-import static com.o3dr.services.android.lib.drone.action.GuidedActions.EXTRA_ALTITUDE;
-import static com.o3dr.services.android.lib.drone.action.GuidedActions.EXTRA_FORCE_GUIDED_POINT;
-import static com.o3dr.services.android.lib.drone.action.GuidedActions.EXTRA_GUIDED_POINT;
 import static com.o3dr.services.android.lib.drone.action.ParameterActions.ACTION_REFRESH_PARAMETERS;
 import static com.o3dr.services.android.lib.drone.action.ParameterActions.ACTION_WRITE_PARAMETERS;
 import static com.o3dr.services.android.lib.drone.action.ParameterActions.EXTRA_PARAMETERS;
 import static com.o3dr.services.android.lib.drone.action.StateActions.ACTION_ARM;
+import static com.o3dr.services.android.lib.drone.action.StateActions.ACTION_SET_VEHICLE_HOME;
 import static com.o3dr.services.android.lib.drone.action.StateActions.ACTION_SET_VEHICLE_MODE;
 import static com.o3dr.services.android.lib.drone.action.StateActions.EXTRA_ARM;
 import static com.o3dr.services.android.lib.drone.action.StateActions.EXTRA_EMERGENCY_DISARM;
+import static com.o3dr.services.android.lib.drone.action.StateActions.EXTRA_VEHICLE_HOME_LOCATION;
 import static com.o3dr.services.android.lib.drone.action.StateActions.EXTRA_VEHICLE_MODE;
 
 /**
@@ -47,6 +44,7 @@ public class VehicleApi extends Api {
 
     /**
      * Retrieves a vehicle api instance.
+     *
      * @param drone target vehicle
      * @return a VehicleApi instance.
      */
@@ -55,9 +53,11 @@ public class VehicleApi extends Api {
     }
 
     private final Drone drone;
+    private final ControlApi controlApi;
 
-    private VehicleApi(Drone drone){
+    private VehicleApi(Drone drone) {
         this.drone = drone;
+        this.controlApi = ControlApi.getApi(drone);
     }
 
     /**
@@ -65,7 +65,7 @@ public class VehicleApi extends Api {
      *
      * @param parameter parameter for the connection.
      */
-    public void connect(ConnectionParameter parameter){
+    public void connect(ConnectionParameter parameter) {
         Bundle params = new Bundle();
         params.putParcelable(EXTRA_CONNECT_PARAMETER, parameter);
         Action connectAction = new Action(ACTION_CONNECT, params);
@@ -75,7 +75,7 @@ public class VehicleApi extends Api {
     /**
      * Break connection with the vehicle.
      */
-    public void disconnect(){
+    public void disconnect() {
         drone.performAsyncAction(new Action(ACTION_DISCONNECT));
     }
 
@@ -91,10 +91,10 @@ public class VehicleApi extends Api {
     /**
      * Arm or disarm the connected drone.
      *
-     * @param arm             true to arm, false to disarm.
+     * @param arm      true to arm, false to disarm.
      * @param listener Register a callback to receive update of the command execution state.
      */
-    public void arm(boolean arm, AbstractCommandListener listener){
+    public void arm(boolean arm, AbstractCommandListener listener) {
         arm(arm, false, listener);
     }
 
@@ -104,7 +104,7 @@ public class VehicleApi extends Api {
      * @param arm             true to arm, false to disarm.
      * @param emergencyDisarm true to skip landing check and disarm immediately,
      *                        false to disarm only if it is safe to do so.
-     * @param listener Register a callback to receive update of the command execution state.
+     * @param listener        Register a callback to receive update of the command execution state.
      */
     public void arm(boolean arm, boolean emergencyDisarm, AbstractCommandListener listener) {
         Bundle params = new Bundle();
@@ -135,37 +135,62 @@ public class VehicleApi extends Api {
     }
 
     /**
+     * Generate action used to refresh the parameters for the connected drone.
+     */
+    public void refreshParameters() {
+        drone.performAsyncAction(new Action(ACTION_REFRESH_PARAMETERS));
+    }
+
+    /**
+     * Generate action used to write the given parameters to the connected drone.
+     *
+     * @param parameters parameters to write to the drone.
+     * @return
+     */
+    public void writeParameters(Parameters parameters) {
+        Bundle params = new Bundle();
+        params.putParcelable(EXTRA_PARAMETERS, parameters);
+        drone.performAsyncAction(new Action(ACTION_WRITE_PARAMETERS, params));
+    }
+
+    /*
+    Deprecated apis
+     */
+
+    /**
+     * @deprecated Use {@link ControlApi#takeoff(double, AbstractCommandListener)} instead.
      * Perform a guided take off.
      *
      * @param altitude altitude in meters
      */
     public void takeoff(double altitude) {
-        takeoff(altitude, null);
+        controlApi.takeoff(altitude, null);
     }
 
     /**
+     * @deprecated Use {@link ControlApi#takeoff(double, AbstractCommandListener)} instead.
      * Perform a guided take off.
      *
      * @param altitude altitude in meters
      * @param listener Register a callback to receive update of the command execution state.
      */
     public void takeoff(double altitude, AbstractCommandListener listener) {
-        Bundle params = new Bundle();
-        params.putDouble(EXTRA_ALTITUDE, altitude);
-        drone.performAsyncActionOnDroneThread(new Action(ACTION_DO_GUIDED_TAKEOFF, params), listener);
+        controlApi.takeoff(altitude, listener);
     }
 
     /**
+     * @deprecated Use {@link ControlApi#goTo(LatLong, boolean, AbstractCommandListener)} instead.
      * Send a guided point to the connected drone.
      *
      * @param point guided point location
      * @param force true to enable guided mode is required.
      */
     public void sendGuidedPoint(LatLong point, boolean force) {
-        sendGuidedPoint(point, force, null);
+        controlApi.goTo(point, force, null);
     }
 
     /**
+     * @deprecated Use {@link ControlApi#goTo(LatLong, boolean, AbstractCommandListener)} instead.
      * Send a guided point to the connected drone.
      *
      * @param point    guided point location
@@ -173,59 +198,45 @@ public class VehicleApi extends Api {
      * @param listener Register a callback to receive update of the command execution state.
      */
     public void sendGuidedPoint(LatLong point, boolean force, AbstractCommandListener listener) {
-        Bundle params = new Bundle();
-        params.putBoolean(EXTRA_FORCE_GUIDED_POINT, force);
-        params.putParcelable(EXTRA_GUIDED_POINT, point);
-        drone.performAsyncActionOnDroneThread(new Action(ACTION_SEND_GUIDED_POINT, params), listener);
+        controlApi.goTo(point, force, listener);
     }
 
     /**
+     * @deprecated Use {@link ControlApi#climbTo(double)} instead.
      * Set the altitude for the guided point.
      *
      * @param altitude altitude in meters
      */
     public void setGuidedAltitude(double altitude) {
-        Bundle params = new Bundle();
-        params.putDouble(EXTRA_ALTITUDE, altitude);
-        drone.performAsyncAction(new Action(ACTION_SET_GUIDED_ALTITUDE, params));
+        controlApi.climbTo(altitude);
     }
 
     /**
+     * @deprecated Use {@link ControlApi#pauseAtCurrentLocation(AbstractCommandListener)} instead.
      * Pause the vehicle at its current location.
      */
     public void pauseAtCurrentLocation() {
-        pauseAtCurrentLocation(null);
+        controlApi.pauseAtCurrentLocation(null);
     }
 
     /**
+     * @deprecated Use {@link ControlApi#pauseAtCurrentLocation(AbstractCommandListener)} instead.
      * Pause the vehicle at its current location.
      *
      * @param listener Register a callback to receive update of the command execution state.
      */
     public void pauseAtCurrentLocation(final AbstractCommandListener listener) {
-        drone.getAttributeAsync(AttributeType.GPS, new Drone.AttributeRetrievedListener<Gps>() {
-            @Override
-            public void onRetrievalSucceed(Gps gps) {
-                sendGuidedPoint(gps.getPosition(), true, listener);
-            }
-        });
+        controlApi.pauseAtCurrentLocation(listener);
     }
 
     /**
-     * Generate action used to refresh the parameters for the connected drone.
+     * Changes the vehicle home location.
+     * @param homeLocation New home coordinate
+     * @param listener Register a callback to receive update of the command execution state.
      */
-    public void refreshParameters(){
-        drone.performAsyncAction(new Action(ACTION_REFRESH_PARAMETERS));
-    }
-
-    /**
-     * Generate action used to write the given parameters to the connected drone.
-     * @param parameters parameters to write to the drone.
-     * @return
-     */
-    public void writeParameters(Parameters parameters){
+    public void setVehicleHome(final LatLongAlt homeLocation, final AbstractCommandListener listener){
         Bundle params = new Bundle();
-        params.putParcelable(EXTRA_PARAMETERS, parameters);
-        drone.performAsyncAction(new Action(ACTION_WRITE_PARAMETERS, params));
+        params.putParcelable(EXTRA_VEHICLE_HOME_LOCATION, homeLocation);
+        drone.performAsyncActionOnDroneThread(new Action(ACTION_SET_VEHICLE_HOME, params), listener);
     }
 }

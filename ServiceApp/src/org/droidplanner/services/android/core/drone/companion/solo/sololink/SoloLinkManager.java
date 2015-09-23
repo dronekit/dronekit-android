@@ -142,8 +142,7 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
     }
 
     public boolean areVersionsSet(){
-        return !TextUtils.isEmpty(vehicleVersion.get()) && !TextUtils.isEmpty(pixhawkVersion.get())
-                && !TextUtils.isEmpty(gimbalVersion.get());
+        return !TextUtils.isEmpty(vehicleVersion.get()) && !TextUtils.isEmpty(pixhawkVersion.get());
     }
 
     @Override
