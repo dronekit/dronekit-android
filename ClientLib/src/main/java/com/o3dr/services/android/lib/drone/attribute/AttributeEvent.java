@@ -171,6 +171,12 @@ public class AttributeEvent {
     public static final String STATE_VEHICLE_VIBRATION = PACKAGE_NAME + ".STATE_VEHICLE_VIBRATION";
 
     /**
+     * Signals vehicle UID updates.
+     * @see {@link com.o3dr.services.android.lib.drone.property.State}
+     */
+    public static final String STATE_VEHICLE_UID = PACKAGE_NAME + ".STATE_VEHICLE_UID";
+
+    /**
      * Home attribute events.
      */
     public static final String HOME_UPDATED = PACKAGE_NAME + ".HOME_UPDATED";
