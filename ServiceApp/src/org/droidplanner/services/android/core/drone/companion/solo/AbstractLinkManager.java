@@ -192,7 +192,7 @@ public abstract class AbstractLinkManager<T extends AbstractLinkManager.LinkList
     }
 
     private void setMacAddress(String trimmedResponse) {
-        Timber.i("Retrieved mac address: %s" + trimmedResponse);
+        Timber.i("Retrieved mac address: %s", trimmedResponse);
         macAddress.set(trimmedResponse);
         if(linkListener != null){
             linkListener.onMacAddressUpdated();

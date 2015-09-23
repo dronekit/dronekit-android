@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.view.Surface;
 
 import org.droidplanner.services.android.core.drone.companion.solo.AbstractLinkManager;
+import org.droidplanner.services.android.utils.connection.SshConnection;
 import org.droidplanner.services.android.utils.connection.UdpConnection;
 import org.droidplanner.services.android.utils.video.DecoderListener;
 import org.droidplanner.services.android.utils.video.MediaCodecManager;
@@ -64,6 +65,11 @@ public class VideoManager extends AbstractLinkManager {
     public void refreshState() {
         //We're good to go for the video stream.
         Timber.d( "Connected to video stream");
+    }
+
+    @Override
+    protected SshConnection getSshLink() {
+        return ControllerLinkManager.sshLink;
     }
 
     @Override

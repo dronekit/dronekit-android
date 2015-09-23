@@ -101,7 +101,7 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
     private final TcpConnection videoHandshake;
     private final TcpConnection batteryConnection;
 
-    private static final SshConnection sshLink = new SshConnection(ARTOO_IP, SoloComp.SSH_USERNAME,
+    protected static final SshConnection sshLink = new SshConnection(ARTOO_IP, SoloComp.SSH_USERNAME,
             SoloComp.SSH_PASSWORD);
 
     private final Runnable artooVersionRetriever = new Runnable() {
