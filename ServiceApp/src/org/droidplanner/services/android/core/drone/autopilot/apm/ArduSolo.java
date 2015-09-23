@@ -29,6 +29,7 @@ public class ArduSolo extends ArduCopter {
     private static final String PIXHAWK_SERIAL_NUMBER_REGEX = ".*PX4v2 (([0-9A-F]{8}) ([0-9A-F]{8}) ([0-9A-F]{8}))";
     private static final Pattern PIXHAWK_SERIAL_NUMBER_PATTERN = Pattern.compile(PIXHAWK_SERIAL_NUMBER_REGEX);
 
+    private static final String SERIAL_NUMBER_LABEL = "serial_number";
     private String pixhawkSerialNumber;
 
     public ArduSolo(Context context, MAVLinkStreams.MAVLinkOutputStream mavClient, DroneInterfaces.Handler handler, Preferences pref, AutopilotWarningParser warningParser, LogMessageListener logListener, DroneInterfaces.AttributeEventListener listener) {
@@ -52,7 +53,7 @@ public class ArduSolo extends ArduCopter {
     public DroneAttribute getAttribute(String attributeType){
         final DroneAttribute attribute = super.getAttribute(attributeType);
         if(attribute instanceof State){
-            ((State) attribute).setVehicleUid(pixhawkSerialNumber);
+            ((State) attribute).addToVehicleUid(SERIAL_NUMBER_LABEL, pixhawkSerialNumber);
         }
 
         return attribute;

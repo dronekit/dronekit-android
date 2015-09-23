@@ -170,7 +170,7 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
     private final Runnable artooModeRetriever = new Runnable(){
             @Override
             public void run() {
-                Timber.d("Retrieving controller mode");
+                Timber.i("Retrieving controller mode");
                 try{
                     final String response = sshLink.execute("sololink_config --get-ui-mode");
                     final String trimmedResponse = TextUtils.isEmpty(response) ? "" : response.trim();
@@ -399,6 +399,9 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
     public void refreshState() {
         Timber.d("Artoo link connected.");
 
+        //Load the mac address for the vehicle.
+        loadMacAddress();
+
         startVideoManager();
 
         //Update sololink wifi
@@ -408,6 +411,11 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
 
         //Update the tx power compliance
         loadCurrentEUTxPowerComplianceMode();
+    }
+
+    @Override
+    protected SshConnection getSshLink() {
+        return sshLink;
     }
 
     private void onVersionsUpdated(){

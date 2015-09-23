@@ -3,14 +3,18 @@ package org.droidplanner.services.android.core.drone.companion.solo;
 import android.content.Context;
 import android.os.Handler;
 import android.os.RemoteException;
+import android.text.TextUtils;
 
 import com.o3dr.services.android.lib.model.ICommandListener;
 
 import org.droidplanner.services.android.utils.connection.AbstractIpConnection;
 import org.droidplanner.services.android.utils.connection.IpConnectionListener;
+import org.droidplanner.services.android.utils.connection.SshConnection;
 
+import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import timber.log.Timber;
 
@@ -18,6 +22,8 @@ import timber.log.Timber;
  * Created by Fredia Huya-Kouadio on 2/20/15.
  */
 public abstract class AbstractLinkManager<T extends AbstractLinkManager.LinkListener> implements IpConnectionListener {
+
+    protected static final String SOLO_MAC_ADDRESS_COMMAND = "/sbin/ifconfig wlan0 | awk '/HWaddr/ {print $NF}'";
 
     protected static final long RECONNECT_COUNTDOWN = 1000l; //ms
 
@@ -29,6 +35,8 @@ public abstract class AbstractLinkManager<T extends AbstractLinkManager.LinkList
         void onLinkDisconnected();
 
         void onVersionsUpdated();
+
+        void onMacAddressUpdated();
     }
 
     private final Runnable reconnectTask = new Runnable() {
@@ -38,6 +46,22 @@ public abstract class AbstractLinkManager<T extends AbstractLinkManager.LinkList
             linkConn.connect();
         }
     };
+
+    private final Runnable macAddressRetriever = new Runnable() {
+        @Override
+        public void run() {
+            try{
+                final String response = getSshLink().execute(SOLO_MAC_ADDRESS_COMMAND);
+                final String trimmedResponse = TextUtils.isEmpty(response) ? "" : response.trim();
+
+                setMacAddress(trimmedResponse);
+            } catch (IOException e) {
+                Timber.e(e, "Error occurred while retrieving sololink mac address");
+            }
+        }
+    };
+
+    private final AtomicReference<String> macAddress = new AtomicReference<>("");
 
     private final ExecutorService asyncExecutor;
     protected final Handler handler;
@@ -109,6 +133,8 @@ public abstract class AbstractLinkManager<T extends AbstractLinkManager.LinkList
         }
     }
 
+    protected abstract SshConnection getSshLink();
+
     public boolean isLinkConnected() {
         return this.linkConn.getConnectionStatus() == AbstractIpConnection.STATE_CONNECTED;
     }
@@ -159,5 +185,21 @@ public abstract class AbstractLinkManager<T extends AbstractLinkManager.LinkList
 
     protected boolean shouldReconnect(){
         return true;
+    }
+
+    protected void loadMacAddress(){
+        postAsyncTask(macAddressRetriever);
+    }
+
+    private void setMacAddress(String trimmedResponse) {
+        Timber.i("Retrieved mac address: %s" + trimmedResponse);
+        macAddress.set(trimmedResponse);
+        if(linkListener != null){
+            linkListener.onMacAddressUpdated();
+        }
+    }
+
+    public String getMacAddress(){
+        return macAddress.get();
     }
 }
