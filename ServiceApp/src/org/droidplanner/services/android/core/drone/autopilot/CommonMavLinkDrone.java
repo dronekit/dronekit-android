@@ -50,7 +50,7 @@ public abstract class CommonMavLinkDrone implements MavLinkDrone {
     protected final Type type;
     private final State state;
 
-    protected final DroneInterfaces.AttributeEventListener attributeListener;
+    private final DroneInterfaces.AttributeEventListener attributeListener;
 
     protected final Altitude altitude = new Altitude();
     protected final Speed speed = new Speed();
@@ -87,6 +87,16 @@ public abstract class CommonMavLinkDrone implements MavLinkDrone {
     @Override
     public void removeDroneListener(DroneInterfaces.OnDroneListener listener) {
         events.removeDroneListener(listener);
+    }
+
+    protected void notifyAttributeListener(String attributeEvent){
+        notifyAttributeListener(attributeEvent, null);
+    }
+
+    protected void notifyAttributeListener(String attributeEvent, Bundle eventInfo){
+        if(attributeListener != null){
+            attributeListener.onAttributeEvent(attributeEvent, eventInfo);
+        }
     }
 
     @Override
@@ -229,8 +239,8 @@ public abstract class CommonMavLinkDrone implements MavLinkDrone {
             wasUpdated = true;
         }
 
-        if(wasUpdated && attributeListener != null){
-            attributeListener.onAttributeEvent(AttributeEvent.STATE_VEHICLE_VIBRATION, null);
+        if(wasUpdated){
+            notifyAttributeListener(AttributeEvent.STATE_VEHICLE_VIBRATION);
         }
     }
 
