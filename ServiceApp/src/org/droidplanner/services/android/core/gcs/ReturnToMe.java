@@ -31,7 +31,7 @@ import timber.log.Timber;
  */
 public class ReturnToMe implements DroneInterfaces.OnDroneListener, Location.LocationReceiver {
 
-    public static final int UPDATE_MINIMAL_DISPLACEMENT = 10; //meters
+    public static final int UPDATE_MINIMAL_DISPLACEMENT = 5; //meters
 
     private static final String TAG = ReturnToMe.class.getSimpleName();
 
