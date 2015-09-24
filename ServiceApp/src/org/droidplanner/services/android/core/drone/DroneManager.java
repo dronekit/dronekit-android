@@ -38,6 +38,7 @@ import com.o3dr.services.android.lib.drone.connection.ConnectionType;
 import com.o3dr.services.android.lib.drone.connection.DroneSharePrefs;
 import com.o3dr.services.android.lib.drone.mission.action.MissionActions;
 import com.o3dr.services.android.lib.drone.property.DroneAttribute;
+import com.o3dr.services.android.lib.drone.property.State;
 import com.o3dr.services.android.lib.gcs.action.FollowMeActions;
 import com.o3dr.services.android.lib.gcs.follow.FollowType;
 import com.o3dr.services.android.lib.gcs.returnToMe.ReturnToMeState;
@@ -576,7 +577,14 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
                 return soloComp.getGoproState();
 
             default:
-                return drone.getAttribute(attributeType);
+                final DroneAttribute droneAttribute = drone.getAttribute(attributeType);
+                if(drone instanceof ArduSolo && isCompanionComputerEnabled() && droneAttribute instanceof State){
+                    final State droneState = (State) droneAttribute;
+                    droneState.addToVehicleUid("solo_mac_address", soloComp.getSoloMacAddress());
+                    droneState.addToVehicleUid("controller_mac_address", soloComp.getControllerMacAddress());
+                }
+
+                return droneAttribute;
         }
     }
 
