@@ -3,6 +3,7 @@ package com.o3dr.services.android.lib.gcs.returnToMe;
 import android.os.Parcel;
 import android.support.annotation.IntDef;
 
+import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.property.DroneAttribute;
 
 import java.lang.annotation.Retention;
@@ -24,6 +25,9 @@ public class ReturnToMeState implements DroneAttribute {
     public static final int STATE_WAITING_FOR_VEHICLE_GPS = 3;
     public static final int STATE_UPDATING_HOME = 4;
 
+    private LatLongAlt originalHomeLocation;
+    private LatLongAlt currentHomeLocation;
+
     @ReturnToMeStates
     private int state = STATE_IDLE;
 
@@ -42,6 +46,22 @@ public class ReturnToMeState implements DroneAttribute {
         this.state = state;
     }
 
+    public LatLongAlt getCurrentHomeLocation() {
+        return currentHomeLocation;
+    }
+
+    public void setCurrentHomeLocation(LatLongAlt currentHomeLocation) {
+        this.currentHomeLocation = currentHomeLocation;
+    }
+
+    public LatLongAlt getOriginalHomeLocation() {
+        return originalHomeLocation;
+    }
+
+    public void setOriginalHomeLocation(LatLongAlt originalHomeLocation) {
+        this.originalHomeLocation = originalHomeLocation;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -50,11 +70,17 @@ public class ReturnToMeState implements DroneAttribute {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(this.state);
+
+        dest.writeParcelable(this.originalHomeLocation, 0);
+        dest.writeParcelable(this.currentHomeLocation, 0);
     }
 
     protected ReturnToMeState(Parcel in) {
         @ReturnToMeStates final int temp = in.readInt();
         this.state = temp;
+
+        this.originalHomeLocation = in.readParcelable(LatLongAlt.class.getClassLoader());
+        this.currentHomeLocation = in.readParcelable(LatLongAlt.class.getClassLoader());
     }
 
     public static final Creator<ReturnToMeState> CREATOR = new Creator<ReturnToMeState>() {

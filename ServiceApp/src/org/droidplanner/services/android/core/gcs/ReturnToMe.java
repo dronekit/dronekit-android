@@ -14,6 +14,7 @@ import org.droidplanner.services.android.core.MAVLink.command.doCmd.MavLinkDoCmd
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
 import org.droidplanner.services.android.core.drone.DroneInterfaces.AttributeEventListener;
 import org.droidplanner.services.android.core.drone.DroneManager;
+import org.droidplanner.services.android.core.drone.autopilot.Drone;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.core.drone.variables.Home;
 import org.droidplanner.services.android.core.gcs.location.Location;
@@ -51,6 +52,14 @@ public class ReturnToMe implements DroneInterfaces.OnDroneListener, Location.Loc
 
         this.attributeListener = listener;
         this.currentState = new ReturnToMeState();
+
+        final MavLinkDrone drone = droneMgr.getDrone();
+        drone.addDroneListener(this);
+
+        final Home droneHome = drone.getHome();
+        if(droneHome.isValid()){
+            currentState.setOriginalHomeLocation(droneHome.getCoord());
+        }
     }
 
     public void enable(ICommandListener listener){
@@ -143,6 +152,15 @@ public class ReturnToMe implements DroneInterfaces.OnDroneListener, Location.Loc
             case DISCONNECTED:
                 //Stops updating the vehicle RTL location
                 disable();
+                break;
+
+            case HOME:
+                final LatLongAlt homeCoord = drone.getHome().getCoord();
+                if(currentState.getOriginalHomeLocation() == null)
+                    currentState.setOriginalHomeLocation(homeCoord);
+                else{
+                    currentState.setCurrentHomeLocation(homeCoord);
+                }
                 break;
         }
     }

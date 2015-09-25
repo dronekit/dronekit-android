@@ -40,10 +40,12 @@ import com.o3dr.services.android.lib.drone.action.StateActions;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
+import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.drone.mission.action.MissionActions;
 import com.o3dr.services.android.lib.drone.property.DroneAttribute;
 import com.o3dr.services.android.lib.gcs.action.CalibrationActions;
 import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
+import com.o3dr.services.android.lib.model.AbstractCommandListener;
 import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
 
@@ -309,7 +311,7 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
     }
 
     @Override
-    public boolean executeAsyncAction(Action action, ICommandListener listener) {
+    public boolean executeAsyncAction(Action action, final ICommandListener listener) {
         final String type = action.getType();
         Bundle data = action.getData();
 
@@ -417,6 +419,32 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
                 boolean doArm = data.getBoolean(StateActions.EXTRA_ARM);
                 boolean emergencyDisarm = data.getBoolean(StateActions.EXTRA_EMERGENCY_DISARM);
                 CommonApiUtils.arm(this, doArm, emergencyDisarm, listener);
+                return true;
+
+            case StateActions.ACTION_SET_VEHICLE_HOME:
+                final LatLongAlt homeLoc = data.getParcelable(StateActions.EXTRA_VEHICLE_HOME_LOCATION);
+                if(homeLoc != null){
+                    MavLinkDoCmds.setVehicleHome(this, homeLoc, new AbstractCommandListener() {
+                        @Override
+                        public void onSuccess() {
+                            CommonApiUtils.postSuccessEvent(listener);
+                            home.requestHomeUpdate();
+                        }
+
+                        @Override
+                        public void onError(int executionError) {
+                            CommonApiUtils.postErrorEvent(executionError, listener);
+                        }
+
+                        @Override
+                        public void onTimeout() {
+                            CommonApiUtils.postTimeoutEvent(listener);
+                        }
+                    });
+                }
+                else {
+                    CommonApiUtils.postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
+                }
                 return true;
 
             //CALIBRATION ACTIONS
