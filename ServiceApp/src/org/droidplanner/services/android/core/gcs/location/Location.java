@@ -5,17 +5,19 @@ import org.droidplanner.services.android.core.helpers.coordinates.Coord3D;
 public class Location {
 
     public interface LocationReceiver {
-        public void onLocationUpdate(Location location);
+        void onLocationUpdate(Location location);
 
-        public void onLocationUnavailable();
+        void onLocationUnavailable();
     }
 
     public interface LocationFinder {
-        public void enableLocationUpdates();
+        void enableLocationUpdates();
 
-        public void disableLocationUpdates();
+        void disableLocationUpdates();
 
-        public void setLocationListener(LocationReceiver receiver);
+        void addLocationListener(String tag, LocationReceiver receiver);
+
+        void removeLocationListener(String tag);
     }
 
     private Coord3D coordinate;
@@ -37,7 +39,11 @@ public class Location {
     }
 
     public boolean isAccurate() {
-        return this.isAccurate;
+        return !isInvalid() && this.isAccurate;
+    }
+
+    private boolean isInvalid(){
+        return this.coordinate == null || (this.coordinate.getLat() == 0 && this.coordinate.getLng() == 0);
     }
 
     public double getBearing() {

@@ -134,13 +134,6 @@ public abstract class CommonMavLinkDrone implements MavLinkDrone {
                 CommonApiUtils.changeVehicleMode(this, newMode, listener);
                 return true;
 
-            case StateActions.ACTION_SET_VEHICLE_HOME:
-                final LatLongAlt homeLoc = data.getParcelable(StateActions.EXTRA_VEHICLE_HOME_LOCATION);
-                if(homeLoc != null){
-                    MavLinkDoCmds.setVehicleHome(this, homeLoc, listener);
-                }
-                return true;
-
             default:
                 CommonApiUtils.postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
                 return true;

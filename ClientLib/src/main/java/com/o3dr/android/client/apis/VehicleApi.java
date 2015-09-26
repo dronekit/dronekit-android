@@ -5,9 +5,7 @@ import android.os.Bundle;
 import com.o3dr.android.client.Drone;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
-import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
-import com.o3dr.services.android.lib.drone.property.Gps;
 import com.o3dr.services.android.lib.drone.property.Parameters;
 import com.o3dr.services.android.lib.drone.property.VehicleMode;
 import com.o3dr.services.android.lib.model.AbstractCommandListener;
@@ -22,10 +20,12 @@ import static com.o3dr.services.android.lib.drone.action.ParameterActions.ACTION
 import static com.o3dr.services.android.lib.drone.action.ParameterActions.ACTION_WRITE_PARAMETERS;
 import static com.o3dr.services.android.lib.drone.action.ParameterActions.EXTRA_PARAMETERS;
 import static com.o3dr.services.android.lib.drone.action.StateActions.ACTION_ARM;
+import static com.o3dr.services.android.lib.drone.action.StateActions.ACTION_ENABLE_RETURN_TO_ME;
 import static com.o3dr.services.android.lib.drone.action.StateActions.ACTION_SET_VEHICLE_HOME;
 import static com.o3dr.services.android.lib.drone.action.StateActions.ACTION_SET_VEHICLE_MODE;
 import static com.o3dr.services.android.lib.drone.action.StateActions.EXTRA_ARM;
 import static com.o3dr.services.android.lib.drone.action.StateActions.EXTRA_EMERGENCY_DISARM;
+import static com.o3dr.services.android.lib.drone.action.StateActions.EXTRA_IS_RETURN_TO_ME_ENABLED;
 import static com.o3dr.services.android.lib.drone.action.StateActions.EXTRA_VEHICLE_HOME_LOCATION;
 import static com.o3dr.services.android.lib.drone.action.StateActions.EXTRA_VEHICLE_MODE;
 
@@ -158,54 +158,49 @@ public class VehicleApi extends Api {
      */
 
     /**
+     * @param altitude altitude in meters
      * @deprecated Use {@link ControlApi#takeoff(double, AbstractCommandListener)} instead.
      * Perform a guided take off.
-     *
-     * @param altitude altitude in meters
      */
     public void takeoff(double altitude) {
         controlApi.takeoff(altitude, null);
     }
 
     /**
-     * @deprecated Use {@link ControlApi#takeoff(double, AbstractCommandListener)} instead.
-     * Perform a guided take off.
-     *
      * @param altitude altitude in meters
      * @param listener Register a callback to receive update of the command execution state.
+     * @deprecated Use {@link ControlApi#takeoff(double, AbstractCommandListener)} instead.
+     * Perform a guided take off.
      */
     public void takeoff(double altitude, AbstractCommandListener listener) {
         controlApi.takeoff(altitude, listener);
     }
 
     /**
-     * @deprecated Use {@link ControlApi#goTo(LatLong, boolean, AbstractCommandListener)} instead.
-     * Send a guided point to the connected drone.
-     *
      * @param point guided point location
      * @param force true to enable guided mode is required.
+     * @deprecated Use {@link ControlApi#goTo(LatLong, boolean, AbstractCommandListener)} instead.
+     * Send a guided point to the connected drone.
      */
     public void sendGuidedPoint(LatLong point, boolean force) {
         controlApi.goTo(point, force, null);
     }
 
     /**
-     * @deprecated Use {@link ControlApi#goTo(LatLong, boolean, AbstractCommandListener)} instead.
-     * Send a guided point to the connected drone.
-     *
      * @param point    guided point location
      * @param force    true to enable guided mode is required.
      * @param listener Register a callback to receive update of the command execution state.
+     * @deprecated Use {@link ControlApi#goTo(LatLong, boolean, AbstractCommandListener)} instead.
+     * Send a guided point to the connected drone.
      */
     public void sendGuidedPoint(LatLong point, boolean force, AbstractCommandListener listener) {
         controlApi.goTo(point, force, listener);
     }
 
     /**
+     * @param altitude altitude in meters
      * @deprecated Use {@link ControlApi#climbTo(double)} instead.
      * Set the altitude for the guided point.
-     *
-     * @param altitude altitude in meters
      */
     public void setGuidedAltitude(double altitude) {
         controlApi.climbTo(altitude);
@@ -220,10 +215,9 @@ public class VehicleApi extends Api {
     }
 
     /**
+     * @param listener Register a callback to receive update of the command execution state.
      * @deprecated Use {@link ControlApi#pauseAtCurrentLocation(AbstractCommandListener)} instead.
      * Pause the vehicle at its current location.
-     *
-     * @param listener Register a callback to receive update of the command execution state.
      */
     public void pauseAtCurrentLocation(final AbstractCommandListener listener) {
         controlApi.pauseAtCurrentLocation(listener);
@@ -231,12 +225,24 @@ public class VehicleApi extends Api {
 
     /**
      * Changes the vehicle home location.
+     *
      * @param homeLocation New home coordinate
-     * @param listener Register a callback to receive update of the command execution state.
+     * @param listener     Register a callback to receive update of the command execution state.
      */
-    public void setVehicleHome(final LatLongAlt homeLocation, final AbstractCommandListener listener){
+    public void setVehicleHome(final LatLongAlt homeLocation, final AbstractCommandListener listener) {
         Bundle params = new Bundle();
         params.putParcelable(EXTRA_VEHICLE_HOME_LOCATION, homeLocation);
         drone.performAsyncActionOnDroneThread(new Action(ACTION_SET_VEHICLE_HOME, params), listener);
+    }
+
+    /**
+     * Enables 'return to me'
+     * @param isEnabled
+     * @param listener
+     */
+    public void enableReturnToMe(boolean isEnabled, final AbstractCommandListener listener){
+        Bundle params = new Bundle();
+        params.putBoolean(EXTRA_IS_RETURN_TO_ME_ENABLED, isEnabled);
+        drone.performAsyncActionOnDroneThread(new Action(ACTION_ENABLE_RETURN_TO_ME, params), listener);
     }
 }

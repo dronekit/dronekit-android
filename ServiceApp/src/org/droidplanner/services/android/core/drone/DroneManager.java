@@ -11,10 +11,12 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.ardupilotmega.msg_mag_cal_progress;
 import com.MAVLink.ardupilotmega.msg_mag_cal_report;
 import com.MAVLink.common.msg_command_ack;
+import com.google.android.gms.location.LocationRequest;
 import com.o3dr.android.client.apis.CapabilityApi;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.action.CapabilityActions;
+import com.o3dr.services.android.lib.drone.action.StateActions;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
@@ -39,6 +41,7 @@ import com.o3dr.services.android.lib.drone.property.DroneAttribute;
 import com.o3dr.services.android.lib.drone.property.State;
 import com.o3dr.services.android.lib.gcs.action.FollowMeActions;
 import com.o3dr.services.android.lib.gcs.follow.FollowType;
+import com.o3dr.services.android.lib.gcs.returnToMe.ReturnToMeState;
 import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
 
@@ -60,6 +63,7 @@ import org.droidplanner.services.android.core.drone.variables.HeartBeat;
 import org.droidplanner.services.android.core.drone.variables.calibration.MagnetometerCalibrationImpl;
 import org.droidplanner.services.android.core.firmware.FirmwareType;
 import org.droidplanner.services.android.core.gcs.GCSHeartbeat;
+import org.droidplanner.services.android.core.gcs.ReturnToMe;
 import org.droidplanner.services.android.core.gcs.follow.Follow;
 import org.droidplanner.services.android.core.gcs.follow.FollowAlgorithm;
 import org.droidplanner.services.android.core.gcs.location.FusedLocation;
@@ -98,6 +102,7 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
 
     private MavLinkDrone drone;
     private Follow followMe;
+    private ReturnToMe returnToMe;
 
     private final MAVLinkClient mavClient;
     private final MavLinkMsgHandler mavLinkMsgHandler;
@@ -278,6 +283,8 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
         this.drone.getStreamRates().setRates(dpPrefs.getRates());
 
         this.followMe = new Follow(this, handler, new FusedLocation(context, handler));
+        this.returnToMe = new ReturnToMe(this, new FusedLocation(context, handler,
+                LocationRequest.PRIORITY_HIGH_ACCURACY, 1000L, 1000L, ReturnToMe.UPDATE_MINIMAL_DISPLACEMENT), this);
 
         drone.addDroneListener(this);
         drone.getParameters().setParameterListener(this);
@@ -312,6 +319,9 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
 
         if (followMe != null && followMe.isEnabled())
             followMe.toggleFollowMeState();
+
+        if(returnToMe != null)
+            returnToMe.disable();
     }
 
     public void connect(String appId, DroneEventsListener listener) throws ConnectionException {
@@ -557,6 +567,9 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
             case AttributeType.FOLLOW_STATE:
                 return CommonApiUtils.getFollowState(followMe);
 
+            case AttributeType.RETURN_TO_ME_STATE:
+                return returnToMe == null ? new ReturnToMeState() : returnToMe.getState();
+
             case SoloAttributes.SOLO_STATE:
                 return SoloApiUtils.getSoloLinkState(this);
 
@@ -631,6 +644,23 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
 
             case FollowMeActions.ACTION_DISABLE_FOLLOW_ME:
                 CommonApiUtils.disableFollowMe(followMe);
+                return true;
+
+            //************ RETURN TO ME ACTIONS *********//
+            case StateActions.ACTION_ENABLE_RETURN_TO_ME:
+                final boolean isEnabled = data.getBoolean(StateActions.EXTRA_IS_RETURN_TO_ME_ENABLED, false);
+                if(returnToMe != null){
+                    if(isEnabled) {
+                        returnToMe.enable(listener);
+                    }
+                    else{
+                        returnToMe.disable();
+                    }
+                    CommonApiUtils.postSuccessEvent(listener);
+                }
+                else{
+                    CommonApiUtils.postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
+                }
                 return true;
 
             //************ SOLOLINK ACTIONS *************//
