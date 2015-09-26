@@ -434,11 +434,13 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
                         @Override
                         public void onError(int executionError) {
                             CommonApiUtils.postErrorEvent(executionError, listener);
+                            home.requestHomeUpdate();
                         }
 
                         @Override
                         public void onTimeout() {
                             CommonApiUtils.postTimeoutEvent(listener);
+                            home.requestHomeUpdate();
                         }
                     });
                 }

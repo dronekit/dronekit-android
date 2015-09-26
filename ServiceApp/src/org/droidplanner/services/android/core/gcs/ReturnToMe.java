@@ -55,16 +55,16 @@ public class ReturnToMe implements DroneInterfaces.OnDroneListener, Location.Loc
 
         final MavLinkDrone drone = droneMgr.getDrone();
         drone.addDroneListener(this);
-
-        final Home droneHome = drone.getHome();
-        if(droneHome.isValid()){
-            currentState.setOriginalHomeLocation(droneHome.getCoord());
-        }
     }
 
     public void enable(ICommandListener listener){
         if(isEnabled.compareAndSet(false, true)){
             this.commandListener = listener;
+
+            final Home droneHome = droneMgr.getDrone().getHome();
+            if(droneHome.isValid()){
+                currentState.setOriginalHomeLocation(droneHome.getCoord());
+            }
 
             //Enable return to me
             Timber.i("Enabling return to me.");
@@ -78,6 +78,8 @@ public class ReturnToMe implements DroneInterfaces.OnDroneListener, Location.Loc
             //Disable return to me
             Timber.i("Disabling return to me.");
             locationFinder.disableLocationUpdates();
+
+            currentState.setCurrentHomeLocation(null);
             updateCurrentState(ReturnToMeState.STATE_IDLE);
 
             this.commandListener = null;
@@ -104,7 +106,6 @@ public class ReturnToMe implements DroneInterfaces.OnDroneListener, Location.Loc
             final float displacement = results[0];
 
             if(displacement >= UPDATE_MINIMAL_DISPLACEMENT){
-                updateCurrentState(ReturnToMeState.STATE_UPDATING_HOME);
                 MavLinkDoCmds.setVehicleHome(droneMgr.getDrone(),
                         new LatLongAlt(locationCoord.getLat(), locationCoord.getLng(), homePosition.getAltitude()),
                         new AbstractCommandListener() {
@@ -113,18 +114,22 @@ public class ReturnToMe implements DroneInterfaces.OnDroneListener, Location.Loc
                                 Timber.i("Updated vehicle home location to %s", locationCoord.toString());
                                 home.requestHomeUpdate();
                                 CommonApiUtils.postSuccessEvent(commandListener);
+                                updateCurrentState(ReturnToMeState.STATE_UPDATING_HOME);
                             }
 
                             @Override
                             public void onError(int executionError) {
                                 Timber.e("Unable to update vehicle home location: %d", executionError);
                                 CommonApiUtils.postErrorEvent(executionError, commandListener);
+                                updateCurrentState(ReturnToMeState.STATE_ERROR_UPDATING_HOME);
+
                             }
 
                             @Override
                             public void onTimeout() {
                                 Timber.w("Vehicle home update timed out!");
                                 CommonApiUtils.postTimeoutEvent(commandListener);
+                                updateCurrentState(ReturnToMeState.STATE_ERROR_UPDATING_HOME);
                             }
                         });
             }
@@ -155,11 +160,13 @@ public class ReturnToMe implements DroneInterfaces.OnDroneListener, Location.Loc
                 break;
 
             case HOME:
-                final LatLongAlt homeCoord = drone.getHome().getCoord();
-                if(currentState.getOriginalHomeLocation() == null)
-                    currentState.setOriginalHomeLocation(homeCoord);
-                else{
-                    currentState.setCurrentHomeLocation(homeCoord);
+                if(isEnabled.get()) {
+                    final LatLongAlt homeCoord = drone.getHome().getCoord();
+                    if (currentState.getOriginalHomeLocation() == null)
+                        currentState.setOriginalHomeLocation(homeCoord);
+                    else {
+                        currentState.setCurrentHomeLocation(homeCoord);
+                    }
                 }
                 break;
         }

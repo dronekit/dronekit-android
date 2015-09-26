@@ -38,22 +38,18 @@ public class Home extends DroneVariable implements DroneInterfaces.OnDroneListen
     }
 
     public void setHome(msg_mission_item msg) {
-        boolean homeLocationUpdated = false;
 
         if (this.coordinate == null) {
             this.coordinate = new LatLongAlt(msg.x, msg.y, msg.z);
-            homeLocationUpdated = true;
         } else if (this.coordinate.getLatitude() != msg.x
                 || this.coordinate.getLongitude() != msg.y
                 || this.coordinate.getAltitude() != msg.z) {
             this.coordinate.setLatitude(msg.x);
             this.coordinate.setLongitude(msg.y);
             this.coordinate.setAltitude(msg.z);
-            homeLocationUpdated = true;
         }
 
-        if (homeLocationUpdated)
-            myDrone.notifyDroneEvent(DroneEventsType.HOME);
+        myDrone.notifyDroneEvent(DroneEventsType.HOME);
     }
 
     public msg_mission_item packMavlink() {
@@ -83,7 +79,7 @@ public class Home extends DroneVariable implements DroneInterfaces.OnDroneListen
         }
     }
 
-    public void requestHomeUpdate(){
+    public void requestHomeUpdate() {
         requestHomeUpdate(myDrone);
     }
 

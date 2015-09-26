@@ -15,7 +15,7 @@ import java.lang.annotation.RetentionPolicy;
 public class ReturnToMeState implements DroneAttribute {
 
     @IntDef({STATE_IDLE, STATE_USER_LOCATION_UNAVAILABLE, STATE_USER_LOCATION_INACCURATE,
-            STATE_WAITING_FOR_VEHICLE_GPS, STATE_UPDATING_HOME})
+            STATE_WAITING_FOR_VEHICLE_GPS, STATE_UPDATING_HOME, STATE_ERROR_UPDATING_HOME})
     @Retention(RetentionPolicy.SOURCE)
     public @interface ReturnToMeStates{}
 
@@ -24,6 +24,7 @@ public class ReturnToMeState implements DroneAttribute {
     public static final int STATE_USER_LOCATION_INACCURATE = 2;
     public static final int STATE_WAITING_FOR_VEHICLE_GPS = 3;
     public static final int STATE_UPDATING_HOME = 4;
+    public static final int STATE_ERROR_UPDATING_HOME = 5;
 
     private LatLongAlt originalHomeLocation;
     private LatLongAlt currentHomeLocation;
