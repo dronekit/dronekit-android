@@ -57,7 +57,7 @@ import org.droidplanner.services.android.core.MAVLink.command.doCmd.MavLinkDoCmd
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
 import org.droidplanner.services.android.core.drone.LogMessageListener;
 import org.droidplanner.services.android.core.drone.Preferences;
-import org.droidplanner.services.android.core.drone.autopilot.generic.CommonMavLinkDrone;
+import org.droidplanner.services.android.core.drone.autopilot.generic.GenericMavLinkDrone;
 import org.droidplanner.services.android.core.drone.profiles.Parameters;
 import org.droidplanner.services.android.core.drone.profiles.VehicleProfile;
 import org.droidplanner.services.android.core.drone.variables.ApmModes;
@@ -80,7 +80,7 @@ import org.droidplanner.services.android.utils.CommonApiUtils;
 /**
  * Base class for the ArduPilot autopilots
  */
-public abstract class ArduPilot extends CommonMavLinkDrone {
+public abstract class ArduPilot extends GenericMavLinkDrone {
 
     public static final int AUTOPILOT_COMPONENT_ID = 1;
     public static final int ARTOO_COMPONENT_ID = 0;

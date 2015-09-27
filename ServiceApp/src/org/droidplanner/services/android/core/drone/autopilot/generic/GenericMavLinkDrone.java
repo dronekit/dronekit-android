@@ -44,7 +44,7 @@ import org.droidplanner.services.android.utils.CommonApiUtils;
  *
  * Created by Fredia Huya-Kouadio on 9/10/15.
  */
-public abstract class CommonMavLinkDrone implements MavLinkDrone {
+public abstract class GenericMavLinkDrone implements MavLinkDrone {
 
     private final MAVLinkStreams.MAVLinkOutputStream MavClient;
 
@@ -62,7 +62,7 @@ public abstract class CommonMavLinkDrone implements MavLinkDrone {
     protected final Attitude attitude = new Attitude();
     protected final Vibration vibration = new Vibration();
 
-    protected CommonMavLinkDrone(DroneInterfaces.Handler handler, MAVLinkStreams.MAVLinkOutputStream mavClient, AutopilotWarningParser warningParser, DroneInterfaces.AttributeEventListener listener) {
+    protected GenericMavLinkDrone(DroneInterfaces.Handler handler, MAVLinkStreams.MAVLinkOutputStream mavClient, AutopilotWarningParser warningParser, DroneInterfaces.AttributeEventListener listener) {
         this.MavClient = mavClient;
 
         events = new DroneEvents(this, handler);

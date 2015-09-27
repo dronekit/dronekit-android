@@ -4,7 +4,7 @@ import org.droidplanner.services.android.core.MAVLink.MAVLinkStreams;
 import org.droidplanner.services.android.core.MAVLink.WaypointManager;
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
 import org.droidplanner.services.android.core.drone.Preferences;
-import org.droidplanner.services.android.core.drone.autopilot.generic.CommonMavLinkDrone;
+import org.droidplanner.services.android.core.drone.autopilot.generic.GenericMavLinkDrone;
 import org.droidplanner.services.android.core.drone.profiles.Parameters;
 import org.droidplanner.services.android.core.drone.profiles.VehicleProfile;
 import org.droidplanner.services.android.core.drone.variables.Camera;
@@ -22,7 +22,7 @@ import org.droidplanner.services.android.core.model.AutopilotWarningParser;
 /**
  * Created by Fredia Huya-Kouadio on 9/10/15.
  */
-public class Px4Native extends CommonMavLinkDrone {
+public class Px4Native extends GenericMavLinkDrone {
 
     public Px4Native(DroneInterfaces.Handler handler, MAVLinkStreams.MAVLinkOutputStream mavClient, AutopilotWarningParser warningParser, DroneInterfaces.AttributeEventListener listener) {
         super(handler, mavClient, warningParser, listener);
