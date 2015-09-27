@@ -1,4 +1,4 @@
-package org.droidplanner.services.android.core.drone.autopilot;
+package org.droidplanner.services.android.core.drone.autopilot.generic;
 
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -31,7 +31,9 @@ import org.droidplanner.services.android.core.MAVLink.MAVLinkStreams;
 import org.droidplanner.services.android.core.MAVLink.command.doCmd.MavLinkDoCmds;
 import org.droidplanner.services.android.core.drone.DroneEvents;
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
+import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.core.drone.variables.State;
+import org.droidplanner.services.android.core.drone.variables.StreamRates;
 import org.droidplanner.services.android.core.drone.variables.Type;
 import org.droidplanner.services.android.core.model.AutopilotWarningParser;
 import org.droidplanner.services.android.utils.CommonApiUtils;
@@ -49,6 +51,7 @@ public abstract class CommonMavLinkDrone implements MavLinkDrone {
     private final DroneEvents events;
     protected final Type type;
     private final State state;
+    private final StreamRates streamRates;
 
     private final DroneInterfaces.AttributeEventListener attributeListener;
 
@@ -64,6 +67,7 @@ public abstract class CommonMavLinkDrone implements MavLinkDrone {
 
         events = new DroneEvents(this, handler);
         this.type = new Type(this);
+        this.streamRates = new StreamRates(this);
         this.state = new State(this, handler, warningParser);
 
         this.attributeListener = listener;
@@ -82,6 +86,11 @@ public abstract class CommonMavLinkDrone implements MavLinkDrone {
     @Override
     public void addDroneListener(DroneInterfaces.OnDroneListener listener) {
         events.addDroneListener(listener);
+    }
+
+    @Override
+    public StreamRates getStreamRates() {
+        return streamRates;
     }
 
     @Override
