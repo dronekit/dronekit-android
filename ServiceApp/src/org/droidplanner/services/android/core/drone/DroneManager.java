@@ -60,6 +60,7 @@ import org.droidplanner.services.android.core.drone.autopilot.apm.ArduSolo;
 import org.droidplanner.services.android.core.drone.autopilot.px4.Px4Native;
 import org.droidplanner.services.android.core.drone.companion.solo.SoloComp;
 import org.droidplanner.services.android.core.drone.variables.HeartBeat;
+import org.droidplanner.services.android.core.drone.variables.StreamRates;
 import org.droidplanner.services.android.core.drone.variables.calibration.MagnetometerCalibrationImpl;
 import org.droidplanner.services.android.core.firmware.FirmwareType;
 import org.droidplanner.services.android.core.gcs.GCSHeartbeat;
@@ -76,6 +77,8 @@ import org.droidplanner.services.android.utils.CommonApiUtils;
 import org.droidplanner.services.android.utils.SoloApiUtils;
 import org.droidplanner.services.android.utils.analytics.GAUtils;
 import org.droidplanner.services.android.utils.prefs.DroidPlannerPrefs;
+
+import org.droidplanner.services.android.core.drone.profiles.Parameters;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -280,15 +283,26 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
                 break;
         }
 
-        this.drone.getStreamRates().setRates(dpPrefs.getRates());
-
         this.followMe = new Follow(this, handler, new FusedLocation(context, handler));
         this.returnToMe = new ReturnToMe(this, new FusedLocation(context, handler,
                 LocationRequest.PRIORITY_HIGH_ACCURACY, 1000L, 1000L, ReturnToMe.UPDATE_MINIMAL_DISPLACEMENT), this);
 
+        final StreamRates streamRates = drone.getStreamRates();
+        if(streamRates != null) {
+            streamRates.setRates(dpPrefs.getRates());
+        }
+
         drone.addDroneListener(this);
-        drone.getParameters().setParameterListener(this);
-        drone.getMagnetometerCalibration().setListener(this);
+
+        final Parameters parameters = drone.getParameters();
+        if(parameters != null) {
+            parameters.setParameterListener(this);
+        }
+
+        final MagnetometerCalibrationImpl magnetometer = drone.getMagnetometerCalibration();
+        if(magnetometer != null) {
+            magnetometer.setListener(this);
+        }
     }
 
     public SoloComp getSoloComp() {
