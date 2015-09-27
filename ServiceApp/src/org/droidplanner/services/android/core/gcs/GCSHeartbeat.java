@@ -58,7 +58,7 @@ public class GCSHeartbeat {
      *
      * @param active true to activate the heartbeat, false to deactivate it
      */
-    public void setActive(boolean active) {
+    public synchronized void setActive(boolean active) {
         if (active) {
             if (heartbeatExecutor == null || heartbeatExecutor.isShutdown()) {
                 heartbeatExecutor = Executors.newSingleThreadScheduledExecutor();

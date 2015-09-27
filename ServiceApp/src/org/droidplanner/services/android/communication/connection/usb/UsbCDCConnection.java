@@ -19,6 +19,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
+import timber.log.Timber;
+
 class UsbCDCConnection extends UsbConnection.UsbConnectionImpl {
     private static final String TAG = UsbCDCConnection.class.getSimpleName();
     private static final String ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION";
@@ -78,7 +80,11 @@ class UsbCDCConnection extends UsbConnection.UsbConnectionImpl {
     }
 
     private void unregisterUsbPermissionBroadcastReceiver() {
-        mContext.unregisterReceiver(broadcastReceiver);
+        try {
+            mContext.unregisterReceiver(broadcastReceiver);
+        }catch(IllegalArgumentException e){
+            Timber.e(e, "Receiver was not registered.");
+        }
     }
 
     private void removeWatchdog() {

@@ -57,7 +57,7 @@ import org.droidplanner.services.android.core.MAVLink.command.doCmd.MavLinkDoCmd
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
 import org.droidplanner.services.android.core.drone.LogMessageListener;
 import org.droidplanner.services.android.core.drone.Preferences;
-import org.droidplanner.services.android.core.drone.autopilot.CommonMavLinkDrone;
+import org.droidplanner.services.android.core.drone.autopilot.generic.GenericMavLinkDrone;
 import org.droidplanner.services.android.core.drone.profiles.Parameters;
 import org.droidplanner.services.android.core.drone.profiles.VehicleProfile;
 import org.droidplanner.services.android.core.drone.variables.ApmModes;
@@ -69,7 +69,6 @@ import org.droidplanner.services.android.core.drone.variables.Home;
 import org.droidplanner.services.android.core.drone.variables.Magnetometer;
 import org.droidplanner.services.android.core.drone.variables.MissionStats;
 import org.droidplanner.services.android.core.drone.variables.RC;
-import org.droidplanner.services.android.core.drone.variables.StreamRates;
 import org.droidplanner.services.android.core.drone.variables.calibration.AccelCalibration;
 import org.droidplanner.services.android.core.drone.variables.calibration.MagnetometerCalibrationImpl;
 import org.droidplanner.services.android.core.helpers.coordinates.Coord3D;
@@ -81,7 +80,7 @@ import org.droidplanner.services.android.utils.CommonApiUtils;
 /**
  * Base class for the ArduPilot autopilots
  */
-public abstract class ArduPilot extends CommonMavLinkDrone {
+public abstract class ArduPilot extends GenericMavLinkDrone {
 
     public static final int AUTOPILOT_COMPONENT_ID = 1;
     public static final int ARTOO_COMPONENT_ID = 0;
@@ -94,7 +93,6 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
     private final Home home;
     private final Mission mission;
     private final MissionStats missionStats;
-    private final StreamRates streamRates;
     private final GuidedPoint guidedPoint;
     private final AccelCalibration accelCalibrationSetup;
     private final WaypointManager waypointManager;
@@ -129,7 +127,6 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
         this.home = new Home(this);
         this.mission = new Mission(this);
         this.missionStats = new MissionStats(this);
-        this.streamRates = new StreamRates(this);
         this.guidedPoint = new GuidedPoint(this, handler);
         this.accelCalibrationSetup = new AccelCalibration(this, handler);
         this.magCalibration = new MagnetometerCalibrationImpl(this);
@@ -233,11 +230,6 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
     @Override
     public MissionStats getMissionStats() {
         return missionStats;
-    }
-
-    @Override
-    public StreamRates getStreamRates() {
-        return streamRates;
     }
 
     @Override
