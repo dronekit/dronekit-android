@@ -521,6 +521,8 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
     @Override
     public void notifyReceivedData(MAVLinkPacket packet) {
         MAVLinkMessage receivedMsg = packet.unpack();
+        if(receivedMsg == null)
+            return;
 
         if (receivedMsg.msgid == msg_command_ack.MAVLINK_MSG_ID_COMMAND_ACK) {
             final msg_command_ack commandAck = (msg_command_ack) receivedMsg;
