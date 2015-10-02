@@ -351,7 +351,7 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
             String ssidUpdateResult = sshLink.execute(SOLOLINK_SSID_CONFIG_PATH + " --set-wifi-ssid " + wifiSsid);
             String passwordUpdateResult = sshLink.execute(SOLOLINK_SSID_CONFIG_PATH + " --set-wifi-password " +
                     password);
-            softRestartHostapdService();
+            restartController();
             return true;
         } catch (IOException e) {
             Timber.e(e, "Error occurred while updating the sololink wifi ssid.");
@@ -515,20 +515,20 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
             @Override
             public void run() {
                 final boolean supportControllerMode = doesSupportControllerMode();
-                if(!supportControllerMode){
+                if (!supportControllerMode) {
                     postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
                     return;
                 }
 
                 Timber.d("Switching controller unit to %s", unit);
-                try{
+                try {
                     final String command = SOLOLINK_SSID_CONFIG_PATH + " --set-ui-units %s";
                     final String response = sshLink.execute(String.format(Locale.US, command, unit));
                     Timber.d("Response from unit change was: %s", response);
                     postSuccessEvent(listener);
 
                     setControllerUnit(unit);
-                } catch(IOException e){
+                } catch (IOException e) {
                     Timber.e(e, "Error occurred while changing controller unit.");
                     postTimeoutEvent(listener);
                 }
@@ -605,7 +605,7 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
                             response = sshLink.execute(SOLOLINK_SSID_CONFIG_PATH + " --set-wifi-country US; echo $?");
                         }
                         if (response.trim().equals("0")) {
-                            hardRestartHostapdService();
+                            restartController();
                             Timber.d("wifi country successfully set, rebooting artoo");
 
                             isEUTxPowerCompliant.set(compliant);
@@ -635,15 +635,7 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
         postAsyncTask(unitsRetriever);
     }
 
-    private void hardRestartHostapdService(){
-        try {
-            sshLink.execute("/etc/init.d/hostapd restart");
-        } catch (IOException e) {
-            Timber.e(e, "Error occurred while restarting hostpad service on Artoo.");
-        }
-    }
-
-    private void softRestartHostapdService(){
+    private void restartController(){
         try {
             sshLink.execute(SOLOLINK_SSID_CONFIG_PATH +" --reboot");
         } catch (IOException e) {
