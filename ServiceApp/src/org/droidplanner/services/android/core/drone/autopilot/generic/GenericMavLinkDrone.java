@@ -1,4 +1,4 @@
-package org.droidplanner.services.android.core.drone.autopilot;
+package org.droidplanner.services.android.core.drone.autopilot.generic;
 
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -31,7 +31,9 @@ import org.droidplanner.services.android.core.MAVLink.MAVLinkStreams;
 import org.droidplanner.services.android.core.MAVLink.command.doCmd.MavLinkDoCmds;
 import org.droidplanner.services.android.core.drone.DroneEvents;
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
+import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.core.drone.variables.State;
+import org.droidplanner.services.android.core.drone.variables.StreamRates;
 import org.droidplanner.services.android.core.drone.variables.Type;
 import org.droidplanner.services.android.core.model.AutopilotWarningParser;
 import org.droidplanner.services.android.utils.CommonApiUtils;
@@ -42,13 +44,14 @@ import org.droidplanner.services.android.utils.CommonApiUtils;
  *
  * Created by Fredia Huya-Kouadio on 9/10/15.
  */
-public abstract class CommonMavLinkDrone implements MavLinkDrone {
+public abstract class GenericMavLinkDrone implements MavLinkDrone {
 
     private final MAVLinkStreams.MAVLinkOutputStream MavClient;
 
     private final DroneEvents events;
     protected final Type type;
     private final State state;
+    private final StreamRates streamRates;
 
     private final DroneInterfaces.AttributeEventListener attributeListener;
 
@@ -59,11 +62,12 @@ public abstract class CommonMavLinkDrone implements MavLinkDrone {
     protected final Attitude attitude = new Attitude();
     protected final Vibration vibration = new Vibration();
 
-    protected CommonMavLinkDrone(DroneInterfaces.Handler handler, MAVLinkStreams.MAVLinkOutputStream mavClient, AutopilotWarningParser warningParser, DroneInterfaces.AttributeEventListener listener) {
+    protected GenericMavLinkDrone(DroneInterfaces.Handler handler, MAVLinkStreams.MAVLinkOutputStream mavClient, AutopilotWarningParser warningParser, DroneInterfaces.AttributeEventListener listener) {
         this.MavClient = mavClient;
 
         events = new DroneEvents(this, handler);
         this.type = new Type(this);
+        this.streamRates = new StreamRates(this);
         this.state = new State(this, handler, warningParser);
 
         this.attributeListener = listener;
@@ -82,6 +86,11 @@ public abstract class CommonMavLinkDrone implements MavLinkDrone {
     @Override
     public void addDroneListener(DroneInterfaces.OnDroneListener listener) {
         events.addDroneListener(listener);
+    }
+
+    @Override
+    public StreamRates getStreamRates() {
+        return streamRates;
     }
 
     @Override

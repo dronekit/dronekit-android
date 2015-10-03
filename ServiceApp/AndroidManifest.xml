@@ -39,6 +39,7 @@
         android:allowBackup="true"
         android:theme="@style/AppTheme"
         android:icon="@drawable/ic_launcher"
+        android:largeHeap="true"
         android:label="@string/app_title">
 
         <meta-data
