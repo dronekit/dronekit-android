@@ -459,12 +459,7 @@ public class CommonApiUtils {
             return new Home();
 
         org.droidplanner.services.android.core.drone.variables.Home droneHome = drone.getHome();
-        LatLongAlt homePosition = droneHome.isValid()
-                ? new LatLongAlt(droneHome.getCoord().getLat(), droneHome.getCoord().getLng(),
-                droneHome.getAltitude())
-                : null;
-
-        return new Home(homePosition);
+        return new Home(droneHome.getCoord());
     }
 
     public static Mission getMission(MavLinkDrone drone) {

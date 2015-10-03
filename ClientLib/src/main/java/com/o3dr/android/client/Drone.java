@@ -40,6 +40,7 @@ import com.o3dr.services.android.lib.drone.property.Type;
 import com.o3dr.services.android.lib.drone.property.VehicleMode;
 import com.o3dr.services.android.lib.gcs.follow.FollowState;
 import com.o3dr.services.android.lib.gcs.follow.FollowType;
+import com.o3dr.services.android.lib.gcs.returnToMe.ReturnToMeState;
 import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
 import com.o3dr.services.android.lib.model.AbstractCommandListener;
 import com.o3dr.services.android.lib.model.IDroneApi;
@@ -358,6 +359,9 @@ public class Drone {
 
             case AttributeType.MAGNETOMETER_CALIBRATION_STATUS:
                 return (T) new MagnetometerCalibrationStatus();
+
+            case AttributeType.RETURN_TO_ME_STATE:
+                return (T) new ReturnToMeState();
 
             case AttributeType.CAMERA:
             case SoloAttributes.SOLO_STATE:

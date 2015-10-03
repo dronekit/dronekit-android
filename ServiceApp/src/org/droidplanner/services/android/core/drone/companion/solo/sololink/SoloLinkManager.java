@@ -3,6 +3,7 @@ package org.droidplanner.services.android.core.drone.companion.solo.sololink;
 import android.content.Context;
 import android.os.Handler;
 import android.text.TextUtils;
+import android.util.Log;
 
 import org.droidplanner.services.android.BuildConfig;
 import org.droidplanner.services.android.core.drone.companion.solo.AbstractLinkManager;
@@ -162,10 +163,18 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
     public void refreshState(){
         Timber.d("Connected to sololink.");
 
+        //Load the mac address for the vehicle.
+        loadMacAddress();
+
         loadPresetButtonSettings();
         loadGoproState();
 
         refreshSoloLinkVersions();
+    }
+
+    @Override
+    protected SshConnection getSshLink() {
+        return sshLink;
     }
 
     @Override
@@ -360,6 +369,5 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
         updatePixhawkVersion();
         updateGimbalVersion();
     }
-
 
 }

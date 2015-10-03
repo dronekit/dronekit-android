@@ -2,6 +2,7 @@ package org.droidplanner.services.android.ui.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -139,7 +140,8 @@ public class RecommendedAppsAdapter extends RecyclerView.Adapter<RecommendedApps
 
             viewHolder.actionButtonContainer.setVisibility(View.VISIBLE);
 
-            Intent tmpIntent = context.getPackageManager().getLaunchIntentForPackage(appId);
+            final PackageManager pm = context.getPackageManager();
+            Intent tmpIntent = pm.getLaunchIntentForPackage(appId);
             if (tmpIntent != null) {
                 //The app is installed on the device.
                 viewHolder.actionButton.setText(R.string.label_action_button_open);
@@ -149,6 +151,12 @@ public class RecommendedAppsAdapter extends RecyclerView.Adapter<RecommendedApps
                 tmpIntent = new Intent(Intent.ACTION_VIEW)
                         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         .setData(Uri.parse("market://details?id=" + appId));
+
+                if(pm.resolveActivity(tmpIntent, PackageManager.MATCH_DEFAULT_ONLY) == null){
+                    tmpIntent = new Intent(Intent.ACTION_VIEW)
+                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            .setData(Uri.parse("https://play.google.com/store/apps/details?id=" + appId));
+                }
 
                 viewHolder.actionButton.setText(R.string.label_action_button_install);
                 viewHolder.actionButton.setBackgroundResource(R.drawable.action_button_install_bg);

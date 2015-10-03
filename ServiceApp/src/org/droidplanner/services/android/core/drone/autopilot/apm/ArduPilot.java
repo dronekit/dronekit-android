@@ -40,10 +40,12 @@ import com.o3dr.services.android.lib.drone.action.StateActions;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
+import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.drone.mission.action.MissionActions;
 import com.o3dr.services.android.lib.drone.property.DroneAttribute;
 import com.o3dr.services.android.lib.gcs.action.CalibrationActions;
 import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
+import com.o3dr.services.android.lib.model.AbstractCommandListener;
 import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
 
@@ -55,7 +57,7 @@ import org.droidplanner.services.android.core.MAVLink.command.doCmd.MavLinkDoCmd
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
 import org.droidplanner.services.android.core.drone.LogMessageListener;
 import org.droidplanner.services.android.core.drone.Preferences;
-import org.droidplanner.services.android.core.drone.autopilot.CommonMavLinkDrone;
+import org.droidplanner.services.android.core.drone.autopilot.generic.GenericMavLinkDrone;
 import org.droidplanner.services.android.core.drone.profiles.Parameters;
 import org.droidplanner.services.android.core.drone.profiles.VehicleProfile;
 import org.droidplanner.services.android.core.drone.variables.ApmModes;
@@ -67,7 +69,6 @@ import org.droidplanner.services.android.core.drone.variables.Home;
 import org.droidplanner.services.android.core.drone.variables.Magnetometer;
 import org.droidplanner.services.android.core.drone.variables.MissionStats;
 import org.droidplanner.services.android.core.drone.variables.RC;
-import org.droidplanner.services.android.core.drone.variables.StreamRates;
 import org.droidplanner.services.android.core.drone.variables.calibration.AccelCalibration;
 import org.droidplanner.services.android.core.drone.variables.calibration.MagnetometerCalibrationImpl;
 import org.droidplanner.services.android.core.helpers.coordinates.Coord3D;
@@ -79,7 +80,7 @@ import org.droidplanner.services.android.utils.CommonApiUtils;
 /**
  * Base class for the ArduPilot autopilots
  */
-public abstract class ArduPilot extends CommonMavLinkDrone {
+public abstract class ArduPilot extends GenericMavLinkDrone {
 
     public static final int AUTOPILOT_COMPONENT_ID = 1;
     public static final int ARTOO_COMPONENT_ID = 0;
@@ -92,7 +93,6 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
     private final Home home;
     private final Mission mission;
     private final MissionStats missionStats;
-    private final StreamRates streamRates;
     private final GuidedPoint guidedPoint;
     private final AccelCalibration accelCalibrationSetup;
     private final WaypointManager waypointManager;
@@ -127,7 +127,6 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
         this.home = new Home(this);
         this.mission = new Mission(this);
         this.missionStats = new MissionStats(this);
-        this.streamRates = new StreamRates(this);
         this.guidedPoint = new GuidedPoint(this, handler);
         this.accelCalibrationSetup = new AccelCalibration(this, handler);
         this.magCalibration = new MagnetometerCalibrationImpl(this);
@@ -234,11 +233,6 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
     }
 
     @Override
-    public StreamRates getStreamRates() {
-        return streamRates;
-    }
-
-    @Override
     public GuidedPoint getGuidedPoint() {
         return guidedPoint;
     }
@@ -309,7 +303,7 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
     }
 
     @Override
-    public boolean executeAsyncAction(Action action, ICommandListener listener) {
+    public boolean executeAsyncAction(Action action, final ICommandListener listener) {
         final String type = action.getType();
         Bundle data = action.getData();
 
@@ -417,6 +411,34 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
                 boolean doArm = data.getBoolean(StateActions.EXTRA_ARM);
                 boolean emergencyDisarm = data.getBoolean(StateActions.EXTRA_EMERGENCY_DISARM);
                 CommonApiUtils.arm(this, doArm, emergencyDisarm, listener);
+                return true;
+
+            case StateActions.ACTION_SET_VEHICLE_HOME:
+                final LatLongAlt homeLoc = data.getParcelable(StateActions.EXTRA_VEHICLE_HOME_LOCATION);
+                if(homeLoc != null){
+                    MavLinkDoCmds.setVehicleHome(this, homeLoc, new AbstractCommandListener() {
+                        @Override
+                        public void onSuccess() {
+                            CommonApiUtils.postSuccessEvent(listener);
+                            home.requestHomeUpdate();
+                        }
+
+                        @Override
+                        public void onError(int executionError) {
+                            CommonApiUtils.postErrorEvent(executionError, listener);
+                            home.requestHomeUpdate();
+                        }
+
+                        @Override
+                        public void onTimeout() {
+                            CommonApiUtils.postTimeoutEvent(listener);
+                            home.requestHomeUpdate();
+                        }
+                    });
+                }
+                else {
+                    CommonApiUtils.postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
+                }
                 return true;
 
             //CALIBRATION ACTIONS
@@ -590,7 +612,7 @@ public abstract class ArduPilot extends CommonMavLinkDrone {
             case msg_mission_item.MAVLINK_MSG_ID_MISSION_ITEM:
                 msg_mission_item missionItem = (msg_mission_item) message;
                 if (missionItem.seq == Home.HOME_WAYPOINT_INDEX) {
-                    getHome().setHome(missionItem);
+                    home.setHome(missionItem);
                 }
                 break;
 

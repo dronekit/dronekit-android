@@ -11,10 +11,12 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.ardupilotmega.msg_mag_cal_progress;
 import com.MAVLink.ardupilotmega.msg_mag_cal_report;
 import com.MAVLink.common.msg_command_ack;
+import com.google.android.gms.location.LocationRequest;
 import com.o3dr.android.client.apis.CapabilityApi;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.action.CapabilityActions;
+import com.o3dr.services.android.lib.drone.action.StateActions;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
@@ -36,8 +38,10 @@ import com.o3dr.services.android.lib.drone.connection.ConnectionType;
 import com.o3dr.services.android.lib.drone.connection.DroneSharePrefs;
 import com.o3dr.services.android.lib.drone.mission.action.MissionActions;
 import com.o3dr.services.android.lib.drone.property.DroneAttribute;
+import com.o3dr.services.android.lib.drone.property.State;
 import com.o3dr.services.android.lib.gcs.action.FollowMeActions;
 import com.o3dr.services.android.lib.gcs.follow.FollowType;
+import com.o3dr.services.android.lib.gcs.returnToMe.ReturnToMeState;
 import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
 
@@ -56,9 +60,11 @@ import org.droidplanner.services.android.core.drone.autopilot.apm.ArduSolo;
 import org.droidplanner.services.android.core.drone.autopilot.px4.Px4Native;
 import org.droidplanner.services.android.core.drone.companion.solo.SoloComp;
 import org.droidplanner.services.android.core.drone.variables.HeartBeat;
+import org.droidplanner.services.android.core.drone.variables.StreamRates;
 import org.droidplanner.services.android.core.drone.variables.calibration.MagnetometerCalibrationImpl;
 import org.droidplanner.services.android.core.firmware.FirmwareType;
 import org.droidplanner.services.android.core.gcs.GCSHeartbeat;
+import org.droidplanner.services.android.core.gcs.ReturnToMe;
 import org.droidplanner.services.android.core.gcs.follow.Follow;
 import org.droidplanner.services.android.core.gcs.follow.FollowAlgorithm;
 import org.droidplanner.services.android.core.gcs.location.FusedLocation;
@@ -71,6 +77,8 @@ import org.droidplanner.services.android.utils.CommonApiUtils;
 import org.droidplanner.services.android.utils.SoloApiUtils;
 import org.droidplanner.services.android.utils.analytics.GAUtils;
 import org.droidplanner.services.android.utils.prefs.DroidPlannerPrefs;
+
+import org.droidplanner.services.android.core.drone.profiles.Parameters;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -97,6 +105,7 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
 
     private MavLinkDrone drone;
     private Follow followMe;
+    private ReturnToMe returnToMe;
 
     private final MAVLinkClient mavClient;
     private final MavLinkMsgHandler mavLinkMsgHandler;
@@ -274,13 +283,26 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
                 break;
         }
 
-        this.drone.getStreamRates().setRates(dpPrefs.getRates());
-
         this.followMe = new Follow(this, handler, new FusedLocation(context, handler));
+        this.returnToMe = new ReturnToMe(this, new FusedLocation(context, handler,
+                LocationRequest.PRIORITY_HIGH_ACCURACY, 1000L, 1000L, ReturnToMe.UPDATE_MINIMAL_DISPLACEMENT), this);
+
+        final StreamRates streamRates = drone.getStreamRates();
+        if(streamRates != null) {
+            streamRates.setRates(dpPrefs.getRates());
+        }
 
         drone.addDroneListener(this);
-        drone.getParameters().setParameterListener(this);
-        drone.getMagnetometerCalibration().setListener(this);
+
+        final Parameters parameters = drone.getParameters();
+        if(parameters != null) {
+            parameters.setParameterListener(this);
+        }
+
+        final MagnetometerCalibrationImpl magnetometer = drone.getMagnetometerCalibration();
+        if(magnetometer != null) {
+            magnetometer.setListener(this);
+        }
     }
 
     public SoloComp getSoloComp() {
@@ -311,6 +333,9 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
 
         if (followMe != null && followMe.isEnabled())
             followMe.toggleFollowMeState();
+
+        if(returnToMe != null)
+            returnToMe.disable();
     }
 
     public void connect(String appId, DroneEventsListener listener) throws ConnectionException {
@@ -496,6 +521,8 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
     @Override
     public void notifyReceivedData(MAVLinkPacket packet) {
         MAVLinkMessage receivedMsg = packet.unpack();
+        if(receivedMsg == null)
+            return;
 
         if (receivedMsg.msgid == msg_command_ack.MAVLINK_MSG_ID_COMMAND_ACK) {
             final msg_command_ack commandAck = (msg_command_ack) receivedMsg;
@@ -556,6 +583,9 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
             case AttributeType.FOLLOW_STATE:
                 return CommonApiUtils.getFollowState(followMe);
 
+            case AttributeType.RETURN_TO_ME_STATE:
+                return returnToMe == null ? new ReturnToMeState() : returnToMe.getState();
+
             case SoloAttributes.SOLO_STATE:
                 return SoloApiUtils.getSoloLinkState(this);
 
@@ -563,7 +593,14 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
                 return soloComp.getGoproState();
 
             default:
-                return drone.getAttribute(attributeType);
+                final DroneAttribute droneAttribute = drone.getAttribute(attributeType);
+                if(drone instanceof ArduSolo && isCompanionComputerEnabled() && droneAttribute instanceof State){
+                    final State droneState = (State) droneAttribute;
+                    droneState.addToVehicleUid("solo_mac_address", soloComp.getSoloMacAddress());
+                    droneState.addToVehicleUid("controller_mac_address", soloComp.getControllerMacAddress());
+                }
+
+                return droneAttribute;
         }
     }
 
@@ -623,6 +660,23 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
 
             case FollowMeActions.ACTION_DISABLE_FOLLOW_ME:
                 CommonApiUtils.disableFollowMe(followMe);
+                return true;
+
+            //************ RETURN TO ME ACTIONS *********//
+            case StateActions.ACTION_ENABLE_RETURN_TO_ME:
+                final boolean isEnabled = data.getBoolean(StateActions.EXTRA_IS_RETURN_TO_ME_ENABLED, false);
+                if(returnToMe != null){
+                    if(isEnabled) {
+                        returnToMe.enable(listener);
+                    }
+                    else{
+                        returnToMe.disable();
+                    }
+                    CommonApiUtils.postSuccessEvent(listener);
+                }
+                else{
+                    CommonApiUtils.postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
+                }
                 return true;
 
             //************ SOLOLINK ACTIONS *************//

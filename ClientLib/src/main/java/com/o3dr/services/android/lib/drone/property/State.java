@@ -3,11 +3,17 @@ package com.o3dr.services.android.lib.drone.property;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.TextUtils;
+import android.util.Log;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * Created by fhuya on 10/28/14.
  */
 public class State implements DroneAttribute {
+
+    private static final String TAG = State.class.getSimpleName();
 
     public static final int INVALID_MAVLINK_VERSION = -1;
 
@@ -25,15 +31,18 @@ public class State implements DroneAttribute {
 
     private Vibration vehicleVibration = new Vibration();
 
-    private String vehicleUid;
+    private final JSONObject vehicleUid;
 
     public State() {
+        this.vehicleUid = new JSONObject();
     }
 
     public State(boolean isConnected, VehicleMode mode, boolean armed, boolean flying,
                  String autopilotErrorId, int mavlinkVersion, String calibrationStatus,
                  long flightStartTime, EkfStatus ekfStatus, boolean isTelemetryLive,
                  Vibration vibration) {
+        this.vehicleUid  = new JSONObject();
+
         this.isConnected = isConnected;
         this.armed = armed;
         this.isFlying = flying;
@@ -146,12 +155,16 @@ public class State implements DroneAttribute {
         return vehicleVibration;
     }
 
-    public String getVehicleUid() {
+    public JSONObject getVehicleUid() {
         return vehicleUid;
     }
 
-    public void setVehicleUid(String vehicleUid) {
-        this.vehicleUid = vehicleUid;
+    public void addToVehicleUid(String uidLabel, String uid) {
+        try {
+            this.vehicleUid.put(uidLabel, uid);
+        } catch (JSONException e) {
+            Log.e(TAG, e.getMessage(), e);
+        }
     }
 
     @Override
@@ -172,7 +185,7 @@ public class State implements DroneAttribute {
         dest.writeParcelable(this.ekfStatus, 0);
         dest.writeByte(isTelemetryLive ? (byte) 1 : (byte) 0);
         dest.writeParcelable(this.vehicleVibration, 0);
-        dest.writeString(this.vehicleUid);
+        dest.writeString(this.vehicleUid.toString());
     }
 
     private State(Parcel in) {
@@ -187,7 +200,15 @@ public class State implements DroneAttribute {
         this.ekfStatus = in.readParcelable(EkfStatus.class.getClassLoader());
         this.isTelemetryLive = in.readByte() != 0;
         this.vehicleVibration = in.readParcelable(Vibration.class.getClassLoader());
-        this.vehicleUid = in.readString();
+
+        JSONObject temp;
+        try {
+            temp = new JSONObject(in.readString());
+        } catch (JSONException e) {
+            temp = new JSONObject();
+        }
+
+        this.vehicleUid = temp;
     }
 
     public static final Creator<State> CREATOR = new Creator<State>() {

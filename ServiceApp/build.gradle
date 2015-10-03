@@ -41,8 +41,8 @@ dependencies {
 //Decomposed version name and code (https://plus.google.com/+JakeWharton/posts/6f5TcVPRZij)
 def versionMajor = 1
 def versionMinor = 4
-def versionPatch = 1
-def versionBuild = 1 //bump for dogfood builds, public betas, etc.
+def versionPatch = 2
+def versionBuild = 2 //bump for dogfood builds, public betas, etc.
 def versionPrefix = "3DR Services v"
 
 //Log levels values
@@ -70,6 +70,7 @@ android {
         //Write logs to file preferences
         buildConfigField "boolean", "WRITE_LOG_FILE", "false"
         buildConfigField "int", "LOG_FILE_LEVEL", "$logLevelDebug"
+        buildConfigField "boolean", "ENABLE_CRASHLYTICS", "false"
     }
 
     compileOptions {
@@ -133,7 +134,7 @@ android {
             signingConfig signingConfigs.release
             versionNameSuffix generateVersionNameSuffix(versionBuild, "beta")
             buildConfigField "boolean", "WRITE_LOG_FILE", "true"
-            debuggable true
+            buildConfigField "boolean", "ENABLE_CRASHLYTICS", "true"
         }
 
         sitl {
@@ -145,6 +146,7 @@ android {
 
         release {
             signingConfig signingConfigs.release
+            buildConfigField "boolean", "ENABLE_CRASHLYTICS", "true"
         }
     }
 

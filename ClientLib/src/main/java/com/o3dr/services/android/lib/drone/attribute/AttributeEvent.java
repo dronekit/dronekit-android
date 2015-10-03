@@ -207,4 +207,10 @@ public class AttributeEvent {
      */
     public static final String GIMBAL_ORIENTATION_UPDATED = PACKAGE_NAME + ".GIMBAL_ORIENTATION_UPDATED";
 
+    /**
+     * Signals an update to the return to me state.
+     * Retrieves the current state via {@link AttributeEventExtra#EXTRA_RETURN_TO_ME_STATE}
+     */
+    public static final String RETURN_TO_ME_STATE_UPDATE = PACKAGE_NAME + ".RETURN_TO_ME_STATE_UPDATE";
+
 }
