@@ -16,7 +16,7 @@ boundaries of autonomous navigation.
 
 ### Usage Guide
 The **DroneKit-Android** project is made of two modules:
-* [3DR Services App](https://github.com/DroidPlanner/DroneKit-Android/tree/master/ServiceApp):
+* [3DR Services App](https://github.com/DroidPlanner/DroneKit-Android/tree/develop/ServiceApp):
 Provided as an apk through the Google Play store, this is the layer performing direct
 communication with the 3DR-powered vehicles.
 
