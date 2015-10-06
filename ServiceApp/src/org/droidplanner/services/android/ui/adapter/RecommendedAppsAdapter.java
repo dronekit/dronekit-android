@@ -32,6 +32,8 @@ import java.net.URL;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import timber.log.Timber;
+
 /**
  * Loads the recommended apps data from the assets directory.
  */
@@ -189,7 +191,7 @@ public class RecommendedAppsAdapter extends RecyclerView.Adapter<RecommendedApps
 
             final File rootDir = new File(context.getExternalFilesDir(null), ROOT_DIR);
             if (!rootDir.exists() && !rootDir.mkdirs()) {
-                throw new IllegalStateException("Unable to create app store icons cache directory.");
+                Timber.w("Unable to create app store icons cache directory.");
             }
 
             this.appIconFile = new File(rootDir, appId);
