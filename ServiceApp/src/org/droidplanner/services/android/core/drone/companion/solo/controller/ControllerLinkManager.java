@@ -25,6 +25,7 @@ import org.droidplanner.services.android.utils.video.DecoderListener;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -269,15 +270,17 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
             @Override
             public void onPacketReceived(ByteBuffer packetBuffer) {
 
-                TLVPacket tlvMsg = TLVMessageParser.parseTLVPacket(packetBuffer);
-                if (tlvMsg == null)
+                List<TLVPacket> tlvMsgs = TLVMessageParser.parseTLVPacket(packetBuffer);
+                if (tlvMsgs.isEmpty())
                     return;
 
-                final int messageType = tlvMsg.getMessageType();
-                Timber.d("Received tlv message: " + messageType);
+                for(TLVPacket tlvMsg : tlvMsgs) {
+                    final int messageType = tlvMsg.getMessageType();
+                    Timber.d("Received tlv message: " + messageType);
 
-                if (linkListener != null)
-                    linkListener.onTlvPacketReceived(tlvMsg);
+                    if (linkListener != null)
+                        linkListener.onTlvPacketReceived(tlvMsg);
+                }
             }
         });
 
