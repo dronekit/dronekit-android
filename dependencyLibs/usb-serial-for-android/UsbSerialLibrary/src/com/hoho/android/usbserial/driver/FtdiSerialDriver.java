@@ -24,6 +24,7 @@ import android.hardware.usb.UsbConstants;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbEndpoint;
+import android.hardware.usb.UsbInterface;
 import android.hardware.usb.UsbRequest;
 import android.util.Log;
 import android.util.SparseArray;
@@ -32,8 +33,6 @@ import com.hoho.android.usbserial.util.HexDump;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * A {@link CommonUsbSerialDriver} implementation for a variety of FTDI devices
@@ -244,7 +243,16 @@ public class FtdiSerialDriver extends CommonUsbSerialDriver {
 
     @Override
     public int read(byte[] dest, int timeoutMillis) throws IOException {
-        final UsbEndpoint endpoint = mDevice.getInterface(0).getEndpoint(0);
+        final int interfaceCount = mDevice.getInterfaceCount();
+        if(interfaceCount == 0)
+            throw new IOException("No available usb interface.");
+
+        final UsbInterface usbInterface = mDevice.getInterface(0);
+        final int endpointCount = usbInterface.getEndpointCount();
+        if(endpointCount == 0)
+            throw new IOException("No available usb endpoint.");
+
+        final UsbEndpoint endpoint = usbInterface.getEndpoint(0);
 
         if (ENABLE_ASYNC_READS) {
             final int readAmt;
