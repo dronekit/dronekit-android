@@ -7,9 +7,11 @@ import com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControl
 import com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerUnits.ControllerUnit;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSetting;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageParser;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
 import com.o3dr.services.android.lib.drone.property.DroneAttribute;
 
 import java.nio.ByteBuffer;
+import java.util.List;
 
 /**
  * Stores state information for the sololink companion computer.
@@ -157,8 +159,15 @@ public class SoloState implements DroneAttribute {
             final ByteBuffer dataBuffer = ByteBuffer.allocate(dataSize);
             in.readByteArray(dataBuffer.array());
 
-            final SoloButtonSetting button = (SoloButtonSetting) TLVMessageParser.parseTLVPacket(dataBuffer);
-            buttonSettings.put(button.getButton(), button);
+            final List<TLVPacket> buttonsList = TLVMessageParser.parseTLVPacket(dataBuffer);
+            if(!buttonsList.isEmpty()){
+                for(TLVPacket tlvPacket : buttonsList){
+                    if(tlvPacket instanceof SoloButtonSetting) {
+                        final SoloButtonSetting button = (SoloButtonSetting) tlvPacket;
+                        buttonSettings.put(button.getButton(), button);
+                    }
+                }
+            }
         }
 
         this.gimbalVersion = in.readString();

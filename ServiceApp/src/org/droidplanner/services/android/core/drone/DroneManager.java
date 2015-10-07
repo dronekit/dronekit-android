@@ -314,8 +314,14 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
             return;
 
         drone.removeDroneListener(this);
-        drone.getParameters().setParameterListener(null);
-        drone.getMagnetometerCalibration().setListener(null);
+
+        final Parameters parameters = drone.getParameters();
+        if(parameters != null)
+            parameters.setParameterListener(null);
+
+        final MagnetometerCalibrationImpl magnetometer = drone.getMagnetometerCalibration();
+        if(magnetometer != null)
+            magnetometer.setListener(null);
 
         drone = null;
     }
