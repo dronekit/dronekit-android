@@ -14,7 +14,7 @@ dependencies {
     compile 'com.android.support:cardview-v7:21.0.0'
     compile 'com.android.support:recyclerview-v7:21.0.2'
 
-    compile files('libs/j2xx.jar')
+    compile files('libs/d2xx.jar')
     compile files('libs/jeromq-0.3.4.jar')
     compile files('libs/droneapi-java.jar')
     compile files('libs/protobuf-java-2.5.0.jar')

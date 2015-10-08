@@ -415,35 +415,45 @@ public class CommonApiUtils {
                 vibration);
     }
 
-    public static Parameters getParameters(MavLinkDrone drone, Context context) {
+    public static Parameters getParameters(MavLinkDrone drone, Context context, Map<String, Parameter> cachedParameters) {
         if (drone == null)
             return new Parameters();
 
-        final Map<String, Parameter> proxyParams = new HashMap<>();
+        final Map<String, Parameter> incompleteParams = new HashMap<>();
+        final List<Parameter> parametersList = new ArrayList<>();
 
         Map<String, org.droidplanner.services.android.core.parameters.Parameter> droneParameters = drone.getParameters().getParameters();
         if (!droneParameters.isEmpty()) {
             for (org.droidplanner.services.android.core.parameters.Parameter param : droneParameters.values()) {
                 if (param.name != null) {
-                    proxyParams.put(param.name, new com.o3dr.services.android.lib.drone.property
-                            .Parameter(param.name, param.value, param.type));
+                    Parameter cachedParam = cachedParameters.get(param.name);
+                    if (cachedParam == null) {
+                        cachedParam = new Parameter(param.name, param.value, param.type);
+                        incompleteParams.put(param.name, cachedParam);
+                        cachedParameters.put(param.name, cachedParam);
+                    }else {
+                        cachedParam.setValue(param.value);
+                        cachedParam.setType(param.type);
+                    }
+
+                    parametersList.add(cachedParam);
                 }
             }
 
-            try {
-                final VehicleProfile profile = drone.getVehicleProfile();
-                if (profile != null) {
+            final VehicleProfile profile = drone.getVehicleProfile();
+            if (!incompleteParams.isEmpty() && profile != null) {
+                try {
                     String metadataType = profile.getParameterMetadataType();
                     if (metadataType != null) {
-                        ParameterMetadataLoader.load(context, metadataType, proxyParams);
+                        ParameterMetadataLoader.load(context, metadataType, incompleteParams);
                     }
+                } catch (IOException | XmlPullParserException e) {
+                    Timber.e(e, e.getMessage());
                 }
-            } catch (IOException | XmlPullParserException e) {
-                Timber.e(e, e.getMessage());
             }
         }
 
-        return new Parameters(new ArrayList<>(proxyParams.values()));
+        return new Parameters(new ArrayList<>(parametersList));
     }
 
     public static float fromRadToDeg(float rad) {

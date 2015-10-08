@@ -77,6 +77,9 @@ import org.droidplanner.services.android.core.model.AutopilotWarningParser;
 import org.droidplanner.services.android.core.parameters.Parameter;
 import org.droidplanner.services.android.utils.CommonApiUtils;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Base class for the ArduPilot autopilots
  */
@@ -107,6 +110,11 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
     private final MagnetometerCalibrationImpl magCalibration;
 
     private final Context context;
+
+    /**
+     * Used to store parameter metadata since it's expensive to load that metadata from the xml assets file.
+     */
+    private final Map<String, com.o3dr.services.android.lib.drone.property.Parameter> cachedParameters = new HashMap<>();
 
     public ArduPilot(Context context, MAVLinkStreams.MAVLinkOutputStream mavClient,
                      DroneInterfaces.Handler handler, Preferences pref, AutopilotWarningParser warningParser,
@@ -280,7 +288,7 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
                     return CommonApiUtils.getGps(this);
 
                 case AttributeType.PARAMETERS:
-                    return CommonApiUtils.getParameters(this, context);
+                    return CommonApiUtils.getParameters(this, context, cachedParameters);
 
                 case AttributeType.HOME:
                     return CommonApiUtils.getHome(this);
@@ -481,7 +489,7 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
             case GimbalActions.ACTION_SET_GIMBAL_MOUNT_MODE:
                 final int mountMode = data.getInt(GimbalActions.GIMBAL_MOUNT_MODE, MAV_MOUNT_MODE.MAV_MOUNT_MODE_MAVLINK_TARGETING);
 
-                Parameter mountParam = getParameters().getParameter("MNT_MODE");
+                Parameter mountParam = this.parameters.getParameter("MNT_MODE");
                 if (mountParam == null) {
                     msg_mount_configure msg = new msg_mount_configure();
                     msg.target_system = getSysid();

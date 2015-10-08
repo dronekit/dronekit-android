@@ -44,8 +44,7 @@ public class msg_gimbal_report_axis_calibration_status extends MAVLinkMessage{
     * @return
     */
     public MAVLinkPacket pack(){
-        MAVLinkPacket packet = new MAVLinkPacket();
-        packet.len = MAVLINK_MSG_LENGTH;
+        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH);
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_GIMBAL_REPORT_AXIS_CALIBRATION_STATUS;

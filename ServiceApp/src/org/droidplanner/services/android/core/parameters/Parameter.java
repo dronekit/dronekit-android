@@ -38,33 +38,6 @@ public class Parameter implements Comparable<Parameter>, Serializable {
 		return format.format(value);
 	}
 
-	public static void checkParameterName(String name) throws Exception {
-		if (name.equals("SYSID_SW_MREV")) {
-			throw new Exception("ExludedName");
-		} else if (name.contains("WP_TOTAL")) {
-			throw new Exception("ExludedName");
-		} else if (name.contains("CMD_TOTAL")) {
-			throw new Exception("ExludedName");
-		} else if (name.contains("FENCE_TOTAL")) {
-			throw new Exception("ExludedName");
-		} else if (name.contains("SYS_NUM_RESETS")) {
-			throw new Exception("ExludedName");
-		} else if (name.contains("ARSPD_OFFSET")) {
-			throw new Exception("ExludedName");
-		} else if (name.contains("GND_ABS_PRESS")) {
-			throw new Exception("ExludedName");
-		} else if (name.contains("GND_TEMP")) {
-			throw new Exception("ExludedName");
-		} else if (name.contains("CMD_INDEX")) {
-			throw new Exception("ExludedName");
-		} else if (name.contains("LOG_LASTFILE")) {
-			throw new Exception("ExludedName");
-		} else if (name.contains("FORMAT_VERSION")) {
-			throw new Exception("ExludedName");
-		} else {
-		}
-	}
-
 	public static DecimalFormat getFormat() {
 		return format;
 	}
