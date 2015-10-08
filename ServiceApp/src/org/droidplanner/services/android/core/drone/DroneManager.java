@@ -600,7 +600,7 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
 
             default:
                 final DroneAttribute droneAttribute = drone.getAttribute(attributeType);
-                if(drone instanceof ArduSolo && isCompanionComputerEnabled() && droneAttribute instanceof State){
+                if(drone instanceof ArduSolo && droneAttribute instanceof State){
                     final State droneState = (State) droneAttribute;
                     droneState.addToVehicleUid("solo_mac_address", soloComp.getSoloMacAddress());
                     droneState.addToVehicleUid("controller_mac_address", soloComp.getControllerMacAddress());
