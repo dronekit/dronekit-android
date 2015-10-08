@@ -67,6 +67,9 @@ public enum ErrorType implements Parcelable {
     }
 
     public CharSequence getLabel(Context context){
+        if(context == null)
+            return null;
+
         return context.getText(this.labelResId);
     }
 
