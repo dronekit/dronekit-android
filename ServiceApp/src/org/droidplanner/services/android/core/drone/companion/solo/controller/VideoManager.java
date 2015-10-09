@@ -26,7 +26,7 @@ public class VideoManager extends AbstractLinkManager {
     private final MediaCodecManager mediaCodecManager;
 
     VideoManager(Context context, Handler handler, ExecutorService asyncExecutor) {
-        super(context, new UdpConnection(handler, ControllerLinkManager.ARTOO_UDP_PORT, UDP_BUFFER_SIZE, true, 16), handler, asyncExecutor);
+        super(context, new UdpConnection(handler, ControllerLinkManager.ARTOO_UDP_PORT, UDP_BUFFER_SIZE, true, 42), handler, asyncExecutor);
         this.mediaCodecManager = new MediaCodecManager(handler);
     }
 
