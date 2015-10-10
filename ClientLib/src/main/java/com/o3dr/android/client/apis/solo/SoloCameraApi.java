@@ -1,10 +1,13 @@
 package com.o3dr.android.client.apis.solo;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Surface;
 
 import com.o3dr.android.client.Drone;
 import com.o3dr.android.client.apis.CapabilityApi;
+import com.o3dr.android.client.utils.video.DecoderListener;
+import com.o3dr.android.client.utils.video.VideoManager;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloGoproRecord;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloGoproSetRequest;
@@ -23,6 +26,8 @@ import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloCame
  * Created by Fredia Huya-Kouadio on 7/12/15.
  */
 public class SoloCameraApi extends SoloApi {
+
+    private static final String TAG = SoloCameraApi.class.getSimpleName();
 
     private static final ConcurrentHashMap<Drone, SoloCameraApi> soloCameraApiCache = new ConcurrentHashMap<>();
     private static final Builder<SoloCameraApi> apiBuilder = new Builder<SoloCameraApi>() {
@@ -44,9 +49,12 @@ public class SoloCameraApi extends SoloApi {
 
     private final CapabilityApi capabilityChecker;
 
+    private final VideoManager videoManager;
+
     private SoloCameraApi(Drone drone) {
         super(drone);
         this.capabilityChecker = CapabilityApi.getApi(drone);
+        this.videoManager = new VideoManager(drone.getHandler());
     }
 
     /**
@@ -148,6 +156,11 @@ public class SoloCameraApi extends SoloApi {
      * @param listener Register a callback to receive update of the command execution status.
      */
     public void startVideoStream(final Surface surface, final String tag, final AbstractCommandListener listener) {
+        if (surface == null) {
+            postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
+            return;
+        }
+
         capabilityChecker.checkFeatureSupport(CapabilityApi.FeatureIds.SOLO_VIDEO_STREAMING,
                 new CapabilityApi.FeatureSupportListener() {
                     @Override
@@ -158,19 +171,53 @@ public class SoloCameraApi extends SoloApi {
                                 final Bundle params = new Bundle();
                                 params.putParcelable(EXTRA_VIDEO_DISPLAY, surface);
                                 params.putString(EXTRA_VIDEO_TAG, tag);
-                                drone.performAsyncActionOnDroneThread(new Action(ACTION_START_VIDEO_STREAM, params), listener);
+
+                                drone.performAsyncActionOnDroneThread(new Action(ACTION_START_VIDEO_STREAM, params),
+                                        new AbstractCommandListener() {
+                                            @Override
+                                            public void onSuccess() {
+
+                                                videoManager.start(null);
+                                                videoManager.startDecoding(surface, new DecoderListener() {
+                                                    @Override
+                                                    public void onDecodingStarted() {
+                                                        Log.i(TAG, "Video decoding started.");
+                                                        postSuccessEvent(listener);
+                                                    }
+
+                                                    @Override
+                                                    public void onDecodingError() {
+                                                        Log.w(TAG, "Video decoding failed.");
+                                                        postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
+                                                        stopVideoStream(tag, null);
+                                                    }
+
+                                                    @Override
+                                                    public void onDecodingEnded() {
+                                                        Log.i(TAG, "Video decoding ended successfully.");
+                                                        stopVideoStream(tag, null);
+                                                    }
+                                                });
+                                            }
+
+                                            @Override
+                                            public void onError(int executionError) {
+                                                postErrorEvent(executionError, listener);
+                                            }
+
+                                            @Override
+                                            public void onTimeout() {
+                                                postTimeoutEvent(listener);
+                                            }
+                                        });
                                 break;
 
                             case CapabilityApi.FEATURE_UNSUPPORTED:
-                                if (listener != null) {
-                                    listener.onError(CommandExecutionError.COMMAND_UNSUPPORTED);
-                                }
+                                postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
                                 break;
 
                             default:
-                                if (listener != null) {
-                                    listener.onError(CommandExecutionError.COMMAND_FAILED);
-                                }
+                                postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
                                 break;
                         }
                     }
@@ -214,19 +261,32 @@ public class SoloCameraApi extends SoloApi {
                             case CapabilityApi.FEATURE_SUPPORTED:
                                 final Bundle params = new Bundle();
                                 params.putString(EXTRA_VIDEO_TAG, tag);
-                                drone.performAsyncActionOnDroneThread(new Action(ACTION_STOP_VIDEO_STREAM, params), listener);
+                                drone.performAsyncActionOnDroneThread(new Action(ACTION_STOP_VIDEO_STREAM, params), new AbstractCommandListener() {
+                                    @Override
+                                    public void onSuccess() {
+                                        videoManager.stopDecoding(null);
+                                        videoManager.stop();
+                                        postSuccessEvent(listener);
+                                    }
+
+                                    @Override
+                                    public void onError(int executionError) {
+                                        postErrorEvent(executionError, listener);
+                                    }
+
+                                    @Override
+                                    public void onTimeout() {
+                                        postTimeoutEvent(listener);
+                                    }
+                                });
                                 break;
 
                             case CapabilityApi.FEATURE_UNSUPPORTED:
-                                if (listener != null) {
-                                    listener.onError(CommandExecutionError.COMMAND_UNSUPPORTED);
-                                }
+                                postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
                                 break;
 
                             default:
-                                if (listener != null) {
-                                    listener.onError(CommandExecutionError.COMMAND_FAILED);
-                                }
+                                postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
                                 break;
                         }
                     }

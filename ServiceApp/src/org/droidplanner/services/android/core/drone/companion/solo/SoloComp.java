@@ -31,7 +31,6 @@ import org.droidplanner.services.android.core.drone.companion.solo.controller.Co
 import org.droidplanner.services.android.core.drone.companion.solo.sololink.SoloLinkListener;
 import org.droidplanner.services.android.core.drone.companion.solo.sololink.SoloLinkManager;
 import org.droidplanner.services.android.utils.NetworkUtils;
-import org.droidplanner.services.android.utils.video.DecoderListener;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -376,28 +375,7 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
 
         if (videoOwnerId.compareAndSet(NO_VIDEO_OWNER, appId)){
             videoTagRef.set(newVideoTag);
-
-            Timber.d("Setting video surface layer.");
-            controllerLinkManager.startDecoding(videoSurface, new DecoderListener() {
-                @Override
-                public void onDecodingStarted() {
-                    Timber.d("Video decoding started.");
-                    postSuccessEvent(listener);
-                }
-
-                @Override
-                public void onDecodingError() {
-                    Timber.d("Video decoding failed.");
-                    postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
-                    resetVideoOwner();
-                }
-
-                @Override
-                public void onDecodingEnded() {
-                    Timber.d("Video decoding ended successfully.");
-                    resetVideoOwner();
-                }
-            });
+            postSuccessEvent(listener);
         }
         else{
             postErrorEvent(CommandExecutionError.COMMAND_DENIED, listener);
@@ -427,22 +405,7 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
             videoTagRef.set("");
 
             Timber.d("Stopping video decoding. Current owner is %s.", currentVideoOwner);
-            controllerLinkManager.stopDecoding(new DecoderListener() {
-                @Override
-                public void onDecodingStarted() {
-                }
-
-                @Override
-                public void onDecodingError() {
-                    postSuccessEvent(listener);
-                }
-
-                @Override
-                public void onDecodingEnded() {
-                    postSuccessEvent(listener);
-                }
-            });
-
+            postSuccessEvent(listener);
         }
         else{
             postErrorEvent(CommandExecutionError.COMMAND_DENIED, listener);
@@ -467,7 +430,6 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
         Timber.d("Resetting video tag (%s) and owner id (%s)", videoTagRef.get(), videoOwnerId.get());
         videoTagRef.set("");
         videoOwnerId.set(NO_VIDEO_OWNER);
-        controllerLinkManager.stopDecoding(null);
     }
 
     protected void postAsyncTask(Runnable task){
