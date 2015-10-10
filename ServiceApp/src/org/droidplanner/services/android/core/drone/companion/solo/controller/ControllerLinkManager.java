@@ -210,6 +210,7 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
     };
 
     private ControllerLinkListener linkListener;
+    private final AtomicBoolean streamingPermission = new AtomicBoolean(false);
 
     public ControllerLinkManager(Context context, final Handler handler, ExecutorService asyncExecutor) {
         super(context, new TcpConnection(handler, ARTOO_IP, ARTOO_BUTTON_PORT), handler, asyncExecutor);
@@ -221,10 +222,14 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
             public void onIpConnected() {
                 handler.removeCallbacks(reconnectVideoHandshake);
                 Timber.d("Artoo link connected. Starting video stream...");
+
+                streamingPermission.set(true);
             }
 
             @Override
             public void onIpDisconnected() {
+                streamingPermission.set(false);
+
                 if (isVideoHandshakeStarted.get())
                     handler.postDelayed(reconnectVideoHandshake, RECONNECT_COUNTDOWN);
             }
@@ -268,6 +273,10 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
             }
         });
 
+    }
+
+    public boolean hasStreamingPermission(){
+        return streamingPermission.get();
     }
 
     public boolean areVersionsSet() {

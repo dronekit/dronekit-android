@@ -177,7 +177,6 @@ public class SoloCameraApi extends SoloApi {
                                             @Override
                                             public void onSuccess() {
 
-                                                videoManager.start(null);
                                                 videoManager.startDecoding(surface, new DecoderListener() {
                                                     @Override
                                                     public void onDecodingStarted() {
@@ -265,7 +264,6 @@ public class SoloCameraApi extends SoloApi {
                                     @Override
                                     public void onSuccess() {
                                         videoManager.stopDecoding(null);
-                                        videoManager.stop();
                                         postSuccessEvent(listener);
                                     }
 

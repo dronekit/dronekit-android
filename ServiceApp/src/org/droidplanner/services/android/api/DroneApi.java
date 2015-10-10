@@ -117,7 +117,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
         }
 
         try {
-            this.service.disconnectDroneManager(this.droneMgr, this.ownerId);
+            this.service.disconnectDroneManager(this.droneMgr, this.ownerId, getApiVersionCode());
         } catch (ConnectionException e) {
             Timber.e(e, e.getMessage());
         }
@@ -174,7 +174,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
     public void disconnect() {
         try {
-            service.disconnectDroneManager(this.droneMgr, this.ownerId);
+            service.disconnectDroneManager(this.droneMgr, this.ownerId, getApiVersionCode());
             this.droneMgr = null;
         } catch (ConnectionException e) {
             notifyConnectionFailed(new ConnectionResult(0, e.getMessage()));
@@ -249,13 +249,13 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
             case SoloCameraActions.ACTION_START_VIDEO_STREAM: {
                 final Surface videoSurface = data.getParcelable(SoloCameraActions.EXTRA_VIDEO_DISPLAY);
                 final String videoTag = data.getString(SoloCameraActions.EXTRA_VIDEO_TAG, "");
-                SoloApiUtils.startVideoStream(getDroneManager(), ownerId, videoTag, videoSurface, listener);
+                SoloApiUtils.startVideoStream(getDroneManager(), getApiVersionCode(), ownerId, videoTag, videoSurface, listener);
                 break;
             }
 
             case SoloCameraActions.ACTION_STOP_VIDEO_STREAM: {
                 final String videoTag = data.getString(SoloCameraActions.EXTRA_VIDEO_TAG, "");
-                SoloApiUtils.stopVideoStream(getDroneManager(), ownerId, videoTag, listener);
+                SoloApiUtils.stopVideoStream(getDroneManager(), getApiVersionCode(), ownerId, videoTag, listener);
                 break;
             }
 

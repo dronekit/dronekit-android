@@ -59,6 +59,8 @@ public class VideoManager implements IpConnectionListener {
     }
 
     public void startDecoding(final Surface surface, final DecoderListener listener) {
+        start(null);
+
         final Surface currentSurface = mediaCodecManager.getSurface();
         if (surface == currentSurface) {
             if (listener != null)
@@ -94,13 +96,15 @@ public class VideoManager implements IpConnectionListener {
     public void stopDecoding(DecoderListener listener) {
         Log.i(TAG, "Aborting video decoding process.");
         mediaCodecManager.stopDecoding(listener);
+
+        stop();
     }
 
     public boolean isLinkConnected() {
         return this.linkConn.getConnectionStatus() == AbstractIpConnection.STATE_CONNECTED;
     }
 
-    public void start(LinkListener listener) {
+    private void start(LinkListener listener) {
         Log.d(TAG, "Starting video manager");
         handler.removeCallbacks(reconnectTask);
 
@@ -110,7 +114,7 @@ public class VideoManager implements IpConnectionListener {
         this.linkListener = listener;
     }
 
-    public void stop() {
+    private void stop() {
         Log.d(TAG, "Stopping video manager");
 
         handler.removeCallbacks(reconnectTask);

@@ -9,6 +9,8 @@ import android.util.Pair;
 import android.util.SparseArray;
 import android.view.Surface;
 
+import com.o3dr.android.client.utils.video.DecoderListener;
+import com.o3dr.android.client.utils.video.VideoManager;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.drone.companion.solo.SoloEventExtras;
@@ -37,6 +39,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
 
 import timber.log.Timber;
+import zmq.Decoder;
 
 /**
  * Sololink companion computer implementation
@@ -64,6 +67,8 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
         void onControllerEvent(String event, Bundle eventInfo);
     }
 
+    private static final int CLIENT_LIB_VIDEO_PIPELINE_MIN_VERSION = 20507;
+
     private static final String NO_VIDEO_OWNER = "no_video_owner";
 
     public static final String SOLO_LINK_WIFI_PREFIX = "SoloLink_";
@@ -73,6 +78,7 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
 
     private final ControllerLinkManager controllerLinkManager;
     private final SoloLinkManager soloLinkMgr;
+    private final VideoManager videoManager;
 
     private final Context context;
     private final Handler handler;
@@ -98,6 +104,7 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
 
         this.controllerLinkManager = new ControllerLinkManager(context, handler, asyncExecutor);
         this.soloLinkMgr = new SoloLinkManager(context, handler, asyncExecutor);
+        this.videoManager = new VideoManager(handler);
     }
 
     public SoloGoproState getGoproState() {
@@ -347,9 +354,9 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
         controllerLinkManager.setEUTxPowerCompliance(isCompliant, listener);
     }
 
-    public void startVideoStream(String appId, String newVideoTag, Surface videoSurface, final ICommandListener listener){
+    public void startVideoStream(int apiVersionCode, String appId, String newVideoTag, Surface videoSurface, final ICommandListener listener){
         Timber.d("Video stream start request from %s. Video owner is %s.", appId, videoOwnerId.get());
-        if(TextUtils.isEmpty(appId)){
+        if(TextUtils.isEmpty(appId) || !controllerLinkManager.hasStreamingPermission()){
             postErrorEvent(CommandExecutionError.COMMAND_DENIED, listener);
             return;
         }
@@ -375,14 +382,41 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
 
         if (videoOwnerId.compareAndSet(NO_VIDEO_OWNER, appId)){
             videoTagRef.set(newVideoTag);
-            postSuccessEvent(listener);
+
+            if(apiVersionCode >= CLIENT_LIB_VIDEO_PIPELINE_MIN_VERSION) {
+                videoManager.stopDecoding(null);
+                postSuccessEvent(listener);
+            }
+            else{
+                videoManager.startDecoding(videoSurface, new DecoderListener(){
+
+                    @Override
+                    public void onDecodingStarted() {
+                        Timber.i("Video decoding started.");
+                        postSuccessEvent(listener);
+                    }
+
+                    @Override
+                    public void onDecodingError() {
+                        Timber.i("Video decoding failed.");
+                        postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
+                        resetVideoOwner();
+                    }
+
+                    @Override
+                    public void onDecodingEnded() {
+                        Timber.i("Video decoding ended successfully.");
+                        resetVideoOwner();
+                    }
+                });
+            }
         }
         else{
             postErrorEvent(CommandExecutionError.COMMAND_DENIED, listener);
         }
     }
 
-    public void stopVideoStream(String appId, String currentVideoTag, final ICommandListener listener){
+    public void stopVideoStream(int apiVersionCode, String appId, String currentVideoTag, final ICommandListener listener){
         Timber.d("Video stream stop request from %s. Video owner is %s.", appId, videoOwnerId.get());
         if(TextUtils.isEmpty(appId)){
             Timber.w("Owner id is empty.");
@@ -405,14 +439,34 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
             videoTagRef.set("");
 
             Timber.d("Stopping video decoding. Current owner is %s.", currentVideoOwner);
-            postSuccessEvent(listener);
+            if(apiVersionCode >= CLIENT_LIB_VIDEO_PIPELINE_MIN_VERSION) {
+                postSuccessEvent(listener);
+            }
+            else{
+                videoManager.stopDecoding(new DecoderListener() {
+                    @Override
+                    public void onDecodingStarted() {
+
+                    }
+
+                    @Override
+                    public void onDecodingError() {
+                        postSuccessEvent(listener);
+                    }
+
+                    @Override
+                    public void onDecodingEnded() {
+                        postSuccessEvent(listener);
+                    }
+                });
+            }
         }
         else{
             postErrorEvent(CommandExecutionError.COMMAND_DENIED, listener);
         }
     }
 
-    public void tryStoppingVideoStream(String parentId){
+    public void tryStoppingVideoStream(int apiVersionCode, String parentId){
         if(TextUtils.isEmpty(parentId))
             return;
 
@@ -422,7 +476,7 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
 
         if(videoOwner.equals(parentId)){
             Timber.d("Stopping video owned by %s", parentId);
-            stopVideoStream(parentId, videoTagRef.get(), null);
+            stopVideoStream(apiVersionCode, parentId, videoTagRef.get(), null);
         }
     }
 
@@ -430,6 +484,7 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
         Timber.d("Resetting video tag (%s) and owner id (%s)", videoTagRef.get(), videoOwnerId.get());
         videoTagRef.set("");
         videoOwnerId.set(NO_VIDEO_OWNER);
+        videoManager.stopDecoding(null);
     }
 
     protected void postAsyncTask(Runnable task){
