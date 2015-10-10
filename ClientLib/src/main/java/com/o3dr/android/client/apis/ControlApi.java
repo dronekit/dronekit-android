@@ -131,7 +131,7 @@ public class ControlApi extends Api {
      * @param vz z velocity in meter / s
      * @param listener Register a callback to receive update of the command execution state.
      */
-    public void setVelocity(float vx, float vy, float vz, AbstractCommandListener listener){
+    public void moveAtVelocity(float vx, float vy, float vz, AbstractCommandListener listener){
         Bundle params = new Bundle();
         params.putFloat(EXTRA_VELOCITY_X, vx);
         params.putFloat(EXTRA_VELOCITY_Y, vy);
