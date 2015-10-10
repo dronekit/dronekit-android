@@ -6,7 +6,6 @@ import android.view.Surface;
 
 import org.droidplanner.services.android.core.drone.companion.solo.AbstractLinkManager;
 import org.droidplanner.services.android.utils.connection.SshConnection;
-import org.droidplanner.services.android.utils.connection.UdpConnection;
 import org.droidplanner.services.android.utils.video.DecoderListener;
 import org.droidplanner.services.android.utils.video.MediaCodecManager;
 

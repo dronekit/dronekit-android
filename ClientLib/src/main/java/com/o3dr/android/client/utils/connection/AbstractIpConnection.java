@@ -1,4 +1,4 @@
-package org.droidplanner.services.android.utils.connection;
+package com.o3dr.android.client.utils.connection;
 
 import android.os.Handler;
 import android.os.Process;
@@ -12,8 +12,6 @@ import java.io.InterruptedIOException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import timber.log.Timber;
 
 /**
  * Base class for ip connection (tcp, udp).
@@ -65,7 +63,7 @@ public abstract class AbstractIpConnection {
                     if(ipConnectionListener != null)
                         ipConnectionListener.onIpConnected();
                 } catch (IOException e) {
-                    Timber.e( "Unable to open ip connection.", e);
+                    Log.e(TAG, "Unable to open ip connection.", e);
                     return;
                 }
 
@@ -95,14 +93,14 @@ public abstract class AbstractIpConnection {
                             }
                         }
                     } catch (IOException e) {
-                        Timber.e("Error occurred while reading from the connection.", e);
+                        Log.e(TAG, "Error occurred while reading from the connection.", e);
                     }
                 }
                 else if(sendingThread != null){
                     try {
                         sendingThread.join();
                     } catch (InterruptedException e) {
-                        Timber.e( "Error while waiting for sending thread to complete.", e);
+                        Log.e(TAG, "Error while waiting for sending thread to complete.", e);
                     }
                 }
             }
@@ -111,7 +109,7 @@ public abstract class AbstractIpConnection {
                     sendingThread.interrupt();
 
                 disconnect();
-                Timber.i( "Exiting connection manager thread.");
+                Log.i(TAG, "Exiting connection manager thread.");
             }
         }
     };
@@ -131,16 +129,16 @@ public abstract class AbstractIpConnection {
                         send(packetData);
                         postSendSuccess(listener);
                     } catch (IOException e) {
-                        Timber.e( "Error occurred while sending packet.", e);
+                        Log.e(TAG, "Error occurred while sending packet.", e);
                         postSendTimeout(listener);
                     }
                 }
             } catch (InterruptedException e) {
-                Timber.e( "Dispatching thread was interrupted.", e);
+                Log.e(TAG, "Dispatching thread was interrupted.", e);
             }
             finally{
                 disconnect();
-                Timber.i( "Exiting packet dispatcher thread.");
+                Log.i(TAG, "Exiting packet dispatcher thread.");
             }
         }
 
@@ -154,7 +152,7 @@ public abstract class AbstractIpConnection {
                     try {
                         listener.onSuccess();
                     } catch (RemoteException e) {
-                        Timber.e(e, e.getMessage());
+                        Log.e(TAG, e.getMessage(), e);
                     }
                 }
             });
@@ -170,7 +168,7 @@ public abstract class AbstractIpConnection {
                     try {
                         listener.onTimeout();
                     } catch (RemoteException e) {
-                        Timber.e(e, e.getMessage());
+                        Log.e(TAG, e.getMessage(), e);
                     }
                 }
             });
@@ -215,7 +213,7 @@ public abstract class AbstractIpConnection {
      */
     public void connect(){
         if(connectionStatus.compareAndSet(STATE_DISCONNECTED, STATE_CONNECTING)){
-            Timber.i( "Starting manager thread.");
+            Log.i(TAG, "Starting manager thread.");
             managerThread = new Thread(managerTask, "IP Connection-Manager Thread");
             managerThread.setPriority(Thread.MAX_PRIORITY);
             managerThread.start();
@@ -237,7 +235,7 @@ public abstract class AbstractIpConnection {
         try {
             close();
         } catch (IOException e) {
-            Timber.e( "Error occurred while closing ip connection.", e);
+            Log.e(TAG, "Error occurred while closing ip connection.", e);
         }
 
         if(ipConnectionListener != null)
