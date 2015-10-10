@@ -29,6 +29,9 @@ import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_YA
 
 /**
  * Provides access to the vehicle control functionality.
+ *
+ * Use of this api might required the vehicle to be in a specific flight mode (i.e: GUIDED)
+ *
  * Created by Fredia Huya-Kouadio on 9/7/15.
  */
 public class ControlApi extends Api {
@@ -125,7 +128,8 @@ public class ControlApi extends Api {
     }
 
     /**
-     * Set the vehicle velocity vector.
+     * Move the vehicle along the specified velocity vector.
+     *
      * @param vx x velocity in meter / s
      * @param vy y velocity in meter / s
      * @param vz z velocity in meter / s
