@@ -1,4 +1,4 @@
-package com.o3dr.android.client.utils.video.file;
+package org.droidplanner.services.android.utils.video.file;
 
 import android.view.Surface;
 

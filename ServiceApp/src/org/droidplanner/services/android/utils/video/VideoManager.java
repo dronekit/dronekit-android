@@ -1,4 +1,4 @@
-package com.o3dr.android.client.utils.video;
+package org.droidplanner.services.android.utils.video;
 
 import android.os.Handler;
 import android.os.RemoteException;

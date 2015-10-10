@@ -9,8 +9,6 @@ import android.util.Pair;
 import android.util.SparseArray;
 import android.view.Surface;
 
-import com.o3dr.android.client.utils.video.DecoderListener;
-import com.o3dr.android.client.utils.video.VideoManager;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.drone.companion.solo.SoloEventExtras;
@@ -33,13 +31,14 @@ import org.droidplanner.services.android.core.drone.companion.solo.controller.Co
 import org.droidplanner.services.android.core.drone.companion.solo.sololink.SoloLinkListener;
 import org.droidplanner.services.android.core.drone.companion.solo.sololink.SoloLinkManager;
 import org.droidplanner.services.android.utils.NetworkUtils;
+import org.droidplanner.services.android.utils.video.DecoderListener;
+import org.droidplanner.services.android.utils.video.VideoManager;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
 
 import timber.log.Timber;
-import zmq.Decoder;
 
 /**
  * Sololink companion computer implementation
@@ -66,8 +65,6 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
 
         void onControllerEvent(String event, Bundle eventInfo);
     }
-
-    private static final int CLIENT_LIB_VIDEO_PIPELINE_MIN_VERSION = 20507;
 
     private static final String NO_VIDEO_OWNER = "no_video_owner";
 
@@ -383,11 +380,7 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
         if (videoOwnerId.compareAndSet(NO_VIDEO_OWNER, appId)){
             videoTagRef.set(newVideoTag);
 
-            if(apiVersionCode >= CLIENT_LIB_VIDEO_PIPELINE_MIN_VERSION) {
-                videoManager.stopDecoding(null);
-                postSuccessEvent(listener);
-            }
-            else{
+                Timber.i("Starting video decoding.");
                 videoManager.startDecoding(videoSurface, new DecoderListener(){
 
                     @Override
@@ -409,7 +402,6 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
                         resetVideoOwner();
                     }
                 });
-            }
         }
         else{
             postErrorEvent(CommandExecutionError.COMMAND_DENIED, listener);
@@ -439,10 +431,8 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
             videoTagRef.set("");
 
             Timber.d("Stopping video decoding. Current owner is %s.", currentVideoOwner);
-            if(apiVersionCode >= CLIENT_LIB_VIDEO_PIPELINE_MIN_VERSION) {
-                postSuccessEvent(listener);
-            }
-            else{
+
+                Timber.i("Stopping video decoding.");
                 videoManager.stopDecoding(new DecoderListener() {
                     @Override
                     public void onDecodingStarted() {
@@ -459,7 +449,6 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
                         postSuccessEvent(listener);
                     }
                 });
-            }
         }
         else{
             postErrorEvent(CommandExecutionError.COMMAND_DENIED, listener);
