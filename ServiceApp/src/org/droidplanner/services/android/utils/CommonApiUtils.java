@@ -401,7 +401,10 @@ public class CommonApiUtils {
         org.droidplanner.services.android.core.drone.variables.State droneState = drone.getState();
         ApmModes droneMode = droneState.getMode();
         AccelCalibration accelCalibration = drone.getCalibrationSetup();
-        String calibrationMessage = accelCalibration.isCalibrating() ? accelCalibration.getMessage() : null;
+        String calibrationMessage = accelCalibration != null && accelCalibration.isCalibrating()
+                ? accelCalibration.getMessage()
+                : null;
+
         final msg_ekf_status_report ekfStatus = droneState.getEkfStatus();
         final EkfStatus proxyEkfStatus = ekfStatus == null
                 ? new EkfStatus()
