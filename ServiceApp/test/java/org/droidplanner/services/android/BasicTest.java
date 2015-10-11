@@ -86,7 +86,7 @@ public class BasicTest {
             }
         }, new DroneInterfaces.AttributeEventListener() {
             @Override
-            public void onAttributeEvent(String attributeEvent, Bundle eventInfo) {
+            public void onAttributeEvent(String attributeEvent, Bundle eventInfo, boolean checkForSololinkApi) {
 
             }
         });

@@ -249,13 +249,13 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
             case SoloCameraActions.ACTION_START_VIDEO_STREAM: {
                 final Surface videoSurface = data.getParcelable(SoloCameraActions.EXTRA_VIDEO_DISPLAY);
                 final String videoTag = data.getString(SoloCameraActions.EXTRA_VIDEO_TAG, "");
-                SoloApiUtils.startVideoStream(getDroneManager(), ownerId, videoTag, videoSurface, listener);
+                SoloApiUtils.startVideoStream(droneMgr.getDrone(), ownerId, videoTag, videoSurface, listener);
                 break;
             }
 
             case SoloCameraActions.ACTION_STOP_VIDEO_STREAM: {
                 final String videoTag = data.getString(SoloCameraActions.EXTRA_VIDEO_TAG, "");
-                SoloApiUtils.stopVideoStream(getDroneManager(), ownerId, videoTag, listener);
+                SoloApiUtils.stopVideoStream(droneMgr.getDrone(), ownerId, videoTag, listener);
                 break;
             }
 
@@ -358,7 +358,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     }
 
     @Override
-    public void onAttributeEvent(String attributeEvent, Bundle eventInfo) {
+    public void onAttributeEvent(String attributeEvent, Bundle eventInfo, boolean checkForSololinkApi) {
         if (TextUtils.isEmpty(attributeEvent))
             return;
 

@@ -112,13 +112,13 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
         this.compListener = listener;
     }
 
-    public boolean isAvailable() {
+    public static boolean isAvailable(Context context) {
         //TODO: complement the logic.
-        return NetworkUtils.isOnSololinkNetwork(this.context);
+        return NetworkUtils.isOnSololinkNetwork(context);
     }
 
     public void start() {
-        if (!isAvailable()) {
+        if (!isAvailable(context)) {
             return;
         }
 

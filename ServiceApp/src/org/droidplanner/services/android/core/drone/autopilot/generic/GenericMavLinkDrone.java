@@ -63,7 +63,10 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
     protected final Attitude attitude = new Attitude();
     protected final Vibration vibration = new Vibration();
 
+    protected final Handler handler;
+
     protected GenericMavLinkDrone(Handler handler, MAVLinkStreams.MAVLinkOutputStream mavClient, AutopilotWarningParser warningParser, DroneInterfaces.AttributeEventListener listener) {
+        this.handler = handler;
         this.MavClient = mavClient;
 
         events = new DroneEvents(this, handler);
@@ -104,8 +107,12 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
     }
 
     protected void notifyAttributeListener(String attributeEvent, Bundle eventInfo){
+        notifyAttributeListener(attributeEvent, eventInfo, false);
+    }
+
+    protected void notifyAttributeListener(String attributeEvent, Bundle eventInfo, boolean checkForSololinkApi){
         if(attributeListener != null){
-            attributeListener.onAttributeEvent(attributeEvent, eventInfo);
+            attributeListener.onAttributeEvent(attributeEvent, eventInfo, checkForSololinkApi);
         }
     }
 

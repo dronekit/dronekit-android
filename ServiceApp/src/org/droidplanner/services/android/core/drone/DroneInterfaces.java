@@ -222,7 +222,7 @@ public class DroneInterfaces {
 	}
 
 	public interface AttributeEventListener {
-		void onAttributeEvent(String attributeEvent, Bundle eventInfo);
+		void onAttributeEvent(String attributeEvent, Bundle eventInfo, boolean checkForSololinkApi);
 	}
 
 	public interface OnParameterManagerListener {
