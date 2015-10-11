@@ -2,6 +2,7 @@ package org.droidplanner.services.android.core.drone.autopilot.apm;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -117,7 +118,7 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
     private final Map<String, com.o3dr.services.android.lib.drone.property.Parameter> cachedParameters = new HashMap<>();
 
     public ArduPilot(Context context, MAVLinkStreams.MAVLinkOutputStream mavClient,
-                     DroneInterfaces.Handler handler, Preferences pref, AutopilotWarningParser warningParser,
+                     Handler handler, Preferences pref, AutopilotWarningParser warningParser,
                      LogMessageListener logListener, DroneInterfaces.AttributeEventListener listener) {
 
         super(handler, mavClient, warningParser, listener);

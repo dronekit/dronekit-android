@@ -247,14 +247,4 @@ public class DroneInterfaces {
 
 	}
 
-	public interface Handler {
-
-		void removeCallbacks(Runnable thread);
-
-        void post(Runnable thread);
-
-		void postDelayed(Runnable thread, long timeout);
-
-	}
-
 }

@@ -1,5 +1,6 @@
 package org.droidplanner.services.android.core.drone.variables.calibration;
 
+import android.os.Handler;
 import android.os.RemoteException;
 
 import com.MAVLink.Messages.MAVLinkMessage;
@@ -36,10 +37,10 @@ public class AccelCalibration extends DroneVariable implements DroneInterfaces.O
     private String mavMsg;
     private boolean calibrating;
 
-    private final DroneInterfaces.Handler handler;
+    private final Handler handler;
     private final AtomicReference<ICommandListener> listenerRef = new AtomicReference<>(null);
 
-    public AccelCalibration(MavLinkDrone drone, DroneInterfaces.Handler handler) {
+    public AccelCalibration(MavLinkDrone drone, Handler handler) {
         super(drone);
         this.handler = handler;
         drone.addDroneListener(this);

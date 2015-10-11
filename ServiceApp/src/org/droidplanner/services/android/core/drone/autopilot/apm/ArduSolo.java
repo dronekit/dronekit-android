@@ -1,6 +1,7 @@
 package org.droidplanner.services.android.core.drone.autopilot.apm;
 
 import android.content.Context;
+import android.os.Handler;
 import android.text.TextUtils;
 
 import com.MAVLink.common.msg_statustext;
@@ -32,7 +33,7 @@ public class ArduSolo extends ArduCopter {
     private static final String SERIAL_NUMBER_LABEL = "serial_number";
     private String pixhawkSerialNumber;
 
-    public ArduSolo(Context context, MAVLinkStreams.MAVLinkOutputStream mavClient, DroneInterfaces.Handler handler, Preferences pref, AutopilotWarningParser warningParser, LogMessageListener logListener, DroneInterfaces.AttributeEventListener listener) {
+    public ArduSolo(Context context, MAVLinkStreams.MAVLinkOutputStream mavClient, Handler handler, Preferences pref, AutopilotWarningParser warningParser, LogMessageListener logListener, DroneInterfaces.AttributeEventListener listener) {
         super(context, mavClient, handler, pref, warningParser, logListener, listener);
     }
 

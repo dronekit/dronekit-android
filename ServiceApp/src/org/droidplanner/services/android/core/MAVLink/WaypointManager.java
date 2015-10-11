@@ -1,5 +1,7 @@
 package org.droidplanner.services.android.core.MAVLink;
 
+import android.os.Handler;
+
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.common.msg_mission_ack;
 import com.MAVLink.common.msg_mission_count;
@@ -48,7 +50,7 @@ public class WaypointManager extends DroneVariable {
      * waypoint witch is currently being written
      */
 
-    private final DroneInterfaces.Handler watchdog;
+    private final Handler watchdog;
 
     private final Runnable watchdogCallback = new Runnable() {
         @Override
@@ -58,7 +60,7 @@ public class WaypointManager extends DroneVariable {
         }
     };
 
-    public WaypointManager(MavLinkDrone drone, DroneInterfaces.Handler handler) {
+    public WaypointManager(MavLinkDrone drone, Handler handler) {
         super(drone);
         this.watchdog = handler;
     }

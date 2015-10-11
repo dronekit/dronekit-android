@@ -1,6 +1,7 @@
 package org.droidplanner.services.android.core.drone.autopilot.generic;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.TextUtils;
 
 import com.MAVLink.Messages.MAVLinkMessage;
@@ -62,7 +63,7 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
     protected final Attitude attitude = new Attitude();
     protected final Vibration vibration = new Vibration();
 
-    protected GenericMavLinkDrone(DroneInterfaces.Handler handler, MAVLinkStreams.MAVLinkOutputStream mavClient, AutopilotWarningParser warningParser, DroneInterfaces.AttributeEventListener listener) {
+    protected GenericMavLinkDrone(Handler handler, MAVLinkStreams.MAVLinkOutputStream mavClient, AutopilotWarningParser warningParser, DroneInterfaces.AttributeEventListener listener) {
         this.MavClient = mavClient;
 
         events = new DroneEvents(this, handler);
