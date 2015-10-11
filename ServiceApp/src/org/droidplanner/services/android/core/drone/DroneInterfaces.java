@@ -241,10 +241,4 @@ public class DroneInterfaces {
 		public void onEndWaypointEvent(WaypointManager.WaypointEvent_Type wpEvent);
 	}
 
-	public interface Clock {
-
-		long elapsedRealtime();
-
-	}
-
 }
