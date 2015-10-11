@@ -215,15 +215,14 @@ public class DroidPlannerService extends Service {
      *
      * @param droneMgr Handler for the connected vehicle.
      * @param appId    Application id of the disconnecting client.
-     * @param apiVersionCode Client api version code
      * @throws ConnectionException
      */
-    void disconnectDroneManager(DroneManager droneMgr, String appId, int apiVersionCode) throws ConnectionException {
+    void disconnectDroneManager(DroneManager droneMgr, String appId) throws ConnectionException {
         if (droneMgr == null || TextUtils.isEmpty(appId))
             return;
 
         Timber.d("Drone manager disconnection for " + appId);
-        droneMgr.disconnect(apiVersionCode, appId);
+        droneMgr.disconnect(appId);
         if (droneMgr.getConnectedAppsCount() == 0) {
             Timber.d("Destroying drone manager.");
             droneMgr.destroy();

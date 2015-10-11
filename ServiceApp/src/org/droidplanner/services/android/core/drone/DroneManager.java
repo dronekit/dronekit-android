@@ -375,9 +375,9 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
             soloComp.stop();
 
         if (!connectedApps.isEmpty()) {
-            for (Map.Entry<String, DroneEventsListener> entry : connectedApps.entrySet()) {
+            for (String appId : connectedApps.keySet()) {
                 try {
-                    disconnect(entry.getValue().getApiVersionCode(), entry.getKey());
+                    disconnect(appId);
                 } catch (ConnectionException e) {
                     Log.e(TAG, e.getMessage(), e);
                 }
@@ -396,12 +396,12 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
         return connectedApps.size();
     }
 
-    public void disconnect(int apiVersionCode, String appId) throws ConnectionException {
+    public void disconnect(String appId) throws ConnectionException {
         if (TextUtils.isEmpty(appId))
             return;
 
         if(isCompanionComputerEnabled())
-            soloComp.tryStoppingVideoStream(apiVersionCode, appId);
+            soloComp.tryStoppingVideoStream(appId);
 
         Log.d(TAG, "Disconnecting client " + appId);
         DroneEventsListener listener = connectedApps.remove(appId);

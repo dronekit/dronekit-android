@@ -351,7 +351,7 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
         controllerLinkManager.setEUTxPowerCompliance(isCompliant, listener);
     }
 
-    public void startVideoStream(int apiVersionCode, String appId, String newVideoTag, Surface videoSurface, final ICommandListener listener){
+    public void startVideoStream(String appId, String newVideoTag, Surface videoSurface, final ICommandListener listener){
         Timber.d("Video stream start request from %s. Video owner is %s.", appId, videoOwnerId.get());
         if(TextUtils.isEmpty(appId) || !controllerLinkManager.hasStreamingPermission()){
             postErrorEvent(CommandExecutionError.COMMAND_DENIED, listener);
@@ -408,7 +408,7 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
         }
     }
 
-    public void stopVideoStream(int apiVersionCode, String appId, String currentVideoTag, final ICommandListener listener){
+    public void stopVideoStream(String appId, String currentVideoTag, final ICommandListener listener){
         Timber.d("Video stream stop request from %s. Video owner is %s.", appId, videoOwnerId.get());
         if(TextUtils.isEmpty(appId)){
             Timber.w("Owner id is empty.");
@@ -455,7 +455,7 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
         }
     }
 
-    public void tryStoppingVideoStream(int apiVersionCode, String parentId){
+    public void tryStoppingVideoStream(String parentId){
         if(TextUtils.isEmpty(parentId))
             return;
 
@@ -465,7 +465,7 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
 
         if(videoOwner.equals(parentId)){
             Timber.d("Stopping video owned by %s", parentId);
-            stopVideoStream(apiVersionCode, parentId, videoTagRef.get(), null);
+            stopVideoStream(parentId, videoTagRef.get(), null);
         }
     }
 
