@@ -40,24 +40,7 @@ public class BasicTest {
     private MavLinkDrone drone;
     private MockMavLinkServiceAPI mavlinkApi;
 
-    private final DroneInterfaces.Handler dpHandler = new DroneInterfaces.Handler() {
-
-        private final Handler h = new Handler();
-
-        public void removeCallbacks(Runnable thread) {
-            h.removeCallbacks(thread);
-        }
-
-        @Override
-        public void post(Runnable thread) {
-            h.post(thread);
-        }
-
-        @Override
-        public void postDelayed(Runnable thread, long timeout) {
-            h.postDelayed(thread, timeout);
-        }
-    };
+    private final Handler dpHandler = new Handler();
 
     private final MAVLinkStreams.MavlinkInputStream inputStreamListener = new MAVLinkStreams.MavlinkInputStream() {
         @Override
