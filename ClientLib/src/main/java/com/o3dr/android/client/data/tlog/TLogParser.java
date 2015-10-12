@@ -1,11 +1,16 @@
-package com.o3dr.android.client.utils.data.tlog;
+package com.o3dr.android.client.data.tlog;
 
+import android.net.Uri;
 import android.os.Handler;
 import android.util.Log;
 
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Parser;
+import com.o3dr.android.client.data.tlog.callback.TLogIteratorCallback;
+import com.o3dr.android.client.data.tlog.callback.TLogIteratorFilter;
+import com.o3dr.android.client.data.tlog.callback.TLogParserCallback;
+import com.o3dr.android.client.data.tlog.callback.TLogParserFilter;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
@@ -14,7 +19,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URI;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -40,7 +44,7 @@ public class TLogParser {
          *
          * @param uri Location of the TLog files
          */
-        public TLogIterator(URI uri) {
+        public TLogIterator(Uri uri) {
             this(uri, new Handler());
         }
 
@@ -50,7 +54,7 @@ public class TLogParser {
          * @param uri     Location of the TLog files
          * @param handler Handler to post results to
          */
-        public TLogIterator(URI uri, Handler handler) {
+        public TLogIterator(Uri uri, Handler handler) {
             this.handler = handler;
             file = new File(uri.toString());
         }
@@ -82,18 +86,12 @@ public class TLogParser {
          * @param callback
          */
         public void nextAsync(final TLogIteratorCallback callback) {
-            iteratorExecutor.execute(new Runnable() {
+            nextAsync(new TLogIteratorFilter() {
                 @Override
-                public void run() {
-                    try {
-                        sendResult(callback, next(in));
-                    } catch (EOFException e) {
-                        sendResult(callback, null);
-                    } catch (IOException e) {
-                        sendFailed(callback, e);
-                    }
+                public boolean acceptEvent(Event event) {
+                    return true;
                 }
-            });
+            }, callback);
         }
 
         /**
@@ -108,16 +106,14 @@ public class TLogParser {
                 @Override
                 public void run() {
                     try {
-                        Event event = null;
-                        while (in.available() > 0) {
-                            Event currEvent = next(in);
-                            if (filter.acceptEvent(currEvent)) {
-                                event = currEvent;
-                                break;
+                        Event event;
+                        do {
+                            event = next(in);
+                            if (filter.acceptEvent(event)) {
+                                sendResult(callback, event);
+                                return;
                             }
-                        }
-                        sendResult(callback, event);
-                    } catch (EOFException e) {
+                        } while (event != null);
                         sendResult(callback, null);
                     } catch (IOException e) {
                         sendFailed(callback, e);
@@ -152,10 +148,11 @@ public class TLogParser {
     /**
      * Returns a list of all events in specified TLog uri
      *
+     * @param handler Thread to callback on. Cannot be null.
      * @param uri
      * @param callback
      */
-    public static void getAllEventsAsync(final URI uri, final TLogParserCallback callback) {
+    public static void getAllEventsAsync(final Handler handler, final Uri uri, final TLogParserCallback callback) {
         parseTlogExecutor = Executors.newSingleThreadExecutor();
         parseTlogExecutor.execute(new Runnable() {
             @Override
@@ -165,16 +162,17 @@ public class TLogParser {
                 LinkedList<Event> eventList = new LinkedList<>();
                 try {
                     in = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
-                    while (in.available() > 0) {
-                        eventList.add(next(in));
+                    Event event = next(in);
+                    while (event != null) {
+                        eventList.add(event);
+                        event = next(in);
                     }
-                    callback.onResult(eventList);
-                } catch (EOFException e) {
-                    callback.onResult(eventList);
+
+                    sendResult(handler, callback, eventList);
                 } catch (FileNotFoundException e) {
-                    callback.onFailed(e);
+                    sendFailed(handler, callback, e);
                 } catch (IOException e) {
-                    callback.onFailed(e);
+                    sendFailed(handler, callback, e);
                 } finally {
                     if (in != null) {
                         try {
@@ -191,11 +189,12 @@ public class TLogParser {
     /**
      * Returns a list of all events in specified TLog uri using the specified filter
      *
+     * @param handler Thread to callback on. Cannot be null.
      * @param uri
      * @param filter
      * @param callback
      */
-    public static void getAllEventsAsync(final URI uri, final TLogParserFilter filter, final TLogParserCallback callback) {
+    public static void getAllEventsAsync(final Handler handler, final Uri uri, final TLogParserFilter filter, final TLogParserCallback callback) {
         parseTlogExecutor = Executors.newSingleThreadExecutor();
         parseTlogExecutor.execute(new Runnable() {
             @Override
@@ -205,19 +204,17 @@ public class TLogParser {
                 LinkedList<Event> eventList = new LinkedList<>();
                 try {
                     in = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
-                    while (in.available() > 0 && filter.continueIterating()) {
-                        Event event = next(in);
-                        if (filter.addEventToList(event)) {
-                            eventList.add(event);
-                        }
+                    Event event = next(in);
+                    while (event != null && filter.continueIterating()) {
+                        eventList.add(event);
+                        event = next(in);
                     }
-                    sendResult(callback, eventList);
-                } catch (EOFException e) {
-                    sendResult(callback, eventList);
+
+                    sendResult(handler, callback, eventList);
                 } catch (FileNotFoundException e) {
-                    sendFailed(callback, e);
+                    sendFailed(handler, callback, e);
                 } catch (IOException e) {
-                    sendFailed(callback, e);
+                    sendFailed(handler, callback, e);
                 } finally {
                     if (in != null) {
                         try {
@@ -231,23 +228,38 @@ public class TLogParser {
         });
     }
 
-    private static void sendResult(final TLogParserCallback callback, final List<Event> events) {
+    private static void sendResult(Handler handler, final TLogParserCallback callback, final List<Event> events) {
         if (callback != null) {
-            callback.onResult(events);
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    callback.onResult(events);
+                }
+            });
         }
     }
 
-    private static void sendFailed(final TLogParserCallback callback, final Exception e) {
+    private static void sendFailed(Handler handler, final TLogParserCallback callback, final Exception e) {
         if (callback != null) {
-            callback.onFailed(e);
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    callback.onFailed(e);
+                }
+            });
         }
     }
 
     private static Event next(DataInputStream in) throws IOException {
-        long timestamp = in.readLong() / 1000;
-        MAVLinkPacket packet;
-        while ((packet = parser.mavlink_parse_char(in.readUnsignedByte())) == null) ;
-        return new Event(timestamp, packet.unpack());
+        try {
+            long timestamp = in.readLong() / 1000;
+            MAVLinkPacket packet;
+            while ((packet = parser.mavlink_parse_char(in.readUnsignedByte())) == null) ;
+            return new Event(timestamp, packet.unpack());
+        } catch (EOFException e) {
+            //File may not be complete so return null
+            return null;
+        }
     }
 
     /**
@@ -269,81 +281,5 @@ public class TLogParser {
         public MAVLinkMessage getMavLinkMessage() {
             return mavLinkMessage;
         }
-    }
-
-    /**
-     * Callback for asynchronous TLog iterator.
-     */
-    public interface TLogIteratorCallback {
-        /**
-         * Next message was retrieved successfully with Event value
-         *
-         * @param event
-         */
-        void onResult(Event event);
-
-        /**
-         * Next message was not retrieved.
-         * When no message exists with specified paramater, NoSuchElementException is returned.
-         *
-         * @param e
-         */
-        void onFailed(Exception e);
-    }
-
-    /**
-     * Callback for asynchronous TLog parser.
-     */
-    public interface TLogParserCallback {
-        /**
-         * Next message was retrieved successfully with Event value
-         *
-         * @param events
-         */
-        void onResult(List<Event> events);
-
-        /**
-         * Next message was not retrieved.
-         * When no message exists with specified paramater, NoSuchElementException is returned.
-         *
-         * @param e
-         */
-        void onFailed(Exception e);
-    }
-
-    /**
-     * Filter class for TLog iterator to allow the caller to determine the criteria for returned event.
-     */
-    public interface TLogIteratorFilter {
-        /**
-         * This method is called when an event is parsed to determine whether the caller wants this result.
-         *
-         * @param event
-         * @return whether this event should be accepted based off criteria
-         */
-        boolean acceptEvent(Event event);
-    }
-
-    /**
-     * Filter class for TLog parser to allow the caller to determine the criteria for the list
-     * of returned events.
-     */
-    public interface TLogParserFilter {
-        /**
-         * This method is called when an event is parsed to determine whether the caller wants this result
-         * in the returned list.
-         *
-         * @param e
-         * @return whether this event should be accepted based off criteria
-         */
-        boolean addEventToList(Event e);
-
-        /**
-         * This method when iterating the TLog file to determine whether the caller wants to
-         * continue iterating.
-         *
-         * @return whether to continue iterating or stop and send results
-         */
-        boolean continueIterating();
     }
 }
