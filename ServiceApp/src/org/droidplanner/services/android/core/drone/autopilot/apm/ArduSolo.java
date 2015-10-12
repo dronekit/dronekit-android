@@ -3,12 +3,16 @@ package org.droidplanner.services.android.core.drone.autopilot.apm;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.RemoteException;
 import android.text.TextUtils;
+import android.util.Log;
+import android.view.Surface;
 
 import com.MAVLink.common.msg_statustext;
 import com.MAVLink.enums.MAV_TYPE;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
+import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.drone.companion.solo.SoloAttributes;
 import com.o3dr.services.android.lib.drone.companion.solo.SoloEventExtras;
 import com.o3dr.services.android.lib.drone.companion.solo.SoloEvents;
@@ -197,6 +201,35 @@ public class ArduSolo extends ArduCopter {
         }
     }
 
+    protected void resetVideoManager(){
+        videoMgr.reset();
+    }
+
+    @Override
+    public void startVideoStream(int udpPort, String appId, String newVideoTag, Surface videoSurface, final ICommandListener listener){
+        if(!soloComp.hasStreamingPermission()){
+            postErrorEvent(CommandExecutionError.COMMAND_DENIED, listener);
+            return;
+        }
+
+        super.startVideoStream(udpPort, appId, newVideoTag, videoSurface, listener);
+    }
+
+    protected void postErrorEvent(final int error, final ICommandListener listener) {
+        if (handler != null && listener != null) {
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        listener.onError(error);
+                    } catch (RemoteException e) {
+                        Timber.e(e, e.getMessage());
+                    }
+                }
+            });
+        }
+    }
+
     @Override
     public void notifyDroneEvent(final DroneInterfaces.DroneEventsType event) {
         switch (event) {
@@ -205,6 +238,7 @@ public class ArduSolo extends ArduCopter {
                 Timber.i("Vehicle " + event.name().toLowerCase());
                 //Try connecting the companion computer
                 if (!soloComp.isConnected()) {
+                    resetVideoManager();
                     soloComp.start();
                     return;
                 }
@@ -214,6 +248,7 @@ public class ArduSolo extends ArduCopter {
                 Timber.i("Vehicle disconnected.");
                 if (soloComp.isConnected()) {
                     soloComp.stop();
+                    resetVideoManager();
                     return;
                 }
                 break;

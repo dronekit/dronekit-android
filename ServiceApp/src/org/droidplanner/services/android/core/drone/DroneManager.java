@@ -44,6 +44,7 @@ import org.droidplanner.services.android.core.drone.autopilot.apm.ArduCopter;
 import org.droidplanner.services.android.core.drone.autopilot.apm.ArduPlane;
 import org.droidplanner.services.android.core.drone.autopilot.apm.ArduRover;
 import org.droidplanner.services.android.core.drone.autopilot.apm.ArduSolo;
+import org.droidplanner.services.android.core.drone.autopilot.generic.GenericMavLinkDrone;
 import org.droidplanner.services.android.core.drone.autopilot.px4.Px4Native;
 import org.droidplanner.services.android.core.drone.companion.solo.SoloComp;
 import org.droidplanner.services.android.core.drone.profiles.Parameters;
@@ -266,8 +267,8 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
         if (TextUtils.isEmpty(appId))
             return;
 
-        if (drone instanceof ArduSolo) {
-            ((ArduSolo) drone).getSoloComp().tryStoppingVideoStream(appId);
+        if (drone instanceof GenericMavLinkDrone) {
+            ((GenericMavLinkDrone)drone).tryStoppingVideoStream(appId);
         }
 
         Log.d(TAG, "Disconnecting client " + appId);

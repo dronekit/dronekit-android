@@ -117,26 +117,4 @@ public class SoloApiUtils {
         soloComp.updateEUTxPowerCompliance(isCompliant, listener);
     }
 
-    public static void startVideoStream(Drone drone, String appId, String videoTag, Surface videoSurface,
-                                        ICommandListener listener) {
-        if (!isSoloLinkFeatureAvailable(drone, listener))
-            return;
-
-        //Passing the check above implies this is an ArduSolo instance
-        final ArduSolo arduSolo = (ArduSolo) drone;
-
-        final SoloComp soloComp = arduSolo.getSoloComp();
-        soloComp.startVideoStream(appId, videoTag, videoSurface, listener);
-    }
-
-    public static void stopVideoStream(Drone drone, String appId, String videoTag, ICommandListener listener) {
-        if (!isSoloLinkFeatureAvailable(drone, listener))
-            return;
-
-        //Passing the check above implies this is an ArduSolo instance
-        final ArduSolo arduSolo = (ArduSolo) drone;
-
-        final SoloComp soloComp = arduSolo.getSoloComp();
-        soloComp.stopVideoStream(appId, videoTag, listener);
-    }
 }

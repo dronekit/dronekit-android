@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.RemoteException;
 import android.text.TextUtils;
+import android.view.Surface;
 
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.ardupilotmega.msg_ekf_status_report;
@@ -47,7 +48,10 @@ import com.o3dr.services.android.lib.model.ICommandListener;
 import org.droidplanner.services.android.core.MAVLink.MavLinkArm;
 import org.droidplanner.services.android.core.MAVLink.command.doCmd.MavLinkDoCmds;
 import org.droidplanner.services.android.core.drone.DroneManager;
+import org.droidplanner.services.android.core.drone.autopilot.Drone;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
+import org.droidplanner.services.android.core.drone.autopilot.apm.ArduSolo;
+import org.droidplanner.services.android.core.drone.autopilot.generic.GenericMavLinkDrone;
 import org.droidplanner.services.android.core.drone.profiles.VehicleProfile;
 import org.droidplanner.services.android.core.drone.variables.ApmModes;
 import org.droidplanner.services.android.core.drone.variables.Camera;
@@ -1042,4 +1046,25 @@ public class CommonApiUtils {
                 msgReport.offdiag_x, msgReport.offdiag_y, msgReport.offdiag_z);
     }
 
+    public static void startVideoStream(Drone drone, int udpPort, String appId, String videoTag, Surface videoSurface,
+                                        ICommandListener listener) {
+
+        if(!(drone instanceof GenericMavLinkDrone)){
+            postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
+            return;
+        }
+
+        final GenericMavLinkDrone mavLinkDrone = (GenericMavLinkDrone) drone;
+        mavLinkDrone.startVideoStream(udpPort, appId, videoTag, videoSurface, listener);
+    }
+
+    public static void stopVideoStream(Drone drone, String appId, String videoTag, ICommandListener listener) {
+        if(!(drone instanceof GenericMavLinkDrone)){
+            postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
+            return;
+        }
+
+        final GenericMavLinkDrone mavLinkDrone = (GenericMavLinkDrone) drone;
+        mavLinkDrone.stopVideoStream(appId, videoTag, listener);
+    }
 }

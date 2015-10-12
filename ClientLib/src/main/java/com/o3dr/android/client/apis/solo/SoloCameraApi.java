@@ -4,19 +4,16 @@ import android.os.Bundle;
 import android.view.Surface;
 
 import com.o3dr.android.client.Drone;
+import com.o3dr.android.client.apis.CameraApi;
 import com.o3dr.android.client.apis.CapabilityApi;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloGoproRecord;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloGoproSetRequest;
 import com.o3dr.services.android.lib.model.AbstractCommandListener;
-import com.o3dr.services.android.lib.model.action.Action;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloCameraActions.ACTION_START_VIDEO_STREAM;
-import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloCameraActions.ACTION_STOP_VIDEO_STREAM;
-import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloCameraActions.EXTRA_VIDEO_DISPLAY;
-import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloCameraActions.EXTRA_VIDEO_TAG;
+import static com.o3dr.services.android.lib.drone.action.CameraActions.DEFAULT_VIDEO_UDP_PORT;
 
 /**
  * Provides access to the solo video specific functionality
@@ -45,10 +42,12 @@ public class SoloCameraApi extends SoloApi {
     }
 
     private final CapabilityApi capabilityChecker;
+    private final CameraApi cameraApi;
 
     private SoloCameraApi(Drone drone) {
         super(drone);
         this.capabilityChecker = CapabilityApi.getApi(drone);
+        this.cameraApi = CameraApi.getApi(drone);
     }
 
     /**
@@ -162,12 +161,7 @@ public class SoloCameraApi extends SoloApi {
                         switch (result) {
 
                             case CapabilityApi.FEATURE_SUPPORTED:
-                                final Bundle params = new Bundle();
-                                params.putParcelable(EXTRA_VIDEO_DISPLAY, surface);
-                                params.putString(EXTRA_VIDEO_TAG, tag);
-
-                                drone.performAsyncActionOnDroneThread(new Action(ACTION_START_VIDEO_STREAM, params),
-                                        listener);
+                                cameraApi.startVideoStream(DEFAULT_VIDEO_UDP_PORT, surface, tag, listener);
                                 break;
 
                             case CapabilityApi.FEATURE_UNSUPPORTED:
@@ -217,9 +211,7 @@ public class SoloCameraApi extends SoloApi {
                         switch (result) {
 
                             case CapabilityApi.FEATURE_SUPPORTED:
-                                final Bundle params = new Bundle();
-                                params.putString(EXTRA_VIDEO_TAG, tag);
-                                drone.performAsyncActionOnDroneThread(new Action(ACTION_STOP_VIDEO_STREAM, params), listener);
+                                cameraApi.stopVideoStream(tag, listener);
                                 break;
 
                             case CapabilityApi.FEATURE_UNSUPPORTED:
