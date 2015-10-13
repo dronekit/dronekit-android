@@ -7,10 +7,6 @@ import android.util.Log;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Parser;
-import com.o3dr.android.client.data.tlog.callback.TLogIteratorCallback;
-import com.o3dr.android.client.data.tlog.callback.TLogIteratorFilter;
-import com.o3dr.android.client.data.tlog.callback.TLogParserCallback;
-import com.o3dr.android.client.data.tlog.callback.TLogParserFilter;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
@@ -19,8 +15,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -31,13 +28,21 @@ public class TLogParser {
     private static final String LOG_TAG = TLogParser.class.getSimpleName();
 
     private static final Parser parser = new Parser();
-    private static ExecutorService parseTlogExecutor;
 
+    /**
+     * Iterator class to iterate and parse the Tlog file.
+     */
     public static class TLogIterator {
         private File file;
         private DataInputStream in = null;
-        private ExecutorService iteratorExecutor;
         private final Handler handler;
+
+        private static final TLogIteratorFilter DEFAULT_FILTER = new TLogIteratorFilter() {
+            @Override
+            public boolean acceptEvent(Event event) {
+                return true;
+            }
+        };
 
         /**
          * Constructor to create a TLogIterator with new Handler.
@@ -65,7 +70,6 @@ public class TLogParser {
          * @throws FileNotFoundException
          */
         public void start() throws FileNotFoundException {
-            iteratorExecutor = Executors.newSingleThreadExecutor();
             in = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
         }
 
@@ -75,46 +79,41 @@ public class TLogParser {
          * @throws IOException
          */
         public void finish() throws IOException {
-            iteratorExecutor.shutdownNow();
             in.close();
         }
 
         /**
          * Retrieve next message from TLog file asynchronously.
-         * start must be called before this method.
+         * {@link #start()} must be called before this method.
          *
-         * @param callback
+         * @param callback {@link TLogIteratorCallback}
          */
         public void nextAsync(final TLogIteratorCallback callback) {
-            nextAsync(new TLogIteratorFilter() {
-                @Override
-                public boolean acceptEvent(Event event) {
-                    return true;
-                }
-            }, callback);
+            nextAsync(DEFAULT_FILTER, callback);
         }
 
         /**
          * Retrieve next message with specified message filter from TLog file asynchronously.
-         * start must be called before this method.
+         * {@link #start()} must be called before this method.
          *
-         * @param filter
-         * @param callback
+         * @param filter {@link TLogIteratorFilter}
+         * @param callback {@link TLogIteratorCallback}
          */
         public void nextAsync(final TLogIteratorFilter filter, final TLogIteratorCallback callback) {
-            iteratorExecutor.execute(new Runnable() {
+            getInstance().execute(new Runnable() {
                 @Override
                 public void run() {
                     try {
-                        Event event;
-                        do {
-                            event = next(in);
+                        Event event = next(in);
+                        while (event != null) {
                             if (filter.acceptEvent(event)) {
                                 sendResult(callback, event);
                                 return;
                             }
-                        } while (event != null);
-                        sendResult(callback, null);
+                            event = next(in);
+                        }
+
+                        sendFailed(callback, new NoSuchElementException());
                     } catch (IOException e) {
                         sendFailed(callback, e);
                     }
@@ -145,75 +144,60 @@ public class TLogParser {
         }
     }
 
+    private static final TLogParserFilter DEFAULT_FILTER = new TLogParserFilter() {
+        @Override
+        public boolean includeEvent(Event e) {
+            return true;
+        }
+
+        @Override
+        public boolean shouldIterate() {
+            return true;
+        }
+    };
+
     /**
      * Returns a list of all events in specified TLog uri
      *
-     * @param handler Thread to callback on. Cannot be null.
-     * @param uri
-     * @param callback
+     * @param handler {@link Handler} Handler to specify what thread to callback on. This cannot be null.
+     * @param uri {@link Uri}
+     * @param callback {@link TLogParserCallback}
      */
     public static void getAllEventsAsync(final Handler handler, final Uri uri, final TLogParserCallback callback) {
-        parseTlogExecutor = Executors.newSingleThreadExecutor();
-        parseTlogExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                File file = new File(uri.toString());
-                DataInputStream in = null;
-                LinkedList<Event> eventList = new LinkedList<>();
-                try {
-                    in = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
-                    Event event = next(in);
-                    while (event != null) {
-                        eventList.add(event);
-                        event = next(in);
-                    }
-
-                    sendResult(handler, callback, eventList);
-                } catch (FileNotFoundException e) {
-                    sendFailed(handler, callback, e);
-                } catch (IOException e) {
-                    sendFailed(handler, callback, e);
-                } finally {
-                    if (in != null) {
-                        try {
-                            in.close();
-                        } catch (IOException e) {
-                            Log.e(LOG_TAG, "Failed to close file " + uri, e);
-                        }
-                    }
-                }
-            }
-        });
+        getAllEventsAsync(handler, uri, DEFAULT_FILTER, callback);
     }
 
     /**
      * Returns a list of all events in specified TLog uri using the specified filter
      *
-     * @param handler Thread to callback on. Cannot be null.
-     * @param uri
-     * @param filter
-     * @param callback
+     * @param handler {@link Handler} Handler to specify what thread to callback on. This cannot be null.
+     * @param uri {@link Uri}
+     * @param filter {@link TLogParserFilter}
+     * @param callback {@link TLogParserCallback}
      */
     public static void getAllEventsAsync(final Handler handler, final Uri uri, final TLogParserFilter filter, final TLogParserCallback callback) {
-        parseTlogExecutor = Executors.newSingleThreadExecutor();
-        parseTlogExecutor.execute(new Runnable() {
+        getInstance().execute(new Runnable() {
             @Override
             public void run() {
                 File file = new File(uri.toString());
                 DataInputStream in = null;
-                LinkedList<Event> eventList = new LinkedList<>();
                 try {
                     in = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
+                    ArrayList<Event> eventList = new ArrayList<>();
                     Event event = next(in);
-                    while (event != null && filter.continueIterating()) {
-                        eventList.add(event);
+                    while (event != null && filter.shouldIterate()) {
+                        if (filter.includeEvent(event)) {
+                            eventList.add(event);
+                        }
                         event = next(in);
                     }
 
-                    sendResult(handler, callback, eventList);
-                } catch (FileNotFoundException e) {
-                    sendFailed(handler, callback, e);
-                } catch (IOException e) {
+                    if (eventList.isEmpty()) {
+                        sendFailed(handler, callback, new NoSuchElementException());
+                    } else {
+                        sendResult(handler, callback, eventList);
+                    }
+                } catch (Exception e) {
                     sendFailed(handler, callback, e);
                 } finally {
                     if (in != null) {
@@ -254,12 +238,24 @@ public class TLogParser {
         try {
             long timestamp = in.readLong() / 1000;
             MAVLinkPacket packet;
-            while ((packet = parser.mavlink_parse_char(in.readUnsignedByte())) == null) ;
-            return new Event(timestamp, packet.unpack());
+            while ((packet = parser.mavlink_parse_char(in.readUnsignedByte())) == null);
+            MAVLinkMessage message = packet.unpack();
+            if (message == null) {
+                return null;
+            }
+            return new Event(timestamp, message);
         } catch (EOFException e) {
             //File may not be complete so return null
             return null;
         }
+    }
+
+    private static ExecutorService getInstance() {
+        return InitializeExecutorService.executorService;
+    }
+
+    private static class InitializeExecutorService {
+        private static final ExecutorService executorService = Executors.newSingleThreadExecutor();
     }
 
     /**
@@ -269,15 +265,25 @@ public class TLogParser {
         private long timestamp;
         private MAVLinkMessage mavLinkMessage;
 
-        public Event(long timestamp, MAVLinkMessage mavLinkMessage) {
+        private Event(long timestamp, MAVLinkMessage mavLinkMessage) {
             this.timestamp = timestamp;
             this.mavLinkMessage = mavLinkMessage;
         }
 
+        /**
+         * Returns time of mavlink message in ms
+         *
+         * @return
+         */
         public long getTimestamp() {
             return timestamp;
         }
 
+        /**
+         * Returns content of mavlink message.
+         *
+         * @return {@link MAVLinkMessage}
+         */
         public MAVLinkMessage getMavLinkMessage() {
             return mavLinkMessage;
         }

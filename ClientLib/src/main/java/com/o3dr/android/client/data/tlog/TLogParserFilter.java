@@ -1,6 +1,4 @@
-package com.o3dr.android.client.data.tlog.callback;
-
-import com.o3dr.android.client.data.tlog.TLogParser;
+package com.o3dr.android.client.data.tlog;
 
 /**
  * Filter class for TLog parser to allow the caller to determine the criteria for the list
@@ -11,16 +9,15 @@ public interface TLogParserFilter {
      * This method is called when an event is parsed to determine whether the caller wants this result
      * in the returned list.
      *
-     * @param e
+     * @param event {@link com.o3dr.android.client.data.tlog.TLogParser.Event}
      * @return whether this event should be accepted based off criteria
      */
-    boolean addEventToList(TLogParser.Event e);
+    boolean includeEvent(TLogParser.Event event);
 
     /**
-     * This method when iterating the TLog file to determine whether the caller wants to
-     * continue iterating.
+     * This method determines whether to iterate through the TLog file.
      *
      * @return whether to continue iterating or stop and send results
      */
-    boolean continueIterating();
+    boolean shouldIterate();
 }
