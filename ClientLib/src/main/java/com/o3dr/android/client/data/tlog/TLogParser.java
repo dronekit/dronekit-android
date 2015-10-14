@@ -179,7 +179,7 @@ public class TLogParser {
         getInstance().execute(new Runnable() {
             @Override
             public void run() {
-                File file = new File(uri.toString());
+                File file = new File(uri.getPath());
                 DataInputStream in = null;
                 try {
                     in = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
