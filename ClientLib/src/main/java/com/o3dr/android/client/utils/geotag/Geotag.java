@@ -42,6 +42,8 @@ public class Geotag {
     /**
      * Asynchronous method to geotag a list of images using a list of Events as coordinate data.
      *
+     * Warning: this copies data to external storage
+     *
      * @param context  {@link Context}
      * @param handler  {@link Handler} Handler to specify what thread to callback on. This cannot be null.
      * @param events   {@link List<com.o3dr.android.client.data.tlog.TLogParser.Event>} list of events to geotag photos.
@@ -50,21 +52,22 @@ public class Geotag {
      */
     public static void geoTagImagesAsync(final Context context, final Handler handler, final List<TLogParser.Event> events,
                                          final ArrayList<File> photos, final GeoTagCallback callback) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            sendFailed(handler, callback, (new UnsupportedOperationException()));
-            return;
-        }
 
         getInstance().execute(new Runnable() {
             @Override
             public void run() {
-                File saveDir = getSaveDir(context);
+                File saveDir = new File(getSaveRootDir(context).getPath(), "GeoTag");
+
+                if (!saveDir.exists() && !saveDir.mkdir()) {
+                    sendFailed(handler, callback, new IllegalStateException("Failed to create directory for images"));
+                    return;
+                }
 
                 GeoTagAlgorithm geoTagAlgorithm = new GeoTagAlgorithmImpl();
                 HashMap<TLogParser.Event, File> matchedPhotos = geoTagAlgorithm.match(events, photos);
 
                 if (!hasEnoughMemory(saveDir.getPath(), matchedPhotos.values())) {
-                    sendFailed(handler, callback, new OutOfMemoryError());
+                    sendFailed(handler, callback, new IllegalStateException("Insufficient external storage space."));
                     return;
                 }
 
@@ -89,13 +92,16 @@ public class Geotag {
         });
     }
 
-    private static File getSaveDir(Context context) {
-        File dirs[] = context.getExternalFilesDirs(null);
+    private static File getSaveRootDir(Context context) {
         File saveDir = context.getExternalFilesDir(null);
-        for (File dir : dirs) {
-            if (Environment.isExternalStorageRemovable(dir)) {
-                saveDir = dir;
-                break;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            File dirs[] = context.getExternalFilesDirs(null);
+            for (File dir : dirs) {
+                if (Environment.isExternalStorageRemovable(dir)) {
+                    saveDir = dir;
+                    break;
+                }
             }
         }
         return saveDir;
@@ -143,7 +149,7 @@ public class Geotag {
         }
     }
 
-    private static void sendFailed(Handler handler, final GeoTagCallback geoTagCallback, final Throwable exception) {
+    private static void sendFailed(Handler handler, final GeoTagCallback geoTagCallback, final Exception exception) {
         if (geoTagCallback != null) {
             handler.post(new Runnable() {
                 @Override
@@ -205,7 +211,7 @@ public class Geotag {
          *
          * @param e {@link Exception}
          */
-        void onFailed(Throwable e);
+        void onFailed(Exception e);
     }
 
     private static class GeoTagAlgorithmImpl implements GeoTagAlgorithm {
