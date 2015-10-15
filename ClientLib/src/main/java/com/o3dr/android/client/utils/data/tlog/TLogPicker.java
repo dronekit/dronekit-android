@@ -1,4 +1,4 @@
-package com.o3dr.android.client.data.tlog;
+package com.o3dr.android.client.utils.data.tlog;
 
 import android.app.Activity;
 import android.content.Intent;

@@ -1,4 +1,4 @@
-package com.o3dr.android.client.data.tlog;
+package com.o3dr.android.client.utils.data.tlog;
 
 import java.util.List;
 
@@ -10,7 +10,7 @@ public interface TLogParserCallback {
     /**
      * Callback for successful retrieval of one or more Event.
      *
-     * @param events {@link com.o3dr.android.client.data.tlog.TLogParser.Event}
+     * @param events {@link com.o3dr.android.client.utils.data.tlog.TLogParser.Event}
      */
     void onResult(List<TLogParser.Event> events);
 
