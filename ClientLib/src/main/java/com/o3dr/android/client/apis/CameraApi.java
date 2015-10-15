@@ -17,9 +17,12 @@ import static com.o3dr.services.android.lib.drone.action.CameraActions.EXTRA_VID
 import static com.o3dr.services.android.lib.drone.action.CameraActions.EXTRA_VIDEO_UDP_PORT;
 
 /**
+ * Provides support to control generic camera functionality
  * Created by Fredia Huya-Kouadio on 10/11/15.
+ *
+ * @since 2.6.8
  */
-public class CameraApi extends Api{
+public class CameraApi extends Api {
 
     private static final ConcurrentHashMap<Drone, CameraApi> apiCache = new ConcurrentHashMap<>();
     private static final Builder<CameraApi> apiBuilder = new Builder<CameraApi>() {
@@ -31,16 +34,17 @@ public class CameraApi extends Api{
 
     /**
      * Retrieves a camera api instance
+     *
      * @param drone
      * @return
      */
-    public static CameraApi getApi(final Drone drone){
+    public static CameraApi getApi(final Drone drone) {
         return getApi(drone, apiCache, apiBuilder);
     }
 
     private final Drone drone;
 
-    private CameraApi(Drone drone){
+    private CameraApi(Drone drone) {
         this.drone = drone;
     }
 
@@ -48,13 +52,14 @@ public class CameraApi extends Api{
      * Attempt to grab ownership and start the video stream from the connected drone. Can fail if
      * the video stream is already owned by another client.
      *
-     * @param udpPort Udp port from which to expect the video stream
+     * @param udpPort  Udp port from which to expect the video stream
      * @param surface  Surface object onto which the video is decoded.
      * @param tag      Video tag.
      * @param listener Register a callback to receive update of the command execution status.
+     * @since 2.6.8
      */
     public void startVideoStream(final int udpPort, final Surface surface, final String tag, final AbstractCommandListener listener) {
-        if(surface == null){
+        if (surface == null) {
             postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
             return;
         }
@@ -72,6 +77,7 @@ public class CameraApi extends Api{
      *
      * @param tag      Video tag.
      * @param listener Register a callback to receive update of the command execution status.
+     * @since 2.6.8
      */
     public void stopVideoStream(final String tag, final AbstractCommandListener listener) {
         final Bundle params = new Bundle();
