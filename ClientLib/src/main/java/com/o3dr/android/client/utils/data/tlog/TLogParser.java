@@ -29,6 +29,9 @@ public class TLogParser {
 
     private static final Parser parser = new Parser();
 
+    //Private constructor to prevent instantiation.
+    private TLogParser(){}
+
     /**
      * Iterator class to iterate and parse the Tlog file.
      */
