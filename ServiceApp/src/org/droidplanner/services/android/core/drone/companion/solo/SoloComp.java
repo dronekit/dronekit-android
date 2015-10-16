@@ -24,6 +24,7 @@ import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
 import com.o3dr.services.android.lib.model.ICommandListener;
 
+import org.droidplanner.services.android.BuildConfig;
 import org.droidplanner.services.android.core.drone.companion.CompComp;
 import org.droidplanner.services.android.core.drone.companion.solo.controller.ControllerLinkListener;
 import org.droidplanner.services.android.core.drone.companion.solo.controller.ControllerLinkManager;
@@ -98,6 +99,9 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
     }
 
     public boolean hasStreamingPermission(){
+        if(BuildConfig.SITL_DEBUG)
+            return true;
+
         return controllerLinkManager.hasStreamingPermission();
     }
 
@@ -115,18 +119,26 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
             return;
         }
 
-        controllerLinkManager.start(this);
+        if(!BuildConfig.SITL_DEBUG) {
+            controllerLinkManager.start(this);
+        }
+
         soloLinkMgr.start(this);
     }
 
     public void stop() {
-        controllerLinkManager.stop();
+        if(!BuildConfig.SITL_DEBUG) {
+            controllerLinkManager.stop();
+        }
+
         soloLinkMgr.stop();
     }
 
     public void refreshState() {
         soloLinkMgr.refreshState();
-        controllerLinkManager.refreshState();
+
+        if(!BuildConfig.SITL_DEBUG)
+            controllerLinkManager.refreshState();
     }
 
     /**
@@ -201,7 +213,7 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
             if (compListener != null)
                 compListener.onConnected();
         } else {
-            if (!controllerLinkManager.isLinkConnected())
+            if (!controllerLinkManager.isLinkConnected() && !BuildConfig.SITL_DEBUG)
                 controllerLinkManager.start(this);
 
             if (!soloLinkMgr.isLinkConnected())
@@ -214,7 +226,10 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
         if (compListener != null)
             compListener.onDisconnected();
 
-        controllerLinkManager.stop();
+        if(!BuildConfig.SITL_DEBUG) {
+            controllerLinkManager.stop();
+        }
+
         soloLinkMgr.stop();
     }
 
@@ -234,6 +249,9 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
     }
 
     public boolean isConnected() {
+        if(BuildConfig.SITL_DEBUG)
+            return soloLinkMgr.isLinkConnected();
+
         return controllerLinkManager.isLinkConnected() && soloLinkMgr.isLinkConnected();
     }
 
@@ -247,7 +265,9 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
 
     public void refreshSoloVersions() {
         soloLinkMgr.refreshSoloLinkVersions();
-        controllerLinkManager.refreshControllerVersions();
+
+        if(!BuildConfig.SITL_DEBUG)
+            controllerLinkManager.refreshControllerVersions();
     }
 
     public String getControllerVersion() {

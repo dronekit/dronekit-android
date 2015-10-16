@@ -7,6 +7,8 @@ import android.util.Log;
 
 import java.nio.ByteBuffer;
 
+import timber.log.Timber;
+
 /**
  * Created by Fredia Huya-Kouadio on 6/1/15.
  */
@@ -65,7 +67,7 @@ public class NALUChunkAssembler {
         final byte nalHeaderByte = buffer[12];
         final int forbiddenBit = (nalHeaderByte & 0x80) >> 7;
         if (forbiddenBit != 0) {
-            Log.w(TAG, "Forbidden bit is set, indicating possible errors.");
+            Timber.w("Forbidden bit is set, indicating possible errors.");
             return null;
         }
 
@@ -78,7 +80,7 @@ public class NALUChunkAssembler {
         final int sequenceNumber = ((buffer[2] & 0xff) << 8) | (buffer[3] & 0xff);
         final int nalType = nalHeaderByte & 0x1f;
         if (nalType <= 0) {
-            Log.d(TAG, "Undefined nal type: " + nalType);
+            Timber.d("Undefined nal type: " + nalType);
             return null;
         }
 
