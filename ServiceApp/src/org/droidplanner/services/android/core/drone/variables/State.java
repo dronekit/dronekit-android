@@ -1,5 +1,6 @@
 package org.droidplanner.services.android.core.drone.variables;
 
+import android.os.Handler;
 import android.os.RemoteException;
 import android.os.SystemClock;
 
@@ -10,7 +11,6 @@ import com.o3dr.services.android.lib.model.ICommandListener;
 
 import org.droidplanner.services.android.core.MAVLink.MavLinkModes;
 import org.droidplanner.services.android.core.drone.DroneInterfaces.DroneEventsType;
-import org.droidplanner.services.android.core.drone.DroneInterfaces.Handler;
 import org.droidplanner.services.android.core.drone.DroneVariable;
 import org.droidplanner.services.android.core.model.AutopilotWarningParser;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;

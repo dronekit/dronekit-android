@@ -3,7 +3,7 @@ apply plugin: 'com.android.library'
 ext {
     VERSION_MAJOR = 2
     VERSION_MINOR = 6
-    VERSION_PATCH = 6
+    VERSION_PATCH = 8
     VERSION_BUILD = 0
 
     PUBLISH_ARTIFACT_ID = 'dronekit-android'

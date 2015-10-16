@@ -137,14 +137,14 @@ public class TLVMessageParser {
                     }
 
                     case TYPE_SOLO_GOPRO_SET_REQUEST: {
-                        @SoloGoproSetRequest.RequestCommand final short command = packetBuffer.getShort();
-                        @SoloGoproSetRequest.RequestCommandValue final short value = packetBuffer.getShort();
+                        @SoloGoproConstants.RequestCommand final short command = packetBuffer.getShort();
+                        @SoloGoproConstants.RequestCommandValue final short value = packetBuffer.getShort();
                         packetList.add(new SoloGoproSetRequest(command, value));
                         break;
                     }
 
                     case TYPE_SOLO_GOPRO_RECORD: {
-                        @SoloGoproRecord.RecordCommand final int command = packetBuffer.getInt();
+                        @SoloGoproConstants.RecordCommand final int command = packetBuffer.getInt();
                         packetList.add(new SoloGoproRecord(command));
                         break;
                     }

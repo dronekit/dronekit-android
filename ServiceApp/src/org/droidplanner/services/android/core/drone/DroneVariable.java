@@ -1,5 +1,6 @@
 package org.droidplanner.services.android.core.drone;
 
+import android.os.Handler;
 import android.os.RemoteException;
 
 import com.o3dr.services.android.lib.model.ICommandListener;
@@ -20,7 +21,7 @@ public class DroneVariable {
 	 * @param handler Use to dispatch the event
 	 * @param listener To whom the event is dispatched.
 	 */
-	protected void postSuccessEvent(DroneInterfaces.Handler handler, final ICommandListener listener){
+	protected void postSuccessEvent(Handler handler, final ICommandListener listener){
 		if(handler != null && listener != null){
 			handler.post(new Runnable() {
 				@Override
@@ -41,7 +42,7 @@ public class DroneVariable {
 	 * @param listener To whom the event is dispatched.
 	 *                 @param error Execution error.
 	 */
-	protected void postErrorEvent(DroneInterfaces.Handler handler, final ICommandListener listener, final int error){
+	protected void postErrorEvent(Handler handler, final ICommandListener listener, final int error){
 		if(handler != null && listener != null){
 			handler.post(new Runnable() {
 				@Override
@@ -61,7 +62,7 @@ public class DroneVariable {
 	 * @param handler Use to dispatch the event
 	 * @param listener To whom the event is dispatched.
 	 */
-	protected void postTimeoutEvent(DroneInterfaces.Handler handler, final ICommandListener listener){
+	protected void postTimeoutEvent(Handler handler, final ICommandListener listener){
 		if(handler != null && listener != null){
 			handler.post(new Runnable() {
 				@Override

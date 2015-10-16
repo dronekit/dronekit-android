@@ -7,6 +7,7 @@ import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloMessageLocatio
 
 import org.droidplanner.services.android.core.drone.DroneManager;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
+import org.droidplanner.services.android.core.drone.autopilot.apm.ArduSolo;
 import org.droidplanner.services.android.core.drone.companion.solo.SoloComp;
 import org.droidplanner.services.android.core.gcs.location.Location;
 import org.droidplanner.services.android.core.gcs.roi.ROIEstimator;
@@ -24,7 +25,8 @@ public class FollowSoloShot extends FollowAlgorithm {
 
     public FollowSoloShot(DroneManager droneMgr, Handler handler) {
         super(droneMgr, handler);
-        this.soloComp = droneMgr.getSoloComp();
+        final ArduSolo drone = (ArduSolo) droneMgr.getDrone();
+        this.soloComp = drone.getSoloComp();
     }
 
     @Override

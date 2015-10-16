@@ -1,12 +1,13 @@
 package org.droidplanner.services.android.core.drone.profiles;
 
+import android.os.Handler;
+
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.common.msg_param_value;
 
 import org.droidplanner.services.android.core.MAVLink.MavLinkParameters;
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
 import org.droidplanner.services.android.core.drone.DroneInterfaces.DroneEventsType;
-import org.droidplanner.services.android.core.drone.DroneInterfaces.Handler;
 import org.droidplanner.services.android.core.drone.DroneInterfaces.OnDroneListener;
 import org.droidplanner.services.android.core.drone.DroneVariable;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;

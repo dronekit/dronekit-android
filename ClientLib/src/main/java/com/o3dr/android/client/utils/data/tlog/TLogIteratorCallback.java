@@ -1,4 +1,4 @@
-package com.o3dr.android.client.data.tlog;
+package com.o3dr.android.client.utils.data.tlog;
 
 /**
  * Callback for asynchronous TLog iterator.

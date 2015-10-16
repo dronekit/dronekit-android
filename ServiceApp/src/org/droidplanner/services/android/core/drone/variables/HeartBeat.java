@@ -1,10 +1,11 @@
 package org.droidplanner.services.android.core.drone.variables;
 
+import android.os.Handler;
+
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.common.msg_heartbeat;
 
 import org.droidplanner.services.android.core.drone.DroneInterfaces.DroneEventsType;
-import org.droidplanner.services.android.core.drone.DroneInterfaces.Handler;
 import org.droidplanner.services.android.core.drone.DroneInterfaces.OnDroneListener;
 import org.droidplanner.services.android.core.drone.DroneVariable;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;

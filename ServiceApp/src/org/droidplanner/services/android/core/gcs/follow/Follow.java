@@ -75,7 +75,7 @@ public class Follow implements OnDroneListener, LocationReceiver {
         locationFinder.enableLocationUpdates();
         followAlgorithm.enableFollow();
 
-        droneMgr.onAttributeEvent(AttributeEvent.FOLLOW_START, null);
+        droneMgr.onAttributeEvent(AttributeEvent.FOLLOW_START, null, false);
     }
 
     private void disableFollowMe() {
@@ -86,7 +86,7 @@ public class Follow implements OnDroneListener, LocationReceiver {
 
         if (isEnabled()) {
             state = FollowStates.FOLLOW_END;
-            droneMgr.onAttributeEvent(AttributeEvent.FOLLOW_STOP, null);
+            droneMgr.onAttributeEvent(AttributeEvent.FOLLOW_STOP, null, false);
         }
     }
 
@@ -122,7 +122,7 @@ public class Follow implements OnDroneListener, LocationReceiver {
             state = FollowStates.FOLLOW_START;
         }
 
-        droneMgr.onAttributeEvent(AttributeEvent.FOLLOW_UPDATE, null);
+        droneMgr.onAttributeEvent(AttributeEvent.FOLLOW_UPDATE, null, false);
     }
 
     @Override
@@ -143,7 +143,7 @@ public class Follow implements OnDroneListener, LocationReceiver {
                 followAlgorithm.onLocationReceived(lastLocation);
         }
 
-        droneMgr.onAttributeEvent(AttributeEvent.FOLLOW_UPDATE, null);
+        droneMgr.onAttributeEvent(AttributeEvent.FOLLOW_UPDATE, null, false);
     }
 
     public FollowAlgorithm getFollowAlgorithm() {

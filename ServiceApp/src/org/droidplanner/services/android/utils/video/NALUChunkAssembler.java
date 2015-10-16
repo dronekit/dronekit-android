@@ -7,8 +7,6 @@ import android.util.Log;
 
 import java.nio.ByteBuffer;
 
-import timber.log.Timber;
-
 /**
  * Created by Fredia Huya-Kouadio on 6/1/15.
  */
@@ -80,7 +78,7 @@ public class NALUChunkAssembler {
         final int sequenceNumber = ((buffer[2] & 0xff) << 8) | (buffer[3] & 0xff);
         final int nalType = nalHeaderByte & 0x1f;
         if (nalType <= 0) {
-            Timber.d("Undefined nal type: " + nalType);
+            Log.d(TAG, "Undefined nal type: " + nalType);
             return null;
         }
 

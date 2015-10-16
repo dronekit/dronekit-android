@@ -177,7 +177,7 @@ public class ReturnToMe implements DroneInterfaces.OnDroneListener, Location.Loc
         if(attributeListener != null){
             final Bundle eventInfo = new Bundle();
             eventInfo.putInt(AttributeEventExtra.EXTRA_RETURN_TO_ME_STATE, state);
-            attributeListener.onAttributeEvent(AttributeEvent.RETURN_TO_ME_STATE_UPDATE, eventInfo);
+            attributeListener.onAttributeEvent(AttributeEvent.RETURN_TO_ME_STATE_UPDATE, eventInfo, false);
         }
     }
 

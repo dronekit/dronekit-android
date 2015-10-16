@@ -1,6 +1,7 @@
 package com.o3dr.android.client.apis;
 
 import com.o3dr.android.client.Drone;
+import com.o3dr.services.android.lib.model.AbstractCommandListener;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -35,5 +36,23 @@ public abstract class Api {
         }
 
         return apiInstance;
+    }
+
+    protected static void postSuccessEvent(final AbstractCommandListener listener){
+        if(listener != null){
+            listener.onSuccess();
+        }
+    }
+
+    protected static void postErrorEvent(int error, AbstractCommandListener listener){
+        if(listener != null){
+            listener.onError(error);
+        }
+    }
+
+    protected static void postTimeoutEvent(AbstractCommandListener listener){
+        if(listener != null){
+            listener.onTimeout();
+        }
     }
 }

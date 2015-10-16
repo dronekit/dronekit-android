@@ -3,13 +3,14 @@ package org.droidplanner.services.android.core.drone.companion.solo.sololink;
 import android.content.Context;
 import android.os.Handler;
 import android.text.TextUtils;
-import android.util.Log;
 
 import org.droidplanner.services.android.BuildConfig;
 import org.droidplanner.services.android.core.drone.companion.solo.AbstractLinkManager;
 import org.droidplanner.services.android.core.drone.companion.solo.SoloComp;
 import org.droidplanner.services.android.core.drone.companion.solo.controller.ControllerLinkManager;
 
+import com.o3dr.android.client.utils.connection.TcpConnection;
+import com.o3dr.android.client.utils.connection.UdpConnection;
 import com.o3dr.services.android.lib.drone.companion.solo.button.ButtonTypes;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSetting;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSettingGetter;
@@ -23,8 +24,6 @@ import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.model.SimpleCommandListener;
 
 import org.droidplanner.services.android.utils.connection.SshConnection;
-import org.droidplanner.services.android.utils.connection.TcpConnection;
-import org.droidplanner.services.android.utils.connection.UdpConnection;
 
 import java.io.IOException;
 import java.net.UnknownHostException;

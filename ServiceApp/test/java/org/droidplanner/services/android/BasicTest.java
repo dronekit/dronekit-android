@@ -40,24 +40,7 @@ public class BasicTest {
     private MavLinkDrone drone;
     private MockMavLinkServiceAPI mavlinkApi;
 
-    private final DroneInterfaces.Handler dpHandler = new DroneInterfaces.Handler() {
-
-        private final Handler h = new Handler();
-
-        public void removeCallbacks(Runnable thread) {
-            h.removeCallbacks(thread);
-        }
-
-        @Override
-        public void post(Runnable thread) {
-            h.post(thread);
-        }
-
-        @Override
-        public void postDelayed(Runnable thread, long timeout) {
-            h.postDelayed(thread, timeout);
-        }
-    };
+    private final Handler dpHandler = new Handler();
 
     private final MAVLinkStreams.MavlinkInputStream inputStreamListener = new MAVLinkStreams.MavlinkInputStream() {
         @Override
@@ -87,12 +70,6 @@ public class BasicTest {
 
         ConnectionParameter connParams = new ConnectionParameter(0, new Bundle(), null);
         mavlinkApi = new MockMavLinkServiceAPI();
-        DroneInterfaces.Clock clock = new DroneInterfaces.Clock() {
-            @Override
-            public long elapsedRealtime() {
-                return SystemClock.elapsedRealtime();
-            }
-        };
         DroidPlannerPrefs dpPrefs = new DroidPlannerPrefs(context);
         MAVLinkClient mavClient = new MAVLinkClient(context, inputStreamListener, connParams, mavlinkApi);
 
@@ -103,7 +80,7 @@ public class BasicTest {
             }
         }, new DroneInterfaces.AttributeEventListener() {
             @Override
-            public void onAttributeEvent(String attributeEvent, Bundle eventInfo) {
+            public void onAttributeEvent(String attributeEvent, Bundle eventInfo, boolean checkForSololinkApi) {
 
             }
         });

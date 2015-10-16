@@ -13,6 +13,8 @@ import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
 import com.o3dr.services.android.lib.model.ICommandListener;
 
 import org.droidplanner.services.android.core.drone.DroneManager;
+import org.droidplanner.services.android.core.drone.autopilot.Drone;
+import org.droidplanner.services.android.core.drone.autopilot.apm.ArduSolo;
 import org.droidplanner.services.android.core.drone.companion.solo.SoloComp;
 
 import timber.log.Timber;
@@ -26,11 +28,11 @@ public class SoloApiUtils {
     private SoloApiUtils() {
     }
 
-    public static SoloState getSoloLinkState(DroneManager droneManager) {
-        if (droneManager == null || !droneManager.isCompanionComputerEnabled())
+    public static SoloState getSoloLinkState(ArduSolo arduSolo) {
+        if (arduSolo == null)
             return null;
 
-        final SoloComp soloComp = droneManager.getSoloComp();
+        final SoloComp soloComp = arduSolo.getSoloComp();
         final Pair<String, String> wifiSettings = soloComp.getWifiSettings();
         return new SoloState(soloComp.getAutopilotVersion(), soloComp.getControllerFirmwareVersion(),
                 soloComp.getControllerVersion(), soloComp.getVehicleVersion(),
@@ -39,11 +41,11 @@ public class SoloApiUtils {
                 soloComp.getControllerMode(), soloComp.getControllerUnit());
     }
 
-    static boolean isSoloLinkFeatureAvailable(DroneManager droneManager, ICommandListener listener) {
-        if (droneManager == null)
+    static boolean isSoloLinkFeatureAvailable(Drone drone, ICommandListener listener) {
+        if (drone == null)
             return false;
 
-        if (!droneManager.isCompanionComputerEnabled()) {
+        if(!(drone instanceof ArduSolo)){
             if (listener != null) {
                 try {
                     listener.onError(CommandExecutionError.COMMAND_UNSUPPORTED);
@@ -57,78 +59,62 @@ public class SoloApiUtils {
         return true;
     }
 
-    public static void sendSoloLinkMessage(DroneManager droneManager, TLVPacket messageData,
+    public static void sendSoloLinkMessage(ArduSolo arduSolo, TLVPacket messageData,
                                            ICommandListener listener) {
-        if (!isSoloLinkFeatureAvailable(droneManager, listener) || messageData == null)
+        if (!isSoloLinkFeatureAvailable(arduSolo, listener) || messageData == null)
             return;
 
-        final SoloComp soloComp = droneManager.getSoloComp();
+        final SoloComp soloComp = arduSolo.getSoloComp();
         soloComp.sendSoloLinkMessage(messageData, listener);
     }
 
-    public static void updateSoloLinkWifiSettings(DroneManager droneManager,
+    public static void updateSoloLinkWifiSettings(ArduSolo arduSolo,
                                                   String wifiSsid, String wifiPassword,
                                                   ICommandListener listener) {
-        if (!isSoloLinkFeatureAvailable(droneManager, listener))
+        if (!isSoloLinkFeatureAvailable(arduSolo, listener))
             return;
 
         if (android.text.TextUtils.isEmpty(wifiSsid) && android.text.TextUtils.isEmpty(wifiPassword))
             return;
 
-        final SoloComp soloComp = droneManager.getSoloComp();
+        final SoloComp soloComp = arduSolo.getSoloComp();
         soloComp.updateWifiSettings(wifiSsid, wifiPassword, listener);
     }
 
-    public static void updateSoloLinkButtonSettings(DroneManager droneManager,
+    public static void updateSoloLinkButtonSettings(ArduSolo arduSolo,
                                                     SoloButtonSettingSetter buttonSettings,
                                                     ICommandListener listener) {
-        if (!isSoloLinkFeatureAvailable(droneManager, listener) || buttonSettings == null)
+        if (!isSoloLinkFeatureAvailable(arduSolo, listener) || buttonSettings == null)
             return;
 
-        final SoloComp soloComp = droneManager.getSoloComp();
+        final SoloComp soloComp = arduSolo.getSoloComp();
         soloComp.pushButtonSettings(buttonSettings, listener);
     }
 
-    public static void updateSoloLinkControllerMode(DroneManager droneManager,
+    public static void updateSoloLinkControllerMode(ArduSolo arduSolo,
                                                     @SoloControllerMode.ControllerMode int mode,
                                                     ICommandListener listener) {
-        if (!isSoloLinkFeatureAvailable(droneManager, listener))
+        if (!isSoloLinkFeatureAvailable(arduSolo, listener))
             return;
 
-        final SoloComp soloComp = droneManager.getSoloComp();
+        final SoloComp soloComp = arduSolo.getSoloComp();
         soloComp.updateControllerMode(mode, listener);
     }
 
-    public static void updateSoloControllerUnit(DroneManager droneManager, @SoloControllerUnits.ControllerUnit String unit, ICommandListener listener){
-        if(!isSoloLinkFeatureAvailable(droneManager, listener))
+    public static void updateSoloControllerUnit(ArduSolo arduSolo, @SoloControllerUnits.ControllerUnit String unit, ICommandListener listener){
+        if(!isSoloLinkFeatureAvailable(arduSolo, listener))
             return;
 
-        final SoloComp soloComp = droneManager.getSoloComp();
+        final SoloComp soloComp = arduSolo.getSoloComp();
         soloComp.updateControllerUnit(unit, listener);
     }
 
-    public static void updateSoloLinkEUTxPowerCompliance(DroneManager droneManager, boolean isCompliant, ICommandListener listener){
-        if(!isSoloLinkFeatureAvailable(droneManager, listener))
+    public static void updateSoloLinkEUTxPowerCompliance(ArduSolo arduSolo, boolean isCompliant, ICommandListener listener){
+        if(!isSoloLinkFeatureAvailable(arduSolo, listener))
             return;
 
-        final SoloComp soloComp = droneManager.getSoloComp();
+        final SoloComp soloComp = arduSolo.getSoloComp();
         soloComp.updateEUTxPowerCompliance(isCompliant, listener);
     }
 
-    public static void startVideoStream(DroneManager droneManager, String appId, String videoTag, Surface videoSurface,
-                                        ICommandListener listener) {
-        if (!isSoloLinkFeatureAvailable(droneManager, listener))
-            return;
-
-        final SoloComp soloComp = droneManager.getSoloComp();
-        soloComp.startVideoStream(appId, videoTag, videoSurface, listener);
-    }
-
-    public static void stopVideoStream(DroneManager droneManager, String appId, String videoTag, ICommandListener listener) {
-        if (!isSoloLinkFeatureAvailable(droneManager, listener))
-            return;
-
-        final SoloComp soloComp = droneManager.getSoloComp();
-        soloComp.stopVideoStream(appId, videoTag, listener);
-    }
 }

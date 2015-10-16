@@ -1,5 +1,7 @@
 package org.droidplanner.services.android.core.drone;
 
+import android.os.Handler;
+
 import org.droidplanner.services.android.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.services.android.core.drone.DroneInterfaces.OnDroneListener;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
@@ -36,9 +38,9 @@ public class DroneEvents extends DroneVariable {
         }
     };
 
-    private final DroneInterfaces.Handler handler;
+    private final Handler handler;
 
-    public DroneEvents(MavLinkDrone myDrone, DroneInterfaces.Handler handler) {
+    public DroneEvents(MavLinkDrone myDrone, Handler handler) {
         super(myDrone);
         this.handler = handler;
     }
