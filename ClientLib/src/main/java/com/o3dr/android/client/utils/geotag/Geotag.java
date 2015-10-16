@@ -73,6 +73,8 @@ public class Geotag {
                 HashMap<File, File> geoTaggedFiles = new HashMap<>();
                 HashMap<File, Exception> failedFiles = new HashMap<>();
 
+                int numTotal = matchedPhotos.size();
+                int numProcessed = 0;
                 for (Map.Entry<TLogParser.Event, File> entry : matchedPhotos.entrySet()) {
                     File photo = entry.getValue();
 
@@ -84,6 +86,9 @@ public class Geotag {
                     } catch (Exception e) {
                         failedFiles.put(photo, e);
                     }
+
+                    numProcessed++;
+                    sendProgress(handler, callback, numProcessed, numTotal);
                 }
 
                 sendResult(handler, callback, geoTaggedFiles, failedFiles);
@@ -147,6 +152,17 @@ public class Geotag {
         }
     }
 
+    private static void sendProgress(Handler handler, final GeoTagCallback geoTagCallback, final int numProcessed, final int numTotal) {
+        if (geoTagCallback != null) {
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    geoTagCallback.onProgress(numProcessed, numTotal);
+                }
+            });
+        }
+    }
+
     private static void sendFailed(Handler handler, final GeoTagCallback geoTagCallback, final Exception exception) {
         if (geoTagCallback != null) {
             handler.post(new Runnable() {
@@ -202,6 +218,14 @@ public class Geotag {
          * @param failedFiles     {@link HashMap<File, Exception>} map of files sent in to exception that occurred when geotagging.
          */
         void onResult(HashMap<File, File> geoTaggedPhotos, HashMap<File, Exception> failedFiles);
+
+        /**
+         * Callback to notify when as items are processed
+         *
+         * @param numProcessed number of items that have been processed.
+         * @param numTotal total number of items that will be processed for geotagging
+         */
+        void onProgress(int numProcessed, int numTotal);
 
         /**
          * Callback for failure in geotagging
