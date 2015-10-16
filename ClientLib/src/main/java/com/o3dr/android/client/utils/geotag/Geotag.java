@@ -5,7 +5,6 @@ import android.media.ExifInterface;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
-import android.os.StatFs;
 
 import com.MAVLink.ardupilotmega.msg_camera_feedback;
 import com.o3dr.android.client.data.tlog.TLogParser;
@@ -56,7 +55,7 @@ public class Geotag {
         getInstance().execute(new Runnable() {
             @Override
             public void run() {
-                File saveDir = new File(getSaveRootDir(context).getPath(), "GeoTag");
+                File saveDir = new File(getSaveRootDir(context), "GeoTag");
 
                 if (!saveDir.exists() && !saveDir.mkdir()) {
                     sendFailed(handler, callback, new IllegalStateException("Failed to create directory for images"));
@@ -66,7 +65,7 @@ public class Geotag {
                 GeoTagAlgorithm geoTagAlgorithm = new GeoTagAlgorithmImpl();
                 HashMap<TLogParser.Event, File> matchedPhotos = geoTagAlgorithm.match(events, photos);
 
-                if (!hasEnoughMemory(saveDir.getPath(), matchedPhotos.values())) {
+                if (!hasEnoughMemory(saveDir, matchedPhotos.values())) {
                     sendFailed(handler, callback, new IllegalStateException("Insufficient external storage space."));
                     return;
                 }
@@ -77,9 +76,9 @@ public class Geotag {
                 for (Map.Entry<TLogParser.Event, File> entry : matchedPhotos.entrySet()) {
                     File photo = entry.getValue();
 
-                    File newFile = new File(saveDir.getPath(), photo.getName());
+                    File newFile = new File(saveDir, photo.getName());
                     try {
-                        copyFile(photo.getPath(), newFile.getPath());
+                        copyFile(photo, newFile);
                         updateExif(entry.getKey(), newFile);
                         geoTaggedFiles.put(photo, newFile);
                     } catch (Exception e) {
@@ -107,9 +106,8 @@ public class Geotag {
         return saveDir;
     }
 
-    private static boolean hasEnoughMemory(String filePath, Collection<File> photos) {
-        StatFs stat = new StatFs(filePath);
-        long freeBytes = stat.getAvailableBytes();
+    private static boolean hasEnoughMemory(File file, Collection<File> photos) {
+        long freeBytes = file.getUsableSpace();
         long bytesNeeded = 0;
         for (File photo : photos) {
             bytesNeeded += photo.length();
@@ -121,7 +119,7 @@ public class Geotag {
         return true;
     }
 
-    private static void copyFile(String inputPath, String outputPath) throws IOException {
+    private static void copyFile(File inputPath, File outputPath) throws IOException {
         InputStream in = new FileInputStream(inputPath);
         OutputStream out = new FileOutputStream(outputPath);
 
@@ -176,15 +174,14 @@ public class Geotag {
     }
 
     private static final String convertLatLngToDMS(double coord) {
+        double dDegree = Math.abs(coord);
+        int degree = (int) dDegree;
 
-        coord = Math.abs(coord);
-        int degree = (int) coord;
-        coord *= 60;
-        coord -= (degree * 60.0d);
-        int minute = (int) coord;
-        coord *= 60;
-        coord -= (minute * 60.0d);
-        int second = (int) (coord * 1000.0d);
+        double dMinute = (dDegree - degree) * 60;
+        int minute = (int) dMinute;
+
+        double dSecond = (dMinute - minute) * 60;
+        int second = (int) (dSecond * 1000);
 
         return String.format("%s/1,%s/1,%s/1000", degree, minute, second);
     }
