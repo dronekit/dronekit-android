@@ -1,5 +1,6 @@
 package org.droidplanner.services.android.core.drone.variables;
 
+import android.os.Handler;
 import android.os.RemoteException;
 
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
@@ -27,13 +28,13 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener {
 
     private Runnable mPostInitializationTask;
 
-    private final DroneInterfaces.Handler handler;
+    private final Handler handler;
 
     public enum GuidedStates {
         UNINITIALIZED, IDLE, ACTIVE
     }
 
-    public GuidedPoint(MavLinkDrone myDrone, DroneInterfaces.Handler handler) {
+    public GuidedPoint(MavLinkDrone myDrone, Handler handler) {
         super(myDrone);
         this.handler = handler;
         myDrone.addDroneListener(this);

@@ -682,6 +682,10 @@ public class Drone {
         MissionApi.getApi(this).loadWaypoints();
     }
 
+    public Handler getHandler(){
+        return handler;
+    }
+
     void notifyDroneConnectionFailed(final ConnectionResult result) {
         if (droneListeners.isEmpty())
             return;

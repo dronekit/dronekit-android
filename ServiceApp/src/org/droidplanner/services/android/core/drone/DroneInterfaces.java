@@ -222,7 +222,7 @@ public class DroneInterfaces {
 	}
 
 	public interface AttributeEventListener {
-		void onAttributeEvent(String attributeEvent, Bundle eventInfo);
+		void onAttributeEvent(String attributeEvent, Bundle eventInfo, boolean checkForSololinkApi);
 	}
 
 	public interface OnParameterManagerListener {
@@ -239,22 +239,6 @@ public class DroneInterfaces {
 		public void onWaypointEvent(WaypointManager.WaypointEvent_Type wpEvent, int index, int count);
 
 		public void onEndWaypointEvent(WaypointManager.WaypointEvent_Type wpEvent);
-	}
-
-	public interface Clock {
-
-		long elapsedRealtime();
-
-	}
-
-	public interface Handler {
-
-		void removeCallbacks(Runnable thread);
-
-        void post(Runnable thread);
-
-		void postDelayed(Runnable thread, long timeout);
-
 	}
 
 }

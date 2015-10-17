@@ -1,7 +1,9 @@
 package org.droidplanner.services.android.core.drone.autopilot.generic;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.TextUtils;
+import android.view.Surface;
 
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.ardupilotmega.msg_ekf_status_report;
@@ -9,7 +11,6 @@ import com.MAVLink.common.msg_attitude;
 import com.MAVLink.common.msg_heartbeat;
 import com.MAVLink.common.msg_radio_status;
 import com.MAVLink.common.msg_vibration;
-import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.action.StateActions;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
@@ -28,7 +29,6 @@ import com.o3dr.services.android.lib.model.action.Action;
 import com.o3dr.services.android.lib.util.MathUtils;
 
 import org.droidplanner.services.android.core.MAVLink.MAVLinkStreams;
-import org.droidplanner.services.android.core.MAVLink.command.doCmd.MavLinkDoCmds;
 import org.droidplanner.services.android.core.drone.DroneEvents;
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
@@ -37,6 +37,7 @@ import org.droidplanner.services.android.core.drone.variables.StreamRates;
 import org.droidplanner.services.android.core.drone.variables.Type;
 import org.droidplanner.services.android.core.model.AutopilotWarningParser;
 import org.droidplanner.services.android.utils.CommonApiUtils;
+import org.droidplanner.services.android.utils.video.VideoManager;
 
 /**
  * Base drone implementation.
@@ -47,6 +48,8 @@ import org.droidplanner.services.android.utils.CommonApiUtils;
 public abstract class GenericMavLinkDrone implements MavLinkDrone {
 
     private final MAVLinkStreams.MAVLinkOutputStream MavClient;
+
+    protected final VideoManager videoMgr;
 
     private final DroneEvents events;
     protected final Type type;
@@ -62,7 +65,10 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
     protected final Attitude attitude = new Attitude();
     protected final Vibration vibration = new Vibration();
 
-    protected GenericMavLinkDrone(DroneInterfaces.Handler handler, MAVLinkStreams.MAVLinkOutputStream mavClient, AutopilotWarningParser warningParser, DroneInterfaces.AttributeEventListener listener) {
+    protected final Handler handler;
+
+    protected GenericMavLinkDrone(Handler handler, MAVLinkStreams.MAVLinkOutputStream mavClient, AutopilotWarningParser warningParser, DroneInterfaces.AttributeEventListener listener) {
+        this.handler = handler;
         this.MavClient = mavClient;
 
         events = new DroneEvents(this, handler);
@@ -71,6 +77,8 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
         this.state = new State(this, handler, warningParser);
 
         this.attributeListener = listener;
+
+        this.videoMgr = new VideoManager(handler);
     }
 
     @Override
@@ -98,13 +106,33 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
         events.removeDroneListener(listener);
     }
 
+    public void startVideoStream(int udpPort, String appId, String newVideoTag, Surface videoSurface, final ICommandListener listener){
+        videoMgr.startVideoStream(udpPort, appId, newVideoTag, videoSurface, listener);
+    }
+
+    public void stopVideoStream(String appId, String currentVideoTag, final ICommandListener listener){
+        videoMgr.stopVideoStream(appId, currentVideoTag, listener);
+    }
+
+    /**
+     * Stops the video stream if the current owner is the passed argument.
+     * @param appId
+     */
+    public void tryStoppingVideoStream(String appId){
+        videoMgr.tryStoppingVideoStream(appId);
+    }
+
     protected void notifyAttributeListener(String attributeEvent){
         notifyAttributeListener(attributeEvent, null);
     }
 
     protected void notifyAttributeListener(String attributeEvent, Bundle eventInfo){
+        notifyAttributeListener(attributeEvent, eventInfo, false);
+    }
+
+    protected void notifyAttributeListener(String attributeEvent, Bundle eventInfo, boolean checkForSololinkApi){
         if(attributeListener != null){
-            attributeListener.onAttributeEvent(attributeEvent, eventInfo);
+            attributeListener.onAttributeEvent(attributeEvent, eventInfo, checkForSololinkApi);
         }
     }
 

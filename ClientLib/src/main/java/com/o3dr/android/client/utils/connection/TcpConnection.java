@@ -1,4 +1,4 @@
-package org.droidplanner.services.android.utils.connection;
+package com.o3dr.android.client.utils.connection;
 
 import android.os.Handler;
 
