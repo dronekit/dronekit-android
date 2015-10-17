@@ -139,6 +139,7 @@ android {
 
         sitl {
             signingConfig signingConfigs.debug
+            versionNameSuffix generateVersionNameSuffix(versionBuild, "sitl")
             buildConfigField "boolean", "SITL_DEBUG", "true"
             buildConfigField "boolean", "WRITE_LOG_FILE", "true"
             debuggable true
