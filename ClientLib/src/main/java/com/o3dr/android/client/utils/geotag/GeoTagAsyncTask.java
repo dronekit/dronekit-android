@@ -256,23 +256,7 @@ public abstract class GeoTagAsyncTask extends AsyncTask<Void, Integer, GeoTagAsy
         return String.format("%s/1,%s/1,%s/1000", degree, minute, second);
     }
 
-    private interface GeoTagAlgorithm {
+    protected interface GeoTagAlgorithm {
         HashMap<TLogParser.Event, File> match(List<TLogParser.Event> events, ArrayList<File> photos);
-    }
-
-    private static class GeoTagAlgorithmImpl implements GeoTagAlgorithm {
-        @Override
-        public HashMap<TLogParser.Event, File> match(List<TLogParser.Event> events, ArrayList<File> photos) {
-            HashMap<TLogParser.Event, File> matchedMap = new HashMap<>();
-
-            int eventsSize = events.size();
-            int photosSize = photos.size();
-
-            for (int i = eventsSize - 1, j = photosSize - 1; i >= 0 && j >= 0; i--, j--) {
-                matchedMap.put(events.get(i), photos.get(j));
-            }
-
-            return matchedMap;
-        }
     }
 }
