@@ -7,7 +7,7 @@ import android.os.Build;
 import android.os.Environment;
 
 import com.MAVLink.ardupilotmega.msg_camera_feedback;
-import com.o3dr.android.client.data.tlog.TLogParser;
+import com.o3dr.android.client.utils.data.tlog.TLogParser;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -36,7 +36,7 @@ public abstract class GeoTagAsyncTask extends AsyncTask<Void, Integer, GeoTagAsy
      * Warning: this copies data to external storage
      *
      * @param context  {@link Context}
-     * @param events   {@link List<com.o3dr.android.client.data.tlog.TLogParser.Event>} list of events to geotag photos.
+     * @param events   {@link List<com.o3dr.android.client.utils.data.tlog.TLogParser.Event>} list of events to geotag photos.
      * @param photos   {@link List<File>} list of files of photos to geotag.
      */
     public GeoTagAsyncTask(Context context, List<TLogParser.Event> events, ArrayList<File> photos) {
