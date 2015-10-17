@@ -190,7 +190,8 @@ public abstract class GeoTagAsyncTask extends AsyncTask<Void, Integer, GeoTagAsy
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             File dirs[] = context.getExternalFilesDirs(null);
             for (File dir : dirs) {
-                if (Environment.isExternalStorageRemovable(dir)) {
+                // dir can be null if the device contains an external SD card slot but no SD card is present.
+                if (dir != null && Environment.isExternalStorageRemovable(dir)) {
                     saveDir = dir;
                     break;
                 }
@@ -234,13 +235,13 @@ public abstract class GeoTagAsyncTask extends AsyncTask<Void, Integer, GeoTagAsy
         double lng = (double) msg.lng / 10000000;
         String alt = String.valueOf(msg.alt_msl);
 
-        ExifInterface newExif = new ExifInterface(photoFile.getPath());
-        newExif.setAttribute(ExifInterface.TAG_GPS_LONGITUDE, convertLatLngToDMS(lng));
-        newExif.setAttribute(ExifInterface.TAG_GPS_LATITUDE, convertLatLngToDMS(lat));
-        newExif.setAttribute(ExifInterface.TAG_GPS_LATITUDE_REF, lat < 0 ? "S" : "N");
-        newExif.setAttribute(ExifInterface.TAG_GPS_LONGITUDE_REF, lng < 0 ? "W" : "E");
-        newExif.setAttribute(ExifInterface.TAG_GPS_ALTITUDE, alt);
-        newExif.saveAttributes();
+        ExifInterface exifInterface = new ExifInterface(photoFile.getPath());
+        exifInterface.setAttribute(ExifInterface.TAG_GPS_LONGITUDE, convertLatLngToDMS(lng));
+        exifInterface.setAttribute(ExifInterface.TAG_GPS_LATITUDE, convertLatLngToDMS(lat));
+        exifInterface.setAttribute(ExifInterface.TAG_GPS_LATITUDE_REF, lat < 0 ? "S" : "N");
+        exifInterface.setAttribute(ExifInterface.TAG_GPS_LONGITUDE_REF, lng < 0 ? "W" : "E");
+        exifInterface.setAttribute(ExifInterface.TAG_GPS_ALTITUDE, alt);
+        exifInterface.saveAttributes();
     }
 
     private static String convertLatLngToDMS(double coord) {
