@@ -16,6 +16,7 @@ import com.o3dr.android.client.apis.CapabilityApi;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.action.CapabilityActions;
+import com.o3dr.services.android.lib.drone.action.GimbalActions;
 import com.o3dr.services.android.lib.drone.action.StateActions;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
@@ -29,6 +30,7 @@ import com.o3dr.services.android.lib.drone.property.DroneAttribute;
 import com.o3dr.services.android.lib.gcs.action.FollowMeActions;
 import com.o3dr.services.android.lib.gcs.follow.FollowType;
 import com.o3dr.services.android.lib.gcs.returnToMe.ReturnToMeState;
+import com.o3dr.services.android.lib.model.AbstractCommandListener;
 import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
 
@@ -200,8 +202,8 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
     public void destroy() {
         Log.d(TAG, "Destroying drone manager.");
 
-        destroyAutopilot();
         disconnect();
+        destroyAutopilot();
 
         connectedApps.clear();
         tlogUploaders.clear();
@@ -282,7 +284,23 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
         }
 
         if (mavClient.isConnected() && connectedApps.isEmpty()) {
-            mavClient.closeConnection();
+            //Reset the gimbal mount mode
+            executeAsyncAction(new Action(GimbalActions.ACTION_RESET_GIMBAL_MOUNT_MODE), new AbstractCommandListener() {
+                @Override
+                public void onSuccess() {
+                    mavClient.closeConnection();
+                }
+
+                @Override
+                public void onError(int executionError) {
+                    mavClient.closeConnection();
+                }
+
+                @Override
+                public void onTimeout() {
+                    mavClient.closeConnection();
+                }
+            });
         }
     }
 
