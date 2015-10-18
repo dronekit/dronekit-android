@@ -17,6 +17,7 @@ import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.action.CameraActions;
+import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionResult;
 import com.o3dr.services.android.lib.drone.connection.DroneSharePrefs;
@@ -277,7 +278,11 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 break;
 
             default:
-                droneMgr.executeAsyncAction(action, listener);
+                if(droneMgr != null) {
+                    droneMgr.executeAsyncAction(action, listener);
+                }else {
+                    CommonApiUtils.postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
+                }
                 break;
         }
     }
