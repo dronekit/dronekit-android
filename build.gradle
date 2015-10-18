@@ -22,8 +22,14 @@ def computeVersionCode(int versionMajor, int versionMinor, int versionPatch, int
     return versionMajor * 100000 + versionMinor * 1000 + versionPatch * 10 + versionBuild
 }
 
-def generateVersionName(String versionPrefix, int versionMajor, int versionMinor, int versionPatch){
-    return "${versionPrefix}${versionMajor}.${versionMinor}.${versionPatch}"
+def generateVersionName(String versionPrefix, int versionMajor, int versionMinor, int versionPatch, String versionSuffix = ""){
+    def versionName = "${versionPrefix}${versionMajor}.${versionMinor}.${versionPatch}"
+
+    if(versionSuffix != null && !versionSuffix.isEmpty() && versionSuffix != "release"){
+        versionName += "-${versionSuffix}"
+    }
+
+    return versionName
 }
 
 def generateVersionNameSuffix(int versionBuild, String releaseType){
