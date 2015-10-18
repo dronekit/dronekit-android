@@ -206,13 +206,13 @@ public class ArduSolo extends ArduCopter {
     }
 
     @Override
-    public void startVideoStream(int udpPort, String appId, String newVideoTag, Surface videoSurface, final ICommandListener listener){
+    public void startVideoStream(Bundle videoProps, String appId, String newVideoTag, Surface videoSurface, final ICommandListener listener){
         if(!soloComp.hasStreamingPermission()){
             postErrorEvent(CommandExecutionError.COMMAND_DENIED, listener);
             return;
         }
 
-        super.startVideoStream(udpPort, appId, newVideoTag, videoSurface, listener);
+        super.startVideoStream(videoProps, appId, newVideoTag, videoSurface, listener);
     }
 
     protected void postErrorEvent(final int error, final ICommandListener listener) {
