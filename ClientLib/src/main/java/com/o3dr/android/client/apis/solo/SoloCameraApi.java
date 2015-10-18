@@ -6,6 +6,7 @@ import android.view.Surface;
 import com.o3dr.android.client.Drone;
 import com.o3dr.android.client.apis.CameraApi;
 import com.o3dr.android.client.apis.CapabilityApi;
+import com.o3dr.services.android.lib.drone.action.CameraActions;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloGoproConstants;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloGoproRecord;
@@ -13,8 +14,6 @@ import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloGoproSetReques
 import com.o3dr.services.android.lib.model.AbstractCommandListener;
 
 import java.util.concurrent.ConcurrentHashMap;
-
-import static com.o3dr.services.android.lib.drone.action.CameraActions.DEFAULT_VIDEO_UDP_PORT;
 
 /**
  * Provides access to the solo video specific functionality
@@ -33,6 +32,8 @@ public class SoloCameraApi extends SoloApi {
             return new SoloCameraApi(drone);
         }
     };
+
+    private static final int SOLO_STREAM_UDP_PORT = 5600;
 
     /**
      * Retrieves a sololink api instance.
@@ -179,7 +180,9 @@ public class SoloCameraApi extends SoloApi {
                         switch (result) {
 
                             case CapabilityApi.FEATURE_SUPPORTED:
-                                cameraApi.startVideoStream(DEFAULT_VIDEO_UDP_PORT, surface, tag, listener);
+                                final Bundle videoProps = new Bundle();
+                                videoProps.putInt(CameraApi.VIDEO_PROPS_UDP_PORT, SOLO_STREAM_UDP_PORT);
+                                cameraApi.startVideoStream(surface, tag, videoProps, listener);
                                 break;
 
                             case CapabilityApi.FEATURE_UNSUPPORTED:

@@ -148,14 +148,20 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
 
     @Override
     public void start(SoloLinkListener listener) {
-        Timber.d("Starting solo link manager");
+        if(!isStarted()) {
+            Timber.i("Starting solo link manager");
+        }
+
         super.start(listener);
         this.linkListener = listener;
     }
 
     @Override
     public void stop() {
-        Timber.d("Stopping solo link manager");
+        if(isStarted()) {
+            Timber.i("Stopping solo link manager");
+        }
+
         super.stop();
     }
 

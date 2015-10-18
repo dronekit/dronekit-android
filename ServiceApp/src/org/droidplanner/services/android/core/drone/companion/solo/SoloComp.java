@@ -127,11 +127,11 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
     }
 
     public void stop() {
+        soloLinkMgr.stop();
+
         if(!BuildConfig.SITL_DEBUG) {
             controllerLinkManager.stop();
         }
-
-        soloLinkMgr.stop();
     }
 
     public void refreshState() {
@@ -226,11 +226,11 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
         if (compListener != null)
             compListener.onDisconnected();
 
+        soloLinkMgr.stop();
+
         if(!BuildConfig.SITL_DEBUG) {
             controllerLinkManager.stop();
         }
-
-        soloLinkMgr.stop();
     }
 
     @Override

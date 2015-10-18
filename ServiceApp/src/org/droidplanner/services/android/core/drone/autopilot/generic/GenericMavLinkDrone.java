@@ -106,8 +106,8 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
         events.removeDroneListener(listener);
     }
 
-    public void startVideoStream(int udpPort, String appId, String newVideoTag, Surface videoSurface, final ICommandListener listener){
-        videoMgr.startVideoStream(udpPort, appId, newVideoTag, videoSurface, listener);
+    public void startVideoStream(Bundle videoProps, String appId, String newVideoTag, Surface videoSurface, final ICommandListener listener){
+        videoMgr.startVideoStream(videoProps, appId, newVideoTag, videoSurface, listener);
     }
 
     public void stopVideoStream(String appId, String currentVideoTag, final ICommandListener listener){
