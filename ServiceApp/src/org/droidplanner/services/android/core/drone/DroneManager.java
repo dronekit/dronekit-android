@@ -30,7 +30,6 @@ import com.o3dr.services.android.lib.drone.property.DroneAttribute;
 import com.o3dr.services.android.lib.gcs.action.FollowMeActions;
 import com.o3dr.services.android.lib.gcs.follow.FollowType;
 import com.o3dr.services.android.lib.gcs.returnToMe.ReturnToMeState;
-import com.o3dr.services.android.lib.model.AbstractCommandListener;
 import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
 
@@ -285,22 +284,9 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
 
         if (mavClient.isConnected() && connectedApps.isEmpty()) {
             //Reset the gimbal mount mode
-            executeAsyncAction(new Action(GimbalActions.ACTION_RESET_GIMBAL_MOUNT_MODE), new AbstractCommandListener() {
-                @Override
-                public void onSuccess() {
-                    mavClient.closeConnection();
-                }
+            executeAsyncAction(new Action(GimbalActions.ACTION_RESET_GIMBAL_MOUNT_MODE), null);
 
-                @Override
-                public void onError(int executionError) {
-                    mavClient.closeConnection();
-                }
-
-                @Override
-                public void onTimeout() {
-                    mavClient.closeConnection();
-                }
-            });
+            mavClient.closeConnection();
         }
     }
 
