@@ -32,6 +32,7 @@ import com.o3dr.services.android.lib.model.IObserver;
 import com.o3dr.services.android.lib.model.action.Action;
 
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
+import org.droidplanner.services.android.core.drone.autopilot.Drone;
 import org.droidplanner.services.android.core.drone.variables.calibration.AccelCalibration;
 import org.droidplanner.services.android.core.parameters.Parameter;
 import org.droidplanner.services.android.core.drone.DroneManager;
@@ -39,6 +40,7 @@ import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.exception.ConnectionException;
 import org.droidplanner.services.android.core.drone.DroneEventsListener;
 import org.droidplanner.services.android.utils.CommonApiUtils;
+import org.droidplanner.services.android.utils.video.VideoManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -249,21 +251,29 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
             case CameraActions.ACTION_START_VIDEO_STREAM: {
                 final Surface videoSurface = data.getParcelable(CameraActions.EXTRA_VIDEO_DISPLAY);
                 final String videoTag = data.getString(CameraActions.EXTRA_VIDEO_TAG, "");
-                final int videoUdpPort = data.getInt(CameraActions.EXTRA_VIDEO_UDP_PORT, CameraActions.DEFAULT_VIDEO_UDP_PORT);
-                CommonApiUtils.startVideoStream(droneMgr.getDrone(), videoUdpPort, ownerId, videoTag, videoSurface, listener);
+
+                Bundle videoProps = data.getBundle(CameraActions.EXTRA_VIDEO_PROPERTIES);
+                if(videoProps == null){
+                    //Only case where it's null is when interacting with a deprecated client version.
+                    //In this case, we assume that the client is attempting to start a solo stream, since that's
+                    //the only api that was exposed.
+                    videoProps = new Bundle();
+                    videoProps.putInt(CameraActions.EXTRA_VIDEO_PROPS_UDP_PORT, VideoManager.ARTOO_UDP_PORT);
+                }
+
+                CommonApiUtils.startVideoStream(getDrone(), videoProps, ownerId, videoTag, videoSurface, listener);
                 break;
             }
 
             case CameraActions.ACTION_STOP_VIDEO_STREAM: {
                 final String videoTag = data.getString(CameraActions.EXTRA_VIDEO_TAG, "");
-                CommonApiUtils.stopVideoStream(droneMgr.getDrone(), ownerId, videoTag, listener);
+                CommonApiUtils.stopVideoStream(getDrone(), ownerId, videoTag, listener);
                 break;
             }
 
             // MISSION ACTIONS
             case MissionActions.ACTION_BUILD_COMPLEX_MISSION_ITEM:
-                final MavLinkDrone drone = droneMgr == null ? null : droneMgr.getDrone();
-                CommonApiUtils.buildComplexMissionItem(drone, data);
+                CommonApiUtils.buildComplexMissionItem(getDrone(), data);
                 break;
 
             default:

@@ -1046,7 +1046,7 @@ public class CommonApiUtils {
                 msgReport.offdiag_x, msgReport.offdiag_y, msgReport.offdiag_z);
     }
 
-    public static void startVideoStream(Drone drone, int udpPort, String appId, String videoTag, Surface videoSurface,
+    public static void startVideoStream(Drone drone, Bundle videoProps, String appId, String videoTag, Surface videoSurface,
                                         ICommandListener listener) {
 
         if(!(drone instanceof GenericMavLinkDrone)){
@@ -1055,7 +1055,7 @@ public class CommonApiUtils {
         }
 
         final GenericMavLinkDrone mavLinkDrone = (GenericMavLinkDrone) drone;
-        mavLinkDrone.startVideoStream(udpPort, appId, videoTag, videoSurface, listener);
+        mavLinkDrone.startVideoStream(videoProps, appId, videoTag, videoSurface, listener);
     }
 
     public static void stopVideoStream(Drone drone, String appId, String videoTag, ICommandListener listener) {

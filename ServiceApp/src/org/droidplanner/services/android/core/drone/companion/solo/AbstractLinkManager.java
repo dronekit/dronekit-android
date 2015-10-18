@@ -175,12 +175,10 @@ public abstract class AbstractLinkManager<T extends AbstractLinkManager.LinkList
                 //Try to reconnect
                 handler.postDelayed(reconnectTask, RECONNECT_COUNTDOWN);
             }
-
-            if (linkListener != null && wasConnected.get())
-                linkListener.onLinkDisconnected();
-
-            wasConnected.set(false);
         }
+
+        if (linkListener != null && wasConnected.compareAndSet(true, false))
+            linkListener.onLinkDisconnected();
     }
 
     protected boolean shouldReconnect(){

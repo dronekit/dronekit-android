@@ -1,6 +1,7 @@
 package com.o3dr.android.client.apis;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.view.Surface;
 
 import com.o3dr.android.client.Drone;
@@ -13,8 +14,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import static com.o3dr.services.android.lib.drone.action.CameraActions.ACTION_START_VIDEO_STREAM;
 import static com.o3dr.services.android.lib.drone.action.CameraActions.ACTION_STOP_VIDEO_STREAM;
 import static com.o3dr.services.android.lib.drone.action.CameraActions.EXTRA_VIDEO_DISPLAY;
+import static com.o3dr.services.android.lib.drone.action.CameraActions.EXTRA_VIDEO_PROPS_UDP_PORT;
 import static com.o3dr.services.android.lib.drone.action.CameraActions.EXTRA_VIDEO_TAG;
-import static com.o3dr.services.android.lib.drone.action.CameraActions.EXTRA_VIDEO_UDP_PORT;
+import static com.o3dr.services.android.lib.drone.action.CameraActions.EXTRA_VIDEO_PROPERTIES;
 
 /**
  * Provides support to control generic camera functionality
@@ -31,6 +33,11 @@ public class CameraApi extends Api {
             return new CameraApi(drone);
         }
     };
+
+    /**
+     * Used to specify the udp port from which to access the streamed video.
+     */
+    public static final String VIDEO_PROPS_UDP_PORT = EXTRA_VIDEO_PROPS_UDP_PORT;
 
     /**
      * Retrieves a camera api instance
@@ -52,14 +59,14 @@ public class CameraApi extends Api {
      * Attempt to grab ownership and start the video stream from the connected drone. Can fail if
      * the video stream is already owned by another client.
      *
-     * @param udpPort  Udp port from which to expect the video stream
      * @param surface  Surface object onto which the video is decoded.
      * @param tag      Video tag.
+     * @param videoProps Non-null video properties. @see VIDEO_PROPS_UDP_PORT
      * @param listener Register a callback to receive update of the command execution status.
      * @since 2.6.8
      */
-    public void startVideoStream(final int udpPort, final Surface surface, final String tag, final AbstractCommandListener listener) {
-        if (surface == null) {
+    public void startVideoStream(@NonNull final Surface surface, final String tag, @NonNull Bundle videoProps, final AbstractCommandListener listener) {
+        if (surface == null || videoProps == null) {
             postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
             return;
         }
@@ -67,7 +74,7 @@ public class CameraApi extends Api {
         final Bundle params = new Bundle();
         params.putParcelable(EXTRA_VIDEO_DISPLAY, surface);
         params.putString(EXTRA_VIDEO_TAG, tag);
-        params.putInt(EXTRA_VIDEO_UDP_PORT, udpPort);
+        params.putBundle(EXTRA_VIDEO_PROPERTIES, videoProps);
 
         drone.performAsyncActionOnDroneThread(new Action(ACTION_START_VIDEO_STREAM, params), listener);
     }

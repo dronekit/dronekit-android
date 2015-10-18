@@ -14,9 +14,9 @@ public class CameraActions {
     public static final String ACTION_START_VIDEO_STREAM = PACKAGE_NAME + ".START_VIDEO_STREAM";
     public static final String EXTRA_VIDEO_DISPLAY = "extra_video_display";
     public static final String EXTRA_VIDEO_TAG = "extra_video_tag";
-    public static final String EXTRA_VIDEO_UDP_PORT = "extra_video_udp_port";
 
-    public static final int DEFAULT_VIDEO_UDP_PORT = 5600;
+    public static final String EXTRA_VIDEO_PROPERTIES = "extra_video_properties";
+    public static final String EXTRA_VIDEO_PROPS_UDP_PORT = "extra_video_props_udp_port";
 
     public static final String ACTION_STOP_VIDEO_STREAM = PACKAGE_NAME + ".STOP_VIDEO_STREAM";
 }
