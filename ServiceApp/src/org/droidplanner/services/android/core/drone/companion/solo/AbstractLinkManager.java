@@ -168,6 +168,10 @@ public abstract class AbstractLinkManager<T extends AbstractLinkManager.LinkList
             linkListener.onLinkConnected();
     }
 
+    protected boolean isStarted(){
+        return isStarted.get();
+    }
+
     @Override
     public void onIpDisconnected() {
         if (isStarted.get()) {
