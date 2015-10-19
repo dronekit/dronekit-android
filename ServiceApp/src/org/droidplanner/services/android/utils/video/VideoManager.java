@@ -1,5 +1,6 @@
 package org.droidplanner.services.android.utils.video;
 
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.RemoteException;
 import android.text.TextUtils;
@@ -9,6 +10,7 @@ import android.view.Surface;
 import com.o3dr.android.client.utils.connection.AbstractIpConnection;
 import com.o3dr.android.client.utils.connection.IpConnectionListener;
 import com.o3dr.android.client.utils.connection.UdpConnection;
+import com.o3dr.services.android.lib.drone.action.CameraActions;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.model.ICommandListener;
 
@@ -61,7 +63,7 @@ public class VideoManager implements IpConnectionListener {
 
     private final MediaCodecManager mediaCodecManager;
 
-    private int udpPort = -1;
+    private int linkPort = -1;
 
     public VideoManager(Handler handler) {
         this.handler = handler;
@@ -122,14 +124,14 @@ public class VideoManager implements IpConnectionListener {
     }
 
     private void start(int udpPort, LinkListener listener) {
-        if(this.linkConn == null || udpPort != this.udpPort){
+        if(this.linkConn == null || udpPort != this.linkPort){
             if(isStarted.get()){
                 stop();
             }
 
             this.linkConn = new UdpConnection(handler, udpPort, UDP_BUFFER_SIZE, true, 42);
             this.linkConn.setIpConnectionListener(this);
-            this.udpPort = udpPort;
+            this.linkPort = udpPort;
         }
 
         Log.d(TAG, "Starting video manager");
@@ -153,7 +155,7 @@ public class VideoManager implements IpConnectionListener {
             this.linkConn = null;
         }
 
-        this.udpPort = -1;
+        this.linkPort = -1;
     }
 
     @Override
@@ -239,14 +241,15 @@ public class VideoManager implements IpConnectionListener {
         return true;
     }
 
-    public void startVideoStream(int udpPort, String appId, String newVideoTag, Surface videoSurface, final ICommandListener listener){
+    public void startVideoStream(Bundle videoProps, String appId, String newVideoTag, Surface videoSurface, final ICommandListener listener){
         Timber.d("Video stream start request from %s. Video owner is %s.", appId, videoOwnerId.get());
         if(TextUtils.isEmpty(appId)){
             postErrorEvent(CommandExecutionError.COMMAND_DENIED, listener);
             return;
         }
 
-        if(videoSurface == null){
+        final int udpPort = videoProps.getInt(CameraActions.EXTRA_VIDEO_PROPS_UDP_PORT, -1);
+        if(videoSurface == null || udpPort == -1){
             postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
             return;
         }

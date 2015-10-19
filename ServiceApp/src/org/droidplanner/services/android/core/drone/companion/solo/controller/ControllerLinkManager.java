@@ -366,7 +366,10 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
     public void start(ControllerLinkListener listener) {
         this.linkListener = listener;
 
-        Timber.d("Starting artoo link manager");
+        if(!isStarted()) {
+            Timber.i("Starting artoo link manager");
+        }
+
         super.start(listener);
 
         //TODO: update when battery info is available
@@ -377,9 +380,9 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
     }
 
     public void stop() {
-        Timber.d("Stopping artoo link manager");
-
-        stopVideoManager();
+        if(isStarted()) {
+            Timber.i("Stopping artoo link manager");
+        }
 
         //TODO: update when battery info is available
         /*handler.removeCallbacks(reconnectBatteryTask);
@@ -458,9 +461,7 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
     @Override
     public void onIpDisconnected() {
         Timber.d("Artoo link disconnected.");
-
         stopVideoManager();
-
         super.onIpDisconnected();
     }
 

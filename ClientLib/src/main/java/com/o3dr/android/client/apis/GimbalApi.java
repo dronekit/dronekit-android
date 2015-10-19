@@ -132,6 +132,7 @@ public final class GimbalApi extends Api implements DroneListener {
     /**
      * Disables control of the gimbal. After calling this method, no call to {@link GimbalApi#updateGimbalOrientation(float, float, float, GimbalOrientationListener)}
      * will be allowed.
+     * @since 2.5.0
      * @param listener non-null GimbalStatusListener callback.
      */
     public void stopGimbalControl(final GimbalOrientationListener listener){
@@ -148,8 +149,12 @@ public final class GimbalApi extends Api implements DroneListener {
             return;
         }
 
+        gimbalListeners.remove(listener);
+
         //Reset the gimbal mount to the default.
-        drone.performAsyncActionOnDroneThread(new Action(ACTION_RESET_GIMBAL_MOUNT_MODE, null), new SimpleCommandListener(){
+        Bundle params = new Bundle(1);
+        params.putInt(GIMBAL_MOUNT_MODE, MAV_MOUNT_MODE.MAV_MOUNT_MODE_RC_TARGETING);
+        drone.performAsyncActionOnDroneThread(new Action(ACTION_SET_GIMBAL_MOUNT_MODE, params), new SimpleCommandListener(){
            @Override
             public void onTimeout(){
                listener.onGimbalOrientationCommandError(CommandExecutionError.COMMAND_FAILED);

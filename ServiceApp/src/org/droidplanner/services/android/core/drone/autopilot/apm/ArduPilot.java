@@ -81,6 +81,8 @@ import org.droidplanner.services.android.utils.CommonApiUtils;
 import java.util.HashMap;
 import java.util.Map;
 
+import timber.log.Timber;
+
 /**
  * Base class for the ArduPilot autopilots
  */
@@ -315,6 +317,9 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
     public boolean executeAsyncAction(Action action, final ICommandListener listener) {
         final String type = action.getType();
         Bundle data = action.getData();
+        if(data == null){
+            data = new Bundle();
+        }
 
         switch (type) {
             // MISSION ACTIONS
@@ -484,11 +489,9 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
                 return true;
 
             case GimbalActions.ACTION_RESET_GIMBAL_MOUNT_MODE:
-                MavLinkDoCmds.resetROI(this, listener);
-                return true;
-
             case GimbalActions.ACTION_SET_GIMBAL_MOUNT_MODE:
-                final int mountMode = data.getInt(GimbalActions.GIMBAL_MOUNT_MODE, MAV_MOUNT_MODE.MAV_MOUNT_MODE_MAVLINK_TARGETING);
+                final int mountMode = data.getInt(GimbalActions.GIMBAL_MOUNT_MODE, MAV_MOUNT_MODE.MAV_MOUNT_MODE_RC_TARGETING);
+                Timber.i("Setting gimbal mount mode: %d", mountMode);
 
                 Parameter mountParam = this.parameters.getParameter("MNT_MODE");
                 if (mountParam == null) {
