@@ -458,18 +458,6 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 droneEvent = AttributeEvent.HOME_UPDATED;
                 break;
 
-            case GPS:
-                droneEvent = AttributeEvent.GPS_POSITION;
-                break;
-
-            case GPS_FIX:
-                droneEvent = AttributeEvent.GPS_FIX;
-                break;
-
-            case GPS_COUNT:
-                droneEvent = AttributeEvent.GPS_COUNT;
-                break;
-
             case CALIBRATION_IMU:
                 final String calIMUMessage = drone.getCalibrationSetup().getMessage();
                 extrasBundle = new Bundle(1);

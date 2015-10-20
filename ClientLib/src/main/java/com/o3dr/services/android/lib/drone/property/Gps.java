@@ -94,6 +94,14 @@ public class Gps implements DroneAttribute {
         this.mPosition = mPosition;
     }
 
+    /**
+     * @return True if there's a 3D GPS lock, false otherwise.
+     * @since 2.6.8
+     */
+    public boolean has3DLock(){
+        return (mFixType == LOCK_3D_TYPE) || (mFixType == LOCK_3D_DGPS_TYPE) || (mFixType == LOCK_3D_RTK_TYPE);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -5,16 +5,17 @@ import java.util.List;
 
 import org.droidplanner.services.android.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.services.android.core.drone.DroneVariable;
-import org.droidplanner.services.android.core.helpers.coordinates.Coord2D;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.core.survey.CameraInfo;
 import org.droidplanner.services.android.core.survey.Footprint;
 
 import com.MAVLink.ardupilotmega.msg_camera_feedback;
 import com.MAVLink.ardupilotmega.msg_mount_status;
+import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.property.Altitude;
 import com.o3dr.services.android.lib.drone.property.Attitude;
+import com.o3dr.services.android.lib.drone.property.Gps;
 
 public class Camera extends DroneVariable {
 	private CameraInfo camera = new CameraInfo();
@@ -45,7 +46,9 @@ public class Camera extends DroneVariable {
 	public Footprint getCurrentFieldOfView() {
 		final Altitude droneAltitude = (Altitude) myDrone.getAttribute(AttributeType.ALTITUDE);
 		double altitude = droneAltitude.getAltitude();
-		Coord2D position = myDrone.getGps().getPosition();
+
+		final Gps droneGps = (Gps) myDrone.getAttribute(AttributeType.GPS);
+		LatLong position = droneGps.getPosition();
 		//double pitch = myDrone.getOrientation().getPitch() - gimbal_pitch;
 
 		final Attitude attitude = (Attitude) myDrone.getAttribute(AttributeType.ATTITUDE);

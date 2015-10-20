@@ -1,21 +1,22 @@
 package org.droidplanner.services.android.core.survey.grid;
 
+import com.o3dr.services.android.lib.coordinate.LatLong;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import org.droidplanner.services.android.core.helpers.coordinates.Coord2D;
 import org.droidplanner.services.android.core.helpers.coordinates.CoordBounds;
 import org.droidplanner.services.android.core.helpers.geoTools.GeoTools;
-import org.droidplanner.services.android.core.helpers.geoTools.LineCoord2D;
+import org.droidplanner.services.android.core.helpers.geoTools.LineLatLong;
 
 public class CircumscribedGrid {
 	private static final int MAX_NUMBER_OF_LINES = 300;
-	List<LineCoord2D> grid = new ArrayList<LineCoord2D>();
-	private Coord2D gridLowerLeft;
+	List<LineLatLong> grid = new ArrayList<LineLatLong>();
+	private LatLong gridLowerLeft;
 	private double extrapolatedDiag;
 	private Double angle;
 
-	public CircumscribedGrid(List<Coord2D> polygonPoints, Double angle, Double lineDist)
+	public CircumscribedGrid(List<LatLong> polygonPoints, Double angle, Double lineDist)
 			throws Exception {
 		this.angle = angle;
 
@@ -25,12 +26,12 @@ public class CircumscribedGrid {
 
 	private void drawGrid(Double lineDist) throws GridWithTooManyLines {
 		int lines = 0;
-		Coord2D startPoint = gridLowerLeft;
+		LatLong startPoint = gridLowerLeft;
 		while (lines * lineDist < extrapolatedDiag) {
-			Coord2D endPoint = GeoTools.newCoordFromBearingAndDistance(startPoint, angle,
+			LatLong endPoint = GeoTools.newCoordFromBearingAndDistance(startPoint, angle,
 					extrapolatedDiag);
 
-			LineCoord2D line = new LineCoord2D(startPoint, endPoint);
+			LineLatLong line = new LineLatLong(startPoint, endPoint);
 			grid.add(line);
 
 			startPoint = GeoTools.newCoordFromBearingAndDistance(startPoint, angle + 90, lineDist);
@@ -41,15 +42,15 @@ public class CircumscribedGrid {
 		}
 	}
 
-	private void findPolygonBounds(List<Coord2D> polygonPoints) {
+	private void findPolygonBounds(List<LatLong> polygonPoints) {
 		CoordBounds bounds = new CoordBounds(polygonPoints);
-		Coord2D middlePoint = bounds.getMiddle();
+		LatLong middlePoint = bounds.getMiddle();
 		gridLowerLeft = GeoTools.newCoordFromBearingAndDistance(middlePoint, angle - 135,
 				bounds.getDiag());
 		extrapolatedDiag = bounds.getDiag() * 1.5;
 	}
 
-	public List<LineCoord2D> getGrid() {
+	public List<LineLatLong> getGrid() {
 		return grid;
 	}
 
