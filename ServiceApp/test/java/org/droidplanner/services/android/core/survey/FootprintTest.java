@@ -1,10 +1,9 @@
 package org.droidplanner.services.android.core.survey;
 
 import com.MAVLink.ardupilotmega.msg_camera_feedback;
+import com.o3dr.services.android.lib.coordinate.LatLong;
 
 import junit.framework.TestCase;
-
-import org.droidplanner.services.android.core.helpers.coordinates.Coord2D;
 
 import java.util.List;
 
@@ -46,11 +45,11 @@ public class FootprintTest extends TestCase {
 
         Footprint footprint = new Footprint(camera, msg);
 
-        List<Coord2D> vertex = footprint.getVertexInGlobalFrame();
-        assertEquals(new Coord2D(-6.351048290444335E-4, 1.271409658088867E-4), vertex.get(0));
-        assertEquals(new Coord2D(1.271409658088868E-4, -6.35104829044434E-4), vertex.get(1));
-        assertEquals(new Coord2D(6.353048290444339E-4, -1.2694096580888691E-4), vertex.get(2));
-        assertEquals(new Coord2D(-1.269409658088866E-4, 6.353048290444336E-4), vertex.get(3));
+        List<LatLong> vertex = footprint.getVertexInGlobalFrame();
+        assertEquals(new LatLong(-6.351048290444335E-4, 1.271409658088867E-4), vertex.get(0));
+        assertEquals(new LatLong(1.271409658088868E-4, -6.35104829044434E-4), vertex.get(1));
+        assertEquals(new LatLong(6.353048290444339E-4, -1.2694096580888691E-4), vertex.get(2));
+        assertEquals(new LatLong(-1.269409658088866E-4, 6.353048290444336E-4), vertex.get(3));
     }
 
     public void testSkewedFootprint() throws Exception {
@@ -64,11 +63,11 @@ public class FootprintTest extends TestCase {
 
         Footprint footprint = new Footprint(camera, msg);
 
-        List<Coord2D> vertex = footprint.getVertexInGlobalFrame();
-        assertEquals(new Coord2D(-7.664157697114501E-5, -1.4395576628291166E-4), vertex.get(0));
-        assertEquals(new Coord2D(0.001167096458779719, -0.0010463895304861626), vertex.get(1));
-        assertEquals(new Coord2D(0.0020605706434187595, 5.362476139283517E-6), vertex.get(2));
-        assertEquals(new Coord2D(1.8929947996117644E-4, 4.296458546032376E-4), vertex.get(3));
+        List<LatLong> vertex = footprint.getVertexInGlobalFrame();
+        assertEquals(new LatLong(-7.664157697114501E-5, -1.4395576628291166E-4), vertex.get(0));
+        assertEquals(new LatLong(0.001167096458779719, -0.0010463895304861626), vertex.get(1));
+        assertEquals(new LatLong(0.0020605706434187595, 5.362476139283517E-6), vertex.get(2));
+        assertEquals(new LatLong(1.8929947996117644E-4, 4.296458546032376E-4), vertex.get(3));
     }
 
 }

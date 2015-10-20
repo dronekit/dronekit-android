@@ -9,7 +9,6 @@ import org.droidplanner.services.android.core.drone.Preferences;
 import org.droidplanner.services.android.core.drone.profiles.Parameters;
 import org.droidplanner.services.android.core.drone.profiles.VehicleProfile;
 import org.droidplanner.services.android.core.drone.variables.Camera;
-import org.droidplanner.services.android.core.drone.variables.GPS;
 import org.droidplanner.services.android.core.drone.variables.GuidedPoint;
 import org.droidplanner.services.android.core.drone.variables.Home;
 import org.droidplanner.services.android.core.drone.variables.Magnetometer;
@@ -34,8 +33,6 @@ public interface MavLinkDrone extends Drone {
     public void removeDroneListener(DroneInterfaces.OnDroneListener listener);
 
     public void notifyDroneEvent(DroneInterfaces.DroneEventsType event);
-
-    public GPS getGps();
 
     public byte getSysid();
 

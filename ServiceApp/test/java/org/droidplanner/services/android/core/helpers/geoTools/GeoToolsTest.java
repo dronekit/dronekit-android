@@ -1,15 +1,16 @@
 package org.droidplanner.services.android.core.helpers.geoTools;
 
+import com.o3dr.services.android.lib.coordinate.LatLong;
+import com.o3dr.services.android.lib.coordinate.LatLongAlt;
+
 import junit.framework.TestCase;
 
-import org.droidplanner.services.android.core.helpers.coordinates.Coord2D;
-import org.droidplanner.services.android.core.helpers.coordinates.Coord3D;
 import org.droidplanner.services.android.core.polygon.Polygon;
 
 public class GeoToolsTest extends TestCase {
 
-    Coord3D p1 = new Coord3D(37.85363485683941, -122.4204097390123, (250.0));
-    Coord3D p2 = new Coord3D(37.85130335221235, -122.4142645673542, (0.0));
+    LatLongAlt p1 = new LatLongAlt(37.85363485683941, -122.4204097390123, (250.0));
+    LatLongAlt p2 = new LatLongAlt(37.85130335221235, -122.4142645673542, (0.0));
     double polygonArea = 502915;
     double dist2DP1toP2 = 599.26;
     double dist3DP1toP2 = 649.32;
@@ -35,13 +36,13 @@ public class GeoToolsTest extends TestCase {
     public void testGetArea() {
         double tolerance = polygonArea * 0.001;
         Polygon poly = new Polygon();
-        poly.addPoint(new Coord2D(51.0282781100882, 2.16705322265625));
-        poly.addPoint(new Coord2D(51.0317878663996, 2.16293267905712));
-        poly.addPoint(new Coord2D(51.0313285768174, 2.16915607452393));
-        poly.addPoint(new Coord2D(51.0349709823585, 2.17203207314014));
-        poly.addPoint(new Coord2D(51.0318104275059, 2.17568457126617));
-        poly.addPoint(new Coord2D(51.0326774403918, 2.18168333172798));
-        poly.addPoint(new Coord2D(51.0285218722540, 2.18014307320118));
+        poly.addPoint(new LatLong(51.0282781100882, 2.16705322265625));
+        poly.addPoint(new LatLong(51.0317878663996, 2.16293267905712));
+        poly.addPoint(new LatLong(51.0313285768174, 2.16915607452393));
+        poly.addPoint(new LatLong(51.0349709823585, 2.17203207314014));
+        poly.addPoint(new LatLong(51.0318104275059, 2.17568457126617));
+        poly.addPoint(new LatLong(51.0326774403918, 2.18168333172798));
+        poly.addPoint(new LatLong(51.0285218722540, 2.18014307320118));
 
         assertEquals(polygonArea, GeoTools.getArea(poly).valueInSqMeters(), tolerance);
         poly.reversePoints();

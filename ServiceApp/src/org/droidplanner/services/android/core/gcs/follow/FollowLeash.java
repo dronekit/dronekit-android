@@ -2,11 +2,13 @@ package org.droidplanner.services.android.core.gcs.follow;
 
 import android.os.Handler;
 
+import com.o3dr.services.android.lib.coordinate.LatLong;
+import com.o3dr.services.android.lib.drone.attribute.AttributeType;
+import com.o3dr.services.android.lib.drone.property.Gps;
+
 import org.droidplanner.services.android.core.drone.DroneManager;
 import org.droidplanner.services.android.core.gcs.location.Location;
-import org.droidplanner.services.android.core.helpers.coordinates.Coord2D;
 import org.droidplanner.services.android.core.helpers.geoTools.GeoTools;
-import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 
 public class FollowLeash extends FollowWithRadiusAlgorithm {
 
@@ -21,8 +23,10 @@ public class FollowLeash extends FollowWithRadiusAlgorithm {
 
     @Override
     protected void processNewLocation(Location location) {
-        final Coord2D locationCoord = location.getCoord();
-        final Coord2D dronePosition = drone.getGps().getPosition();
+        final LatLong locationCoord = location.getCoord();
+
+        final Gps droneGps = (Gps) drone.getAttribute(AttributeType.GPS);
+        final LatLong dronePosition = droneGps.getPosition();
 
         if (locationCoord == null || dronePosition == null) {
             return;
@@ -30,7 +34,7 @@ public class FollowLeash extends FollowWithRadiusAlgorithm {
 
         if (GeoTools.getDistance(locationCoord, dronePosition) > radius) {
             double headingGCStoDrone = GeoTools.getHeadingFromCoordinates(locationCoord, dronePosition);
-            Coord2D goCoord = GeoTools.newCoordFromBearingAndDistance(locationCoord, headingGCStoDrone, radius);
+            LatLong goCoord = GeoTools.newCoordFromBearingAndDistance(locationCoord, headingGCStoDrone, radius);
             drone.getGuidedPoint().newGuidedCoord(goCoord);
         }
     }
