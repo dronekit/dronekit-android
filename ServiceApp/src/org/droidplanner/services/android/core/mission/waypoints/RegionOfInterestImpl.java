@@ -19,11 +19,17 @@ public class RegionOfInterestImpl extends SpatialCoordItem {
 	public RegionOfInterestImpl(Mission mission, LatLongAlt coord) {
 		super(mission,coord);
 	}
-	
 
 	public RegionOfInterestImpl(msg_mission_item msg, Mission mission) {
 		super(mission, null);
 		unpackMAVMessage(msg);
+	}
+
+	/**
+	 * @return True if this roi cancels a previously set roi.
+	 */
+	public boolean isReset(){
+		return coordinate.getLatitude() == 0 && coordinate.getLongitude() == 0 && coordinate.getAltitude() == 0;
 	}
 
 	@Override

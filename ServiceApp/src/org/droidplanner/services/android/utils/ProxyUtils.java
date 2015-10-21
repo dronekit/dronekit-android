@@ -2,11 +2,13 @@ package org.droidplanner.services.android.utils;
 
 import android.util.Log;
 
+import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
 import com.o3dr.services.android.lib.drone.mission.item.command.CameraTrigger;
 import com.o3dr.services.android.lib.drone.mission.item.command.ChangeSpeed;
 import com.o3dr.services.android.lib.drone.mission.item.command.DoJump;
 import com.o3dr.services.android.lib.drone.mission.item.command.EpmGripper;
+import com.o3dr.services.android.lib.drone.mission.item.command.ResetROI;
 import com.o3dr.services.android.lib.drone.mission.item.command.ReturnToLaunch;
 import com.o3dr.services.android.lib.drone.mission.item.command.SetRelay;
 import com.o3dr.services.android.lib.drone.mission.item.command.SetServo;
@@ -168,6 +170,7 @@ public class ProxyUtils {
                 missionItemImpl = temp;
                 break;
             }
+
             case REGION_OF_INTEREST: {
                 RegionOfInterest proxy = (RegionOfInterest) proxyItem;
 
@@ -176,6 +179,14 @@ public class ProxyUtils {
                 missionItemImpl = temp;
                 break;
             }
+
+            case RESET_ROI: {
+                //Sending a roi with all coordinates set to 0 will reset the current roi.
+                RegionOfInterestImpl temp = new RegionOfInterestImpl(mission, new LatLongAlt(0, 0, 0));
+                missionItemImpl = temp;
+                break;
+            }
+
             case SPLINE_WAYPOINT: {
                 SplineWaypoint proxy = (SplineWaypoint) proxyItem;
 
@@ -377,10 +388,16 @@ public class ProxyUtils {
             case ROI: {
                 RegionOfInterestImpl source = (RegionOfInterestImpl) itemImpl;
 
-                RegionOfInterest temp = new RegionOfInterest();
-                temp.setCoordinate((source.getCoordinate()));
+                if(source.isReset()){
+                    ResetROI temp = new ResetROI();
+                    proxyMissionItem = temp;
+                }
+                else {
+                    RegionOfInterest temp = new RegionOfInterest();
+                    temp.setCoordinate((source.getCoordinate()));
 
-                proxyMissionItem = temp;
+                    proxyMissionItem = temp;
+                }
                 break;
             }
 
