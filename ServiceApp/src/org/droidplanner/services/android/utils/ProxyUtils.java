@@ -8,6 +8,7 @@ import com.o3dr.services.android.lib.drone.mission.item.command.CameraTrigger;
 import com.o3dr.services.android.lib.drone.mission.item.command.ChangeSpeed;
 import com.o3dr.services.android.lib.drone.mission.item.command.DoJump;
 import com.o3dr.services.android.lib.drone.mission.item.command.EpmGripper;
+import com.o3dr.services.android.lib.drone.mission.item.command.ResetROI;
 import com.o3dr.services.android.lib.drone.mission.item.command.ReturnToLaunch;
 import com.o3dr.services.android.lib.drone.mission.item.command.SetRelay;
 import com.o3dr.services.android.lib.drone.mission.item.command.SetServo;
@@ -387,10 +388,16 @@ public class ProxyUtils {
             case ROI: {
                 RegionOfInterestImpl source = (RegionOfInterestImpl) itemImpl;
 
-                RegionOfInterest temp = new RegionOfInterest();
-                temp.setCoordinate((source.getCoordinate()));
+                if(source.isReset()){
+                    ResetROI temp = new ResetROI();
+                    proxyMissionItem = temp;
+                }
+                else {
+                    RegionOfInterest temp = new RegionOfInterest();
+                    temp.setCoordinate((source.getCoordinate()));
 
-                proxyMissionItem = temp;
+                    proxyMissionItem = temp;
+                }
                 break;
             }
 
