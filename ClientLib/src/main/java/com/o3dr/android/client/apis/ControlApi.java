@@ -43,7 +43,7 @@ public class ControlApi extends Api {
     public static final int EARTH_NED_COORDINATE_FRAME = 0;
     public static final int VEHICLE_COORDINATE_FRAME = 1;
 
-    @IntDef({})
+    @IntDef({EARTH_NED_COORDINATE_FRAME, VEHICLE_COORDINATE_FRAME})
     @Retention(RetentionPolicy.SOURCE)
     public @interface CoordinateFrame{}
 
