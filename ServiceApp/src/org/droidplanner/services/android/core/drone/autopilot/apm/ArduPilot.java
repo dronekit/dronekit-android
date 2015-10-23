@@ -379,16 +379,26 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
                 return true;
 
             case ControlActions.ACTION_SET_VELOCITY:
-                //TODO: For testing, the velocity will be capped at 5m/s. For release, retrieve and use the WPNAV_SPEED* parameters values
-                final float maxSpeed = 5; //m/s
-
+                //Retrieve the normalized values
                 final float normalizedXVel = data.getFloat(ControlActions.EXTRA_VELOCITY_X);
                 final float normalizedYVel = data.getFloat(ControlActions.EXTRA_VELOCITY_Y);
                 final float normalizedZVel = data.getFloat(ControlActions.EXTRA_VELOCITY_Z);
 
-                MavLinkCommands.setVelocityInLocalFrame(this, normalizedXVel * maxSpeed,
-                        normalizedYVel * maxSpeed,
-                        normalizedZVel * maxSpeed,
+                //Retrieve the speed parameters.
+                final float defaultSpeed = 5; //m/s
+
+                //Retrieve the horizontal speed value
+                final Parameter horizSpeedParam = parameters.getParameter("WPNAV_SPEED");
+                final double horizontalSpeed = horizSpeedParam == null ? defaultSpeed : horizSpeedParam.value / 100;
+
+                //Retrieve the vertical speed value.
+                String vertSpeedParamName = normalizedZVel >= 0 ? "WPNAV_SPEED_UP" : "WPNAV_SPEED_DN";
+                final Parameter vertSpeedParam = parameters.getParameter(vertSpeedParamName);
+                final double verticalSpeed = vertSpeedParam == null ? defaultSpeed : vertSpeedParam.value / 100;
+
+                MavLinkCommands.setVelocityInLocalFrame(this, (float) (normalizedXVel * horizontalSpeed),
+                        (float) (normalizedYVel * horizontalSpeed),
+                        (float) (normalizedZVel * verticalSpeed),
                         listener);
                 return true;
 

@@ -44,8 +44,10 @@ import org.droidplanner.services.android.core.drone.variables.State;
 import org.droidplanner.services.android.core.drone.variables.StreamRates;
 import org.droidplanner.services.android.core.drone.variables.Type;
 import org.droidplanner.services.android.core.model.AutopilotWarningParser;
+import org.droidplanner.services.android.core.parameters.Parameter;
 import org.droidplanner.services.android.utils.CommonApiUtils;
 import org.droidplanner.services.android.utils.video.VideoManager;
+import org.droidplanner.services.android.core.drone.profiles.Parameters;
 
 /**
  * Base drone implementation.
@@ -183,8 +185,16 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
 
             //CONTROL ACTIONS
             case ControlActions.ACTION_SET_CONDITION_YAW:
-                //TODO: for testing, cap the turning speed at 2. For release, use the value of the ACRO_YAW_P parameter.
-                final float turnSpeed = 2;
+                //Retrieve the yaw turn speed.
+                float turnSpeed = 2; //default turn speed.
+
+                final Parameters parameters = getParameters();
+                if(parameters != null){
+                    Parameter turnSpeedParam = parameters.getParameter("ACRO_YAW_P");
+                    if(turnSpeedParam != null){
+                        turnSpeed = (float) turnSpeedParam.value;
+                    }
+                }
 
                 final float targetAngle = data.getFloat(ControlActions.EXTRA_YAW_TARGET_ANGLE);
                 final float yawRate = data.getFloat(ControlActions.EXTRA_YAW_CHANGE_RATE);
