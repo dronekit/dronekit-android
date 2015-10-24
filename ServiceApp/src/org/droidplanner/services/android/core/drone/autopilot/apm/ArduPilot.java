@@ -53,6 +53,7 @@ import org.droidplanner.services.android.core.MAVLink.command.doCmd.MavLinkDoCmd
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
 import org.droidplanner.services.android.core.drone.LogMessageListener;
 import org.droidplanner.services.android.core.drone.Preferences;
+import org.droidplanner.services.android.core.drone.autopilot.apm.variables.APMHeartBeat;
 import org.droidplanner.services.android.core.drone.autopilot.generic.GenericMavLinkDrone;
 import org.droidplanner.services.android.core.drone.profiles.Parameters;
 import org.droidplanner.services.android.core.drone.profiles.VehicleProfile;
@@ -94,7 +95,6 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
     private final WaypointManager waypointManager;
     private final Magnetometer mag;
     private final Camera footprints;
-    private final HeartBeat heartbeat;
     private final Parameters parameters;
 
     private final Preferences preferences;
@@ -119,7 +119,6 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
         this.preferences = pref;
         this.logListener = logListener;
 
-        heartbeat = new HeartBeat(this, handler);
         parameters = new Parameters(this, handler);
         this.waypointManager = new WaypointManager(this, handler);
 
@@ -133,6 +132,11 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
         this.footprints = new Camera(this);
 
         loadVehicleProfile();
+    }
+
+    @Override
+    protected HeartBeat initHeartBeat(Handler handler){
+        return new APMHeartBeat(this, handler);
     }
 
     protected void setAltitudeGroundAndAirSpeeds(double altitude, double groundSpeed, double airSpeed, double climb) {
@@ -155,35 +159,6 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
 
         this.altitude.setTargetAltitude(this.altitude.getAltitude() + alt_error);
         notifyDroneEvent(DroneInterfaces.DroneEventsType.ORIENTATION);
-    }
-
-    @Override
-    public boolean isConnected() {
-        return super.isConnected() && heartbeat.hasHeartbeat();
-    }
-
-    @Override
-    public boolean isConnectionAlive() {
-        return heartbeat.isConnectionAlive();
-    }
-
-    @Override
-    public byte getSysid() {
-        return heartbeat.getSysid();
-    }
-
-    @Override
-    public byte getCompid() {
-        return heartbeat.getCompid();
-    }
-
-    @Override
-    public int getMavlinkVersion() {
-        return heartbeat.getMavlinkVersion();
-    }
-
-    protected void onHeartbeat(MAVLinkMessage msg) {
-        heartbeat.onHeartbeat(msg);
     }
 
     @Override
@@ -502,91 +477,88 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
             return;
         }
 
-        onHeartbeat(message);
+        if (!getParameters().processMessage(message)) {
 
-        if (getParameters().processMessage(message)) {
-            return;
-        }
+            getWaypointManager().processMessage(message);
+            getCalibrationSetup().processMessage(message);
 
-        getWaypointManager().processMessage(message);
-        getCalibrationSetup().processMessage(message);
+            switch (message.msgid) {
+                case msg_heartbeat.MAVLINK_MSG_ID_HEARTBEAT:
+                    msg_heartbeat msg_heart = (msg_heartbeat) message;
+                    checkIfFlying(msg_heart);
+                    processState(msg_heart);
+                    ApmModes newMode = ApmModes.getMode(msg_heart.custom_mode, getType());
+                    getState().setMode(newMode);
+                    break;
 
-        switch (message.msgid) {
-            case msg_heartbeat.MAVLINK_MSG_ID_HEARTBEAT:
-                msg_heartbeat msg_heart = (msg_heartbeat) message;
-                checkIfFlying(msg_heart);
-                processState(msg_heart);
-                ApmModes newMode = ApmModes.getMode(msg_heart.custom_mode, getType());
-                getState().setMode(newMode);
-                break;
+                case msg_statustext.MAVLINK_MSG_ID_STATUSTEXT:
+                    // These are any warnings sent from APM:Copter with
+                    // gcs_send_text_P()
+                    // This includes important thing like arm fails, prearm fails, low
+                    // battery, etc.
+                    // also less important things like "erasing logs" and
+                    // "calibrating barometer"
+                    msg_statustext msg_statustext = (msg_statustext) message;
+                    processStatusText(msg_statustext);
+                    break;
 
-            case msg_statustext.MAVLINK_MSG_ID_STATUSTEXT:
-                // These are any warnings sent from APM:Copter with
-                // gcs_send_text_P()
-                // This includes important thing like arm fails, prearm fails, low
-                // battery, etc.
-                // also less important things like "erasing logs" and
-                // "calibrating barometer"
-                msg_statustext msg_statustext = (msg_statustext) message;
-                processStatusText(msg_statustext);
-                break;
+                case msg_vfr_hud.MAVLINK_MSG_ID_VFR_HUD:
+                    processVfrHud((msg_vfr_hud) message);
+                    break;
 
-            case msg_vfr_hud.MAVLINK_MSG_ID_VFR_HUD:
-                processVfrHud((msg_vfr_hud) message);
-                break;
+                case msg_mission_current.MAVLINK_MSG_ID_MISSION_CURRENT:
+                    getMissionStats().setWpno(((msg_mission_current) message).seq);
+                    break;
 
-            case msg_mission_current.MAVLINK_MSG_ID_MISSION_CURRENT:
-                getMissionStats().setWpno(((msg_mission_current) message).seq);
-                break;
+                case msg_mission_item_reached.MAVLINK_MSG_ID_MISSION_ITEM_REACHED:
+                    getMissionStats().setLastReachedWaypointNumber(((msg_mission_item_reached) message).seq);
+                    break;
 
-            case msg_mission_item_reached.MAVLINK_MSG_ID_MISSION_ITEM_REACHED:
-                getMissionStats().setLastReachedWaypointNumber(((msg_mission_item_reached) message).seq);
-                break;
+                case msg_nav_controller_output.MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT:
+                    msg_nav_controller_output m_nav = (msg_nav_controller_output) message;
+                    setDisttowpAndSpeedAltErrors(m_nav.wp_dist, m_nav.alt_error, m_nav.aspd_error);
+                    break;
 
-            case msg_nav_controller_output.MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT:
-                msg_nav_controller_output m_nav = (msg_nav_controller_output) message;
-                setDisttowpAndSpeedAltErrors(m_nav.wp_dist, m_nav.alt_error, m_nav.aspd_error);
-                break;
+                case msg_raw_imu.MAVLINK_MSG_ID_RAW_IMU:
+                    msg_raw_imu msg_imu = (msg_raw_imu) message;
+                    getMagnetometer().newData(msg_imu);
+                    break;
 
-            case msg_raw_imu.MAVLINK_MSG_ID_RAW_IMU:
-                msg_raw_imu msg_imu = (msg_raw_imu) message;
-                getMagnetometer().newData(msg_imu);
-                break;
+                case msg_radio.MAVLINK_MSG_ID_RADIO:
+                    msg_radio m_radio = (msg_radio) message;
+                    processSignalUpdate(m_radio.rxerrors, m_radio.fixed, m_radio.rssi,
+                            m_radio.remrssi, m_radio.txbuf, m_radio.noise, m_radio.remnoise);
+                    break;
 
-            case msg_radio.MAVLINK_MSG_ID_RADIO:
-                msg_radio m_radio = (msg_radio) message;
-                processSignalUpdate(m_radio.rxerrors, m_radio.fixed, m_radio.rssi,
-                        m_radio.remrssi, m_radio.txbuf, m_radio.noise, m_radio.remnoise);
-                break;
+                case msg_rc_channels_raw.MAVLINK_MSG_ID_RC_CHANNELS_RAW:
+                    rc.setRcInputValues((msg_rc_channels_raw) message);
+                    break;
 
-            case msg_rc_channels_raw.MAVLINK_MSG_ID_RC_CHANNELS_RAW:
-                rc.setRcInputValues((msg_rc_channels_raw) message);
-                break;
+                case msg_servo_output_raw.MAVLINK_MSG_ID_SERVO_OUTPUT_RAW:
+                    rc.setRcOutputValues((msg_servo_output_raw) message);
+                    break;
 
-            case msg_servo_output_raw.MAVLINK_MSG_ID_SERVO_OUTPUT_RAW:
-                rc.setRcOutputValues((msg_servo_output_raw) message);
-                break;
+                case msg_camera_feedback.MAVLINK_MSG_ID_CAMERA_FEEDBACK:
+                    getCamera().newImageLocation((msg_camera_feedback) message);
+                    break;
 
-            case msg_camera_feedback.MAVLINK_MSG_ID_CAMERA_FEEDBACK:
-                getCamera().newImageLocation((msg_camera_feedback) message);
-                break;
+                case msg_mount_status.MAVLINK_MSG_ID_MOUNT_STATUS:
+                    processMountStatus((msg_mount_status) message);
+                    break;
 
-            case msg_mount_status.MAVLINK_MSG_ID_MOUNT_STATUS:
-                processMountStatus((msg_mount_status) message);
-                break;
+                case msg_named_value_int.MAVLINK_MSG_ID_NAMED_VALUE_INT:
+                    processNamedValueInt((msg_named_value_int) message);
+                    break;
 
-            case msg_named_value_int.MAVLINK_MSG_ID_NAMED_VALUE_INT:
-                processNamedValueInt((msg_named_value_int) message);
-                break;
+                //*************** Magnetometer calibration messages handling *************//
+                case msg_mag_cal_progress.MAVLINK_MSG_ID_MAG_CAL_PROGRESS:
+                case msg_mag_cal_report.MAVLINK_MSG_ID_MAG_CAL_REPORT:
+                    getMagnetometerCalibration().processCalibrationMessage(message);
+                    break;
 
-            //*************** Magnetometer calibration messages handling *************//
-            case msg_mag_cal_progress.MAVLINK_MSG_ID_MAG_CAL_PROGRESS:
-            case msg_mag_cal_report.MAVLINK_MSG_ID_MAG_CAL_REPORT:
-                getMagnetometerCalibration().processCalibrationMessage(message);
-                break;
-
-            default:
-                break;
+                default:
+                    break;
+            }
         }
 
         super.onMavLinkMessageReceived(message);

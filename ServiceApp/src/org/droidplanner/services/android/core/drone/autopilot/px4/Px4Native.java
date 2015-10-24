@@ -29,26 +29,6 @@ public class Px4Native extends GenericMavLinkDrone {
     }
 
     @Override
-    public boolean isConnectionAlive() {
-        return false;
-    }
-
-    @Override
-    public int getMavlinkVersion() {
-        return 0;
-    }
-
-    @Override
-    public byte getSysid() {
-        return 0;
-    }
-
-    @Override
-    public byte getCompid() {
-        return 0;
-    }
-
-    @Override
     public Parameters getParameters() {
         return null;
     }

@@ -45,6 +45,7 @@ import org.droidplanner.services.android.core.drone.DroneEvents;
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.core.drone.autopilot.apm.APMConstants;
+import org.droidplanner.services.android.core.drone.variables.HeartBeat;
 import org.droidplanner.services.android.core.drone.variables.State;
 import org.droidplanner.services.android.core.drone.variables.StreamRates;
 import org.droidplanner.services.android.core.drone.variables.Type;
@@ -70,6 +71,7 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
     private final DroneEvents events;
     protected final Type type;
     private final State state;
+    private final HeartBeat heartbeat;
     private final StreamRates streamRates;
 
     private final DroneInterfaces.AttributeEventListener attributeListener;
@@ -90,6 +92,7 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
         this.mavClient = mavClient;
 
         events = new DroneEvents(this, handler);
+        heartbeat = initHeartBeat(handler);
         this.type = new Type(this);
         this.streamRates = new StreamRates(this);
         this.state = new State(this, handler, warningParser);
@@ -97,6 +100,10 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
         this.attributeListener = listener;
 
         this.videoMgr = new VideoManager(handler);
+    }
+
+    protected HeartBeat initHeartBeat(Handler handler){
+        return new HeartBeat(this, handler);
     }
 
     @Override
@@ -111,7 +118,27 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
 
     @Override
     public boolean isConnected() {
-        return mavClient.isConnected();
+        return mavClient.isConnected() && heartbeat.hasHeartbeat();
+    }
+
+    @Override
+    public boolean isConnectionAlive() {
+        return heartbeat.isConnectionAlive();
+    }
+
+    @Override
+    public byte getSysid() {
+        return heartbeat.getSysid();
+    }
+
+    @Override
+    public byte getCompid() {
+        return heartbeat.getCompid();
+    }
+
+    @Override
+    public int getMavlinkVersion() {
+        return heartbeat.getMavlinkVersion();
     }
 
     @Override
@@ -274,8 +301,15 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
         return null;
     }
 
+    private void onHeartbeat(MAVLinkMessage msg) {
+        heartbeat.onHeartbeat(msg);
+    }
+
     @Override
     public void onMavLinkMessageReceived(MAVLinkMessage message) {
+
+        onHeartbeat(message);
+
         switch (message.msgid) {
             case msg_radio_status.MAVLINK_MSG_ID_RADIO_STATUS:
                 msg_radio_status m_radio_status = (msg_radio_status) message;
