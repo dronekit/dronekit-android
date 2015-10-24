@@ -177,8 +177,8 @@ public class ControlApi extends Api {
             final double cosAttitude = Math.cos(attitudeInRad);
             final double sinAttitude = Math.sin(attitudeInRad);
 
-            projectedX = (float) (vy * cosAttitude) - (float) (vx * sinAttitude);
-            projectedY = (float) (vy * sinAttitude) + (float) (vx * cosAttitude);
+            projectedX = (float) (vx * cosAttitude) - (float) (vy * sinAttitude);
+            projectedY = (float) (vx * sinAttitude) + (float) (vy * cosAttitude);
         }
 
         moveAtVelocity(projectedX, projectedY, vz, listener);
