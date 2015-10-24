@@ -1,11 +1,10 @@
-package org.droidplanner.services.android.core.drone.autopilot.apm;
+package org.droidplanner.services.android.core.drone.autopilot.apm.solo;
 
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.RemoteException;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Surface;
 
 import com.MAVLink.common.msg_statustext;
@@ -34,7 +33,8 @@ import org.droidplanner.services.android.core.MAVLink.MAVLinkStreams;
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
 import org.droidplanner.services.android.core.drone.LogMessageListener;
 import org.droidplanner.services.android.core.drone.Preferences;
-import org.droidplanner.services.android.core.drone.companion.solo.SoloComp;
+import org.droidplanner.services.android.core.drone.autopilot.apm.ArduCopter;
+import org.droidplanner.services.android.core.drone.autopilot.apm.solo.SoloComp;
 import org.droidplanner.services.android.core.drone.variables.HeartBeat;
 import org.droidplanner.services.android.core.firmware.FirmwareType;
 import org.droidplanner.services.android.core.model.AutopilotWarningParser;

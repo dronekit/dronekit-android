@@ -1,4 +1,4 @@
-package org.droidplanner.services.android.core.drone.companion.solo;
+package org.droidplanner.services.android.core.drone.autopilot.apm.solo;
 
 import android.content.Context;
 import android.os.Handler;
