@@ -174,8 +174,11 @@ public class ControlApi extends Api {
             Attitude attitude = drone.getAttribute(AttributeType.ATTITUDE);
             double attitudeInRad = Math.toRadians(attitude.getYaw());
 
-            projectedX = (float) (vy * Math.cos(attitudeInRad)) - (float) (vx * Math.sin(attitudeInRad));
-            projectedY = (float) (vy * Math.sin(attitudeInRad)) + (float) (vx * Math.cos(attitudeInRad));
+            final double cosAttitude = Math.cos(attitudeInRad);
+            final double sinAttitude = Math.sin(attitudeInRad);
+
+            projectedX = (float) (vy * cosAttitude) - (float) (vx * sinAttitude);
+            projectedY = (float) (vy * sinAttitude) + (float) (vx * cosAttitude);
         }
 
         moveAtVelocity(projectedX, projectedY, vz, listener);
