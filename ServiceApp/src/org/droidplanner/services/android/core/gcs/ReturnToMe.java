@@ -14,11 +14,9 @@ import org.droidplanner.services.android.core.MAVLink.command.doCmd.MavLinkDoCmd
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
 import org.droidplanner.services.android.core.drone.DroneInterfaces.AttributeEventListener;
 import org.droidplanner.services.android.core.drone.DroneManager;
-import org.droidplanner.services.android.core.drone.autopilot.Drone;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.core.drone.variables.Home;
 import org.droidplanner.services.android.core.gcs.location.Location;
-import org.droidplanner.services.android.core.helpers.coordinates.Coord3D;
 import org.droidplanner.services.android.utils.CommonApiUtils;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -45,7 +43,7 @@ public class ReturnToMe implements DroneInterfaces.OnDroneListener, Location.Loc
 
     private ICommandListener commandListener;
 
-    public ReturnToMe(DroneManager droneMgr, Location.LocationFinder locationFinder, AttributeEventListener listener){
+    public ReturnToMe(DroneManager droneMgr, Location.LocationFinder locationFinder, AttributeEventListener listener) {
         this.droneMgr = droneMgr;
         this.locationFinder = locationFinder;
         locationFinder.addLocationListener(TAG, this);
@@ -57,12 +55,12 @@ public class ReturnToMe implements DroneInterfaces.OnDroneListener, Location.Loc
         drone.addDroneListener(this);
     }
 
-    public void enable(ICommandListener listener){
-        if(isEnabled.compareAndSet(false, true)){
+    public void enable(ICommandListener listener) {
+        if (isEnabled.compareAndSet(false, true)) {
             this.commandListener = listener;
 
             final Home droneHome = droneMgr.getDrone().getHome();
-            if(droneHome.isValid()){
+            if (droneHome.isValid()) {
                 currentState.setOriginalHomeLocation(droneHome.getCoord());
             }
 
@@ -73,8 +71,8 @@ public class ReturnToMe implements DroneInterfaces.OnDroneListener, Location.Loc
         }
     }
 
-    public void disable(){
-        if(isEnabled.compareAndSet(true, false)){
+    public void disable() {
+        if (isEnabled.compareAndSet(true, false)) {
             //Disable return to me
             Timber.i("Disabling return to me.");
             locationFinder.disableLocationUpdates();
@@ -88,9 +86,9 @@ public class ReturnToMe implements DroneInterfaces.OnDroneListener, Location.Loc
 
     @Override
     public void onLocationUpdate(Location location) {
-        if(location.isAccurate()){
+        if (location.isAccurate()) {
             final Home home = getHome();
-            if(!home.isValid()) {
+            if (!home.isValid()) {
                 updateCurrentState(ReturnToMeState.STATE_WAITING_FOR_VEHICLE_GPS);
                 return;
             }
@@ -98,16 +96,16 @@ public class ReturnToMe implements DroneInterfaces.OnDroneListener, Location.Loc
             final LatLongAlt homePosition = home.getCoord();
 
             //Calculate the displacement between the home location and the user location.
-            final Coord3D locationCoord = location.getCoord();
+            final LatLongAlt locationCoord = location.getCoord();
 
             final float[] results = new float[3];
             android.location.Location.distanceBetween(homePosition.getLatitude(), homePosition.getLongitude(),
-                    locationCoord.getLat(), locationCoord.getLng(), results);
+                    locationCoord.getLatitude(), locationCoord.getLongitude(), results);
             final float displacement = results[0];
 
-            if(displacement >= UPDATE_MINIMAL_DISPLACEMENT){
+            if (displacement >= UPDATE_MINIMAL_DISPLACEMENT) {
                 MavLinkDoCmds.setVehicleHome(droneMgr.getDrone(),
-                        new LatLongAlt(locationCoord.getLat(), locationCoord.getLng(), homePosition.getAltitude()),
+                        new LatLongAlt(locationCoord.getLatitude(), locationCoord.getLongitude(), homePosition.getAltitude()),
                         new AbstractCommandListener() {
                             @Override
                             public void onSuccess() {
@@ -133,19 +131,18 @@ public class ReturnToMe implements DroneInterfaces.OnDroneListener, Location.Loc
                             }
                         });
             }
-        }
-        else{
+        } else {
             updateCurrentState(ReturnToMeState.STATE_USER_LOCATION_INACCURATE);
         }
     }
 
-    private Home getHome(){
+    private Home getHome() {
         return droneMgr.getDrone().getHome();
     }
 
     @Override
     public void onLocationUnavailable() {
-        if(isEnabled.get()){
+        if (isEnabled.get()) {
             updateCurrentState(ReturnToMeState.STATE_USER_LOCATION_UNAVAILABLE);
             disable();
         }
@@ -153,14 +150,14 @@ public class ReturnToMe implements DroneInterfaces.OnDroneListener, Location.Loc
 
     @Override
     public void onDroneEvent(DroneInterfaces.DroneEventsType event, MavLinkDrone drone) {
-        switch(event){
+        switch (event) {
             case DISCONNECTED:
                 //Stops updating the vehicle RTL location
                 disable();
                 break;
 
             case HOME:
-                if(isEnabled.get()) {
+                if (isEnabled.get()) {
                     final LatLongAlt homeCoord = drone.getHome().getCoord();
                     if (currentState.getOriginalHomeLocation() == null)
                         currentState.setOriginalHomeLocation(homeCoord);
@@ -172,12 +169,12 @@ public class ReturnToMe implements DroneInterfaces.OnDroneListener, Location.Loc
         }
     }
 
-    private void updateCurrentState(@ReturnToMeState.ReturnToMeStates int state){
+    private void updateCurrentState(@ReturnToMeState.ReturnToMeStates int state) {
         this.currentState.setState(state);
-        if(attributeListener != null){
+        if (attributeListener != null) {
             final Bundle eventInfo = new Bundle();
             eventInfo.putInt(AttributeEventExtra.EXTRA_RETURN_TO_ME_STATE, state);
-            attributeListener.onAttributeEvent(AttributeEvent.RETURN_TO_ME_STATE_UPDATE, eventInfo);
+            attributeListener.onAttributeEvent(AttributeEvent.RETURN_TO_ME_STATE_UPDATE, eventInfo, false);
         }
     }
 

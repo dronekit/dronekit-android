@@ -7,10 +7,10 @@ import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloMessageLocatio
 
 import org.droidplanner.services.android.core.drone.DroneManager;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
+import org.droidplanner.services.android.core.drone.autopilot.apm.ArduSolo;
 import org.droidplanner.services.android.core.drone.companion.solo.SoloComp;
 import org.droidplanner.services.android.core.gcs.location.Location;
 import org.droidplanner.services.android.core.gcs.roi.ROIEstimator;
-import org.droidplanner.services.android.core.helpers.coordinates.Coord3D;
 
 /**
  * Created by Fredia Huya-Kouadio on 8/3/15.
@@ -24,29 +24,30 @@ public class FollowSoloShot extends FollowAlgorithm {
 
     public FollowSoloShot(DroneManager droneMgr, Handler handler) {
         super(droneMgr, handler);
-        this.soloComp = droneMgr.getSoloComp();
+        final ArduSolo drone = (ArduSolo) droneMgr.getDrone();
+        this.soloComp = drone.getSoloComp();
     }
 
     @Override
-    public void enableFollow(){
+    public void enableFollow() {
         super.enableFollow();
         soloComp.enableFollowDataConnection();
     }
 
     @Override
-    public void disableFollow(){
+    public void disableFollow() {
         super.disableFollow();
         soloComp.disableFollowDataConnection();
     }
 
     @Override
     protected void processNewLocation(Location location) {
-        if(location != null){
-            final Coord3D receivedCoord = location.getCoord();
+        if (location != null) {
+            final LatLongAlt receivedCoord = location.getCoord();
 
             locationCoord.setAltitude(receivedCoord.getAltitude());
-            locationCoord.setLatitude(receivedCoord.getLat());
-            locationCoord.setLongitude(receivedCoord.getLng());
+            locationCoord.setLatitude(receivedCoord.getLatitude());
+            locationCoord.setLongitude(receivedCoord.getLongitude());
 
             locationSetter.setCoordinate(locationCoord);
 
@@ -60,7 +61,7 @@ public class FollowSoloShot extends FollowAlgorithm {
     }
 
     @Override
-    protected ROIEstimator initROIEstimator(MavLinkDrone drone, Handler handler){
+    protected ROIEstimator initROIEstimator(MavLinkDrone drone, Handler handler) {
         return null;
     }
 }

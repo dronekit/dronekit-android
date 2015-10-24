@@ -3,6 +3,7 @@ package org.droidplanner.services.android.core.MAVLink;
 import org.droidplanner.services.android.core.drone.variables.ApmModes;
 
 import com.MAVLink.common.msg_command_long;
+import com.MAVLink.common.msg_manual_control;
 import com.MAVLink.common.msg_mission_item;
 import com.MAVLink.common.msg_set_position_target_global_int;
 import com.MAVLink.common.msg_set_mode;
@@ -13,7 +14,7 @@ import com.o3dr.services.android.lib.model.ICommandListener;
 
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 
-public class MavLinkModes {
+public class MavLinkCommands {
 
     private static final int MAVLINK_SET_POS_TYPE_MASK_POS_IGNORE = ((1 << 0) | (1 << 1) | (1 << 2));
     private static final int MAVLINK_SET_POS_TYPE_MASK_VEL_IGNORE = ((1 << 3) | (1 << 4) | (1 << 5));
@@ -109,6 +110,30 @@ public class MavLinkModes {
         msg.param3 = isClockwise ? 1 : -1;
         msg.param4 = isRelative ? 1 : 0;
 
+        drone.getMavClient().sendMavMessage(msg, listener);
+    }
+
+    /**
+     * API for sending manually control to the vehicle using standard joystick axes nomenclature, along with a joystick-like input device.
+     * Unused axes can be disabled and buttons are also transmit as boolean values.
+     * @see <a href="MANUAL_CONTROL">https://pixhawk.ethz.ch/mavlink/#MANUAL_CONTROL</a>
+     *
+     * @param drone
+     * @param x X-axis, normalized to the range [-1000,1000]. A value of INT16_MAX indicates that this axis is invalid. Generally corresponds to forward(1000)-backward(-1000) movement on a joystick and the pitch of a vehicle.
+     * @param y Y-axis, normalized to the range [-1000,1000]. A value of INT16_MAX indicates that this axis is invalid. Generally corresponds to left(-1000)-right(1000) movement on a joystick and the roll of a vehicle.
+     * @param z Z-axis, normalized to the range [-1000,1000]. A value of INT16_MAX indicates that this axis is invalid. Generally corresponds to a separate slider movement with maximum being 1000 and minimum being -1000 on a joystick and the thrust of a vehicle.
+     * @param r R-axis, normalized to the range [-1000,1000]. A value of INT16_MAX indicates that this axis is invalid. Generally corresponds to a twisting of the joystick, with counter-clockwise being 1000 and clockwise being -1000, and the yaw of a vehicle.
+     * @param buttons A bitfield corresponding to the joystick buttons' current state, 1 for pressed, 0 for released. The lowest bit corresponds to Button 1.
+     * @param listener
+     */
+    public static void sendManualControl(MavLinkDrone drone, short x, short y, short z, short r, int buttons, ICommandListener listener){
+        msg_manual_control msg = new msg_manual_control();
+        msg.target = drone.getSysid();
+        msg.x = x;
+        msg.y = y;
+        msg.z = z;
+        msg.r = r;
+        msg.buttons = buttons;
         drone.getMavClient().sendMavMessage(msg, listener);
     }
 }

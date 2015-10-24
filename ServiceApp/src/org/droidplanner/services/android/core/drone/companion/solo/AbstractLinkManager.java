@@ -5,10 +5,10 @@ import android.os.Handler;
 import android.os.RemoteException;
 import android.text.TextUtils;
 
+import com.o3dr.android.client.utils.connection.AbstractIpConnection;
+import com.o3dr.android.client.utils.connection.IpConnectionListener;
 import com.o3dr.services.android.lib.model.ICommandListener;
 
-import org.droidplanner.services.android.utils.connection.AbstractIpConnection;
-import org.droidplanner.services.android.utils.connection.IpConnectionListener;
 import org.droidplanner.services.android.utils.connection.SshConnection;
 
 import java.io.IOException;
@@ -168,6 +168,10 @@ public abstract class AbstractLinkManager<T extends AbstractLinkManager.LinkList
             linkListener.onLinkConnected();
     }
 
+    protected boolean isStarted(){
+        return isStarted.get();
+    }
+
     @Override
     public void onIpDisconnected() {
         if (isStarted.get()) {
@@ -175,12 +179,10 @@ public abstract class AbstractLinkManager<T extends AbstractLinkManager.LinkList
                 //Try to reconnect
                 handler.postDelayed(reconnectTask, RECONNECT_COUNTDOWN);
             }
-
-            if (linkListener != null && wasConnected.get())
-                linkListener.onLinkDisconnected();
-
-            wasConnected.set(false);
         }
+
+        if (linkListener != null && wasConnected.compareAndSet(true, false))
+            linkListener.onLinkDisconnected();
     }
 
     protected boolean shouldReconnect(){

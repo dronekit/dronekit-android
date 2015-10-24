@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/dronekit/DroneKit-Android.svg?branch=develop)](https://travis-ci.org/dronekit/DroneKit-Android)
+[![Build Status](https://travis-ci.org/dronekit/dronekit-android.svg?branch=develop)](https://travis-ci.org/dronekit/dronekit-android)
 [![Issue Stats](http://issuestats.com/github/dronekit/DroneKit-Android/badge/pr)](http://issuestats.com/github/dronekit/DroneKit-Android)
 [![Issue Stats](http://issuestats.com/github/dronekit/DroneKit-Android/badge/issue)](http://issuestats.com/github/dronekit/DroneKit-Android)
 [![Join the chat at https://gitter.im/dronekit/dronekit-android](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/dronekit/dronekit-android?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
@@ -16,7 +16,7 @@ boundaries of autonomous navigation.
 
 ### Usage Guide
 The **DroneKit-Android** project is made of two modules:
-* [3DR Services App](https://github.com/DroidPlanner/DroneKit-Android/tree/master/ServiceApp):
+* [3DR Services App](https://github.com/DroidPlanner/DroneKit-Android/tree/develop/ServiceApp):
 Provided as an apk through the Google Play store, this is the layer performing direct
 communication with the 3DR-powered vehicles.
 

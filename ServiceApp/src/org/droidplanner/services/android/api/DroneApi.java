@@ -16,7 +16,8 @@ import com.o3dr.services.android.lib.drone.action.ConnectionActions;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
-import com.o3dr.services.android.lib.drone.companion.solo.action.SoloCameraActions;
+import com.o3dr.services.android.lib.drone.action.CameraActions;
+import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionResult;
 import com.o3dr.services.android.lib.drone.connection.DroneSharePrefs;
@@ -32,6 +33,7 @@ import com.o3dr.services.android.lib.model.IObserver;
 import com.o3dr.services.android.lib.model.action.Action;
 
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
+import org.droidplanner.services.android.core.drone.autopilot.Drone;
 import org.droidplanner.services.android.core.drone.variables.calibration.AccelCalibration;
 import org.droidplanner.services.android.core.parameters.Parameter;
 import org.droidplanner.services.android.core.drone.DroneManager;
@@ -39,7 +41,7 @@ import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.exception.ConnectionException;
 import org.droidplanner.services.android.core.drone.DroneEventsListener;
 import org.droidplanner.services.android.utils.CommonApiUtils;
-import org.droidplanner.services.android.utils.SoloApiUtils;
+import org.droidplanner.services.android.utils.video.VideoManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -246,27 +248,41 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 disconnect();
                 break;
 
-            case SoloCameraActions.ACTION_START_VIDEO_STREAM: {
-                final Surface videoSurface = data.getParcelable(SoloCameraActions.EXTRA_VIDEO_DISPLAY);
-                final String videoTag = data.getString(SoloCameraActions.EXTRA_VIDEO_TAG, "");
-                SoloApiUtils.startVideoStream(getDroneManager(), ownerId, videoTag, videoSurface, listener);
+            //CAMERA ACTIONS
+            case CameraActions.ACTION_START_VIDEO_STREAM: {
+                final Surface videoSurface = data.getParcelable(CameraActions.EXTRA_VIDEO_DISPLAY);
+                final String videoTag = data.getString(CameraActions.EXTRA_VIDEO_TAG, "");
+
+                Bundle videoProps = data.getBundle(CameraActions.EXTRA_VIDEO_PROPERTIES);
+                if(videoProps == null){
+                    //Only case where it's null is when interacting with a deprecated client version.
+                    //In this case, we assume that the client is attempting to start a solo stream, since that's
+                    //the only api that was exposed.
+                    videoProps = new Bundle();
+                    videoProps.putInt(CameraActions.EXTRA_VIDEO_PROPS_UDP_PORT, VideoManager.ARTOO_UDP_PORT);
+                }
+
+                CommonApiUtils.startVideoStream(getDrone(), videoProps, ownerId, videoTag, videoSurface, listener);
                 break;
             }
 
-            case SoloCameraActions.ACTION_STOP_VIDEO_STREAM: {
-                final String videoTag = data.getString(SoloCameraActions.EXTRA_VIDEO_TAG, "");
-                SoloApiUtils.stopVideoStream(getDroneManager(), ownerId, videoTag, listener);
+            case CameraActions.ACTION_STOP_VIDEO_STREAM: {
+                final String videoTag = data.getString(CameraActions.EXTRA_VIDEO_TAG, "");
+                CommonApiUtils.stopVideoStream(getDrone(), ownerId, videoTag, listener);
                 break;
             }
 
             // MISSION ACTIONS
             case MissionActions.ACTION_BUILD_COMPLEX_MISSION_ITEM:
-                final MavLinkDrone drone = droneMgr == null ? null : droneMgr.getDrone();
-                CommonApiUtils.buildComplexMissionItem(drone, data);
+                CommonApiUtils.buildComplexMissionItem(getDrone(), data);
                 break;
 
             default:
-                droneMgr.executeAsyncAction(action, listener);
+                if(droneMgr != null) {
+                    droneMgr.executeAsyncAction(action, listener);
+                }else {
+                    CommonApiUtils.postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
+                }
                 break;
         }
     }
@@ -358,7 +374,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     }
 
     @Override
-    public void onAttributeEvent(String attributeEvent, Bundle eventInfo) {
+    public void onAttributeEvent(String attributeEvent, Bundle eventInfo, boolean checkForSololinkApi) {
         if (TextUtils.isEmpty(attributeEvent))
             return;
 
@@ -440,18 +456,6 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
             case HOME:
                 droneEvent = AttributeEvent.HOME_UPDATED;
-                break;
-
-            case GPS:
-                droneEvent = AttributeEvent.GPS_POSITION;
-                break;
-
-            case GPS_FIX:
-                droneEvent = AttributeEvent.GPS_FIX;
-                break;
-
-            case GPS_COUNT:
-                droneEvent = AttributeEvent.GPS_COUNT;
                 break;
 
             case CALIBRATION_IMU:

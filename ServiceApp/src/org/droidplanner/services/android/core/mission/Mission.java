@@ -5,15 +5,16 @@ import android.util.Pair;
 import com.MAVLink.common.msg_mission_ack;
 import com.MAVLink.common.msg_mission_item;
 import com.MAVLink.enums.MAV_CMD;
+import com.o3dr.services.android.lib.coordinate.LatLong;
+import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.property.Attitude;
+import com.o3dr.services.android.lib.drone.property.Gps;
 
 import org.droidplanner.services.android.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.services.android.core.drone.DroneVariable;
 import org.droidplanner.services.android.core.drone.variables.Home;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
-import org.droidplanner.services.android.core.helpers.coordinates.Coord2D;
-import org.droidplanner.services.android.core.helpers.coordinates.Coord3D;
 import org.droidplanner.services.android.core.helpers.geoTools.GeoTools;
 import org.droidplanner.services.android.core.mission.commands.CameraTriggerImpl;
 import org.droidplanner.services.android.core.mission.commands.ChangeSpeedImpl;
@@ -31,7 +32,6 @@ import org.droidplanner.services.android.core.mission.waypoints.RegionOfInterest
 import org.droidplanner.services.android.core.mission.waypoints.SpatialCoordItem;
 import org.droidplanner.services.android.core.mission.waypoints.SplineWaypointImpl;
 import org.droidplanner.services.android.core.mission.waypoints.WaypointImpl;
-import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.core.parameters.Parameter;
 
 import java.util.ArrayList;
@@ -370,8 +370,9 @@ public class Mission extends DroneVariable {
      * @return the bearing in degrees the drone trajectory will take.
      */
     public double makeAndUploadDronie() {
-        Coord2D currentPosition = myDrone.getGps().getPosition();
-        if (currentPosition == null || myDrone.getGps().getSatCount() <= 5) {
+        final Gps droneGps = (Gps) myDrone.getAttribute(AttributeType.GPS);
+        LatLong currentPosition = droneGps.getPosition();
+        if (currentPosition == null || droneGps.getSatellitesCount() <= 5) {
             myDrone.notifyDroneEvent(DroneEventsType.WARNING_NO_GPS);
             return -1;
         }
@@ -397,10 +398,10 @@ public class Mission extends DroneVariable {
 
     }
 
-    public List<MissionItem> createDronie(Coord2D start, Coord2D end) {
+    public List<MissionItem> createDronie(LatLong start, LatLong end) {
         final int startAltitude = 4;
         final int roiDistance = -8;
-        Coord2D slowDownPoint = GeoTools.pointAlongTheLine(start, end, 5);
+        LatLong slowDownPoint = GeoTools.pointAlongTheLine(start, end, 5);
 
         double defaultSpeed = getSpeedParameter();
         if (defaultSpeed == -1) {
@@ -410,12 +411,12 @@ public class Mission extends DroneVariable {
         List<MissionItem> dronieItems = new ArrayList<MissionItem>();
         dronieItems.add(new TakeoffImpl(this, startAltitude));
         dronieItems.add(new RegionOfInterestImpl(this,
-                new Coord3D(GeoTools.pointAlongTheLine(start, end, roiDistance), (1.0))));
-        dronieItems.add(new WaypointImpl(this, new Coord3D(end, (startAltitude + GeoTools.getDistance(start, end) / 2.0))));
+                new LatLongAlt(GeoTools.pointAlongTheLine(start, end, roiDistance), (1.0))));
+        dronieItems.add(new WaypointImpl(this, new LatLongAlt(end, (startAltitude + GeoTools.getDistance(start, end) / 2.0))));
         dronieItems.add(new WaypointImpl(this,
-                new Coord3D(slowDownPoint, (startAltitude + GeoTools.getDistance(start, slowDownPoint) / 2.0))));
+                new LatLongAlt(slowDownPoint, (startAltitude + GeoTools.getDistance(start, slowDownPoint) / 2.0))));
         dronieItems.add(new ChangeSpeedImpl(this, 1.0));
-        dronieItems.add(new WaypointImpl(this, new Coord3D(start, startAltitude)));
+        dronieItems.add(new WaypointImpl(this, new LatLongAlt(start, startAltitude)));
         dronieItems.add(new ChangeSpeedImpl(this, defaultSpeed));
         dronieItems.add(new LandImpl(this, start));
         return dronieItems;

@@ -97,8 +97,7 @@ public class msg_position_target_local_ned extends MAVLinkMessage{
     * @return
     */
     public MAVLinkPacket pack(){
-        MAVLinkPacket packet = new MAVLinkPacket();
-        packet.len = MAVLINK_MSG_LENGTH;
+        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH);
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED;

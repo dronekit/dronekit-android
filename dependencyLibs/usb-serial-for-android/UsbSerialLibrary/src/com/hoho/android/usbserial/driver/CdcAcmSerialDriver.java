@@ -48,7 +48,12 @@ public class CdcAcmSerialDriver extends CommonUsbSerialDriver {
 
     @Override
     public void open() throws IOException {
-        Log.d(TAG, "claiming interfaces, count=" + mDevice.getInterfaceCount());
+        final int interfaceCount = mDevice.getInterfaceCount();
+        Log.d(TAG, "claiming interfaces, count=" + interfaceCount);
+
+        if(interfaceCount == 0){
+            throw new IOException("No available usb interfaces.");
+        }
 
         Log.d(TAG, "Claiming control interface.");
         mControlInterface = mDevice.getInterface(0);
@@ -58,6 +63,12 @@ public class CdcAcmSerialDriver extends CommonUsbSerialDriver {
         if (!mConnection.claimInterface(mControlInterface, true)) {
             throw new IOException("Could not claim control interface.");
         }
+
+        final int controlEndpointCount = mControlInterface.getEndpointCount();
+        if(controlEndpointCount == 0){
+            throw new IOException("No available control interface endpoints.");
+        }
+
         mControlEndpoint = mControlInterface.getEndpoint(0);
         Log.d(TAG, "Control endpoint direction: " + mControlEndpoint.getDirection());
 
@@ -69,6 +80,12 @@ public class CdcAcmSerialDriver extends CommonUsbSerialDriver {
         if (!mConnection.claimInterface(mDataInterface, true)) {
             throw new IOException("Could not claim data interface.");
         }
+
+        final int dataEndpointCount = mDataInterface.getEndpointCount();
+        if(dataEndpointCount < 2){
+            throw new IOException("No available data interface endpoints.");
+        }
+
         mReadEndpoint = mDataInterface.getEndpoint(1);
         Log.d(TAG, "Read endpoint direction: " + mReadEndpoint.getDirection());
         mWriteEndpoint = mDataInterface.getEndpoint(0);

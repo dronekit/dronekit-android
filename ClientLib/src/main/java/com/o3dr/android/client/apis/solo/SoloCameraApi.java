@@ -4,25 +4,26 @@ import android.os.Bundle;
 import android.view.Surface;
 
 import com.o3dr.android.client.Drone;
+import com.o3dr.android.client.apis.CameraApi;
 import com.o3dr.android.client.apis.CapabilityApi;
+import com.o3dr.services.android.lib.drone.action.CameraActions;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloGoproConstants;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloGoproRecord;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloGoproSetRequest;
 import com.o3dr.services.android.lib.model.AbstractCommandListener;
-import com.o3dr.services.android.lib.model.action.Action;
 
 import java.util.concurrent.ConcurrentHashMap;
-
-import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloCameraActions.ACTION_START_VIDEO_STREAM;
-import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloCameraActions.ACTION_STOP_VIDEO_STREAM;
-import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloCameraActions.EXTRA_VIDEO_DISPLAY;
-import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloCameraActions.EXTRA_VIDEO_TAG;
 
 /**
  * Provides access to the solo video specific functionality
  * Created by Fredia Huya-Kouadio on 7/12/15.
+ *
+ * @since 2.5.0
  */
 public class SoloCameraApi extends SoloApi {
+
+    private static final String TAG = SoloCameraApi.class.getSimpleName();
 
     private static final ConcurrentHashMap<Drone, SoloCameraApi> soloCameraApiCache = new ConcurrentHashMap<>();
     private static final Builder<SoloCameraApi> apiBuilder = new Builder<SoloCameraApi>() {
@@ -31,6 +32,8 @@ public class SoloCameraApi extends SoloApi {
             return new SoloCameraApi(drone);
         }
     };
+
+    private static final int SOLO_STREAM_UDP_PORT = 5600;
 
     /**
      * Retrieves a sololink api instance.
@@ -43,27 +46,27 @@ public class SoloCameraApi extends SoloApi {
     }
 
     private final CapabilityApi capabilityChecker;
+    private final CameraApi cameraApi;
 
     private SoloCameraApi(Drone drone) {
         super(drone);
         this.capabilityChecker = CapabilityApi.getApi(drone);
+        this.cameraApi = CameraApi.getApi(drone);
     }
 
     /**
      * Take a photo with the connected gopro.
      *
      * @param listener Register a callback to receive update of the command execution status.
+     * @since 2.5.0
      */
     public void takePhoto(final AbstractCommandListener listener) {
         //Set the gopro to photo mode
-        final SoloGoproSetRequest photoModeRequest = new SoloGoproSetRequest(SoloGoproSetRequest.CAPTURE_MODE,
-                SoloGoproSetRequest.CAPTURE_MODE_PHOTO);
-
-        sendMessage(photoModeRequest, new AbstractCommandListener() {
+        switchCameraCaptureMode(SoloGoproConstants.CAPTURE_MODE_PHOTO, new AbstractCommandListener() {
             @Override
             public void onSuccess() {
                 //Send the command to take a picture.
-                final SoloGoproRecord photoRecord = new SoloGoproRecord(SoloGoproRecord.START_RECORDING);
+                final SoloGoproRecord photoRecord = new SoloGoproRecord(SoloGoproConstants.START_RECORDING);
                 sendMessage(photoRecord, listener);
             }
 
@@ -87,35 +90,50 @@ public class SoloCameraApi extends SoloApi {
      * Toggle video recording on the connected gopro.
      *
      * @param listener Register a callback to receive update of the command execution status.
+     * @since 2.5.0
      */
     public void toggleVideoRecording(final AbstractCommandListener listener) {
-        sendVideoRecordingCommand(SoloGoproRecord.TOGGLE_RECORDING, listener);
+        sendVideoRecordingCommand(SoloGoproConstants.TOGGLE_RECORDING, listener);
     }
 
     /**
      * Starts video recording on the connected gopro.
      *
      * @param listener Register a callback to receive update of the command execution status.
+     * @since 2.5.0
      */
     public void startVideoRecording(final AbstractCommandListener listener) {
-        sendVideoRecordingCommand(SoloGoproRecord.START_RECORDING, listener);
+        sendVideoRecordingCommand(SoloGoproConstants.START_RECORDING, listener);
     }
 
     /**
      * Stops video recording on the connected gopro.
      *
      * @param listener Register a callback to receive update of the command execution status.
+     * @since 2.5.0
      */
     public void stopVideoRecording(final AbstractCommandListener listener) {
-        sendVideoRecordingCommand(SoloGoproRecord.STOP_RECORDING, listener);
+        sendVideoRecordingCommand(SoloGoproConstants.STOP_RECORDING, listener);
     }
 
-    private void sendVideoRecordingCommand(@SoloGoproRecord.RecordCommand final int recordCommand, final AbstractCommandListener listener) {
-        //Set the gopro to video mode
-        final SoloGoproSetRequest videoModeRequest = new SoloGoproSetRequest(SoloGoproSetRequest.CAPTURE_MODE,
-                SoloGoproSetRequest.CAPTURE_MODE_VIDEO);
+    /**
+     * Switches the camera capture mode.
+     *
+     * @param captureMode One of {@link SoloGoproConstants#CAPTURE_MODE_VIDEO},
+     *                    {@link SoloGoproConstants#CAPTURE_MODE_PHOTO},
+     *                    {@link SoloGoproConstants#CAPTURE_MODE_BURST},
+     *                    {@link SoloGoproConstants#CAPTURE_MODE_TIME_LAPSE}
+     * @param listener    Register a callback to receive update of the command execution status.
+     * @since 2.6.8
+     */
+    public void switchCameraCaptureMode(@SoloGoproConstants.CaptureMode byte captureMode, final AbstractCommandListener listener) {
+        final SoloGoproSetRequest captureModeRequest = new SoloGoproSetRequest(SoloGoproConstants.CAPTURE_MODE, captureMode);
+        sendMessage(captureModeRequest, listener);
+    }
 
-        sendMessage(videoModeRequest, new AbstractCommandListener() {
+    private void sendVideoRecordingCommand(@SoloGoproConstants.RecordCommand final int recordCommand, final AbstractCommandListener listener) {
+        //Set the gopro to video mode
+        switchCameraCaptureMode(SoloGoproConstants.CAPTURE_MODE_VIDEO, new AbstractCommandListener() {
             @Override
             public void onSuccess() {
                 //Send the command to toggle video recording
@@ -146,8 +164,15 @@ public class SoloCameraApi extends SoloApi {
      * @param surface  Surface object onto which the video is decoded.
      * @param tag      Video tag.
      * @param listener Register a callback to receive update of the command execution status.
+     *
+     * @since 2.5.0
      */
     public void startVideoStream(final Surface surface, final String tag, final AbstractCommandListener listener) {
+        if (surface == null) {
+            postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
+            return;
+        }
+
         capabilityChecker.checkFeatureSupport(CapabilityApi.FeatureIds.SOLO_VIDEO_STREAMING,
                 new CapabilityApi.FeatureSupportListener() {
                     @Override
@@ -155,22 +180,17 @@ public class SoloCameraApi extends SoloApi {
                         switch (result) {
 
                             case CapabilityApi.FEATURE_SUPPORTED:
-                                final Bundle params = new Bundle();
-                                params.putParcelable(EXTRA_VIDEO_DISPLAY, surface);
-                                params.putString(EXTRA_VIDEO_TAG, tag);
-                                drone.performAsyncActionOnDroneThread(new Action(ACTION_START_VIDEO_STREAM, params), listener);
+                                final Bundle videoProps = new Bundle();
+                                videoProps.putInt(CameraApi.VIDEO_PROPS_UDP_PORT, SOLO_STREAM_UDP_PORT);
+                                cameraApi.startVideoStream(surface, tag, videoProps, listener);
                                 break;
 
                             case CapabilityApi.FEATURE_UNSUPPORTED:
-                                if (listener != null) {
-                                    listener.onError(CommandExecutionError.COMMAND_UNSUPPORTED);
-                                }
+                                postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
                                 break;
 
                             default:
-                                if (listener != null) {
-                                    listener.onError(CommandExecutionError.COMMAND_FAILED);
-                                }
+                                postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
                                 break;
                         }
                     }
@@ -184,6 +204,8 @@ public class SoloCameraApi extends SoloApi {
      *
      * @param surface  Surface object onto which the video is decoded.
      * @param listener Register a callback to receive update of the command execution status.
+     *
+     * @since 2.5.0
      */
     public void startVideoStream(final Surface surface, final AbstractCommandListener listener) {
         startVideoStream(surface, "", listener);
@@ -193,6 +215,8 @@ public class SoloCameraApi extends SoloApi {
      * Stop the video stream from the connected drone, and release ownership.
      *
      * @param listener Register a callback to receive update of the command execution status.
+     *
+     * @since 2.5.0
      */
     public void stopVideoStream(final AbstractCommandListener listener) {
         stopVideoStream("", listener);
@@ -203,6 +227,8 @@ public class SoloCameraApi extends SoloApi {
      *
      * @param tag      Video tag.
      * @param listener Register a callback to receive update of the command execution status.
+     *
+     * @since 2.5.0
      */
     public void stopVideoStream(final String tag, final AbstractCommandListener listener) {
         capabilityChecker.checkFeatureSupport(CapabilityApi.FeatureIds.SOLO_VIDEO_STREAMING,
@@ -212,21 +238,15 @@ public class SoloCameraApi extends SoloApi {
                         switch (result) {
 
                             case CapabilityApi.FEATURE_SUPPORTED:
-                                final Bundle params = new Bundle();
-                                params.putString(EXTRA_VIDEO_TAG, tag);
-                                drone.performAsyncActionOnDroneThread(new Action(ACTION_STOP_VIDEO_STREAM, params), listener);
+                                cameraApi.stopVideoStream(tag, listener);
                                 break;
 
                             case CapabilityApi.FEATURE_UNSUPPORTED:
-                                if (listener != null) {
-                                    listener.onError(CommandExecutionError.COMMAND_UNSUPPORTED);
-                                }
+                                postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
                                 break;
 
                             default:
-                                if (listener != null) {
-                                    listener.onError(CommandExecutionError.COMMAND_FAILED);
-                                }
+                                postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
                                 break;
                         }
                     }

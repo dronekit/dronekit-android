@@ -2,9 +2,9 @@ package org.droidplanner.services.android.core.mission.waypoints;
 
 import com.MAVLink.common.msg_mission_item;
 import com.MAVLink.enums.MAV_CMD;
+import com.o3dr.services.android.lib.coordinate.LatLong;
+import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 
-import org.droidplanner.services.android.core.helpers.coordinates.Coord2D;
-import org.droidplanner.services.android.core.helpers.coordinates.Coord3D;
 import org.droidplanner.services.android.core.mission.Mission;
 import org.droidplanner.services.android.core.mission.MissionItem;
 import org.droidplanner.services.android.core.mission.MissionItemType;
@@ -19,11 +19,11 @@ public class LandImpl extends SpatialCoordItem {
     }
 
     public LandImpl(Mission mission) {
-        this(mission, new Coord2D(0, 0));
+        this(mission, new LatLong(0, 0));
     }
 
-    public LandImpl(Mission mMission, Coord2D coord) {
-        super(mMission, new Coord3D(coord, (0)));
+    public LandImpl(Mission mMission, LatLong coord) {
+        super(mMission, new LatLongAlt(coord, 0));
     }
 
     public LandImpl(msg_mission_item msg, Mission mission) {

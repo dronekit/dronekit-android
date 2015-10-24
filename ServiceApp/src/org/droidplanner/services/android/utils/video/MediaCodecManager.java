@@ -5,6 +5,7 @@ import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.os.Build;
 import android.os.Handler;
+import android.util.Log;
 import android.view.Surface;
 
 import java.io.IOException;
@@ -12,13 +13,13 @@ import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
-import timber.log.Timber;
-
 /**
  * Created by Fredia Huya-Kouadio on 2/19/15.
  */
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class MediaCodecManager {
+
+    private static final String TAG = MediaCodecManager.class.getSimpleName();
 
     private static final String MIME_TYPE = "video/avc";
     public static final int DEFAULT_VIDEO_WIDTH = 1920;
@@ -32,7 +33,7 @@ public class MediaCodecManager {
             naluChunkAssembler.reset();
 
             if (dequeueRunner != null && dequeueRunner.isAlive()) {
-                Timber.d("Interrupting dequeue runner thread.");
+                Log.d(TAG, "Interrupting dequeue runner thread.");
                 dequeueRunner.interrupt();
             }
             dequeueRunner = null;
@@ -42,11 +43,13 @@ public class MediaCodecManager {
                 try {
                     mediaCodec.stop();
                 }catch(IllegalStateException e){
-                    Timber.e(e, "Error while stopping media codec.");
+                    Log.e(TAG, "Error while stopping media codec.", e);
                 }
                 mediaCodec.release();
                 mediaCodecRef.set(null);
             }
+
+            surfaceRef.set(null);
 
             isDecoding.set(false);
             handler.post(decodingEndedNotification);
@@ -85,6 +88,7 @@ public class MediaCodecManager {
     private final AtomicBoolean isDecoding = new AtomicBoolean(false);
     private final AtomicBoolean processInputData = new AtomicBoolean(false);
     private final AtomicBoolean sendCompletionFlag = new AtomicBoolean(false);
+    private final AtomicReference<Surface> surfaceRef = new AtomicReference<>();
     private final AtomicReference<MediaCodec> mediaCodecRef = new AtomicReference<>();
     private final AtomicReference<DecoderListener> decoderListenerRef = new AtomicReference<>();
     private final NALUChunkAssembler naluChunkAssembler;
@@ -98,12 +102,16 @@ public class MediaCodecManager {
         this.naluChunkAssembler = new NALUChunkAssembler();
     }
 
+    Surface getSurface(){
+        return surfaceRef.get();
+    }
+
     public void startDecoding(Surface surface, DecoderListener listener) throws IOException {
         if (surface == null)
             throw new IllegalStateException("Surface argument must be non-null.");
 
         if (isDecoding.compareAndSet(false, true)) {
-            Timber.i("Starting decoding...");
+            Log.i(TAG, "Starting decoding...");
             this.naluChunkAssembler.reset();
 
             this.decoderListenerRef.set(listener);
@@ -114,6 +122,7 @@ public class MediaCodecManager {
             mediaCodec.configure(mediaFormat, surface, null, 0);
             mediaCodec.start();
 
+            surfaceRef.set(surface);
             mediaCodecRef.set(mediaCodec);
             processInputData.set(true);
 
@@ -123,7 +132,7 @@ public class MediaCodecManager {
     }
 
     public void stopDecoding(DecoderListener listener) {
-        Timber.i("Stopping input data processing...");
+        Log.i(TAG, "Stopping input data processing...");
 
         this.decoderListenerRef.set(listener);
         if(!isDecoding.get()) {
@@ -152,7 +161,7 @@ public class MediaCodecManager {
                     processNALUChunk(naluChunk);
             } else {
                 if (sendCompletionFlag.get()) {
-                    Timber.d("Sending end of stream data.");
+                    Log.d(TAG, "Sending end of stream data.");
                     sendCompletionFlag.set(!processNALUChunk(naluChunkAssembler.getEndOfStream()));
                 }
             }
@@ -200,7 +209,7 @@ public class MediaCodecManager {
                 mediaCodec.queueInputBuffer(index, 0, totalLength, naluChunk.presentationTime, naluChunk.flags);
             }
         } catch (IllegalStateException e) {
-            Timber.e(e.getMessage(), e);
+            Log.e(TAG, e.getMessage(), e);
             return false;
         }
 
@@ -226,7 +235,7 @@ public class MediaCodecManager {
             if (mediaCodec == null)
                 throw new IllegalStateException("Start decoding hasn't been called yet.");
 
-            Timber.i("Starting dequeue codec runner.");
+            Log.i(TAG, "Starting dequeue codec runner.");
 
             final MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
             decodedFirstFrame.set(false);
@@ -241,24 +250,24 @@ public class MediaCodecManager {
 
                         if (decodedFirstFrame.compareAndSet(false, true)) {
                             notifyDecodingStarted();
-                            Timber.i("Received first decoded frame of size " + info.size);
+                            Log.i(TAG, "Received first decoded frame of size " + info.size);
                         }
 
                         continueDequeue = (info.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) == 0;
                         if (!continueDequeue) {
-                            Timber.i("Received end of stream flag.");
+                            Log.i(TAG, "Received end of stream flag.");
                         }
                     }
                 }
             } catch (IllegalStateException e) {
                 if(!isInterrupted()) {
-                    Timber.e("Decoding error!", e);
+                    Log.e(TAG, "Decoding error!", e);
                     notifyDecodingError();
                 }
             } finally {
                 if (!isInterrupted())
                     notifyDecodingEnded();
-                Timber.i("Stopping dequeue codec runner.");
+                Log.i(TAG, "Stopping dequeue codec runner.");
             }
         }
     }

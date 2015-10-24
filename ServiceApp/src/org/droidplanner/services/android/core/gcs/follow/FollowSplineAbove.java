@@ -2,9 +2,10 @@ package org.droidplanner.services.android.core.gcs.follow;
 
 import android.os.Handler;
 
+import com.o3dr.services.android.lib.coordinate.LatLong;
+
 import org.droidplanner.services.android.core.drone.DroneManager;
 import org.droidplanner.services.android.core.gcs.location.Location;
-import org.droidplanner.services.android.core.helpers.coordinates.Coord2D;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 
 /**
@@ -16,7 +17,7 @@ public class FollowSplineAbove extends FollowAlgorithm {
 
     @Override
     public void processNewLocation(Location location) {
-        Coord2D gcsLoc = new Coord2D(location.getCoord().getLat(), location.getCoord().getLng());
+        LatLong gcsLoc = new LatLong(location.getCoord());
 
         //TODO: some device (nexus 6) do not report the speed (always 0).. figure out workaround.
         double speed = location.getSpeed();

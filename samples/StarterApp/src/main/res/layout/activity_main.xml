@@ -220,12 +220,12 @@
         </android.support.v7.widget.CardView>
 
         <android.support.v7.widget.CardView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="5dp">
+            android:layout_margin="0dp">
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:gravity="center_horizontal">
@@ -273,8 +273,9 @@
             </LinearLayout>
                 <TextureView
                     android:id="@+id/video_content"
-                    android:layout_width="300dp"
-                    android:layout_height="144dp"/>
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="380dp"/>
 
             </LinearLayout>
 

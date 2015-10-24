@@ -79,9 +79,15 @@ public class Cp2102SerialDriver extends CommonUsbSerialDriver {
                     Log.d(TAG, "claimInterface " + i + " FAIL");
                 }
             }                       
-            
-            UsbInterface dataIface = mDevice.getInterface(mDevice.getInterfaceCount() - 1);
-            for (int i = 0; i < dataIface.getEndpointCount(); i++) {
+
+            final int interfaceCount = mDevice.getInterfaceCount();
+            if(interfaceCount == 0){
+                throw new IOException("No usb interfaces to access.");
+            }
+
+            UsbInterface dataIface = mDevice.getInterface(interfaceCount - 1);
+            final int endpointCount = dataIface.getEndpointCount();
+            for (int i = 0; i < endpointCount; i++) {
                 UsbEndpoint ep = dataIface.getEndpoint(i);
                 if (ep.getType() == UsbConstants.USB_ENDPOINT_XFER_BULK) {
                     if (ep.getDirection() == UsbConstants.USB_DIR_IN) {

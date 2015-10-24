@@ -42,8 +42,7 @@ public class msg_power_status extends MAVLinkMessage{
     * @return
     */
     public MAVLinkPacket pack(){
-        MAVLinkPacket packet = new MAVLinkPacket();
-        packet.len = MAVLINK_MSG_LENGTH;
+        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH);
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_POWER_STATUS;

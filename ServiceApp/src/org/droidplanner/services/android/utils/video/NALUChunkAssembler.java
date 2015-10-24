@@ -15,8 +15,6 @@ import timber.log.Timber;
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class NALUChunkAssembler {
 
-    private static final String TAG = NALUChunkAssembler.class.getSimpleName();
-
     private final NALUChunk assembledNaluChunk;
     private final NALUChunk paramsNaluChunk;
     private final NALUChunk eosNaluChunk;
@@ -62,12 +60,17 @@ public class NALUChunkAssembler {
         return eosNaluChunk;
     }
 
+    private int prevSeq = -1;
+    private int naluCounter = 0;
+    private final static long DELTA_PRESENTATION_TIME = 42000L;
+
     NALUChunk assembleNALUChunk(byte[] buffer, int bufferLength) {
+
         //The first 12 bytes are the rtp header.
         final byte nalHeaderByte = buffer[12];
         final int forbiddenBit = (nalHeaderByte & 0x80) >> 7;
         if (forbiddenBit != 0) {
-            Log.w(TAG, "Forbidden bit is set, indicating possible errors.");
+            Timber.w("Forbidden bit is set, indicating possible errors.");
             return null;
         }
 
@@ -83,6 +86,16 @@ public class NALUChunkAssembler {
             Timber.d("Undefined nal type: " + nalType);
             return null;
         }
+
+        //DEBUG LOGIC
+        if(prevSeq != -1){
+            final int expectedSeq = prevSeq + 1;
+            if(sequenceNumber != expectedSeq){
+                Timber.v("Sequence number is out of order: %d != %d", expectedSeq, sequenceNumber);
+            }
+        }
+        prevSeq = sequenceNumber;
+        //DEBUG LOGIC
 
         if (nalType <= 23) {
             //Single nal unit packet.
@@ -106,7 +119,7 @@ public class NALUChunkAssembler {
 
                     if (areParametersSet()) {
                         paramsNaluChunk.sequenceNumber = sequenceNumber;
-                        paramsNaluChunk.presentationTime = rtpTimestamp;
+                        paramsNaluChunk.presentationTime = 0;
                         return paramsNaluChunk;
                     }
 
@@ -124,7 +137,7 @@ public class NALUChunkAssembler {
                     assembledNaluChunk.type = nalType;
                     assembledNaluChunk.sequenceNumber = sequenceNumber;
                     assembledNaluChunk.flags = 0;
-                    assembledNaluChunk.presentationTime = rtpTimestamp;
+                    assembledNaluChunk.presentationTime = naluCounter++ * DELTA_PRESENTATION_TIME;
                     return assembledNaluChunk;
             }
         }
@@ -155,7 +168,7 @@ public class NALUChunkAssembler {
                 assembledNaluChunk.sequenceNumber = sequenceNumber;
                 assembledNaluChunk.type = fuNalType;
                 assembledNaluChunk.flags = isConfig ? MediaCodec.BUFFER_FLAG_CODEC_CONFIG : 0;
-                assembledNaluChunk.presentationTime = rtpTimestamp;
+//                assembledNaluChunk.presentationTime = rtpTimestamp;
                 return null;
             } else {
                 if (sequenceNumber - 1 != assembledNaluChunk.sequenceNumber) {
@@ -167,6 +180,7 @@ public class NALUChunkAssembler {
                 assembledNaluChunk.sequenceNumber = sequenceNumber;
 
                 if (endBit == 1) {
+                    assembledNaluChunk.presentationTime = naluCounter++ * DELTA_PRESENTATION_TIME;
                     return assembledNaluChunk;
                 } else {
                     return null;

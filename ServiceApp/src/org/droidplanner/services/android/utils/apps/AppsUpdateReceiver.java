@@ -11,9 +11,10 @@ import org.droidplanner.services.android.ui.fragment.RecommendedAppsFragment;
  * Created by Fredia Huya-Kouadio on 2/5/15.
  */
 public class AppsUpdateReceiver extends BroadcastReceiver {
+
     @Override
     public void onReceive(Context context, Intent intent) {
-        LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(RecommendedAppsFragment
-                .ACTION_REFRESH_RECOMMENDED_APPS));
+        LocalBroadcastManager.getInstance(context)
+                .sendBroadcast(new Intent(RecommendedAppsFragment.ACTION_REFRESH_RECOMMENDED_APPS));
     }
 }

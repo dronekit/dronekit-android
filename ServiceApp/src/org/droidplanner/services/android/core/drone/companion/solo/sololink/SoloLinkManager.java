@@ -3,13 +3,14 @@ package org.droidplanner.services.android.core.drone.companion.solo.sololink;
 import android.content.Context;
 import android.os.Handler;
 import android.text.TextUtils;
-import android.util.Log;
 
 import org.droidplanner.services.android.BuildConfig;
 import org.droidplanner.services.android.core.drone.companion.solo.AbstractLinkManager;
 import org.droidplanner.services.android.core.drone.companion.solo.SoloComp;
 import org.droidplanner.services.android.core.drone.companion.solo.controller.ControllerLinkManager;
 
+import com.o3dr.android.client.utils.connection.TcpConnection;
+import com.o3dr.android.client.utils.connection.UdpConnection;
 import com.o3dr.services.android.lib.drone.companion.solo.button.ButtonTypes;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSetting;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSettingGetter;
@@ -23,12 +24,11 @@ import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.model.SimpleCommandListener;
 
 import org.droidplanner.services.android.utils.connection.SshConnection;
-import org.droidplanner.services.android.utils.connection.TcpConnection;
-import org.droidplanner.services.android.utils.connection.UdpConnection;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicReference;
@@ -148,14 +148,20 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
 
     @Override
     public void start(SoloLinkListener listener) {
-        Timber.d("Starting solo link manager");
+        if(!isStarted()) {
+            Timber.i("Starting solo link manager");
+        }
+
         super.start(listener);
         this.linkListener = listener;
     }
 
     @Override
     public void stop() {
-        Timber.d("Stopping solo link manager");
+        if(isStarted()) {
+            Timber.i("Stopping solo link manager");
+        }
+
         super.stop();
     }
 
@@ -185,28 +191,30 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
 
     @Override
     public void onPacketReceived(ByteBuffer packetBuffer) {
-        TLVPacket tlvMsg = TLVMessageParser.parseTLVPacket(packetBuffer);
-        if (tlvMsg == null) {
+        final List<TLVPacket> tlvMsgs = TLVMessageParser.parseTLVPacket(packetBuffer);
+        if (tlvMsgs.isEmpty()) {
             return;
         }
 
-        final int messageType = tlvMsg.getMessageType();
-        Timber.d("Received tlv message: " + messageType);
+        for(TLVPacket tlvMsg : tlvMsgs) {
+            final int messageType = tlvMsg.getMessageType();
+            Timber.d("Received tlv message: " + messageType);
 
-        //Have shot manager examine the received message first.
-        switch (messageType) {
-            case TLVMessageTypes.TYPE_SOLO_MESSAGE_SHOT_MANAGER_ERROR:
-                Timber.w(((SoloMessageShotManagerError) tlvMsg).getExceptionInfo());
-                break;
+            //Have shot manager examine the received message first.
+            switch (messageType) {
+                case TLVMessageTypes.TYPE_SOLO_MESSAGE_SHOT_MANAGER_ERROR:
+                    Timber.w(((SoloMessageShotManagerError) tlvMsg).getExceptionInfo());
+                    break;
 
-            case TLVMessageTypes.TYPE_SOLO_GET_BUTTON_SETTING:
-                final SoloButtonSettingGetter receivedPresetButton = (SoloButtonSettingGetter) tlvMsg;
-                handleReceivedPresetButton(receivedPresetButton);
-                break;
-        }
+                case TLVMessageTypes.TYPE_SOLO_GET_BUTTON_SETTING:
+                    final SoloButtonSettingGetter receivedPresetButton = (SoloButtonSettingGetter) tlvMsg;
+                    handleReceivedPresetButton(receivedPresetButton);
+                    break;
+            }
 
-        if (linkListener != null) {
-            linkListener.onTlvPacketReceived(tlvMsg);
+            if (linkListener != null) {
+                linkListener.onTlvPacketReceived(tlvMsg);
+            }
         }
     }
 

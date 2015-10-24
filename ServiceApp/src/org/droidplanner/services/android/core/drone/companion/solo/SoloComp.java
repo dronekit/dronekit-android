@@ -7,15 +7,14 @@ import android.os.RemoteException;
 import android.text.TextUtils;
 import android.util.Pair;
 import android.util.SparseArray;
-import android.view.Surface;
 
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.drone.companion.solo.SoloEventExtras;
 import com.o3dr.services.android.lib.drone.companion.solo.SoloEvents;
-import com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerMode;
 import com.o3dr.services.android.lib.drone.companion.solo.button.ButtonPacket;
 import com.o3dr.services.android.lib.drone.companion.solo.button.ButtonTypes;
+import com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerMode;
 import com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerUnits;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSetting;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSettingSetter;
@@ -25,17 +24,16 @@ import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
 import com.o3dr.services.android.lib.model.ICommandListener;
 
+import org.droidplanner.services.android.BuildConfig;
 import org.droidplanner.services.android.core.drone.companion.CompComp;
 import org.droidplanner.services.android.core.drone.companion.solo.controller.ControllerLinkListener;
 import org.droidplanner.services.android.core.drone.companion.solo.controller.ControllerLinkManager;
 import org.droidplanner.services.android.core.drone.companion.solo.sololink.SoloLinkListener;
 import org.droidplanner.services.android.core.drone.companion.solo.sololink.SoloLinkManager;
 import org.droidplanner.services.android.utils.NetworkUtils;
-import org.droidplanner.services.android.utils.video.DecoderListener;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicReference;
 
 import timber.log.Timber;
 
@@ -65,8 +63,6 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
         void onControllerEvent(String event, Bundle eventInfo);
     }
 
-    private static final String NO_VIDEO_OWNER = "no_video_owner";
-
     public static final String SOLO_LINK_WIFI_PREFIX = "SoloLink_";
 
     public static final String SSH_USERNAME = "root";
@@ -78,9 +74,6 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
     private final Context context;
     private final Handler handler;
     private final ExecutorService asyncExecutor;
-
-    private final AtomicReference<String> videoOwnerId = new AtomicReference<>(NO_VIDEO_OWNER);
-    private final AtomicReference<String> videoTagRef = new AtomicReference<>("");
 
     private SoloCompListener compListener;
 
@@ -105,35 +98,47 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
         return goproState;
     }
 
+    public boolean hasStreamingPermission(){
+        if(BuildConfig.SITL_DEBUG)
+            return true;
+
+        return controllerLinkManager.hasStreamingPermission();
+    }
+
     public void setListener(SoloCompListener listener) {
         this.compListener = listener;
     }
 
-    public boolean isAvailable() {
+    public static boolean isAvailable(Context context) {
         //TODO: complement the logic.
-        return NetworkUtils.isOnSololinkNetwork(this.context);
+        return NetworkUtils.isOnSololinkNetwork(context);
     }
 
     public void start() {
-        if (!isAvailable()) {
+        if (!isAvailable(context)) {
             return;
         }
 
-        resetVideoOwner();
+        if(!BuildConfig.SITL_DEBUG) {
+            controllerLinkManager.start(this);
+        }
 
-        controllerLinkManager.start(this);
         soloLinkMgr.start(this);
     }
 
     public void stop() {
-        resetVideoOwner();
-        controllerLinkManager.stop();
         soloLinkMgr.stop();
+
+        if(!BuildConfig.SITL_DEBUG) {
+            controllerLinkManager.stop();
+        }
     }
 
     public void refreshState() {
         soloLinkMgr.refreshState();
-        controllerLinkManager.refreshState();
+
+        if(!BuildConfig.SITL_DEBUG)
+            controllerLinkManager.refreshState();
     }
 
     /**
@@ -146,10 +151,10 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
 
     @Override
     public void onTlvPacketReceived(TLVPacket packet) {
-        if(packet == null)
+        if (packet == null)
             return;
 
-        switch(packet.getMessageType()){
+        switch (packet.getMessageType()) {
             case TLVMessageTypes.TYPE_SOLO_GOPRO_STATE:
                 goproState = (SoloGoproState) packet;
                 Timber.d("Updated gopro state.");
@@ -174,13 +179,13 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
 
     @Override
     public void onEUTxPowerComplianceUpdated(boolean isCompliant) {
-        if(compListener != null)
+        if (compListener != null)
             compListener.onEUTxPowerComplianceUpdated(isCompliant);
     }
 
     @Override
     public void onControllerModeUpdated() {
-        if (compListener != null){
+        if (compListener != null) {
             final Bundle eventInfo = new Bundle();
             eventInfo.putInt(SoloEventExtras.EXTRA_SOLO_CONTROLLER_MODE, getControllerMode());
             compListener.onControllerEvent(SoloEvents.SOLO_CONTROLLER_MODE_UPDATED, eventInfo);
@@ -189,7 +194,7 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
 
     @Override
     public void onControllerUnitUpdated(String trimmedResponse) {
-        if(compListener != null){
+        if (compListener != null) {
             final Bundle eventInfo = new Bundle();
             eventInfo.putString(SoloEventExtras.EXTRA_SOLO_CONTROLLER_UNIT, trimmedResponse);
             compListener.onControllerEvent(SoloEvents.SOLO_CONTROLLER_UNIT_UPDATED, eventInfo);
@@ -208,7 +213,7 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
             if (compListener != null)
                 compListener.onConnected();
         } else {
-            if (!controllerLinkManager.isLinkConnected())
+            if (!controllerLinkManager.isLinkConnected() && !BuildConfig.SITL_DEBUG)
                 controllerLinkManager.start(this);
 
             if (!soloLinkMgr.isLinkConnected())
@@ -221,13 +226,16 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
         if (compListener != null)
             compListener.onDisconnected();
 
-        controllerLinkManager.stop();
         soloLinkMgr.stop();
+
+        if(!BuildConfig.SITL_DEBUG) {
+            controllerLinkManager.stop();
+        }
     }
 
     @Override
     public void onVersionsUpdated() {
-        if(compListener != null)
+        if (compListener != null)
             compListener.onVersionsUpdated();
     }
 
@@ -235,12 +243,15 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
     public void onMacAddressUpdated() {
         final String soloMacAddress = soloLinkMgr.getMacAddress();
         final String artooMacAddress = controllerLinkManager.getMacAddress();
-        if(!TextUtils.isEmpty(soloMacAddress) && !TextUtils.isEmpty(artooMacAddress) && compListener != null){
+        if (!TextUtils.isEmpty(soloMacAddress) && !TextUtils.isEmpty(artooMacAddress) && compListener != null) {
             compListener.onControllerEvent(AttributeEvent.STATE_VEHICLE_UID, null);
         }
     }
 
     public boolean isConnected() {
+        if(BuildConfig.SITL_DEBUG)
+            return soloLinkMgr.isLinkConnected();
+
         return controllerLinkManager.isLinkConnected() && soloLinkMgr.isLinkConnected();
     }
 
@@ -252,9 +263,11 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
         return controllerLinkManager.isEUTxPowerCompliant();
     }
 
-    public void refreshSoloVersions(){
+    public void refreshSoloVersions() {
         soloLinkMgr.refreshSoloLinkVersions();
-        controllerLinkManager.refreshControllerVersions();
+
+        if(!BuildConfig.SITL_DEBUG)
+            controllerLinkManager.refreshControllerVersions();
     }
 
     public String getControllerVersion() {
@@ -270,20 +283,20 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
     }
 
     @SoloControllerMode.ControllerMode
-    public int getControllerMode(){
-        return  controllerLinkManager.getControllerMode();
+    public int getControllerMode() {
+        return controllerLinkManager.getControllerMode();
     }
 
     @SoloControllerUnits.ControllerUnit
-    public String getControllerUnit(){
+    public String getControllerUnit() {
         return controllerLinkManager.getControllerUnit();
     }
 
-    public String getSoloMacAddress(){
+    public String getSoloMacAddress() {
         return soloLinkMgr.getMacAddress();
     }
 
-    public String getControllerMacAddress(){
+    public String getControllerMacAddress() {
         return controllerLinkManager.getMacAddress();
     }
 
@@ -291,7 +304,7 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
         return soloLinkMgr.getPixhawkVersion();
     }
 
-    public String getGimbalVersion(){
+    public String getGimbalVersion() {
         return soloLinkMgr.getGimbalVersion();
     }
 
@@ -299,48 +312,48 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
         return soloLinkMgr.getLoadedPresetButton(buttonType);
     }
 
-    public SparseArray<SoloButtonSetting> getButtonSettings(){
+    public SparseArray<SoloButtonSetting> getButtonSettings() {
         final SparseArray<SoloButtonSetting> buttonSettings = new SparseArray<>(2);
         buttonSettings.append(ButtonTypes.BUTTON_A, soloLinkMgr.getLoadedPresetButton(ButtonTypes.BUTTON_A));
         buttonSettings.append(ButtonTypes.BUTTON_B, soloLinkMgr.getLoadedPresetButton(ButtonTypes.BUTTON_B));
         return buttonSettings;
     }
 
-    public void sendSoloLinkMessage(TLVPacket message, ICommandListener listener){
+    public void sendSoloLinkMessage(TLVPacket message, ICommandListener listener) {
         soloLinkMgr.sendTLVPacket(message, listener);
     }
 
     public void updateWifiSettings(final String wifiSsid, final String wifiPassword,
-                                   final ICommandListener listener){
-            postAsyncTask(new Runnable() {
-                @Override
-                public void run() {
-                    if (soloLinkMgr.updateSololinkWifi(wifiSsid, wifiPassword)
-                            && controllerLinkManager.updateSololinkWifi(wifiSsid, wifiPassword)) {
-                        Timber.d("Sololink wifi update successful.");
+                                   final ICommandListener listener) {
+        postAsyncTask(new Runnable() {
+            @Override
+            public void run() {
+                if (soloLinkMgr.updateSololinkWifi(wifiSsid, wifiPassword)
+                        && controllerLinkManager.updateSololinkWifi(wifiSsid, wifiPassword)) {
+                    Timber.d("Sololink wifi update successful.");
 
-                        if (listener != null) {
-                            postSuccessEvent(listener);
-                        }
-                    } else {
-                        Timber.d("Sololink wifi update failed.");
-                        if (listener != null) {
-                            postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
-                        }
+                    if (listener != null) {
+                        postSuccessEvent(listener);
+                    }
+                } else {
+                    Timber.d("Sololink wifi update failed.");
+                    if (listener != null) {
+                        postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
                     }
                 }
-            });
+            }
+        });
     }
 
-    public void pushButtonSettings(SoloButtonSettingSetter buttonSettings, ICommandListener listener){
+    public void pushButtonSettings(SoloButtonSettingSetter buttonSettings, ICommandListener listener) {
         soloLinkMgr.pushPresetButtonSettings(buttonSettings, listener);
     }
 
-    public void updateControllerMode(@SoloControllerMode.ControllerMode final int selectedMode, ICommandListener listener){
+    public void updateControllerMode(@SoloControllerMode.ControllerMode final int selectedMode, ICommandListener listener) {
         controllerLinkManager.updateControllerMode(selectedMode, listener);
     }
 
-    public void updateControllerUnit(@SoloControllerUnits.ControllerUnit final String selectedUnit, ICommandListener listener){
+    public void updateControllerUnit(@SoloControllerUnits.ControllerUnit final String selectedUnit, ICommandListener listener) {
         controllerLinkManager.updateControllerUnit(selectedUnit, listener);
     }
 
@@ -348,136 +361,14 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
         controllerLinkManager.setEUTxPowerCompliance(isCompliant, listener);
     }
 
-    public void startVideoStream(String appId, String newVideoTag, Surface videoSurface, final ICommandListener listener){
-        Timber.d("Video stream start request from %s. Video owner is %s.", appId, videoOwnerId.get());
-        if(TextUtils.isEmpty(appId)){
-            postErrorEvent(CommandExecutionError.COMMAND_DENIED, listener);
-            return;
-        }
-
-        if(videoSurface == null){
-            postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
-            return;
-        }
-
-        if(newVideoTag == null)
-            newVideoTag = "";
-
-        if(appId.equals(videoOwnerId.get())){
-            String currentVideoTag = videoTagRef.get();
-            if(currentVideoTag == null)
-                currentVideoTag = "";
-
-            if(newVideoTag.equals(currentVideoTag)){
-                postSuccessEvent(listener);
-                return;
-            }
-        }
-
-        if (videoOwnerId.compareAndSet(NO_VIDEO_OWNER, appId)){
-            videoTagRef.set(newVideoTag);
-
-            Timber.d("Setting video surface layer.");
-            controllerLinkManager.startDecoding(videoSurface, new DecoderListener() {
-                @Override
-                public void onDecodingStarted() {
-                    Timber.d("Video decoding started.");
-                    postSuccessEvent(listener);
-                }
-
-                @Override
-                public void onDecodingError() {
-                    Timber.d("Video decoding failed.");
-                    postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
-                    resetVideoOwner();
-                }
-
-                @Override
-                public void onDecodingEnded() {
-                    Timber.d("Video decoding ended successfully.");
-                    resetVideoOwner();
-                }
-            });
-        }
-        else{
-            postErrorEvent(CommandExecutionError.COMMAND_DENIED, listener);
-        }
-    }
-
-    public void stopVideoStream(String appId, String currentVideoTag, final ICommandListener listener){
-        Timber.d("Video stream stop request from %s. Video owner is %s.", appId, videoOwnerId.get());
-        if(TextUtils.isEmpty(appId)){
-            Timber.w("Owner id is empty.");
-            postErrorEvent(CommandExecutionError.COMMAND_DENIED, listener);
-            return;
-        }
-
-        final String currentVideoOwner = videoOwnerId.get();
-        if(NO_VIDEO_OWNER.equals(currentVideoOwner)){
-            Timber.d("No video owner set. Nothing to do.");
-            postSuccessEvent(listener);
-            return;
-        }
-
-        if(currentVideoTag == null)
-            currentVideoTag = "";
-
-        if(appId.equals(currentVideoOwner) && currentVideoTag.equals(videoTagRef.get())
-                && videoOwnerId.compareAndSet(currentVideoOwner, NO_VIDEO_OWNER)){
-            videoTagRef.set("");
-
-            Timber.d("Stopping video decoding. Current owner is %s.", currentVideoOwner);
-            controllerLinkManager.stopDecoding(new DecoderListener() {
-                @Override
-                public void onDecodingStarted() {
-                }
-
-                @Override
-                public void onDecodingError() {
-                    postSuccessEvent(listener);
-                }
-
-                @Override
-                public void onDecodingEnded() {
-                    postSuccessEvent(listener);
-                }
-            });
-
-        }
-        else{
-            postErrorEvent(CommandExecutionError.COMMAND_DENIED, listener);
-        }
-    }
-
-    public void tryStoppingVideoStream(String parentId){
-        if(TextUtils.isEmpty(parentId))
-            return;
-
-        final String videoOwner = videoOwnerId.get();
-        if(NO_VIDEO_OWNER.equals(videoOwner))
-            return;
-
-        if(videoOwner.equals(parentId)){
-            Timber.d("Stopping video owned by %s", parentId);
-            stopVideoStream(parentId, videoTagRef.get(), null);
-        }
-    }
-
-    private void resetVideoOwner(){
-        Timber.d("Resetting video tag (%s) and owner id (%s)", videoTagRef.get(), videoOwnerId.get());
-        videoTagRef.set("");
-        videoOwnerId.set(NO_VIDEO_OWNER);
-        controllerLinkManager.stopDecoding(null);
-    }
-
-    protected void postAsyncTask(Runnable task){
-        if(asyncExecutor != null && !asyncExecutor.isShutdown()){
+    protected void postAsyncTask(Runnable task) {
+        if (asyncExecutor != null && !asyncExecutor.isShutdown()) {
             asyncExecutor.execute(task);
         }
     }
 
-    protected void postSuccessEvent(final ICommandListener listener){
-        if(handler != null && listener != null){
+    protected void postSuccessEvent(final ICommandListener listener) {
+        if (handler != null && listener != null) {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -491,8 +382,8 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
         }
     }
 
-    protected void postTimeoutEvent(final ICommandListener listener){
-        if(handler != null && listener != null){
+    protected void postTimeoutEvent(final ICommandListener listener) {
+        if (handler != null && listener != null) {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -506,8 +397,8 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
         }
     }
 
-    protected void postErrorEvent(final int error, final ICommandListener listener){
-        if(handler != null && listener != null){
+    protected void postErrorEvent(final int error, final ICommandListener listener) {
+        if (handler != null && listener != null) {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -521,15 +412,15 @@ public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListe
         }
     }
 
-    public void enableFollowDataConnection(){
+    public void enableFollowDataConnection() {
         soloLinkMgr.enableFollowDataConnection();
     }
 
-    public void disableFollowDataConnection(){
+    public void disableFollowDataConnection() {
         soloLinkMgr.disableFollowDataConnection();
     }
 
-    public void updateFollowCenter(SoloMessageLocation location){
+    public void updateFollowCenter(SoloMessageLocation location) {
         soloLinkMgr.sendTLVPacket(location, true, null);
     }
 

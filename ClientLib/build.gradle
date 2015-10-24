@@ -3,11 +3,12 @@ apply plugin: 'com.android.library'
 ext {
     VERSION_MAJOR = 2
     VERSION_MINOR = 6
-    VERSION_PATCH = 6
+    VERSION_PATCH = 8
     VERSION_BUILD = 0
+    VERSION_SUFFIX = "release"
 
     PUBLISH_ARTIFACT_ID = 'dronekit-android'
-    PUBLISH_VERSION = generateVersionName("", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH)
+    PUBLISH_VERSION = generateVersionName("", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH, VERSION_SUFFIX)
     PUBLISH_VERSION_CODE = computeVersionCode(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH, VERSION_BUILD)
     PROJECT_DESCRIPTION = "Android DroneKit client library."
     PROJECT_LABELS = ['3DR', '3DR Services', 'DroneAPI', 'Android', 'DroneKit']

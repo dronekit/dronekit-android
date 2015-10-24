@@ -3,7 +3,6 @@ package org.droidplanner.services.android;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.SystemClock;
 
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
@@ -11,13 +10,13 @@ import com.MAVLink.common.msg_command_long;
 import com.MAVLink.enums.MAV_CMD;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 
+import org.droidplanner.services.android.communication.service.MAVLinkClient;
 import org.droidplanner.services.android.core.MAVLink.MAVLinkStreams;
 import org.droidplanner.services.android.core.MAVLink.MavLinkArm;
-import org.droidplanner.services.android.core.drone.autopilot.apm.ArduCopter;
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
 import org.droidplanner.services.android.core.drone.LogMessageListener;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
-import org.droidplanner.services.android.communication.service.MAVLinkClient;
+import org.droidplanner.services.android.core.drone.autopilot.apm.ArduCopter;
 import org.droidplanner.services.android.mock.MockMavLinkServiceAPI;
 import org.droidplanner.services.android.utils.AndroidApWarningParser;
 import org.droidplanner.services.android.utils.prefs.DroidPlannerPrefs;
@@ -40,24 +39,7 @@ public class BasicTest {
     private MavLinkDrone drone;
     private MockMavLinkServiceAPI mavlinkApi;
 
-    private final DroneInterfaces.Handler dpHandler = new DroneInterfaces.Handler() {
-
-        private final Handler h = new Handler();
-
-        public void removeCallbacks(Runnable thread) {
-            h.removeCallbacks(thread);
-        }
-
-        @Override
-        public void post(Runnable thread) {
-            h.post(thread);
-        }
-
-        @Override
-        public void postDelayed(Runnable thread, long timeout) {
-            h.postDelayed(thread, timeout);
-        }
-    };
+    private final Handler dpHandler = new Handler();
 
     private final MAVLinkStreams.MavlinkInputStream inputStreamListener = new MAVLinkStreams.MavlinkInputStream() {
         @Override
@@ -87,12 +69,6 @@ public class BasicTest {
 
         ConnectionParameter connParams = new ConnectionParameter(0, new Bundle(), null);
         mavlinkApi = new MockMavLinkServiceAPI();
-        DroneInterfaces.Clock clock = new DroneInterfaces.Clock() {
-            @Override
-            public long elapsedRealtime() {
-                return SystemClock.elapsedRealtime();
-            }
-        };
         DroidPlannerPrefs dpPrefs = new DroidPlannerPrefs(context);
         MAVLinkClient mavClient = new MAVLinkClient(context, inputStreamListener, connParams, mavlinkApi);
 
@@ -103,7 +79,7 @@ public class BasicTest {
             }
         }, new DroneInterfaces.AttributeEventListener() {
             @Override
-            public void onAttributeEvent(String attributeEvent, Bundle eventInfo) {
+            public void onAttributeEvent(String attributeEvent, Bundle eventInfo, boolean checkForSololinkApi) {
 
             }
         });
