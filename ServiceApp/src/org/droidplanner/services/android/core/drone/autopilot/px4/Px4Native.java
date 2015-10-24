@@ -11,7 +11,6 @@ import org.droidplanner.services.android.core.drone.profiles.Parameters;
 import org.droidplanner.services.android.core.drone.profiles.VehicleProfile;
 import org.droidplanner.services.android.core.drone.variables.Camera;
 import org.droidplanner.services.android.core.drone.variables.GuidedPoint;
-import org.droidplanner.services.android.core.drone.variables.Home;
 import org.droidplanner.services.android.core.drone.variables.Magnetometer;
 import org.droidplanner.services.android.core.drone.variables.MissionStats;
 import org.droidplanner.services.android.core.drone.variables.calibration.AccelCalibration;
@@ -76,11 +75,6 @@ public class Px4Native extends GenericMavLinkDrone {
 
     @Override
     public WaypointManager getWaypointManager() {
-        return null;
-    }
-
-    @Override
-    public Home getHome() {
         return null;
     }
 

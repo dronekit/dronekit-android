@@ -11,11 +11,13 @@ import com.MAVLink.common.msg_attitude;
 import com.MAVLink.common.msg_global_position_int;
 import com.MAVLink.common.msg_gps_raw_int;
 import com.MAVLink.common.msg_heartbeat;
+import com.MAVLink.common.msg_mission_item;
 import com.MAVLink.common.msg_radio_status;
 import com.MAVLink.common.msg_sys_status;
 import com.MAVLink.common.msg_vibration;
 import com.MAVLink.enums.MAV_SYS_STATUS_SENSOR;
 import com.o3dr.services.android.lib.coordinate.LatLong;
+import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.action.ControlActions;
 import com.o3dr.services.android.lib.drone.action.StateActions;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
@@ -27,6 +29,7 @@ import com.o3dr.services.android.lib.drone.property.Attitude;
 import com.o3dr.services.android.lib.drone.property.Battery;
 import com.o3dr.services.android.lib.drone.property.DroneAttribute;
 import com.o3dr.services.android.lib.drone.property.Gps;
+import com.o3dr.services.android.lib.drone.property.Home;
 import com.o3dr.services.android.lib.drone.property.Signal;
 import com.o3dr.services.android.lib.drone.property.Speed;
 import com.o3dr.services.android.lib.drone.property.VehicleMode;
@@ -37,9 +40,11 @@ import com.o3dr.services.android.lib.util.MathUtils;
 
 import org.droidplanner.services.android.core.MAVLink.MAVLinkStreams;
 import org.droidplanner.services.android.core.MAVLink.MavLinkCommands;
+import org.droidplanner.services.android.core.MAVLink.MavLinkWaypoint;
 import org.droidplanner.services.android.core.drone.DroneEvents;
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
+import org.droidplanner.services.android.core.drone.autopilot.apm.APMConstants;
 import org.droidplanner.services.android.core.drone.variables.State;
 import org.droidplanner.services.android.core.drone.variables.StreamRates;
 import org.droidplanner.services.android.core.drone.variables.Type;
@@ -68,6 +73,7 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
 
     private final DroneInterfaces.AttributeEventListener attributeListener;
 
+    private final Home vehicleHome = new Home();
     private final Gps vehicleGps = new Gps();
     protected final Altitude altitude = new Altitude();
     protected final Speed speed = new Speed();
@@ -117,11 +123,11 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
         events.removeDroneListener(listener);
     }
 
-    public void startVideoStream(Bundle videoProps, String appId, String newVideoTag, Surface videoSurface, final ICommandListener listener) {
+    public void startVideoStream(Bundle videoProps, String appId, String newVideoTag, Surface videoSurface, ICommandListener listener) {
         videoMgr.startVideoStream(videoProps, appId, newVideoTag, videoSurface, listener);
     }
 
-    public void stopVideoStream(String appId, String currentVideoTag, final ICommandListener listener) {
+    public void stopVideoStream(String appId, String currentVideoTag, ICommandListener listener) {
         videoMgr.stopVideoStream(appId, currentVideoTag, listener);
     }
 
@@ -149,7 +155,7 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
     }
 
     @Override
-    public void notifyDroneEvent(final DroneInterfaces.DroneEventsType event) {
+    public void notifyDroneEvent(DroneInterfaces.DroneEventsType event) {
         switch (event) {
             case DISCONNECTED:
                 signal.setValid(false);
@@ -166,7 +172,7 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
 
     @Override
     public boolean executeAsyncAction(Action action, ICommandListener listener) {
-        final String type = action.getType();
+        String type = action.getType();
         Bundle data = action.getData();
 
         switch (type) {
@@ -188,7 +194,7 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
                 //Retrieve the yaw turn speed.
                 float turnSpeed = 2; //default turn speed.
 
-                final Parameters parameters = getParameters();
+                Parameters parameters = getParameters();
                 if(parameters != null){
                     Parameter turnSpeedParam = parameters.getParameter("ACRO_YAW_P");
                     if(turnSpeedParam != null){
@@ -196,25 +202,30 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
                     }
                 }
 
-                final float targetAngle = data.getFloat(ControlActions.EXTRA_YAW_TARGET_ANGLE);
-                final float yawRate = data.getFloat(ControlActions.EXTRA_YAW_CHANGE_RATE);
-                final boolean isClockwise = yawRate >= 0;
-                final boolean isRelative = data.getBoolean(ControlActions.EXTRA_YAW_IS_RELATIVE);
+                float targetAngle = data.getFloat(ControlActions.EXTRA_YAW_TARGET_ANGLE);
+                float yawRate = data.getFloat(ControlActions.EXTRA_YAW_CHANGE_RATE);
+                boolean isClockwise = yawRate >= 0;
+                boolean isRelative = data.getBoolean(ControlActions.EXTRA_YAW_IS_RELATIVE);
 
                 MavLinkCommands.setConditionYaw(this, targetAngle, Math.abs(yawRate) * turnSpeed, isClockwise, isRelative, listener);
                 return true;
 
             case ControlActions.ACTION_SET_VELOCITY:
-                final float xAxis = data.getFloat(ControlActions.EXTRA_VELOCITY_X);
-                final short x = (short) (xAxis * 1000);
+                float xAxis = data.getFloat(ControlActions.EXTRA_VELOCITY_X);
+                short x = (short) (xAxis * 1000);
 
-                final float yAxis = data.getFloat(ControlActions.EXTRA_VELOCITY_Y);
-                final short y = (short) (yAxis * 1000);
+                float yAxis = data.getFloat(ControlActions.EXTRA_VELOCITY_Y);
+                short y = (short) (yAxis * 1000);
 
-                final float zAxis = data.getFloat(ControlActions.EXTRA_VELOCITY_Z);
-                final short z = (short) (zAxis * 1000);
+                float zAxis = data.getFloat(ControlActions.EXTRA_VELOCITY_Z);
+                short z = (short) (zAxis * 1000);
 
                 MavLinkCommands.sendManualControl(this, x, y, z, (short) 0, 0, listener);
+                return true;
+
+            //INTERNAL DRONE ACTIONS
+            case ACTION_REQUEST_HOME_UPDATE:
+                requestHomeUpdate();
                 return true;
 
             default:
@@ -249,6 +260,9 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
 
             case AttributeType.GPS:
                 return vehicleGps;
+
+            case AttributeType.HOME:
+                return vehicleHome;
         }
 
         return null;
@@ -297,6 +311,10 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
             case msg_gps_raw_int.MAVLINK_MSG_ID_GPS_RAW_INT:
                 processGpsState((msg_gps_raw_int) message);
                 break;
+
+            case msg_mission_item.MAVLINK_MSG_ID_MISSION_ITEM:
+                processHomeUpdate((msg_mission_item) message);
+                break;
         }
     }
 
@@ -305,6 +323,37 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
                 .MAV_SYS_STATUS_SENSOR_RC_RECEIVER) == 0;
         if (isRCFailsafe) {
             state.parseAutopilotError("RC FAILSAFE");
+        }
+    }
+
+    public void processHomeUpdate(msg_mission_item missionItem){
+        if (missionItem.seq != APMConstants.HOME_WAYPOINT_INDEX) {
+            return;
+        }
+
+        float latitude = missionItem.x;
+        float longitude = missionItem.y;
+        float altitude = missionItem.z;
+        boolean homeUpdated = false;
+
+        LatLongAlt homeCoord = vehicleHome.getCoordinate();
+        if(homeCoord == null){
+            vehicleHome.setCoordinate(new LatLongAlt(latitude, longitude, altitude));
+            homeUpdated = true;
+        }
+        else{
+            if(homeCoord.getLatitude() != latitude
+                    || homeCoord.getLongitude() != longitude
+                    || homeCoord.getAltitude() != altitude){
+                homeCoord.setLatitude(latitude);
+                homeCoord.setLongitude(longitude);
+                homeCoord.setAltitude(altitude);
+                homeUpdated = true;
+            }
+        }
+
+        if(homeUpdated){
+            notifyDroneEvent(DroneInterfaces.DroneEventsType.HOME);
         }
     }
 
@@ -366,14 +415,14 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
     }
 
     private void processAttitude(msg_attitude m_att) {
-        attitude.setRoll(CommonApiUtils.fromRadToDeg(m_att.roll));
-        attitude.setRollSpeed(CommonApiUtils.fromRadToDeg(m_att.rollspeed));
+        attitude.setRoll(Math.toDegrees(m_att.roll));
+        attitude.setRollSpeed((float) Math.toDegrees(m_att.rollspeed));
 
-        attitude.setPitch(CommonApiUtils.fromRadToDeg(m_att.pitch));
-        attitude.setPitchSpeed(CommonApiUtils.fromRadToDeg(m_att.pitchspeed));
+        attitude.setPitch(Math.toDegrees(m_att.pitch));
+        attitude.setPitchSpeed((float) Math.toDegrees(m_att.pitchspeed));
 
-        attitude.setYaw(CommonApiUtils.fromRadToDeg(m_att.yaw));
-        attitude.setYawSpeed(CommonApiUtils.fromRadToDeg(m_att.yawspeed));
+        attitude.setYaw(Math.toDegrees(m_att.yaw));
+        attitude.setYawSpeed((float) Math.toDegrees(m_att.yawspeed));
 
         notifyDroneEvent(DroneInterfaces.DroneEventsType.ATTITUDE);
     }
@@ -411,8 +460,8 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
         if (gpi == null)
             return;
 
-        final double newLat = gpi.lat / 1E7;
-        final double newLong = gpi.lon / 1E7;
+        double newLat = gpi.lat / 1E7;
+        double newLong = gpi.lon / 1E7;
 
         boolean positionUpdated = false;
         LatLong gpsPosition = vehicleGps.getPosition();
@@ -435,7 +484,7 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
         if (gpsState == null)
             return;
 
-        final double newEph = gpsState.eph / 100.0; // convert from eph(cm) to gps_eph(m)
+        double newEph = gpsState.eph / 100.0; // convert from eph(cm) to gps_eph(m)
         if (vehicleGps.getSatellitesCount() != gpsState.satellites_visible
                 || vehicleGps.getGpsEph() != newEph) {
             vehicleGps.setSatCount(gpsState.satellites_visible);
@@ -447,6 +496,14 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
             vehicleGps.setFixType(gpsState.fix_type);
             notifyAttributeListener(AttributeEvent.GPS_FIX);
         }
+    }
+
+    protected void requestHomeUpdate() {
+        requestHomeUpdate(this);
+    }
+
+    private static void requestHomeUpdate(MavLinkDrone drone) {
+        MavLinkWaypoint.requestWayPoint(drone, APMConstants.HOME_WAYPOINT_INDEX);
     }
 
 }

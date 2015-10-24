@@ -15,7 +15,6 @@ import com.MAVLink.ardupilotmega.msg_mount_status;
 import com.MAVLink.ardupilotmega.msg_radio;
 import com.MAVLink.common.msg_heartbeat;
 import com.MAVLink.common.msg_mission_current;
-import com.MAVLink.common.msg_mission_item;
 import com.MAVLink.common.msg_mission_item_reached;
 import com.MAVLink.common.msg_named_value_int;
 import com.MAVLink.common.msg_nav_controller_output;
@@ -61,7 +60,6 @@ import org.droidplanner.services.android.core.drone.variables.ApmModes;
 import org.droidplanner.services.android.core.drone.variables.Camera;
 import org.droidplanner.services.android.core.drone.variables.GuidedPoint;
 import org.droidplanner.services.android.core.drone.variables.HeartBeat;
-import org.droidplanner.services.android.core.drone.variables.Home;
 import org.droidplanner.services.android.core.drone.variables.Magnetometer;
 import org.droidplanner.services.android.core.drone.variables.MissionStats;
 import org.droidplanner.services.android.core.drone.variables.RC;
@@ -89,7 +87,6 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
     private VehicleProfile profile;
 
     private final org.droidplanner.services.android.core.drone.variables.RC rc;
-    private final Home home;
     private final Mission mission;
     private final MissionStats missionStats;
     private final GuidedPoint guidedPoint;
@@ -127,7 +124,6 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
         this.waypointManager = new WaypointManager(this, handler);
 
         rc = new RC(this);
-        this.home = new Home(this);
         this.mission = new Mission(this);
         this.missionStats = new MissionStats(this);
         this.guidedPoint = new GuidedPoint(this, handler);
@@ -216,11 +212,6 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
     }
 
     @Override
-    public Home getHome() {
-        return home;
-    }
-
-    @Override
     public Mission getMission() {
         return mission;
     }
@@ -278,9 +269,6 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
                 case AttributeType.PARAMETERS:
                     return CommonApiUtils.getParameters(this, context, cachedParameters);
 
-                case AttributeType.HOME:
-                    return CommonApiUtils.getHome(this);
-
                 case AttributeType.MISSION:
                     return CommonApiUtils.getMission(this);
 
@@ -300,7 +288,7 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
 
     @Override
     public boolean executeAsyncAction(Action action, final ICommandListener listener) {
-        final String type = action.getType();
+        String type = action.getType();
         Bundle data = action.getData();
         if (data == null) {
             data = new Bundle();
@@ -380,21 +368,21 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
 
             case ControlActions.ACTION_SET_VELOCITY:
                 //Retrieve the normalized values
-                final float normalizedXVel = data.getFloat(ControlActions.EXTRA_VELOCITY_X);
-                final float normalizedYVel = data.getFloat(ControlActions.EXTRA_VELOCITY_Y);
-                final float normalizedZVel = data.getFloat(ControlActions.EXTRA_VELOCITY_Z);
+                float normalizedXVel = data.getFloat(ControlActions.EXTRA_VELOCITY_X);
+                float normalizedYVel = data.getFloat(ControlActions.EXTRA_VELOCITY_Y);
+                float normalizedZVel = data.getFloat(ControlActions.EXTRA_VELOCITY_Z);
 
                 //Retrieve the speed parameters.
-                final float defaultSpeed = 5; //m/s
+                float defaultSpeed = 5; //m/s
 
                 //Retrieve the horizontal speed value
-                final Parameter horizSpeedParam = parameters.getParameter("WPNAV_SPEED");
-                final double horizontalSpeed = horizSpeedParam == null ? defaultSpeed : horizSpeedParam.value / 100;
+                Parameter horizSpeedParam = parameters.getParameter("WPNAV_SPEED");
+                double horizontalSpeed = horizSpeedParam == null ? defaultSpeed : horizSpeedParam.value / 100;
 
                 //Retrieve the vertical speed value.
                 String vertSpeedParamName = normalizedZVel >= 0 ? "WPNAV_SPEED_UP" : "WPNAV_SPEED_DN";
-                final Parameter vertSpeedParam = parameters.getParameter(vertSpeedParamName);
-                final double verticalSpeed = vertSpeedParam == null ? defaultSpeed : vertSpeedParam.value / 100;
+                Parameter vertSpeedParam = parameters.getParameter(vertSpeedParamName);
+                double verticalSpeed = vertSpeedParam == null ? defaultSpeed : vertSpeedParam.value / 100;
 
                 MavLinkCommands.setVelocityInLocalFrame(this, (float) (normalizedXVel * horizontalSpeed),
                         (float) (normalizedYVel * horizontalSpeed),
@@ -421,25 +409,25 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
                 return true;
 
             case StateActions.ACTION_SET_VEHICLE_HOME:
-                final LatLongAlt homeLoc = data.getParcelable(StateActions.EXTRA_VEHICLE_HOME_LOCATION);
+                LatLongAlt homeLoc = data.getParcelable(StateActions.EXTRA_VEHICLE_HOME_LOCATION);
                 if (homeLoc != null) {
                     MavLinkDoCmds.setVehicleHome(this, homeLoc, new AbstractCommandListener() {
                         @Override
                         public void onSuccess() {
                             CommonApiUtils.postSuccessEvent(listener);
-                            home.requestHomeUpdate();
+                            requestHomeUpdate();
                         }
 
                         @Override
                         public void onError(int executionError) {
                             CommonApiUtils.postErrorEvent(executionError, listener);
-                            home.requestHomeUpdate();
+                            requestHomeUpdate();
                         }
 
                         @Override
                         public void onTimeout() {
                             CommonApiUtils.postTimeoutEvent(listener);
-                            home.requestHomeUpdate();
+                            requestHomeUpdate();
                         }
                     });
                 } else {
@@ -458,9 +446,9 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
                 return true;
 
             case CalibrationActions.ACTION_START_MAGNETOMETER_CALIBRATION:
-                final boolean retryOnFailure = data.getBoolean(CalibrationActions.EXTRA_RETRY_ON_FAILURE, false);
-                final boolean saveAutomatically = data.getBoolean(CalibrationActions.EXTRA_SAVE_AUTOMATICALLY, true);
-                final int startDelay = data.getInt(CalibrationActions.EXTRA_START_DELAY, 0);
+                boolean retryOnFailure = data.getBoolean(CalibrationActions.EXTRA_RETRY_ON_FAILURE, false);
+                boolean saveAutomatically = data.getBoolean(CalibrationActions.EXTRA_SAVE_AUTOMATICALLY, true);
+                int startDelay = data.getInt(CalibrationActions.EXTRA_START_DELAY, 0);
                 CommonApiUtils.startMagnetometerCalibration(this, retryOnFailure, saveAutomatically, startDelay);
                 return true;
 
@@ -482,7 +470,7 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
 
             case GimbalActions.ACTION_RESET_GIMBAL_MOUNT_MODE:
             case GimbalActions.ACTION_SET_GIMBAL_MOUNT_MODE:
-                final int mountMode = data.getInt(GimbalActions.GIMBAL_MOUNT_MODE, MAV_MOUNT_MODE.MAV_MOUNT_MODE_RC_TARGETING);
+                int mountMode = data.getInt(GimbalActions.GIMBAL_MOUNT_MODE, MAV_MOUNT_MODE.MAV_MOUNT_MODE_RC_TARGETING);
                 Timber.i("Setting gimbal mount mode: %d", mountMode);
 
                 Parameter mountParam = this.parameters.getParameter("MNT_MODE");
@@ -507,7 +495,7 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
 
     @Override
     public void onMavLinkMessageReceived(MAVLinkMessage message) {
-        final int compId = message.compid;
+        int compId = message.compid;
         if (compId != AUTOPILOT_COMPONENT_ID
                 && compId != ARTOO_COMPONENT_ID
                 && compId != TELEMETRY_RADIO_COMPONENT_ID) {
@@ -597,13 +585,6 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
                 getMagnetometerCalibration().processCalibrationMessage(message);
                 break;
 
-            case msg_mission_item.MAVLINK_MSG_ID_MISSION_ITEM:
-                msg_mission_item missionItem = (msg_mission_item) message;
-                if (missionItem.seq == Home.HOME_WAYPOINT_INDEX) {
-                    home.setHome(missionItem);
-                }
-                break;
-
             default:
                 break;
         }
@@ -621,7 +602,7 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
     protected void processMountStatus(msg_mount_status mountStatus) {
         footprints.updateMountOrientation(mountStatus);
 
-        final Bundle eventInfo = new Bundle(3);
+        Bundle eventInfo = new Bundle(3);
         eventInfo.putFloat(AttributeEventExtra.EXTRA_GIMBAL_ORIENTATION_PITCH, mountStatus.pointing_a / 100f);
         eventInfo.putFloat(AttributeEventExtra.EXTRA_GIMBAL_ORIENTATION_ROLL, mountStatus.pointing_b / 100f);
         eventInfo.putFloat(AttributeEventExtra.EXTRA_GIMBAL_ORIENTATION_YAW, mountStatus.pointing_c / 100f);
@@ -635,11 +616,11 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
         switch (message.getName()) {
             case "ARMMASK":
                 //Give information about the vehicle's ability to arm successfully.
-                final ApmModes vehicleMode = getState().getMode();
+                ApmModes vehicleMode = getState().getMode();
                 if (ApmModes.isCopter(vehicleMode.getType())) {
-                    final int value = message.value;
-                    final boolean isReadyToArm = (value & (1 << vehicleMode.getNumber())) != 0;
-                    final String armReadinessMsg = isReadyToArm ? "READY TO ARM" : "UNREADY FOR ARMING";
+                    int value = message.value;
+                    boolean isReadyToArm = (value & (1 << vehicleMode.getNumber())) != 0;
+                    String armReadinessMsg = isReadyToArm ? "READY TO ARM" : "UNREADY FOR ARMING";
                     logMessage(Log.INFO, armReadinessMsg);
                 }
                 break;
@@ -647,10 +628,10 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
     }
 
     private void checkIfFlying(msg_heartbeat msg_heart) {
-        final short systemStatus = msg_heart.system_status;
-        final boolean wasFlying = getState().isFlying();
+        short systemStatus = msg_heart.system_status;
+        boolean wasFlying = getState().isFlying();
 
-        final boolean isFlying = systemStatus == MAV_STATE.MAV_STATE_ACTIVE
+        boolean isFlying = systemStatus == MAV_STATE.MAV_STATE_ACTIVE
                 || (wasFlying
                 && (systemStatus == MAV_STATE.MAV_STATE_CRITICAL || systemStatus == MAV_STATE.MAV_STATE_EMERGENCY));
 
@@ -692,7 +673,7 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
             if (!getState().parseAutopilotError(message)) {
 
                 //Relay to the connected client.
-                final int logLevel;
+                int logLevel;
                 switch (statusText.severity) {
                     case APMConstants.Severity.SEVERITY_CRITICAL:
                         logLevel = Log.ERROR;

@@ -12,12 +12,13 @@ import com.o3dr.services.android.lib.model.ICommandListener;
 import org.droidplanner.services.android.core.MAVLink.MavLinkCommands;
 import org.droidplanner.services.android.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.services.android.core.drone.DroneVariable;
+import org.droidplanner.services.android.core.drone.autopilot.generic.GenericMavLinkDrone;
 import org.droidplanner.services.android.core.model.AutopilotWarningParser;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 
 import timber.log.Timber;
 
-public class State extends DroneVariable {
+public class State extends DroneVariable<GenericMavLinkDrone> {
     private static final long ERROR_TIMEOUT = 5000l;
 
     private final AutopilotWarningParser warningParser;
@@ -42,7 +43,7 @@ public class State extends DroneVariable {
         }
     };
 
-    public State(MavLinkDrone myDrone, Handler handler, AutopilotWarningParser warningParser) {
+    public State(GenericMavLinkDrone myDrone, Handler handler, AutopilotWarningParser warningParser) {
         super(myDrone);
         this.handler = handler;
         this.warningParser = warningParser;
@@ -203,6 +204,10 @@ public class State extends DroneVariable {
         if (isEkfPositionOk != isOk) {
             isEkfPositionOk = isOk;
             myDrone.notifyDroneEvent(DroneEventsType.EKF_POSITION_STATE_UPDATE);
+
+            if(isEkfPositionOk){
+                myDrone.requestHomeUpdate();
+            }
         }
     }
 

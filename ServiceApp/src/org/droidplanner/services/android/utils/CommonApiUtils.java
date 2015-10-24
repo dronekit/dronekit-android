@@ -446,22 +446,6 @@ public class CommonApiUtils {
         return new Parameters(new ArrayList<>(parametersList));
     }
 
-    public static float fromRadToDeg(float rad) {
-        return (float) (rad * 180f / Math.PI);
-    }
-
-    public static float fromDegToRad(float deg) {
-        return (float) (deg * Math.PI / 180f);
-    }
-
-    public static Home getHome(MavLinkDrone drone) {
-        if (drone == null)
-            return new Home();
-
-        org.droidplanner.services.android.core.drone.variables.Home droneHome = drone.getHome();
-        return new Home(droneHome.getCoord());
-    }
-
     public static Mission getMission(MavLinkDrone drone) {
         Mission proxyMission = new Mission();
         if (drone == null)

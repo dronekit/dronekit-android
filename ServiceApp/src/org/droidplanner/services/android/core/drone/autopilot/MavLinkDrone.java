@@ -10,7 +10,6 @@ import org.droidplanner.services.android.core.drone.profiles.Parameters;
 import org.droidplanner.services.android.core.drone.profiles.VehicleProfile;
 import org.droidplanner.services.android.core.drone.variables.Camera;
 import org.droidplanner.services.android.core.drone.variables.GuidedPoint;
-import org.droidplanner.services.android.core.drone.variables.Home;
 import org.droidplanner.services.android.core.drone.variables.Magnetometer;
 import org.droidplanner.services.android.core.drone.variables.MissionStats;
 import org.droidplanner.services.android.core.drone.variables.State;
@@ -21,6 +20,10 @@ import org.droidplanner.services.android.core.firmware.FirmwareType;
 import org.droidplanner.services.android.core.mission.Mission;
 
 public interface MavLinkDrone extends Drone {
+
+    String PACKAGE_NAME = "org.droidplanner.services.android.core.drone.autopilot";
+
+    public static final String ACTION_REQUEST_HOME_UPDATE = PACKAGE_NAME + ".action.REQUEST_HOME_UPDATE";
 
     boolean isConnectionAlive();
 
@@ -55,8 +58,6 @@ public interface MavLinkDrone extends Drone {
     public Preferences getPreferences();
 
     public WaypointManager getWaypointManager();
-
-    public Home getHome();
 
     public Mission getMission();
 
