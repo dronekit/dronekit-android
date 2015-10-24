@@ -1,7 +1,8 @@
 package org.droidplanner.services.android.core.helpers.geoTools;
 
-import org.droidplanner.services.android.core.helpers.coordinates.Coord2D;
-import org.droidplanner.services.android.core.helpers.coordinates.Coord3D;
+import com.o3dr.services.android.lib.coordinate.LatLong;
+import com.o3dr.services.android.lib.coordinate.LatLongAlt;
+
 import org.droidplanner.services.android.core.helpers.math.MathUtil;
 import org.droidplanner.services.android.core.helpers.units.Area;
 import org.droidplanner.services.android.core.polygon.Polygon;
@@ -19,7 +20,7 @@ import static java.lang.Math.toRadians;
 public class GeoTools {
     private static final double RADIUS_OF_EARTH = 6378137.0;// In meters.
     // Source: WGS84
-    public List<Coord2D> waypoints;
+    public List<LatLong> waypoints;
 
     public GeoTools() {
     }
@@ -29,8 +30,8 @@ public class GeoTools {
      *
      * @return distance between the points in degrees
      */
-    public static Double getAproximatedDistance(Coord2D p1, Coord2D p2) {
-        return (Math.hypot((p1.getX() - p2.getX()), (p1.getY() - p2.getY())));
+    public static Double getAproximatedDistance(LatLong p1, LatLong p2) {
+        return (Math.hypot((p1.getLatitude() - p2.getLatitude()), (p1.getLongitude() - p2.getLongitude())));
     }
 
     private static Double metersTolat(double meters) {
@@ -50,10 +51,22 @@ public class GeoTools {
      * @param distance distance to be added
      * @return New point with the added distance
      */
-    public static Coord2D newCoordFromBearingAndDistance(Coord2D origin, double bearing, double distance) {
+    public static LatLong newCoordFromBearingAndDistance(LatLong origin, double bearing, double distance) {
+        return newCoordFromBearingAndDistance(origin.getLatitude(), origin.getLongitude(), bearing, distance);
+    }
 
-        double lat = origin.getLat();
-        double lon = origin.getLng();
+    /**
+     * Extrapolate latitude/longitude given a heading and distance thanks to
+     * http://www.movable-type.co.uk/scripts/latlong.html
+     *
+     * @param lat   latitude
+     * @param lon   longitude
+     * @param bearing  bearing to navigate
+     * @param distance distance to be added
+     * @return New point with the added distance
+     */
+    private static LatLong newCoordFromBearingAndDistance(double lat, double lon, double bearing, double distance) {
+
         double lat1 = Math.toRadians(lat);
         double lon1 = Math.toRadians(lon);
         double brng = Math.toRadians(bearing);
@@ -65,7 +78,7 @@ public class GeoTools {
                 + Math.atan2(Math.sin(brng) * Math.sin(dr) * Math.cos(lat1),
                 Math.cos(dr) - Math.sin(lat1) * Math.sin(lat2));
 
-        return (new Coord2D(Math.toDegrees(lat2), Math.toDegrees(lon2)));
+        return (new LatLong(Math.toDegrees(lat2), Math.toDegrees(lon2)));
     }
 
     /**
@@ -76,15 +89,15 @@ public class GeoTools {
      * @param yMeters Offset distance in the north direction
      * @return new coordinate with the offset
      */
-    public static Coord2D moveCoordinate(Coord2D origin, double xMeters, double yMeters) {
-        double lon = origin.getLng();
-        double lat = origin.getLat();
+    public static LatLong moveCoordinate(LatLong origin, double xMeters, double yMeters) {
+        double lon = origin.getLongitude();
+        double lat = origin.getLatitude();
         double lon1 = Math.toRadians(lon);
         double lat1 = Math.toRadians(lat);
 
         double lon2 = lon1 + Math.toRadians(metersTolat(xMeters));
         double lat2 = lat1 + Math.toRadians(metersTolat(yMeters));
-        return (new Coord2D(Math.toDegrees(lat2), Math.toDegrees(lon2)));
+        return (new LatLong(Math.toDegrees(lat2), Math.toDegrees(lon2)));
     }
 
     /**
@@ -93,18 +106,18 @@ public class GeoTools {
      *
      * @return the arc in degrees
      */
-    static double getArcInRadians(Coord2D from, Coord2D to) {
+    static double getArcInRadians(LatLong from, LatLong to) {
 
-        double latitudeArc = Math.toRadians(from.getLat() - to.getLat());
-        double longitudeArc = Math.toRadians(from.getLng() - to.getLng());
+        double latitudeArc = Math.toRadians(from.getLatitude() - to.getLatitude());
+        double longitudeArc = Math.toRadians(from.getLongitude() - to.getLongitude());
 
         double latitudeH = Math.sin(latitudeArc * 0.5);
         latitudeH *= latitudeH;
         double lontitudeH = Math.sin(longitudeArc * 0.5);
         lontitudeH *= lontitudeH;
 
-        double tmp = Math.cos(Math.toRadians(from.getLat()))
-                * Math.cos(Math.toRadians(to.getLat()));
+        double tmp = Math.cos(Math.toRadians(from.getLatitude()))
+                * Math.cos(Math.toRadians(to.getLatitude()));
         return Math.toDegrees(2.0 * Math.asin(Math.sqrt(latitudeH + tmp * lontitudeH)));
     }
 
@@ -113,7 +126,7 @@ public class GeoTools {
      *
      * @return distance in meters
      */
-    public static double getDistance(Coord2D from, Coord2D to) {
+    public static double getDistance(LatLong from, LatLong to) {
         return RADIUS_OF_EARTH * Math.toRadians(getArcInRadians(from, to));
     }
 
@@ -123,7 +136,7 @@ public class GeoTools {
      *
      * @return distance in meters
      */
-    public static double get3DDistance(Coord3D end, Coord3D start) {
+    public static double get3DDistance(LatLongAlt end, LatLongAlt start) {
         double horizontalDistance = getDistance(end, start);
         double altitudeDiff = Math.abs((end.getAltitude() - start.getAltitude()));
         return MathUtil.hypot(horizontalDistance, altitudeDiff);
@@ -134,11 +147,11 @@ public class GeoTools {
      *
      * @return heading in degrees
      */
-    public static double getHeadingFromCoordinates(Coord2D fromLoc, Coord2D toLoc) {
-        double fLat = Math.toRadians(fromLoc.getLat());
-        double fLng = Math.toRadians(fromLoc.getLng());
-        double tLat = Math.toRadians(toLoc.getLat());
-        double tLng = Math.toRadians(toLoc.getLng());
+    public static double getHeadingFromCoordinates(LatLong fromLoc, LatLong toLoc) {
+        double fLat = Math.toRadians(fromLoc.getLatitude());
+        double fLng = Math.toRadians(fromLoc.getLongitude());
+        double tLat = Math.toRadians(toLoc.getLatitude());
+        double tLng = Math.toRadians(toLoc.getLongitude());
 
         double degree = Math.toDegrees(Math.atan2(
                 Math.sin(tLng - fLng) * Math.cos(tLat),
@@ -163,21 +176,21 @@ public class GeoTools {
      * @return area in m�
      */
     public static Area getArea(Polygon poly) {
-        List<Coord2D> path = poly.getPoints();
+        List<LatLong> path = poly.getPoints();
         int size = path.size();
         if (size < 3) {
             return new Area(0);
         }
         double total = 0;
-        Coord2D prev = path.get(size - 1);
-        double prevTanLat = tan((PI / 2 - toRadians(prev.getLat())) / 2);
-        double prevLng = toRadians(prev.getLng());
+        LatLong prev = path.get(size - 1);
+        double prevTanLat = tan((PI / 2 - toRadians(prev.getLatitude())) / 2);
+        double prevLng = toRadians(prev.getLongitude());
         // For each edge, accumulate the signed area of the triangle formed by
         // the North Pole
         // and that edge ("polar triangle").
-        for (Coord2D point : path) {
-            double tanLat = tan((PI / 2 - toRadians(point.getLat())) / 2);
-            double lng = toRadians(point.getLng());
+        for (LatLong point : path) {
+            double tanLat = tan((PI / 2 - toRadians(point.getLatitude())) / 2);
+            double lng = toRadians(point.getLongitude());
             total += polarTriangleArea(tanLat, lng, prevTanLat, prevLng);
             prevTanLat = tanLat;
             prevLng = lng;
@@ -202,7 +215,7 @@ public class GeoTools {
         return 2 * atan2(t * sin(deltaLng), 1 + t * cos(deltaLng));
     }
 
-    public static Coord2D pointAlongTheLine(Coord2D start, Coord2D end, int distance) {
+    public static LatLong pointAlongTheLine(LatLong start, LatLong end, int distance) {
         return newCoordFromBearingAndDistance(start, getHeadingFromCoordinates(start, end), distance);
     }
 }

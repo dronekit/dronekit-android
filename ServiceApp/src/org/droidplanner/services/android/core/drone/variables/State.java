@@ -9,7 +9,7 @@ import com.MAVLink.enums.EKF_STATUS_FLAGS;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.model.ICommandListener;
 
-import org.droidplanner.services.android.core.MAVLink.MavLinkModes;
+import org.droidplanner.services.android.core.MAVLink.MavLinkCommands;
 import org.droidplanner.services.android.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.services.android.core.drone.DroneVariable;
 import org.droidplanner.services.android.core.model.AutopilotWarningParser;
@@ -138,7 +138,7 @@ public class State extends DroneVariable {
         }
 
         if (ApmModes.isValid(mode)) {
-            MavLinkModes.changeFlightMode(myDrone, mode, listener);
+            MavLinkCommands.changeFlightMode(myDrone, mode, listener);
         } else {
             if (listener != null) {
                 handler.post(new Runnable() {

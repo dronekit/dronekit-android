@@ -8,9 +8,15 @@ import android.view.Surface;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.ardupilotmega.msg_ekf_status_report;
 import com.MAVLink.common.msg_attitude;
+import com.MAVLink.common.msg_global_position_int;
+import com.MAVLink.common.msg_gps_raw_int;
 import com.MAVLink.common.msg_heartbeat;
 import com.MAVLink.common.msg_radio_status;
+import com.MAVLink.common.msg_sys_status;
 import com.MAVLink.common.msg_vibration;
+import com.MAVLink.enums.MAV_SYS_STATUS_SENSOR;
+import com.o3dr.services.android.lib.coordinate.LatLong;
+import com.o3dr.services.android.lib.drone.action.ControlActions;
 import com.o3dr.services.android.lib.drone.action.StateActions;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
@@ -20,6 +26,7 @@ import com.o3dr.services.android.lib.drone.property.Altitude;
 import com.o3dr.services.android.lib.drone.property.Attitude;
 import com.o3dr.services.android.lib.drone.property.Battery;
 import com.o3dr.services.android.lib.drone.property.DroneAttribute;
+import com.o3dr.services.android.lib.drone.property.Gps;
 import com.o3dr.services.android.lib.drone.property.Signal;
 import com.o3dr.services.android.lib.drone.property.Speed;
 import com.o3dr.services.android.lib.drone.property.VehicleMode;
@@ -29,6 +36,7 @@ import com.o3dr.services.android.lib.model.action.Action;
 import com.o3dr.services.android.lib.util.MathUtils;
 
 import org.droidplanner.services.android.core.MAVLink.MAVLinkStreams;
+import org.droidplanner.services.android.core.MAVLink.MavLinkCommands;
 import org.droidplanner.services.android.core.drone.DroneEvents;
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
@@ -36,18 +44,20 @@ import org.droidplanner.services.android.core.drone.variables.State;
 import org.droidplanner.services.android.core.drone.variables.StreamRates;
 import org.droidplanner.services.android.core.drone.variables.Type;
 import org.droidplanner.services.android.core.model.AutopilotWarningParser;
+import org.droidplanner.services.android.core.parameters.Parameter;
 import org.droidplanner.services.android.utils.CommonApiUtils;
 import org.droidplanner.services.android.utils.video.VideoManager;
+import org.droidplanner.services.android.core.drone.profiles.Parameters;
 
 /**
  * Base drone implementation.
  * Supports mavlink messages belonging to the common set: https://pixhawk.ethz.ch/mavlink/
- *
+ * <p/>
  * Created by Fredia Huya-Kouadio on 9/10/15.
  */
 public abstract class GenericMavLinkDrone implements MavLinkDrone {
 
-    private final MAVLinkStreams.MAVLinkOutputStream MavClient;
+    private final MAVLinkStreams.MAVLinkOutputStream mavClient;
 
     protected final VideoManager videoMgr;
 
@@ -58,6 +68,7 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
 
     private final DroneInterfaces.AttributeEventListener attributeListener;
 
+    private final Gps vehicleGps = new Gps();
     protected final Altitude altitude = new Altitude();
     protected final Speed speed = new Speed();
     protected final Battery battery = new Battery();
@@ -69,7 +80,7 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
 
     protected GenericMavLinkDrone(Handler handler, MAVLinkStreams.MAVLinkOutputStream mavClient, AutopilotWarningParser warningParser, DroneInterfaces.AttributeEventListener listener) {
         this.handler = handler;
-        this.MavClient = mavClient;
+        this.mavClient = mavClient;
 
         events = new DroneEvents(this, handler);
         this.type = new Type(this);
@@ -88,7 +99,7 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
 
     @Override
     public boolean isConnected() {
-        return MavClient.isConnected();
+        return mavClient.isConnected();
     }
 
     @Override
@@ -106,32 +117,33 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
         events.removeDroneListener(listener);
     }
 
-    public void startVideoStream(Bundle videoProps, String appId, String newVideoTag, Surface videoSurface, final ICommandListener listener){
+    public void startVideoStream(Bundle videoProps, String appId, String newVideoTag, Surface videoSurface, final ICommandListener listener) {
         videoMgr.startVideoStream(videoProps, appId, newVideoTag, videoSurface, listener);
     }
 
-    public void stopVideoStream(String appId, String currentVideoTag, final ICommandListener listener){
+    public void stopVideoStream(String appId, String currentVideoTag, final ICommandListener listener) {
         videoMgr.stopVideoStream(appId, currentVideoTag, listener);
     }
 
     /**
      * Stops the video stream if the current owner is the passed argument.
+     *
      * @param appId
      */
-    public void tryStoppingVideoStream(String appId){
+    public void tryStoppingVideoStream(String appId) {
         videoMgr.tryStoppingVideoStream(appId);
     }
 
-    protected void notifyAttributeListener(String attributeEvent){
+    protected void notifyAttributeListener(String attributeEvent) {
         notifyAttributeListener(attributeEvent, null);
     }
 
-    protected void notifyAttributeListener(String attributeEvent, Bundle eventInfo){
+    protected void notifyAttributeListener(String attributeEvent, Bundle eventInfo) {
         notifyAttributeListener(attributeEvent, eventInfo, false);
     }
 
-    protected void notifyAttributeListener(String attributeEvent, Bundle eventInfo, boolean checkForSololinkApi){
-        if(attributeListener != null){
+    protected void notifyAttributeListener(String attributeEvent, Bundle eventInfo, boolean checkForSololinkApi) {
+        if (attributeListener != null) {
             attributeListener.onAttributeEvent(attributeEvent, eventInfo, checkForSololinkApi);
         }
     }
@@ -149,15 +161,15 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
 
     @Override
     public MAVLinkStreams.MAVLinkOutputStream getMavClient() {
-        return MavClient;
+        return mavClient;
     }
 
     @Override
-    public boolean executeAsyncAction(Action action, ICommandListener listener){
+    public boolean executeAsyncAction(Action action, ICommandListener listener) {
         final String type = action.getType();
         Bundle data = action.getData();
 
-        switch(type){
+        switch (type) {
             //MISSION ACTIONS
             case MissionActions.ACTION_GOTO_WAYPOINT:
                 int missionItemIndex = data.getInt(MissionActions.EXTRA_MISSION_ITEM_INDEX);
@@ -169,6 +181,40 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
                 data.setClassLoader(VehicleMode.class.getClassLoader());
                 VehicleMode newMode = data.getParcelable(StateActions.EXTRA_VEHICLE_MODE);
                 CommonApiUtils.changeVehicleMode(this, newMode, listener);
+                return true;
+
+            //CONTROL ACTIONS
+            case ControlActions.ACTION_SET_CONDITION_YAW:
+                //Retrieve the yaw turn speed.
+                float turnSpeed = 2; //default turn speed.
+
+                final Parameters parameters = getParameters();
+                if(parameters != null){
+                    Parameter turnSpeedParam = parameters.getParameter("ACRO_YAW_P");
+                    if(turnSpeedParam != null){
+                        turnSpeed = (float) turnSpeedParam.value;
+                    }
+                }
+
+                final float targetAngle = data.getFloat(ControlActions.EXTRA_YAW_TARGET_ANGLE);
+                final float yawRate = data.getFloat(ControlActions.EXTRA_YAW_CHANGE_RATE);
+                final boolean isClockwise = yawRate >= 0;
+                final boolean isRelative = data.getBoolean(ControlActions.EXTRA_YAW_IS_RELATIVE);
+
+                MavLinkCommands.setConditionYaw(this, targetAngle, Math.abs(yawRate) * turnSpeed, isClockwise, isRelative, listener);
+                return true;
+
+            case ControlActions.ACTION_SET_VELOCITY:
+                final float xAxis = data.getFloat(ControlActions.EXTRA_VELOCITY_X);
+                final short x = (short) (xAxis * 1000);
+
+                final float yAxis = data.getFloat(ControlActions.EXTRA_VELOCITY_Y);
+                final short y = (short) (yAxis * 1000);
+
+                final float zAxis = data.getFloat(ControlActions.EXTRA_VELOCITY_Z);
+                final short z = (short) (zAxis * 1000);
+
+                MavLinkCommands.sendManualControl(this, x, y, z, (short) 0, 0, listener);
                 return true;
 
             default:
@@ -200,6 +246,9 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
 
             case AttributeType.STATE:
                 return CommonApiUtils.getState(this, isConnected(), vibration);
+
+            case AttributeType.GPS:
+                return vehicleGps;
         }
 
         return null;
@@ -233,43 +282,76 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
             case msg_ekf_status_report.MAVLINK_MSG_ID_EKF_STATUS_REPORT:
                 state.setEkfStatus((msg_ekf_status_report) message);
                 break;
+
+            case msg_sys_status.MAVLINK_MSG_ID_SYS_STATUS:
+                msg_sys_status m_sys = (msg_sys_status) message;
+                processBatteryUpdate(m_sys.voltage_battery / 1000.0, m_sys.battery_remaining,
+                        m_sys.current_battery / 100.0);
+                checkControlSensorsHealth(m_sys);
+                break;
+
+            case msg_global_position_int.MAVLINK_MSG_ID_GLOBAL_POSITION_INT:
+                processGlobalPositionInt((msg_global_position_int) message);
+                break;
+
+            case msg_gps_raw_int.MAVLINK_MSG_ID_GPS_RAW_INT:
+                processGpsState((msg_gps_raw_int) message);
+                break;
         }
     }
 
-    private void processVibrationMessage(msg_vibration vibrationMsg){
+    private void checkControlSensorsHealth(msg_sys_status sysStatus) {
+        boolean isRCFailsafe = (sysStatus.onboard_control_sensors_health & MAV_SYS_STATUS_SENSOR
+                .MAV_SYS_STATUS_SENSOR_RC_RECEIVER) == 0;
+        if (isRCFailsafe) {
+            state.parseAutopilotError("RC FAILSAFE");
+        }
+    }
+
+    protected void processBatteryUpdate(double voltage, double remain, double current) {
+        if (battery.getBatteryVoltage() != voltage || battery.getBatteryRemain() != remain || battery.getBatteryCurrent() != current) {
+            battery.setBatteryVoltage(voltage);
+            battery.setBatteryRemain(remain);
+            battery.setBatteryCurrent(current);
+
+            notifyDroneEvent(DroneInterfaces.DroneEventsType.BATTERY);
+        }
+    }
+
+    private void processVibrationMessage(msg_vibration vibrationMsg) {
         boolean wasUpdated = false;
 
-        if(vibration.getVibrationX() != vibrationMsg.vibration_x) {
+        if (vibration.getVibrationX() != vibrationMsg.vibration_x) {
             vibration.setVibrationX(vibrationMsg.vibration_x);
             wasUpdated = true;
         }
 
-        if(vibration.getVibrationY() != vibrationMsg.vibration_y) {
+        if (vibration.getVibrationY() != vibrationMsg.vibration_y) {
             vibration.setVibrationY(vibrationMsg.vibration_y);
             wasUpdated = true;
         }
 
-        if(vibration.getVibrationZ() != vibrationMsg.vibration_z) {
+        if (vibration.getVibrationZ() != vibrationMsg.vibration_z) {
             vibration.setVibrationZ(vibrationMsg.vibration_z);
             wasUpdated = true;
         }
 
-        if(vibration.getFirstAccelClipping() != vibrationMsg.clipping_0) {
+        if (vibration.getFirstAccelClipping() != vibrationMsg.clipping_0) {
             vibration.setFirstAccelClipping(vibrationMsg.clipping_0);
             wasUpdated = true;
         }
 
-        if(vibration.getSecondAccelClipping() != vibrationMsg.clipping_1) {
+        if (vibration.getSecondAccelClipping() != vibrationMsg.clipping_1) {
             vibration.setSecondAccelClipping(vibrationMsg.clipping_1);
             wasUpdated = true;
         }
 
-        if(vibration.getThirdAccelClipping() != vibrationMsg.clipping_2) {
+        if (vibration.getThirdAccelClipping() != vibrationMsg.clipping_2) {
             vibration.setThirdAccelClipping(vibrationMsg.clipping_2);
             wasUpdated = true;
         }
 
-        if(wasUpdated){
+        if (wasUpdated) {
             notifyAttributeListener(AttributeEvent.STATE_VEHICLE_VIBRATION);
         }
     }
@@ -318,6 +400,53 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
      */
     protected double SikValueToDB(int value) {
         return (value / 1.9) - 127;
+    }
+
+    /**
+     * Used to update the vehicle location.
+     *
+     * @param gpi
+     */
+    protected void processGlobalPositionInt(msg_global_position_int gpi) {
+        if (gpi == null)
+            return;
+
+        final double newLat = gpi.lat / 1E7;
+        final double newLong = gpi.lon / 1E7;
+
+        boolean positionUpdated = false;
+        LatLong gpsPosition = vehicleGps.getPosition();
+        if (gpsPosition == null) {
+            gpsPosition = new LatLong(newLat, newLong);
+            vehicleGps.setPosition(gpsPosition);
+            positionUpdated = true;
+        } else if (gpsPosition.getLatitude() != newLat || gpsPosition.getLongitude() != newLong) {
+            gpsPosition.setLatitude(newLat);
+            gpsPosition.setLongitude(newLong);
+            positionUpdated = true;
+        }
+
+        if (positionUpdated) {
+            notifyAttributeListener(AttributeEvent.GPS_POSITION);
+        }
+    }
+
+    private void processGpsState(msg_gps_raw_int gpsState) {
+        if (gpsState == null)
+            return;
+
+        final double newEph = gpsState.eph / 100.0; // convert from eph(cm) to gps_eph(m)
+        if (vehicleGps.getSatellitesCount() != gpsState.satellites_visible
+                || vehicleGps.getGpsEph() != newEph) {
+            vehicleGps.setSatCount(gpsState.satellites_visible);
+            vehicleGps.setGpsEph(newEph);
+            notifyAttributeListener(AttributeEvent.GPS_COUNT);
+        }
+
+        if (vehicleGps.getFixType() != gpsState.fix_type) {
+            vehicleGps.setFixType(gpsState.fix_type);
+            notifyAttributeListener(AttributeEvent.GPS_FIX);
+        }
     }
 
 }

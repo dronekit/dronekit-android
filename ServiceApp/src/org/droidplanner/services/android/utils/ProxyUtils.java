@@ -2,11 +2,13 @@ package org.droidplanner.services.android.utils;
 
 import android.util.Log;
 
+import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
 import com.o3dr.services.android.lib.drone.mission.item.command.CameraTrigger;
 import com.o3dr.services.android.lib.drone.mission.item.command.ChangeSpeed;
 import com.o3dr.services.android.lib.drone.mission.item.command.DoJump;
 import com.o3dr.services.android.lib.drone.mission.item.command.EpmGripper;
+import com.o3dr.services.android.lib.drone.mission.item.command.ResetROI;
 import com.o3dr.services.android.lib.drone.mission.item.command.ReturnToLaunch;
 import com.o3dr.services.android.lib.drone.mission.item.command.SetRelay;
 import com.o3dr.services.android.lib.drone.mission.item.command.SetServo;
@@ -24,7 +26,6 @@ import com.o3dr.services.android.lib.drone.mission.item.spatial.RegionOfInterest
 import com.o3dr.services.android.lib.drone.mission.item.spatial.SplineWaypoint;
 import com.o3dr.services.android.lib.drone.mission.item.spatial.Waypoint;
 
-import org.droidplanner.services.android.core.helpers.coordinates.Coord2D;
 import org.droidplanner.services.android.core.mission.Mission;
 import org.droidplanner.services.android.core.mission.commands.CameraTriggerImpl;
 import org.droidplanner.services.android.core.mission.commands.ChangeSpeedImpl;
@@ -46,8 +47,6 @@ import org.droidplanner.services.android.core.mission.waypoints.StructureScanner
 import org.droidplanner.services.android.core.mission.waypoints.WaypointImpl;
 import org.droidplanner.services.android.core.survey.CameraInfo;
 import org.droidplanner.services.android.core.survey.SurveyData;
-
-import java.util.List;
 
 /**
  * Created by fhuya on 11/10/14.
@@ -148,8 +147,7 @@ public class ProxyUtils {
             case CIRCLE: {
                 Circle proxy = (Circle) proxyItem;
 
-                CircleImpl temp = new CircleImpl(mission, MathUtils.latLongAltToCoord3D(proxy
-                        .getCoordinate()));
+                CircleImpl temp = new CircleImpl(mission, (proxy.getCoordinate()));
                 temp.setRadius(proxy.getRadius());
                 temp.setTurns(proxy.getTurns());
 
@@ -159,8 +157,7 @@ public class ProxyUtils {
             case LAND: {
                 Land proxy = (Land) proxyItem;
 
-                LandImpl temp = new LandImpl(mission, MathUtils.latLongToCoord2D(proxy
-                        .getCoordinate()));
+                LandImpl temp = new LandImpl(mission, (proxy.getCoordinate()));
 
                 missionItemImpl = temp;
                 break;
@@ -168,26 +165,32 @@ public class ProxyUtils {
             case DO_LAND_START: {
                 DoLandStart proxy = (DoLandStart) proxyItem;
 
-                DoLandStartImpl temp = new DoLandStartImpl(mission, MathUtils.latLongToCoord2D(proxy
-                        .getCoordinate()));
+                DoLandStartImpl temp = new DoLandStartImpl(mission, (proxy.getCoordinate()));
 
                 missionItemImpl = temp;
                 break;
             }
+
             case REGION_OF_INTEREST: {
                 RegionOfInterest proxy = (RegionOfInterest) proxyItem;
 
-                RegionOfInterestImpl temp = new RegionOfInterestImpl(mission,
-                        MathUtils.latLongAltToCoord3D(proxy.getCoordinate()));
+                RegionOfInterestImpl temp = new RegionOfInterestImpl(mission, (proxy.getCoordinate()));
 
                 missionItemImpl = temp;
                 break;
             }
+
+            case RESET_ROI: {
+                //Sending a roi with all coordinates set to 0 will reset the current roi.
+                RegionOfInterestImpl temp = new RegionOfInterestImpl(mission, new LatLongAlt(0, 0, 0));
+                missionItemImpl = temp;
+                break;
+            }
+
             case SPLINE_WAYPOINT: {
                 SplineWaypoint proxy = (SplineWaypoint) proxyItem;
 
-                SplineWaypointImpl temp = new SplineWaypointImpl(mission,
-                        MathUtils.latLongAltToCoord3D(proxy.getCoordinate()));
+                SplineWaypointImpl temp = new SplineWaypointImpl(mission, (proxy.getCoordinate()));
                 temp.setDelay(proxy.getDelay());
 
                 missionItemImpl = temp;
@@ -196,8 +199,7 @@ public class ProxyUtils {
             case STRUCTURE_SCANNER: {
                 StructureScanner proxy = (StructureScanner) proxyItem;
 
-                StructureScannerImpl temp = new StructureScannerImpl(mission,
-                        MathUtils.latLongAltToCoord3D(proxy.getCoordinate()));
+                StructureScannerImpl temp = new StructureScannerImpl(mission, (proxy.getCoordinate()));
                 temp.setRadius((int) proxy.getRadius());
                 temp.setNumberOfSteps(proxy.getStepsCount());
                 temp.setAltitudeStep((int) proxy.getHeightStep());
@@ -213,7 +215,7 @@ public class ProxyUtils {
             case WAYPOINT: {
                 Waypoint proxy = (Waypoint) proxyItem;
 
-                WaypointImpl temp = new WaypointImpl(mission, MathUtils.latLongAltToCoord3D(proxy
+                WaypointImpl temp = new WaypointImpl(mission, (proxy
                         .getCoordinate()));
                 temp.setAcceptanceRadius(proxy.getAcceptanceRadius());
                 temp.setDelay(proxy.getDelay());
@@ -227,9 +229,8 @@ public class ProxyUtils {
             case SURVEY: {
                 Survey proxy = (Survey) proxyItem;
                 SurveyDetail surveyDetail = proxy.getSurveyDetail();
-                List<Coord2D> polygonPoints = MathUtils.latLongToCoord2D(proxy.getPolygonPoints());
 
-                SurveyImpl temp = new SurveyImpl(mission, polygonPoints);
+                SurveyImpl temp = new SurveyImpl(mission, proxy.getPolygonPoints());
 
                 if (surveyDetail != null) {
                     CameraDetail cameraDetail = surveyDetail.getCameraDetail();
@@ -252,9 +253,8 @@ public class ProxyUtils {
             case SPLINE_SURVEY: {
                 SplineSurvey proxy = (SplineSurvey) proxyItem;
                 SurveyDetail surveyDetail = proxy.getSurveyDetail();
-                List<Coord2D> polygonPoints = MathUtils.latLongToCoord2D(proxy.getPolygonPoints());
 
-                SplineSurveyImpl temp = new SplineSurveyImpl(mission, polygonPoints);
+                SplineSurveyImpl temp = new SplineSurveyImpl(mission, proxy.getPolygonPoints());
 
                 if (surveyDetail != null) {
                     CameraDetail cameraDetail = surveyDetail.getCameraDetail();
@@ -314,7 +314,7 @@ public class ProxyUtils {
                 WaypointImpl source = (WaypointImpl) itemImpl;
 
                 Waypoint temp = new Waypoint();
-                temp.setCoordinate(MathUtils.coord3DToLatLongAlt(source.getCoordinate()));
+                temp.setCoordinate((source.getCoordinate()));
                 temp.setAcceptanceRadius(source.getAcceptanceRadius());
                 temp.setDelay(source.getDelay());
                 temp.setOrbitalRadius(source.getOrbitalRadius());
@@ -329,7 +329,7 @@ public class ProxyUtils {
                 SplineWaypointImpl source = (SplineWaypointImpl) itemImpl;
 
                 SplineWaypoint temp = new SplineWaypoint();
-                temp.setCoordinate(MathUtils.coord3DToLatLongAlt(source.getCoordinate()));
+                temp.setCoordinate((source.getCoordinate()));
                 temp.setDelay(source.getDelay());
 
                 proxyMissionItem = temp;
@@ -359,7 +359,7 @@ public class ProxyUtils {
                 LandImpl source = (LandImpl) itemImpl;
 
                 Land temp = new Land();
-                temp.setCoordinate(MathUtils.coord3DToLatLongAlt(source.getCoordinate()));
+                temp.setCoordinate((source.getCoordinate()));
 
                 proxyMissionItem = temp;
                 break;
@@ -368,7 +368,7 @@ public class ProxyUtils {
                 DoLandStartImpl source = (DoLandStartImpl) itemImpl;
 
                 DoLandStart temp = new DoLandStart();
-                temp.setCoordinate(MathUtils.coord3DToLatLongAlt(source.getCoordinate()));
+                temp.setCoordinate((source.getCoordinate()));
 
                 proxyMissionItem = temp;
                 break;
@@ -377,7 +377,7 @@ public class ProxyUtils {
                 CircleImpl source = (CircleImpl) itemImpl;
 
                 Circle temp = new Circle();
-                temp.setCoordinate(MathUtils.coord3DToLatLongAlt(source.getCoordinate()));
+                temp.setCoordinate((source.getCoordinate()));
                 temp.setRadius(source.getRadius());
                 temp.setTurns(source.getNumberOfTurns());
 
@@ -388,10 +388,16 @@ public class ProxyUtils {
             case ROI: {
                 RegionOfInterestImpl source = (RegionOfInterestImpl) itemImpl;
 
-                RegionOfInterest temp = new RegionOfInterest();
-                temp.setCoordinate(MathUtils.coord3DToLatLongAlt(source.getCoordinate()));
+                if(source.isReset()){
+                    ResetROI temp = new ResetROI();
+                    proxyMissionItem = temp;
+                }
+                else {
+                    RegionOfInterest temp = new RegionOfInterest();
+                    temp.setCoordinate((source.getCoordinate()));
 
-                proxyMissionItem = temp;
+                    proxyMissionItem = temp;
+                }
                 break;
             }
 
@@ -408,11 +414,11 @@ public class ProxyUtils {
                 Survey temp = new Survey();
                 temp.setValid(isValid);
                 temp.setSurveyDetail(getSurveyDetail(source.surveyData));
-                temp.setPolygonPoints(MathUtils.coord2DToLatLong(source.polygon.getPoints()));
+                temp.setPolygonPoints((source.polygon.getPoints()));
 
                 if (source.grid != null) {
-                    temp.setGridPoints(MathUtils.coord2DToLatLong(source.grid.gridPoints));
-                    temp.setCameraLocations(MathUtils.coord2DToLatLong(source.grid.getCameraLocations()));
+                    temp.setGridPoints((source.grid.gridPoints));
+                    temp.setCameraLocations((source.grid.getCameraLocations()));
                 }
 
                 temp.setPolygonArea(source.polygon.getArea().valueInSqMeters());
@@ -434,11 +440,11 @@ public class ProxyUtils {
                 Survey temp = new Survey();
                 temp.setValid(isValid);
                 temp.setSurveyDetail(getSurveyDetail(source.surveyData));
-                temp.setPolygonPoints(MathUtils.coord2DToLatLong(source.polygon.getPoints()));
+                temp.setPolygonPoints((source.polygon.getPoints()));
 
                 if (source.grid != null) {
-                    temp.setGridPoints(MathUtils.coord2DToLatLong(source.grid.gridPoints));
-                    temp.setCameraLocations(MathUtils.coord2DToLatLong(source.grid.getCameraLocations()));
+                    temp.setGridPoints((source.grid.gridPoints));
+                    temp.setCameraLocations((source.grid.getCameraLocations()));
                 }
 
                 temp.setPolygonArea(source.polygon.getArea().valueInSqMeters());
@@ -452,12 +458,12 @@ public class ProxyUtils {
 
                 StructureScanner temp = new StructureScanner();
                 temp.setSurveyDetail(getSurveyDetail(source.getSurveyData()));
-                temp.setCoordinate(MathUtils.coord3DToLatLongAlt(source.getCoordinate()));
+                temp.setCoordinate((source.getCoordinate()));
                 temp.setRadius(source.getRadius());
                 temp.setCrossHatch(source.isCrossHatchEnabled());
                 temp.setHeightStep(source.getEndAltitude());
                 temp.setStepsCount(source.getNumberOfSteps());
-                temp.setPath(MathUtils.coord2DToLatLong(source.getPath()));
+                temp.setPath((source.getPath()));
 
                 proxyMissionItem = temp;
                 break;

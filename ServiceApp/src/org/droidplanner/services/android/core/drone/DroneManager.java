@@ -14,7 +14,6 @@ import com.MAVLink.common.msg_command_ack;
 import com.google.android.gms.location.LocationRequest;
 import com.o3dr.android.client.apis.CapabilityApi;
 import com.o3dr.services.android.lib.coordinate.LatLong;
-import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.action.CapabilityActions;
 import com.o3dr.services.android.lib.drone.action.GimbalActions;
 import com.o3dr.services.android.lib.drone.action.StateActions;
@@ -57,8 +56,6 @@ import org.droidplanner.services.android.core.gcs.ReturnToMe;
 import org.droidplanner.services.android.core.gcs.follow.Follow;
 import org.droidplanner.services.android.core.gcs.follow.FollowAlgorithm;
 import org.droidplanner.services.android.core.gcs.location.FusedLocation;
-import org.droidplanner.services.android.core.helpers.coordinates.Coord2D;
-import org.droidplanner.services.android.core.helpers.coordinates.Coord3D;
 import org.droidplanner.services.android.core.parameters.Parameter;
 import org.droidplanner.services.android.exception.ConnectionException;
 import org.droidplanner.services.android.utils.AndroidApWarningParser;
@@ -269,7 +266,7 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
             return;
 
         if (drone instanceof GenericMavLinkDrone) {
-            ((GenericMavLinkDrone)drone).tryStoppingVideoStream(appId);
+            ((GenericMavLinkDrone) drone).tryStoppingVideoStream(appId);
         }
 
         Log.d(TAG, "Disconnecting client " + appId);
@@ -499,20 +496,7 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
                         Set<String> dataKeys = data.keySet();
 
                         for (String key : dataKeys) {
-                            if (FollowType.EXTRA_FOLLOW_ROI_TARGET.equals(key)) {
-                                LatLong target = data.getParcelable(key);
-                                if (target != null) {
-                                    final Coord2D roiTarget;
-                                    if (target instanceof LatLongAlt) {
-                                        roiTarget = new Coord3D(target.getLatitude(), target.getLongitude(),
-                                                ((LatLongAlt) target).getAltitude());
-                                    } else {
-                                        roiTarget = new Coord2D(target.getLatitude(), target.getLongitude());
-                                    }
-                                    paramsMap.put(key, roiTarget);
-                                }
-                            } else
-                                paramsMap.put(key, data.get(key));
+                            paramsMap.put(key, data.get(key));
                         }
 
                         followAlgorithm.updateAlgorithmParams(paramsMap);

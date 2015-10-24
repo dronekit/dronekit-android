@@ -3,19 +3,20 @@ package org.droidplanner.services.android.core.drone.variables;
 import android.os.Handler;
 import android.os.RemoteException;
 
+import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.drone.property.Altitude;
+import com.o3dr.services.android.lib.drone.property.Gps;
 import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.model.SimpleCommandListener;
 
-import org.droidplanner.services.android.core.MAVLink.MavLinkModes;
+import org.droidplanner.services.android.core.MAVLink.MavLinkCommands;
 import org.droidplanner.services.android.core.MAVLink.MavLinkTakeoff;
-import org.droidplanner.services.android.core.drone.DroneInterfaces;
 import org.droidplanner.services.android.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.services.android.core.drone.DroneInterfaces.OnDroneListener;
 import org.droidplanner.services.android.core.drone.DroneVariable;
-import org.droidplanner.services.android.core.helpers.coordinates.Coord2D;
+import org.droidplanner.services.android.core.drone.autopilot.Drone;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 
 import timber.log.Timber;
@@ -23,7 +24,7 @@ import timber.log.Timber;
 public class GuidedPoint extends DroneVariable implements OnDroneListener {
 
     private GuidedStates state = GuidedStates.UNINITIALIZED;
-    private Coord2D coord = new Coord2D(0, 0);
+    private LatLong coord = new LatLong(0, 0);
     private double altitude = 0.0; //altitude in meters
 
     private Runnable mPostInitializationTask;
@@ -63,7 +64,7 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener {
     }
 
     public static boolean isGuidedMode(MavLinkDrone drone) {
-        if(drone == null)
+        if (drone == null)
             return false;
 
         final int droneType = drone.getType();
@@ -88,9 +89,18 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener {
         if (state == GuidedStates.UNINITIALIZED) {
             changeToGuidedMode(myDrone, listener);
         } else {
-            newGuidedCoord(myDrone.getGps().getPosition());
+            newGuidedCoord(getGpsPosition());
             state = GuidedStates.IDLE;
         }
+    }
+
+    private LatLong getGpsPosition() {
+        return getGpsPosition(myDrone);
+    }
+
+    private static LatLong getGpsPosition(Drone drone) {
+        final Gps droneGps = (Gps) drone.getAttribute(AttributeType.GPS);
+        return droneGps == null ? null : droneGps.getPosition();
     }
 
     public static void changeToGuidedMode(MavLinkDrone drone, ICommandListener listener) {
@@ -101,7 +111,7 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener {
             droneState.changeFlightMode(ApmModes.ROTOR_GUIDED, listener);
         } else if (Type.isPlane(droneType)) {
             //You have to send a guided point to the plane in order to trigger guided mode.
-            forceSendGuidedPoint(drone, drone.getGps().getPosition(), getDroneAltConstrained(drone));
+            forceSendGuidedPoint(drone, getGpsPosition(drone), getDroneAltConstrained(drone));
         } else if (Type.isRover(droneType)) {
             droneState.changeFlightMode(ApmModes.ROVER_GUIDED, listener);
         }
@@ -109,7 +119,7 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener {
 
     public void doGuidedTakeoff(final double alt, final ICommandListener listener) {
         if (Type.isCopter(myDrone.getType())) {
-            coord = myDrone.getGps().getPosition();
+            coord = getGpsPosition();
             altitude = alt;
             state = GuidedStates.IDLE;
 
@@ -121,8 +131,8 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener {
                 }
 
                 @Override
-                public void onError(int executionError){
-                    if(listener != null){
+                public void onError(int executionError) {
+                    if (listener != null) {
                         try {
                             listener.onError(executionError);
                         } catch (RemoteException e) {
@@ -132,8 +142,8 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener {
                 }
 
                 @Override
-                public void onTimeout(){
-                    if(listener != null){
+                public void onTimeout() {
+                    if (listener != null) {
                         try {
                             listener.onTimeout();
                         } catch (RemoteException e) {
@@ -142,9 +152,8 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener {
                     }
                 }
             });
-        }
-        else{
-            if(listener !=  null){
+        } else {
+            if (listener != null) {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
@@ -159,19 +168,19 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener {
         }
     }
 
-    public void newGuidedCoord(Coord2D coord) {
+    public void newGuidedCoord(LatLong coord) {
         changeCoord(coord);
     }
 
     public void newGuidedPosition(double latitude, double longitude, double altitude) {
-        MavLinkModes.sendGuidedPosition(myDrone, latitude, longitude, altitude);
+        MavLinkCommands.sendGuidedPosition(myDrone, latitude, longitude, altitude);
     }
 
     public void newGuidedVelocity(double xVel, double yVel, double zVel) {
-        MavLinkModes.sendGuidedVelocity(myDrone, xVel, yVel, zVel);
+        MavLinkCommands.sendGuidedVelocity(myDrone, xVel, yVel, zVel);
     }
 
-    public void newGuidedCoordAndVelocity(Coord2D coord, double xVel, double yVel, double zVel) {
+    public void newGuidedCoordAndVelocity(LatLong coord, double xVel, double yVel, double zVel) {
         changeCoordAndVelocity(coord, xVel, yVel, zVel);
     }
 
@@ -179,8 +188,9 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener {
         changeAlt(alt);
     }
 
-    public void forcedGuidedCoordinate(final Coord2D coord, final ICommandListener listener) {
-        if (!myDrone.getGps().hasGpsLock()) {
+    public void forcedGuidedCoordinate(final LatLong coord, final ICommandListener listener) {
+        final Gps droneGps = (Gps) myDrone.getAttribute(AttributeType.GPS);
+        if (!droneGps.has3DLock()) {
             postErrorEvent(handler, listener, CommandExecutionError.COMMAND_FAILED);
             return;
         }
@@ -200,8 +210,9 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener {
         }
     }
 
-    public void forcedGuidedCoordinate(final Coord2D coord, final double alt, final ICommandListener listener) {
-        if (!myDrone.getGps().hasGpsLock()) {
+    public void forcedGuidedCoordinate(final LatLong coord, final double alt, final ICommandListener listener) {
+        final Gps droneGps = (Gps) myDrone.getAttribute(AttributeType.GPS);
+        if (!droneGps.has3DLock()) {
             postErrorEvent(handler, listener, CommandExecutionError.COMMAND_FAILED);
             return;
         }
@@ -225,7 +236,7 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener {
 
     private void initialize() {
         if (state == GuidedStates.UNINITIALIZED) {
-            coord = myDrone.getGps().getPosition();
+            coord = getGpsPosition();
             altitude = getDroneAltConstrained(myDrone);
             state = GuidedStates.IDLE;
             myDrone.notifyDroneEvent(DroneEventsType.GUIDEDPOINT);
@@ -238,7 +249,7 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener {
     }
 
     private void disable() {
-        if(state == GuidedStates.UNINITIALIZED)
+        if (state == GuidedStates.UNINITIALIZED)
             return;
 
         state = GuidedStates.UNINITIALIZED;
@@ -261,7 +272,7 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener {
         }
     }
 
-    private void changeCoord(Coord2D coord) {
+    private void changeCoord(LatLong coord) {
         switch (state) {
             case UNINITIALIZED:
                 break;
@@ -276,7 +287,7 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener {
         }
     }
 
-    private void changeCoordAndVelocity(Coord2D coord, double xVel, double yVel, double zVel) {
+    private void changeCoordAndVelocity(LatLong coord, double xVel, double yVel, double zVel) {
         switch (state) {
             case UNINITIALIZED:
                 break;
@@ -303,18 +314,18 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener {
         }
     }
 
-    public static void forceSendGuidedPoint(MavLinkDrone drone, Coord2D coord, double altitudeInMeters) {
+    public static void forceSendGuidedPoint(MavLinkDrone drone, LatLong coord, double altitudeInMeters) {
         drone.notifyDroneEvent(DroneEventsType.GUIDEDPOINT);
         if (coord != null) {
-            MavLinkModes.setGuidedMode(drone, coord.getLat(), coord.getLng(), altitudeInMeters);
+            MavLinkCommands.setGuidedMode(drone, coord.getLatitude(), coord.getLongitude(), altitudeInMeters);
         }
     }
 
-    public static void forceSendGuidedPointAndVelocity(MavLinkDrone drone, Coord2D coord, double altitudeInMeters,
+    public static void forceSendGuidedPointAndVelocity(MavLinkDrone drone, LatLong coord, double altitudeInMeters,
                                                        double xVel, double yVel, double zVel) {
         drone.notifyDroneEvent(DroneEventsType.GUIDEDPOINT);
         if (coord != null) {
-            MavLinkModes.sendGuidedPositionAndVelocity(drone, coord.getLat(), coord.getLng(), altitudeInMeters, xVel,
+            MavLinkCommands.sendGuidedPositionAndVelocity(drone, coord.getLatitude(), coord.getLongitude(), altitudeInMeters, xVel,
                     yVel, zVel);
         }
     }
@@ -325,7 +336,7 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener {
         return Math.max(alt, getDefaultMinAltitude(drone));
     }
 
-    public Coord2D getCoord() {
+    public LatLong getCoord() {
         return coord;
     }
 

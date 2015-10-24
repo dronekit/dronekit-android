@@ -98,21 +98,6 @@ public class DroneInterfaces {
 		HOME,
 
 		/**
-		 * Broadcast to notify of updates to the drone's gps location.
-		 */
-		GPS,
-
-		/**
-         *
-         */
-		GPS_FIX,
-
-		/**
-         *
-         */
-		GPS_COUNT,
-
-		/**
          *
          */
 		CALIBRATION_IMU,
