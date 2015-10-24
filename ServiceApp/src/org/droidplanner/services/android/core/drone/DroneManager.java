@@ -38,6 +38,7 @@ import org.droidplanner.services.android.communication.service.MAVLinkClient;
 import org.droidplanner.services.android.communication.service.UploaderService;
 import org.droidplanner.services.android.core.MAVLink.MAVLinkStreams;
 import org.droidplanner.services.android.core.MAVLink.MavLinkMsgHandler;
+import org.droidplanner.services.android.core.MAVLink.WaypointManager;
 import org.droidplanner.services.android.core.drone.autopilot.Drone;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.core.drone.autopilot.apm.ArduCopter;
@@ -48,7 +49,14 @@ import org.droidplanner.services.android.core.drone.autopilot.generic.GenericMav
 import org.droidplanner.services.android.core.drone.autopilot.px4.Px4Native;
 import org.droidplanner.services.android.core.drone.companion.solo.SoloComp;
 import org.droidplanner.services.android.core.drone.profiles.Parameters;
+import org.droidplanner.services.android.core.drone.profiles.VehicleProfile;
+import org.droidplanner.services.android.core.drone.variables.Camera;
+import org.droidplanner.services.android.core.drone.variables.GuidedPoint;
+import org.droidplanner.services.android.core.drone.variables.Home;
+import org.droidplanner.services.android.core.drone.variables.Magnetometer;
+import org.droidplanner.services.android.core.drone.variables.MissionStats;
 import org.droidplanner.services.android.core.drone.variables.StreamRates;
+import org.droidplanner.services.android.core.drone.variables.calibration.AccelCalibration;
 import org.droidplanner.services.android.core.drone.variables.calibration.MagnetometerCalibrationImpl;
 import org.droidplanner.services.android.core.firmware.FirmwareType;
 import org.droidplanner.services.android.core.gcs.GCSHeartbeat;
@@ -56,6 +64,7 @@ import org.droidplanner.services.android.core.gcs.ReturnToMe;
 import org.droidplanner.services.android.core.gcs.follow.Follow;
 import org.droidplanner.services.android.core.gcs.follow.FollowAlgorithm;
 import org.droidplanner.services.android.core.gcs.location.FusedLocation;
+import org.droidplanner.services.android.core.mission.Mission;
 import org.droidplanner.services.android.core.parameters.Parameter;
 import org.droidplanner.services.android.exception.ConnectionException;
 import org.droidplanner.services.android.utils.AndroidApWarningParser;
@@ -149,6 +158,11 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
             case PX4_NATIVE:
                 Timber.i("Instantiating PX4 Native autopilot.");
                 this.drone = new Px4Native(handler, mavClient, new AndroidApWarningParser(), this);
+                break;
+
+            case GENERIC:
+                Timber.i("Instantiating Generic mavlink autopilot.");
+//                this.drone = new GenericMavLinkDrone(handler, mavClient, new AndroidApWarningParser(), this);
                 break;
         }
 

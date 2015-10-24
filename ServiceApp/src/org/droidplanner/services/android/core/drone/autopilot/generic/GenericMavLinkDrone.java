@@ -78,7 +78,7 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
 
     protected final Handler handler;
 
-    protected GenericMavLinkDrone(Handler handler, MAVLinkStreams.MAVLinkOutputStream mavClient, AutopilotWarningParser warningParser, DroneInterfaces.AttributeEventListener listener) {
+    public GenericMavLinkDrone(Handler handler, MAVLinkStreams.MAVLinkOutputStream mavClient, AutopilotWarningParser warningParser, DroneInterfaces.AttributeEventListener listener) {
         this.handler = handler;
         this.mavClient = mavClient;
 

@@ -7,8 +7,15 @@ public enum FirmwareType {
     ARDU_ROVER("ArduRover"),
     ARDU_SOLO("ArduSolo"),
 
-    /* PX4 firmware type */
-    PX4_NATIVE("PX4 Native");
+    /**
+     * PX4 firmware type
+     */
+    PX4_NATIVE("PX4 Native"),
+
+    /**
+     * Generic firmware type
+     */
+    GENERIC("Generic");
 
     private final String type;
 
