@@ -23,7 +23,7 @@ public interface MavLinkDrone extends Drone {
 
     String PACKAGE_NAME = "org.droidplanner.services.android.core.drone.autopilot";
 
-    public static final String ACTION_REQUEST_HOME_UPDATE = PACKAGE_NAME + ".action.REQUEST_HOME_UPDATE";
+    String ACTION_REQUEST_HOME_UPDATE = PACKAGE_NAME + ".action.REQUEST_HOME_UPDATE";
 
     boolean isConnectionAlive();
 

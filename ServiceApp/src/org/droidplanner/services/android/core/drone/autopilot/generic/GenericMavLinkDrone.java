@@ -48,6 +48,7 @@ import org.droidplanner.services.android.core.drone.autopilot.apm.APMConstants;
 import org.droidplanner.services.android.core.drone.variables.State;
 import org.droidplanner.services.android.core.drone.variables.StreamRates;
 import org.droidplanner.services.android.core.drone.variables.Type;
+import org.droidplanner.services.android.core.firmware.FirmwareType;
 import org.droidplanner.services.android.core.model.AutopilotWarningParser;
 import org.droidplanner.services.android.core.parameters.Parameter;
 import org.droidplanner.services.android.utils.CommonApiUtils;
@@ -96,6 +97,11 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
         this.attributeListener = listener;
 
         this.videoMgr = new VideoManager(handler);
+    }
+
+    @Override
+    public FirmwareType getFirmwareType() {
+        return FirmwareType.GENERIC;
     }
 
     @Override
