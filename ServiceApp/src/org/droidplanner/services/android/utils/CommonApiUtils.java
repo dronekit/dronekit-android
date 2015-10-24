@@ -17,6 +17,7 @@ import com.MAVLink.enums.MAV_CMD;
 import com.MAVLink.enums.MAV_TYPE;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
+import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.drone.calibration.magnetometer.MagnetometerCalibrationProgress;
 import com.o3dr.services.android.lib.drone.calibration.magnetometer.MagnetometerCalibrationResult;
@@ -50,20 +51,16 @@ import org.droidplanner.services.android.core.MAVLink.command.doCmd.MavLinkDoCmd
 import org.droidplanner.services.android.core.drone.DroneManager;
 import org.droidplanner.services.android.core.drone.autopilot.Drone;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
-import org.droidplanner.services.android.core.drone.autopilot.apm.ArduSolo;
 import org.droidplanner.services.android.core.drone.autopilot.generic.GenericMavLinkDrone;
 import org.droidplanner.services.android.core.drone.profiles.VehicleProfile;
 import org.droidplanner.services.android.core.drone.variables.ApmModes;
 import org.droidplanner.services.android.core.drone.variables.Camera;
-import org.droidplanner.services.android.core.drone.variables.GPS;
 import org.droidplanner.services.android.core.drone.variables.GuidedPoint;
 import org.droidplanner.services.android.core.drone.variables.calibration.AccelCalibration;
 import org.droidplanner.services.android.core.drone.variables.calibration.MagnetometerCalibrationImpl;
 import org.droidplanner.services.android.core.firmware.FirmwareType;
 import org.droidplanner.services.android.core.gcs.follow.Follow;
 import org.droidplanner.services.android.core.gcs.follow.FollowAlgorithm;
-import org.droidplanner.services.android.core.helpers.coordinates.Coord2D;
-import org.droidplanner.services.android.core.helpers.coordinates.Coord3D;
 import org.droidplanner.services.android.core.mission.survey.SplineSurveyImpl;
 import org.droidplanner.services.android.core.mission.survey.SurveyImpl;
 import org.droidplanner.services.android.core.mission.waypoints.StructureScannerImpl;
@@ -259,8 +256,7 @@ public class CommonApiUtils {
     public static FootPrint getProxyCameraFootPrint(Footprint footprint) {
         if (footprint == null) return null;
 
-        return new FootPrint(footprint.getGSD(),
-                MathUtils.coord2DToLatLong(footprint.getVertexInGlobalFrame()));
+        return new FootPrint(footprint.getGSD(), footprint.getVertexInGlobalFrame());
     }
 
     public static FollowAlgorithm.FollowModes followTypeToMode(MavLinkDrone drone, FollowType followType) {
@@ -279,7 +275,7 @@ public class CommonApiUtils {
 
             default:
             case LEASH:
-                followMode =  (drone.getFirmwareType() == FirmwareType.ARDU_SOLO)
+                followMode = (drone.getFirmwareType() == FirmwareType.ARDU_SOLO)
                         ? FollowAlgorithm.FollowModes.SPLINE_LEASH
                         : FollowAlgorithm.FollowModes.LEASH;
                 break;
@@ -376,26 +372,13 @@ public class CommonApiUtils {
                 proxyPrints.add(CommonApiUtils.getProxyCameraFootPrint(footprint));
             }
 
-            GPS droneGps = drone.getGps();
-            currentFieldOfView = droneGps.isPositionValid()
+            Gps droneGps = (Gps) drone.getAttribute(AttributeType.GPS);
+            currentFieldOfView = droneGps != null && droneGps.isValid()
                     ? CommonApiUtils.getProxyCameraFootPrint(droneCamera.getCurrentFieldOfView())
                     : new FootPrint();
         }
 
         return new CameraProxy(camDetail, currentFieldOfView, proxyPrints, cameraDetails);
-    }
-
-    public static Gps getGps(MavLinkDrone drone) {
-        if (drone == null)
-            return new Gps();
-
-        final GPS droneGps = drone.getGps();
-        LatLong dronePosition = droneGps.isPositionValid()
-                ? new LatLong(droneGps.getPosition().getLat(), droneGps.getPosition().getLng())
-                : null;
-
-        return new Gps(dronePosition, droneGps.getGpsEPH(), droneGps.getSatCount(),
-                droneGps.getFixTypeNumeric());
     }
 
     public static State getState(MavLinkDrone drone, boolean isConnected, Vibration vibration) {
@@ -438,7 +421,7 @@ public class CommonApiUtils {
                         cachedParam = new Parameter(param.name, param.value, param.type);
                         incompleteParams.put(param.name, cachedParam);
                         cachedParameters.put(param.name, cachedParam);
-                    }else {
+                    } else {
                         cachedParam.setValue(param.value);
                         cachedParam.setType(param.type);
                     }
@@ -526,11 +509,13 @@ public class CommonApiUtils {
                 break;
         }
 
-        Coord2D guidedCoord = guidedPoint.getCoord() == null
-                ? new Coord2D(0, 0)
-                : guidedPoint.getCoord();
+        LatLong guidedCoord = guidedPoint.getCoord();
+        if (guidedCoord == null) {
+            guidedCoord = new LatLong(0, 0);
+        }
+
         double guidedAlt = guidedPoint.getAltitude();
-        return new GuidedState(guidedState, new LatLongAlt(guidedCoord.getLat(), guidedCoord.getLng(), guidedAlt));
+        return new GuidedState(guidedState, new LatLongAlt(guidedCoord, guidedAlt));
     }
 
     public static void changeVehicleMode(MavLinkDrone drone, VehicleMode newMode, ICommandListener listener) {
@@ -595,10 +580,9 @@ public class CommonApiUtils {
         for (Map.Entry<String, Object> entry : modeParams.entrySet()) {
             switch (entry.getKey()) {
                 case FollowType.EXTRA_FOLLOW_ROI_TARGET:
-                    Coord3D target = (Coord3D) entry.getValue();
+                    LatLongAlt target = (LatLongAlt) entry.getValue();
                     if (target != null) {
-                        params.putParcelable(entry.getKey(), new LatLongAlt(target.getLat(), target.getLng(),
-                                target.getAltitude()));
+                        params.putParcelable(entry.getKey(), target);
                     }
                     break;
 
@@ -903,10 +887,10 @@ public class CommonApiUtils {
 
         GuidedPoint guidedPoint = drone.getGuidedPoint();
         if (guidedPoint.isInitialized()) {
-            guidedPoint.newGuidedCoord(MathUtils.latLongToCoord2D(point));
+            guidedPoint.newGuidedCoord(point);
         } else if (force) {
             try {
-                guidedPoint.forcedGuidedCoordinate(MathUtils.latLongToCoord2D(point), listener);
+                guidedPoint.forcedGuidedCoordinate(point, listener);
             } catch (Exception e) {
                 Timber.e(e, e.getMessage());
             }
@@ -1049,7 +1033,7 @@ public class CommonApiUtils {
     public static void startVideoStream(Drone drone, Bundle videoProps, String appId, String videoTag, Surface videoSurface,
                                         ICommandListener listener) {
 
-        if(!(drone instanceof GenericMavLinkDrone)){
+        if (!(drone instanceof GenericMavLinkDrone)) {
             postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
             return;
         }
@@ -1059,7 +1043,7 @@ public class CommonApiUtils {
     }
 
     public static void stopVideoStream(Drone drone, String appId, String videoTag, ICommandListener listener) {
-        if(!(drone instanceof GenericMavLinkDrone)){
+        if (!(drone instanceof GenericMavLinkDrone)) {
             postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
             return;
         }

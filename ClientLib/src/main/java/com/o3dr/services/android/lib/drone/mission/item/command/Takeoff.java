@@ -6,14 +6,14 @@ import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
 import com.o3dr.services.android.lib.drone.mission.MissionItemType;
 
 /**
+ * The vehicle will climb straight up from it’s current location to the altitude specified (in meters).
+ * This should be the first command of nearly all missions.
+ * If the mission is begun while the copter is already flying, the vehicle will climb straight up to the specified altitude.
+ * If the vehicle is already above the specified altitude the takeoff command will be ignored and the mission will move onto the next command immediately.
+ *
  * Created by fhuya on 11/6/14.
  */
 public class Takeoff extends MissionItem implements MissionItem.Command, android.os.Parcelable {
-
-    /**
-     * Default takeoff altitude in meters.
-     */
-    public static final double DEFAULT_TAKEOFF_ALTITUDE = 10.0;
 
     private double takeoffAltitude;
     private double takeoffPitch;
@@ -28,10 +28,17 @@ public class Takeoff extends MissionItem implements MissionItem.Command, android
         takeoffPitch = copy.takeoffPitch;
     }
 
+    /**
+     * @return take off altitude in meters
+     */
     public double getTakeoffAltitude() {
         return takeoffAltitude;
     }
 
+    /**
+     * Sets the take off altitude
+     * @param takeoffAltitude Altitude value in meters
+     */
     public void setTakeoffAltitude(double takeoffAltitude) {
         this.takeoffAltitude = takeoffAltitude;
     }

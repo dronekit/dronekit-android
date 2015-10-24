@@ -7,9 +7,9 @@ import com.MAVLink.common.msg_param_value;
 
 public class Parameter implements Comparable<Parameter>, Serializable {
 
-	public String name;
-	public double value;
-	public int type;
+	public final String name;
+	public final double value;
+	public final int type;
 
 	private final static DecimalFormat format = (DecimalFormat) DecimalFormat.getInstance();
 	static {

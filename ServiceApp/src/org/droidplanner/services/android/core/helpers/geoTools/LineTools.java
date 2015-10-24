@@ -1,53 +1,54 @@
 package org.droidplanner.services.android.core.helpers.geoTools;
 
+import com.o3dr.services.android.lib.coordinate.LatLong;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import org.droidplanner.services.android.core.helpers.coordinates.Coord2D;
 import org.droidplanner.services.android.core.helpers.coordinates.CoordBounds;
 
 public class LineTools {
 
-	public static LineCoord2D findExternalPoints(ArrayList<Coord2D> crosses) {
-		Coord2D meanCoord = new CoordBounds(crosses).getMiddle();
-		Coord2D start = PointTools.findFarthestPoint(crosses, meanCoord);
-		Coord2D end = PointTools.findFarthestPoint(crosses, start);
-		return new LineCoord2D(start, end);
+	public static LineLatLong findExternalPoints(ArrayList<LatLong> crosses) {
+		LatLong meanCoord = new CoordBounds(crosses).getMiddle();
+		LatLong start = PointTools.findFarthestPoint(crosses, meanCoord);
+		LatLong end = PointTools.findFarthestPoint(crosses, start);
+		return new LineLatLong(start, end);
 	}
 
 	/**
 	 * Finds the intersection of two lines http://stackoverflow.com/questions/
 	 * 1119451/how-to-tell-if-a-line-intersects -a-polygon-in-c
 	 */
-	public static Coord2D FindLineIntersection(LineCoord2D first, LineCoord2D second) {
-		double denom = ((first.getEnd().getX() - first.getStart().getX()) * (second.getEnd().getY() - second
-				.getStart().getY()))
-				- ((first.getEnd().getY() - first.getStart().getY()) * (second.getEnd().getX() - second
-						.getStart().getX()));
+	public static LatLong FindLineIntersection(LineLatLong first, LineLatLong second) {
+		double denom = ((first.getEnd().getLatitude() - first.getStart().getLatitude()) * (second.getEnd().getLongitude() - second
+				.getStart().getLongitude()))
+				- ((first.getEnd().getLongitude() - first.getStart().getLongitude()) * (second.getEnd().getLatitude() - second
+						.getStart().getLatitude()));
 		if (denom == 0){
             //Parallel lines
             return null;
         }
-		double numer = ((first.getStart().getY() - second.getStart().getY()) * (second.getEnd()
-				.getX() - second.getStart().getX()))
-				- ((first.getStart().getX() - second.getStart().getX()) * (second.getEnd().getY() - second
-						.getStart().getY()));
+		double numer = ((first.getStart().getLongitude() - second.getStart().getLongitude()) * (second.getEnd()
+				.getLatitude() - second.getStart().getLatitude()))
+				- ((first.getStart().getLatitude() - second.getStart().getLatitude()) * (second.getEnd().getLongitude() - second
+						.getStart().getLongitude()));
 		double r = numer / denom;
-		double numer2 = ((first.getStart().getY() - second.getStart().getY()) * (first.getEnd()
-				.getX() - first.getStart().getX()))
-				- ((first.getStart().getX() - second.getStart().getX()) * (first.getEnd().getY() - first
-						.getStart().getY()));
+		double numer2 = ((first.getStart().getLongitude() - second.getStart().getLongitude()) * (first.getEnd()
+				.getLatitude() - first.getStart().getLatitude()))
+				- ((first.getStart().getLatitude() - second.getStart().getLatitude()) * (first.getEnd().getLongitude() - first
+						.getStart().getLongitude()));
 		double s = numer2 / denom;
 		if ((r < 0 || r > 1) || (s < 0 || s > 1)){
             //No intersection
             return null;
         }
 		// Find intersection point
-		double x = first.getStart().getX()
-				+ (r * (first.getEnd().getX() - first.getStart().getX()));
-		double y = first.getStart().getY()
-				+ (r * (first.getEnd().getY() - first.getStart().getY()));
-		return (new Coord2D(x, y));
+		double x = first.getStart().getLatitude()
+				+ (r * (first.getEnd().getLatitude() - first.getStart().getLatitude()));
+		double y = first.getStart().getLongitude()
+				+ (r * (first.getEnd().getLongitude() - first.getStart().getLongitude()));
+		return (new LatLong(x, y));
 	}
 
 	/**
@@ -59,14 +60,14 @@ public class LineTools {
 	 *            A list of lines to search
 	 * @return The closest Line
 	 */
-	public static LineCoord2D findClosestLineToPoint(Coord2D point, List<LineCoord2D> list) {
-		LineCoord2D answer = list.get(0);
+	public static LineLatLong findClosestLineToPoint(LatLong point, List<LineLatLong> list) {
+		LineLatLong answer = list.get(0);
 		double shortest = Double.MAX_VALUE;
 
-		for (LineCoord2D line : list) {
+		for (LineLatLong line : list) {
 			double ans1 = GeoTools.getAproximatedDistance(point, line.getStart());
 			double ans2 = GeoTools.getAproximatedDistance(point, line.getEnd());
-			Coord2D shorterpnt = ans1 < ans2 ? line.getStart() : line.getEnd();
+			LatLong shorterpnt = ans1 < ans2 ? line.getStart() : line.getEnd();
 
 			if (shortest > GeoTools.getAproximatedDistance(point, shorterpnt)) {
 				answer = line;

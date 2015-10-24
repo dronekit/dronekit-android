@@ -2,12 +2,14 @@ package org.droidplanner.services.android.core.gcs.follow;
 
 import android.os.Handler;
 
+import com.o3dr.services.android.lib.coordinate.LatLong;
+import com.o3dr.services.android.lib.coordinate.LatLongAlt;
+import com.o3dr.services.android.lib.drone.attribute.AttributeType;
+import com.o3dr.services.android.lib.drone.property.Gps;
+
 import org.droidplanner.services.android.core.drone.DroneManager;
 import org.droidplanner.services.android.core.gcs.location.Location;
-import org.droidplanner.services.android.core.helpers.coordinates.Coord2D;
-import org.droidplanner.services.android.core.helpers.coordinates.Coord3D;
 import org.droidplanner.services.android.core.helpers.geoTools.GeoTools;
-import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 
 /**
  * Created by fhuya on 1/5/15.
@@ -15,15 +17,17 @@ import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 public class FollowSplineLeash extends FollowWithRadiusAlgorithm {
     @Override
     public void processNewLocation(Location location) {
-        final Coord3D userLoc = location.getCoord();
-        final Coord2D droneLoc = drone.getGps().getPosition();
+        final LatLongAlt userLoc = location.getCoord();
+
+        final Gps droneGps = (Gps) drone.getAttribute(AttributeType.GPS);
+        final LatLong droneLoc = droneGps.getPosition();
 
         if (userLoc == null || droneLoc == null)
             return;
 
         if (GeoTools.getDistance(userLoc, droneLoc) > radius) {
             double headingGCSToDrone = GeoTools.getHeadingFromCoordinates(userLoc, droneLoc);
-            Coord2D goCoord = GeoTools.newCoordFromBearingAndDistance(userLoc, headingGCSToDrone, radius);
+            LatLong goCoord = GeoTools.newCoordFromBearingAndDistance(userLoc, headingGCSToDrone, radius);
 
             //TODO: some device (nexus 6) do not report the speed (always 0).. figure out workaround.
             double speed = location.getSpeed();

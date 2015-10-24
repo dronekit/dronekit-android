@@ -1,25 +1,25 @@
 package org.droidplanner.services.android.core.helpers.geoTools;
 
-import org.droidplanner.services.android.core.helpers.coordinates.Coord2D;
+import com.o3dr.services.android.lib.coordinate.LatLong;
 
-public class LineCoord2D {
-	private final Coord2D start;
-	private final Coord2D end;
+public class LineLatLong {
+	private final LatLong start;
+	private final LatLong end;
 
-	public LineCoord2D(Coord2D start, Coord2D end) {
+	public LineLatLong(LatLong start, LatLong end) {
 		this.start = start;
 		this.end = end;
 	}
 
-	public LineCoord2D(LineCoord2D line) {
+	public LineLatLong(LineLatLong line) {
 		this(line.start, line.end);
 	}
 
-	public Coord2D getStart() {
+	public LatLong getStart() {
 		return start;
 	}
 
-	public Coord2D getEnd() {
+	public LatLong getEnd() {
 		return end;
 	}
 
@@ -27,7 +27,7 @@ public class LineCoord2D {
 		return GeoTools.getHeadingFromCoordinates(this.start, this.end);
 	}
 
-	public Coord2D getFarthestEndpointTo(Coord2D point) {
+	public LatLong getFarthestEndpointTo(LatLong point) {
 		if (getClosestEndpointTo(point).equals(start)) {
 			return end;
 		} else {
@@ -35,7 +35,7 @@ public class LineCoord2D {
 		}
 	}
 
-	public Coord2D getClosestEndpointTo(Coord2D point) {
+	public LatLong getClosestEndpointTo(LatLong point) {
 		if (getDistanceToStart(point) < getDistanceToEnd(point)) {
 			return start;
 		} else {
@@ -43,11 +43,11 @@ public class LineCoord2D {
 		}
 	}
 
-	private Double getDistanceToEnd(Coord2D point) {
+	private Double getDistanceToEnd(LatLong point) {
 		return GeoTools.getAproximatedDistance(end, point);
 	}
 
-	private Double getDistanceToStart(Coord2D point) {
+	private Double getDistanceToStart(LatLong point) {
 		return GeoTools.getAproximatedDistance(start, point);
 	}
 

@@ -1,6 +1,6 @@
 package org.droidplanner.services.android.core.helpers.geoTools;
 
-import org.droidplanner.services.android.core.helpers.coordinates.Coord2D;
+import com.o3dr.services.android.lib.coordinate.LatLong;
 
 import java.util.List;
 
@@ -12,10 +12,10 @@ public class PolylineTools {
      * @param gridPoints
      * @return
      */
-    public static double getPolylineLength(List<Coord2D> gridPoints) {
+    public static double getPolylineLength(List<LatLong> gridPoints) {
         double length = 0;
         for (int i = 1; i < gridPoints.size(); i++) {
-            final Coord2D to = gridPoints.get(i - 1);
+            final LatLong to = gridPoints.get(i - 1);
             if (to == null) {
                 continue;
             }

@@ -1,5 +1,7 @@
 package org.droidplanner.services.android.core.helpers.coordinates;
 
+import com.o3dr.services.android.lib.coordinate.LatLong;
+
 import java.util.List;
 
 import org.droidplanner.services.android.core.helpers.geoTools.GeoTools;
@@ -8,35 +10,35 @@ import org.droidplanner.services.android.core.helpers.geoTools.GeoTools;
  * Calculate a rectangle that bounds all inserted points
  */
 public class CoordBounds {
-	public Coord2D sw_3quadrant;
-	public Coord2D ne_1quadrant;
+	public LatLong sw_3quadrant;
+	public LatLong ne_1quadrant;
 
-	public CoordBounds(Coord2D point) {
+	public CoordBounds(LatLong point) {
 		include(point);
 	}
 
-	public CoordBounds(List<Coord2D> points) {
-		for (Coord2D point : points) {
+	public CoordBounds(List<LatLong> points) {
+		for (LatLong point : points) {
 			include(point);
 		}
 	}
 
-	public void include(Coord2D point) {
+	public void include(LatLong point) {
 		if ((sw_3quadrant == null) || (ne_1quadrant == null)) {
-			ne_1quadrant = new Coord2D(point);
-			sw_3quadrant = new Coord2D(point);
+			ne_1quadrant = new LatLong(point);
+			sw_3quadrant = new LatLong(point);
 		} else {
-			if (point.getY() > ne_1quadrant.getY()) {
-				ne_1quadrant.set(ne_1quadrant.getX(), point.getY());
+			if (point.getLongitude() > ne_1quadrant.getLongitude()) {
+				ne_1quadrant.setLongitude(point.getLongitude());
 			}
-			if (point.getX() > ne_1quadrant.getX()) {
-				ne_1quadrant.set(point.getX(), ne_1quadrant.getY());
+			if (point.getLatitude() > ne_1quadrant.getLatitude()) {
+				ne_1quadrant.setLatitude(point.getLatitude());
 			}
-			if (point.getY() < sw_3quadrant.getY()) {
-				sw_3quadrant.set(sw_3quadrant.getX(), point.getY());
+			if (point.getLongitude() < sw_3quadrant.getLongitude()) {
+				sw_3quadrant.setLongitude(point.getLongitude());
 			}
-			if (point.getX() < sw_3quadrant.getX()) {
-				sw_3quadrant.set(point.getX(), sw_3quadrant.getY());
+			if (point.getLatitude() < sw_3quadrant.getLatitude()) {
+				sw_3quadrant.setLatitude(point.getLatitude());
 			}
 		}
 	}
@@ -45,9 +47,9 @@ public class CoordBounds {
 		return GeoTools.latToMeters(GeoTools.getAproximatedDistance(ne_1quadrant, sw_3quadrant));
 	}
 
-	public Coord2D getMiddle() {
-		return (new Coord2D((ne_1quadrant.getLat() + sw_3quadrant.getLat()) / 2,
-				(ne_1quadrant.getLng() + sw_3quadrant.getLng()) / 2));
+	public LatLong getMiddle() {
+		return (new LatLong((ne_1quadrant.getLatitude() + sw_3quadrant.getLatitude()) / 2,
+				(ne_1quadrant.getLongitude() + sw_3quadrant.getLongitude()) / 2));
 
 	}
 }

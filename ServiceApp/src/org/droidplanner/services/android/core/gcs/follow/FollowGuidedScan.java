@@ -2,12 +2,13 @@ package org.droidplanner.services.android.core.gcs.follow;
 
 import android.os.Handler;
 
+import com.o3dr.services.android.lib.coordinate.LatLong;
+import com.o3dr.services.android.lib.coordinate.LatLongAlt;
+
 import org.droidplanner.services.android.core.MAVLink.command.doCmd.MavLinkDoCmds;
 import org.droidplanner.services.android.core.drone.DroneManager;
-import org.droidplanner.services.android.core.gcs.roi.ROIEstimator;
-import org.droidplanner.services.android.core.helpers.coordinates.Coord2D;
-import org.droidplanner.services.android.core.helpers.coordinates.Coord3D;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
+import org.droidplanner.services.android.core.gcs.roi.ROIEstimator;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -39,13 +40,13 @@ public class FollowGuidedScan extends FollowAbove {
     public void updateAlgorithmParams(Map<String, ?> params) {
         super.updateAlgorithmParams(params);
 
-        final Coord3D target;
+        final LatLongAlt target;
 
-        Coord2D tempCoord = (Coord2D) params.get(EXTRA_FOLLOW_ROI_TARGET);
-        if (tempCoord == null || tempCoord instanceof Coord3D) {
-            target = (Coord3D) tempCoord;
+        LatLong tempCoord = (LatLong) params.get(EXTRA_FOLLOW_ROI_TARGET);
+        if (tempCoord == null || tempCoord instanceof LatLongAlt) {
+            target = (LatLongAlt) tempCoord;
         } else {
-            target = new Coord3D(tempCoord, sDefaultRoiAltitude);
+            target = new LatLongAlt(tempCoord, sDefaultRoiAltitude);
         }
 
         getROIEstimator().updateROITarget(target);
@@ -70,13 +71,13 @@ public class FollowGuidedScan extends FollowAbove {
 
     private static class GuidedROIEstimator extends ROIEstimator {
 
-        private Coord3D roiTarget;
+        private LatLongAlt roiTarget;
 
         public GuidedROIEstimator(MavLinkDrone drone, Handler handler) {
             super(drone, handler);
         }
 
-        void updateROITarget(Coord3D roiTarget) {
+        void updateROITarget(LatLongAlt roiTarget) {
             this.roiTarget = roiTarget;
             onLocationUpdate(null);
         }

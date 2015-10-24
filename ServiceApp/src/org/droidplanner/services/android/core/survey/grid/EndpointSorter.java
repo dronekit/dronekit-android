@@ -1,43 +1,44 @@
 package org.droidplanner.services.android.core.survey.grid;
 
+import com.o3dr.services.android.lib.coordinate.LatLong;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import org.droidplanner.services.android.core.helpers.coordinates.Coord2D;
-import org.droidplanner.services.android.core.helpers.geoTools.LineCoord2D;
+import org.droidplanner.services.android.core.helpers.geoTools.LineLatLong;
 import org.droidplanner.services.android.core.helpers.geoTools.LineSampler;
 import org.droidplanner.services.android.core.helpers.geoTools.LineTools;
 
 public class EndpointSorter {
 	private static final int MAX_NUMBER_OF_CAMERAS = 2000;
 
-	private List<Coord2D> gridPoints = new ArrayList<Coord2D>();
-	private List<LineCoord2D> grid;
+	private List<LatLong> gridPoints = new ArrayList<LatLong>();
+	private List<LineLatLong> grid;
 	private Double sampleDistance;
-	private List<Coord2D> cameraLocations = new ArrayList<Coord2D>();
+	private List<LatLong> cameraLocations = new ArrayList<LatLong>();
 
-	public EndpointSorter(List<LineCoord2D> grid, Double sampleDistance) {
+	public EndpointSorter(List<LineLatLong> grid, Double sampleDistance) {
 		this.grid = grid;
 		this.sampleDistance = sampleDistance;
 	}
 
-	public void sortGrid(Coord2D lastpnt, boolean sort) throws Exception {
+	public void sortGrid(LatLong lastpnt, boolean sort) throws Exception {
 		while (grid.size() > 0) {
 			if (sort) {				
-				LineCoord2D closestLine = LineTools.findClosestLineToPoint(lastpnt, grid);
-				Coord2D secondWp = processOneGridLine(closestLine, lastpnt, sort);
+				LineLatLong closestLine = LineTools.findClosestLineToPoint(lastpnt, grid);
+				LatLong secondWp = processOneGridLine(closestLine, lastpnt, sort);
 				lastpnt = secondWp;
 			}else{
-				LineCoord2D closestLine = grid.get(0);
-				Coord2D secondWp = processOneGridLine(closestLine, lastpnt, sort);
+				LineLatLong closestLine = grid.get(0);
+				LatLong secondWp = processOneGridLine(closestLine, lastpnt, sort);
 				lastpnt = secondWp;
 			}
 		}
 	}
 
-	private Coord2D processOneGridLine(LineCoord2D closestLine, Coord2D lastpnt, boolean sort)
+	private LatLong processOneGridLine(LineLatLong closestLine, LatLong lastpnt, boolean sort)
 			throws Exception {
-		Coord2D firstWP, secondWp;
+		LatLong firstWP, secondWp;
 		firstWP = closestLine.getClosestEndpointTo(lastpnt);
 		secondWp = closestLine.getFarthestEndpointTo(lastpnt);
 
@@ -53,17 +54,17 @@ public class EndpointSorter {
 		return secondWp;
 	}
 
-	private void updateCameraLocations(Coord2D firstWP, Coord2D secondWp) {
-		List<Coord2D> cameraLocationsOnThisStrip = new LineSampler(firstWP, secondWp)
+	private void updateCameraLocations(LatLong firstWP, LatLong secondWp) {
+		List<LatLong> cameraLocationsOnThisStrip = new LineSampler(firstWP, secondWp)
 				.sample(sampleDistance);
 		cameraLocations.addAll(cameraLocationsOnThisStrip);
 	}
 
-	public List<Coord2D> getSortedGrid() {
+	public List<LatLong> getSortedGrid() {
 		return gridPoints;
 	}
 
-	public List<Coord2D> getCameraLocations() {
+	public List<LatLong> getCameraLocations() {
 		return cameraLocations;
 	}
 
