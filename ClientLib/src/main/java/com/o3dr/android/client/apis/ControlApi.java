@@ -1,14 +1,19 @@
 package com.o3dr.android.client.apis;
 
 import android.os.Bundle;
+import android.support.annotation.IntDef;
 
 import com.o3dr.android.client.Drone;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
+import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
+import com.o3dr.services.android.lib.drone.property.Attitude;
 import com.o3dr.services.android.lib.drone.property.Gps;
 import com.o3dr.services.android.lib.model.AbstractCommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_DO_GUIDED_TAKEOFF;
@@ -23,7 +28,6 @@ import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_VE
 import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_VELOCITY_Y;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_VELOCITY_Z;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_YAW_CHANGE_RATE;
-import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_YAW_IS_CLOCKWISE;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_YAW_IS_RELATIVE;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_YAW_TARGET_ANGLE;
 
@@ -35,6 +39,13 @@ import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_YA
  * Created by Fredia Huya-Kouadio on 9/7/15.
  */
 public class ControlApi extends Api {
+
+    public static final int EARTH_NED_COORDINATE_FRAME = 0;
+    public static final int VEHICLE_COORDINATE_FRAME = 1;
+
+    @IntDef({EARTH_NED_COORDINATE_FRAME, VEHICLE_COORDINATE_FRAME})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface CoordinateFrame{}
 
     private static final ConcurrentHashMap<Drone, ControlApi> apiCache = new ConcurrentHashMap<>();
     private static final Builder<ControlApi> apiBuilder = new Builder<ControlApi>() {
@@ -113,33 +124,67 @@ public class ControlApi extends Api {
     /**
      * Instructs the vehicle to turn to the specified target angle
      * @param targetAngle Target angle in degrees [0-360], with 0 == north.
-     * @param turnSpeed Speed during turn in degrees per second
-     * @param isClockwise True for clockwise turn, false for counter clockwise turn
+     * @param turnRate Turning rate normalized to the range [-1.0f, 1.0f]. Positive values for clockwise turns, and negative values for counter-clockwise turns.
      * @param isRelative True is the target angle is relative to the current vehicle attitude, false otherwise if it's absolute.
      * @param listener Register a callback to receive update of the command execution state.
      */
-    public void turnTo(float targetAngle, float turnSpeed, boolean isClockwise, boolean isRelative, AbstractCommandListener listener){
+    public void turnTo(float targetAngle, float turnRate, boolean isRelative, AbstractCommandListener listener){
+        if(!isWithinBounds(targetAngle, 0, 360) || !isWithinBounds(turnRate, -1.0f, 1.0f)){
+            postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
+            return;
+        }
+
         Bundle params = new Bundle();
         params.putFloat(EXTRA_YAW_TARGET_ANGLE, targetAngle);
-        params.putFloat(EXTRA_YAW_CHANGE_RATE, turnSpeed);
-        params.putBoolean(EXTRA_YAW_IS_CLOCKWISE, isClockwise);
+        params.putFloat(EXTRA_YAW_CHANGE_RATE, turnRate);
         params.putBoolean(EXTRA_YAW_IS_RELATIVE, isRelative);
         drone.performAsyncActionOnDroneThread(new Action(ACTION_SET_CONDITION_YAW, params), listener);
     }
 
-    /**
-     * Move the vehicle along the specified velocity vector.
-     *
-     * @param vx x velocity in meter / s
-     * @param vy y velocity in meter / s
-     * @param vz z velocity in meter / s
-     * @param listener Register a callback to receive update of the command execution state.
-     */
-    public void moveAtVelocity(float vx, float vy, float vz, AbstractCommandListener listener){
+    private void moveAtVelocity(float vx, float vy, float vz, AbstractCommandListener listener){
         Bundle params = new Bundle();
         params.putFloat(EXTRA_VELOCITY_X, vx);
         params.putFloat(EXTRA_VELOCITY_Y, vy);
         params.putFloat(EXTRA_VELOCITY_Z, vz);
         drone.performAsyncActionOnDroneThread(new Action(ACTION_SET_VELOCITY, params), listener);
+    }
+
+    /**
+     * Move the vehicle along the specified velocity vector.
+     *
+     * @param referenceFrame Reference frame to use. Can be one of
+     *                       {@link #EARTH_NED_COORDINATE_FRAME},
+     *                       {@link #VEHICLE_COORDINATE_FRAME}
+     *
+     * @param vx             x velocity normalized to the range [-1.0f, 1.0f].
+     * @param vy             y velocity normalized to the range [-1.0f, 1.0f].
+     * @param vz             z velocity normalized to the range [-1.0f, 1.0f].
+     * @param listener       Register a callback to receive update of the command execution state.
+     */
+    public void moveAtVelocity(@CoordinateFrame int referenceFrame, float vx, float vy, float vz, AbstractCommandListener listener){
+        if(!isWithinBounds(vx, -1f, 1f) || !isWithinBounds(vy, -1f, 1f) || !isWithinBounds(vz, -1f, 1f)){
+            postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
+            return;
+        }
+
+        float projectedX = vx;
+        float projectedY = vy;
+
+        if(referenceFrame == VEHICLE_COORDINATE_FRAME) {
+            Attitude attitude = drone.getAttribute(AttributeType.ATTITUDE);
+            double attitudeInRad = Math.toRadians(attitude.getYaw());
+
+            final double cosAttitude = Math.cos(attitudeInRad);
+            final double sinAttitude = Math.sin(attitudeInRad);
+
+            projectedX = (float) (vx * cosAttitude) - (float) (vy * sinAttitude);
+            projectedY = (float) (vx * sinAttitude) + (float) (vy * cosAttitude);
+        }
+
+        moveAtVelocity(projectedX, projectedY, vz, listener);
+    }
+
+    private static boolean isWithinBounds(float value, float lowerBound, float upperBound){
+        return value <= upperBound && value >= lowerBound;
     }
 }

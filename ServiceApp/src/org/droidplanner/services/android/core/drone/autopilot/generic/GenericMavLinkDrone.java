@@ -16,6 +16,7 @@ import com.MAVLink.common.msg_sys_status;
 import com.MAVLink.common.msg_vibration;
 import com.MAVLink.enums.MAV_SYS_STATUS_SENSOR;
 import com.o3dr.services.android.lib.coordinate.LatLong;
+import com.o3dr.services.android.lib.drone.action.ControlActions;
 import com.o3dr.services.android.lib.drone.action.StateActions;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
@@ -35,6 +36,7 @@ import com.o3dr.services.android.lib.model.action.Action;
 import com.o3dr.services.android.lib.util.MathUtils;
 
 import org.droidplanner.services.android.core.MAVLink.MAVLinkStreams;
+import org.droidplanner.services.android.core.MAVLink.MavLinkCommands;
 import org.droidplanner.services.android.core.drone.DroneEvents;
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
@@ -42,8 +44,10 @@ import org.droidplanner.services.android.core.drone.variables.State;
 import org.droidplanner.services.android.core.drone.variables.StreamRates;
 import org.droidplanner.services.android.core.drone.variables.Type;
 import org.droidplanner.services.android.core.model.AutopilotWarningParser;
+import org.droidplanner.services.android.core.parameters.Parameter;
 import org.droidplanner.services.android.utils.CommonApiUtils;
 import org.droidplanner.services.android.utils.video.VideoManager;
+import org.droidplanner.services.android.core.drone.profiles.Parameters;
 
 /**
  * Base drone implementation.
@@ -177,6 +181,40 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
                 data.setClassLoader(VehicleMode.class.getClassLoader());
                 VehicleMode newMode = data.getParcelable(StateActions.EXTRA_VEHICLE_MODE);
                 CommonApiUtils.changeVehicleMode(this, newMode, listener);
+                return true;
+
+            //CONTROL ACTIONS
+            case ControlActions.ACTION_SET_CONDITION_YAW:
+                //Retrieve the yaw turn speed.
+                float turnSpeed = 2; //default turn speed.
+
+                final Parameters parameters = getParameters();
+                if(parameters != null){
+                    Parameter turnSpeedParam = parameters.getParameter("ACRO_YAW_P");
+                    if(turnSpeedParam != null){
+                        turnSpeed = (float) turnSpeedParam.value;
+                    }
+                }
+
+                final float targetAngle = data.getFloat(ControlActions.EXTRA_YAW_TARGET_ANGLE);
+                final float yawRate = data.getFloat(ControlActions.EXTRA_YAW_CHANGE_RATE);
+                final boolean isClockwise = yawRate >= 0;
+                final boolean isRelative = data.getBoolean(ControlActions.EXTRA_YAW_IS_RELATIVE);
+
+                MavLinkCommands.setConditionYaw(this, targetAngle, Math.abs(yawRate) * turnSpeed, isClockwise, isRelative, listener);
+                return true;
+
+            case ControlActions.ACTION_SET_VELOCITY:
+                final float xAxis = data.getFloat(ControlActions.EXTRA_VELOCITY_X);
+                final short x = (short) (xAxis * 1000);
+
+                final float yAxis = data.getFloat(ControlActions.EXTRA_VELOCITY_Y);
+                final short y = (short) (yAxis * 1000);
+
+                final float zAxis = data.getFloat(ControlActions.EXTRA_VELOCITY_Z);
+                final short z = (short) (zAxis * 1000);
+
+                MavLinkCommands.sendManualControl(this, x, y, z, (short) 0, 0, listener);
                 return true;
 
             default:

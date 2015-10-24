@@ -47,7 +47,7 @@ import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
 
 import org.droidplanner.services.android.core.MAVLink.MAVLinkStreams;
-import org.droidplanner.services.android.core.MAVLink.MavLinkModes;
+import org.droidplanner.services.android.core.MAVLink.MavLinkCommands;
 import org.droidplanner.services.android.core.MAVLink.MavLinkParameters;
 import org.droidplanner.services.android.core.MAVLink.WaypointManager;
 import org.droidplanner.services.android.core.MAVLink.command.doCmd.MavLinkDoCmds;
@@ -378,19 +378,28 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
                 CommonApiUtils.setGuidedAltitude(this, guidedAltitude);
                 return true;
 
-            case ControlActions.ACTION_SET_CONDITION_YAW:
-                final float targetAngle = data.getFloat(ControlActions.EXTRA_YAW_TARGET_ANGLE);
-                final float yawRate = data.getFloat(ControlActions.EXTRA_YAW_CHANGE_RATE);
-                final boolean isClockwise = data.getBoolean(ControlActions.EXTRA_YAW_IS_CLOCKWISE);
-                final boolean isRelative = data.getBoolean(ControlActions.EXTRA_YAW_IS_RELATIVE);
-                MavLinkModes.setConditionYaw(this, targetAngle, yawRate, isClockwise, isRelative, listener);
-                return true;
-
             case ControlActions.ACTION_SET_VELOCITY:
-                final float xVel = data.getFloat(ControlActions.EXTRA_VELOCITY_X);
-                final float yVel = data.getFloat(ControlActions.EXTRA_VELOCITY_Y);
-                final float zVel = data.getFloat(ControlActions.EXTRA_VELOCITY_Z);
-                MavLinkModes.setVelocityInLocalFrame(this, xVel, yVel, zVel, listener);
+                //Retrieve the normalized values
+                final float normalizedXVel = data.getFloat(ControlActions.EXTRA_VELOCITY_X);
+                final float normalizedYVel = data.getFloat(ControlActions.EXTRA_VELOCITY_Y);
+                final float normalizedZVel = data.getFloat(ControlActions.EXTRA_VELOCITY_Z);
+
+                //Retrieve the speed parameters.
+                final float defaultSpeed = 5; //m/s
+
+                //Retrieve the horizontal speed value
+                final Parameter horizSpeedParam = parameters.getParameter("WPNAV_SPEED");
+                final double horizontalSpeed = horizSpeedParam == null ? defaultSpeed : horizSpeedParam.value / 100;
+
+                //Retrieve the vertical speed value.
+                String vertSpeedParamName = normalizedZVel >= 0 ? "WPNAV_SPEED_UP" : "WPNAV_SPEED_DN";
+                final Parameter vertSpeedParam = parameters.getParameter(vertSpeedParamName);
+                final double verticalSpeed = vertSpeedParam == null ? defaultSpeed : vertSpeedParam.value / 100;
+
+                MavLinkCommands.setVelocityInLocalFrame(this, (float) (normalizedXVel * horizontalSpeed),
+                        (float) (normalizedYVel * horizontalSpeed),
+                        (float) (normalizedZVel * verticalSpeed),
+                        listener);
                 return true;
 
             //PARAMETER ACTIONS

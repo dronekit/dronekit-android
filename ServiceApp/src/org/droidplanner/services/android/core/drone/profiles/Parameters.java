@@ -1,6 +1,7 @@
 package org.droidplanner.services.android.core.drone.profiles;
 
 import android.os.Handler;
+import android.text.TextUtils;
 
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.common.msg_param_value;
@@ -154,7 +155,7 @@ public class Parameters extends DroneVariable implements OnDroneListener {
     }
 
     public Parameter getParameter(String name) {
-        if (name == null || name.length() == 0)
+        if (TextUtils.isEmpty(name))
             return null;
 
         return parameters.get(name.toLowerCase(Locale.US));

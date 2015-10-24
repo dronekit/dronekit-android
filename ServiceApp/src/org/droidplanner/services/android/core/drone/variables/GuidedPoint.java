@@ -11,7 +11,7 @@ import com.o3dr.services.android.lib.drone.property.Gps;
 import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.model.SimpleCommandListener;
 
-import org.droidplanner.services.android.core.MAVLink.MavLinkModes;
+import org.droidplanner.services.android.core.MAVLink.MavLinkCommands;
 import org.droidplanner.services.android.core.MAVLink.MavLinkTakeoff;
 import org.droidplanner.services.android.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.services.android.core.drone.DroneInterfaces.OnDroneListener;
@@ -173,11 +173,11 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener {
     }
 
     public void newGuidedPosition(double latitude, double longitude, double altitude) {
-        MavLinkModes.sendGuidedPosition(myDrone, latitude, longitude, altitude);
+        MavLinkCommands.sendGuidedPosition(myDrone, latitude, longitude, altitude);
     }
 
     public void newGuidedVelocity(double xVel, double yVel, double zVel) {
-        MavLinkModes.sendGuidedVelocity(myDrone, xVel, yVel, zVel);
+        MavLinkCommands.sendGuidedVelocity(myDrone, xVel, yVel, zVel);
     }
 
     public void newGuidedCoordAndVelocity(LatLong coord, double xVel, double yVel, double zVel) {
@@ -317,7 +317,7 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener {
     public static void forceSendGuidedPoint(MavLinkDrone drone, LatLong coord, double altitudeInMeters) {
         drone.notifyDroneEvent(DroneEventsType.GUIDEDPOINT);
         if (coord != null) {
-            MavLinkModes.setGuidedMode(drone, coord.getLatitude(), coord.getLongitude(), altitudeInMeters);
+            MavLinkCommands.setGuidedMode(drone, coord.getLatitude(), coord.getLongitude(), altitudeInMeters);
         }
     }
 
@@ -325,7 +325,7 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener {
                                                        double xVel, double yVel, double zVel) {
         drone.notifyDroneEvent(DroneEventsType.GUIDEDPOINT);
         if (coord != null) {
-            MavLinkModes.sendGuidedPositionAndVelocity(drone, coord.getLatitude(), coord.getLongitude(), altitudeInMeters, xVel,
+            MavLinkCommands.sendGuidedPositionAndVelocity(drone, coord.getLatitude(), coord.getLongitude(), altitudeInMeters, xVel,
                     yVel, zVel);
         }
     }
