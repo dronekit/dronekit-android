@@ -25,7 +25,6 @@ import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
 import com.o3dr.services.android.lib.model.ICommandListener;
 
 import org.droidplanner.services.android.BuildConfig;
-import org.droidplanner.services.android.core.drone.companion.CompComp;
 import org.droidplanner.services.android.core.drone.autopilot.apm.solo.controller.ControllerLinkListener;
 import org.droidplanner.services.android.core.drone.autopilot.apm.solo.controller.ControllerLinkManager;
 import org.droidplanner.services.android.core.drone.autopilot.apm.solo.sololink.SoloLinkListener;
@@ -41,7 +40,7 @@ import timber.log.Timber;
  * Sololink companion computer implementation
  * Created by Fredia Huya-Kouadio on 7/9/15.
  */
-public class SoloComp implements CompComp, SoloLinkListener, ControllerLinkListener {
+public class SoloComp implements SoloLinkListener, ControllerLinkListener {
 
     public interface SoloCompListener {
         void onConnected();
