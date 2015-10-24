@@ -54,7 +54,7 @@ import org.droidplanner.services.android.core.model.AutopilotWarningParser;
 import org.droidplanner.services.android.core.parameters.Parameter;
 import org.droidplanner.services.android.utils.CommonApiUtils;
 import org.droidplanner.services.android.utils.video.VideoManager;
-import org.droidplanner.services.android.core.drone.profiles.Parameters;
+import org.droidplanner.services.android.core.drone.profiles.ParameterManager;
 
 /**
  * Base drone implementation.
@@ -227,9 +227,9 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
                 //Retrieve the yaw turn speed.
                 float turnSpeed = 2; //default turn speed.
 
-                Parameters parameters = getParameters();
-                if(parameters != null){
-                    Parameter turnSpeedParam = parameters.getParameter("ACRO_YAW_P");
+                ParameterManager parameterManager = getParameterManager();
+                if(parameterManager != null){
+                    Parameter turnSpeedParam = parameterManager.getParameter("ACRO_YAW_P");
                     if(turnSpeedParam != null){
                         turnSpeed = (float) turnSpeedParam.value;
                     }

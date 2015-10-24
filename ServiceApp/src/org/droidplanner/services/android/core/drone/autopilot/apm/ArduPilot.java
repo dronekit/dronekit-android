@@ -55,7 +55,7 @@ import org.droidplanner.services.android.core.drone.LogMessageListener;
 import org.droidplanner.services.android.core.drone.Preferences;
 import org.droidplanner.services.android.core.drone.autopilot.apm.variables.APMHeartBeat;
 import org.droidplanner.services.android.core.drone.autopilot.generic.GenericMavLinkDrone;
-import org.droidplanner.services.android.core.drone.profiles.Parameters;
+import org.droidplanner.services.android.core.drone.profiles.ParameterManager;
 import org.droidplanner.services.android.core.drone.profiles.VehicleProfile;
 import org.droidplanner.services.android.core.drone.variables.ApmModes;
 import org.droidplanner.services.android.core.drone.variables.Camera;
@@ -95,7 +95,7 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
     private final WaypointManager waypointManager;
     private final Magnetometer mag;
     private final Camera footprints;
-    private final Parameters parameters;
+    private final ParameterManager parameterManager;
 
     private final Preferences preferences;
 
@@ -119,7 +119,7 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
         this.preferences = pref;
         this.logListener = logListener;
 
-        parameters = new Parameters(this, handler);
+        parameterManager = new ParameterManager(this, handler);
         this.waypointManager = new WaypointManager(this, handler);
 
         rc = new RC(this);
@@ -162,8 +162,8 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
     }
 
     @Override
-    public Parameters getParameters() {
-        return parameters;
+    public ParameterManager getParameterManager() {
+        return parameterManager;
     }
 
     @Override
@@ -351,12 +351,12 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
                 float defaultSpeed = 5; //m/s
 
                 //Retrieve the horizontal speed value
-                Parameter horizSpeedParam = parameters.getParameter("WPNAV_SPEED");
+                Parameter horizSpeedParam = parameterManager.getParameter("WPNAV_SPEED");
                 double horizontalSpeed = horizSpeedParam == null ? defaultSpeed : horizSpeedParam.value / 100;
 
                 //Retrieve the vertical speed value.
                 String vertSpeedParamName = normalizedZVel >= 0 ? "WPNAV_SPEED_UP" : "WPNAV_SPEED_DN";
-                Parameter vertSpeedParam = parameters.getParameter(vertSpeedParamName);
+                Parameter vertSpeedParam = parameterManager.getParameter(vertSpeedParamName);
                 double verticalSpeed = vertSpeedParam == null ? defaultSpeed : vertSpeedParam.value / 100;
 
                 MavLinkCommands.setVelocityInLocalFrame(this, (float) (normalizedXVel * horizontalSpeed),
@@ -448,7 +448,7 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
                 int mountMode = data.getInt(GimbalActions.GIMBAL_MOUNT_MODE, MAV_MOUNT_MODE.MAV_MOUNT_MODE_RC_TARGETING);
                 Timber.i("Setting gimbal mount mode: %d", mountMode);
 
-                Parameter mountParam = this.parameters.getParameter("MNT_MODE");
+                Parameter mountParam = this.parameterManager.getParameter("MNT_MODE");
                 if (mountParam == null) {
                     msg_mount_configure msg = new msg_mount_configure();
                     msg.target_system = getSysid();
@@ -477,7 +477,7 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
             return;
         }
 
-        if (!getParameters().processMessage(message)) {
+        if (!getParameterManager().processMessage(message)) {
 
             getWaypointManager().processMessage(message);
             getCalibrationSetup().processMessage(message);
@@ -675,7 +675,7 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
     }
 
     public Double getBattDischarge(double battRemain) {
-        Parameter battCap = getParameters().getParameter("BATT_CAPACITY");
+        Parameter battCap = getParameterManager().getParameter("BATT_CAPACITY");
         if (battCap == null || battRemain == -1) {
             return null;
         }

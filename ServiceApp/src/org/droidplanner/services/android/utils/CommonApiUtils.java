@@ -33,7 +33,6 @@ import com.o3dr.services.android.lib.drone.property.EkfStatus;
 import com.o3dr.services.android.lib.drone.property.FootPrint;
 import com.o3dr.services.android.lib.drone.property.Gps;
 import com.o3dr.services.android.lib.drone.property.GuidedState;
-import com.o3dr.services.android.lib.drone.property.Home;
 import com.o3dr.services.android.lib.drone.property.Parameter;
 import com.o3dr.services.android.lib.drone.property.Parameters;
 import com.o3dr.services.android.lib.drone.property.State;
@@ -52,6 +51,7 @@ import org.droidplanner.services.android.core.drone.DroneManager;
 import org.droidplanner.services.android.core.drone.autopilot.Drone;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.core.drone.autopilot.generic.GenericMavLinkDrone;
+import org.droidplanner.services.android.core.drone.profiles.ParameterManager;
 import org.droidplanner.services.android.core.drone.profiles.VehicleProfile;
 import org.droidplanner.services.android.core.drone.variables.ApmModes;
 import org.droidplanner.services.android.core.drone.variables.Camera;
@@ -412,7 +412,7 @@ public class CommonApiUtils {
         final Map<String, Parameter> incompleteParams = new HashMap<>();
         final List<Parameter> parametersList = new ArrayList<>();
 
-        Map<String, org.droidplanner.services.android.core.parameters.Parameter> droneParameters = drone.getParameters().getParameters();
+        Map<String, org.droidplanner.services.android.core.parameters.Parameter> droneParameters = drone.getParameterManager().getParameters();
         if (!droneParameters.isEmpty()) {
             for (org.droidplanner.services.android.core.parameters.Parameter param : droneParameters.values()) {
                 if (param.name != null) {
@@ -610,7 +610,7 @@ public class CommonApiUtils {
     public static void refreshParameters(MavLinkDrone drone) {
         if (drone == null)
             return;
-        drone.getParameters().refreshParameters();
+        drone.getParameterManager().refreshParameters();
     }
 
     public static void writeParameters(MavLinkDrone drone, Parameters parameters) {
@@ -620,7 +620,7 @@ public class CommonApiUtils {
         if (parametersList.isEmpty())
             return;
 
-        org.droidplanner.services.android.core.drone.profiles.Parameters droneParams = drone.getParameters();
+        ParameterManager droneParams = drone.getParameterManager();
         for (Parameter proxyParam : parametersList) {
             droneParams.sendParameter(new org.droidplanner.services.android.core.parameters.Parameter(proxyParam.getName(), proxyParam.getValue(), proxyParam.getType()));
         }

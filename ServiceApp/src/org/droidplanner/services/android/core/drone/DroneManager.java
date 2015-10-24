@@ -47,7 +47,7 @@ import org.droidplanner.services.android.core.drone.autopilot.apm.solo.ArduSolo;
 import org.droidplanner.services.android.core.drone.autopilot.generic.GenericMavLinkDrone;
 import org.droidplanner.services.android.core.drone.autopilot.px4.Px4Native;
 import org.droidplanner.services.android.core.drone.autopilot.apm.solo.SoloComp;
-import org.droidplanner.services.android.core.drone.profiles.Parameters;
+import org.droidplanner.services.android.core.drone.profiles.ParameterManager;
 import org.droidplanner.services.android.core.drone.variables.StreamRates;
 import org.droidplanner.services.android.core.drone.variables.calibration.MagnetometerCalibrationImpl;
 import org.droidplanner.services.android.core.firmware.FirmwareType;
@@ -168,9 +168,9 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
 
         drone.addDroneListener(this);
 
-        Parameters parameters = drone.getParameters();
-        if (parameters != null) {
-            parameters.setParameterListener(this);
+        ParameterManager parameterManager = drone.getParameterManager();
+        if (parameterManager != null) {
+            parameterManager.setParameterListener(this);
         }
 
         MagnetometerCalibrationImpl magnetometer = drone.getMagnetometerCalibration();
@@ -185,9 +185,9 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
 
         drone.removeDroneListener(this);
 
-        Parameters parameters = drone.getParameters();
-        if (parameters != null)
-            parameters.setParameterListener(null);
+        ParameterManager parameterManager = drone.getParameterManager();
+        if (parameterManager != null)
+            parameterManager.setParameterListener(null);
 
         MagnetometerCalibrationImpl magnetometer = drone.getMagnetometerCalibration();
         if (magnetometer != null)

@@ -379,7 +379,7 @@ public class Mission extends DroneVariable<GenericMavLinkDrone> {
     }
 
     private double getSpeedParameter(){
-        Parameter param = myDrone.getParameters().getParameter("WPNAV_SPEED");
+        Parameter param = myDrone.getParameterManager().getParameter("WPNAV_SPEED");
         if (param == null ) {
             return -1;
         }else{

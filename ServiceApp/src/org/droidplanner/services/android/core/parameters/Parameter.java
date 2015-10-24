@@ -26,14 +26,6 @@ public class Parameter implements Comparable<Parameter>, Serializable {
 		this(m_value.getParam_Id(), m_value.param_value, m_value.param_type);
 	}
 
-	public Parameter(String name, Double value) {
-		this(name, value, 0); // TODO Setting type to Zero may cause an error
-	}
-
-	public Parameter(String name) {
-		this(name, 0, 0); // TODO Setting type to Zero may cause an error
-	}
-
 	public String getValue() {
 		return format.format(value);
 	}

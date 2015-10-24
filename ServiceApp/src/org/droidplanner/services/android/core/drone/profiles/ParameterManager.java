@@ -2,6 +2,7 @@ package org.droidplanner.services.android.core.drone.profiles;
 
 import android.os.Handler;
 import android.text.TextUtils;
+import android.util.SparseBooleanArray;
 
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.common.msg_param_value;
@@ -27,9 +28,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * via the MAV link. The function processMessage must be called with every new
  * MAV Message.
  */
-public class Parameters extends DroneVariable implements OnDroneListener {
+public class ParameterManager extends DroneVariable implements OnDroneListener {
 
-    private static final int TIMEOUT = 1000; //milliseconds
+    private static final long TIMEOUT = 1000l; //milliseconds
 
     private final Runnable parametersReceiptStartNotification = new Runnable() {
         @Override
@@ -57,14 +58,14 @@ public class Parameters extends DroneVariable implements OnDroneListener {
 
     private int expectedParams;
 
-    private final Map<Integer, Boolean> paramsRollCall = new HashMap<>();
+    private final SparseBooleanArray paramsRollCall = new SparseBooleanArray();
     private final ConcurrentHashMap<String, Parameter> parameters = new ConcurrentHashMap<>();
 
     private DroneInterfaces.OnParameterManagerListener parameterListener;
 
     public final Handler watchdog;
 
-    public Parameters(MavLinkDrone myDrone, Handler handler) {
+    public ParameterManager(MavLinkDrone myDrone, Handler handler) {
         super(myDrone);
         this.watchdog = handler;
         myDrone.addDroneListener(this);
@@ -106,12 +107,12 @@ public class Parameters extends DroneVariable implements OnDroneListener {
         return false;
     }
 
-    private void processReceivedParam(msg_param_value m_value) {
+    protected void processReceivedParam(msg_param_value m_value) {
         // collect params in parameter list
         Parameter param = new Parameter(m_value);
 
         parameters.put(param.name.toLowerCase(Locale.US), param);
-        final int paramIndex = m_value.param_index;
+        int paramIndex = m_value.param_index;
         if (paramIndex == -1) {
             // update listener
             notifyParameterReceipt(param, 0, 1);
@@ -120,7 +121,7 @@ public class Parameters extends DroneVariable implements OnDroneListener {
             return;
         }
 
-        paramsRollCall.put(paramIndex, true);
+        paramsRollCall.append(paramIndex, true);
         expectedParams = m_value.param_count;
 
         // update listener
@@ -139,8 +140,7 @@ public class Parameters extends DroneVariable implements OnDroneListener {
 
     private void reRequestMissingParams(int howManyParams) {
         for (int i = 0; i < howManyParams; i++) {
-            Boolean isPresent = paramsRollCall.get(i);
-            if (isPresent == null || !isPresent) {
+            if (!paramsRollCall.get(i)) {
                 MavLinkParameters.readParameter(myDrone, i);
             }
         }

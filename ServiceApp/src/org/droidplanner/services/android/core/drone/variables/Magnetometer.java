@@ -41,9 +41,9 @@ public class Magnetometer extends DroneVariable {
 	}
 
 	public int[] getOffsets() {
-		Parameter paramX = myDrone.getParameters().getParameter("COMPASS_OFS_X");
-		Parameter paramY = myDrone.getParameters().getParameter("COMPASS_OFS_Y");
-		Parameter paramZ = myDrone.getParameters().getParameter("COMPASS_OFS_Z");
+		Parameter paramX = myDrone.getParameterManager().getParameter("COMPASS_OFS_X");
+		Parameter paramY = myDrone.getParameterManager().getParameter("COMPASS_OFS_Y");
+		Parameter paramZ = myDrone.getParameterManager().getParameter("COMPASS_OFS_Z");
 		if (paramX == null || paramY == null || paramZ == null) {
 			return null;
 		}

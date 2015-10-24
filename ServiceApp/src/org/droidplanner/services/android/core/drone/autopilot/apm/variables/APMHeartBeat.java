@@ -12,7 +12,7 @@ import org.droidplanner.services.android.core.drone.variables.HeartBeat;
  */
 public class APMHeartBeat extends HeartBeat {
 
-    private static final long HEARTBEAT_IMU_CALIBRATION_TIMEOUT = 35000; //ms
+    private static final long HEARTBEAT_IMU_CALIBRATION_TIMEOUT = 35000l; //ms
 
     protected static final int IMU_CALIBRATION = 3;
 
