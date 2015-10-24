@@ -43,7 +43,7 @@ import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.core.drone.autopilot.apm.ArduCopter;
 import org.droidplanner.services.android.core.drone.autopilot.apm.ArduPlane;
 import org.droidplanner.services.android.core.drone.autopilot.apm.ArduRover;
-import org.droidplanner.services.android.core.drone.autopilot.apm.ArduSolo;
+import org.droidplanner.services.android.core.drone.autopilot.apm.solo.ArduSolo;
 import org.droidplanner.services.android.core.drone.autopilot.generic.GenericMavLinkDrone;
 import org.droidplanner.services.android.core.drone.autopilot.px4.Px4Native;
 import org.droidplanner.services.android.core.drone.autopilot.apm.solo.SoloComp;

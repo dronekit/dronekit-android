@@ -12,7 +12,7 @@ import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
 import com.o3dr.services.android.lib.model.ICommandListener;
 
 import org.droidplanner.services.android.core.drone.autopilot.Drone;
-import org.droidplanner.services.android.core.drone.autopilot.apm.ArduSolo;
+import org.droidplanner.services.android.core.drone.autopilot.apm.solo.ArduSolo;
 import org.droidplanner.services.android.core.drone.autopilot.apm.solo.SoloComp;
 
 import timber.log.Timber;
