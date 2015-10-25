@@ -39,6 +39,8 @@ import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.drone.mission.action.MissionActions;
 import com.o3dr.services.android.lib.drone.property.DroneAttribute;
+import com.o3dr.services.android.lib.drone.property.Parameter;
+import com.o3dr.services.android.lib.drone.property.Parameters;
 import com.o3dr.services.android.lib.gcs.action.CalibrationActions;
 import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
 import com.o3dr.services.android.lib.model.AbstractCommandListener;
@@ -68,9 +70,9 @@ import org.droidplanner.services.android.core.drone.variables.calibration.AccelC
 import org.droidplanner.services.android.core.drone.variables.calibration.MagnetometerCalibrationImpl;
 import org.droidplanner.services.android.core.mission.Mission;
 import org.droidplanner.services.android.core.model.AutopilotWarningParser;
-import org.droidplanner.services.android.core.parameters.Parameter;
 import org.droidplanner.services.android.utils.CommonApiUtils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -102,24 +104,18 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
     private final LogMessageListener logListener;
     private final MagnetometerCalibrationImpl magCalibration;
 
-    private final Context context;
-
-    /**
-     * Used to store parameter metadata since it's expensive to load that metadata from the xml assets file.
-     */
-    private final Map<String, com.o3dr.services.android.lib.drone.property.Parameter> cachedParameters = new HashMap<>();
-
     public ArduPilot(Context context, MAVLinkStreams.MAVLinkOutputStream mavClient,
                      Handler handler, Preferences pref, AutopilotWarningParser warningParser,
                      LogMessageListener logListener, DroneInterfaces.AttributeEventListener listener) {
 
         super(handler, mavClient, warningParser, listener);
 
-        this.context = context;
         this.preferences = pref;
         this.logListener = logListener;
 
-        parameterManager = new ParameterManager(this, handler);
+        loadVehicleProfile();
+
+        parameterManager = new ParameterManager(this, context, handler);
         this.waypointManager = new WaypointManager(this, handler);
 
         rc = new RC(this);
@@ -130,8 +126,6 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
         this.magCalibration = new MagnetometerCalibrationImpl(this);
         this.mag = new Magnetometer(this);
         this.footprints = new Camera(this);
-
-        loadVehicleProfile();
     }
 
     @Override
@@ -241,9 +235,6 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
         if (!TextUtils.isEmpty(attributeType)) {
             switch (attributeType) {
 
-                case AttributeType.PARAMETERS:
-                    return CommonApiUtils.getParameters(this, context, cachedParameters);
-
                 case AttributeType.MISSION:
                     return CommonApiUtils.getMission(this);
 
@@ -352,12 +343,12 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
 
                 //Retrieve the horizontal speed value
                 Parameter horizSpeedParam = parameterManager.getParameter("WPNAV_SPEED");
-                double horizontalSpeed = horizSpeedParam == null ? defaultSpeed : horizSpeedParam.value / 100;
+                double horizontalSpeed = horizSpeedParam == null ? defaultSpeed : horizSpeedParam.getValue() / 100;
 
                 //Retrieve the vertical speed value.
                 String vertSpeedParamName = normalizedZVel >= 0 ? "WPNAV_SPEED_UP" : "WPNAV_SPEED_DN";
                 Parameter vertSpeedParam = parameterManager.getParameter(vertSpeedParamName);
-                double verticalSpeed = vertSpeedParam == null ? defaultSpeed : vertSpeedParam.value / 100;
+                double verticalSpeed = vertSpeedParam == null ? defaultSpeed : vertSpeedParam.getValue() / 100;
 
                 MavLinkCommands.setVelocityInLocalFrame(this, (float) (normalizedXVel * horizontalSpeed),
                         (float) (normalizedYVel * horizontalSpeed),
@@ -679,7 +670,7 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
         if (battCap == null || battRemain == -1) {
             return null;
         }
-        return (1 - battRemain / 100.0) * battCap.value;
+        return (1 - battRemain / 100.0) * battCap.getValue();
     }
 
     @Override

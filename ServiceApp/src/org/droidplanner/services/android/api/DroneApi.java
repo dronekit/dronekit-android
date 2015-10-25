@@ -12,17 +12,18 @@ import android.view.Surface;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.ardupilotmega.msg_mag_cal_progress;
 import com.MAVLink.ardupilotmega.msg_mag_cal_report;
+import com.o3dr.services.android.lib.drone.action.CameraActions;
 import com.o3dr.services.android.lib.drone.action.ConnectionActions;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
-import com.o3dr.services.android.lib.drone.action.CameraActions;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionResult;
 import com.o3dr.services.android.lib.drone.connection.DroneSharePrefs;
 import com.o3dr.services.android.lib.drone.mission.action.MissionActions;
 import com.o3dr.services.android.lib.drone.property.DroneAttribute;
+import com.o3dr.services.android.lib.drone.property.Parameter;
 import com.o3dr.services.android.lib.gcs.event.GCSEvent;
 import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
 import com.o3dr.services.android.lib.model.IApiListener;
@@ -32,14 +33,12 @@ import com.o3dr.services.android.lib.model.IMavlinkObserver;
 import com.o3dr.services.android.lib.model.IObserver;
 import com.o3dr.services.android.lib.model.action.Action;
 
+import org.droidplanner.services.android.core.drone.DroneEventsListener;
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
-import org.droidplanner.services.android.core.drone.autopilot.Drone;
-import org.droidplanner.services.android.core.drone.variables.calibration.AccelCalibration;
-import org.droidplanner.services.android.core.parameters.Parameter;
 import org.droidplanner.services.android.core.drone.DroneManager;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
+import org.droidplanner.services.android.core.drone.variables.calibration.AccelCalibration;
 import org.droidplanner.services.android.exception.ConnectionException;
-import org.droidplanner.services.android.core.drone.DroneEventsListener;
 import org.droidplanner.services.android.utils.CommonApiUtils;
 import org.droidplanner.services.android.utils.video.VideoManager;
 
@@ -87,7 +86,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     }
 
     @Override
-    public int getApiVersionCode(){
+    public int getApiVersionCode() {
         try {
             return apiListener.getApiVersionCode();
         } catch (RemoteException e) {
@@ -98,7 +97,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     }
 
     @Override
-    public int getClientVersionCode(){
+    public int getClientVersionCode() {
         try {
             return apiListener.getClientVersionCode();
         } catch (RemoteException e) {
@@ -133,8 +132,8 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
         return this.droneMgr;
     }
 
-    private MavLinkDrone getDrone(){
-        if(this.droneMgr == null)
+    private MavLinkDrone getDrone() {
+        if (this.droneMgr == null)
             return null;
 
         return this.droneMgr.getDrone();
@@ -144,13 +143,13 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     public Bundle getAttribute(String type) throws RemoteException {
         final Bundle carrier = new Bundle();
 
-        switch(type){
+        switch (type) {
             case AttributeType.CAMERA:
                 carrier.putParcelable(type, CommonApiUtils.getCameraProxy(getDrone(), service.getCameraDetails()));
-            break;
+                break;
 
             default:
-                if(droneMgr != null) {
+                if (droneMgr != null) {
                     final DroneAttribute attribute = droneMgr.getAttribute(type);
                     if (attribute != null)
                         carrier.putParcelable(type, attribute);
@@ -254,7 +253,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 final String videoTag = data.getString(CameraActions.EXTRA_VIDEO_TAG, "");
 
                 Bundle videoProps = data.getBundle(CameraActions.EXTRA_VIDEO_PROPERTIES);
-                if(videoProps == null){
+                if (videoProps == null) {
                     //Only case where it's null is when interacting with a deprecated client version.
                     //In this case, we assume that the client is attempting to start a solo stream, since that's
                     //the only api that was exposed.
@@ -278,9 +277,9 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 break;
 
             default:
-                if(droneMgr != null) {
+                if (droneMgr != null) {
                     droneMgr.executeAsyncAction(action, listener);
-                }else {
+                } else {
                     CommonApiUtils.postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
                 }
                 break;
@@ -590,8 +589,8 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
         Bundle paramsBundle = new Bundle(4);
         paramsBundle.putInt(AttributeEventExtra.EXTRA_PARAMETER_INDEX, index);
         paramsBundle.putInt(AttributeEventExtra.EXTRA_PARAMETERS_COUNT, count);
-        paramsBundle.putString(AttributeEventExtra.EXTRA_PARAMETER_NAME, parameter.name);
-        paramsBundle.putDouble(AttributeEventExtra.EXTRA_PARAMETER_VALUE, parameter.value);
+        paramsBundle.putString(AttributeEventExtra.EXTRA_PARAMETER_NAME, parameter.getName());
+        paramsBundle.putDouble(AttributeEventExtra.EXTRA_PARAMETER_VALUE, parameter.getValue());
         notifyAttributeUpdate(AttributeEvent.PARAMETER_RECEIVED, paramsBundle);
     }
 

@@ -30,6 +30,8 @@ import com.o3dr.services.android.lib.drone.property.Battery;
 import com.o3dr.services.android.lib.drone.property.DroneAttribute;
 import com.o3dr.services.android.lib.drone.property.Gps;
 import com.o3dr.services.android.lib.drone.property.Home;
+import com.o3dr.services.android.lib.drone.property.Parameter;
+import com.o3dr.services.android.lib.drone.property.Parameters;
 import com.o3dr.services.android.lib.drone.property.Signal;
 import com.o3dr.services.android.lib.drone.property.Speed;
 import com.o3dr.services.android.lib.drone.property.VehicleMode;
@@ -45,16 +47,15 @@ import org.droidplanner.services.android.core.drone.DroneEvents;
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.core.drone.autopilot.apm.APMConstants;
+import org.droidplanner.services.android.core.drone.profiles.ParameterManager;
 import org.droidplanner.services.android.core.drone.variables.HeartBeat;
 import org.droidplanner.services.android.core.drone.variables.State;
 import org.droidplanner.services.android.core.drone.variables.StreamRates;
 import org.droidplanner.services.android.core.drone.variables.Type;
 import org.droidplanner.services.android.core.firmware.FirmwareType;
 import org.droidplanner.services.android.core.model.AutopilotWarningParser;
-import org.droidplanner.services.android.core.parameters.Parameter;
 import org.droidplanner.services.android.utils.CommonApiUtils;
 import org.droidplanner.services.android.utils.video.VideoManager;
-import org.droidplanner.services.android.core.drone.profiles.ParameterManager;
 
 /**
  * Base drone implementation.
@@ -78,6 +79,7 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
 
     private final Home vehicleHome = new Home();
     private final Gps vehicleGps = new Gps();
+    private final Parameters parameters = new Parameters();
     protected final Altitude altitude = new Altitude();
     protected final Speed speed = new Speed();
     protected final Battery battery = new Battery();
@@ -102,7 +104,7 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
         this.videoMgr = new VideoManager(handler);
     }
 
-    protected HeartBeat initHeartBeat(Handler handler){
+    protected HeartBeat initHeartBeat(Handler handler) {
         return new HeartBeat(this, handler);
     }
 
@@ -228,10 +230,10 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
                 float turnSpeed = 2; //default turn speed.
 
                 ParameterManager parameterManager = getParameterManager();
-                if(parameterManager != null){
+                if (parameterManager != null) {
                     Parameter turnSpeedParam = parameterManager.getParameter("ACRO_YAW_P");
-                    if(turnSpeedParam != null){
-                        turnSpeed = (float) turnSpeedParam.value;
+                    if (turnSpeedParam != null) {
+                        turnSpeed = (float) turnSpeedParam.getValue();
                     }
                 }
 
@@ -296,6 +298,14 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
 
             case AttributeType.HOME:
                 return vehicleHome;
+
+            case AttributeType.PARAMETERS:
+                ParameterManager paramMgr = getParameterManager();
+                if (paramMgr != null) {
+                    parameters.setParametersList(paramMgr.getParameters().values());
+                }
+
+                return parameters;
         }
 
         return null;
@@ -366,7 +376,7 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
         }
     }
 
-    public void processHomeUpdate(msg_mission_item missionItem){
+    public void processHomeUpdate(msg_mission_item missionItem) {
         if (missionItem.seq != APMConstants.HOME_WAYPOINT_INDEX) {
             return;
         }
@@ -377,14 +387,13 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
         boolean homeUpdated = false;
 
         LatLongAlt homeCoord = vehicleHome.getCoordinate();
-        if(homeCoord == null){
+        if (homeCoord == null) {
             vehicleHome.setCoordinate(new LatLongAlt(latitude, longitude, altitude));
             homeUpdated = true;
-        }
-        else{
-            if(homeCoord.getLatitude() != latitude
+        } else {
+            if (homeCoord.getLatitude() != latitude
                     || homeCoord.getLongitude() != longitude
-                    || homeCoord.getAltitude() != altitude){
+                    || homeCoord.getAltitude() != altitude) {
                 homeCoord.setLatitude(latitude);
                 homeCoord.setLongitude(longitude);
                 homeCoord.setAltitude(altitude);
@@ -392,7 +401,7 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
             }
         }
 
-        if(homeUpdated){
+        if (homeUpdated) {
             notifyDroneEvent(DroneInterfaces.DroneEventsType.HOME);
         }
     }

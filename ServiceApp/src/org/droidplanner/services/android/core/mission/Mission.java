@@ -12,6 +12,7 @@ import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.property.Attitude;
 import com.o3dr.services.android.lib.drone.property.Gps;
 import com.o3dr.services.android.lib.drone.property.Home;
+import com.o3dr.services.android.lib.drone.property.Parameter;
 
 import org.droidplanner.services.android.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.services.android.core.drone.DroneVariable;
@@ -34,7 +35,6 @@ import org.droidplanner.services.android.core.mission.waypoints.RegionOfInterest
 import org.droidplanner.services.android.core.mission.waypoints.SpatialCoordItem;
 import org.droidplanner.services.android.core.mission.waypoints.SplineWaypointImpl;
 import org.droidplanner.services.android.core.mission.waypoints.WaypointImpl;
-import org.droidplanner.services.android.core.parameters.Parameter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -383,7 +383,7 @@ public class Mission extends DroneVariable<GenericMavLinkDrone> {
         if (param == null ) {
             return -1;
         }else{
-            return (param.value/100);
+            return (param.getValue()/100);
         }
 
     }
