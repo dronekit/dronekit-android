@@ -271,6 +271,11 @@
                     android:text="Stop streaming"/>
 
             </LinearLayout>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:id="@+id/video_stream_stats"
+                    android:visibility="invisible"/>
                 <TextureView
                     android:id="@+id/video_content"
                     android:layout_width="match_parent"

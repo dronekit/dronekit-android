@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.view.Surface;
 
 import com.o3dr.android.client.Drone;
+import com.o3dr.android.client.VideoStreamObserver;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.model.AbstractCommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
@@ -65,14 +66,16 @@ public class CameraApi extends Api {
      * @param listener Register a callback to receive update of the command execution status.
      * @since 2.6.8
      */
-    public void startVideoStream(@NonNull final Surface surface, final String tag, @NonNull Bundle videoProps, final AbstractCommandListener listener) {
-        if (surface == null || videoProps == null) {
+    public void startVideoStream(final Surface surface, final String tag, @NonNull Bundle videoProps, final AbstractCommandListener listener) {
+        if (videoProps == null) {
             postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
             return;
         }
 
         final Bundle params = new Bundle();
-        params.putParcelable(EXTRA_VIDEO_DISPLAY, surface);
+        if (surface != null) {
+            params.putParcelable(EXTRA_VIDEO_DISPLAY, surface);
+        }
         params.putString(EXTRA_VIDEO_TAG, tag);
         params.putBundle(EXTRA_VIDEO_PROPERTIES, videoProps);
 
@@ -91,4 +94,23 @@ public class CameraApi extends Api {
         params.putString(EXTRA_VIDEO_TAG, tag);
         drone.performAsyncActionOnDroneThread(new Action(ACTION_STOP_VIDEO_STREAM, params), listener);
     }
+
+    /**
+     * Register an observer on the video stream
+     * @param observer Register an observer on the stream which will receive each video packet
+     */
+    public void addVideoStreamObserver(VideoStreamObserver observer)
+    {
+        drone.addVideoStreamObserver(observer);
+    }
+
+    /**
+     * Unregister an observer on the video stream
+     * @param observer Unregister an observer on the stream which will receive each video packet
+     */
+    public void removeVideoStreamObserver(VideoStreamObserver observer)
+    {
+        drone.removeVideoStreamObserver(observer);
+    }
+
 }

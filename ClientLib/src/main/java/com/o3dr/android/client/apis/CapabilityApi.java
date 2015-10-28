@@ -56,6 +56,29 @@ public class CapabilityApi extends Api {
         this.drone = drone;
     }
 
+    private void checkDroneFeatureSupport(final String featureId, final FeatureSupportListener resultListener)
+    {
+        final Bundle params = new Bundle();
+        params.putString(EXTRA_FEATURE_ID, featureId);
+        drone.performAsyncActionOnDroneThread(new Action(ACTION_CHECK_FEATURE_SUPPORT, params),
+                                              new AbstractCommandListener() {
+                                                  @Override
+                                                  public void onSuccess() {
+                                                      resultListener.onFeatureSupportResult(featureId, FEATURE_SUPPORTED, null);
+                                                  }
+
+                                                  @Override
+                                                  public void onError(int executionError) {
+                                                      resultListener.onFeatureSupportResult(featureId, FEATURE_UNSUPPORTED, null);
+                                                  }
+
+                                                  @Override
+                                                  public void onTimeout() {
+                                                      //TODO: figure out if that's the correct thing to do.
+                                                      resultListener.onFeatureSupportResult(featureId, FEATURE_UNSUPPORTED, null);
+                                                  }
+                                              });
+    }
     /**
      * Determine whether the given feature is supported.
      * @param featureId Id of the feature to check.
@@ -85,6 +108,9 @@ public class CapabilityApi extends Api {
                     });
                 break;
 
+            case FeatureIds.SOLO_VIDEO_STREAMING_TO_OBSERVER:
+                checkDroneFeatureSupport(FeatureIds.SOLO_VIDEO_STREAMING, resultListener);
+                break;
             case FeatureIds.SOLO_VIDEO_STREAMING:
                 if(Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2) {
                     drone.post(new Runnable() {
@@ -98,26 +124,7 @@ public class CapabilityApi extends Api {
             //********FALL THROUGH ***********//
             case FeatureIds.COMPASS_CALIBRATION:
             case FeatureIds.KILL_SWITCH:
-                final Bundle params = new Bundle();
-                params.putString(EXTRA_FEATURE_ID, featureId);
-                drone.performAsyncActionOnDroneThread(new Action(ACTION_CHECK_FEATURE_SUPPORT, params),
-                        new AbstractCommandListener() {
-                    @Override
-                    public void onSuccess() {
-                        resultListener.onFeatureSupportResult(featureId, FEATURE_SUPPORTED, null);
-                    }
-
-                    @Override
-                    public void onError(int executionError) {
-                        resultListener.onFeatureSupportResult(featureId, FEATURE_UNSUPPORTED, null);
-                    }
-
-                    @Override
-                    public void onTimeout() {
-                        //TODO: figure out if that's the correct thing to do.
-                        resultListener.onFeatureSupportResult(featureId, FEATURE_UNSUPPORTED, null);
-                    }
-                });
+                checkDroneFeatureSupport(featureId, resultListener);
                 break;
 
             default:
@@ -140,6 +147,11 @@ public class CapabilityApi extends Api {
          * Id for the video feature.
          */
         public static final String SOLO_VIDEO_STREAMING = "feature_solo_video_streaming";
+
+        /**
+         * Id for the video feature.
+         */
+        public static final String SOLO_VIDEO_STREAMING_TO_OBSERVER = "feature_solo_video_streaming_to_observer";
 
         /**
          * Id for the compass calibration feature.

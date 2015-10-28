@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.o3dr.android.client.ControlTower;
 import com.o3dr.android.client.Drone;
+import com.o3dr.android.client.VideoStreamObserver;
 import com.o3dr.android.client.apis.ControlApi;
 import com.o3dr.android.client.apis.solo.SoloCameraApi;
 import com.o3dr.android.client.apis.VehicleApi;
@@ -29,6 +30,7 @@ import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.companion.solo.SoloAttributes;
 import com.o3dr.services.android.lib.drone.companion.solo.SoloState;
+import com.o3dr.services.android.lib.drone.companion.solo.video.VideoPacket;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionResult;
 import com.o3dr.services.android.lib.drone.connection.ConnectionType;
@@ -491,7 +493,51 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
         });
     }
 
+    private VideoStreamObserver videoStreamObserver = null;
     private void startVideoStream(Surface videoSurface){
+        videoStreamObserver = new VideoStreamObserver()
+        {
+            private int packetCount = 0;
+            private int byteCount = 0;
+            @Override
+            public void onVideoPacketReceived(VideoPacket videoPacket)
+            {
+                byteCount += videoPacket.size();
+                final TextView tv = ((TextView)findViewById(R.id.video_stream_stats));
+                tv.post(new Runnable()
+                {
+                    // http://stackoverflow.com/questions/3758606/how-to-convert-byte-size-into-human-readable-format-in-java
+                    public String humanReadableByteCount(long bytes, boolean si) {
+                        int unit = si ? 1000 : 1024;
+                        if (bytes < unit) return bytes + " B";
+                        int exp = (int) (Math.log(bytes) / Math.log(unit));
+                        String pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp-1) + (si ? "" : "i");
+                        return String.format("%.3f %sB", bytes / Math.pow(unit, exp), pre);
+                    }
+                    @Override
+                    public void run()
+                    {
+                        tv.setText(String.format("Packets: %d, Bytes: %s", packetCount++, humanReadableByteCount(byteCount, false)));
+                    }
+                });
+            }
+        };
+        SoloCameraApi.getApi(drone).addVideoStreamObserver(videoStreamObserver, new AbstractCommandListener() {
+            @Override
+            public void onSuccess()  {
+                findViewById(R.id.video_stream_stats).setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onError(int executionError) {
+                alertUser("Error while registering video stream observer: " + executionError);
+            }
+
+            @Override
+            public void onTimeout() {
+                alertUser("Timed out while attempting to register video stream observer.");
+            }
+        });
         SoloCameraApi.getApi(drone).startVideoStream(videoSurface, new AbstractCommandListener() {
             @Override
             public void onSuccess() {
@@ -523,6 +569,22 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
 
                 if(startVideoStream != null)
                     startVideoStream.setEnabled(true);
+            }
+        });
+        SoloCameraApi.getApi(drone).removeVideoStreamObserver(videoStreamObserver, new AbstractCommandListener() {
+            @Override
+            public void onSuccess() {
+                findViewById(R.id.video_stream_stats).setVisibility(View.INVISIBLE);
+            }
+
+            @Override
+            public void onError(int executionError) {
+                alertUser("Error while unregistering video stream observer: " + executionError);
+            }
+
+            @Override
+            public void onTimeout() {
+                alertUser("Timed out while attempting to unregister video stream observer.");
             }
         });
     }

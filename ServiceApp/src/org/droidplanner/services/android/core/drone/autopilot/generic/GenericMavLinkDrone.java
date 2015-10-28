@@ -124,6 +124,9 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
     public void stopVideoStream(String appId, String currentVideoTag, final ICommandListener listener) {
         videoMgr.stopVideoStream(appId, currentVideoTag, listener);
     }
+    public void setVideoStreamListener(VideoManager.VideoStreamListener listener) {
+        videoMgr.setVideoStreamListener(listener);
+    }
 
     /**
      * Stops the video stream if the current owner is the passed argument.

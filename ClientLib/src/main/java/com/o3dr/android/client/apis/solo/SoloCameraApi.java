@@ -5,6 +5,7 @@ import android.view.Surface;
 
 import com.o3dr.android.client.Drone;
 import com.o3dr.android.client.apis.CameraApi;
+import com.o3dr.android.client.VideoStreamObserver;
 import com.o3dr.android.client.apis.CapabilityApi;
 import com.o3dr.services.android.lib.drone.action.CameraActions;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
@@ -133,28 +134,100 @@ public class SoloCameraApi extends SoloApi {
 
     private void sendVideoRecordingCommand(@SoloGoproConstants.RecordCommand final int recordCommand, final AbstractCommandListener listener) {
         //Set the gopro to video mode
-        switchCameraCaptureMode(SoloGoproConstants.CAPTURE_MODE_VIDEO, new AbstractCommandListener() {
+        switchCameraCaptureMode(SoloGoproConstants.CAPTURE_MODE_VIDEO, new AbstractCommandListener()
+        {
             @Override
-            public void onSuccess() {
+            public void onSuccess()
+            {
                 //Send the command to toggle video recording
                 final SoloGoproRecord videoToggle = new SoloGoproRecord(recordCommand);
                 sendMessage(videoToggle, listener);
             }
 
             @Override
-            public void onError(int executionError) {
-                if (listener != null) {
+            public void onError(int executionError)
+            {
+                if (listener != null)
+                {
                     listener.onError(executionError);
                 }
             }
 
             @Override
-            public void onTimeout() {
-                if (listener != null) {
+            public void onTimeout()
+            {
+                if (listener != null)
+                {
                     listener.onTimeout();
                 }
             }
         });
+    }
+
+    /**
+     * Adds a video stream observer.
+     *
+     * @param observer The observer to register. It's onVideoPacketReceived method is called with the raw (presumably H264) video data.
+     */
+    public void addVideoStreamObserver(final VideoStreamObserver observer, final AbstractCommandListener listener)
+    {
+        capabilityChecker.checkFeatureSupport(CapabilityApi.FeatureIds.SOLO_VIDEO_STREAMING_TO_OBSERVER,
+                                              new CapabilityApi.FeatureSupportListener()
+                                              {
+                                                  @Override
+                                                  public void onFeatureSupportResult(String featureId, int result, Bundle resultInfo)
+                                                  {
+                                                      switch (result)
+                                                      {
+
+                                                          case CapabilityApi.FEATURE_SUPPORTED:
+                                                              cameraApi.addVideoStreamObserver(observer);
+                                                              listener.onSuccess();
+                                                              break;
+
+                                                          case CapabilityApi.FEATURE_UNSUPPORTED:
+                                                              postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
+                                                              break;
+
+                                                          default:
+                                                              postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
+                                                              break;
+                                                      }
+                                                  }
+                                              });
+    }
+
+    /**
+     * Removes a video stream observer.
+     *
+     * @param observer The observer to unregister. It's onVideoPacketReceived method is called with the raw (presumably H264) video data.
+     */
+    public void removeVideoStreamObserver(final VideoStreamObserver observer, final AbstractCommandListener listener)
+    {
+        capabilityChecker.checkFeatureSupport(CapabilityApi.FeatureIds.SOLO_VIDEO_STREAMING_TO_OBSERVER,
+                                              new CapabilityApi.FeatureSupportListener()
+                                              {
+                                                  @Override
+                                                  public void onFeatureSupportResult(String featureId, int result, Bundle resultInfo)
+                                                  {
+                                                      switch (result)
+                                                      {
+
+                                                          case CapabilityApi.FEATURE_SUPPORTED:
+                                                              cameraApi.removeVideoStreamObserver(observer);
+                                                              listener.onSuccess();
+                                                              break;
+
+                                                          case CapabilityApi.FEATURE_UNSUPPORTED:
+                                                              postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
+                                                              break;
+
+                                                          default:
+                                                              postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
+                                                              break;
+                                                      }
+                                                  }
+                                              });
     }
 
     /**
@@ -173,7 +246,10 @@ public class SoloCameraApi extends SoloApi {
             return;
         }
 
-        capabilityChecker.checkFeatureSupport(CapabilityApi.FeatureIds.SOLO_VIDEO_STREAMING,
+        final String featureRequired = (surface == null)
+                                       ? CapabilityApi.FeatureIds.SOLO_VIDEO_STREAMING_TO_OBSERVER
+                                       : CapabilityApi.FeatureIds.SOLO_VIDEO_STREAMING;
+        capabilityChecker.checkFeatureSupport(featureRequired,
                 new CapabilityApi.FeatureSupportListener() {
                     @Override
                     public void onFeatureSupportResult(String featureId, int result, Bundle resultInfo) {
@@ -231,7 +307,7 @@ public class SoloCameraApi extends SoloApi {
      * @since 2.5.0
      */
     public void stopVideoStream(final String tag, final AbstractCommandListener listener) {
-        capabilityChecker.checkFeatureSupport(CapabilityApi.FeatureIds.SOLO_VIDEO_STREAMING,
+        capabilityChecker.checkFeatureSupport(CapabilityApi.FeatureIds.SOLO_VIDEO_STREAMING_TO_OBSERVER,
                 new CapabilityApi.FeatureSupportListener() {
                     @Override
                     public void onFeatureSupportResult(String featureId, int result, Bundle resultInfo) {

@@ -3,6 +3,7 @@ package com.o3dr.services.android.lib.model;
 
 import com.o3dr.services.android.lib.model.IObserver;
 import com.o3dr.services.android.lib.model.IMavlinkObserver;
+import com.o3dr.services.android.lib.model.IVideoStreamObserver;
 import com.o3dr.services.android.lib.model.action.Action;
 import com.o3dr.services.android.lib.model.ICommandListener;
 
@@ -56,6 +57,19 @@ interface IDroneApi {
     * @param observer the observer to remove.
     */
     oneway void removeMavlinkObserver(IMavlinkObserver observer);
+
+    /**
+    * Register a listener to receive encoded video data.
+    * @param observer the observer to register.
+    */
+    oneway void addVideoStreamObserver(IVideoStreamObserver observer);
+
+    /**
+    * Removes an encoded video data listener.
+    * @param observer the observer to remove.
+    */
+    oneway void removeVideoStreamObserver(IVideoStreamObserver observer);
+
 
     /**
     * Performs an action among the set exposed by the api.

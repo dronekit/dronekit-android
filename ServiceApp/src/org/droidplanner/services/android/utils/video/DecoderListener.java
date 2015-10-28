@@ -7,7 +7,11 @@ public interface DecoderListener {
 
     void onDecodingStarted();
 
+    boolean wantDecoderInput();
+
     void onDecodingError();
+
+    void onDecoderInput(byte[] bytes, int validLength);
 
     void onDecodingEnded();
 

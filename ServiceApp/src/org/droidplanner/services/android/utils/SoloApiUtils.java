@@ -11,6 +11,7 @@ import com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControl
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSettingSetter;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
 import com.o3dr.services.android.lib.model.ICommandListener;
+import com.o3dr.services.android.lib.model.IVideoStreamObserver;
 
 import org.droidplanner.services.android.core.drone.DroneManager;
 import org.droidplanner.services.android.core.drone.autopilot.Drone;
@@ -116,5 +117,4 @@ public class SoloApiUtils {
         final SoloComp soloComp = arduSolo.getSoloComp();
         soloComp.updateEUTxPowerCompliance(isCompliant, listener);
     }
-
 }

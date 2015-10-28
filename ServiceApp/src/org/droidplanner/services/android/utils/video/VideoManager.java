@@ -12,6 +12,7 @@ import com.o3dr.android.client.utils.connection.IpConnectionListener;
 import com.o3dr.android.client.utils.connection.UdpConnection;
 import com.o3dr.services.android.lib.drone.action.CameraActions;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
+import com.o3dr.services.android.lib.drone.companion.solo.video.VideoPacket;
 import com.o3dr.services.android.lib.model.ICommandListener;
 
 import java.io.IOException;
@@ -26,6 +27,10 @@ import timber.log.Timber;
  */
 public class VideoManager implements IpConnectionListener {
 
+    public interface VideoStreamListener
+    {
+        void onVideoPacketReceived(final VideoPacket packet);
+    }
     private static final String TAG = VideoManager.class.getSimpleName();
 
     private static final String NO_VIDEO_OWNER = "no_video_owner";
@@ -34,6 +39,13 @@ public class VideoManager implements IpConnectionListener {
 
     public static final int ARTOO_UDP_PORT = 5600;
     private static final int UDP_BUFFER_SIZE = 1500;
+
+    volatile VideoStreamListener videoListener;
+
+    public void setVideoStreamListener(VideoStreamListener listener)
+    {
+        videoListener = listener;
+    }
 
     public interface LinkListener {
         void onLinkConnected();
@@ -74,7 +86,7 @@ public class VideoManager implements IpConnectionListener {
         start(udpPort, null);
 
         final Surface currentSurface = mediaCodecManager.getSurface();
-        if (surface == currentSurface) {
+        if (surface == currentSurface && surface != null) {
             if (listener != null)
                 listener.onDecodingStarted();
             return;
@@ -88,7 +100,18 @@ public class VideoManager implements IpConnectionListener {
             }
 
             @Override
+            public boolean wantDecoderInput()
+            {
+                return false;
+            }
+
+            @Override
             public void onDecodingError() {
+            }
+
+            @Override
+            public void onDecoderInput(byte[] bytes, int validLength) {
+
             }
 
             @Override
@@ -241,6 +264,10 @@ public class VideoManager implements IpConnectionListener {
         return true;
     }
 
+    private boolean isVideoStreamObserved() {
+        return videoListener != null;
+    }
+
     public void startVideoStream(Bundle videoProps, String appId, String newVideoTag, Surface videoSurface, final ICommandListener listener){
         Timber.d("Video stream start request from %s. Video owner is %s.", appId, videoOwnerId.get());
         if(TextUtils.isEmpty(appId)){
@@ -249,7 +276,7 @@ public class VideoManager implements IpConnectionListener {
         }
 
         final int udpPort = videoProps.getInt(CameraActions.EXTRA_VIDEO_PROPS_UDP_PORT, -1);
-        if(videoSurface == null || udpPort == -1){
+        if((videoSurface == null && !isVideoStreamObserved()) || udpPort == -1){
             postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
             return;
         }
@@ -273,6 +300,16 @@ public class VideoManager implements IpConnectionListener {
 
             Timber.i("Starting video decoding.");
             startDecoding(udpPort, videoSurface, new DecoderListener() {
+
+                @Override
+                public boolean wantDecoderInput() {
+                    return isVideoStreamObserved();
+                }
+
+                @Override
+                public void onDecoderInput(byte[] bytes, int validLength) {
+                    videoListener.onVideoPacketReceived(new VideoPacket(bytes, validLength));
+                }
 
                 @Override
                 public void onDecodingStarted() {
@@ -331,8 +368,17 @@ public class VideoManager implements IpConnectionListener {
                 }
 
                 @Override
+                public boolean wantDecoderInput() {
+                    return false;
+                }
+
+                @Override
                 public void onDecodingError() {
                     postSuccessEvent(listener);
+                }
+
+                @Override
+                public void onDecoderInput(byte[] bytes, int validLength) {
                 }
 
                 @Override
@@ -359,5 +405,6 @@ public class VideoManager implements IpConnectionListener {
             stopVideoStream(parentId, videoTagRef.get(), null);
         }
     }
+
 }
 

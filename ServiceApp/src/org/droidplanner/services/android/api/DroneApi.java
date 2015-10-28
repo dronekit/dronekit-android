@@ -1,10 +1,13 @@
 package org.droidplanner.services.android.api;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.os.TransactionTooLargeException;
 import android.text.TextUtils;
 import android.util.Pair;
 import android.view.Surface;
@@ -25,15 +28,16 @@ import com.o3dr.services.android.lib.drone.mission.action.MissionActions;
 import com.o3dr.services.android.lib.drone.property.DroneAttribute;
 import com.o3dr.services.android.lib.gcs.event.GCSEvent;
 import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
+import com.o3dr.services.android.lib.drone.companion.solo.video.VideoPacket;
 import com.o3dr.services.android.lib.model.IApiListener;
 import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.model.IDroneApi;
 import com.o3dr.services.android.lib.model.IMavlinkObserver;
+import com.o3dr.services.android.lib.model.IVideoStreamObserver;
 import com.o3dr.services.android.lib.model.IObserver;
 import com.o3dr.services.android.lib.model.action.Action;
 
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
-import org.droidplanner.services.android.core.drone.autopilot.Drone;
 import org.droidplanner.services.android.core.drone.variables.calibration.AccelCalibration;
 import org.droidplanner.services.android.core.parameters.Parameter;
 import org.droidplanner.services.android.core.drone.DroneManager;
@@ -53,12 +57,13 @@ import timber.log.Timber;
 /**
  * Implementation for the IDroneApi interface.
  */
-public final class DroneApi extends IDroneApi.Stub implements DroneEventsListener, IBinder.DeathRecipient {
+public final class DroneApi extends IDroneApi.Stub implements DroneEventsListener, VideoManager.VideoStreamListener, IBinder.DeathRecipient {
 
     private final Context context;
 
     private final ConcurrentLinkedQueue<IObserver> observersList;
     private final ConcurrentLinkedQueue<IMavlinkObserver> mavlinkObserversList;
+    private final ConcurrentLinkedQueue<IVideoStreamObserver> videoObserversList;
     private DroneManager droneMgr;
     private final IApiListener apiListener;
     private final String ownerId;
@@ -75,6 +80,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
         observersList = new ConcurrentLinkedQueue<>();
         mavlinkObserversList = new ConcurrentLinkedQueue<>();
+        videoObserversList = new ConcurrentLinkedQueue<>();
 
         this.apiListener = listener;
         try {
@@ -111,6 +117,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
         Timber.d("Destroying drone api instance for %s", this.ownerId);
         this.observersList.clear();
         this.mavlinkObserversList.clear();
+        this.videoObserversList.clear();
 
         try {
             this.apiListener.asBinder().unlinkToDeath(this, 0);
@@ -188,8 +195,8 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
         if (!apiListener.asBinder().pingBinder()) {
             Timber.w("Client is not longer available.");
             this.context.startService(new Intent(this.context, DroidPlannerService.class)
-                    .setAction(DroidPlannerService.ACTION_RELEASE_API_INSTANCE)
-                    .putExtra(DroidPlannerService.EXTRA_API_INSTANCE_APP_ID, this.ownerId));
+                                              .setAction(DroidPlannerService.ACTION_RELEASE_API_INSTANCE)
+                                              .putExtra(DroidPlannerService.EXTRA_API_INSTANCE_APP_ID, this.ownerId));
         }
     }
 
@@ -220,6 +227,25 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     public void removeMavlinkObserver(IMavlinkObserver observer) throws RemoteException {
         if (observer != null) {
             mavlinkObserversList.remove(observer);
+            checkForSelfRelease();
+        }
+    }
+
+    @Override
+    public void addVideoStreamObserver(IVideoStreamObserver observer) throws RemoteException {
+        Timber.v("DroneApi.addVideoStreamObserver()");
+        if (observer != null)
+        {
+            videoObserversList.add(observer);
+
+        }
+    }
+
+    @Override
+    public void removeVideoStreamObserver(IVideoStreamObserver observer) throws RemoteException {
+        Timber.v("DroneApi.removeVideoStreamObserver()");
+        if (observer != null) {
+            videoObserversList.remove(observer);
             checkForSelfRelease();
         }
     }
@@ -262,14 +288,17 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                     videoProps.putInt(CameraActions.EXTRA_VIDEO_PROPS_UDP_PORT, VideoManager.ARTOO_UDP_PORT);
                 }
 
+                if(!videoObserversList.isEmpty()) {
+                    CommonApiUtils.setVideoStreamListener(getDrone(), this);
+                }
                 CommonApiUtils.startVideoStream(getDrone(), videoProps, ownerId, videoTag, videoSurface, listener);
                 break;
             }
 
             case CameraActions.ACTION_STOP_VIDEO_STREAM: {
                 final String videoTag = data.getString(CameraActions.EXTRA_VIDEO_TAG, "");
+                CommonApiUtils.setVideoStreamListener(getDrone(), null);
                 CommonApiUtils.stopVideoStream(getDrone(), ownerId, videoTag, listener);
-                break;
             }
 
             // MISSION ACTIONS
@@ -639,5 +668,33 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 CommonApiUtils.getMagnetometerCalibrationResult(report));
 
         notifyAttributeUpdate(AttributeEvent.CALIBRATION_MAG_COMPLETED, reportBundle);
+    }
+
+    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1)
+    @Override
+    public void onVideoPacketReceived(final VideoPacket videoPacket)
+    {
+        if (videoObserversList.isEmpty())
+            return;
+
+        if (videoPacket != null && videoPacket.size() != 0) {
+            for (IVideoStreamObserver observer : videoObserversList) {
+                try {
+                    observer.onVideoPacketReceived(videoPacket);
+                }
+                catch (TransactionTooLargeException e)
+                {
+                    Timber.e(e, e.getMessage() + " for video packet with data length: " + videoPacket.data().length);
+                }
+                catch (RemoteException e) {
+                    Timber.e(e, e.getMessage());
+                    try {
+                        removeVideoStreamObserver(observer);
+                    } catch (RemoteException e1) {
+                        Timber.e(e1, e1.getMessage());
+                    }
+                }
+            }
+        }
     }
 }

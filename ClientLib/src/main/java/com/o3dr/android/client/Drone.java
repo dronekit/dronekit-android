@@ -552,6 +552,31 @@ public class Drone {
         }
     }
 
+    public void addVideoStreamObserver(VideoStreamObserver observer) {
+        final IDroneApi droneApi = droneApiRef.get();
+        if (isStarted(droneApi)) {
+            try {
+                droneApi.addVideoStreamObserver(observer);
+            } catch (RemoteException e) {
+                handleRemoteException(e);
+            }
+        } else {
+            Log.v("Drone", "addVideoStreamObserver(): no operation performed because isStarted(droneApi)is false");
+        }
+    }
+
+    public void removeVideoStreamObserver(VideoStreamObserver observer) {
+        final IDroneApi droneApi = droneApiRef.get();
+        if (isStarted(droneApi)) {
+            try {
+                droneApi.removeVideoStreamObserver(observer);
+            } catch (RemoteException e) {
+                handleRemoteException(e);
+            }
+        } else {
+            Log.v("Drone", "addVideoStreamObserver(): no operation performed because isStarted(droneApi)is false");
+        }
+    }
     public void unregisterDroneListener(DroneListener listener) {
         if (listener == null)
             return;
