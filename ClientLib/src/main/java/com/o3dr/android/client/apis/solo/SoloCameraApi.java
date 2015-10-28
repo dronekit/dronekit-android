@@ -241,10 +241,6 @@ public class SoloCameraApi extends SoloApi {
      * @since 2.5.0
      */
     public void startVideoStream(final Surface surface, final String tag, final AbstractCommandListener listener) {
-        if (surface == null) {
-            postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
-            return;
-        }
 
         final String featureRequired = (surface == null)
                                        ? CapabilityApi.FeatureIds.SOLO_VIDEO_STREAMING_TO_OBSERVER
