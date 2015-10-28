@@ -40,7 +40,6 @@ import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError
 import com.o3dr.services.android.lib.drone.mission.action.MissionActions;
 import com.o3dr.services.android.lib.drone.property.DroneAttribute;
 import com.o3dr.services.android.lib.drone.property.Parameter;
-import com.o3dr.services.android.lib.drone.property.Parameters;
 import com.o3dr.services.android.lib.gcs.action.CalibrationActions;
 import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
 import com.o3dr.services.android.lib.model.AbstractCommandListener;
@@ -71,10 +70,6 @@ import org.droidplanner.services.android.core.drone.variables.calibration.Magnet
 import org.droidplanner.services.android.core.mission.Mission;
 import org.droidplanner.services.android.core.model.AutopilotWarningParser;
 import org.droidplanner.services.android.utils.CommonApiUtils;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import timber.log.Timber;
 
@@ -129,7 +124,7 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
     }
 
     @Override
-    protected HeartBeat initHeartBeat(Handler handler){
+    protected HeartBeat initHeartBeat(Handler handler) {
         return new APMHeartBeat(this, handler);
     }
 
