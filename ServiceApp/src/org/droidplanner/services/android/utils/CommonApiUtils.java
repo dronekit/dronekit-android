@@ -66,6 +66,7 @@ import org.droidplanner.services.android.core.mission.survey.SurveyImpl;
 import org.droidplanner.services.android.core.mission.waypoints.StructureScannerImpl;
 import org.droidplanner.services.android.core.survey.Footprint;
 import org.droidplanner.services.android.utils.file.IO.ParameterMetadataLoader;
+import org.droidplanner.services.android.utils.video.VideoManager;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
@@ -1050,5 +1051,15 @@ public class CommonApiUtils {
 
         final GenericMavLinkDrone mavLinkDrone = (GenericMavLinkDrone) drone;
         mavLinkDrone.stopVideoStream(appId, videoTag, listener);
+    }
+
+    public static void setVideoStreamListener(Drone drone, VideoManager.VideoStreamListener listener)
+    {
+        if(!(drone instanceof GenericMavLinkDrone)){
+            return;
+        }
+
+        final GenericMavLinkDrone mavLinkDrone = (GenericMavLinkDrone) drone;
+        mavLinkDrone.setVideoStreamListener(listener);
     }
 }

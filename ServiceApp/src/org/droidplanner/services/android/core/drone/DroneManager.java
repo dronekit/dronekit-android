@@ -531,6 +531,7 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
                         switch (featureId) {
 
                             case CapabilityApi.FeatureIds.SOLO_VIDEO_STREAMING:
+                            case CapabilityApi.FeatureIds.SOLO_VIDEO_STREAMING_TO_OBSERVER:
                             case CapabilityApi.FeatureIds.COMPASS_CALIBRATION:
                                 if (this.isCompanionComputerEnabled()) {
                                     CommonApiUtils.postSuccessEvent(listener);

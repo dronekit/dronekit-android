@@ -4,14 +4,23 @@ import android.annotation.TargetApi;
 import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.os.Build;
+import android.os.Environment;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Surface;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+
+import timber.log.Timber;
 
 /**
  * Created by Fredia Huya-Kouadio on 2/19/15.
@@ -24,6 +33,99 @@ public class MediaCodecManager {
     private static final String MIME_TYPE = "video/avc";
     public static final int DEFAULT_VIDEO_WIDTH = 1920;
     public static final int DEFAULT_VIDEO_HEIGHT = 1080;
+
+    private interface ISimpleByteBuffer
+    {
+        void put(ByteBuffer inBuffer);
+        void put(byte[] array, int offset, int validbytes);
+        void clear();
+        byte[] array();
+        void order(ByteOrder order);
+        int size();
+    }
+    public static class ByteBufferWrapper implements ISimpleByteBuffer
+    {
+        private ByteBuffer mBuffer;
+        public ByteBufferWrapper(ByteBuffer byteBuffer)
+        {
+            mBuffer = byteBuffer;
+        }
+        public void put(ByteBuffer inBuffer)
+        {
+            mBuffer.put(inBuffer);
+        }
+        public void put(byte[] array, int offset, int validBytes)
+        {
+            mBuffer.put(array, offset, validBytes);
+        }
+        public void clear()
+        {
+            mBuffer.clear();
+        }
+        public byte[] array()
+        {
+            return mBuffer.array();
+        }
+        public void order(ByteOrder order)
+        {
+            mBuffer.order();
+        }
+        public int size()
+        {
+            return mBuffer.limit() - mBuffer.position();
+        }
+    }
+    private static class GrowBuffer implements ISimpleByteBuffer
+    {
+        private ByteBuffer mBuffer = null;
+
+        private void growToFit(int size)
+        {
+            int avail = mBuffer.remaining();
+            if (avail < size) {
+                ByteBuffer newByteBuffer = ByteBuffer.allocate(Math.max(mBuffer.capacity()*2, mBuffer.capacity() + size));
+                mBuffer.flip();
+                newByteBuffer.put(mBuffer);
+                mBuffer = newByteBuffer;
+            }
+        }
+
+        public GrowBuffer(int baseSize)
+        {
+            mBuffer = ByteBuffer.allocate(baseSize);
+        }
+
+        public void put(ByteBuffer inBuffer)
+        {
+            growToFit(inBuffer.limit() - inBuffer.position());
+            mBuffer.put(inBuffer);
+        }
+        public void put(byte[] array, int offset, int validBytes)
+        {
+            growToFit(validBytes-offset);
+            mBuffer.put(array, offset, validBytes);
+        }
+
+        public void clear()
+        {
+            mBuffer.clear();
+        }
+
+        public byte[] array()
+        {
+            return mBuffer.array();
+        }
+        public void order(ByteOrder order)
+        {
+            mBuffer.order();
+        }
+        public int size()
+        {
+            return mBuffer.limit() - mBuffer.position();
+        }
+    }
+
+    private GrowBuffer mGrowBuffer = null;
 
     private final Runnable stopSafely = new Runnable() {
         @Override
@@ -97,6 +199,7 @@ public class MediaCodecManager {
 
     private DequeueCodec dequeueRunner;
 
+
     public MediaCodecManager(Handler handler) {
         this.handler = handler;
         this.naluChunkAssembler = new NALUChunkAssembler();
@@ -107,8 +210,8 @@ public class MediaCodecManager {
     }
 
     public void startDecoding(Surface surface, DecoderListener listener) throws IOException {
-        if (surface == null)
-            throw new IllegalStateException("Surface argument must be non-null.");
+        if (surface == null && !listener.wantDecoderInput())
+            throw new IllegalStateException("Surface argument must be non-null unless a listener is registered.");
 
         if (isDecoding.compareAndSet(false, true)) {
             Log.i(TAG, "Starting decoding...");
@@ -116,18 +219,26 @@ public class MediaCodecManager {
 
             this.decoderListenerRef.set(listener);
 
-            final MediaFormat mediaFormat = MediaFormat.createVideoFormat(MIME_TYPE, DEFAULT_VIDEO_WIDTH, DEFAULT_VIDEO_HEIGHT);
+            if (surface != null)
+            {
+                final MediaFormat mediaFormat = MediaFormat.createVideoFormat(MIME_TYPE, DEFAULT_VIDEO_WIDTH, DEFAULT_VIDEO_HEIGHT);
 
-            final MediaCodec mediaCodec = MediaCodec.createDecoderByType(MIME_TYPE);
-            mediaCodec.configure(mediaFormat, surface, null, 0);
-            mediaCodec.start();
+                final MediaCodec mediaCodec = MediaCodec.createDecoderByType(MIME_TYPE);
+                mediaCodec.configure(mediaFormat, surface, null, 0);
+                mediaCodec.start();
 
+                mediaCodecRef.set(mediaCodec);
+            } else {
+                mediaCodecRef.set(null);
+            }
             surfaceRef.set(surface);
-            mediaCodecRef.set(mediaCodec);
             processInputData.set(true);
 
-            dequeueRunner = new DequeueCodec();
-            dequeueRunner.start();
+            if (surface != null)
+            {
+                dequeueRunner = new DequeueCodec();
+                dequeueRunner.start();
+            }
         }
     }
 
@@ -154,16 +265,15 @@ public class MediaCodecManager {
 
     public void onInputDataReceived(byte[] data, int dataSize) {
         if (isDecoding.get()) {
-            if (processInputData.get()) {
-                //Process the received buffer
+            if (processInputData.get())
+            {
                 NALUChunk naluChunk = naluChunkAssembler.assembleNALUChunk(data, dataSize);
                 if (naluChunk != null)
                     processNALUChunk(naluChunk);
             } else {
                 if (sendCompletionFlag.get()) {
                     Log.d(TAG, "Sending end of stream data.");
-                    sendCompletionFlag.set(!processNALUChunk(naluChunkAssembler.getEndOfStream()));
-                }
+                    sendCompletionFlag.set(!processNALUChunk(naluChunkAssembler.getEndOfStream()));                }
             }
         }
     }
@@ -173,17 +283,47 @@ public class MediaCodecManager {
             return false;
 
         final MediaCodec mediaCodec = mediaCodecRef.get();
-        if (mediaCodec == null)
+        final DecoderListener decListener = decoderListenerRef.get();
+
+        if (decListener == null)
+        {
             return false;
+        }
+
+        final boolean decListenerWantsDecoderInput = decListener.wantDecoderInput();
+
+        if (mediaCodec == null && !decListenerWantsDecoderInput)
+        {
+            return false;
+        }
+
+        if (mGrowBuffer == null && decListenerWantsDecoderInput)
+        {
+            mGrowBuffer = new GrowBuffer(1024 * 64);
+        }
 
         try {
-            final int index = mediaCodec.dequeueInputBuffer(-1);
+            final int index = mediaCodec == null ?
+                              0 :
+                              mediaCodec.dequeueInputBuffer(-1);
             if (index >= 0) {
-                ByteBuffer inputBuffer;
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    inputBuffer = mediaCodec.getInputBuffer(index);
-                } else {
-                    inputBuffer = mediaCodec.getInputBuffers()[index];
+                ISimpleByteBuffer inputBuffer=null;
+                ISimpleByteBuffer mediaCodecInBuffer = null;
+
+                if (mediaCodec != null)
+                {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        mediaCodecInBuffer = new ByteBufferWrapper( mediaCodec.getInputBuffer(index) );
+                    } else {
+                        mediaCodecInBuffer = new ByteBufferWrapper( mediaCodec.getInputBuffers()[index] );
+                    }
+                }
+
+                if (decListenerWantsDecoderInput) {
+                    inputBuffer = mGrowBuffer;
+                }
+                else {
+                    inputBuffer = mediaCodecInBuffer;
                 }
 
                 if (inputBuffer == null)
@@ -201,12 +341,22 @@ public class MediaCodecManager {
 
                     inputBuffer.order(payload.order());
                     final int dataLength = payload.position();
+
                     inputBuffer.put(payload.array(), 0, dataLength);
 
                     totalLength += dataLength;
                 }
 
-                mediaCodec.queueInputBuffer(index, 0, totalLength, naluChunk.presentationTime, naluChunk.flags);
+                if (mediaCodec != null) {
+                    if (inputBuffer != mediaCodecInBuffer) {
+                        mediaCodecInBuffer.clear();
+                        mediaCodecInBuffer.put(inputBuffer.array(), 0, totalLength);
+                    }
+
+                    mediaCodec.queueInputBuffer(index, 0, totalLength, naluChunk.presentationTime, naluChunk.flags);
+                }
+                if (decListenerWantsDecoderInput)
+                    decListener.onDecoderInput(inputBuffer.array(), totalLength);
             }
         } catch (IllegalStateException e) {
             Log.e(TAG, e.getMessage(), e);
