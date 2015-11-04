@@ -15,8 +15,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +28,7 @@ import java.util.Map;
  */
 public abstract class GeoTagAsyncTask extends AsyncTask<Void, Integer, GeoTagAsyncTask.ResultObject> {
     private static final String STORE_PHOTO_DIR_NAME = "GeoTag";
+    private static final SimpleDateFormat formatter = new SimpleDateFormat("MM-dd-yy-HH");
     private final Context context;
     private final List<TLogParser.Event> events;
     private final ArrayList<File> photos;
@@ -50,7 +53,7 @@ public abstract class GeoTagAsyncTask extends AsyncTask<Void, Integer, GeoTagAsy
         ResultObject resultObject = new ResultObject();
 
         try {
-            File saveDir = new File(getSaveRootDir(context), STORE_PHOTO_DIR_NAME);
+            File saveDir = findNextDirName(context);
 
             HashMap<File, File> geoTaggedFiles = new HashMap<>();
             HashMap<File, Exception> failedFiles = new HashMap<>();
@@ -60,7 +63,7 @@ public abstract class GeoTagAsyncTask extends AsyncTask<Void, Integer, GeoTagAsy
                 return resultObject;
             }
 
-            if (!saveDir.exists() && !saveDir.mkdir()) {
+            if (!saveDir.mkdir()) {
                 resultObject.setException(new IllegalStateException("Failed to create directory for images"));
                 return resultObject;
             }
@@ -259,5 +262,20 @@ public abstract class GeoTagAsyncTask extends AsyncTask<Void, Integer, GeoTagAsy
 
     protected interface GeoTagAlgorithm {
         HashMap<TLogParser.Event, File> match(List<TLogParser.Event> events, ArrayList<File> photos);
+    }
+
+    private static File findNextDirName(Context context) {
+        File rootDir = getSaveRootDir(context);
+
+        Date date = new Date();
+        String dirName = STORE_PHOTO_DIR_NAME + "_" + formatter.format(date);
+        File file = new File(rootDir, dirName);
+        int i = 0;
+        while (file.exists()) {
+            i++;
+            dirName = STORE_PHOTO_DIR_NAME + "_" + formatter.format(date) + "_" + i;
+            file = new File(rootDir, dirName);
+        }
+        return file;
     }
 }
