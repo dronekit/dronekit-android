@@ -20,7 +20,7 @@ import static org.junit.Assert.assertArrayEquals;
 public class msg_local_position_ned_cov_test{
 
 public static final int MAVLINK_MSG_ID_LOCAL_POSITION_NED_COV = 64;
-public static final int MAVLINK_MSG_LENGTH = 181;
+public static final int MAVLINK_MSG_LENGTH = 229;
 private static final long serialVersionUID = MAVLINK_MSG_ID_LOCAL_POSITION_NED_COV;
 
 private Parser parser = new Parser();
@@ -50,44 +50,56 @@ public byte[] generateTestPacket(){
     payload.putFloat((float)185.0); //vx
     payload.putFloat((float)213.0); //vy
     payload.putFloat((float)241.0); //vz
+    payload.putFloat((float)269.0); //ax
+    payload.putFloat((float)297.0); //ay
+    payload.putFloat((float)325.0); //az
     //covariance
-    payload.putFloat((float)269.0);
-    payload.putFloat((float)270.0);
-    payload.putFloat((float)271.0);
-    payload.putFloat((float)272.0);
-    payload.putFloat((float)273.0);
-    payload.putFloat((float)274.0);
-    payload.putFloat((float)275.0);
-    payload.putFloat((float)276.0);
-    payload.putFloat((float)277.0);
-    payload.putFloat((float)278.0);
-    payload.putFloat((float)279.0);
-    payload.putFloat((float)280.0);
-    payload.putFloat((float)281.0);
-    payload.putFloat((float)282.0);
-    payload.putFloat((float)283.0);
-    payload.putFloat((float)284.0);
-    payload.putFloat((float)285.0);
-    payload.putFloat((float)286.0);
-    payload.putFloat((float)287.0);
-    payload.putFloat((float)288.0);
-    payload.putFloat((float)289.0);
-    payload.putFloat((float)290.0);
-    payload.putFloat((float)291.0);
-    payload.putFloat((float)292.0);
-    payload.putFloat((float)293.0);
-    payload.putFloat((float)294.0);
-    payload.putFloat((float)295.0);
-    payload.putFloat((float)296.0);
-    payload.putFloat((float)297.0);
-    payload.putFloat((float)298.0);
-    payload.putFloat((float)299.0);
-    payload.putFloat((float)300.0);
-    payload.putFloat((float)301.0);
-    payload.putFloat((float)302.0);
-    payload.putFloat((float)303.0);
-    payload.putFloat((float)304.0);
-    payload.put((byte)33); //estimator_type
+    payload.putFloat((float)353.0);
+    payload.putFloat((float)354.0);
+    payload.putFloat((float)355.0);
+    payload.putFloat((float)356.0);
+    payload.putFloat((float)357.0);
+    payload.putFloat((float)358.0);
+    payload.putFloat((float)359.0);
+    payload.putFloat((float)360.0);
+    payload.putFloat((float)361.0);
+    payload.putFloat((float)362.0);
+    payload.putFloat((float)363.0);
+    payload.putFloat((float)364.0);
+    payload.putFloat((float)365.0);
+    payload.putFloat((float)366.0);
+    payload.putFloat((float)367.0);
+    payload.putFloat((float)368.0);
+    payload.putFloat((float)369.0);
+    payload.putFloat((float)370.0);
+    payload.putFloat((float)371.0);
+    payload.putFloat((float)372.0);
+    payload.putFloat((float)373.0);
+    payload.putFloat((float)374.0);
+    payload.putFloat((float)375.0);
+    payload.putFloat((float)376.0);
+    payload.putFloat((float)377.0);
+    payload.putFloat((float)378.0);
+    payload.putFloat((float)379.0);
+    payload.putFloat((float)380.0);
+    payload.putFloat((float)381.0);
+    payload.putFloat((float)382.0);
+    payload.putFloat((float)383.0);
+    payload.putFloat((float)384.0);
+    payload.putFloat((float)385.0);
+    payload.putFloat((float)386.0);
+    payload.putFloat((float)387.0);
+    payload.putFloat((float)388.0);
+    payload.putFloat((float)389.0);
+    payload.putFloat((float)390.0);
+    payload.putFloat((float)391.0);
+    payload.putFloat((float)392.0);
+    payload.putFloat((float)393.0);
+    payload.putFloat((float)394.0);
+    payload.putFloat((float)395.0);
+    payload.putFloat((float)396.0);
+    payload.putFloat((float)397.0);
+    payload.put((byte)177); //estimator_type
     
     CRC crc = generateCRC(payload.array());
     payload.put((byte)crc.getLSB());

@@ -52,7 +52,7 @@ public class msg_distance_sensor extends MAVLinkMessage{
     public short id;
     
     /**
-    * Direction the sensor faces from FIXME enum.
+    * Direction the sensor faces from MAV_SENSOR_ORIENTATION enum.
     */
     public short orientation;
     

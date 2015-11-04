@@ -15,7 +15,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertArrayEquals;
 
 /**
-* 
+* THIS INTERFACE IS DEPRECATED. USE SET_MESSAGE_INTERVAL INSTEAD.
 */
 public class msg_request_data_stream_test{
 
