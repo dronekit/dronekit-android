@@ -7,13 +7,9 @@ public class ParameterMetadata {
      */
     private final int autopilotFamily;
 
-    /**
-     * One of {@link org.droidplanner.services.android.core.firmware.FirmwareType}
-     */
-    private String autopilotType;
+    private final String name;
 
     private String group;
-    private String name;
 
     /**
      * One of {@link com.MAVLink.enums.MAV_PARAM_TYPE}
@@ -27,20 +23,13 @@ public class ParameterMetadata {
     private String range;
     private String values;
 
-    public ParameterMetadata(int autopilotFamily) {
+    public ParameterMetadata(int autopilotFamily, String name) {
         this.autopilotFamily = autopilotFamily;
+        this.name = name;
     }
 
     public int getAutopilotFamily() {
         return autopilotFamily;
-    }
-
-    public String getAutopilotType() {
-        return autopilotType;
-    }
-
-    public void setAutopilotType(String autopilotType) {
-        this.autopilotType = autopilotType;
     }
 
     public int getDataType() {
@@ -61,10 +50,6 @@ public class ParameterMetadata {
 
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getDisplayName() {

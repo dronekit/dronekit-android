@@ -22,7 +22,6 @@ public final class ParametersMetadataTable extends ServicesTable {
     private static final String TABLE_NAME = "parameters_metadata";
 
     private static final String COLUMN_NAME_FAMILY = "autopilot_family";
-    private static final String COLUMN_NAME_AUTOPILOT_TYPE = "autopilot_type";
     private static final String COLUMN_NAME_PARAMETER_GROUP = "param_group";
     private static final String COLUMN_NAME_PARAMETER_NAME = "param_name";
     private static final String COLUMN_NAME_PARAMETER_DATATYPE = "param_datatype";
@@ -37,8 +36,7 @@ public final class ParametersMetadataTable extends ServicesTable {
     static {
         COLUMNS_DEF.put(_ID, "INTEGER PRIMARY KEY");
         COLUMNS_DEF.put(COLUMN_NAME_FAMILY, "INTEGER NOT NULL");
-        COLUMNS_DEF.put(COLUMN_NAME_AUTOPILOT_TYPE, "TEXT");
-        COLUMNS_DEF.put(COLUMN_NAME_PARAMETER_GROUP, "TEXT");
+        COLUMNS_DEF.put(COLUMN_NAME_PARAMETER_GROUP, "TEXT NOT NULL");
         COLUMNS_DEF.put(COLUMN_NAME_PARAMETER_NAME, "TEXT NOT NULL");
         COLUMNS_DEF.put(COLUMN_NAME_PARAMETER_DATATYPE, "INTEGER NOT NULL");
         COLUMNS_DEF.put(COLUMN_NAME_SHORT_DESCRIPTION, "TEXT");
@@ -49,8 +47,8 @@ public final class ParametersMetadataTable extends ServicesTable {
     }
 
     private static final String SQL_CREATE_CONSTRAINT =
-            String.format(Locale.US, "UNIQUE (%s, %s, %s, %s) ON CONFLICT REPLACE",
-                    COLUMN_NAME_FAMILY, COLUMN_NAME_AUTOPILOT_TYPE, COLUMN_NAME_PARAMETER_GROUP, COLUMN_NAME_PARAMETER_NAME);
+            String.format(Locale.US, "UNIQUE (%s, %s, %s) ON CONFLICT REPLACE",
+                    COLUMN_NAME_FAMILY, COLUMN_NAME_PARAMETER_GROUP, COLUMN_NAME_PARAMETER_NAME);
 
     private static final String SQL_CREATE = generateSqlCreateEntries(TABLE_NAME, COLUMNS_DEF, SQL_CREATE_CONSTRAINT);
 
@@ -84,7 +82,6 @@ public final class ParametersMetadataTable extends ServicesTable {
 
         ContentValues values = new ContentValues();
         values.put(COLUMN_NAME_FAMILY, metadata.getAutopilotFamily());
-        values.put(COLUMN_NAME_AUTOPILOT_TYPE, metadata.getAutopilotType());
         values.put(COLUMN_NAME_PARAMETER_GROUP, metadata.getGroup());
         values.put(COLUMN_NAME_PARAMETER_NAME, metadata.getName());
         values.put(COLUMN_NAME_PARAMETER_DATATYPE, metadata.getDataType());
@@ -100,65 +97,45 @@ public final class ParametersMetadataTable extends ServicesTable {
     /**
      * Retrieves a parameter metadata from the database that matches the given arguments.
      * @param family Parameter family (i.e: PX4, APM). One of {@link com.MAVLink.enums.MAV_AUTOPILOT} constants.
-     * @param autopilotType Parameter autopilot type. Can be null if the parameter is not tied to a specific autopilot.
-     * @param paramGroup Parameter group. Can be null if the parameter has no group.
      * @param paramName Non null parameter name.
-     * @return {@link ParameterMetadata} object if one is found, null otherwise.
+     * @return List of {@link ParameterMetadata} objects.
      */
-    public ParameterMetadata retrieveParameterMetadata(int family, String autopilotType, String paramGroup, @NonNull String paramName){
+    public List<ParameterMetadata> retrieveParameterMetadata(int family, @NonNull String paramName){
+        List<ParameterMetadata> results = new ArrayList<>();
         if(TextUtils.isEmpty(paramName))
-            return null;
+            return results;
 
         SQLiteDatabase db = getReadableDatabase();
-        String[] projection = {COLUMN_NAME_PARAMETER_DATATYPE, COLUMN_NAME_SHORT_DESCRIPTION,
+        String[] projection = {COLUMN_NAME_PARAMETER_GROUP, COLUMN_NAME_PARAMETER_DATATYPE, COLUMN_NAME_SHORT_DESCRIPTION,
                 COLUMN_NAME_DESCRIPTION, COLUMN_NAME_UNITS, COLUMN_NAME_RANGE, COLUMN_NAME_VALUES};
 
-        List<String> selectionArgs = new ArrayList<>();
+        String selection = COLUMN_NAME_FAMILY + " = ? AND " + COLUMN_NAME_PARAMETER_NAME + " = ?";
+        String[] selectionArgs = {String.valueOf(family), paramName};
 
-        StringBuilder selection = new StringBuilder(COLUMN_NAME_FAMILY).append(" = ?");
-        selectionArgs.add(String.valueOf(family));
-        if(!TextUtils.isEmpty(autopilotType)){
-            selection.append(" AND ").append(COLUMN_NAME_AUTOPILOT_TYPE).append(" = ?")
-                    .append(" OR ").append(COLUMN_NAME_AUTOPILOT_TYPE).append(" IS NULL")
-            .append(" OR ").append(COLUMN_NAME_AUTOPILOT_TYPE).append(" = ''");
-
-            selectionArgs.add(autopilotType);
-        }
-
-        if(!TextUtils.isEmpty(paramGroup)){
-            selection.append(" AND ").append(COLUMN_NAME_PARAMETER_GROUP).append(" = ?")
-                    .append(" OR ").append(COLUMN_NAME_PARAMETER_GROUP).append(" IS NULL")
-                    .append(" OR ").append(COLUMN_NAME_PARAMETER_GROUP).append(" = ''");
-
-            selectionArgs.add(paramGroup);
-        }
-
-        selection.append(" AND ").append(COLUMN_NAME_PARAMETER_NAME).append(" = ?");
-        selectionArgs.add(paramName);
-
-        Cursor cursor = db.query(TABLE_NAME, projection, selection.toString(),
-                selectionArgs.toArray(new String[selectionArgs.size()]), null, null, null);
+        Cursor cursor = db.query(TABLE_NAME, projection, selection, selectionArgs,
+                null, null, null);
 
         if(cursor == null)
-            return null;
+            return results;
 
         if(cursor.moveToFirst()){
-            ParameterMetadata result = new ParameterMetadata(family);
-            result.setAutopilotType(autopilotType);
-            result.setGroup(paramGroup);
-            result.setName(paramName);
+            do {
+                ParameterMetadata result = new ParameterMetadata(family, paramName);
 
-            result.setDataType(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_PARAMETER_DATATYPE)));
-            result.setDisplayName(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_SHORT_DESCRIPTION)));
-            result.setDescription(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_DESCRIPTION)));
-            result.setUnits(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_UNITS)));
-            result.setRange(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_RANGE)));
-            result.setValues(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_VALUES)));
+                result.setGroup(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_PARAMETER_GROUP)));
+                result.setDataType(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_PARAMETER_DATATYPE)));
+                result.setDisplayName(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_SHORT_DESCRIPTION)));
+                result.setDescription(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_DESCRIPTION)));
+                result.setUnits(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_UNITS)));
+                result.setRange(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_RANGE)));
+                result.setValues(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_VALUES)));
+
+                results.add(result);
+            }while(cursor.moveToNext());
 
             cursor.close();
-            return result;
         }
 
-        return null;
+        return results;
     }
 }
