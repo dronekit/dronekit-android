@@ -13,7 +13,7 @@ import org.droidplanner.services.android.core.MAVLink.connection.MavLinkConnecti
 import org.droidplanner.services.android.core.MAVLink.connection.MavLinkConnectionTypes;
 import org.droidplanner.services.android.core.drone.CommandTracker;
 import org.droidplanner.services.android.api.MavLinkServiceApi;
-import org.droidplanner.services.android.data.SessionDB;
+import org.droidplanner.services.android.data.database.ServicesDb;
 import org.droidplanner.services.android.utils.file.DirectoryPath;
 import org.droidplanner.services.android.utils.file.FileUtils;
 
@@ -69,7 +69,7 @@ public class MAVLinkClient implements MAVLinkStreams.MAVLinkOutputStream {
 
     private final MAVLinkStreams.MavlinkInputStream listener;
     private final MavLinkServiceApi mavLinkApi;
-    private final SessionDB sessionDB;
+    private final ServicesDb servicesDb;
     private final Context context;
 
     private int packetSeqNumber = 0;
@@ -83,7 +83,7 @@ public class MAVLinkClient implements MAVLinkStreams.MAVLinkOutputStream {
         this.listener = listener;
         this.mavLinkApi = serviceApi;
         this.connParams = connParams;
-        this.sessionDB = new SessionDB(context);
+        this.servicesDb = new ServicesDb(context);
     }
 
     public void setCommandTracker(CommandTracker commandTracker) {
@@ -189,12 +189,12 @@ public class MAVLinkClient implements MAVLinkStreams.MAVLinkOutputStream {
     private void startLoggingThread(long startTime) {
         //log into the database the connection time.
         final String connectionType = MavLinkConnectionTypes.getConnectionTypeLabel(connParams.getConnectionType());
-        this.sessionDB.startSession(new Date(startTime), connectionType);
+        this.servicesDb.getSessionDataTable().startSession(new Date(startTime), connectionType);
     }
 
     private void stopLoggingThread(long stopTime) {
         //log into the database the disconnection time.
         final String connectionType = MavLinkConnectionTypes.getConnectionTypeLabel(connParams.getConnectionType());
-        this.sessionDB.endSession(new Date(stopTime), connectionType, new Date());
+        this.servicesDb.getSessionDataTable().endSession(new Date(stopTime), connectionType, new Date());
     }
 }

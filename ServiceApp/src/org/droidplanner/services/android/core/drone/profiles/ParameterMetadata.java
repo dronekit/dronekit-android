@@ -1,68 +1,109 @@
 package org.droidplanner.services.android.core.drone.profiles;
 
-import java.io.Serializable;
-import java.text.DecimalFormat;
-import java.text.ParseException;
-import java.util.LinkedHashMap;
-import java.util.Map;
+public class ParameterMetadata {
 
-public class ParameterMetadata implements Serializable {
+    /**
+     * One of {@link com.MAVLink.enums.MAV_AUTOPILOT}
+     */
+    private final int autopilotFamily;
 
-	private String name;
-	private String displayName;
-	private String description;
+    /**
+     * One of {@link org.droidplanner.services.android.core.firmware.FirmwareType}
+     */
+    private String autopilotType;
 
-	private String units;
-	private String range;
-	private String values;
+    private String group;
+    private String name;
 
-	public String getName() {
-		return name;
-	}
+    /**
+     * One of {@link com.MAVLink.enums.MAV_PARAM_TYPE}
+     */
+    private int dataType;
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    private String displayName;
+    private String description;
 
-	public String getDisplayName() {
-		return displayName;
-	}
+    private String units;
+    private String range;
+    private String values;
 
-	public void setDisplayName(String displayName) {
-		this.displayName = displayName;
-	}
+    public ParameterMetadata(int autopilotFamily) {
+        this.autopilotFamily = autopilotFamily;
+    }
 
-	public String getDescription() {
-		return description;
-	}
+    public int getAutopilotFamily() {
+        return autopilotFamily;
+    }
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
+    public String getAutopilotType() {
+        return autopilotType;
+    }
 
-	public String getUnits() {
-		return units;
-	}
+    public void setAutopilotType(String autopilotType) {
+        this.autopilotType = autopilotType;
+    }
 
-	public void setUnits(String units) {
-		this.units = units;
-	}
+    public int getDataType() {
+        return dataType;
+    }
 
-	public String getRange() {
-		return range;
-	}
+    public void setDataType(int dataType) {
+        this.dataType = dataType;
+    }
 
-	public void setRange(String range) {
-		this.range = range;
-	}
+    public String getGroup() {
+        return group;
+    }
 
-	public String getValues() {
-		return values;
-	}
+    public void setGroup(String group) {
+        this.group = group;
+    }
 
-	public void setValues(String values) {
-		this.values = values;
-	}
+    public String getName() {
+        return name;
+    }
 
+    public void setName(String name) {
+        this.name = name;
+    }
 
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getUnits() {
+        return units;
+    }
+
+    public void setUnits(String units) {
+        this.units = units;
+    }
+
+    public String getRange() {
+        return range;
+    }
+
+    public void setRange(String range) {
+        this.range = range;
+    }
+
+    public String getValues() {
+        return values;
+    }
+
+    public void setValues(String values) {
+        this.values = values;
+    }
 }
