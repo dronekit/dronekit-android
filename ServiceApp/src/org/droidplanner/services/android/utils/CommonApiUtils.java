@@ -920,7 +920,8 @@ public class CommonApiUtils {
 
             FollowAlgorithm currentAlg = followMe.getFollowAlgorithm();
             if (currentAlg.getType() != selectedMode) {
-                if (selectedMode == FollowAlgorithm.FollowModes.SOLO_SHOT && !SoloApiUtils.isSoloLinkFeatureAvailable(droneMgr, listener))
+                if (selectedMode == FollowAlgorithm.FollowModes.SOLO_SHOT &&
+                        !SoloApiUtils.isSoloLinkFeatureAvailable(droneMgr.getDrone(), listener))
                     return;
 
                 followMe.setAlgorithm(selectedMode.getAlgorithmType(droneMgr, droneHandler));
