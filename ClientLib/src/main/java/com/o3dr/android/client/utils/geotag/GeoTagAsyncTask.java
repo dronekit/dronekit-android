@@ -27,7 +27,7 @@ import java.util.Map;
  * GeoTagAsyncTask images based on camera mavlink messages.
  */
 public abstract class GeoTagAsyncTask extends AsyncTask<Void, Integer, GeoTagAsyncTask.ResultObject> {
-    private static final String STORE_PHOTO_DIR_NAME = "GeoTag";
+    public static final String STORE_PHOTO_DIR_NAME = "GeoTag";
     private static final SimpleDateFormat formatter = new SimpleDateFormat("MM-dd-yy-HH");
     private final Context context;
     private final List<TLogParser.Event> events;
@@ -53,11 +53,19 @@ public abstract class GeoTagAsyncTask extends AsyncTask<Void, Integer, GeoTagAsy
         ResultObject resultObject = new ResultObject();
 
         try {
-            File saveDir = findNextDirName(context);
-
             HashMap<File, File> geoTaggedFiles = new HashMap<>();
             HashMap<File, Exception> failedFiles = new HashMap<>();
             resultObject.setResult(geoTaggedFiles, failedFiles);
+
+            if (isCancelled()) {
+                return resultObject;
+            }
+
+            File saveDir = findNextDirName(context);
+            if (saveDir == null) {
+                resultObject.setException(new IllegalStateException("Failed to create directory for images"));
+                return resultObject;
+            }
 
             if (isCancelled()) {
                 return resultObject;
@@ -265,7 +273,11 @@ public abstract class GeoTagAsyncTask extends AsyncTask<Void, Integer, GeoTagAsy
     }
 
     private static File findNextDirName(Context context) {
-        File rootDir = getSaveRootDir(context);
+        File rootDir = new File(getSaveRootDir(context), STORE_PHOTO_DIR_NAME);
+
+        if (!rootDir.exists() && !rootDir.mkdir()) {
+            return null;
+        }
 
         Date date = new Date();
         String dirName = STORE_PHOTO_DIR_NAME + "_" + formatter.format(date);
