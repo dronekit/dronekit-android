@@ -61,6 +61,7 @@ import org.droidplanner.services.android.core.drone.variables.calibration.Magnet
 import org.droidplanner.services.android.core.firmware.FirmwareType;
 import org.droidplanner.services.android.core.gcs.follow.Follow;
 import org.droidplanner.services.android.core.gcs.follow.FollowAlgorithm;
+import org.droidplanner.services.android.core.mission.MissionItemImpl;
 import org.droidplanner.services.android.core.mission.survey.SplineSurveyImpl;
 import org.droidplanner.services.android.core.mission.survey.SurveyImpl;
 import org.droidplanner.services.android.core.mission.waypoints.StructureScannerImpl;
@@ -411,12 +412,12 @@ public class CommonApiUtils {
             return proxyMission;
 
         org.droidplanner.services.android.core.mission.Mission droneMission = drone.getMission();
-        List<org.droidplanner.services.android.core.mission.MissionItem> droneMissionItems = droneMission.getComponentItems();
+        List<MissionItemImpl> droneMissionItemImpls = droneMission.getComponentItems();
 
 
         proxyMission.setCurrentMissionItem((short) drone.getMissionStats().getCurrentWP());
-        if (!droneMissionItems.isEmpty()) {
-            for (org.droidplanner.services.android.core.mission.MissionItem item : droneMissionItems) {
+        if (!droneMissionItemImpls.isEmpty()) {
+            for (MissionItemImpl item : droneMissionItemImpls) {
                 proxyMission.addMissionItem(ProxyUtils.getProxyMissionItem(item));
             }
         }
@@ -860,7 +861,8 @@ public class CommonApiUtils {
 
             FollowAlgorithm currentAlg = followMe.getFollowAlgorithm();
             if (currentAlg.getType() != selectedMode) {
-                if (selectedMode == FollowAlgorithm.FollowModes.SOLO_SHOT && !SoloApiUtils.isSoloLinkFeatureAvailable(droneMgr, listener))
+                if (selectedMode == FollowAlgorithm.FollowModes.SOLO_SHOT &&
+                        !SoloApiUtils.isSoloLinkFeatureAvailable(droneMgr.getDrone(), listener))
                     return;
 
                 followMe.setAlgorithm(selectedMode.getAlgorithmType(droneMgr, droneHandler));

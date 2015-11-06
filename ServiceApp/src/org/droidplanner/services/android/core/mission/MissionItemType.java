@@ -53,7 +53,7 @@ public enum MissionItemType {
         return name;
     }
 
-    public MissionItem getNewItem(MissionItem referenceItem) throws IllegalArgumentException {
+    public MissionItemImpl getNewItem(MissionItemImpl referenceItem) throws IllegalArgumentException {
         switch (this) {
             case WAYPOINT:
                 return new WaypointImpl(referenceItem);

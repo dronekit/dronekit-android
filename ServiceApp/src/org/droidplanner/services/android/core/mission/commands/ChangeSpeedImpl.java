@@ -3,7 +3,7 @@ package org.droidplanner.services.android.core.mission.commands;
 import java.util.List;
 
 import org.droidplanner.services.android.core.mission.Mission;
-import org.droidplanner.services.android.core.mission.MissionItem;
+import org.droidplanner.services.android.core.mission.MissionItemImpl;
 import org.droidplanner.services.android.core.mission.MissionItemType;
 
 import com.MAVLink.common.msg_mission_item;
@@ -13,7 +13,7 @@ import com.MAVLink.enums.MAV_FRAME;
 public class ChangeSpeedImpl extends MissionCMD {
 	private double speed = 5; //meters per second
 
-	public ChangeSpeedImpl(MissionItem item) {
+	public ChangeSpeedImpl(MissionItemImpl item) {
 		super(item);
 	}
 

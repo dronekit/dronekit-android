@@ -5,7 +5,7 @@ import com.MAVLink.enums.MAV_CMD;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 
 import org.droidplanner.services.android.core.mission.Mission;
-import org.droidplanner.services.android.core.mission.MissionItem;
+import org.droidplanner.services.android.core.mission.MissionItemImpl;
 import org.droidplanner.services.android.core.mission.MissionItemType;
 
 import java.util.List;
@@ -21,7 +21,7 @@ public class SplineWaypointImpl extends SpatialCoordItem {
      */
     private double delay;
 
-    public SplineWaypointImpl(MissionItem item) {
+    public SplineWaypointImpl(MissionItemImpl item) {
         super(item);
     }
 

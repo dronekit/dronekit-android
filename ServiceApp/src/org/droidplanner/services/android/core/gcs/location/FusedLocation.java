@@ -23,6 +23,8 @@ import org.droidplanner.services.android.core.gcs.location.Location.LocationRece
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import timber.log.Timber;
+
 /**
  * Feeds Location Data from Android's FusedLocation LocationProvider
  */
@@ -121,9 +123,11 @@ public class FusedLocation extends LocationCallback implements LocationFinder, G
         final float currentSpeed = distanceToLast > 0f && timeSinceLast > 0
                 ? (distanceToLast / timeSinceLast)
                 : 0f;
-        final boolean isLocationAccurate = isLocationAccurate(androidLocation.getAccuracy(), currentSpeed);
+        final boolean isLocationAccurate = isLocationAccurate(androidLocation.getAccuracy(),
+                currentSpeed);
 
-        org.droidplanner.services.android.core.gcs.location.Location location = new org.droidplanner.services.android.core.gcs.location.Location(
+        org.droidplanner.services.android.core.gcs.location.Location location =
+                new org.droidplanner.services.android.core.gcs.location.Location(
                 new LatLongAlt(
                         androidLocation.getLatitude(),
                         androidLocation.getLongitude(),
@@ -134,6 +138,9 @@ public class FusedLocation extends LocationCallback implements LocationFinder, G
                 androidLocationTime);
 
         mLastLocation = androidLocation;
+
+        Timber.d("Location Lat/Long: " + getLatLongFromLocation(androidLocation));
+
         notifyLocationUpdate(location);
     }
 
@@ -168,6 +175,11 @@ public class FusedLocation extends LocationCallback implements LocationFinder, G
         }
 
         return true;
+    }
+
+    public String getLatLongFromLocation(final Location location) {
+        return Location.convert(location.getLatitude(), Location.FORMAT_DEGREES) + " " +
+                Location.convert(location.getLongitude(), Location.FORMAT_DEGREES);
     }
 
     @Override

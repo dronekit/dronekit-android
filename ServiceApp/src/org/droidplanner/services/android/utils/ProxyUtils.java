@@ -27,6 +27,7 @@ import com.o3dr.services.android.lib.drone.mission.item.spatial.SplineWaypoint;
 import com.o3dr.services.android.lib.drone.mission.item.spatial.Waypoint;
 
 import org.droidplanner.services.android.core.mission.Mission;
+import org.droidplanner.services.android.core.mission.MissionItemImpl;
 import org.droidplanner.services.android.core.mission.commands.CameraTriggerImpl;
 import org.droidplanner.services.android.core.mission.commands.ChangeSpeedImpl;
 import org.droidplanner.services.android.core.mission.commands.ConditionYawImpl;
@@ -88,11 +89,11 @@ public class ProxyUtils {
         return surveyDetail;
     }
 
-    public static org.droidplanner.services.android.core.mission.MissionItem getMissionItemImpl(Mission mission, MissionItem proxyItem) {
+    public static MissionItemImpl getMissionItemImpl(Mission mission, MissionItem proxyItem) {
         if (proxyItem == null)
             return null;
 
-        org.droidplanner.services.android.core.mission.MissionItem missionItemImpl;
+        MissionItemImpl missionItemImpl;
         switch (proxyItem.getType()) {
 
             case CAMERA_TRIGGER: {
@@ -304,7 +305,7 @@ public class ProxyUtils {
         return missionItemImpl;
     }
 
-    public static MissionItem getProxyMissionItem(org.droidplanner.services.android.core.mission.MissionItem itemImpl) {
+    public static MissionItem getProxyMissionItem(MissionItemImpl itemImpl) {
         if (itemImpl == null)
             return null;
 

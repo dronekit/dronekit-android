@@ -13,6 +13,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.ardupilotmega.msg_mag_cal_progress;
 import com.MAVLink.ardupilotmega.msg_mag_cal_report;
 import com.o3dr.services.android.lib.drone.action.CameraActions;
+import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.action.ConnectionActions;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
@@ -21,7 +22,11 @@ import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionResult;
 import com.o3dr.services.android.lib.drone.connection.DroneSharePrefs;
+import com.o3dr.services.android.lib.drone.mission.Mission;
 import com.o3dr.services.android.lib.drone.mission.action.MissionActions;
+import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
+import com.o3dr.services.android.lib.drone.mission.item.command.ResetROI;
+import com.o3dr.services.android.lib.drone.mission.item.spatial.RegionOfInterest;
 import com.o3dr.services.android.lib.drone.property.DroneAttribute;
 import com.o3dr.services.android.lib.drone.property.Parameter;
 import com.o3dr.services.android.lib.gcs.event.GCSEvent;
@@ -53,6 +58,9 @@ import timber.log.Timber;
  * Implementation for the IDroneApi interface.
  */
 public final class DroneApi extends IDroneApi.Stub implements DroneEventsListener, IBinder.DeathRecipient {
+
+    //The Reset ROI mission item was introduced in version 2.6.8. Any client library older than this do not support it.
+    private final static int RESET_ROI_LIB_VERSION = 206080;
 
     private final Context context;
 
@@ -141,7 +149,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
     @Override
     public Bundle getAttribute(String type) throws RemoteException {
-        final Bundle carrier = new Bundle();
+        Bundle carrier = new Bundle();
 
         switch (type) {
             case AttributeType.CAMERA:
@@ -149,10 +157,30 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 break;
 
             default:
-                if (droneMgr != null) {
-                    final DroneAttribute attribute = droneMgr.getAttribute(type);
-                    if (attribute != null)
+                if(droneMgr != null) {
+                    DroneAttribute attribute = droneMgr.getAttribute(type);
+                    if (attribute != null) {
+
+                        //Check if the client supports the ResetROI mission item.
+                        // Replace it with a RegionOfInterest with coordinate set to 0 if it doesn't.
+                        if(getClientVersionCode() < RESET_ROI_LIB_VERSION && attribute instanceof Mission){
+                            Mission proxyMission = (Mission) attribute;
+                            List<MissionItem> missionItems = proxyMission.getMissionItems();
+                            int missionItemsCount = missionItems.size();
+                            for(int i = 0; i < missionItemsCount; i++){
+                                MissionItem missionItem = missionItems.get(i);
+                                if(missionItem instanceof ResetROI){
+                                    missionItems.remove(i);
+
+                                    RegionOfInterest replacement = new RegionOfInterest();
+                                    replacement.setCoordinate(new LatLongAlt(0, 0, 0));
+                                    missionItems.add(i, replacement);
+                                }
+                            }
+                        }
+
                         carrier.putParcelable(type, attribute);
+                    }
                 }
                 break;
         }
@@ -228,7 +256,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
         if (action == null)
             return;
 
-        final String type = action.getType();
+        String type = action.getType();
         if (type == null)
             return;
 
@@ -249,8 +277,8 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
             //CAMERA ACTIONS
             case CameraActions.ACTION_START_VIDEO_STREAM: {
-                final Surface videoSurface = data.getParcelable(CameraActions.EXTRA_VIDEO_DISPLAY);
-                final String videoTag = data.getString(CameraActions.EXTRA_VIDEO_TAG, "");
+                Surface videoSurface = data.getParcelable(CameraActions.EXTRA_VIDEO_DISPLAY);
+                String videoTag = data.getString(CameraActions.EXTRA_VIDEO_TAG, "");
 
                 Bundle videoProps = data.getBundle(CameraActions.EXTRA_VIDEO_PROPERTIES);
                 if (videoProps == null) {
@@ -266,7 +294,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
             }
 
             case CameraActions.ACTION_STOP_VIDEO_STREAM: {
-                final String videoTag = data.getString(CameraActions.EXTRA_VIDEO_TAG, "");
+                String videoTag = data.getString(CameraActions.EXTRA_VIDEO_TAG, "");
                 CommonApiUtils.stopVideoStream(getDrone(), ownerId, videoTag, listener);
                 break;
             }
@@ -348,7 +376,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
             return;
 
         if (msg != null) {
-            final MavlinkMessageWrapper msgWrapper = new MavlinkMessageWrapper(msg);
+            MavlinkMessageWrapper msgWrapper = new MavlinkMessageWrapper(msg);
             for (IMavlinkObserver observer : mavlinkObserversList) {
                 try {
                     observer.onMavlinkMessageReceived(msgWrapper);
@@ -366,7 +394,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 
     @Override
     public void onMessageLogged(int logLevel, String message) {
-        final Bundle args = new Bundle(2);
+        Bundle args = new Bundle(2);
         args.putInt(AttributeEventExtra.EXTRA_AUTOPILOT_MESSAGE_LEVEL, logLevel);
         args.putString(AttributeEventExtra.EXTRA_AUTOPILOT_MESSAGE, message);
         notifyAttributeUpdate(AttributeEvent.AUTOPILOT_MESSAGE, args);
@@ -384,7 +412,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
     public void onDroneEvent(DroneInterfaces.DroneEventsType event, MavLinkDrone drone) {
         Bundle extrasBundle = null;
         String droneEvent = null;
-        final List<Pair<String, Bundle>> attributesInfo = new ArrayList<>();
+        List<Pair<String, Bundle>> attributesInfo = new ArrayList<>();
 
         switch (event) {
             case DISCONNECTED:
@@ -458,7 +486,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 break;
 
             case CALIBRATION_IMU:
-                final String calIMUMessage = drone.getCalibrationSetup().getMessage();
+                String calIMUMessage = drone.getCalibrationSetup().getMessage();
                 extrasBundle = new Bundle(1);
                 extrasBundle.putString(AttributeEventExtra.EXTRA_CALIBRATION_IMU_MESSAGE, calIMUMessage);
                 droneEvent = AttributeEvent.CALIBRATION_IMU;
@@ -472,8 +500,8 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
 				 * flag and re-trigger the HEARBEAT_TIMEOUT this however should
 				 * not be happening
 				 */
-                final AccelCalibration accelCalibration = drone.getCalibrationSetup();
-                final String message = accelCalibration.getMessage();
+                AccelCalibration accelCalibration = drone.getCalibrationSetup();
+                String message = accelCalibration.getMessage();
                 if (accelCalibration.isCalibrating() && TextUtils.isEmpty(message)) {
                     accelCalibration.cancelCalibration();
                     droneEvent = AttributeEvent.HEARTBEAT_TIMEOUT;
@@ -499,13 +527,13 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 break;
 
             case HEARTBEAT_FIRST:
-                final Bundle heartBeatExtras = new Bundle(1);
+                Bundle heartBeatExtras = new Bundle(1);
                 heartBeatExtras.putInt(AttributeEventExtra.EXTRA_MAVLINK_VERSION, drone.getMavlinkVersion());
                 attributesInfo.add(Pair.create(AttributeEvent.HEARTBEAT_FIRST, heartBeatExtras));
 
             case CONNECTED:
                 //Broadcast the vehicle connection.
-                final ConnectionParameter sanitizedParameter = new ConnectionParameter(connectionParams
+                ConnectionParameter sanitizedParameter = new ConnectionParameter(connectionParams
                         .getConnectionType(), connectionParams.getParamsBundle(), null);
 
                 context.sendBroadcast(new Intent(GCSEvent.ACTION_VEHICLE_CONNECTION)
@@ -529,14 +557,14 @@ public final class DroneApi extends IDroneApi.Stub implements DroneEventsListene
                 break;
 
             case MISSION_WP_UPDATE:
-                final int currentWaypoint = drone.getMissionStats().getCurrentWP();
+                int currentWaypoint = drone.getMissionStats().getCurrentWP();
                 extrasBundle = new Bundle(1);
                 extrasBundle.putInt(AttributeEventExtra.EXTRA_MISSION_CURRENT_WAYPOINT, currentWaypoint);
                 droneEvent = AttributeEvent.MISSION_ITEM_UPDATED;
                 break;
 
             case MISSION_WP_REACHED:
-                final int lastReachedWaypoint = drone.getMissionStats().getLastReachedWP();
+                int lastReachedWaypoint = drone.getMissionStats().getLastReachedWP();
                 extrasBundle = new Bundle(1);
                 extrasBundle.putInt(AttributeEventExtra.EXTRA_MISSION_LAST_REACHED_WAYPOINT, lastReachedWaypoint);
                 droneEvent = AttributeEvent.MISSION_ITEM_REACHED;
