@@ -1,10 +1,7 @@
 package com.o3dr.android.client.utils.geotag;
 
-import android.content.Context;
 import android.media.ExifInterface;
 import android.os.AsyncTask;
-import android.os.Build;
-import android.os.Environment;
 
 import com.MAVLink.ardupilotmega.msg_camera_feedback;
 import com.o3dr.android.client.utils.data.tlog.TLogParser;
@@ -27,9 +24,9 @@ import java.util.Map;
  * GeoTagAsyncTask images based on camera mavlink messages.
  */
 public abstract class GeoTagAsyncTask extends AsyncTask<Void, Integer, GeoTagAsyncTask.ResultObject> {
-    public static final String STORE_PHOTO_DIR_NAME = "GeoTag";
+    private static final String STORE_PHOTO_PREFIX = "GeoTag";
     private static final SimpleDateFormat formatter = new SimpleDateFormat("MM-dd-yy-HH");
-    private final Context context;
+    private final File rootDir;
     private final List<TLogParser.Event> events;
     private final ArrayList<File> photos;
 
@@ -38,12 +35,12 @@ public abstract class GeoTagAsyncTask extends AsyncTask<Void, Integer, GeoTagAsy
      *
      * Warning: this copies data to external storage
      *
-     * @param context  {@link Context}
+     * @param rootDir  {@link File}
      * @param events   {@link List<com.o3dr.android.client.utils.data.tlog.TLogParser.Event>} list of events to geotag photos.
      * @param photos   {@link List<File>} list of files of photos to geotag.
      */
-    public GeoTagAsyncTask(Context context, List<TLogParser.Event> events, ArrayList<File> photos) {
-        this.context = context;
+    public GeoTagAsyncTask(File rootDir, List<TLogParser.Event> events, ArrayList<File> photos) {
+        this.rootDir = rootDir;
         this.events = events;
         this.photos = photos;
     }
@@ -61,17 +58,13 @@ public abstract class GeoTagAsyncTask extends AsyncTask<Void, Integer, GeoTagAsy
                 return resultObject;
             }
 
-            File saveDir = findNextDirName(context);
-            if (saveDir == null) {
-                resultObject.setException(new IllegalStateException("Failed to create directory for images"));
-                return resultObject;
-            }
+            File saveDir = findNextDirName(rootDir);
 
             if (isCancelled()) {
                 return resultObject;
             }
 
-            if (!saveDir.mkdir()) {
+            if (!saveDir.mkdirs()) {
                 resultObject.setException(new IllegalStateException("Failed to create directory for images"));
                 return resultObject;
             }
@@ -195,22 +188,6 @@ public abstract class GeoTagAsyncTask extends AsyncTask<Void, Integer, GeoTagAsy
         }
     }
 
-    private static File getSaveRootDir(Context context) {
-        File saveDir = context.getExternalFilesDir(null);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            File dirs[] = context.getExternalFilesDirs(null);
-            for (File dir : dirs) {
-                // dir can be null if the device contains an external SD card slot but no SD card is present.
-                if (dir != null && Environment.isExternalStorageRemovable(dir)) {
-                    saveDir = dir;
-                    break;
-                }
-            }
-        }
-        return saveDir;
-    }
-
     private static boolean hasEnoughMemory(File file, Collection<File> photos) {
         long freeBytes = file.getUsableSpace();
         long bytesNeeded = 0;
@@ -272,22 +249,16 @@ public abstract class GeoTagAsyncTask extends AsyncTask<Void, Integer, GeoTagAsy
         HashMap<TLogParser.Event, File> match(List<TLogParser.Event> events, ArrayList<File> photos);
     }
 
-    private static File findNextDirName(Context context) {
-        File rootDir = new File(getSaveRootDir(context), STORE_PHOTO_DIR_NAME);
-
-        if (!rootDir.exists() && !rootDir.mkdir()) {
-            return null;
-        }
-
+    private static File findNextDirName(File rootDir) {
         Date date = new Date();
-        String dirName = STORE_PHOTO_DIR_NAME + "_" + formatter.format(date);
-        File file = new File(rootDir, dirName);
+        File file;
         int i = 0;
-        while (file.exists()) {
-            i++;
-            dirName = STORE_PHOTO_DIR_NAME + "_" + formatter.format(date) + "_" + i;
+        do {
+            String dirName = STORE_PHOTO_PREFIX + "_" + formatter.format(date) + "_" + i;
             file = new File(rootDir, dirName);
-        }
+            i++;
+        } while (file.exists());
+
         return file;
     }
 }
