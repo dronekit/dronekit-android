@@ -35,44 +35,4 @@ public class Px4Native extends GenericMavLinkDrone {
         return FirmwareType.PX4_NATIVE;
     }
 
-    @Override
-    public WaypointManager getWaypointManager() {
-        return null;
-    }
-
-    @Override
-    public Mission getMission() {
-        return null;
-    }
-
-    @Override
-    public MissionStats getMissionStats() {
-        return null;
-    }
-
-    @Override
-    public GuidedPoint getGuidedPoint() {
-        return null;
-    }
-
-    @Override
-    public AccelCalibration getCalibrationSetup() {
-        return null;
-    }
-
-    @Override
-    public MagnetometerCalibrationImpl getMagnetometerCalibration() {
-        return null;
-    }
-
-    @Override
-    public String getFirmwareVersion() {
-        return null;
-    }
-
-    @Override
-    public Camera getCamera() {
-        return null;
-    }
-
 }

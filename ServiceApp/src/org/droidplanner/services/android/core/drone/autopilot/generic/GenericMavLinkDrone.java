@@ -44,17 +44,24 @@ import com.o3dr.services.android.lib.util.MathUtils;
 import org.droidplanner.services.android.core.MAVLink.MAVLinkStreams;
 import org.droidplanner.services.android.core.MAVLink.MavLinkCommands;
 import org.droidplanner.services.android.core.MAVLink.MavLinkWaypoint;
+import org.droidplanner.services.android.core.MAVLink.WaypointManager;
 import org.droidplanner.services.android.core.drone.DroneEvents;
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
 import org.droidplanner.services.android.core.drone.LogMessageListener;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.core.drone.autopilot.apm.APMConstants;
 import org.droidplanner.services.android.core.drone.profiles.ParameterManager;
+import org.droidplanner.services.android.core.drone.variables.Camera;
+import org.droidplanner.services.android.core.drone.variables.GuidedPoint;
 import org.droidplanner.services.android.core.drone.variables.HeartBeat;
+import org.droidplanner.services.android.core.drone.variables.MissionStats;
 import org.droidplanner.services.android.core.drone.variables.State;
 import org.droidplanner.services.android.core.drone.variables.StreamRates;
 import org.droidplanner.services.android.core.drone.variables.Type;
+import org.droidplanner.services.android.core.drone.variables.calibration.AccelCalibration;
+import org.droidplanner.services.android.core.drone.variables.calibration.MagnetometerCalibrationImpl;
 import org.droidplanner.services.android.core.firmware.FirmwareType;
+import org.droidplanner.services.android.core.mission.Mission;
 import org.droidplanner.services.android.core.model.AutopilotWarningParser;
 import org.droidplanner.services.android.utils.CommonApiUtils;
 import org.droidplanner.services.android.utils.video.VideoManager;
@@ -65,7 +72,7 @@ import org.droidplanner.services.android.utils.video.VideoManager;
  * <p/>
  * Created by Fredia Huya-Kouadio on 9/10/15.
  */
-public abstract class GenericMavLinkDrone implements MavLinkDrone {
+public class GenericMavLinkDrone implements MavLinkDrone {
 
     private final MAVLinkStreams.MAVLinkOutputStream mavClient;
 
@@ -112,6 +119,48 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
         this.videoMgr = new VideoManager(handler);
     }
 
+    @Override
+    public MissionStats getMissionStats() {
+        //TODO: complete implementation
+        return null;
+    }
+
+    @Override
+    public Mission getMission() {
+        //TODO: complete implementation
+        return null;
+    }
+
+    @Override
+    public Camera getCamera() {
+        //TODO: complete implementation
+        return null;
+    }
+
+    @Override
+    public GuidedPoint getGuidedPoint() {
+        //TODO: complete implementation
+        return null;
+    }
+
+    @Override
+    public AccelCalibration getCalibrationSetup() {
+        //TODO: complete implementation
+        return null;
+    }
+
+    @Override
+    public WaypointManager getWaypointManager() {
+        //TODO: complete implementation
+        return null;
+    }
+
+    @Override
+    public MagnetometerCalibrationImpl getMagnetometerCalibration() {
+        //TODO: complete implementation
+        return null;
+    }
+
     protected HeartBeat initHeartBeat(Handler handler) {
         return new HeartBeat(this, handler);
     }
@@ -119,6 +168,15 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
     @Override
     public FirmwareType getFirmwareType() {
         return FirmwareType.GENERIC;
+    }
+
+    @Override
+    public String getFirmwareVersion() {
+        return type.getFirmwareVersion();
+    }
+
+    protected void setFirmwareVersion(String message) {
+        type.setFirmwareVersion(message);
     }
 
     @Override

@@ -166,15 +166,6 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
         return magCalibration;
     }
 
-    @Override
-    public String getFirmwareVersion() {
-        return type.getFirmwareVersion();
-    }
-
-    protected void setFirmwareVersion(String message) {
-        type.setFirmwareVersion(message);
-    }
-
     public Camera getCamera() {
         return footprints;
     }
