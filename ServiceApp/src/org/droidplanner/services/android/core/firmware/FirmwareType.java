@@ -1,26 +1,40 @@
 package org.droidplanner.services.android.core.firmware;
 
+import com.MAVLink.enums.MAV_AUTOPILOT;
+
 public enum FirmwareType {
     /* APM firmware types */
-    ARDU_PLANE("ArduPlane"),
-    ARDU_COPTER("ArduCopter"),
-    ARDU_ROVER("ArduRover"),
-    ARDU_SOLO("ArduSolo"),
+    ARDU_PLANE(MAV_AUTOPILOT.MAV_AUTOPILOT_ARDUPILOTMEGA, "ArduPlane", "ArduPlane"),
+    ARDU_COPTER(MAV_AUTOPILOT.MAV_AUTOPILOT_ARDUPILOTMEGA, "ArduCopter2", "ArduCopter"),
+    ARDU_ROVER(MAV_AUTOPILOT.MAV_AUTOPILOT_ARDUPILOTMEGA, "ArduRover", "ArduRover"),
+    ARDU_SOLO(MAV_AUTOPILOT.MAV_AUTOPILOT_ARDUPILOTMEGA, "ArduCopter2", "ArduSolo"),
 
     /**
      * PX4 firmware type
      */
-    PX4_NATIVE("PX4 Native"),
+    PX4_NATIVE(MAV_AUTOPILOT.MAV_AUTOPILOT_PX4, "", "PX4 Native"),
 
     /**
      * Generic firmware type
      */
-    GENERIC("Generic");
+    GENERIC(MAV_AUTOPILOT.MAV_AUTOPILOT_GENERIC, "", "Generic");
 
     private final String type;
+    private final int family;
+    private final String parameterMetadataGroup;
 
-    FirmwareType(String type) {
+    FirmwareType(int family, String group, String type) {
+        this.family = family;
         this.type = type;
+        this.parameterMetadataGroup = group;
+    }
+
+    public int getFamily() {
+        return family;
+    }
+
+    public String getParameterMetadataGroup() {
+        return parameterMetadataGroup;
     }
 
     @Override

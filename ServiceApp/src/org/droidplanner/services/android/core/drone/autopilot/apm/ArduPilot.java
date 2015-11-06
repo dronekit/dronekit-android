@@ -53,11 +53,9 @@ import org.droidplanner.services.android.core.MAVLink.WaypointManager;
 import org.droidplanner.services.android.core.MAVLink.command.doCmd.MavLinkDoCmds;
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
 import org.droidplanner.services.android.core.drone.LogMessageListener;
-import org.droidplanner.services.android.core.drone.Preferences;
 import org.droidplanner.services.android.core.drone.autopilot.apm.variables.APMHeartBeat;
 import org.droidplanner.services.android.core.drone.autopilot.generic.GenericMavLinkDrone;
 import org.droidplanner.services.android.core.drone.profiles.ParameterManager;
-import org.droidplanner.services.android.core.drone.profiles.VehicleProfile;
 import org.droidplanner.services.android.core.drone.variables.ApmModes;
 import org.droidplanner.services.android.core.drone.variables.Camera;
 import org.droidplanner.services.android.core.drone.variables.GuidedPoint;
@@ -82,8 +80,6 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
     public static final int ARTOO_COMPONENT_ID = 0;
     public static final int TELEMETRY_RADIO_COMPONENT_ID = 68;
 
-    private VehicleProfile profile;
-
     private final org.droidplanner.services.android.core.drone.variables.RC rc;
     private final Mission mission;
     private final MissionStats missionStats;
@@ -92,25 +88,19 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
     private final WaypointManager waypointManager;
     private final Magnetometer mag;
     private final Camera footprints;
-    private final ParameterManager parameterManager;
 
-    private final Preferences preferences;
 
     private final LogMessageListener logListener;
     private final MagnetometerCalibrationImpl magCalibration;
 
     public ArduPilot(Context context, MAVLinkStreams.MAVLinkOutputStream mavClient,
-                     Handler handler, Preferences pref, AutopilotWarningParser warningParser,
+                     Handler handler, AutopilotWarningParser warningParser,
                      LogMessageListener logListener, DroneInterfaces.AttributeEventListener listener) {
 
-        super(handler, mavClient, warningParser, listener);
+        super(context, handler, mavClient, warningParser, listener);
 
-        this.preferences = pref;
         this.logListener = logListener;
 
-        loadVehicleProfile();
-
-        parameterManager = new ParameterManager(this, context, handler);
         this.waypointManager = new WaypointManager(this, handler);
 
         rc = new RC(this);
@@ -148,26 +138,6 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
 
         this.altitude.setTargetAltitude(this.altitude.getAltitude() + alt_error);
         notifyDroneEvent(DroneInterfaces.DroneEventsType.ORIENTATION);
-    }
-
-    @Override
-    public ParameterManager getParameterManager() {
-        return parameterManager;
-    }
-
-    @Override
-    public void loadVehicleProfile() {
-        profile = preferences.loadVehicleProfile(getFirmwareType());
-    }
-
-    @Override
-    public VehicleProfile getVehicleProfile() {
-        return profile;
-    }
-
-    @Override
-    public Preferences getPreferences() {
-        return preferences;
     }
 
     @Override
@@ -336,6 +306,8 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
                 //Retrieve the speed parameters.
                 float defaultSpeed = 5; //m/s
 
+                ParameterManager parameterManager = getParameterManager();
+
                 //Retrieve the horizontal speed value
                 Parameter horizSpeedParam = parameterManager.getParameter("WPNAV_SPEED");
                 double horizontalSpeed = horizSpeedParam == null ? defaultSpeed : horizSpeedParam.getValue() / 100;
@@ -434,7 +406,7 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
                 int mountMode = data.getInt(GimbalActions.GIMBAL_MOUNT_MODE, MAV_MOUNT_MODE.MAV_MOUNT_MODE_RC_TARGETING);
                 Timber.i("Setting gimbal mount mode: %d", mountMode);
 
-                Parameter mountParam = this.parameterManager.getParameter("MNT_MODE");
+                Parameter mountParam = getParameterManager().getParameter("MNT_MODE");
                 if (mountParam == null) {
                     msg_mount_configure msg = new msg_mount_configure();
                     msg.target_system = getSysid();

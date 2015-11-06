@@ -1,5 +1,6 @@
 package org.droidplanner.services.android.core.drone.autopilot.generic;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
@@ -74,6 +75,7 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
     private final State state;
     private final HeartBeat heartbeat;
     private final StreamRates streamRates;
+    private final ParameterManager parameterManager;
 
     private final DroneInterfaces.AttributeEventListener attributeListener;
 
@@ -89,7 +91,7 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
 
     protected final Handler handler;
 
-    public GenericMavLinkDrone(Handler handler, MAVLinkStreams.MAVLinkOutputStream mavClient, AutopilotWarningParser warningParser, DroneInterfaces.AttributeEventListener listener) {
+    public GenericMavLinkDrone(Context context, Handler handler, MAVLinkStreams.MAVLinkOutputStream mavClient, AutopilotWarningParser warningParser, DroneInterfaces.AttributeEventListener listener) {
         this.handler = handler;
         this.mavClient = mavClient;
 
@@ -98,6 +100,7 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
         this.type = new Type(this);
         this.streamRates = new StreamRates(this);
         this.state = new State(this, handler, warningParser);
+        parameterManager = new ParameterManager(this, context, handler);
 
         this.attributeListener = listener;
 
@@ -111,6 +114,11 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
     @Override
     public FirmwareType getFirmwareType() {
         return FirmwareType.GENERIC;
+    }
+
+    @Override
+    public ParameterManager getParameterManager() {
+        return parameterManager;
     }
 
     @Override

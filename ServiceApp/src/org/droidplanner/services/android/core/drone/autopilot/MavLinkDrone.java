@@ -49,13 +49,7 @@ public interface MavLinkDrone extends Drone {
 
     public FirmwareType getFirmwareType();
 
-    public void loadVehicleProfile();
-
-    public VehicleProfile getVehicleProfile();
-
     public MAVLinkStreams.MAVLinkOutputStream getMavClient();
-
-    public Preferences getPreferences();
 
     public WaypointManager getWaypointManager();
 

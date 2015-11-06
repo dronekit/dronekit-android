@@ -212,8 +212,7 @@ public class ParameterManager extends DroneVariable implements OnDroneListener {
 
     private void refreshParametersMetadata() {
         //Reload the vehicle parameters metadata
-        VehicleProfile profile = myDrone.getVehicleProfile();
-        String metadataType = profile == null ? null : profile.getParameterMetadataType();
+        String metadataType = myDrone.getFirmwareType().getParameterMetadataGroup();
         if (!TextUtils.isEmpty(metadataType)) {
             try {
                 ParameterMetadataLoader.load(context, metadataType, this.parametersMetadata);
