@@ -3,7 +3,7 @@ package org.droidplanner.services.android.core.mission.waypoints;
 import java.util.List;
 
 import org.droidplanner.services.android.core.mission.Mission;
-import org.droidplanner.services.android.core.mission.MissionItem;
+import org.droidplanner.services.android.core.mission.MissionItemImpl;
 import org.droidplanner.services.android.core.mission.MissionItemType;
 
 import com.MAVLink.common.msg_mission_item;
@@ -12,7 +12,7 @@ import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 
 public class RegionOfInterestImpl extends SpatialCoordItem {
 
-	public RegionOfInterestImpl(MissionItem item) {
+	public RegionOfInterestImpl(MissionItemImpl item) {
 		super(item);
 	}
 	
