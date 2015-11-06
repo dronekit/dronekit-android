@@ -138,4 +138,41 @@ public final class ParametersMetadataTable extends ServicesTable {
 
         return results;
     }
+
+    public List<ParameterMetadata> retrieveAllParameterMetadata(){
+        List<ParameterMetadata> results = new ArrayList<>();
+
+        String[] projection = {COLUMN_NAME_FAMILY, COLUMN_NAME_PARAMETER_GROUP, COLUMN_NAME_PARAMETER_NAME,
+                COLUMN_NAME_PARAMETER_DATATYPE, COLUMN_NAME_SHORT_DESCRIPTION,
+                COLUMN_NAME_DESCRIPTION, COLUMN_NAME_UNITS, COLUMN_NAME_RANGE, COLUMN_NAME_VALUES};
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.query(TABLE_NAME, projection, null, null, null, null, null);
+
+        if(cursor == null)
+            return results;
+
+        if(cursor.moveToFirst()){
+            do{
+                int family = cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_FAMILY));
+                String paramName = cursor.getString(cursor.getColumnIndex(COLUMN_NAME_PARAMETER_NAME));
+
+                ParameterMetadata result = new ParameterMetadata(family, paramName);
+
+                result.setGroup(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_PARAMETER_GROUP)));
+                result.setDataType(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_PARAMETER_DATATYPE)));
+                result.setDisplayName(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_SHORT_DESCRIPTION)));
+                result.setDescription(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_DESCRIPTION)));
+                result.setUnits(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_UNITS)));
+                result.setRange(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_RANGE)));
+                result.setValues(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_VALUES)));
+
+                results.add(result);
+            } while(cursor.moveToNext());
+
+            cursor.close();
+        }
+
+        return results;
+
+    }
 }

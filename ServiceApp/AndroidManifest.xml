@@ -35,7 +35,7 @@
         android:required="false"/>
 
     <application
-        android:name=".DroidPlannerServicesApp"
+        android:name=".ServicesApp"
         android:allowBackup="true"
         android:theme="@style/AppTheme"
         android:icon="@drawable/ic_launcher"
@@ -84,6 +84,9 @@
                 <data android:mimeType="application/octet-stream"/>
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".ui.activity.ParametersMetadataViewer"/>
 
         <provider
             android:name=".data.provider.FileProvider"

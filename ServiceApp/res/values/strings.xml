@@ -33,5 +33,6 @@
     <string name="label_action_button_open">Open</string>
     <string name="label_view_category_active">Active</string>
     <string name="label_view_category_recommended">Recommended</string>
+    <string name="menu_parameters_metadata">Parameters Metadata</string>
 
 </resources>

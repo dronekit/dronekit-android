@@ -3,7 +3,7 @@ package org.droidplanner.services.android.utils.analytics;
 import java.util.Map;
 
 import org.droidplanner.services.android.BuildConfig;
-import org.droidplanner.services.android.DroidPlannerServicesApp;
+import org.droidplanner.services.android.ServicesApp;
 import org.droidplanner.services.android.R;
 import org.droidplanner.services.android.utils.prefs.DroidPlannerPrefs;
 
@@ -73,7 +73,7 @@ public class GAUtils {
 	 */
 	private static Tracker sAppTracker;
 
-	public static void initGATracker(DroidPlannerServicesApp app) {
+	public static void initGATracker(ServicesApp app) {
 		if (sAppTracker == null) {
 			final Context context = app.getApplicationContext();
 

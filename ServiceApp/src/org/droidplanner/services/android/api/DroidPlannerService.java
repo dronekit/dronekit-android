@@ -26,7 +26,7 @@ import com.o3dr.services.android.lib.drone.mission.item.complex.CameraDetail;
 import com.o3dr.services.android.lib.model.IApiListener;
 import com.o3dr.services.android.lib.model.IDroidPlannerServices;
 
-import org.droidplanner.services.android.DroidPlannerServicesApp;
+import org.droidplanner.services.android.ServicesApp;
 import org.droidplanner.services.android.core.MAVLink.connection.MavLinkConnection;
 import org.droidplanner.services.android.core.MAVLink.connection.MavLinkConnectionListener;
 import org.droidplanner.services.android.core.survey.CameraInfo;
@@ -418,7 +418,7 @@ public class DroidPlannerService extends Service {
     public void onCreate() {
         super.onCreate();
 
-        final DroidPlannerServicesApp dpApp = (DroidPlannerServicesApp) getApplication();
+        final ServicesApp dpApp = (ServicesApp) getApplication();
         dpApp.createFileStartLogging();
 
         Timber.d("Creating 3DR Services.");
@@ -496,7 +496,7 @@ public class DroidPlannerService extends Service {
             wifiLock = null;
         }
 
-        final DroidPlannerServicesApp dpApp = (DroidPlannerServicesApp) getApplication();
+        final ServicesApp dpApp = (ServicesApp) getApplication();
         dpApp.closeLogFile();
     }
 

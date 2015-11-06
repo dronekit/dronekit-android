@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.crashlytics.android.Crashlytics;
 
+import org.droidplanner.services.android.data.database.ServicesDb;
 import org.droidplanner.services.android.utils.LogToFileTree;
 import org.droidplanner.services.android.utils.analytics.GAUtils;
 import org.droidplanner.services.android.utils.file.IO.ExceptionWriter;
@@ -11,9 +12,10 @@ import org.droidplanner.services.android.utils.file.IO.ExceptionWriter;
 import io.fabric.sdk.android.Fabric;
 import timber.log.Timber;
 
-public class DroidPlannerServicesApp extends Application {
+public class ServicesApp extends Application {
 
     private LogToFileTree logToFileTree;
+    private ServicesDb servicesDb;
 
     @Override
     public void onCreate() {
@@ -33,7 +35,7 @@ public class DroidPlannerServicesApp extends Application {
         final ExceptionWriter exceptionWriter = new ExceptionWriter(getApplicationContext());
         final Thread.UncaughtExceptionHandler defaultHandler = Thread.getDefaultUncaughtExceptionHandler();
 
-        final Thread.UncaughtExceptionHandler handler = new Thread.UncaughtExceptionHandler() {
+        Thread.UncaughtExceptionHandler handler = new Thread.UncaughtExceptionHandler() {
             @Override
             public void uncaughtException(Thread thread, Throwable ex) {
                 exceptionWriter.saveStackTraceToSD(ex);
@@ -45,6 +47,8 @@ public class DroidPlannerServicesApp extends Application {
 
         GAUtils.initGATracker(this);
         GAUtils.startNewSession(null);
+
+        servicesDb = new ServicesDb(getApplicationContext());
     }
 
     public void createFileStartLogging() {
@@ -57,5 +61,9 @@ public class DroidPlannerServicesApp extends Application {
         if(logToFileTree != null) {
             logToFileTree.stopLoggingThread();
         }
+    }
+
+    public ServicesDb getServicesDatabase(){
+        return servicesDb;
     }
 }

@@ -11,6 +11,7 @@ import android.os.IBinder;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,7 +26,7 @@ import org.droidplanner.services.android.utils.Utils;
 /**
  * User interface for the 3DR Services app.
  */
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends AppCompatActivity {
 
     private final static String TAG = MainActivity.class.getSimpleName();
 
@@ -93,6 +94,10 @@ public class MainActivity extends ActionBarActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.menu_parameters_metadata:
+                startActivity(new Intent(getApplicationContext(), ParametersMetadataViewer.class));
+                return true;
+
             case R.id.menu_learn_more:
                 startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse("http://dronekit.io/")));
                 return true;
