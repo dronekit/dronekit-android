@@ -3,6 +3,8 @@ package org.droidplanner.services.android.utils.file.IO;
 import android.content.Context;
 import android.util.Xml;
 
+import com.MAVLink.enums.MAV_AUTOPILOT;
+
 import org.droidplanner.services.android.core.drone.profiles.ParameterMetadata;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -66,8 +68,7 @@ public class ParameterMetadataLoader {
                         parsing = true;
                     } else if (parsing) {
                         if (metadata == null) {
-                            metadata = new ParameterMetadata();
-                            metadata.setName(name);
+                            metadata = new ParameterMetadata(MAV_AUTOPILOT.MAV_AUTOPILOT_ARDUPILOTMEGA, name);
                         } else {
                             addMetaDataProperty(metadata, name, parser.nextText());
                         }
