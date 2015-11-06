@@ -6,7 +6,7 @@ import com.MAVLink.enums.MAV_FRAME;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 
 import org.droidplanner.services.android.core.mission.Mission;
-import org.droidplanner.services.android.core.mission.MissionItem;
+import org.droidplanner.services.android.core.mission.MissionItemImpl;
 import org.droidplanner.services.android.core.mission.MissionItemType;
 import org.droidplanner.services.android.core.mission.commands.CameraTriggerImpl;
 import org.droidplanner.services.android.core.polygon.Polygon;
@@ -18,7 +18,7 @@ import org.droidplanner.services.android.core.survey.grid.GridBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SurveyImpl extends MissionItem {
+public class SurveyImpl extends MissionItemImpl {
 
     public Polygon polygon = new Polygon();
     public SurveyData surveyData = new SurveyData();

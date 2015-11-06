@@ -6,14 +6,14 @@ import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 
 import org.droidplanner.services.android.core.mission.Mission;
-import org.droidplanner.services.android.core.mission.MissionItem;
+import org.droidplanner.services.android.core.mission.MissionItemImpl;
 import org.droidplanner.services.android.core.mission.MissionItemType;
 
 import java.util.List;
 
 public class LandImpl extends SpatialCoordItem {
 
-    public LandImpl(MissionItem item) {
+    public LandImpl(MissionItemImpl item) {
         super(item);
         setAltitude((0.0));
     }

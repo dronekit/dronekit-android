@@ -5,11 +5,11 @@ import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 
 import org.droidplanner.services.android.core.mission.Mission;
-import org.droidplanner.services.android.core.mission.MissionItem;
+import org.droidplanner.services.android.core.mission.MissionItemImpl;
 
 import java.util.List;
 
-public abstract class SpatialCoordItem extends MissionItem {
+public abstract class SpatialCoordItem extends MissionItemImpl {
 
     protected LatLongAlt coordinate;
 
@@ -18,7 +18,7 @@ public abstract class SpatialCoordItem extends MissionItem {
         this.coordinate = coord;
     }
 
-    public SpatialCoordItem(MissionItem item) {
+    public SpatialCoordItem(MissionItemImpl item) {
         super(item);
         if (item instanceof SpatialCoordItem) {
             coordinate = ((SpatialCoordItem) item).getCoordinate();

@@ -5,7 +5,7 @@ import com.MAVLink.enums.MAV_CMD;
 import com.MAVLink.enums.MAV_FRAME;
 
 import org.droidplanner.services.android.core.mission.Mission;
-import org.droidplanner.services.android.core.mission.MissionItem;
+import org.droidplanner.services.android.core.mission.MissionItemImpl;
 import org.droidplanner.services.android.core.mission.MissionItemType;
 
 import java.util.List;
@@ -17,7 +17,7 @@ public class TakeoffImpl extends MissionCMD {
     private double finishedAlt = 10;
     private double pitch = 0;
 
-    public TakeoffImpl(MissionItem item) {
+    public TakeoffImpl(MissionItemImpl item) {
         super(item);
     }
 

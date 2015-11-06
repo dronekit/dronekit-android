@@ -4,7 +4,7 @@ import com.MAVLink.common.msg_mission_item;
 import com.MAVLink.enums.MAV_CMD;
 
 import org.droidplanner.services.android.core.mission.Mission;
-import org.droidplanner.services.android.core.mission.MissionItem;
+import org.droidplanner.services.android.core.mission.MissionItemImpl;
 import org.droidplanner.services.android.core.mission.MissionItemType;
 
 import java.util.List;
@@ -18,7 +18,7 @@ public class SetRelayImpl extends MissionCMD {
     private int relayNumber;
     private boolean enabled;
 
-    public SetRelayImpl(MissionItem item){
+    public SetRelayImpl(MissionItemImpl item){
         super(item);
     }
 
