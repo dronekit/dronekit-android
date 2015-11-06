@@ -32,9 +32,7 @@ import com.o3dr.services.android.lib.model.action.Action;
 import org.droidplanner.services.android.core.MAVLink.MAVLinkStreams;
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
 import org.droidplanner.services.android.core.drone.LogMessageListener;
-import org.droidplanner.services.android.core.drone.Preferences;
 import org.droidplanner.services.android.core.drone.autopilot.apm.ArduCopter;
-import org.droidplanner.services.android.core.drone.autopilot.apm.solo.SoloComp;
 import org.droidplanner.services.android.core.drone.variables.HeartBeat;
 import org.droidplanner.services.android.core.firmware.FirmwareType;
 import org.droidplanner.services.android.core.model.AutopilotWarningParser;
@@ -71,8 +69,8 @@ public class ArduSolo extends ArduCopter {
     private final SoloComp soloComp;
 
     public ArduSolo(Context context, MAVLinkStreams.MAVLinkOutputStream mavClient, Handler handler,
-                    Preferences pref, AutopilotWarningParser warningParser, LogMessageListener logListener, DroneInterfaces.AttributeEventListener listener) {
-        super(context, mavClient, handler, pref, warningParser, logListener, listener);
+                    AutopilotWarningParser warningParser, LogMessageListener logListener, DroneInterfaces.AttributeEventListener listener) {
+        super(context, mavClient, handler, warningParser, logListener, listener);
         this.soloComp = new SoloComp(context, handler);
         this.soloComp.setListener(new SoloComp.SoloCompListener() {
             @Override
@@ -176,13 +174,13 @@ public class ArduSolo extends ArduCopter {
     }
 
     @Override
-    public boolean isConnected(){
+    public boolean isConnected() {
         return soloComp.isConnected() && super.isConnected();
     }
 
     @Override
     public DroneAttribute getAttribute(String attributeType) {
-        switch(attributeType){
+        switch (attributeType) {
             case SoloAttributes.SOLO_STATE:
                 return SoloApiUtils.getSoloLinkState(this);
 
@@ -201,13 +199,13 @@ public class ArduSolo extends ArduCopter {
         }
     }
 
-    protected void resetVideoManager(){
+    protected void resetVideoManager() {
         videoMgr.reset();
     }
 
     @Override
-    public void startVideoStream(Bundle videoProps, String appId, String newVideoTag, Surface videoSurface, final ICommandListener listener){
-        if(!soloComp.hasStreamingPermission()){
+    public void startVideoStream(Bundle videoProps, String appId, String newVideoTag, Surface videoSurface, final ICommandListener listener) {
+        if (!soloComp.hasStreamingPermission()) {
             postErrorEvent(CommandExecutionError.COMMAND_DENIED, listener);
             return;
         }
@@ -277,11 +275,11 @@ public class ArduSolo extends ArduCopter {
     }
 
     @Override
-    public boolean executeAsyncAction(Action action, final ICommandListener listener){
+    public boolean executeAsyncAction(Action action, final ICommandListener listener) {
         final String type = action.getType();
         Bundle data = action.getData();
 
-        switch(type){
+        switch (type) {
             //************ SOLOLINK ACTIONS *************//
             case SoloActions.ACTION_SEND_MESSAGE:
                 final TLVPacket messageData = data.getParcelable(SoloActions.EXTRA_MESSAGE_DATA);
