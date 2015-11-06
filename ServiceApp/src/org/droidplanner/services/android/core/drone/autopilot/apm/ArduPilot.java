@@ -89,17 +89,13 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
     private final Magnetometer mag;
     private final Camera footprints;
 
-
-    private final LogMessageListener logListener;
     private final MagnetometerCalibrationImpl magCalibration;
 
     public ArduPilot(Context context, MAVLinkStreams.MAVLinkOutputStream mavClient,
                      Handler handler, AutopilotWarningParser warningParser,
                      LogMessageListener logListener, DroneInterfaces.AttributeEventListener listener) {
 
-        super(context, handler, mavClient, warningParser, listener);
-
-        this.logListener = logListener;
+        super(context, handler, mavClient, warningParser, logListener, listener);
 
         this.waypointManager = new WaypointManager(this, handler);
 
@@ -179,21 +175,9 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
         type.setFirmwareVersion(message);
     }
 
-    @Override
-    public Magnetometer getMagnetometer() {
-        return mag;
-    }
-
     public Camera getCamera() {
         return footprints;
     }
-
-    @Override
-    public void logMessage(int logLevel, String message) {
-        if (logListener != null)
-            logListener.onMessageLogged(logLevel, message);
-    }
-
 
     @Override
     public DroneAttribute getAttribute(String attributeType) {
@@ -479,7 +463,7 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
 
                 case msg_raw_imu.MAVLINK_MSG_ID_RAW_IMU:
                     msg_raw_imu msg_imu = (msg_raw_imu) message;
-                    getMagnetometer().newData(msg_imu);
+                    mag.newData(msg_imu);
                     break;
 
                 case msg_radio.MAVLINK_MSG_ID_RADIO:

@@ -65,12 +65,8 @@ public interface MavLinkDrone extends Drone {
 
     public MagnetometerCalibrationImpl getMagnetometerCalibration();
 
-    public Magnetometer getMagnetometer();
-
     public String getFirmwareVersion();
 
     public Camera getCamera();
-
-    public void logMessage(int mavSeverity, String message);
 
 }

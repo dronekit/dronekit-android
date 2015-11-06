@@ -6,6 +6,7 @@ import android.os.Handler;
 import org.droidplanner.services.android.core.MAVLink.MAVLinkStreams;
 import org.droidplanner.services.android.core.MAVLink.WaypointManager;
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
+import org.droidplanner.services.android.core.drone.LogMessageListener;
 import org.droidplanner.services.android.core.drone.Preferences;
 import org.droidplanner.services.android.core.drone.autopilot.generic.GenericMavLinkDrone;
 import org.droidplanner.services.android.core.drone.profiles.ParameterManager;
@@ -25,8 +26,8 @@ import org.droidplanner.services.android.core.model.AutopilotWarningParser;
  */
 public class Px4Native extends GenericMavLinkDrone {
 
-    public Px4Native(Context context, Handler handler, MAVLinkStreams.MAVLinkOutputStream mavClient, AutopilotWarningParser warningParser, DroneInterfaces.AttributeEventListener listener) {
-        super(context, handler, mavClient, warningParser, listener);
+    public Px4Native(Context context, Handler handler, MAVLinkStreams.MAVLinkOutputStream mavClient, AutopilotWarningParser warningParser, LogMessageListener logListener, DroneInterfaces.AttributeEventListener listener) {
+        super(context, handler, mavClient, warningParser, logListener, listener);
     }
 
     @Override
@@ -65,11 +66,6 @@ public class Px4Native extends GenericMavLinkDrone {
     }
 
     @Override
-    public Magnetometer getMagnetometer() {
-        return null;
-    }
-
-    @Override
     public String getFirmwareVersion() {
         return null;
     }
@@ -79,8 +75,4 @@ public class Px4Native extends GenericMavLinkDrone {
         return null;
     }
 
-    @Override
-    public void logMessage(int mavSeverity, String message) {
-
-    }
 }

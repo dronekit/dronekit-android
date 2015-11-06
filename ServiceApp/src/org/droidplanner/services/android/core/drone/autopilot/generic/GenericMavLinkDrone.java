@@ -46,6 +46,7 @@ import org.droidplanner.services.android.core.MAVLink.MavLinkCommands;
 import org.droidplanner.services.android.core.MAVLink.MavLinkWaypoint;
 import org.droidplanner.services.android.core.drone.DroneEvents;
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
+import org.droidplanner.services.android.core.drone.LogMessageListener;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.core.drone.autopilot.apm.APMConstants;
 import org.droidplanner.services.android.core.drone.profiles.ParameterManager;
@@ -76,6 +77,7 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
     private final HeartBeat heartbeat;
     private final StreamRates streamRates;
     private final ParameterManager parameterManager;
+    private final LogMessageListener logListener;
 
     private final DroneInterfaces.AttributeEventListener attributeListener;
 
@@ -91,9 +93,12 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
 
     protected final Handler handler;
 
-    public GenericMavLinkDrone(Context context, Handler handler, MAVLinkStreams.MAVLinkOutputStream mavClient, AutopilotWarningParser warningParser, DroneInterfaces.AttributeEventListener listener) {
+    public GenericMavLinkDrone(Context context, Handler handler, MAVLinkStreams.MAVLinkOutputStream mavClient,
+                               AutopilotWarningParser warningParser, LogMessageListener logListener, DroneInterfaces.AttributeEventListener listener) {
         this.handler = handler;
         this.mavClient = mavClient;
+
+        this.logListener = logListener;
 
         events = new DroneEvents(this, handler);
         heartbeat = initHeartBeat(handler);
@@ -119,6 +124,11 @@ public abstract class GenericMavLinkDrone implements MavLinkDrone {
     @Override
     public ParameterManager getParameterManager() {
         return parameterManager;
+    }
+
+    protected void logMessage(int logLevel, String message) {
+        if (logListener != null)
+            logListener.onMessageLogged(logLevel, message);
     }
 
     @Override
