@@ -69,10 +69,9 @@ public class BasicTest {
 
         ConnectionParameter connParams = new ConnectionParameter(0, new Bundle(), null);
         mavlinkApi = new MockMavLinkServiceAPI();
-        DroidPlannerPrefs dpPrefs = new DroidPlannerPrefs(context);
         MAVLinkClient mavClient = new MAVLinkClient(context, inputStreamListener, connParams, mavlinkApi);
 
-        drone = new ArduCopter(context, mavClient, dpHandler, dpPrefs, new AndroidApWarningParser(), new LogMessageListener() {
+        drone = new ArduCopter(context, mavClient, dpHandler, new AndroidApWarningParser(), new LogMessageListener() {
             @Override
             public void onMessageLogged(int logLevel, String message) {
 
