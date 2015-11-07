@@ -24,6 +24,7 @@ import com.MAVLink.enums.MAV_STATE;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.action.ControlActions;
+import com.o3dr.services.android.lib.drone.action.ExperimentalActions;
 import com.o3dr.services.android.lib.drone.action.StateActions;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
@@ -41,6 +42,7 @@ import com.o3dr.services.android.lib.drone.property.Signal;
 import com.o3dr.services.android.lib.drone.property.Speed;
 import com.o3dr.services.android.lib.drone.property.VehicleMode;
 import com.o3dr.services.android.lib.drone.property.Vibration;
+import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
 import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
 import com.o3dr.services.android.lib.util.MathUtils;
@@ -300,6 +302,9 @@ public class GenericMavLinkDrone implements MavLinkDrone {
                 return true;
 
             //STATE ACTIONS
+            case StateActions.ACTION_ARM:
+                return performArming(data, listener);
+
             case StateActions.ACTION_SET_VEHICLE_MODE:
                 return setVehicleMode(data, listener);
 
@@ -330,6 +335,13 @@ public class GenericMavLinkDrone implements MavLinkDrone {
             case ControlActions.ACTION_SET_VELOCITY:
                 return setVelocity(data, listener);
 
+            //EXPERIMENTAL ACTIONS
+            case ExperimentalActions.ACTION_SEND_MAVLINK_MESSAGE:
+                data.setClassLoader(MavlinkMessageWrapper.class.getClassLoader());
+                MavlinkMessageWrapper messageWrapper = data.getParcelable(ExperimentalActions.EXTRA_MAVLINK_MESSAGE);
+                CommonApiUtils.sendMavlinkMessage(this, messageWrapper);
+                return true;
+
             //INTERNAL DRONE ACTIONS
             case ACTION_REQUEST_HOME_UPDATE:
                 requestHomeUpdate();
@@ -341,17 +353,30 @@ public class GenericMavLinkDrone implements MavLinkDrone {
         }
     }
 
+    protected boolean performArming(Bundle data, ICommandListener listener) {
+        boolean doArm = data.getBoolean(StateActions.EXTRA_ARM);
+        boolean emergencyDisarm = data.getBoolean(StateActions.EXTRA_EMERGENCY_DISARM);
+
+        if(!doArm && emergencyDisarm){
+            MavLinkCommands.sendFlightTermination(this, listener);
+        }
+        else{
+            MavLinkCommands.sendArmMessage(this, doArm, false, listener);
+        }
+        return true;
+    }
+
     protected boolean setVehicleMode(Bundle data, ICommandListener listener) {
         data.setClassLoader(VehicleMode.class.getClassLoader());
         VehicleMode newMode = data.getParcelable(StateActions.EXTRA_VEHICLE_MODE);
         if(newMode != null) {
             switch (newMode) {
                 case COPTER_LAND:
-                    MavLinkCommands.sendLand(this, listener);
+                    MavLinkCommands.sendNavLand(this, listener);
                     break;
 
                 case COPTER_RTL:
-                    MavLinkCommands.sendRTL(this, listener);
+                    MavLinkCommands.sendNavRTL(this, listener);
                     break;
 
                 case COPTER_GUIDED:

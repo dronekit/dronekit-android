@@ -13,20 +13,14 @@ import com.MAVLink.ardupilotmega.msg_mag_cal_report;
 import com.MAVLink.ardupilotmega.msg_mount_configure;
 import com.MAVLink.ardupilotmega.msg_mount_status;
 import com.MAVLink.ardupilotmega.msg_radio;
-import com.MAVLink.common.msg_heartbeat;
-import com.MAVLink.common.msg_mission_current;
-import com.MAVLink.common.msg_mission_item_reached;
 import com.MAVLink.common.msg_named_value_int;
-import com.MAVLink.common.msg_nav_controller_output;
 import com.MAVLink.common.msg_raw_imu;
 import com.MAVLink.common.msg_rc_channels_raw;
 import com.MAVLink.common.msg_servo_output_raw;
 import com.MAVLink.common.msg_statustext;
 import com.MAVLink.common.msg_sys_status;
 import com.MAVLink.common.msg_vfr_hud;
-import com.MAVLink.enums.MAV_MODE_FLAG;
 import com.MAVLink.enums.MAV_MOUNT_MODE;
-import com.MAVLink.enums.MAV_STATE;
 import com.MAVLink.enums.MAV_SYS_STATUS_SENSOR;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
@@ -44,7 +38,6 @@ import com.o3dr.services.android.lib.drone.property.DroneAttribute;
 import com.o3dr.services.android.lib.drone.property.Parameter;
 import com.o3dr.services.android.lib.drone.property.VehicleMode;
 import com.o3dr.services.android.lib.gcs.action.CalibrationActions;
-import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
 import com.o3dr.services.android.lib.model.AbstractCommandListener;
 import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
@@ -64,7 +57,6 @@ import org.droidplanner.services.android.core.drone.variables.Camera;
 import org.droidplanner.services.android.core.drone.variables.GuidedPoint;
 import org.droidplanner.services.android.core.drone.variables.HeartBeat;
 import org.droidplanner.services.android.core.drone.variables.Magnetometer;
-import org.droidplanner.services.android.core.drone.variables.MissionStats;
 import org.droidplanner.services.android.core.drone.variables.RC;
 import org.droidplanner.services.android.core.drone.variables.calibration.AccelCalibration;
 import org.droidplanner.services.android.core.drone.variables.calibration.MagnetometerCalibrationImpl;
@@ -222,12 +214,6 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
                 }
                 return true;
 
-            case ExperimentalActions.ACTION_SEND_MAVLINK_MESSAGE:
-                data.setClassLoader(MavlinkMessageWrapper.class.getClassLoader());
-                MavlinkMessageWrapper messageWrapper = data.getParcelable(ExperimentalActions.EXTRA_MAVLINK_MESSAGE);
-                CommonApiUtils.sendMavlinkMessage(this, messageWrapper);
-                return true;
-
             case ExperimentalActions.ACTION_SET_RELAY:
                 int relayNumber = data.getInt(ExperimentalActions.EXTRA_RELAY_NUMBER);
                 boolean isOn = data.getBoolean(ExperimentalActions.EXTRA_IS_RELAY_ON);
@@ -265,12 +251,6 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
                 return true;
 
             //DRONE STATE ACTIONS
-            case StateActions.ACTION_ARM:
-                boolean doArm = data.getBoolean(StateActions.EXTRA_ARM);
-                boolean emergencyDisarm = data.getBoolean(StateActions.EXTRA_EMERGENCY_DISARM);
-                CommonApiUtils.arm(this, doArm, emergencyDisarm, listener);
-                return true;
-
             case StateActions.ACTION_SET_VEHICLE_HOME:
                 LatLongAlt homeLoc = data.getParcelable(StateActions.EXTRA_VEHICLE_HOME_LOCATION);
                 if (homeLoc != null) {
@@ -357,6 +337,14 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
     }
 
     @Override
+    protected boolean performArming(Bundle data, ICommandListener listener) {
+        boolean doArm = data.getBoolean(StateActions.EXTRA_ARM);
+        boolean emergencyDisarm = data.getBoolean(StateActions.EXTRA_EMERGENCY_DISARM);
+        CommonApiUtils.arm(this, doArm, emergencyDisarm, listener);
+        return true;
+    }
+
+    @Override
     protected boolean setVehicleMode(Bundle data, ICommandListener listener) {
         data.setClassLoader(VehicleMode.class.getClassLoader());
         VehicleMode newMode = data.getParcelable(StateActions.EXTRA_VEHICLE_MODE);
@@ -365,7 +353,7 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
     }
 
     @Override
-    protected boolean setVelocity(Bundle data, ICommandListener listener){
+    protected boolean setVelocity(Bundle data, ICommandListener listener) {
         //Retrieve the normalized values
         float normalizedXVel = data.getFloat(ControlActions.EXTRA_VELOCITY_X);
         float normalizedYVel = data.getFloat(ControlActions.EXTRA_VELOCITY_Y);
@@ -393,7 +381,7 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
     }
 
     @Override
-    protected boolean performTakeoff(Bundle data, ICommandListener listener){
+    protected boolean performTakeoff(Bundle data, ICommandListener listener) {
         double takeoffAltitude = data.getDouble(ControlActions.EXTRA_ALTITUDE);
         CommonApiUtils.doGuidedTakeoff(this, takeoffAltitude, listener);
         return true;
@@ -476,7 +464,7 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
     }
 
     @Override
-    protected void processSysStatus(msg_sys_status m_sys){
+    protected void processSysStatus(msg_sys_status m_sys) {
         super.processSysStatus(m_sys);
         checkControlSensorsHealth(m_sys);
     }
