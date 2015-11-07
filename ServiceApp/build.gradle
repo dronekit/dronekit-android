@@ -42,7 +42,7 @@ dependencies {
 def versionMajor = 1
 def versionMinor = 4
 def versionPatch = 4
-def versionBuild = 0 //bump for dogfood builds, public betas, etc.
+def versionBuild = 1 //bump for dogfood builds, public betas, etc.
 def versionPrefix = "3DR Services v"
 
 //Log levels values
