@@ -12,7 +12,10 @@ import com.MAVLink.common.msg_attitude;
 import com.MAVLink.common.msg_global_position_int;
 import com.MAVLink.common.msg_gps_raw_int;
 import com.MAVLink.common.msg_heartbeat;
+import com.MAVLink.common.msg_mission_current;
 import com.MAVLink.common.msg_mission_item;
+import com.MAVLink.common.msg_mission_item_reached;
+import com.MAVLink.common.msg_nav_controller_output;
 import com.MAVLink.common.msg_radio_status;
 import com.MAVLink.common.msg_sys_status;
 import com.MAVLink.common.msg_vibration;
@@ -85,6 +88,7 @@ public class GenericMavLinkDrone implements MavLinkDrone {
     private final StreamRates streamRates;
     private final ParameterManager parameterManager;
     private final LogMessageListener logListener;
+    private final MissionStats missionStats;
 
     private final DroneInterfaces.AttributeEventListener attributeListener;
 
@@ -110,6 +114,7 @@ public class GenericMavLinkDrone implements MavLinkDrone {
         events = new DroneEvents(this, handler);
         heartbeat = initHeartBeat(handler);
         this.type = new Type(this);
+        this.missionStats = new MissionStats(this);
         this.streamRates = new StreamRates(this);
         this.state = new State(this, handler, warningParser);
         parameterManager = new ParameterManager(this, context, handler);
@@ -121,8 +126,7 @@ public class GenericMavLinkDrone implements MavLinkDrone {
 
     @Override
     public MissionStats getMissionStats() {
-        //TODO: complete implementation
-        return null;
+        return missionStats;
     }
 
     @Override
@@ -441,7 +445,27 @@ public class GenericMavLinkDrone implements MavLinkDrone {
             case msg_mission_item.MAVLINK_MSG_ID_MISSION_ITEM:
                 processHomeUpdate((msg_mission_item) message);
                 break;
+
+            case msg_mission_current.MAVLINK_MSG_ID_MISSION_CURRENT:
+                missionStats.setWpno(((msg_mission_current) message).seq);
+                break;
+
+            case msg_mission_item_reached.MAVLINK_MSG_ID_MISSION_ITEM_REACHED:
+                missionStats.setLastReachedWaypointNumber(((msg_mission_item_reached) message).seq);
+                break;
+
+            case msg_nav_controller_output.MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT:
+                msg_nav_controller_output m_nav = (msg_nav_controller_output) message;
+                setDisttowpAndSpeedAltErrors(m_nav.wp_dist, m_nav.alt_error, m_nav.aspd_error);
+                break;
         }
+    }
+
+    private void setDisttowpAndSpeedAltErrors(double disttowp, double alt_error, double aspd_error) {
+        missionStats.setDistanceToWp(disttowp);
+
+        this.altitude.setTargetAltitude(this.altitude.getAltitude() + alt_error);
+        notifyDroneEvent(DroneInterfaces.DroneEventsType.ORIENTATION);
     }
 
     private void checkControlSensorsHealth(msg_sys_status sysStatus) {

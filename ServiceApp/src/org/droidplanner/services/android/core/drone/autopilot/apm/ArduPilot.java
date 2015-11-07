@@ -82,7 +82,6 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
 
     private final org.droidplanner.services.android.core.drone.variables.RC rc;
     private final Mission mission;
-    private final MissionStats missionStats;
     private final GuidedPoint guidedPoint;
     private final AccelCalibration accelCalibrationSetup;
     private final WaypointManager waypointManager;
@@ -101,7 +100,6 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
 
         rc = new RC(this);
         this.mission = new Mission(this);
-        this.missionStats = new MissionStats(this);
         this.guidedPoint = new GuidedPoint(this, handler);
         this.accelCalibrationSetup = new AccelCalibration(this, handler);
         this.magCalibration = new MagnetometerCalibrationImpl(this);
@@ -129,13 +127,6 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
         }
     }
 
-    protected void setDisttowpAndSpeedAltErrors(double disttowp, double alt_error, double aspd_error) {
-        missionStats.setDistanceToWp(disttowp);
-
-        this.altitude.setTargetAltitude(this.altitude.getAltitude() + alt_error);
-        notifyDroneEvent(DroneInterfaces.DroneEventsType.ORIENTATION);
-    }
-
     @Override
     public WaypointManager getWaypointManager() {
         return waypointManager;
@@ -144,11 +135,6 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
     @Override
     public Mission getMission() {
         return mission;
-    }
-
-    @Override
-    public MissionStats getMissionStats() {
-        return missionStats;
     }
 
     @Override
@@ -437,19 +423,6 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
 
                 case msg_vfr_hud.MAVLINK_MSG_ID_VFR_HUD:
                     processVfrHud((msg_vfr_hud) message);
-                    break;
-
-                case msg_mission_current.MAVLINK_MSG_ID_MISSION_CURRENT:
-                    getMissionStats().setWpno(((msg_mission_current) message).seq);
-                    break;
-
-                case msg_mission_item_reached.MAVLINK_MSG_ID_MISSION_ITEM_REACHED:
-                    getMissionStats().setLastReachedWaypointNumber(((msg_mission_item_reached) message).seq);
-                    break;
-
-                case msg_nav_controller_output.MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT:
-                    msg_nav_controller_output m_nav = (msg_nav_controller_output) message;
-                    setDisttowpAndSpeedAltErrors(m_nav.wp_dist, m_nav.alt_error, m_nav.aspd_error);
                     break;
 
                 case msg_raw_imu.MAVLINK_MSG_ID_RAW_IMU:
