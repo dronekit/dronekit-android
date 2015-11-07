@@ -21,7 +21,6 @@ import com.MAVLink.common.msg_sys_status;
 import com.MAVLink.common.msg_vibration;
 import com.MAVLink.enums.MAV_MODE_FLAG;
 import com.MAVLink.enums.MAV_STATE;
-import com.MAVLink.enums.MAV_SYS_STATUS_SENSOR;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.action.ControlActions;
@@ -48,7 +47,6 @@ import com.o3dr.services.android.lib.util.MathUtils;
 
 import org.droidplanner.services.android.core.MAVLink.MAVLinkStreams;
 import org.droidplanner.services.android.core.MAVLink.MavLinkCommands;
-import org.droidplanner.services.android.core.MAVLink.MavLinkTakeoff;
 import org.droidplanner.services.android.core.MAVLink.MavLinkWaypoint;
 import org.droidplanner.services.android.core.MAVLink.WaypointManager;
 import org.droidplanner.services.android.core.drone.DroneEvents;
@@ -303,10 +301,7 @@ public class GenericMavLinkDrone implements MavLinkDrone {
 
             //STATE ACTIONS
             case StateActions.ACTION_SET_VEHICLE_MODE:
-                data.setClassLoader(VehicleMode.class.getClassLoader());
-                VehicleMode newMode = data.getParcelable(StateActions.EXTRA_VEHICLE_MODE);
-                CommonApiUtils.changeVehicleMode(this, newMode, listener);
-                return true;
+                return setVehicleMode(data, listener);
 
             //CONTROL ACTIONS
             case ControlActions.ACTION_DO_GUIDED_TAKEOFF:
@@ -346,6 +341,31 @@ public class GenericMavLinkDrone implements MavLinkDrone {
         }
     }
 
+    protected boolean setVehicleMode(Bundle data, ICommandListener listener) {
+        data.setClassLoader(VehicleMode.class.getClassLoader());
+        VehicleMode newMode = data.getParcelable(StateActions.EXTRA_VEHICLE_MODE);
+        if(newMode != null) {
+            switch (newMode) {
+                case COPTER_LAND:
+                    MavLinkCommands.sendLand(this, listener);
+                    break;
+
+                case COPTER_RTL:
+                    MavLinkCommands.sendRTL(this, listener);
+                    break;
+
+                case COPTER_GUIDED:
+                    MavLinkCommands.sendPause(this, listener);
+                    break;
+
+                case COPTER_AUTO:
+                    MavLinkCommands.startMission(this, listener);
+                    break;
+            }
+        }
+        return true;
+    }
+
     protected boolean setVelocity(Bundle data, ICommandListener listener) {
         float xAxis = data.getFloat(ControlActions.EXTRA_VELOCITY_X);
         short x = (short) (xAxis * 1000);
@@ -362,7 +382,7 @@ public class GenericMavLinkDrone implements MavLinkDrone {
 
     protected boolean performTakeoff(Bundle data, ICommandListener listener){
         double takeoffAltitude = data.getDouble(ControlActions.EXTRA_ALTITUDE);
-        MavLinkTakeoff.sendTakeoff(this, takeoffAltitude, listener);
+        MavLinkCommands.sendTakeoff(this, takeoffAltitude, listener);
         return true;
     }
 
@@ -517,7 +537,7 @@ public class GenericMavLinkDrone implements MavLinkDrone {
 
     private void checkIfFlying(msg_heartbeat msg_heart) {
         short systemStatus = msg_heart.system_status;
-        boolean wasFlying = getState().isFlying();
+        boolean wasFlying = state.isFlying();
 
         boolean isFlying = systemStatus == MAV_STATE.MAV_STATE_ACTIVE
                 || (wasFlying

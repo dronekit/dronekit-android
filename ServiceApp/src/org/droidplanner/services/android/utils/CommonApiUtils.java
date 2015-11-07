@@ -46,6 +46,7 @@ import com.o3dr.services.android.lib.model.AbstractCommandListener;
 import com.o3dr.services.android.lib.model.ICommandListener;
 
 import org.droidplanner.services.android.core.MAVLink.MavLinkArm;
+import org.droidplanner.services.android.core.MAVLink.MavLinkCommands;
 import org.droidplanner.services.android.core.MAVLink.command.doCmd.MavLinkDoCmds;
 import org.droidplanner.services.android.core.drone.DroneManager;
 import org.droidplanner.services.android.core.drone.autopilot.Drone;
@@ -610,12 +611,7 @@ public class CommonApiUtils {
         final Runnable sendCommandRunnable = new Runnable() {
             @Override
             public void run() {
-                msg_command_long msg = new msg_command_long();
-                msg.target_system = drone.getSysid();
-                msg.target_component = drone.getCompid();
-                msg.command = MAV_CMD.MAV_CMD_MISSION_START;
-
-                drone.getMavClient().sendMavMessage(msg, listener);
+                MavLinkCommands.startMission(drone, listener);
             }
         };
 

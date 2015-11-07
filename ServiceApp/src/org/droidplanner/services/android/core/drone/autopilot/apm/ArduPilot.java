@@ -42,6 +42,7 @@ import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError
 import com.o3dr.services.android.lib.drone.mission.action.MissionActions;
 import com.o3dr.services.android.lib.drone.property.DroneAttribute;
 import com.o3dr.services.android.lib.drone.property.Parameter;
+import com.o3dr.services.android.lib.drone.property.VehicleMode;
 import com.o3dr.services.android.lib.gcs.action.CalibrationActions;
 import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
 import com.o3dr.services.android.lib.model.AbstractCommandListener;
@@ -353,6 +354,14 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
             default:
                 return super.executeAsyncAction(action, listener);
         }
+    }
+
+    @Override
+    protected boolean setVehicleMode(Bundle data, ICommandListener listener) {
+        data.setClassLoader(VehicleMode.class.getClassLoader());
+        VehicleMode newMode = data.getParcelable(StateActions.EXTRA_VEHICLE_MODE);
+        CommonApiUtils.changeVehicleMode(this, newMode, listener);
+        return true;
     }
 
     @Override
