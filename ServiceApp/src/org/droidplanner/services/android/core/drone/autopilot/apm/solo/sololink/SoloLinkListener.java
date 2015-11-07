@@ -1,6 +1,6 @@
-package org.droidplanner.services.android.core.drone.companion.solo.sololink;
+package org.droidplanner.services.android.core.drone.autopilot.apm.solo.sololink;
 
-import org.droidplanner.services.android.core.drone.companion.solo.AbstractLinkManager;
+import org.droidplanner.services.android.core.drone.autopilot.apm.solo.AbstractLinkManager;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSetting;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
 

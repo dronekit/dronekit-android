@@ -8,17 +8,21 @@ import com.MAVLink.ardupilotmega.msg_ekf_status_report;
 import com.MAVLink.enums.EKF_STATUS_FLAGS;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.model.ICommandListener;
+import com.o3dr.services.android.lib.model.action.Action;
 
 import org.droidplanner.services.android.core.MAVLink.MavLinkCommands;
 import org.droidplanner.services.android.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.services.android.core.drone.DroneVariable;
+import org.droidplanner.services.android.core.drone.autopilot.generic.GenericMavLinkDrone;
 import org.droidplanner.services.android.core.model.AutopilotWarningParser;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 
 import timber.log.Timber;
 
-public class State extends DroneVariable {
+public class State extends DroneVariable<GenericMavLinkDrone> {
     private static final long ERROR_TIMEOUT = 5000l;
+
+    private final static Action requestHomeUpdateAction = new Action(MavLinkDrone.ACTION_REQUEST_HOME_UPDATE);
 
     private final AutopilotWarningParser warningParser;
 
@@ -42,7 +46,7 @@ public class State extends DroneVariable {
         }
     };
 
-    public State(MavLinkDrone myDrone, Handler handler, AutopilotWarningParser warningParser) {
+    public State(GenericMavLinkDrone myDrone, Handler handler, AutopilotWarningParser warningParser) {
         super(myDrone);
         this.handler = handler;
         this.warningParser = warningParser;
@@ -192,9 +196,9 @@ public class State extends DroneVariable {
         if (ekfStatus == null)
             return;
 
-        final int flags = ekfStatus.flags;
+        int flags = ekfStatus.flags;
 
-        final boolean isOk = this.armed
+        boolean isOk = this.armed
                 ? (flags & EKF_STATUS_FLAGS.EKF_POS_HORIZ_ABS) != 0
                 && (flags & EKF_STATUS_FLAGS.EKF_CONST_POS_MODE) == 0
                 : (flags & EKF_STATUS_FLAGS.EKF_POS_HORIZ_ABS) != 0
@@ -203,6 +207,10 @@ public class State extends DroneVariable {
         if (isEkfPositionOk != isOk) {
             isEkfPositionOk = isOk;
             myDrone.notifyDroneEvent(DroneEventsType.EKF_POSITION_STATE_UPDATE);
+
+            if(isEkfPositionOk){
+                myDrone.executeAsyncAction(requestHomeUpdateAction, null);
+            }
         }
     }
 

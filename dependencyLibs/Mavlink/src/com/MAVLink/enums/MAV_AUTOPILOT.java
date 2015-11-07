@@ -12,7 +12,7 @@ package com.MAVLink.enums;
 */
 public class MAV_AUTOPILOT {
    public static final int MAV_AUTOPILOT_GENERIC = 0; /* Generic autopilot, full support for everything | */
-   public static final int MAV_AUTOPILOT_PIXHAWK = 1; /* PIXHAWK autopilot, http://pixhawk.ethz.ch | */
+   public static final int MAV_AUTOPILOT_RESERVED = 1; /* Reserved for future use. | */
    public static final int MAV_AUTOPILOT_SLUGS = 2; /* SLUGS autopilot, http://slugsuav.soe.ucsc.edu | */
    public static final int MAV_AUTOPILOT_ARDUPILOTMEGA = 3; /* ArduPilotMega / ArduCopter, http://diydrones.com | */
    public static final int MAV_AUTOPILOT_OPENPILOT = 4; /* OpenPilot, http://openpilot.org | */

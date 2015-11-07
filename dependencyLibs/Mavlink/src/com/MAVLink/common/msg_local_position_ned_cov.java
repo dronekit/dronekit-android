@@ -16,7 +16,7 @@ import com.MAVLink.Messages.MAVLinkPayload;
 public class msg_local_position_ned_cov extends MAVLinkMessage{
 
     public static final int MAVLINK_MSG_ID_LOCAL_POSITION_NED_COV = 64;
-    public static final int MAVLINK_MSG_LENGTH = 181;
+    public static final int MAVLINK_MSG_LENGTH = 229;
     private static final long serialVersionUID = MAVLINK_MSG_ID_LOCAL_POSITION_NED_COV;
 
 
@@ -27,7 +27,7 @@ public class msg_local_position_ned_cov extends MAVLinkMessage{
     public long time_utc;
     
     /**
-    * Timestamp (milliseconds since system boot)
+    * Timestamp (milliseconds since system boot). 0 for system without monotonic timestamp
     */
     public long time_boot_ms;
     
@@ -47,24 +47,39 @@ public class msg_local_position_ned_cov extends MAVLinkMessage{
     public float z;
     
     /**
-    * X Speed
+    * X Speed (m/s)
     */
     public float vx;
     
     /**
-    * Y Speed
+    * Y Speed (m/s)
     */
     public float vy;
     
     /**
-    * Z Speed
+    * Z Speed (m/s)
     */
     public float vz;
     
     /**
-    * Covariance matrix (first six entries are the first ROW, next six entries are the second row, etc.)
+    * X Acceleration (m/s^2)
     */
-    public float covariance[] = new float[36];
+    public float ax;
+    
+    /**
+    * Y Acceleration (m/s^2)
+    */
+    public float ay;
+    
+    /**
+    * Z Acceleration (m/s^2)
+    */
+    public float az;
+    
+    /**
+    * Covariance matrix upper right triangular (first nine entries are the first ROW, next eight entries are the second row, etc.)
+    */
+    public float covariance[] = new float[45];
     
     /**
     * Class id of the estimator this estimate originated from.
@@ -97,6 +112,12 @@ public class msg_local_position_ned_cov extends MAVLinkMessage{
         packet.payload.putFloat(vy);
         
         packet.payload.putFloat(vz);
+        
+        packet.payload.putFloat(ax);
+        
+        packet.payload.putFloat(ay);
+        
+        packet.payload.putFloat(az);
         
         
         for (int i = 0; i < covariance.length; i++) {
@@ -133,6 +154,12 @@ public class msg_local_position_ned_cov extends MAVLinkMessage{
         
         this.vz = payload.getFloat();
         
+        this.ax = payload.getFloat();
+        
+        this.ay = payload.getFloat();
+        
+        this.az = payload.getFloat();
+        
         
         for (int i = 0; i < this.covariance.length; i++) {
             this.covariance[i] = payload.getFloat();
@@ -162,12 +189,12 @@ public class msg_local_position_ned_cov extends MAVLinkMessage{
         unpack(mavLinkPacket.payload);
     }
 
-                        
+                              
     /**
     * Returns a string with the MSG name and data
     */
     public String toString(){
-        return "MAVLINK_MSG_ID_LOCAL_POSITION_NED_COV -"+" time_utc:"+time_utc+" time_boot_ms:"+time_boot_ms+" x:"+x+" y:"+y+" z:"+z+" vx:"+vx+" vy:"+vy+" vz:"+vz+" covariance:"+covariance+" estimator_type:"+estimator_type+"";
+        return "MAVLINK_MSG_ID_LOCAL_POSITION_NED_COV -"+" time_utc:"+time_utc+" time_boot_ms:"+time_boot_ms+" x:"+x+" y:"+y+" z:"+z+" vx:"+vx+" vy:"+vy+" vz:"+vz+" ax:"+ax+" ay:"+ay+" az:"+az+" covariance:"+covariance+" estimator_type:"+estimator_type+"";
     }
 }
         

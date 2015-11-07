@@ -1,10 +1,13 @@
 package org.droidplanner.services.android.core.drone.profiles;
 
+import android.content.Context;
 import android.os.Handler;
 import android.text.TextUtils;
+import android.util.SparseBooleanArray;
 
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.common.msg_param_value;
+import com.o3dr.services.android.lib.drone.property.Parameter;
 
 import org.droidplanner.services.android.core.MAVLink.MavLinkParameters;
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
@@ -12,13 +15,14 @@ import org.droidplanner.services.android.core.drone.DroneInterfaces.DroneEventsT
 import org.droidplanner.services.android.core.drone.DroneInterfaces.OnDroneListener;
 import org.droidplanner.services.android.core.drone.DroneVariable;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
-import org.droidplanner.services.android.core.parameters.Parameter;
+import org.droidplanner.services.android.utils.file.IO.ParameterMetadataLoader;
 
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import timber.log.Timber;
 
 /**
  * Class to manage the communication of parameters to the MAV.
@@ -27,9 +31,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * via the MAV link. The function processMessage must be called with every new
  * MAV Message.
  */
-public class Parameters extends DroneVariable implements OnDroneListener {
+public class ParameterManager extends DroneVariable implements OnDroneListener {
 
-    private static final int TIMEOUT = 1000; //milliseconds
+    private static final long TIMEOUT = 1000l; //milliseconds
 
     private final Runnable parametersReceiptStartNotification = new Runnable() {
         @Override
@@ -57,17 +61,21 @@ public class Parameters extends DroneVariable implements OnDroneListener {
 
     private int expectedParams;
 
-    private final Map<Integer, Boolean> paramsRollCall = new HashMap<>();
+    private final SparseBooleanArray paramsRollCall = new SparseBooleanArray();
     private final ConcurrentHashMap<String, Parameter> parameters = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, ParameterMetadata> parametersMetadata = new ConcurrentHashMap<>();
 
     private DroneInterfaces.OnParameterManagerListener parameterListener;
 
-    public final Handler watchdog;
+    private final Handler watchdog;
+    private final Context context;
 
-    public Parameters(MavLinkDrone myDrone, Handler handler) {
+    public ParameterManager(MavLinkDrone myDrone, Context context, Handler handler) {
         super(myDrone);
+        this.context = context;
         this.watchdog = handler;
         myDrone.addDroneListener(this);
+        refreshParametersMetadata();
     }
 
     public void refreshParameters() {
@@ -106,12 +114,13 @@ public class Parameters extends DroneVariable implements OnDroneListener {
         return false;
     }
 
-    private void processReceivedParam(msg_param_value m_value) {
+    protected void processReceivedParam(msg_param_value m_value) {
         // collect params in parameter list
-        Parameter param = new Parameter(m_value);
+        Parameter param = new Parameter(m_value.getParam_Id(), m_value.param_value, m_value.param_type);
+        loadParameterMetadata(param);
 
-        parameters.put(param.name.toLowerCase(Locale.US), param);
-        final int paramIndex = m_value.param_index;
+        parameters.put(param.getName().toLowerCase(Locale.US), param);
+        int paramIndex = m_value.param_index;
         if (paramIndex == -1) {
             // update listener
             notifyParameterReceipt(param, 0, 1);
@@ -120,7 +129,7 @@ public class Parameters extends DroneVariable implements OnDroneListener {
             return;
         }
 
-        paramsRollCall.put(paramIndex, true);
+        paramsRollCall.append(paramIndex, true);
         expectedParams = m_value.param_count;
 
         // update listener
@@ -139,8 +148,7 @@ public class Parameters extends DroneVariable implements OnDroneListener {
 
     private void reRequestMissingParams(int howManyParams) {
         for (int i = 0; i < howManyParams; i++) {
-            Boolean isPresent = paramsRollCall.get(i);
-            if (isPresent == null || !isPresent) {
+            if (!paramsRollCall.get(i)) {
                 MavLinkParameters.readParameter(myDrone, i);
             }
         }
@@ -191,9 +199,44 @@ public class Parameters extends DroneVariable implements OnDroneListener {
             case HEARTBEAT_TIMEOUT:
                 killWatchdog();
                 break;
+
+            case TYPE:
+                refreshParametersMetadata();
+                break;
+
             default:
                 break;
 
+        }
+    }
+
+    private void refreshParametersMetadata() {
+        //Reload the vehicle parameters metadata
+        String metadataType = myDrone.getFirmwareType().getParameterMetadataGroup();
+        if (!TextUtils.isEmpty(metadataType)) {
+            try {
+                ParameterMetadataLoader.load(context, metadataType, this.parametersMetadata);
+            } catch (Exception e) {
+                Timber.e(e, e.getMessage());
+            }
+        }
+
+        if (parametersMetadata.isEmpty() || parameters.isEmpty())
+            return;
+
+        for (Parameter parameter : parameters.values()) {
+            loadParameterMetadata(parameter);
+        }
+    }
+
+    private void loadParameterMetadata(Parameter parameter){
+        ParameterMetadata metadata = parametersMetadata.get(parameter.getName());
+        if (metadata != null) {
+            parameter.setDisplayName(metadata.getDisplayName());
+            parameter.setDescription(metadata.getDescription());
+            parameter.setUnits(metadata.getUnits());
+            parameter.setRange(metadata.getRange());
+            parameter.setValues(metadata.getValues());
         }
     }
 
@@ -216,8 +259,8 @@ public class Parameters extends DroneVariable implements OnDroneListener {
             watchdog.post(new Runnable() {
                 @Override
                 public void run() {
-                    if(parameterListener != null)
-                    parameterListener.onParameterReceived(parameter, index, count);
+                    if (parameterListener != null)
+                        parameterListener.onParameterReceived(parameter, index, count);
                 }
             });
         }

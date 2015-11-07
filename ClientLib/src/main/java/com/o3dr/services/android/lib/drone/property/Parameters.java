@@ -5,6 +5,7 @@ import android.os.Parcelable;
 import android.text.TextUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -12,12 +13,13 @@ import java.util.List;
  */
 public class Parameters implements DroneAttribute {
 
-    private List<Parameter> parametersList = new ArrayList<Parameter>();
+    private final List<Parameter> parametersList = new ArrayList<>();
 
-    public Parameters(){}
+    public Parameters(){
+    }
 
-    public Parameters(List<Parameter> parameterList) {
-        this.parametersList = parameterList;
+    public Parameters(Collection<Parameter> parameterList) {
+        setParametersList(parameterList);
     }
 
     public List<Parameter> getParameters(){
@@ -36,8 +38,11 @@ public class Parameters implements DroneAttribute {
         return null;
     }
 
-    public void setParametersList(List<Parameter> parametersList) {
-        this.parametersList = parametersList;
+    public void setParametersList(Collection<Parameter> parametersList) {
+        this.parametersList.clear();
+        if(parametersList != null && !parametersList.isEmpty()) {
+            this.parametersList.addAll(parametersList);
+        }
     }
 
     @Override

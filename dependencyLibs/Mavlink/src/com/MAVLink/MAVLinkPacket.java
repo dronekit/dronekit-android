@@ -556,6 +556,9 @@ public class MAVLinkPacket implements Serializable {
             case msg_timesync.MAVLINK_MSG_ID_TIMESYNC:
                 return  new msg_timesync(this);
             
+            case msg_camera_trigger.MAVLINK_MSG_ID_CAMERA_TRIGGER:
+                return  new msg_camera_trigger(this);
+            
             case msg_hil_gps.MAVLINK_MSG_ID_HIL_GPS:
                 return  new msg_hil_gps(this);
             
@@ -640,8 +643,17 @@ public class MAVLinkPacket implements Serializable {
             case msg_actuator_control_target.MAVLINK_MSG_ID_ACTUATOR_CONTROL_TARGET:
                 return  new msg_actuator_control_target(this);
             
+            case msg_altitude.MAVLINK_MSG_ID_ALTITUDE:
+                return  new msg_altitude(this);
+            
+            case msg_resource_request.MAVLINK_MSG_ID_RESOURCE_REQUEST:
+                return  new msg_resource_request(this);
+            
             case msg_scaled_pressure3.MAVLINK_MSG_ID_SCALED_PRESSURE3:
                 return  new msg_scaled_pressure3(this);
+            
+            case msg_control_system_state.MAVLINK_MSG_ID_CONTROL_SYSTEM_STATE:
+                return  new msg_control_system_state(this);
             
             case msg_battery_status.MAVLINK_MSG_ID_BATTERY_STATUS:
                 return  new msg_battery_status(this);
@@ -654,6 +666,18 @@ public class MAVLinkPacket implements Serializable {
             
             case msg_vibration.MAVLINK_MSG_ID_VIBRATION:
                 return  new msg_vibration(this);
+            
+            case msg_home_position.MAVLINK_MSG_ID_HOME_POSITION:
+                return  new msg_home_position(this);
+            
+            case msg_set_home_position.MAVLINK_MSG_ID_SET_HOME_POSITION:
+                return  new msg_set_home_position(this);
+            
+            case msg_message_interval.MAVLINK_MSG_ID_MESSAGE_INTERVAL:
+                return  new msg_message_interval(this);
+            
+            case msg_extended_sys_state.MAVLINK_MSG_ID_EXTENDED_SYS_STATE:
+                return  new msg_extended_sys_state(this);
             
             case msg_v2_extension.MAVLINK_MSG_ID_V2_EXTENSION:
                 return  new msg_v2_extension(this);

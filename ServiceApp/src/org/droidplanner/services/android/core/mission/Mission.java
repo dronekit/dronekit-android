@@ -5,16 +5,19 @@ import android.util.Pair;
 import com.MAVLink.common.msg_mission_ack;
 import com.MAVLink.common.msg_mission_item;
 import com.MAVLink.enums.MAV_CMD;
+import com.MAVLink.enums.MAV_FRAME;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.property.Attitude;
 import com.o3dr.services.android.lib.drone.property.Gps;
+import com.o3dr.services.android.lib.drone.property.Home;
+import com.o3dr.services.android.lib.drone.property.Parameter;
 
 import org.droidplanner.services.android.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.services.android.core.drone.DroneVariable;
-import org.droidplanner.services.android.core.drone.variables.Home;
-import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
+import org.droidplanner.services.android.core.drone.autopilot.apm.APMConstants;
+import org.droidplanner.services.android.core.drone.autopilot.generic.GenericMavLinkDrone;
 import org.droidplanner.services.android.core.helpers.geoTools.GeoTools;
 import org.droidplanner.services.android.core.mission.commands.CameraTriggerImpl;
 import org.droidplanner.services.android.core.mission.commands.ChangeSpeedImpl;
@@ -32,7 +35,6 @@ import org.droidplanner.services.android.core.mission.waypoints.RegionOfInterest
 import org.droidplanner.services.android.core.mission.waypoints.SpatialCoordItem;
 import org.droidplanner.services.android.core.mission.waypoints.SplineWaypointImpl;
 import org.droidplanner.services.android.core.mission.waypoints.WaypointImpl;
-import org.droidplanner.services.android.core.parameters.Parameter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,36 +42,18 @@ import java.util.List;
 
 /**
  * This implements a mavlink mission. A mavlink mission is a set of
- * commands/mission items to be carried out by the drone. TODO: rename the
- * 'waypoint' method to 'missionItem' (i.e: addMissionItem)
+ * commands/mission items to be carried out by the drone.
  */
-public class Mission extends DroneVariable {
+public class Mission extends DroneVariable<GenericMavLinkDrone> {
 
     /**
      * Stores the set of mission items belonging to this mission.
      */
     private List<MissionItemImpl> items = new ArrayList<MissionItemImpl>();
     private final List<MissionItemImpl> componentItems = new ArrayList<>();
-    private double defaultAlt = 20.0;
 
-    public Mission(MavLinkDrone myDrone) {
+    public Mission(GenericMavLinkDrone myDrone) {
         super(myDrone);
-    }
-
-    /**
-     * @return the mission's default altitude
-     */
-    public double getDefaultAlt() {
-        return defaultAlt;
-    }
-
-    /**
-     * Sets the mission default altitude.
-     *
-     * @param newAltitude value
-     */
-    public void setDefaultAlt(double newAltitude) {
-        defaultAlt = newAltitude;
     }
 
     /**
@@ -129,21 +113,6 @@ public class Mission extends DroneVariable {
     public void notifyMissionUpdate() {
         updateComponentItems();
         myDrone.notifyDroneEvent(DroneEventsType.MISSION_UPDATE);
-    }
-
-    /**
-     * @return the altitude of the last added mission item.
-     */
-    public double getLastAltitude() {
-        double alt = defaultAlt;
-        try {
-            SpatialCoordItem lastItem = (SpatialCoordItem) items.get(items.size() - 1);
-            if (!(lastItem instanceof RegionOfInterestImpl)) {
-                alt = lastItem.getCoordinate().getAltitude();
-            }
-        } catch (Exception e) {
-        }
-        return alt;
     }
 
     /**
@@ -243,7 +212,7 @@ public class Mission extends DroneVariable {
 
     public void onMissionReceived(List<msg_mission_item> msgs) {
         if (msgs != null) {
-            myDrone.getHome().setHome(msgs.get(0));
+            myDrone.processHomeUpdate(msgs.get(0));
             msgs.remove(0); // Remove Home waypoint
             items.clear();
             items.addAll(processMavLinkMessages(msgs));
@@ -254,7 +223,7 @@ public class Mission extends DroneVariable {
 
     public void onMissionLoaded(List<msg_mission_item> msgs) {
         if (msgs != null) {
-            myDrone.getHome().setHome(msgs.get(0));
+            myDrone.processHomeUpdate(msgs.get(0));
             msgs.remove(0); // Remove Home waypoint
             items.clear();
             items.addAll(processMavLinkMessages(msgs));
@@ -340,16 +309,36 @@ public class Mission extends DroneVariable {
             return;
         }
         msg_mission_item firstItem = msgMissionItems.get(0);
-        if(firstItem.seq == Home.HOME_WAYPOINT_INDEX) {
+        if(firstItem.seq == APMConstants.HOME_WAYPOINT_INDEX) {
             msgMissionItems.remove(0); // Remove Home waypoint
         }
         componentItems.addAll(processMavLinkMessages(msgMissionItems));
     }
 
+    public msg_mission_item packHomeMavlink() {
+        Home home = (Home) myDrone.getAttribute(AttributeType.HOME);
+        LatLongAlt coordinate = home.getCoordinate();
+
+        msg_mission_item mavMsg = new msg_mission_item();
+        mavMsg.autocontinue = 1;
+        mavMsg.command = MAV_CMD.MAV_CMD_NAV_WAYPOINT;
+        mavMsg.current = 0;
+        mavMsg.frame = MAV_FRAME.MAV_FRAME_GLOBAL;
+        mavMsg.target_system = myDrone.getSysid();
+        mavMsg.target_component = myDrone.getCompid();
+        if (home.isValid()) {
+            mavMsg.x = (float) coordinate.getLatitude();
+            mavMsg.y = (float) coordinate.getLongitude();
+            mavMsg.z = (float) coordinate.getAltitude();
+        }
+
+        return mavMsg;
+    }
+
     public List<msg_mission_item> getMsgMissionItems() {
-        final List<msg_mission_item> data = new ArrayList<msg_mission_item>();
+        List<msg_mission_item> data = new ArrayList<msg_mission_item>();
         int waypointCount = 0;
-        msg_mission_item home = myDrone.getHome().packMavlink();
+        msg_mission_item home = packHomeMavlink();
         home.seq = waypointCount++;
         data.add(home);
 
@@ -389,11 +378,11 @@ public class Mission extends DroneVariable {
     }
 
     private double getSpeedParameter(){
-        Parameter param = myDrone.getParameters().getParameter("WPNAV_SPEED");
+        Parameter param = myDrone.getParameterManager().getParameter("WPNAV_SPEED");
         if (param == null ) {
             return -1;
         }else{
-            return (param.value/100);
+            return (param.getValue()/100);
         }
 
     }

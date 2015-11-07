@@ -143,6 +143,22 @@ public class Parameter implements DroneAttribute, Comparable<Parameter> {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Parameter)) return false;
+
+        Parameter parameter = (Parameter) o;
+
+        return !(name != null ? !name.equals(parameter.name) : parameter.name != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return name != null ? name.hashCode() : 0;
+    }
+
+    @Override
     public int describeContents() {
         return 0;
     }
