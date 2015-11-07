@@ -48,6 +48,7 @@ import com.o3dr.services.android.lib.util.MathUtils;
 
 import org.droidplanner.services.android.core.MAVLink.MAVLinkStreams;
 import org.droidplanner.services.android.core.MAVLink.MavLinkCommands;
+import org.droidplanner.services.android.core.MAVLink.MavLinkTakeoff;
 import org.droidplanner.services.android.core.MAVLink.MavLinkWaypoint;
 import org.droidplanner.services.android.core.MAVLink.WaypointManager;
 import org.droidplanner.services.android.core.drone.DroneEvents;
@@ -308,6 +309,9 @@ public class GenericMavLinkDrone implements MavLinkDrone {
                 return true;
 
             //CONTROL ACTIONS
+            case ControlActions.ACTION_DO_GUIDED_TAKEOFF:
+                return performTakeoff(data, listener);
+
             case ControlActions.ACTION_SET_CONDITION_YAW:
                 //Retrieve the yaw turn speed.
                 float turnSpeed = 2; //default turn speed.
@@ -329,17 +333,7 @@ public class GenericMavLinkDrone implements MavLinkDrone {
                 return true;
 
             case ControlActions.ACTION_SET_VELOCITY:
-                float xAxis = data.getFloat(ControlActions.EXTRA_VELOCITY_X);
-                short x = (short) (xAxis * 1000);
-
-                float yAxis = data.getFloat(ControlActions.EXTRA_VELOCITY_Y);
-                short y = (short) (yAxis * 1000);
-
-                float zAxis = data.getFloat(ControlActions.EXTRA_VELOCITY_Z);
-                short z = (short) (zAxis * 1000);
-
-                MavLinkCommands.sendManualControl(this, x, y, z, (short) 0, 0, listener);
-                return true;
+                return setVelocity(data, listener);
 
             //INTERNAL DRONE ACTIONS
             case ACTION_REQUEST_HOME_UPDATE:
@@ -350,6 +344,26 @@ public class GenericMavLinkDrone implements MavLinkDrone {
                 CommonApiUtils.postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
                 return true;
         }
+    }
+
+    protected boolean setVelocity(Bundle data, ICommandListener listener) {
+        float xAxis = data.getFloat(ControlActions.EXTRA_VELOCITY_X);
+        short x = (short) (xAxis * 1000);
+
+        float yAxis = data.getFloat(ControlActions.EXTRA_VELOCITY_Y);
+        short y = (short) (yAxis * 1000);
+
+        float zAxis = data.getFloat(ControlActions.EXTRA_VELOCITY_Z);
+        short z = (short) (zAxis * 1000);
+
+        MavLinkCommands.sendManualControl(this, x, y, z, (short) 0, 0, listener);
+        return true;
+    }
+
+    protected boolean performTakeoff(Bundle data, ICommandListener listener){
+        double takeoffAltitude = data.getDouble(ControlActions.EXTRA_ALTITUDE);
+        MavLinkTakeoff.sendTakeoff(this, takeoffAltitude, listener);
+        return true;
     }
 
     @Override

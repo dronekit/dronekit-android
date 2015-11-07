@@ -240,11 +240,6 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
                 return true;
 
             //CONTROL ACTIONS
-            case ControlActions.ACTION_DO_GUIDED_TAKEOFF:
-                double takeoffAltitude = data.getDouble(ControlActions.EXTRA_ALTITUDE);
-                CommonApiUtils.doGuidedTakeoff(this, takeoffAltitude, listener);
-                return true;
-
             case ControlActions.ACTION_SEND_GUIDED_POINT:
                 data.setClassLoader(LatLong.class.getClassLoader());
                 boolean force = data.getBoolean(ControlActions.EXTRA_FORCE_GUIDED_POINT);
@@ -255,32 +250,6 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
             case ControlActions.ACTION_SET_GUIDED_ALTITUDE:
                 double guidedAltitude = data.getDouble(ControlActions.EXTRA_ALTITUDE);
                 CommonApiUtils.setGuidedAltitude(this, guidedAltitude);
-                return true;
-
-            case ControlActions.ACTION_SET_VELOCITY:
-                //Retrieve the normalized values
-                float normalizedXVel = data.getFloat(ControlActions.EXTRA_VELOCITY_X);
-                float normalizedYVel = data.getFloat(ControlActions.EXTRA_VELOCITY_Y);
-                float normalizedZVel = data.getFloat(ControlActions.EXTRA_VELOCITY_Z);
-
-                //Retrieve the speed parameters.
-                float defaultSpeed = 5; //m/s
-
-                ParameterManager parameterManager = getParameterManager();
-
-                //Retrieve the horizontal speed value
-                Parameter horizSpeedParam = parameterManager.getParameter("WPNAV_SPEED");
-                double horizontalSpeed = horizSpeedParam == null ? defaultSpeed : horizSpeedParam.getValue() / 100;
-
-                //Retrieve the vertical speed value.
-                String vertSpeedParamName = normalizedZVel >= 0 ? "WPNAV_SPEED_UP" : "WPNAV_SPEED_DN";
-                Parameter vertSpeedParam = parameterManager.getParameter(vertSpeedParamName);
-                double verticalSpeed = vertSpeedParam == null ? defaultSpeed : vertSpeedParam.getValue() / 100;
-
-                MavLinkCommands.setVelocityInLocalFrame(this, (float) (normalizedXVel * horizontalSpeed),
-                        (float) (normalizedYVel * horizontalSpeed),
-                        (float) (normalizedZVel * verticalSpeed),
-                        listener);
                 return true;
 
             //PARAMETER ACTIONS
@@ -384,6 +353,41 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
             default:
                 return super.executeAsyncAction(action, listener);
         }
+    }
+
+    @Override
+    protected boolean setVelocity(Bundle data, ICommandListener listener){
+        //Retrieve the normalized values
+        float normalizedXVel = data.getFloat(ControlActions.EXTRA_VELOCITY_X);
+        float normalizedYVel = data.getFloat(ControlActions.EXTRA_VELOCITY_Y);
+        float normalizedZVel = data.getFloat(ControlActions.EXTRA_VELOCITY_Z);
+
+        //Retrieve the speed parameters.
+        float defaultSpeed = 5; //m/s
+
+        ParameterManager parameterManager = getParameterManager();
+
+        //Retrieve the horizontal speed value
+        Parameter horizSpeedParam = parameterManager.getParameter("WPNAV_SPEED");
+        double horizontalSpeed = horizSpeedParam == null ? defaultSpeed : horizSpeedParam.getValue() / 100;
+
+        //Retrieve the vertical speed value.
+        String vertSpeedParamName = normalizedZVel >= 0 ? "WPNAV_SPEED_UP" : "WPNAV_SPEED_DN";
+        Parameter vertSpeedParam = parameterManager.getParameter(vertSpeedParamName);
+        double verticalSpeed = vertSpeedParam == null ? defaultSpeed : vertSpeedParam.getValue() / 100;
+
+        MavLinkCommands.setVelocityInLocalFrame(this, (float) (normalizedXVel * horizontalSpeed),
+                (float) (normalizedYVel * horizontalSpeed),
+                (float) (normalizedZVel * verticalSpeed),
+                listener);
+        return true;
+    }
+
+    @Override
+    protected boolean performTakeoff(Bundle data, ICommandListener listener){
+        double takeoffAltitude = data.getDouble(ControlActions.EXTRA_ALTITUDE);
+        CommonApiUtils.doGuidedTakeoff(this, takeoffAltitude, listener);
+        return true;
     }
 
     @Override
