@@ -86,13 +86,21 @@ public class ROIEstimator implements LocationReceiver {
                 * (System.currentTimeMillis() - timeOfLastLocation) / 1000f;
         LatLong goCoord = GeoTools.newCoordFromBearingAndDistance(gcsCoord, bearing, distanceTraveledSinceLastPoint);
 
-        MavLinkDoCmds.setROI(drone, new LatLongAlt(goCoord.getLatitude(), goCoord.getLongitude(), (0.0)), null);
+        sendUpdateROI(goCoord);
 
         if (realLocation.getSpeed() > 0)
-            watchdog.postDelayed(watchdogCallback, TIMEOUT);
+            watchdog.postDelayed(watchdogCallback, getUpdatePeriod());
+    }
+
+    protected void sendUpdateROI(LatLong goCoord) {
+        MavLinkDoCmds.setROI(drone, new LatLongAlt(goCoord.getLatitude(), goCoord.getLongitude(), (0.0)), null);
     }
 
     public boolean isFollowEnabled() {
         return isFollowEnabled.get();
+    }
+
+    protected long getUpdatePeriod(){
+        return TIMEOUT;
     }
 }
