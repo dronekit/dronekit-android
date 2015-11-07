@@ -421,22 +421,7 @@ public class SoloComp implements SoloLinkListener, ControllerLinkListener {
     }
 
     public void updateFollowCenter(SoloMessageLocation location) {
-        soloLinkMgr.sendTLVPacket(location, true, new AbstractCommandListener() {
-            @Override
-            public void onSuccess() {
-
-            }
-
-            @Override
-            public void onError(int executionError) {
-                Timber.w("Failed to update follow ROI: %d", executionError);
-            }
-
-            @Override
-            public void onTimeout() {
-                Timber.w("Timed out while attempting to update the follow ROI.");
-            }
-        });
+        soloLinkMgr.sendTLVPacket(location, true, null);
     }
 
 }
