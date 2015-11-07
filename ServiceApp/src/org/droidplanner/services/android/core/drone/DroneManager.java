@@ -118,32 +118,30 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
             return;
         }
 
-        DroidPlannerPrefs dpPrefs = new DroidPlannerPrefs(context);
-
         switch (type) {
             case ARDU_COPTER:
                 if (isCompanionComputerEnabled()) {
                     Timber.i("Instantiating ArduSolo autopilot.");
-                    this.drone = new ArduSolo(context, mavClient, handler, dpPrefs, new AndroidApWarningParser(), this, this);
+                    this.drone = new ArduSolo(context, mavClient, handler, new AndroidApWarningParser(), this, this);
                 } else {
                     Timber.i("Instantiating ArduCopter autopilot.");
-                    this.drone = new ArduCopter(context, mavClient, handler, dpPrefs, new AndroidApWarningParser(), this, this);
+                    this.drone = new ArduCopter(context, mavClient, handler, new AndroidApWarningParser(), this, this);
                 }
                 break;
 
             case ARDU_SOLO:
                 Timber.i("Instantiating ArduCopter autopilot.");
-                this.drone = new ArduSolo(context, mavClient, handler, dpPrefs, new AndroidApWarningParser(), this, this);
+                this.drone = new ArduSolo(context, mavClient, handler, new AndroidApWarningParser(), this, this);
                 break;
 
             case ARDU_PLANE:
                 Timber.i("Instantiating ArduPlane autopilot.");
-                this.drone = new ArduPlane(context, mavClient, handler, dpPrefs, new AndroidApWarningParser(), this, this);
+                this.drone = new ArduPlane(context, mavClient, handler, new AndroidApWarningParser(), this, this);
                 break;
 
             case ARDU_ROVER:
                 Timber.i("Instantiating ArduPlane autopilot.");
-                this.drone = new ArduRover(context, mavClient, handler, dpPrefs, new AndroidApWarningParser(), this, this);
+                this.drone = new ArduRover(context, mavClient, handler, new AndroidApWarningParser(), this, this);
                 break;
 
             case PX4_NATIVE:
@@ -163,6 +161,7 @@ public class DroneManager implements Drone, MAVLinkStreams.MavlinkInputStream, D
 
         StreamRates streamRates = drone.getStreamRates();
         if (streamRates != null) {
+            DroidPlannerPrefs dpPrefs = new DroidPlannerPrefs(context);
             streamRates.setRates(dpPrefs.getRates());
         }
 
