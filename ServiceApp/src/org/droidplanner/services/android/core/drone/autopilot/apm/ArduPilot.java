@@ -22,10 +22,12 @@ import com.MAVLink.common.msg_raw_imu;
 import com.MAVLink.common.msg_rc_channels_raw;
 import com.MAVLink.common.msg_servo_output_raw;
 import com.MAVLink.common.msg_statustext;
+import com.MAVLink.common.msg_sys_status;
 import com.MAVLink.common.msg_vfr_hud;
 import com.MAVLink.enums.MAV_MODE_FLAG;
 import com.MAVLink.enums.MAV_MOUNT_MODE;
 import com.MAVLink.enums.MAV_STATE;
+import com.MAVLink.enums.MAV_SYS_STATUS_SENSOR;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.action.ControlActions;
@@ -399,13 +401,6 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
             getCalibrationSetup().processMessage(message);
 
             switch (message.msgid) {
-                case msg_heartbeat.MAVLINK_MSG_ID_HEARTBEAT:
-                    msg_heartbeat msg_heart = (msg_heartbeat) message;
-                    checkIfFlying(msg_heart);
-                    processState(msg_heart);
-                    ApmModes newMode = ApmModes.getMode(msg_heart.custom_mode, getType());
-                    getState().setMode(newMode);
-                    break;
 
                 case msg_statustext.MAVLINK_MSG_ID_STATUSTEXT:
                     // These are any warnings sent from APM:Copter with
@@ -467,6 +462,20 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
         super.onMavLinkMessageReceived(message);
     }
 
+    @Override
+    protected void processSysStatus(msg_sys_status m_sys){
+        super.processSysStatus(m_sys);
+        checkControlSensorsHealth(m_sys);
+    }
+
+    private void checkControlSensorsHealth(msg_sys_status sysStatus) {
+        boolean isRCFailsafe = (sysStatus.onboard_control_sensors_health & MAV_SYS_STATUS_SENSOR
+                .MAV_SYS_STATUS_SENSOR_RC_RECEIVER) == 0;
+        if (isRCFailsafe) {
+            getState().parseAutopilotError("RC FAILSAFE");
+        }
+    }
+
     protected void processVfrHud(msg_vfr_hud vfrHud) {
         if (vfrHud == null)
             return;
@@ -500,36 +509,6 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
                 }
                 break;
         }
-    }
-
-    private void checkIfFlying(msg_heartbeat msg_heart) {
-        short systemStatus = msg_heart.system_status;
-        boolean wasFlying = getState().isFlying();
-
-        boolean isFlying = systemStatus == MAV_STATE.MAV_STATE_ACTIVE
-                || (wasFlying
-                && (systemStatus == MAV_STATE.MAV_STATE_CRITICAL || systemStatus == MAV_STATE.MAV_STATE_EMERGENCY));
-
-        getState().setIsFlying(isFlying);
-    }
-
-    private void processState(msg_heartbeat msg_heart) {
-        checkArmState(msg_heart);
-        checkFailsafe(msg_heart);
-    }
-
-    private void checkFailsafe(msg_heartbeat msg_heart) {
-        boolean failsafe2 = msg_heart.system_status == MAV_STATE.MAV_STATE_CRITICAL
-                || msg_heart.system_status == MAV_STATE.MAV_STATE_EMERGENCY;
-
-        if (failsafe2) {
-            getState().repeatWarning();
-        }
-    }
-
-    private void checkArmState(msg_heartbeat msg_heart) {
-        getState().setArmed(
-                (msg_heart.base_mode & MAV_MODE_FLAG.MAV_MODE_FLAG_SAFETY_ARMED) == MAV_MODE_FLAG.MAV_MODE_FLAG_SAFETY_ARMED);
     }
 
     protected void processStatusText(msg_statustext statusText) {

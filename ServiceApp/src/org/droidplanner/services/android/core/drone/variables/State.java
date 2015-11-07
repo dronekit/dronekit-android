@@ -11,6 +11,7 @@ import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
 
 import org.droidplanner.services.android.core.MAVLink.MavLinkCommands;
+import org.droidplanner.services.android.core.MAVLink.WaypointManager;
 import org.droidplanner.services.android.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.services.android.core.drone.DroneVariable;
 import org.droidplanner.services.android.core.drone.autopilot.generic.GenericMavLinkDrone;
@@ -110,7 +111,10 @@ public class State extends DroneVariable<GenericMavLinkDrone> {
             myDrone.notifyDroneEvent(DroneEventsType.ARMING);
 
             if (newState) {
-                myDrone.getWaypointManager().getWaypoints();
+                WaypointManager waypointManager = myDrone.getWaypointManager();
+                if(waypointManager != null) {
+                    waypointManager.getWaypoints();
+                }
             }
         }
 
