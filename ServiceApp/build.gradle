@@ -41,8 +41,8 @@ dependencies {
 //Decomposed version name and code (https://plus.google.com/+JakeWharton/posts/6f5TcVPRZij)
 def versionMajor = 1
 def versionMinor = 4
-def versionPatch = 3
-def versionBuild = 3 //bump for dogfood builds, public betas, etc.
+def versionPatch = 4
+def versionBuild = 0 //bump for dogfood builds, public betas, etc.
 def versionPrefix = "3DR Services v"
 
 //Log levels values
