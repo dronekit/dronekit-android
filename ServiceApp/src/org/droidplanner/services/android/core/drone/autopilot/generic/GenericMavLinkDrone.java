@@ -386,6 +386,9 @@ public class GenericMavLinkDrone implements MavLinkDrone {
                 }
 
                 return parameters;
+
+            case AttributeType.TYPE:
+                return CommonApiUtils.getType(this);
         }
 
         return null;

@@ -164,9 +164,6 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
                 case AttributeType.MISSION:
                     return CommonApiUtils.getMission(this);
 
-                case AttributeType.TYPE:
-                    return CommonApiUtils.getType(this);
-
                 case AttributeType.GUIDED_STATE:
                     return CommonApiUtils.getGuidedState(this);
 
