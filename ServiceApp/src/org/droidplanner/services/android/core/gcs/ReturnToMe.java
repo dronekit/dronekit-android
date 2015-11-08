@@ -114,7 +114,7 @@ public class ReturnToMe implements DroneInterfaces.OnDroneListener, Location.Loc
                             @Override
                             public void onSuccess() {
                                 Timber.i("Updated vehicle home location to %s", locationCoord.toString());
-                                droneMgr.executeAsyncAction(requestHomeUpdateAction, null);
+                                droneMgr.getDrone().executeAsyncAction(requestHomeUpdateAction, null);
                                 CommonApiUtils.postSuccessEvent(commandListener);
                                 updateCurrentState(ReturnToMeState.STATE_UPDATING_HOME);
                             }
