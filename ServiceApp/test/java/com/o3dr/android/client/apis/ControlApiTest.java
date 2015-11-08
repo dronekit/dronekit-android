@@ -4,8 +4,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.util.SparseArray;
 
-import com.o3dr.services.android.lib.drone.attribute.AttributeType;
-import com.o3dr.services.android.lib.drone.property.Attitude;
 import com.o3dr.services.android.lib.model.AbstractCommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
 
@@ -30,16 +28,17 @@ import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_VE
 public class ControlApiTest {
 
     private static final SparseArray<float[][]> expectedVelocitiesPerAttitude = new SparseArray<>();
+
     static {
         expectedVelocitiesPerAttitude.append(0, new float[][]{{1f, 0f, 1f}, {1f, 0f, 1f}});
         expectedVelocitiesPerAttitude.append(45, new float[][]{{1f, 1f, 1f}, {0f, (float) Math.sqrt(2), 1f}});
-        expectedVelocitiesPerAttitude.append(90, new float[][]{{1f, 1f, 1f},{-1f, 1f, 1f}});
+        expectedVelocitiesPerAttitude.append(90, new float[][]{{1f, 1f, 1f}, {-1f, 1f, 1f}});
         expectedVelocitiesPerAttitude.append(135, new float[][]{{1f, 1f, 1f}, {-(float) Math.sqrt(2), 0, 1f}});
         expectedVelocitiesPerAttitude.append(180, new float[][]{{1f, 1f, 1f}, {-1f, -1f, 1f}});
         expectedVelocitiesPerAttitude.append(225, new float[][]{{1f, 1f, 1f}, {0f, -(float) Math.sqrt(2), 1f}});
-        expectedVelocitiesPerAttitude.append(270, new float[][]{{1f, 1f, 1f},{1f, -1f, 1f}});
+        expectedVelocitiesPerAttitude.append(270, new float[][]{{1f, 1f, 1f}, {1f, -1f, 1f}});
         expectedVelocitiesPerAttitude.append(315, new float[][]{{1f, 1f, 1f}, {(float) Math.sqrt(2), 0, 1f}});
-        expectedVelocitiesPerAttitude.append(360, new float[][]{{1f, 1f, 1f},{1f, 1f, 1f}});
+        expectedVelocitiesPerAttitude.append(360, new float[][]{{1f, 1f, 1f}, {1f, 1f, 1f}});
     }
 
     /**
@@ -64,9 +63,9 @@ public class ControlApiTest {
 
         //Test with the EARTH NED coordinate frame. What goes in should be what comes out.
         final int testCount = 100;
-        for(int i= 0; i < testCount; i++){
+        for (int i = 0; i < testCount; i++) {
             final float randomX = (float) ((Math.random() * 2) - 1f);
-            final float randomY =(float) ((Math.random() * 2) - 1f);
+            final float randomY = (float) ((Math.random() * 2) - 1f);
             final float randomZ = (float) ((Math.random() * 2) - 1f);
 
             controlApi.manualControl(randomX, randomY, randomZ, null);
