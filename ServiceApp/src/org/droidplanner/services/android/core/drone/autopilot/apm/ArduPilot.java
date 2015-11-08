@@ -361,29 +361,7 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
 
     @Override
     protected boolean setVelocity(Bundle data, ICommandListener listener) {
-        //Retrieve the normalized values
-        float normalizedXVel = data.getFloat(ControlActions.EXTRA_VELOCITY_X);
-        float normalizedYVel = data.getFloat(ControlActions.EXTRA_VELOCITY_Y);
-        float normalizedZVel = data.getFloat(ControlActions.EXTRA_VELOCITY_Z);
-
-        //Retrieve the speed parameters.
-        float defaultSpeed = 5; //m/s
-
-        ParameterManager parameterManager = getParameterManager();
-
-        //Retrieve the horizontal speed value
-        Parameter horizSpeedParam = parameterManager.getParameter("WPNAV_SPEED");
-        double horizontalSpeed = horizSpeedParam == null ? defaultSpeed : horizSpeedParam.getValue() / 100;
-
-        //Retrieve the vertical speed value.
-        String vertSpeedParamName = normalizedZVel >= 0 ? "WPNAV_SPEED_UP" : "WPNAV_SPEED_DN";
-        Parameter vertSpeedParam = parameterManager.getParameter(vertSpeedParamName);
-        double verticalSpeed = vertSpeedParam == null ? defaultSpeed : vertSpeedParam.getValue() / 100;
-
-        MavLinkCommands.setVelocityInLocalFrame(this, (float) (normalizedXVel * horizontalSpeed),
-                (float) (normalizedYVel * horizontalSpeed),
-                (float) (normalizedZVel * verticalSpeed),
-                listener);
+        CommonApiUtils.postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
         return true;
     }
 

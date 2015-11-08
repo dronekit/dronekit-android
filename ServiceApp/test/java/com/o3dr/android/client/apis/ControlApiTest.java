@@ -69,7 +69,7 @@ public class ControlApiTest {
             final float randomY =(float) ((Math.random() * 2) - 1f);
             final float randomZ = (float) ((Math.random() * 2) - 1f);
 
-            controlApi.manualControl(ControlApi.EARTH_NED_COORDINATE_FRAME, randomX, randomY, randomZ, null);
+            controlApi.manualControl(randomX, randomY, randomZ, null);
 
             Assert.assertTrue(mockDrone.getAsyncAction().getType().equals(ACTION_SET_VELOCITY));
 
@@ -79,26 +79,26 @@ public class ControlApiTest {
             Assert.assertEquals(params.getFloat(EXTRA_VELOCITY_Z), randomZ, 0.001);
         }
 
-        //Test with the VEHICLE coordinate frame. The output is dependent on the vehicle attitude data.
-        final Attitude attitude = new Attitude();
-        final int expectedValuesCount = expectedVelocitiesPerAttitude.size();
-        for(int i = 0; i < expectedValuesCount; i++) {
-            final int yaw = expectedVelocitiesPerAttitude.keyAt(i);
-            final float[][] paramsAndResults = expectedVelocitiesPerAttitude.valueAt(i);
-            final float[] params = paramsAndResults[0];
-
-            attitude.setYaw(yaw);
-            mockDrone.setAttribute(AttributeType.ATTITUDE, attitude);
-
-            controlApi.manualControl(ControlApi.VEHICLE_COORDINATE_FRAME, params[0], params[1], params[2], null);
-
-            Assert.assertTrue(mockDrone.getAsyncAction().getType().equals(ACTION_SET_VELOCITY));
-
-            final float[] expectedValues = paramsAndResults[1];
-            Bundle data = mockDrone.getAsyncAction().getData();
-            Assert.assertEquals("Invalid x velocity for attitude = " + yaw, data.getFloat(EXTRA_VELOCITY_X), expectedValues[0], 0.001);
-            Assert.assertEquals("Invalid y velocity for attitude = " + yaw, data.getFloat(EXTRA_VELOCITY_Y), expectedValues[1], 0.001);
-            Assert.assertEquals("Invalid z velocity for attitude = " + yaw, data.getFloat(EXTRA_VELOCITY_Z), expectedValues[2], 0.001);
-        }
+//        //Test with the VEHICLE coordinate frame. The output is dependent on the vehicle attitude data.
+//        final Attitude attitude = new Attitude();
+//        final int expectedValuesCount = expectedVelocitiesPerAttitude.size();
+//        for(int i = 0; i < expectedValuesCount; i++) {
+//            final int yaw = expectedVelocitiesPerAttitude.keyAt(i);
+//            final float[][] paramsAndResults = expectedVelocitiesPerAttitude.valueAt(i);
+//            final float[] params = paramsAndResults[0];
+//
+//            attitude.setYaw(yaw);
+//            mockDrone.setAttribute(AttributeType.ATTITUDE, attitude);
+//
+//            controlApi.manualControl(ControlApi.VEHICLE_COORDINATE_FRAME, params[0], params[1], params[2], null);
+//
+//            Assert.assertTrue(mockDrone.getAsyncAction().getType().equals(ACTION_SET_VELOCITY));
+//
+//            final float[] expectedValues = paramsAndResults[1];
+//            Bundle data = mockDrone.getAsyncAction().getData();
+//            Assert.assertEquals("Invalid x velocity for attitude = " + yaw, data.getFloat(EXTRA_VELOCITY_X), expectedValues[0], 0.001);
+//            Assert.assertEquals("Invalid y velocity for attitude = " + yaw, data.getFloat(EXTRA_VELOCITY_Y), expectedValues[1], 0.001);
+//            Assert.assertEquals("Invalid z velocity for attitude = " + yaw, data.getFloat(EXTRA_VELOCITY_Z), expectedValues[2], 0.001);
+//        }
     }
 }

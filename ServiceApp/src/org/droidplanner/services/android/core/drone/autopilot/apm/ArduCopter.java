@@ -5,15 +5,20 @@ import android.os.Bundle;
 import android.os.Handler;
 
 import com.o3dr.services.android.lib.drone.action.ControlActions;
+import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
+import com.o3dr.services.android.lib.drone.property.Attitude;
+import com.o3dr.services.android.lib.drone.property.Parameter;
 import com.o3dr.services.android.lib.model.AbstractCommandListener;
 import com.o3dr.services.android.lib.model.ICommandListener;
 
 import org.droidplanner.services.android.core.MAVLink.MAVLinkStreams;
+import org.droidplanner.services.android.core.MAVLink.MavLinkCommands;
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
 import org.droidplanner.services.android.core.drone.DroneManager;
 import org.droidplanner.services.android.core.drone.LogMessageListener;
 import org.droidplanner.services.android.core.drone.Preferences;
+import org.droidplanner.services.android.core.drone.profiles.ParameterManager;
 import org.droidplanner.services.android.core.drone.variables.ApmModes;
 import org.droidplanner.services.android.core.drone.variables.State;
 import org.droidplanner.services.android.core.firmware.FirmwareType;
@@ -36,6 +41,42 @@ public class ArduCopter extends ArduPilot {
     @Override
     public FirmwareType getFirmwareType() {
         return FirmwareType.ARDU_COPTER;
+    }
+
+    @Override
+    protected boolean setVelocity(Bundle data, ICommandListener listener){
+        //Retrieve the normalized values
+        float normalizedXVel = data.getFloat(ControlActions.EXTRA_VELOCITY_X);
+        float normalizedYVel = data.getFloat(ControlActions.EXTRA_VELOCITY_Y);
+        float normalizedZVel = data.getFloat(ControlActions.EXTRA_VELOCITY_Z);
+
+        double attitudeInRad = Math.toRadians(attitude.getYaw());
+
+        final double cosAttitude = Math.cos(attitudeInRad);
+        final double sinAttitude = Math.sin(attitudeInRad);
+
+        float projectedX = (float) (normalizedXVel * cosAttitude) - (float) (normalizedYVel * sinAttitude);
+        float projectedY = (float) (normalizedXVel * sinAttitude) + (float) (normalizedYVel * cosAttitude);
+
+        //Retrieve the speed parameters.
+        float defaultSpeed = 5; //m/s
+
+        ParameterManager parameterManager = getParameterManager();
+
+        //Retrieve the horizontal speed value
+        Parameter horizSpeedParam = parameterManager.getParameter("WPNAV_SPEED");
+        double horizontalSpeed = horizSpeedParam == null ? defaultSpeed : horizSpeedParam.getValue() / 100;
+
+        //Retrieve the vertical speed value.
+        String vertSpeedParamName = normalizedZVel >= 0 ? "WPNAV_SPEED_UP" : "WPNAV_SPEED_DN";
+        Parameter vertSpeedParam = parameterManager.getParameter(vertSpeedParamName);
+        double verticalSpeed = vertSpeedParam == null ? defaultSpeed : vertSpeedParam.getValue() / 100;
+
+        MavLinkCommands.setVelocityInLocalFrame(this, (float) (projectedX * horizontalSpeed),
+                (float) (projectedY * horizontalSpeed),
+                (float) (normalizedZVel * verticalSpeed),
+                listener);
+        return true;
     }
 
     @Override

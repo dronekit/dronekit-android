@@ -42,13 +42,6 @@ import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_YA
  */
 public class ControlApi extends Api {
 
-    public static final int EARTH_NED_COORDINATE_FRAME = 0;
-    public static final int VEHICLE_COORDINATE_FRAME = 1;
-
-    @IntDef({EARTH_NED_COORDINATE_FRAME, VEHICLE_COORDINATE_FRAME})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface CoordinateFrame{}
-
     private static final ConcurrentHashMap<Drone, ControlApi> apiCache = new ConcurrentHashMap<>();
     private static final Builder<ControlApi> apiBuilder = new Builder<ControlApi>() {
         @Override
@@ -143,48 +136,26 @@ public class ControlApi extends Api {
         drone.performAsyncActionOnDroneThread(new Action(ACTION_SET_CONDITION_YAW, params), listener);
     }
 
-    private void manualControl(float vx, float vy, float vz, AbstractCommandListener listener){
-        Bundle params = new Bundle();
-        params.putFloat(EXTRA_VELOCITY_X, vx);
-        params.putFloat(EXTRA_VELOCITY_Y, vy);
-        params.putFloat(EXTRA_VELOCITY_Z, vz);
-        drone.performAsyncActionOnDroneThread(new Action(ACTION_SET_VELOCITY, params), listener);
-    }
-
     /**
      * Move the vehicle along the specified normalized velocity vector.
      * @since 2.6.9
      *
-     * @param referenceFrame Reference frame to use. Can be one of
-     *                       {@link #EARTH_NED_COORDINATE_FRAME},
-     *                       {@link #VEHICLE_COORDINATE_FRAME}
-     *
-     * @param vx             x velocity normalized to the range [-1.0f, 1.0f].
-     * @param vy             y velocity normalized to the range [-1.0f, 1.0f].
-     * @param vz             z velocity normalized to the range [-1.0f, 1.0f].
+     * @param vx             x velocity normalized to the range [-1.0f, 1.0f]. Generally correspond to the pitch of the vehicle.
+     * @param vy             y velocity normalized to the range [-1.0f, 1.0f]. Generally correspond to the roll of the vehicle.
+     * @param vz             z velocity normalized to the range [-1.0f, 1.0f]. Generally correspond to the thrust of the vehicle.
      * @param listener       Register a callback to receive update of the command execution state.
      */
-    public void manualControl(@CoordinateFrame int referenceFrame, float vx, float vy, float vz, AbstractCommandListener listener){
+    public void manualControl(float vx, float vy, float vz, AbstractCommandListener listener){
         if(!isWithinBounds(vx, -1f, 1f) || !isWithinBounds(vy, -1f, 1f) || !isWithinBounds(vz, -1f, 1f)){
             postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
             return;
         }
 
-        float projectedX = vx;
-        float projectedY = vy;
-
-        if(referenceFrame == VEHICLE_COORDINATE_FRAME) {
-            Attitude attitude = drone.getAttribute(AttributeType.ATTITUDE);
-            double attitudeInRad = Math.toRadians(attitude.getYaw());
-
-            final double cosAttitude = Math.cos(attitudeInRad);
-            final double sinAttitude = Math.sin(attitudeInRad);
-
-            projectedX = (float) (vx * cosAttitude) - (float) (vy * sinAttitude);
-            projectedY = (float) (vx * sinAttitude) + (float) (vy * cosAttitude);
-        }
-
-        manualControl(projectedX, projectedY, vz, listener);
+        Bundle params = new Bundle();
+        params.putFloat(EXTRA_VELOCITY_X, vx);
+        params.putFloat(EXTRA_VELOCITY_Y, vy);
+        params.putFloat(EXTRA_VELOCITY_Z, vz);
+        drone.performAsyncActionOnDroneThread(new Action(ACTION_SET_VELOCITY, params), listener);
     }
 
     /**
