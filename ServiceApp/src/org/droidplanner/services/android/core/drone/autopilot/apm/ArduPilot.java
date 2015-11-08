@@ -48,6 +48,7 @@ import org.droidplanner.services.android.core.MAVLink.MavLinkParameters;
 import org.droidplanner.services.android.core.MAVLink.WaypointManager;
 import org.droidplanner.services.android.core.MAVLink.command.doCmd.MavLinkDoCmds;
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
+import org.droidplanner.services.android.core.drone.DroneManager;
 import org.droidplanner.services.android.core.drone.LogMessageListener;
 import org.droidplanner.services.android.core.drone.autopilot.apm.variables.APMHeartBeat;
 import org.droidplanner.services.android.core.drone.autopilot.generic.GenericMavLinkDrone;
@@ -334,6 +335,12 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
             default:
                 return super.executeAsyncAction(action, listener);
         }
+    }
+
+    @Override
+    protected boolean enableManualControl(Bundle data, ICommandListener listener){
+        CommonApiUtils.postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
+        return true;
     }
 
     @Override

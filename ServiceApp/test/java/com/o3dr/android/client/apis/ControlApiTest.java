@@ -43,7 +43,7 @@ public class ControlApiTest {
     }
 
     /**
-     * Tests the ControlApi#moveAtVelocity(...) method.
+     * Tests the ControlApi#manualControl(...) method.
      * Ensures the method correctly interpret its given parameters.
      *
      * @throws Exception
@@ -69,7 +69,7 @@ public class ControlApiTest {
             final float randomY =(float) ((Math.random() * 2) - 1f);
             final float randomZ = (float) ((Math.random() * 2) - 1f);
 
-            controlApi.moveAtVelocity(ControlApi.EARTH_NED_COORDINATE_FRAME, randomX, randomY, randomZ, null);
+            controlApi.manualControl(ControlApi.EARTH_NED_COORDINATE_FRAME, randomX, randomY, randomZ, null);
 
             Assert.assertTrue(mockDrone.getAsyncAction().getType().equals(ACTION_SET_VELOCITY));
 
@@ -90,7 +90,7 @@ public class ControlApiTest {
             attitude.setYaw(yaw);
             mockDrone.setAttribute(AttributeType.ATTITUDE, attitude);
 
-            controlApi.moveAtVelocity(ControlApi.VEHICLE_COORDINATE_FRAME, params[0], params[1], params[2], null);
+            controlApi.manualControl(ControlApi.VEHICLE_COORDINATE_FRAME, params[0], params[1], params[2], null);
 
             Assert.assertTrue(mockDrone.getAsyncAction().getType().equals(ACTION_SET_VELOCITY));
 

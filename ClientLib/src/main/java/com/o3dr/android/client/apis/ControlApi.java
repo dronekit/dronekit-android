@@ -17,11 +17,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_DO_GUIDED_TAKEOFF;
+import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_ENABLE_MANUAL_CONTROL;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_SEND_GUIDED_POINT;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_SET_CONDITION_YAW;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_SET_GUIDED_ALTITUDE;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_SET_VELOCITY;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_ALTITUDE;
+import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_DO_ENABLE;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_FORCE_GUIDED_POINT;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_GUIDED_POINT;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_VELOCITY_X;
@@ -141,7 +143,7 @@ public class ControlApi extends Api {
         drone.performAsyncActionOnDroneThread(new Action(ACTION_SET_CONDITION_YAW, params), listener);
     }
 
-    private void moveAtVelocity(float vx, float vy, float vz, AbstractCommandListener listener){
+    private void manualControl(float vx, float vy, float vz, AbstractCommandListener listener){
         Bundle params = new Bundle();
         params.putFloat(EXTRA_VELOCITY_X, vx);
         params.putFloat(EXTRA_VELOCITY_Y, vy);
@@ -150,7 +152,8 @@ public class ControlApi extends Api {
     }
 
     /**
-     * Move the vehicle along the specified velocity vector.
+     * Move the vehicle along the specified normalized velocity vector.
+     * @since 2.6.9
      *
      * @param referenceFrame Reference frame to use. Can be one of
      *                       {@link #EARTH_NED_COORDINATE_FRAME},
@@ -161,7 +164,7 @@ public class ControlApi extends Api {
      * @param vz             z velocity normalized to the range [-1.0f, 1.0f].
      * @param listener       Register a callback to receive update of the command execution state.
      */
-    public void moveAtVelocity(@CoordinateFrame int referenceFrame, float vx, float vy, float vz, AbstractCommandListener listener){
+    public void manualControl(@CoordinateFrame int referenceFrame, float vx, float vy, float vz, AbstractCommandListener listener){
         if(!isWithinBounds(vx, -1f, 1f) || !isWithinBounds(vy, -1f, 1f) || !isWithinBounds(vz, -1f, 1f)){
             postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
             return;
@@ -181,10 +184,68 @@ public class ControlApi extends Api {
             projectedY = (float) (vx * sinAttitude) + (float) (vy * cosAttitude);
         }
 
-        moveAtVelocity(projectedX, projectedY, vz, listener);
+        manualControl(projectedX, projectedY, vz, listener);
+    }
+
+    /**
+     * [Dis|En]able manual control on the vehicle.
+     * The result of the action will be conveyed through the passed listener.
+     *
+     * @since 2.6.9
+     *
+     * @param enable True to enable manual control, false to disable.
+     * @param listener Register a callback to receive the result of the operation.
+     */
+    public void enableManualControl(final boolean enable, final ManualControlStateListener listener){
+        AbstractCommandListener listenerWrapper = listener == null ? null
+                : new AbstractCommandListener() {
+            @Override
+            public void onSuccess() {
+                if(enable){
+                    listener.onManualControlEnabled();
+                }
+                else{
+                    listener.onManualControlDisabled();
+                }
+            }
+
+            @Override
+            public void onError(int executionError) {
+                if(enable){
+                    listener.onManualControlDisabled();
+                }
+            }
+
+            @Override
+            public void onTimeout() {
+                if(enable){
+                    listener.onManualControlDisabled();
+                }
+            }
+        };
+
+        Bundle params = new Bundle();
+        params.putBoolean(EXTRA_DO_ENABLE, enable);
+        drone.performAsyncActionOnDroneThread(new Action(ACTION_ENABLE_MANUAL_CONTROL, params), listenerWrapper);
     }
 
     private static boolean isWithinBounds(float value, float lowerBound, float upperBound){
         return value <= upperBound && value >= lowerBound;
+    }
+
+    /**
+     * Used to monitor the state of manual control for the vehicle.
+     * @since 2.6.9
+     */
+    public interface ManualControlStateListener {
+        /**
+         * Manual control is enabled on the vehicle.
+         */
+        void onManualControlEnabled();
+
+        /**
+         * Manual control is disabled on the vehicle.
+         */
+        void onManualControlDisabled();
     }
 }

@@ -335,6 +335,9 @@ public class GenericMavLinkDrone implements MavLinkDrone {
             case ControlActions.ACTION_SET_VELOCITY:
                 return setVelocity(data, listener);
 
+            case ControlActions.ACTION_ENABLE_MANUAL_CONTROL:
+                return enableManualControl(data, listener);
+
             //EXPERIMENTAL ACTIONS
             case ExperimentalActions.ACTION_SEND_MAVLINK_MESSAGE:
                 data.setClassLoader(MavlinkMessageWrapper.class.getClassLoader());
@@ -353,14 +356,23 @@ public class GenericMavLinkDrone implements MavLinkDrone {
         }
     }
 
+    protected boolean enableManualControl(Bundle data, ICommandListener listener) {
+        boolean enable = data.getBoolean(ControlActions.EXTRA_DO_ENABLE);
+        if (enable) {
+            CommonApiUtils.postSuccessEvent(listener);
+        } else {
+            CommonApiUtils.postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
+        }
+        return true;
+    }
+
     protected boolean performArming(Bundle data, ICommandListener listener) {
         boolean doArm = data.getBoolean(StateActions.EXTRA_ARM);
         boolean emergencyDisarm = data.getBoolean(StateActions.EXTRA_EMERGENCY_DISARM);
 
-        if(!doArm && emergencyDisarm){
+        if (!doArm && emergencyDisarm) {
             MavLinkCommands.sendFlightTermination(this, listener);
-        }
-        else{
+        } else {
             MavLinkCommands.sendArmMessage(this, doArm, false, listener);
         }
         return true;
@@ -369,7 +381,7 @@ public class GenericMavLinkDrone implements MavLinkDrone {
     protected boolean setVehicleMode(Bundle data, ICommandListener listener) {
         data.setClassLoader(VehicleMode.class.getClassLoader());
         VehicleMode newMode = data.getParcelable(StateActions.EXTRA_VEHICLE_MODE);
-        if(newMode != null) {
+        if (newMode != null) {
             switch (newMode) {
                 case COPTER_LAND:
                     MavLinkCommands.sendNavLand(this, listener);
@@ -405,7 +417,7 @@ public class GenericMavLinkDrone implements MavLinkDrone {
         return true;
     }
 
-    protected boolean performTakeoff(Bundle data, ICommandListener listener){
+    protected boolean performTakeoff(Bundle data, ICommandListener listener) {
         double takeoffAltitude = data.getDouble(ControlActions.EXTRA_ALTITUDE);
         MavLinkCommands.sendTakeoff(this, takeoffAltitude, listener);
         return true;
@@ -536,7 +548,7 @@ public class GenericMavLinkDrone implements MavLinkDrone {
         processVehicleMode(msg_heart);
     }
 
-    private void processVehicleMode(msg_heartbeat msg_heart){
+    private void processVehicleMode(msg_heartbeat msg_heart) {
         ApmModes newMode = ApmModes.getMode(msg_heart.custom_mode, getType());
         state.setMode(newMode);
     }
