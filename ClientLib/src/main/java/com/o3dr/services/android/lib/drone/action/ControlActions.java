@@ -40,6 +40,10 @@ public class ControlActions {
      */
     public static final String EXTRA_VELOCITY_Z = "extra_velocity_z";
 
+    public static final String ACTION_ENABLE_MANUAL_CONTROL = PACKAGE_NAME + ".ENABLE_MANUAL_CONTROL";
+
+    public static final String EXTRA_DO_ENABLE = "extra_do_enable";
+
     //Private to prevent instantiation
     private ControlActions(){}
 

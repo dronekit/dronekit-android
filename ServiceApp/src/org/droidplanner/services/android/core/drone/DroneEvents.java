@@ -58,6 +58,10 @@ public class DroneEvents extends DroneVariable {
             droneListeners.remove(listener);
     }
 
+    public void removeAllDroneListeners(){
+        droneListeners.clear();
+    }
+
     public void notifyDroneEvent(DroneEventsType event) {
         if (event == null || droneListeners.isEmpty() || eventQueue.contains(event))
             return;

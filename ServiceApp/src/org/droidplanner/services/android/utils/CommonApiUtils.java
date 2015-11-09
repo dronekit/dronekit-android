@@ -1,6 +1,5 @@
 package org.droidplanner.services.android.utils;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.RemoteException;
@@ -11,9 +10,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.ardupilotmega.msg_ekf_status_report;
 import com.MAVLink.ardupilotmega.msg_mag_cal_progress;
 import com.MAVLink.ardupilotmega.msg_mag_cal_report;
-import com.MAVLink.common.msg_command_long;
 import com.MAVLink.enums.MAG_CAL_STATUS;
-import com.MAVLink.enums.MAV_CMD;
 import com.MAVLink.enums.MAV_TYPE;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
@@ -45,14 +42,14 @@ import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
 import com.o3dr.services.android.lib.model.AbstractCommandListener;
 import com.o3dr.services.android.lib.model.ICommandListener;
 
-import org.droidplanner.services.android.core.MAVLink.MavLinkArm;
+import org.droidplanner.services.android.core.MAVLink.MavLinkCommands;
 import org.droidplanner.services.android.core.MAVLink.command.doCmd.MavLinkDoCmds;
 import org.droidplanner.services.android.core.drone.DroneManager;
 import org.droidplanner.services.android.core.drone.autopilot.Drone;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
+import org.droidplanner.services.android.core.drone.autopilot.apm.ArduPilot;
 import org.droidplanner.services.android.core.drone.autopilot.generic.GenericMavLinkDrone;
 import org.droidplanner.services.android.core.drone.profiles.ParameterManager;
-import org.droidplanner.services.android.core.drone.profiles.VehicleProfile;
 import org.droidplanner.services.android.core.drone.variables.ApmModes;
 import org.droidplanner.services.android.core.drone.variables.Camera;
 import org.droidplanner.services.android.core.drone.variables.GuidedPoint;
@@ -66,14 +63,10 @@ import org.droidplanner.services.android.core.mission.survey.SplineSurveyImpl;
 import org.droidplanner.services.android.core.mission.survey.SurveyImpl;
 import org.droidplanner.services.android.core.mission.waypoints.StructureScannerImpl;
 import org.droidplanner.services.android.core.survey.Footprint;
-import org.droidplanner.services.android.utils.file.IO.ParameterMetadataLoader;
-import org.xmlpull.v1.XmlPullParserException;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -602,7 +595,7 @@ public class CommonApiUtils {
             droneMission.sendMissionToAPM();
     }
 
-    public static void startMission(final MavLinkDrone drone, final boolean forceModeChange, boolean forceArm, final ICommandListener listener) {
+    public static void startMission(final ArduPilot drone, final boolean forceModeChange, boolean forceArm, final ICommandListener listener) {
         if (drone == null) {
             return;
         }
@@ -610,12 +603,7 @@ public class CommonApiUtils {
         final Runnable sendCommandRunnable = new Runnable() {
             @Override
             public void run() {
-                msg_command_long msg = new msg_command_long();
-                msg.target_system = drone.getSysid();
-                msg.target_component = drone.getCompid();
-                msg.command = MAV_CMD.MAV_CMD_MISSION_START;
-
-                drone.getMavClient().sendMavMessage(msg, listener);
+                MavLinkCommands.startMission(drone, listener);
             }
         };
 
@@ -684,11 +672,11 @@ public class CommonApiUtils {
         return (float) drone.getMission().makeAndUploadDronie();
     }
 
-    public static void arm(MavLinkDrone drone, boolean arm, ICommandListener listener) {
+    public static void arm(ArduPilot drone, boolean arm, ICommandListener listener) {
         arm(drone, arm, false, listener);
     }
 
-    public static void arm(final MavLinkDrone drone, final boolean arm, final boolean emergencyDisarm, final ICommandListener listener) {
+    public static void arm(final ArduPilot drone, final boolean arm, final boolean emergencyDisarm, final ICommandListener listener) {
         if (drone == null)
             return;
 
@@ -698,7 +686,7 @@ public class CommonApiUtils {
                 changeVehicleMode(drone, VehicleMode.COPTER_STABILIZE, new AbstractCommandListener() {
                     @Override
                     public void onSuccess() {
-                        MavLinkArm.sendArmMessage(drone, arm, emergencyDisarm, listener);
+                        MavLinkCommands.sendArmMessage(drone, arm, emergencyDisarm, listener);
                     }
 
                     @Override
@@ -728,7 +716,7 @@ public class CommonApiUtils {
             }
         }
 
-        MavLinkArm.sendArmMessage(drone, arm, emergencyDisarm, listener);
+        MavLinkCommands.sendArmMessage(drone, arm, emergencyDisarm, listener);
     }
 
     /**
