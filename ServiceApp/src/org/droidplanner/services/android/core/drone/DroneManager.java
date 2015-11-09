@@ -186,20 +186,7 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream, DroneInt
         if (drone == null)
             return;
 
-        drone.removeDroneListener(this);
-
-        ParameterManager parameterManager = drone.getParameterManager();
-        if (parameterManager != null)
-            parameterManager.setParameterListener(null);
-
-        MagnetometerCalibrationImpl magnetometer = drone.getMagnetometerCalibration();
-        if (magnetometer != null)
-            magnetometer.setListener(null);
-
-        if (drone instanceof ArduSolo) {
-            ((ArduSolo) drone).getSoloComp().destroy();
-        }
-
+        drone.destroy();
         drone = null;
     }
 

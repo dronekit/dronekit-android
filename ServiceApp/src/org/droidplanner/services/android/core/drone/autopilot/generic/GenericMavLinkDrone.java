@@ -169,6 +169,19 @@ public class GenericMavLinkDrone implements MavLinkDrone {
         return null;
     }
 
+    @Override
+    public void destroy(){
+        events.removeAllDroneListeners();
+
+        ParameterManager parameterManager = getParameterManager();
+        if (parameterManager != null)
+            parameterManager.setParameterListener(null);
+
+        MagnetometerCalibrationImpl magnetometer = getMagnetometerCalibration();
+        if (magnetometer != null)
+            magnetometer.setListener(null);
+    }
+
     protected HeartBeat initHeartBeat(Handler handler) {
         return new HeartBeat(this, handler);
     }

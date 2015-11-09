@@ -80,6 +80,12 @@ public class ArduCopter extends ArduPilot {
     }
 
     @Override
+    public void destroy(){
+        super.destroy();
+        manualControlStateListeners.clear();
+    }
+
+    @Override
     protected boolean enableManualControl(Bundle data, ICommandListener listener){
         boolean enable = data.getBoolean(ControlActions.EXTRA_DO_ENABLE);
         String appId = data.getString(DroneManager.EXTRA_CLIENT_APP_ID);
