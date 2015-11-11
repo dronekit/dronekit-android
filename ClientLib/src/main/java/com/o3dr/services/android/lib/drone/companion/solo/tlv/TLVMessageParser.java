@@ -42,14 +42,16 @@ public class TLVMessageParser {
             try {
                 messageType = packetBuffer.getInt();
                 final int messageLength = packetBuffer.getInt();
-                Log.d(TAG, String.format("Received message %d of with value of length %d. Remaining buffer size is %d", messageType, messageLength, packetBuffer.remaining()));
+                int remaining = packetBuffer.remaining();
+                Log.d(TAG, String.format("Received message %d of with value of length %d. Remaining buffer size is %d", messageType, messageLength, remaining));
 
-                if (messageLength > packetBuffer.remaining()) {
+                if (messageLength > remaining) {
                     break;
                 }
 
                 TLVPacket packet = null;
                 packetBuffer.mark();
+
                 switch (messageType) {
                     case TYPE_SOLO_MESSAGE_GET_CURRENT_SHOT:
                     case TYPE_SOLO_MESSAGE_SET_CURRENT_SHOT: {
@@ -173,7 +175,7 @@ public class TLVMessageParser {
                     packetList.add(packet);
                 } else {
                     packetBuffer.reset();
-                    packetBuffer.get(new byte[messageLength]);
+                    packetBuffer.position(packetBuffer.position() + messageLength);
                 }
 
             } catch (BufferUnderflowException e) {
