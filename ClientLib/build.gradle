@@ -40,6 +40,10 @@ android {
         abortOnError false
     }
 
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+
     android.libraryVariants.all { variant ->
         variant.outputs.each { output ->
             def file = output.outputFile
