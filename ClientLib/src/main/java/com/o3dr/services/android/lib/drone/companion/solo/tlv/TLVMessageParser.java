@@ -8,7 +8,23 @@ import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.*;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_ARTOO_INPUT_REPORT_MESSAGE;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_CABLE_CAM_OPTIONS;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_CABLE_CAM_WAYPOINT;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_FOLLOW_OPTIONS;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_GET_BUTTON_SETTING;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_GOPRO_RECORD;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_GOPRO_REQUEST_STATE;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_GOPRO_SET_REQUEST;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_GOPRO_STATE;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_MESSAGE_GET_CURRENT_SHOT;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_MESSAGE_LOCATION;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_MESSAGE_RECORD_POSITION;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_MESSAGE_SET_CURRENT_SHOT;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_MESSAGE_SHOT_MANAGER_ERROR;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SET_BUTTON_SETTING;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SHOT_ERROR;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SHOT_OPTIONS;
 
 /**
  * Utility class to generate tlv packet from received bytes.
@@ -37,21 +53,31 @@ public class TLVMessageParser {
         final ByteOrder originalOrder = packetBuffer.order();
         packetBuffer.order(TLVPacket.TLV_BYTE_ORDER);
 
-        while(packetBuffer.remaining() > 0) {
-            int messageType = -1;
-            try {
+        int messageType = -1;
+        try {
+
+            while (packetBuffer.remaining() >= TLVPacket.MIN_TLV_PACKET_SIZE) {
                 messageType = packetBuffer.getInt();
                 final int messageLength = packetBuffer.getInt();
-                Log.d(TAG, String.format("Received message %d of with value of length %d. Remaining buffer size is %d", messageType, messageLength, packetBuffer.remaining()));
+
+                int remaining = packetBuffer.remaining();
+                Log.d(TAG, String.format("Received message %d of with value of length %d. Remaining buffer size is %d", messageType, messageLength, remaining));
+
+                if (messageLength > remaining) {
+                    break;
+                }
+
+                TLVPacket packet = null;
+                packetBuffer.mark();
 
                 switch (messageType) {
                     case TYPE_SOLO_MESSAGE_GET_CURRENT_SHOT:
                     case TYPE_SOLO_MESSAGE_SET_CURRENT_SHOT: {
                         final int shotType = packetBuffer.getInt();
                         if (messageType == TYPE_SOLO_MESSAGE_GET_CURRENT_SHOT)
-                            packetList.add(new SoloMessageShotGetter(shotType));
+                            packet = new SoloMessageShotGetter(shotType);
                         else
-                            packetList.add(new SoloMessageShotSetter(shotType));
+                            packet = new SoloMessageShotSetter(shotType);
                         break;
                     }
 
@@ -59,12 +85,12 @@ public class TLVMessageParser {
                         final double latitude = packetBuffer.getDouble();
                         final double longitude = packetBuffer.getDouble();
                         final float altitude = packetBuffer.getFloat();
-                        packetList.add(new SoloMessageLocation(latitude, longitude, altitude));
+                        packet = new SoloMessageLocation(latitude, longitude, altitude);
                         break;
                     }
 
                     case TYPE_SOLO_MESSAGE_RECORD_POSITION: {
-                        packetList.add(new SoloMessageRecordPosition());
+                        packet = new SoloMessageRecordPosition();
                         break;
                     }
 
@@ -72,7 +98,7 @@ public class TLVMessageParser {
                         final short camInterpolation = packetBuffer.getShort();
                         final short yawDirectionClockwise = packetBuffer.getShort();
                         final float cruiseSpeed = packetBuffer.getFloat();
-                        packetList.add(new SoloCableCamOptions(camInterpolation, yawDirectionClockwise, cruiseSpeed));
+                        packet = new SoloCableCamOptions(camInterpolation, yawDirectionClockwise, cruiseSpeed);
                         break;
                     }
 
@@ -83,35 +109,35 @@ public class TLVMessageParser {
                         final int shotType = packetBuffer.getInt();
                         final int flightMode = packetBuffer.getInt();
                         if (messageType == TYPE_SOLO_GET_BUTTON_SETTING)
-                            packetList.add(new SoloButtonSettingGetter(button, event, shotType, flightMode));
+                            packet = new SoloButtonSettingGetter(button, event, shotType, flightMode);
                         else
-                            packetList.add(new SoloButtonSettingSetter(button, event, shotType, flightMode));
+                            packet = new SoloButtonSettingSetter(button, event, shotType, flightMode);
                         break;
                     }
 
                     case TYPE_SOLO_FOLLOW_OPTIONS: {
                         final float cruiseSpeed = packetBuffer.getFloat();
                         final int lookAtValue = packetBuffer.getInt();
-                        packetList.add(new SoloFollowOptions(cruiseSpeed, lookAtValue));
+                        packet = new SoloFollowOptions(cruiseSpeed, lookAtValue);
                         break;
                     }
 
                     case TYPE_SOLO_SHOT_OPTIONS: {
                         final float cruiseSpeed = packetBuffer.getFloat();
-                        packetList.add(new SoloShotOptions(cruiseSpeed));
+                        packet = new SoloShotOptions(cruiseSpeed);
                         break;
                     }
 
                     case TYPE_SOLO_SHOT_ERROR: {
                         final int errorType = packetBuffer.getInt();
-                        packetList.add(new SoloShotError(errorType));
+                        packet = new SoloShotError(errorType);
                         break;
                     }
 
                     case TYPE_SOLO_MESSAGE_SHOT_MANAGER_ERROR: {
                         final byte[] exceptionData = new byte[messageLength];
                         packetBuffer.get(exceptionData);
-                        packetList.add(new SoloMessageShotManagerError(new String(exceptionData)));
+                        packet = new SoloMessageShotManagerError(new String(exceptionData));
                         break;
                     }
 
@@ -122,7 +148,7 @@ public class TLVMessageParser {
                         final float degreesYaw = packetBuffer.getFloat();
                         final float pitch = packetBuffer.getFloat();
 
-                        packetList.add(new SoloCableCamWaypoint(latitude, longitude, altitude, degreesYaw, pitch));
+                        packet = new SoloCableCamWaypoint(latitude, longitude, altitude, degreesYaw, pitch);
                         break;
                     }
 
@@ -132,39 +158,47 @@ public class TLVMessageParser {
                         final short gimbalRate = packetBuffer.getShort();
                         final short battery = packetBuffer.getShort();
 
-                        packetList.add(new ControllerMessageInputReport(timestamp, gimbalY, gimbalRate, battery));
+                        packet = new ControllerMessageInputReport(timestamp, gimbalY, gimbalRate, battery);
                         break;
                     }
 
                     case TYPE_SOLO_GOPRO_SET_REQUEST: {
                         @SoloGoproConstants.RequestCommand final short command = packetBuffer.getShort();
                         @SoloGoproConstants.RequestCommandValue final short value = packetBuffer.getShort();
-                        packetList.add(new SoloGoproSetRequest(command, value));
+                        packet = new SoloGoproSetRequest(command, value);
                         break;
                     }
 
                     case TYPE_SOLO_GOPRO_RECORD: {
                         @SoloGoproConstants.RecordCommand final int command = packetBuffer.getInt();
-                        packetList.add(new SoloGoproRecord(command));
+                        packet = new SoloGoproRecord(command);
                         break;
                     }
 
                     case TYPE_SOLO_GOPRO_STATE: {
-                        packetList.add(new SoloGoproState(packetBuffer));
+                        packet = new SoloGoproState(packetBuffer);
                         break;
                     }
 
                     case TYPE_SOLO_GOPRO_REQUEST_STATE: {
-                        packetList.add(new SoloGoproRequestState());
+                        packet = new SoloGoproRequestState();
                         break;
                     }
 
                     default:
                         break;
                 }
-            } catch (BufferUnderflowException e) {
-                Log.e(TAG, "Invalid data for tlv packet of type " + messageType);
+
+                if (packet != null && packet.getMessageLength() == messageLength) {
+                    packetList.add(packet);
+                } else {
+                    packetBuffer.reset();
+                    packetBuffer.position(packetBuffer.position() + messageLength);
+                }
             }
+
+        } catch (BufferUnderflowException e) {
+            Log.e(TAG, "Invalid data for tlv packet of type " + messageType);
         }
 
         packetBuffer.order(originalOrder);
