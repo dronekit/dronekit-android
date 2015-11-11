@@ -8,7 +8,23 @@ import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.*;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_ARTOO_INPUT_REPORT_MESSAGE;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_CABLE_CAM_OPTIONS;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_CABLE_CAM_WAYPOINT;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_FOLLOW_OPTIONS;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_GET_BUTTON_SETTING;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_GOPRO_RECORD;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_GOPRO_REQUEST_STATE;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_GOPRO_SET_REQUEST;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_GOPRO_STATE;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_MESSAGE_GET_CURRENT_SHOT;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_MESSAGE_LOCATION;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_MESSAGE_RECORD_POSITION;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_MESSAGE_SET_CURRENT_SHOT;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_MESSAGE_SHOT_MANAGER_ERROR;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SET_BUTTON_SETTING;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SHOT_ERROR;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SHOT_OPTIONS;
 
 /**
  * Utility class to generate tlv packet from received bytes.
@@ -37,11 +53,13 @@ public class TLVMessageParser {
         final ByteOrder originalOrder = packetBuffer.order();
         packetBuffer.order(TLVPacket.TLV_BYTE_ORDER);
 
-        while(packetBuffer.remaining() > 0) {
-            int messageType = -1;
-            try {
+        int messageType = -1;
+        try {
+
+            while (packetBuffer.remaining() >= TLVPacket.MIN_TLV_PACKET_SIZE) {
                 messageType = packetBuffer.getInt();
                 final int messageLength = packetBuffer.getInt();
+
                 int remaining = packetBuffer.remaining();
                 Log.d(TAG, String.format("Received message %d of with value of length %d. Remaining buffer size is %d", messageType, messageLength, remaining));
 
@@ -177,10 +195,10 @@ public class TLVMessageParser {
                     packetBuffer.reset();
                     packetBuffer.position(packetBuffer.position() + messageLength);
                 }
-
-            } catch (BufferUnderflowException e) {
-                Log.e(TAG, "Invalid data for tlv packet of type " + messageType);
             }
+
+        } catch (BufferUnderflowException e) {
+            Log.e(TAG, "Invalid data for tlv packet of type " + messageType);
         }
 
         packetBuffer.order(originalOrder);
