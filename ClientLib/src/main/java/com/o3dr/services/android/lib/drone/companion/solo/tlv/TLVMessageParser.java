@@ -17,6 +17,7 @@ import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageT
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_GOPRO_REQUEST_STATE;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_GOPRO_SET_REQUEST;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_GOPRO_STATE;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_GOPRO_STATE_V2;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_MESSAGE_GET_CURRENT_SHOT;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_MESSAGE_LOCATION;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_MESSAGE_RECORD_POSITION;
@@ -177,6 +178,11 @@ public class TLVMessageParser {
 
                     case TYPE_SOLO_GOPRO_STATE: {
                         packet = new SoloGoproState(packetBuffer);
+                        break;
+                    }
+
+                    case TYPE_SOLO_GOPRO_STATE_V2:{
+                        packet = new SoloGoproStateV2(packetBuffer);
                         break;
                     }
 
