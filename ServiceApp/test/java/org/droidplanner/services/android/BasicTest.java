@@ -12,14 +12,13 @@ import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 
 import org.droidplanner.services.android.communication.service.MAVLinkClient;
 import org.droidplanner.services.android.core.MAVLink.MAVLinkStreams;
-import org.droidplanner.services.android.core.MAVLink.MavLinkArm;
+import org.droidplanner.services.android.core.MAVLink.MavLinkCommands;
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
 import org.droidplanner.services.android.core.drone.LogMessageListener;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.core.drone.autopilot.apm.ArduCopter;
 import org.droidplanner.services.android.mock.MockMavLinkServiceAPI;
 import org.droidplanner.services.android.utils.AndroidApWarningParser;
-import org.droidplanner.services.android.utils.prefs.DroidPlannerPrefs;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -99,7 +98,7 @@ public class BasicTest {
      */
     @Test
     public void testArm() {
-        MavLinkArm.sendArmMessage(drone, true, false, null);
+        MavLinkCommands.sendArmMessage(drone, true, false, null);
         MAVLinkPacket data = mavlinkApi.getData();
         Assert.assertTrue(data != null);
 

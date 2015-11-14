@@ -1,20 +1,22 @@
 package org.droidplanner.services.android.core.MAVLink;
 
-import org.droidplanner.services.android.core.drone.variables.ApmModes;
-
 import com.MAVLink.common.msg_command_long;
 import com.MAVLink.common.msg_manual_control;
 import com.MAVLink.common.msg_mission_item;
-import com.MAVLink.common.msg_set_position_target_global_int;
 import com.MAVLink.common.msg_set_mode;
+import com.MAVLink.common.msg_set_position_target_global_int;
 import com.MAVLink.common.msg_set_position_target_local_ned;
 import com.MAVLink.enums.MAV_CMD;
 import com.MAVLink.enums.MAV_FRAME;
+import com.MAVLink.enums.MAV_GOTO;
 import com.o3dr.services.android.lib.model.ICommandListener;
 
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
+import org.droidplanner.services.android.core.drone.variables.ApmModes;
 
 public class MavLinkCommands {
+
+    public static final int EMERGENCY_DISARM_MAGIC_NUMBER = 21196;
 
     private static final int MAVLINK_SET_POS_TYPE_MASK_POS_IGNORE = ((1 << 0) | (1 << 1) | (1 << 2));
     private static final int MAVLINK_SET_POS_TYPE_MASK_VEL_IGNORE = ((1 << 3) | (1 << 4) | (1 << 5));
@@ -134,6 +136,84 @@ public class MavLinkCommands {
         msg.z = z;
         msg.r = r;
         msg.buttons = buttons;
+        drone.getMavClient().sendMavMessage(msg, listener);
+    }
+
+    public static void sendTakeoff(MavLinkDrone drone, double alt, ICommandListener listener) {
+        msg_command_long msg = new msg_command_long();
+        msg.target_system = drone.getSysid();
+        msg.target_component = drone.getCompid();
+        msg.command = MAV_CMD.MAV_CMD_NAV_TAKEOFF;
+
+        msg.param7 = (float) alt;
+
+        drone.getMavClient().sendMavMessage(msg, listener);
+    }
+
+    public static void sendNavLand(MavLinkDrone drone, ICommandListener listener){
+        msg_command_long msg = new msg_command_long();
+        msg.target_system = drone.getSysid();
+        msg.target_component = drone.getCompid();
+        msg.command = MAV_CMD.MAV_CMD_NAV_LAND;
+
+        drone.getMavClient().sendMavMessage(msg, listener);
+    }
+
+    public static void sendNavRTL(MavLinkDrone drone, ICommandListener listener){
+        msg_command_long msg = new msg_command_long();
+        msg.target_system = drone.getSysid();
+        msg.target_component = drone.getCompid();
+        msg.command = MAV_CMD.MAV_CMD_NAV_RETURN_TO_LAUNCH;
+
+        drone.getMavClient().sendMavMessage(msg, listener);
+    }
+
+    public static void sendPause(MavLinkDrone drone, ICommandListener listener){
+        msg_command_long msg = new msg_command_long();
+        msg.target_system = drone.getSysid();
+        msg.target_component = drone.getCompid();
+
+        msg.command = MAV_CMD.MAV_CMD_OVERRIDE_GOTO;
+        msg.param1 = MAV_GOTO.MAV_GOTO_DO_HOLD;
+        msg.param2 = MAV_GOTO.MAV_GOTO_HOLD_AT_CURRENT_POSITION;
+
+        drone.getMavClient().sendMavMessage(msg, listener);
+    }
+
+    public static void startMission(MavLinkDrone drone, ICommandListener listener){
+        msg_command_long msg = new msg_command_long();
+        msg.target_system = drone.getSysid();
+        msg.target_component = drone.getCompid();
+        msg.command = MAV_CMD.MAV_CMD_MISSION_START;
+
+        drone.getMavClient().sendMavMessage(msg, listener);
+    }
+
+    public static void sendArmMessage(MavLinkDrone drone, boolean arm, boolean emergencyDisarm, ICommandListener listener) {
+        msg_command_long msg = new msg_command_long();
+        msg.target_system = drone.getSysid();
+        msg.target_component = drone.getCompid();
+
+        msg.command = MAV_CMD.MAV_CMD_COMPONENT_ARM_DISARM;
+        msg.param1 = arm ? 1 : 0;
+        msg.param2 = emergencyDisarm ? EMERGENCY_DISARM_MAGIC_NUMBER : 0;
+        msg.param3 = 0;
+        msg.param4 = 0;
+        msg.param5 = 0;
+        msg.param6 = 0;
+        msg.param7 = 0;
+        msg.confirmation = 0;
+        drone.getMavClient().sendMavMessage(msg, listener);
+    }
+
+    public static void sendFlightTermination(MavLinkDrone drone, ICommandListener listener) {
+        msg_command_long msg = new msg_command_long();
+        msg.target_system = drone.getSysid();
+        msg.target_component = drone.getCompid();
+
+        msg.command = MAV_CMD.MAV_CMD_DO_FLIGHTTERMINATION;
+        msg.param1 = 1;
+
         drone.getMavClient().sendMavMessage(msg, listener);
     }
 }

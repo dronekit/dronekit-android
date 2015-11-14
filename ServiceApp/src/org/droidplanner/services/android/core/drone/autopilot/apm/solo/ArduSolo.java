@@ -155,6 +155,12 @@ public class ArduSolo extends ArduCopter {
         });
     }
 
+    @Override
+    public void destroy(){
+        super.destroy();
+        soloComp.destroy();
+    }
+
     public SoloComp getSoloComp() {
         return soloComp;
     }
