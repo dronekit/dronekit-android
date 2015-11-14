@@ -9,10 +9,10 @@ import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 
 import timber.log.Timber;
 
-public class DroneVariable {
-	protected MavLinkDrone myDrone;
+public class DroneVariable<T extends MavLinkDrone> {
+	protected T myDrone;
 
-	public DroneVariable(MavLinkDrone myDrone) {
+	public DroneVariable(T myDrone) {
 		this.myDrone = myDrone;
 	}
 

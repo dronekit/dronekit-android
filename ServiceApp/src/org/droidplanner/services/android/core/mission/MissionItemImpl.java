@@ -6,15 +6,15 @@ import java.util.List;
 import com.MAVLink.common.msg_mission_item;
 import com.MAVLink.enums.MAV_FRAME;
 
-public abstract class MissionItem implements Comparable<MissionItem> {
+public abstract class MissionItemImpl implements Comparable<MissionItemImpl> {
 
 	protected Mission mission;
 
-	public MissionItem(Mission mission) {
+	public MissionItemImpl(Mission mission) {
 		this.mission = mission;
 	}
 
-	public MissionItem(MissionItem item) {
+	public MissionItemImpl(MissionItemImpl item) {
 		this(item.mission);
 	}
 
@@ -47,7 +47,7 @@ public abstract class MissionItem implements Comparable<MissionItem> {
 	}
 
 	@Override
-	public int compareTo(MissionItem another) {
+	public int compareTo(MissionItemImpl another) {
 		return mission.getOrder(this) - mission.getOrder(another);
 	}
 

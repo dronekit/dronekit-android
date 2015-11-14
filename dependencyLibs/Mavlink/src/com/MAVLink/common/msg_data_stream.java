@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
 
 /**
-* 
+* THIS INTERFACE IS DEPRECATED. USE MESSAGE_INTERVAL INSTEAD.
 */
 public class msg_data_stream extends MAVLinkMessage{
 
@@ -22,7 +22,7 @@ public class msg_data_stream extends MAVLinkMessage{
 
     
     /**
-    * The requested interval between two messages of this type
+    * The message rate
     */
     public int message_rate;
     

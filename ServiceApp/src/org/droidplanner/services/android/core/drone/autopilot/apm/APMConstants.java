@@ -6,6 +6,11 @@ package org.droidplanner.services.android.core.drone.autopilot.apm;
  */
 public class APMConstants {
 
+    /**
+     * Index of the home waypoint within a mission items list.
+     */
+    public static final int HOME_WAYPOINT_INDEX = 0;
+
     //Private to prevent instantiation
     private APMConstants(){}
 

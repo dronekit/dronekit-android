@@ -1,10 +1,7 @@
 package com.o3dr.android.client.utils.geotag;
 
-import android.content.Context;
 import android.media.ExifInterface;
 import android.os.AsyncTask;
-import android.os.Build;
-import android.os.Environment;
 
 import com.MAVLink.ardupilotmega.msg_camera_feedback;
 import com.o3dr.android.client.utils.data.tlog.TLogParser;
@@ -15,8 +12,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,8 +24,9 @@ import java.util.Map;
  * GeoTagAsyncTask images based on camera mavlink messages.
  */
 public abstract class GeoTagAsyncTask extends AsyncTask<Void, Integer, GeoTagAsyncTask.ResultObject> {
-    private static final String STORE_PHOTO_DIR_NAME = "GeoTag";
-    private final Context context;
+    private static final String STORE_PHOTO_PREFIX = "GeoTag";
+    private static final SimpleDateFormat formatter = new SimpleDateFormat("MM-dd-yy-HH");
+    private final File rootDir;
     private final List<TLogParser.Event> events;
     private final ArrayList<File> photos;
 
@@ -35,12 +35,12 @@ public abstract class GeoTagAsyncTask extends AsyncTask<Void, Integer, GeoTagAsy
      *
      * Warning: this copies data to external storage
      *
-     * @param context  {@link Context}
+     * @param rootDir  {@link File}
      * @param events   {@link List<com.o3dr.android.client.utils.data.tlog.TLogParser.Event>} list of events to geotag photos.
      * @param photos   {@link List<File>} list of files of photos to geotag.
      */
-    public GeoTagAsyncTask(Context context, List<TLogParser.Event> events, ArrayList<File> photos) {
-        this.context = context;
+    public GeoTagAsyncTask(File rootDir, List<TLogParser.Event> events, ArrayList<File> photos) {
+        this.rootDir = rootDir;
         this.events = events;
         this.photos = photos;
     }
@@ -50,8 +50,6 @@ public abstract class GeoTagAsyncTask extends AsyncTask<Void, Integer, GeoTagAsy
         ResultObject resultObject = new ResultObject();
 
         try {
-            File saveDir = new File(getSaveRootDir(context), STORE_PHOTO_DIR_NAME);
-
             HashMap<File, File> geoTaggedFiles = new HashMap<>();
             HashMap<File, Exception> failedFiles = new HashMap<>();
             resultObject.setResult(geoTaggedFiles, failedFiles);
@@ -60,7 +58,13 @@ public abstract class GeoTagAsyncTask extends AsyncTask<Void, Integer, GeoTagAsy
                 return resultObject;
             }
 
-            if (!saveDir.exists() && !saveDir.mkdir()) {
+            File saveDir = findNextDirName(rootDir);
+
+            if (isCancelled()) {
+                return resultObject;
+            }
+
+            if (!saveDir.mkdirs()) {
                 resultObject.setException(new IllegalStateException("Failed to create directory for images"));
                 return resultObject;
             }
@@ -184,22 +188,6 @@ public abstract class GeoTagAsyncTask extends AsyncTask<Void, Integer, GeoTagAsy
         }
     }
 
-    private static File getSaveRootDir(Context context) {
-        File saveDir = context.getExternalFilesDir(null);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            File dirs[] = context.getExternalFilesDirs(null);
-            for (File dir : dirs) {
-                // dir can be null if the device contains an external SD card slot but no SD card is present.
-                if (dir != null && Environment.isExternalStorageRemovable(dir)) {
-                    saveDir = dir;
-                    break;
-                }
-            }
-        }
-        return saveDir;
-    }
-
     private static boolean hasEnoughMemory(File file, Collection<File> photos) {
         long freeBytes = file.getUsableSpace();
         long bytesNeeded = 0;
@@ -259,5 +247,18 @@ public abstract class GeoTagAsyncTask extends AsyncTask<Void, Integer, GeoTagAsy
 
     protected interface GeoTagAlgorithm {
         HashMap<TLogParser.Event, File> match(List<TLogParser.Event> events, ArrayList<File> photos);
+    }
+
+    private static File findNextDirName(File rootDir) {
+        Date date = new Date();
+        File file;
+        int i = 0;
+        do {
+            String dirName = STORE_PHOTO_PREFIX + "_" + formatter.format(date) + "_" + i;
+            file = new File(rootDir, dirName);
+            i++;
+        } while (file.exists());
+
+        return file;
     }
 }

@@ -14,13 +14,16 @@ import timber.log.Timber;
 
 public class HeartBeat extends DroneVariable implements OnDroneListener {
 
-    public static final long HEARTBEAT_NORMAL_TIMEOUT = 5000; //ms
-    private static final long HEARTBEAT_LOST_TIMEOUT = 15000; //ms
-    private static final long HEARTBEAT_IMU_CALIBRATION_TIMEOUT = 35000; //ms
+    public static final long HEARTBEAT_NORMAL_TIMEOUT = 5000l; //ms
+    private static final long HEARTBEAT_LOST_TIMEOUT = 15000l; //ms
 
     public static final int INVALID_MAVLINK_VERSION = -1;
 
-    public HeartbeatState heartbeatState = HeartbeatState.FIRST_HEARTBEAT;
+    protected static final int FIRST_HEARTBEAT = 0;
+    protected static final int LOST_HEARTBEAT = 1;
+    protected static final int NORMAL_HEARTBEAT = 2;
+
+    protected int heartbeatState = FIRST_HEARTBEAT;
     private byte sysid = 1;
     private byte compid = 1;
 
@@ -28,10 +31,6 @@ public class HeartBeat extends DroneVariable implements OnDroneListener {
      * Stores the version of the mavlink protocol.
      */
     private short mMavlinkVersion = INVALID_MAVLINK_VERSION;
-
-    public enum HeartbeatState {
-        FIRST_HEARTBEAT, LOST_HEARTBEAT, NORMAL_HEARTBEAT, IMU_CALIBRATION
-    }
 
     public final Handler watchdog;
     public final Runnable watchdogCallback = new Runnable() {
@@ -75,7 +74,7 @@ public class HeartBeat extends DroneVariable implements OnDroneListener {
                 if(heartBeatMsg != null) {
                     Timber.i("Received first heartbeat.");
 
-                    heartbeatState = HeartbeatState.NORMAL_HEARTBEAT;
+                    heartbeatState = NORMAL_HEARTBEAT;
                     restartWatchdog(HEARTBEAT_NORMAL_TIMEOUT);
 
                     myDrone.notifyDroneEvent(DroneEventsType.HEARTBEAT_FIRST);
@@ -87,29 +86,23 @@ public class HeartBeat extends DroneVariable implements OnDroneListener {
             // FALL THROUGH
 
             default:
-                heartbeatState = HeartbeatState.NORMAL_HEARTBEAT;
+                heartbeatState = NORMAL_HEARTBEAT;
                 restartWatchdog(HEARTBEAT_NORMAL_TIMEOUT);
                 break;
         }
     }
 
     public boolean hasHeartbeat() {
-        return heartbeatState != HeartbeatState.FIRST_HEARTBEAT;
+        return heartbeatState != FIRST_HEARTBEAT;
     }
 
     public boolean isConnectionAlive() {
-        return heartbeatState != HeartbeatState.LOST_HEARTBEAT;
+        return heartbeatState != LOST_HEARTBEAT;
     }
 
     @Override
     public void onDroneEvent(DroneEventsType event, MavLinkDrone drone) {
         switch (event) {
-            case CALIBRATION_IMU:
-                //Set the heartbeat in imu calibration mode.
-                heartbeatState = HeartbeatState.IMU_CALIBRATION;
-                restartWatchdog(HEARTBEAT_IMU_CALIBRATION_TIMEOUT);
-                break;
-
             case CONNECTION_FAILED:
             case DISCONNECTED:
                 notifyDisconnected();
@@ -122,31 +115,26 @@ public class HeartBeat extends DroneVariable implements OnDroneListener {
 
     private void notifyDisconnected() {
         watchdog.removeCallbacks(watchdogCallback);
-        heartbeatState = HeartbeatState.FIRST_HEARTBEAT;
+        heartbeatState = FIRST_HEARTBEAT;
         mMavlinkVersion = INVALID_MAVLINK_VERSION;
     }
 
-    private void onHeartbeatTimeout() {
+    protected void onHeartbeatTimeout() {
         switch (heartbeatState) {
-            case IMU_CALIBRATION:
-                restartWatchdog(HEARTBEAT_IMU_CALIBRATION_TIMEOUT);
-                myDrone.notifyDroneEvent(DroneEventsType.CALIBRATION_TIMEOUT);
-                break;
-
             case FIRST_HEARTBEAT:
                 Timber.i("First heartbeat timeout.");
                 myDrone.notifyDroneEvent(DroneEventsType.CONNECTION_FAILED);
                 break;
 
             default:
-                heartbeatState = HeartbeatState.LOST_HEARTBEAT;
+                heartbeatState = LOST_HEARTBEAT;
                 restartWatchdog(HEARTBEAT_LOST_TIMEOUT);
                 myDrone.notifyDroneEvent(DroneEventsType.HEARTBEAT_TIMEOUT);
                 break;
         }
     }
 
-    private void restartWatchdog(long timeout) {
+    protected void restartWatchdog(long timeout) {
         // re-start watchdog
         watchdog.removeCallbacks(watchdogCallback);
         watchdog.postDelayed(watchdogCallback, timeout);

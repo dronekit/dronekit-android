@@ -19,8 +19,8 @@ import org.droidplanner.services.android.core.model.AutopilotWarningParser;
  */
 public class ArduPlane extends ArduPilot {
 
-    public ArduPlane(Context context, MAVLinkStreams.MAVLinkOutputStream mavClient, Handler handler, Preferences pref, AutopilotWarningParser warningParser, LogMessageListener logListener, DroneInterfaces.AttributeEventListener listener) {
-        super(context, mavClient, handler, pref, warningParser, logListener, listener);
+    public ArduPlane(Context context, MAVLinkStreams.MAVLinkOutputStream mavClient, Handler handler, AutopilotWarningParser warningParser, LogMessageListener logListener, DroneInterfaces.AttributeEventListener listener) {
+        super(context, mavClient, handler, warningParser, logListener, listener);
     }
 
     @Override

@@ -1,13 +1,13 @@
-package org.droidplanner.services.android.core.drone.companion.solo.sololink;
+package org.droidplanner.services.android.core.drone.autopilot.apm.solo.sololink;
 
 import android.content.Context;
 import android.os.Handler;
 import android.text.TextUtils;
 
 import org.droidplanner.services.android.BuildConfig;
-import org.droidplanner.services.android.core.drone.companion.solo.AbstractLinkManager;
-import org.droidplanner.services.android.core.drone.companion.solo.SoloComp;
-import org.droidplanner.services.android.core.drone.companion.solo.controller.ControllerLinkManager;
+import org.droidplanner.services.android.core.drone.autopilot.apm.solo.AbstractLinkManager;
+import org.droidplanner.services.android.core.drone.autopilot.apm.solo.SoloComp;
+import org.droidplanner.services.android.core.drone.autopilot.apm.solo.controller.ControllerLinkManager;
 
 import com.o3dr.android.client.utils.connection.TcpConnection;
 import com.o3dr.android.client.utils.connection.UdpConnection;

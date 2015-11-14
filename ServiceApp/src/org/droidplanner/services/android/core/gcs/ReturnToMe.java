@@ -5,17 +5,19 @@ import android.os.Bundle;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
+import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.property.DroneAttribute;
+import com.o3dr.services.android.lib.drone.property.Home;
 import com.o3dr.services.android.lib.gcs.returnToMe.ReturnToMeState;
 import com.o3dr.services.android.lib.model.AbstractCommandListener;
 import com.o3dr.services.android.lib.model.ICommandListener;
+import com.o3dr.services.android.lib.model.action.Action;
 
 import org.droidplanner.services.android.core.MAVLink.command.doCmd.MavLinkDoCmds;
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
 import org.droidplanner.services.android.core.drone.DroneInterfaces.AttributeEventListener;
 import org.droidplanner.services.android.core.drone.DroneManager;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
-import org.droidplanner.services.android.core.drone.variables.Home;
 import org.droidplanner.services.android.core.gcs.location.Location;
 import org.droidplanner.services.android.utils.CommonApiUtils;
 
@@ -33,6 +35,8 @@ public class ReturnToMe implements DroneInterfaces.OnDroneListener, Location.Loc
     public static final int UPDATE_MINIMAL_DISPLACEMENT = 5; //meters
 
     private static final String TAG = ReturnToMe.class.getSimpleName();
+
+    private final static Action requestHomeUpdateAction = new Action(MavLinkDrone.ACTION_REQUEST_HOME_UPDATE);
 
     private final AtomicBoolean isEnabled = new AtomicBoolean(false);
     private final ReturnToMeState currentState;
@@ -59,9 +63,9 @@ public class ReturnToMe implements DroneInterfaces.OnDroneListener, Location.Loc
         if (isEnabled.compareAndSet(false, true)) {
             this.commandListener = listener;
 
-            final Home droneHome = droneMgr.getDrone().getHome();
+            final Home droneHome = getHome();
             if (droneHome.isValid()) {
-                currentState.setOriginalHomeLocation(droneHome.getCoord());
+                currentState.setOriginalHomeLocation(droneHome.getCoordinate());
             }
 
             //Enable return to me
@@ -93,7 +97,7 @@ public class ReturnToMe implements DroneInterfaces.OnDroneListener, Location.Loc
                 return;
             }
 
-            final LatLongAlt homePosition = home.getCoord();
+            final LatLongAlt homePosition = home.getCoordinate();
 
             //Calculate the displacement between the home location and the user location.
             final LatLongAlt locationCoord = location.getCoord();
@@ -110,7 +114,7 @@ public class ReturnToMe implements DroneInterfaces.OnDroneListener, Location.Loc
                             @Override
                             public void onSuccess() {
                                 Timber.i("Updated vehicle home location to %s", locationCoord.toString());
-                                home.requestHomeUpdate();
+                                droneMgr.getDrone().executeAsyncAction(requestHomeUpdateAction, null);
                                 CommonApiUtils.postSuccessEvent(commandListener);
                                 updateCurrentState(ReturnToMeState.STATE_UPDATING_HOME);
                             }
@@ -137,7 +141,7 @@ public class ReturnToMe implements DroneInterfaces.OnDroneListener, Location.Loc
     }
 
     private Home getHome() {
-        return droneMgr.getDrone().getHome();
+        return (Home) droneMgr.getDrone().getAttribute(AttributeType.HOME);
     }
 
     @Override
@@ -158,7 +162,7 @@ public class ReturnToMe implements DroneInterfaces.OnDroneListener, Location.Loc
 
             case HOME:
                 if (isEnabled.get()) {
-                    final LatLongAlt homeCoord = drone.getHome().getCoord();
+                    final LatLongAlt homeCoord = getHome().getCoordinate();
                     if (currentState.getOriginalHomeLocation() == null)
                         currentState.setOriginalHomeLocation(homeCoord);
                     else {

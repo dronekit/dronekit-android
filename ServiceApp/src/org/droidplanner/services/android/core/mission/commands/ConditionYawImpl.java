@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.droidplanner.services.android.core.helpers.geoTools.GeoTools;
 import org.droidplanner.services.android.core.mission.Mission;
-import org.droidplanner.services.android.core.mission.MissionItem;
+import org.droidplanner.services.android.core.mission.MissionItemImpl;
 import org.droidplanner.services.android.core.mission.MissionItemType;
 
 import com.MAVLink.common.msg_mission_item;
@@ -15,7 +15,7 @@ public class ConditionYawImpl extends MissionCMD {
 	private double angle = 0;
 	private double angularSpeed = 0;
 
-	public ConditionYawImpl(MissionItem item) {
+	public ConditionYawImpl(MissionItemImpl item) {
 		super(item);
 	}
 
