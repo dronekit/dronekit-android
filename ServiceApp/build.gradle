@@ -42,7 +42,7 @@ dependencies {
 def versionMajor = 1
 def versionMinor = 4
 def versionPatch = 4
-def versionBuild = 2 //bump for dogfood builds, public betas, etc.
+def versionBuild = 3 //bump for dogfood builds, public betas, etc.
 def versionPrefix = "3DR Services v"
 
 //Log levels values
@@ -154,6 +154,10 @@ android {
     //FIXME: Remove when lint errors are taken care of.
     lintOptions {
         abortOnError false
+    }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
     }
 }
 
