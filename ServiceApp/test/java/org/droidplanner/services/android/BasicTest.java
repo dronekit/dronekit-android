@@ -33,8 +33,8 @@ import org.robolectric.shadows.ShadowApplication;
  * Created by djmedina on 3/5/15.
  * This is a simple test case.
  */
-@RunWith(RobolectricTestRunner.class)
-@Config(sdk = 18)
+@RunWith(RobolectricGradleTestRunner.class)
+@Config(constants = BuildConfig.class, sdk = 18)
 public class BasicTest {
 
     private MavLinkDrone drone;

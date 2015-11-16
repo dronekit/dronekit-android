@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.util.SparseArray;
 
-import com.o3dr.android.client.BuildConfig;
 import com.o3dr.services.android.lib.model.AbstractCommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
 
@@ -13,7 +12,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricGradleTestRunner;
-import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowApplication;
 
@@ -25,8 +23,8 @@ import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_VE
 /**
  * Created by Fredia Huya-Kouadio on 10/23/15.
  */
-@RunWith(RobolectricTestRunner.class)
-@Config(sdk = 18)
+@RunWith(RobolectricGradleTestRunner.class)
+@Config(constants = org.droidplanner.services.android.BuildConfig.class, sdk = 18)
 public class ControlApiTest {
 
     private static final SparseArray<float[][]> expectedVelocitiesPerAttitude = new SparseArray<>();
