@@ -23,16 +23,18 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.robolectric.Robolectric;
+import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.RobolectricTestRunner;
+import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
+import org.robolectric.shadows.ShadowApplication;
 
 /**
  * Created by djmedina on 3/5/15.
  * This is a simple test case.
  */
 @RunWith(RobolectricTestRunner.class)
-@Config(emulateSdk = 18)
+@Config(sdk = 18)
 public class BasicTest {
 
     private MavLinkDrone drone;
@@ -64,7 +66,7 @@ public class BasicTest {
 
     @Before
     public void setUp() throws Exception {
-        final Context context = Robolectric.getShadowApplication().getApplicationContext();
+        final Context context = RuntimeEnvironment.application.getApplicationContext();
 
         ConnectionParameter connParams = new ConnectionParameter(0, new Bundle(), null);
         mavlinkApi = new MockMavLinkServiceAPI();
