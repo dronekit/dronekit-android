@@ -9,6 +9,7 @@ import android.view.Surface;
 
 import com.MAVLink.common.msg_statustext;
 import com.MAVLink.enums.MAV_TYPE;
+import com.o3dr.android.client.apis.CapabilityApi;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
@@ -328,6 +329,20 @@ public class ArduSolo extends ArduCopter {
 
             default:
                 return super.executeAsyncAction(action, listener);
+        }
+    }
+
+    @Override
+    protected boolean isFeatureSupported(String featureId){
+        switch (featureId) {
+
+            case CapabilityApi.FeatureIds.SOLO_VIDEO_STREAMING:
+            case CapabilityApi.FeatureIds.COMPASS_CALIBRATION:
+            case CapabilityApi.FeatureIds.KILL_SWITCH:
+                return true;
+
+            default:
+                return super.isFeatureSupported(featureId);
         }
     }
 

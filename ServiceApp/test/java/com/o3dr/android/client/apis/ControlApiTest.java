@@ -11,9 +11,9 @@ import org.droidplanner.services.android.mock.MockDrone;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.robolectric.Robolectric;
-import org.robolectric.RobolectricTestRunner;
+import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
+import org.robolectric.shadows.ShadowApplication;
 
 import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_SET_VELOCITY;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_VELOCITY_X;
@@ -23,8 +23,8 @@ import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_VE
 /**
  * Created by Fredia Huya-Kouadio on 10/23/15.
  */
-@RunWith(RobolectricTestRunner.class)
-@Config(emulateSdk = 18)
+@RunWith(RobolectricGradleTestRunner.class)
+@Config(constants = org.droidplanner.services.android.BuildConfig.class, sdk = 18)
 public class ControlApiTest {
 
     private static final SparseArray<float[][]> expectedVelocitiesPerAttitude = new SparseArray<>();
@@ -49,7 +49,7 @@ public class ControlApiTest {
      */
     @Test
     public void testMoveAtVelocity() throws Exception {
-        final Context context = Robolectric.getShadowApplication().getApplicationContext();
+        final Context context = ShadowApplication.getInstance().getApplicationContext();
         final MockDrone mockDrone = new MockDrone(context) {
             @Override
             public boolean performAsyncActionOnDroneThread(Action action, AbstractCommandListener listener) {
