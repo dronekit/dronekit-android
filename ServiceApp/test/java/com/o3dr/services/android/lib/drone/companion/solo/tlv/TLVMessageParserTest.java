@@ -1,5 +1,7 @@
 package com.o3dr.services.android.lib.drone.companion.solo.tlv;
 
+import com.MAVLink.enums.GOPRO_COMMAND;
+
 import org.junit.Test;
 
 import java.nio.ByteBuffer;
@@ -112,7 +114,7 @@ public class TLVMessageParserTest {
         byte[] values = new byte[4];
 
         SoloGoproSetExtendedRequest extendedRequest =
-            new SoloGoproSetExtendedRequest(SoloGoproConstants.CAPTURE_MODE, values);
+            new SoloGoproSetExtendedRequest((short) GOPRO_COMMAND.GOPRO_COMMAND_CAPTURE_MODE, values);
 
         TLVPacket[] inputPackets = {extendedRequest};
 
@@ -133,7 +135,7 @@ public class TLVMessageParserTest {
     @Test
     public void testParseTLVPacket_goProSetRequest() {
         SoloGoproSetRequest setRequest =
-            new SoloGoproSetRequest(SoloGoproConstants.CAPTURE_MODE, SoloGoproConstants.POWER_OFF);
+            new SoloGoproSetRequest((short) GOPRO_COMMAND.GOPRO_COMMAND_CAPTURE_MODE, SoloGoproConstants.CAPTURE_MODE_PHOTO);
 
         TLVPacket[] inputPackets = {setRequest};
 
