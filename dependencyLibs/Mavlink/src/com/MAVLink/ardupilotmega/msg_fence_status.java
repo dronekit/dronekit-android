@@ -12,7 +12,7 @@ import com.MAVLink.Messages.MAVLinkPayload;
 
 /**
 * Status of geo-fencing. Sent in extended
-	    status stream when fencing enabled
+      status stream when fencing enabled
 */
 public class msg_fence_status extends MAVLinkMessage{
 

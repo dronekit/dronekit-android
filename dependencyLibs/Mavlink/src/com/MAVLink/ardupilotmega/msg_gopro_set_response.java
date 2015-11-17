@@ -27,9 +27,9 @@ public class msg_gopro_set_response extends MAVLinkMessage{
     public short cmd_id;
     
     /**
-    * Result
+    * Status
     */
-    public short result;
+    public short status;
     
 
     /**
@@ -44,7 +44,7 @@ public class msg_gopro_set_response extends MAVLinkMessage{
         
         packet.payload.putUnsignedByte(cmd_id);
         
-        packet.payload.putUnsignedByte(result);
+        packet.payload.putUnsignedByte(status);
         
         return packet;
     }
@@ -59,7 +59,7 @@ public class msg_gopro_set_response extends MAVLinkMessage{
         
         this.cmd_id = payload.getUnsignedByte();
         
-        this.result = payload.getUnsignedByte();
+        this.status = payload.getUnsignedByte();
         
     }
 
@@ -87,7 +87,7 @@ public class msg_gopro_set_response extends MAVLinkMessage{
     * Returns a string with the MSG name and data
     */
     public String toString(){
-        return "MAVLINK_MSG_ID_GOPRO_SET_RESPONSE -"+" cmd_id:"+cmd_id+" result:"+result+"";
+        return "MAVLINK_MSG_ID_GOPRO_SET_RESPONSE -"+" cmd_id:"+cmd_id+" status:"+status+"";
     }
 }
         

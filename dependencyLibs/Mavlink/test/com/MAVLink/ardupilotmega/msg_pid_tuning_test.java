@@ -4,7 +4,7 @@
  * java mavlink generator tool. It should not be modified by hand.
  */
          
-// MESSAGE GOPRO_SET_REQUEST PACKING
+// MESSAGE PID_TUNING PACKING
 package com.MAVLink.ardupilotmega;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Parser;
@@ -15,13 +15,13 @@ import org.junit.Test;
 import static org.junit.Assert.assertArrayEquals;
 
 /**
-* Request to set a GOPRO_COMMAND with a desired
+* PID tuning information
 */
-public class msg_gopro_set_request_test{
+public class msg_pid_tuning_test{
 
-public static final int MAVLINK_MSG_ID_GOPRO_SET_REQUEST = 218;
-public static final int MAVLINK_MSG_LENGTH = 7;
-private static final long serialVersionUID = MAVLINK_MSG_ID_GOPRO_SET_REQUEST;
+public static final int MAVLINK_MSG_ID_PID_TUNING = 194;
+public static final int MAVLINK_MSG_LENGTH = 25;
+private static final long serialVersionUID = MAVLINK_MSG_ID_PID_TUNING;
 
 private Parser parser = new Parser();
 
@@ -30,7 +30,7 @@ public CRC generateCRC(byte[] packet){
     for (int i = 1; i < packet.length - 2; i++) {
         crc.update_checksum(packet[i] & 0xFF);
     }
-    crc.finish_checksum(MAVLINK_MSG_ID_GOPRO_SET_REQUEST);
+    crc.finish_checksum(MAVLINK_MSG_ID_PID_TUNING);
     return crc;
 }
 
@@ -41,15 +41,14 @@ public byte[] generateTestPacket(){
     payload.put((byte)0); //seq
     payload.put((byte)255); //sysid
     payload.put((byte)190); //comp id
-    payload.put((byte)MAVLINK_MSG_ID_GOPRO_SET_REQUEST); //msg id
-    payload.put((byte)5); //target_system
-    payload.put((byte)72); //target_component
-    payload.put((byte)139); //cmd_id
-    //value
-    payload.put((byte)206);
-    payload.put((byte)207);
-    payload.put((byte)208);
-    payload.put((byte)209);
+    payload.put((byte)MAVLINK_MSG_ID_PID_TUNING); //msg id
+    payload.putFloat((float)17.0); //desired
+    payload.putFloat((float)45.0); //achieved
+    payload.putFloat((float)73.0); //FF
+    payload.putFloat((float)101.0); //P
+    payload.putFloat((float)129.0); //I
+    payload.putFloat((float)157.0); //D
+    payload.put((byte)77); //axis
     
     CRC crc = generateCRC(payload.array());
     payload.put((byte)crc.getLSB());
@@ -65,7 +64,7 @@ public void test(){
     }
     MAVLinkPacket m = parser.mavlink_parse_char(packet[packet.length - 1] & 0xFF);
     byte[] processedPacket = m.encodePacket();
-    assertArrayEquals("msg_gopro_set_request", processedPacket, packet);
+    assertArrayEquals("msg_pid_tuning", processedPacket, packet);
 }
 }
         

@@ -4,33 +4,39 @@
  * java mavlink generator tool. It should not be modified by hand.
  */
 
-// MESSAGE FENCE_POINT PACKING
+// MESSAGE GIMBAL_TORQUE_CMD_REPORT PACKING
 package com.MAVLink.ardupilotmega;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
 
 /**
-* A fence point. Used to set a point when from
-        GCS -> MAV. Also used to return a point from MAV -> GCS
+* 
+            100 Hz gimbal torque command telemetry
+        
 */
-public class msg_fence_point extends MAVLinkMessage{
+public class msg_gimbal_torque_cmd_report extends MAVLinkMessage{
 
-    public static final int MAVLINK_MSG_ID_FENCE_POINT = 160;
-    public static final int MAVLINK_MSG_LENGTH = 12;
-    private static final long serialVersionUID = MAVLINK_MSG_ID_FENCE_POINT;
+    public static final int MAVLINK_MSG_ID_GIMBAL_TORQUE_CMD_REPORT = 214;
+    public static final int MAVLINK_MSG_LENGTH = 8;
+    private static final long serialVersionUID = MAVLINK_MSG_ID_GIMBAL_TORQUE_CMD_REPORT;
 
 
     
     /**
-    * Latitude of point
+    * Roll Torque Command
     */
-    public float lat;
+    public short rl_torque_cmd;
     
     /**
-    * Longitude of point
+    * Elevation Torque Command
     */
-    public float lng;
+    public short el_torque_cmd;
+    
+    /**
+    * Azimuth Torque Command
+    */
+    public short az_torque_cmd;
     
     /**
     * System ID
@@ -42,16 +48,6 @@ public class msg_fence_point extends MAVLinkMessage{
     */
     public short target_component;
     
-    /**
-    * point index (first point is 1, 0 is for return point)
-    */
-    public short idx;
-    
-    /**
-    * total number of points (for sanity checking)
-    */
-    public short count;
-    
 
     /**
     * Generates the payload for a mavlink message for a message of this type
@@ -61,50 +57,46 @@ public class msg_fence_point extends MAVLinkMessage{
         MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH);
         packet.sysid = 255;
         packet.compid = 190;
-        packet.msgid = MAVLINK_MSG_ID_FENCE_POINT;
+        packet.msgid = MAVLINK_MSG_ID_GIMBAL_TORQUE_CMD_REPORT;
         
-        packet.payload.putFloat(lat);
+        packet.payload.putShort(rl_torque_cmd);
         
-        packet.payload.putFloat(lng);
+        packet.payload.putShort(el_torque_cmd);
+        
+        packet.payload.putShort(az_torque_cmd);
         
         packet.payload.putUnsignedByte(target_system);
         
         packet.payload.putUnsignedByte(target_component);
         
-        packet.payload.putUnsignedByte(idx);
-        
-        packet.payload.putUnsignedByte(count);
-        
         return packet;
     }
 
     /**
-    * Decode a fence_point message into this class fields
+    * Decode a gimbal_torque_cmd_report message into this class fields
     *
     * @param payload The message to decode
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
         
-        this.lat = payload.getFloat();
+        this.rl_torque_cmd = payload.getShort();
         
-        this.lng = payload.getFloat();
+        this.el_torque_cmd = payload.getShort();
+        
+        this.az_torque_cmd = payload.getShort();
         
         this.target_system = payload.getUnsignedByte();
         
         this.target_component = payload.getUnsignedByte();
-        
-        this.idx = payload.getUnsignedByte();
-        
-        this.count = payload.getUnsignedByte();
         
     }
 
     /**
     * Constructor for a new message, just initializes the msgid
     */
-    public msg_fence_point(){
-        msgid = MAVLINK_MSG_ID_FENCE_POINT;
+    public msg_gimbal_torque_cmd_report(){
+        msgid = MAVLINK_MSG_ID_GIMBAL_TORQUE_CMD_REPORT;
     }
 
     /**
@@ -112,19 +104,19 @@ public class msg_fence_point extends MAVLinkMessage{
     * from a mavlink packet
     *
     */
-    public msg_fence_point(MAVLinkPacket mavLinkPacket){
+    public msg_gimbal_torque_cmd_report(MAVLinkPacket mavLinkPacket){
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
-        this.msgid = MAVLINK_MSG_ID_FENCE_POINT;
+        this.msgid = MAVLINK_MSG_ID_GIMBAL_TORQUE_CMD_REPORT;
         unpack(mavLinkPacket.payload);
     }
 
-                
+              
     /**
     * Returns a string with the MSG name and data
     */
     public String toString(){
-        return "MAVLINK_MSG_ID_FENCE_POINT -"+" lat:"+lat+" lng:"+lng+" target_system:"+target_system+" target_component:"+target_component+" idx:"+idx+" count:"+count+"";
+        return "MAVLINK_MSG_ID_GIMBAL_TORQUE_CMD_REPORT -"+" rl_torque_cmd:"+rl_torque_cmd+" el_torque_cmd:"+el_torque_cmd+" az_torque_cmd:"+az_torque_cmd+" target_system:"+target_system+" target_component:"+target_component+"";
     }
 }
         

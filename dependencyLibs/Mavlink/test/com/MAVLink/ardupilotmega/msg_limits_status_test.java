@@ -16,7 +16,7 @@ import static org.junit.Assert.assertArrayEquals;
 
 /**
 * Status of AP_Limits. Sent in extended
-	    status stream when AP_Limits is enabled
+      status stream when AP_Limits is enabled
 */
 public class msg_limits_status_test{
 

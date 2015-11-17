@@ -4,7 +4,7 @@
  * java mavlink generator tool. It should not be modified by hand.
  */
          
-// MESSAGE GOPRO_SET_REQUEST PACKING
+// MESSAGE REMOTE_LOG_BLOCK_STATUS PACKING
 package com.MAVLink.ardupilotmega;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Parser;
@@ -15,13 +15,13 @@ import org.junit.Test;
 import static org.junit.Assert.assertArrayEquals;
 
 /**
-* Request to set a GOPRO_COMMAND with a desired
+* Send Status of each log block that autopilot board might have sent
 */
-public class msg_gopro_set_request_test{
+public class msg_remote_log_block_status_test{
 
-public static final int MAVLINK_MSG_ID_GOPRO_SET_REQUEST = 218;
+public static final int MAVLINK_MSG_ID_REMOTE_LOG_BLOCK_STATUS = 185;
 public static final int MAVLINK_MSG_LENGTH = 7;
-private static final long serialVersionUID = MAVLINK_MSG_ID_GOPRO_SET_REQUEST;
+private static final long serialVersionUID = MAVLINK_MSG_ID_REMOTE_LOG_BLOCK_STATUS;
 
 private Parser parser = new Parser();
 
@@ -30,7 +30,7 @@ public CRC generateCRC(byte[] packet){
     for (int i = 1; i < packet.length - 2; i++) {
         crc.update_checksum(packet[i] & 0xFF);
     }
-    crc.finish_checksum(MAVLINK_MSG_ID_GOPRO_SET_REQUEST);
+    crc.finish_checksum(MAVLINK_MSG_ID_REMOTE_LOG_BLOCK_STATUS);
     return crc;
 }
 
@@ -41,15 +41,11 @@ public byte[] generateTestPacket(){
     payload.put((byte)0); //seq
     payload.put((byte)255); //sysid
     payload.put((byte)190); //comp id
-    payload.put((byte)MAVLINK_MSG_ID_GOPRO_SET_REQUEST); //msg id
-    payload.put((byte)5); //target_system
-    payload.put((byte)72); //target_component
-    payload.put((byte)139); //cmd_id
-    //value
-    payload.put((byte)206);
-    payload.put((byte)207);
-    payload.put((byte)208);
-    payload.put((byte)209);
+    payload.put((byte)MAVLINK_MSG_ID_REMOTE_LOG_BLOCK_STATUS); //msg id
+    payload.putInt((int)963497464); //seqno
+    payload.put((byte)17); //target_system
+    payload.put((byte)84); //target_component
+    payload.put((byte)151); //status
     
     CRC crc = generateCRC(payload.array());
     payload.put((byte)crc.getLSB());
@@ -65,7 +61,7 @@ public void test(){
     }
     MAVLinkPacket m = parser.mavlink_parse_char(packet[packet.length - 1] & 0xFF);
     byte[] processedPacket = m.encodePacket();
-    assertArrayEquals("msg_gopro_set_request", processedPacket, packet);
+    assertArrayEquals("msg_remote_log_block_status", processedPacket, packet);
 }
 }
         

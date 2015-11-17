@@ -4,22 +4,27 @@
  * java mavlink generator tool. It should not be modified by hand.
  */
 
-// MESSAGE GOPRO_SET_REQUEST PACKING
+// MESSAGE REMOTE_LOG_DATA_BLOCK PACKING
 package com.MAVLink.ardupilotmega;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
 
 /**
-* Request to set a GOPRO_COMMAND with a desired
+* Send a block of log data to remote location
 */
-public class msg_gopro_set_request extends MAVLinkMessage{
+public class msg_remote_log_data_block extends MAVLinkMessage{
 
-    public static final int MAVLINK_MSG_ID_GOPRO_SET_REQUEST = 218;
-    public static final int MAVLINK_MSG_LENGTH = 7;
-    private static final long serialVersionUID = MAVLINK_MSG_ID_GOPRO_SET_REQUEST;
+    public static final int MAVLINK_MSG_ID_REMOTE_LOG_DATA_BLOCK = 184;
+    public static final int MAVLINK_MSG_LENGTH = 206;
+    private static final long serialVersionUID = MAVLINK_MSG_ID_REMOTE_LOG_DATA_BLOCK;
 
 
+    
+    /**
+    * log data block sequence number
+    */
+    public long seqno;
     
     /**
     * System ID
@@ -32,14 +37,9 @@ public class msg_gopro_set_request extends MAVLinkMessage{
     public short target_component;
     
     /**
-    * Command ID
+    * log data block
     */
-    public short cmd_id;
-    
-    /**
-    * Value
-    */
-    public short value[] = new short[4];
+    public short data[] = new short[200];
     
 
     /**
@@ -50,17 +50,17 @@ public class msg_gopro_set_request extends MAVLinkMessage{
         MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH);
         packet.sysid = 255;
         packet.compid = 190;
-        packet.msgid = MAVLINK_MSG_ID_GOPRO_SET_REQUEST;
+        packet.msgid = MAVLINK_MSG_ID_REMOTE_LOG_DATA_BLOCK;
+        
+        packet.payload.putUnsignedInt(seqno);
         
         packet.payload.putUnsignedByte(target_system);
         
         packet.payload.putUnsignedByte(target_component);
         
-        packet.payload.putUnsignedByte(cmd_id);
         
-        
-        for (int i = 0; i < value.length; i++) {
-            packet.payload.putUnsignedByte(value[i]);
+        for (int i = 0; i < data.length; i++) {
+            packet.payload.putUnsignedByte(data[i]);
         }
                     
         
@@ -68,22 +68,22 @@ public class msg_gopro_set_request extends MAVLinkMessage{
     }
 
     /**
-    * Decode a gopro_set_request message into this class fields
+    * Decode a remote_log_data_block message into this class fields
     *
     * @param payload The message to decode
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
         
+        this.seqno = payload.getUnsignedInt();
+        
         this.target_system = payload.getUnsignedByte();
         
         this.target_component = payload.getUnsignedByte();
         
-        this.cmd_id = payload.getUnsignedByte();
         
-        
-        for (int i = 0; i < this.value.length; i++) {
-            this.value[i] = payload.getUnsignedByte();
+        for (int i = 0; i < this.data.length; i++) {
+            this.data[i] = payload.getUnsignedByte();
         }
                 
         
@@ -92,8 +92,8 @@ public class msg_gopro_set_request extends MAVLinkMessage{
     /**
     * Constructor for a new message, just initializes the msgid
     */
-    public msg_gopro_set_request(){
-        msgid = MAVLINK_MSG_ID_GOPRO_SET_REQUEST;
+    public msg_remote_log_data_block(){
+        msgid = MAVLINK_MSG_ID_REMOTE_LOG_DATA_BLOCK;
     }
 
     /**
@@ -101,10 +101,10 @@ public class msg_gopro_set_request extends MAVLinkMessage{
     * from a mavlink packet
     *
     */
-    public msg_gopro_set_request(MAVLinkPacket mavLinkPacket){
+    public msg_remote_log_data_block(MAVLinkPacket mavLinkPacket){
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
-        this.msgid = MAVLINK_MSG_ID_GOPRO_SET_REQUEST;
+        this.msgid = MAVLINK_MSG_ID_REMOTE_LOG_DATA_BLOCK;
         unpack(mavLinkPacket.payload);
     }
 
@@ -113,7 +113,7 @@ public class msg_gopro_set_request extends MAVLinkMessage{
     * Returns a string with the MSG name and data
     */
     public String toString(){
-        return "MAVLINK_MSG_ID_GOPRO_SET_REQUEST -"+" target_system:"+target_system+" target_component:"+target_component+" cmd_id:"+cmd_id+" value:"+value+"";
+        return "MAVLINK_MSG_ID_REMOTE_LOG_DATA_BLOCK -"+" seqno:"+seqno+" target_system:"+target_system+" target_component:"+target_component+" data:"+data+"";
     }
 }
         
