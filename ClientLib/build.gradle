@@ -4,7 +4,7 @@ ext {
     VERSION_MAJOR = 2
     VERSION_MINOR = 7
     VERSION_PATCH = 0
-    VERSION_SUFFIX = "alpha1"
+    VERSION_SUFFIX = "alpha2"
 
     PUBLISH_ARTIFACT_ID = 'dronekit-android'
     PUBLISH_VERSION = generateVersionName("", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH, VERSION_SUFFIX)

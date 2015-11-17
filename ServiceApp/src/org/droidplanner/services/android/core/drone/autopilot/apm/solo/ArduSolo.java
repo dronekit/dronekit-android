@@ -104,6 +104,10 @@ public class ArduSolo extends ArduCopter {
                         notifyAttributeListener(SoloEvents.SOLO_GOPRO_STATE_UPDATED);
                         break;
 
+                    case TLVMessageTypes.TYPE_SOLO_GOPRO_STATE_V2:
+                        notifyAttributeListener(SoloEvents.SOLO_GOPRO_STATE_V2_UPDATED);
+                        break;
+
                     default:
                         final Bundle messageInfo = new Bundle();
                         messageInfo.putParcelable(SoloEventExtras.EXTRA_SOLO_MESSAGE_DATA, packet);
@@ -193,6 +197,9 @@ public class ArduSolo extends ArduCopter {
 
             case SoloAttributes.SOLO_GOPRO_STATE:
                 return soloComp.getGoproState();
+
+            case SoloAttributes.SOLO_GOPRO_STATE_V2:
+                return soloComp.getGoproStateV2();
 
             case AttributeType.STATE:
                 final State stateAttr = (State) super.getAttribute(attributeType);
