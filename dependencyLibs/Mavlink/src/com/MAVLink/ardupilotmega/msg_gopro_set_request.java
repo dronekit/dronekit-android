@@ -16,7 +16,7 @@ import com.MAVLink.Messages.MAVLinkPayload;
 public class msg_gopro_set_request extends MAVLinkMessage{
 
     public static final int MAVLINK_MSG_ID_GOPRO_SET_REQUEST = 218;
-    public static final int MAVLINK_MSG_LENGTH = 4;
+    public static final int MAVLINK_MSG_LENGTH = 7;
     private static final long serialVersionUID = MAVLINK_MSG_ID_GOPRO_SET_REQUEST;
 
 
@@ -39,7 +39,7 @@ public class msg_gopro_set_request extends MAVLinkMessage{
     /**
     * Value
     */
-    public short value;
+    public short value[] = new short[4];
     
 
     /**
@@ -58,7 +58,11 @@ public class msg_gopro_set_request extends MAVLinkMessage{
         
         packet.payload.putUnsignedByte(cmd_id);
         
-        packet.payload.putUnsignedByte(value);
+        
+        for (int i = 0; i < value.length; i++) {
+            packet.payload.putUnsignedByte(value[i]);
+        }
+                    
         
         return packet;
     }
@@ -77,7 +81,11 @@ public class msg_gopro_set_request extends MAVLinkMessage{
         
         this.cmd_id = payload.getUnsignedByte();
         
-        this.value = payload.getUnsignedByte();
+        
+        for (int i = 0; i < this.value.length; i++) {
+            this.value[i] = payload.getUnsignedByte();
+        }
+                
         
     }
 

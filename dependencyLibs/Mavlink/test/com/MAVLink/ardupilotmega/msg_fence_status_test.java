@@ -16,7 +16,7 @@ import static org.junit.Assert.assertArrayEquals;
 
 /**
 * Status of geo-fencing. Sent in extended
-	    status stream when fencing enabled
+      status stream when fencing enabled
 */
 public class msg_fence_status_test{
 

@@ -16,7 +16,7 @@ import com.MAVLink.Messages.MAVLinkPayload;
 public class msg_gopro_heartbeat extends MAVLinkMessage{
 
     public static final int MAVLINK_MSG_ID_GOPRO_HEARTBEAT = 215;
-    public static final int MAVLINK_MSG_LENGTH = 1;
+    public static final int MAVLINK_MSG_LENGTH = 3;
     private static final long serialVersionUID = MAVLINK_MSG_ID_GOPRO_HEARTBEAT;
 
 
@@ -25,6 +25,16 @@ public class msg_gopro_heartbeat extends MAVLinkMessage{
     * Status
     */
     public short status;
+    
+    /**
+    * Current capture mode
+    */
+    public short capture_mode;
+    
+    /**
+    * additional status bits
+    */
+    public short flags;
     
 
     /**
@@ -39,6 +49,10 @@ public class msg_gopro_heartbeat extends MAVLinkMessage{
         
         packet.payload.putUnsignedByte(status);
         
+        packet.payload.putUnsignedByte(capture_mode);
+        
+        packet.payload.putUnsignedByte(flags);
+        
         return packet;
     }
 
@@ -51,6 +65,10 @@ public class msg_gopro_heartbeat extends MAVLinkMessage{
         payload.resetIndex();
         
         this.status = payload.getUnsignedByte();
+        
+        this.capture_mode = payload.getUnsignedByte();
+        
+        this.flags = payload.getUnsignedByte();
         
     }
 
@@ -73,12 +91,12 @@ public class msg_gopro_heartbeat extends MAVLinkMessage{
         unpack(mavLinkPacket.payload);
     }
 
-      
+          
     /**
     * Returns a string with the MSG name and data
     */
     public String toString(){
-        return "MAVLINK_MSG_ID_GOPRO_HEARTBEAT -"+" status:"+status+"";
+        return "MAVLINK_MSG_ID_GOPRO_HEARTBEAT -"+" status:"+status+" capture_mode:"+capture_mode+" flags:"+flags+"";
     }
 }
         
