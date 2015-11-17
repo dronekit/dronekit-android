@@ -166,7 +166,7 @@ public class TLVMessageParser {
 
                     case TYPE_SOLO_GOPRO_SET_REQUEST: {
                         @SoloGoproConstants.RequestCommand final short command = packetBuffer.getShort();
-                        @SoloGoproConstants.RequestCommandValue final short value = packetBuffer.getShort();
+                        final short value = packetBuffer.getShort();
                         packet = new SoloGoproSetRequest(command, value);
                         break;
                     }

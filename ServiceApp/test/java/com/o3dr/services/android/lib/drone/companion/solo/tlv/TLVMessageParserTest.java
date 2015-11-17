@@ -133,7 +133,7 @@ public class TLVMessageParserTest {
     @Test
     public void testParseTLVPacket_goProSetRequest() {
         SoloGoproSetRequest setRequest =
-            new SoloGoproSetRequest(SoloGoproConstants.CAPTURE_MODE, SoloGoproConstants.POWER_OFF);
+            new SoloGoproSetRequest(SoloGoproConstants.CAPTURE_MODE, SoloGoproConstants.CAPTURE_MODE_PHOTO);
 
         TLVPacket[] inputPackets = {setRequest};
 

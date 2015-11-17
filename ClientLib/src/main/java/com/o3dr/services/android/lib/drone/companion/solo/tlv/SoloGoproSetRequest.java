@@ -15,10 +15,9 @@ public class SoloGoproSetRequest extends TLVPacket {
     @SoloGoproConstants.RequestCommand
     private short command;
 
-    @SoloGoproConstants.RequestCommandValue
     private short value;
 
-    public SoloGoproSetRequest(@SoloGoproConstants.RequestCommand short requestCommand, @SoloGoproConstants.RequestCommandValue short value){
+    public SoloGoproSetRequest(@SoloGoproConstants.RequestCommand short requestCommand, short value){
         super(TLVMessageTypes.TYPE_SOLO_GOPRO_SET_REQUEST, MESSAGE_LENGTH);
         this.command = requestCommand;
         this.value = value;
@@ -33,12 +32,11 @@ public class SoloGoproSetRequest extends TLVPacket {
         this.command = command;
     }
 
-    @SoloGoproConstants.RequestCommandValue
     public short getValue() {
         return value;
     }
 
-    public void setValue(@SoloGoproConstants.RequestCommandValue short value) {
+    public void setValue(short value) {
         this.value = value;
     }
 
@@ -58,10 +56,9 @@ public class SoloGoproSetRequest extends TLVPacket {
     protected SoloGoproSetRequest(Parcel in) {
         super(in);
         @SoloGoproConstants.RequestCommand short readCommand = (short) in.readInt();
-        @SoloGoproConstants.RequestCommandValue short readValue = (short) in.readInt();
 
         this.command = readCommand;
-        this.value = readValue;
+        this.value = (short) in.readInt();
     }
 
     public static final Creator<SoloGoproSetRequest> CREATOR = new Creator<SoloGoproSetRequest>() {
