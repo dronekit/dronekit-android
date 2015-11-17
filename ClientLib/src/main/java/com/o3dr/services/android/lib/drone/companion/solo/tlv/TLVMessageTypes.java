@@ -25,6 +25,7 @@ public class TLVMessageTypes {
     public static final int TYPE_SOLO_GOPRO_SET_REQUEST = 5001;
     public static final int TYPE_SOLO_GOPRO_RECORD = 5003;
     public static final int TYPE_SOLO_GOPRO_STATE = 5005;
+    public static final int TYPE_SOLO_GOPRO_STATE_V2 = 5006;
     public static final int TYPE_SOLO_GOPRO_REQUEST_STATE = 5007;
     public static final int TYPE_SOLO_GOPRO_SET_EXTENDED_REQUEST = 5009;
 
