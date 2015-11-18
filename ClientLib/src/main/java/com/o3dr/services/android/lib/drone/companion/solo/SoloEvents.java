@@ -18,6 +18,13 @@ public class SoloEvents {
      * @see {@link com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloGoproState}
      */
     public static final String SOLO_GOPRO_STATE_UPDATED = PACKAGE_NAME + ".GOPRO_STATE_UPDATED";
+
+    /**
+     * Broadcasts updates to the Gopro extended state.
+     * @see {@link com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloGoproStateV2}
+     */
+    public static final String SOLO_GOPRO_STATE_V2_UPDATED = PACKAGE_NAME + ".GOPRO_STATE_V2_UPDATED";
+
     /**
      * Signals update to the sololink wifi settings
      *

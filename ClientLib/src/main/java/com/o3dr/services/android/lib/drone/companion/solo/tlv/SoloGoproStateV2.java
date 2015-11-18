@@ -262,4 +262,80 @@ public class SoloGoproStateV2 extends TLVPacket implements DroneAttribute {
             return new SoloGoproStateV2[size];
         }
     };
+
+    public byte getFov() {
+        return fov;
+    }
+
+    public byte getFps() {
+        return fps;
+    }
+
+    public byte getGimbalEnabled() {
+        return gimbalEnabled;
+    }
+
+    public byte getLowLight() {
+        return lowLight;
+    }
+
+    public byte getModel() {
+        return model;
+    }
+
+    public byte getNtsc_pal() {
+        return ntsc_pal;
+    }
+
+    public byte getPhotoBurstRate() {
+        return photoBurstRate;
+    }
+
+    public byte getPhotoResolution() {
+        return photoResolution;
+    }
+
+    public byte getRecording() {
+        return recording;
+    }
+
+    public byte getStatus() {
+        return status;
+    }
+
+    public byte getVersion() {
+        return version;
+    }
+
+    public byte getVideoColor() {
+        return videoColor;
+    }
+
+    public byte getVideoExposure() {
+        return videoExposure;
+    }
+
+    public byte getVideoGain() {
+        return videoGain;
+    }
+
+    public byte getVideoProtune() {
+        return videoProtune;
+    }
+
+    public byte getVideoResolution() {
+        return videoResolution;
+    }
+
+    public byte getVideoSharpness() {
+        return videoSharpness;
+    }
+
+    public byte getVideoWhiteBalance() {
+        return videoWhiteBalance;
+    }
+
+    public byte getCaptureMode() {
+        return captureMode;
+    }
 }
