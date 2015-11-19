@@ -170,23 +170,23 @@ public class ControlApi extends Api {
             @Override
             public void onSuccess() {
                 if (enable) {
-                    listener.onManualControlEnabled();
+                    listener.onManualControlToggled(true);
                 } else {
-                    listener.onManualControlDisabled();
+                    listener.onManualControlToggled(false);
                 }
             }
 
             @Override
             public void onError(int executionError) {
                 if (enable) {
-                    listener.onManualControlDisabled();
+                    listener.onManualControlToggled(false);
                 }
             }
 
             @Override
             public void onTimeout() {
                 if (enable) {
-                    listener.onManualControlDisabled();
+                    listener.onManualControlToggled(false);
                 }
             }
         };
@@ -207,13 +207,9 @@ public class ControlApi extends Api {
      */
     public interface ManualControlStateListener {
         /**
-         * Manual control is enabled on the vehicle.
+         * Manual control is toggled on the vehicle.
+         * @param isEnabled True if manual control is enabled, false if disabled.
          */
-        void onManualControlEnabled();
-
-        /**
-         * Manual control is disabled on the vehicle.
-         */
-        void onManualControlDisabled();
+        void onManualControlToggled(boolean isEnabled);
     }
 }
