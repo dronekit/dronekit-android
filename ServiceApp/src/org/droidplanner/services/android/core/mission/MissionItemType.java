@@ -1,6 +1,7 @@
 package org.droidplanner.services.android.core.mission;
 
-import org.droidplanner.services.android.core.helpers.coordinates.Coord2D;
+import com.o3dr.services.android.lib.coordinate.LatLong;
+
 import org.droidplanner.services.android.core.mission.commands.CameraTriggerImpl;
 import org.droidplanner.services.android.core.mission.commands.ChangeSpeedImpl;
 import org.droidplanner.services.android.core.mission.commands.ConditionYawImpl;
@@ -52,7 +53,7 @@ public enum MissionItemType {
         return name;
     }
 
-    public MissionItem getNewItem(MissionItem referenceItem) throws IllegalArgumentException {
+    public MissionItemImpl getNewItem(MissionItemImpl referenceItem) throws IllegalArgumentException {
         switch (this) {
             case WAYPOINT:
                 return new WaypointImpl(referenceItem);
@@ -75,9 +76,9 @@ public enum MissionItemType {
             case ROI:
                 return new RegionOfInterestImpl(referenceItem);
             case SURVEY:
-                return new SurveyImpl(referenceItem.getMission(), Collections.<Coord2D>emptyList());
+                return new SurveyImpl(referenceItem.getMission(), Collections.<LatLong>emptyList());
             case SPLINE_SURVEY:
-                return new SplineSurveyImpl(referenceItem.getMission(), Collections.<Coord2D>emptyList());
+                return new SplineSurveyImpl(referenceItem.getMission(), Collections.<LatLong>emptyList());
             case CYLINDRICAL_SURVEY:
                 return new StructureScannerImpl(referenceItem);
             case SET_SERVO:

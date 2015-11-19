@@ -3,9 +3,9 @@ package org.droidplanner.services.android.core.drone.variables;
 import org.droidplanner.services.android.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.services.android.core.drone.DroneVariable;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
-import org.droidplanner.services.android.core.parameters.Parameter;
 
 import com.MAVLink.common.msg_raw_imu;
+import com.o3dr.services.android.lib.drone.property.Parameter;
 
 public class Magnetometer extends DroneVariable {
 
@@ -41,13 +41,13 @@ public class Magnetometer extends DroneVariable {
 	}
 
 	public int[] getOffsets() {
-		Parameter paramX = myDrone.getParameters().getParameter("COMPASS_OFS_X");
-		Parameter paramY = myDrone.getParameters().getParameter("COMPASS_OFS_Y");
-		Parameter paramZ = myDrone.getParameters().getParameter("COMPASS_OFS_Z");
+		Parameter paramX = myDrone.getParameterManager().getParameter("COMPASS_OFS_X");
+		Parameter paramY = myDrone.getParameterManager().getParameter("COMPASS_OFS_Y");
+		Parameter paramZ = myDrone.getParameterManager().getParameter("COMPASS_OFS_Z");
 		if (paramX == null || paramY == null || paramZ == null) {
 			return null;
 		}
-		return new int[]{(int) paramX.value,(int) paramY.value,(int) paramZ.value};
+		return new int[]{(int) paramX.getValue(),(int) paramY.getValue(),(int) paramZ.getValue()};
 
 	}
 }

@@ -3,7 +3,7 @@ package org.droidplanner.services.android.core.mission.commands;
 import java.util.List;
 
 import org.droidplanner.services.android.core.mission.Mission;
-import org.droidplanner.services.android.core.mission.MissionItem;
+import org.droidplanner.services.android.core.mission.MissionItemImpl;
 import org.droidplanner.services.android.core.mission.MissionItemType;
 
 import com.MAVLink.common.msg_mission_item;
@@ -14,7 +14,7 @@ public class EpmGripperImpl extends MissionCMD {
 
 	private boolean release = true;
 
-	public EpmGripperImpl(MissionItem item) {
+	public EpmGripperImpl(MissionItemImpl item) {
 		super(item);
 	}
 

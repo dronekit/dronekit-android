@@ -1,8 +1,5 @@
 apply plugin: 'com.android.application'
-// This does not break the build when Android Studio is missing the JRebel for Android plugin.
-apply plugin: 'com.zeroturnaround.jrebel.android'
 apply plugin: 'io.fabric'
-apply plugin: 'org.robolectric'
 
 dependencies {
 
@@ -35,14 +32,14 @@ dependencies {
     compile 'com.github.zafarkhaja:java-semver:0.9.0'
 
     testCompile 'junit:junit:4.12'
-    testCompile 'org.robolectric:robolectric:2.4'
+    testCompile "org.robolectric:robolectric:3.0"
 }
 
 //Decomposed version name and code (https://plus.google.com/+JakeWharton/posts/6f5TcVPRZij)
 def versionMajor = 1
 def versionMinor = 4
-def versionPatch = 2
-def versionBuild = 2 //bump for dogfood builds, public betas, etc.
+def versionPatch = 4
+def versionBuild = 4 //bump for dogfood builds, public betas, etc.
 def versionPrefix = "3DR Services v"
 
 //Log levels values
@@ -154,6 +151,10 @@ android {
     //FIXME: Remove when lint errors are taken care of.
     lintOptions {
         abortOnError false
+    }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
     }
 }
 

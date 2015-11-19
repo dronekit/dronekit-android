@@ -1,11 +1,11 @@
 package org.droidplanner.services.android.core.MAVLink;
 
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
-import org.droidplanner.services.android.core.parameters.Parameter;
 
 import com.MAVLink.common.msg_param_request_list;
 import com.MAVLink.common.msg_param_request_read;
 import com.MAVLink.common.msg_param_set;
+import com.o3dr.services.android.lib.drone.property.Parameter;
 
 public class MavLinkParameters {
 	public static void requestParametersList(MavLinkDrone drone) {
@@ -33,7 +33,7 @@ public class MavLinkParameters {
 	}
 
 	public static void sendParameter(MavLinkDrone drone, Parameter parameter) {
-		sendParameter(drone, parameter.name, parameter.type, (float) parameter.value);
+		sendParameter(drone, parameter.getName(), parameter.getType(), (float) parameter.getValue());
 	}
 
 	public static void sendParameter(MavLinkDrone drone, String name, int type, float value) {

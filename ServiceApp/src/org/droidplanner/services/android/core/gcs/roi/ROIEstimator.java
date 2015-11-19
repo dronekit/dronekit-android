@@ -2,13 +2,14 @@ package org.droidplanner.services.android.core.gcs.roi;
 
 import android.os.Handler;
 
+import com.o3dr.services.android.lib.coordinate.LatLong;
+import com.o3dr.services.android.lib.coordinate.LatLongAlt;
+
 import org.droidplanner.services.android.core.MAVLink.command.doCmd.MavLinkDoCmds;
+import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.core.gcs.location.Location;
 import org.droidplanner.services.android.core.gcs.location.Location.LocationReceiver;
-import org.droidplanner.services.android.core.helpers.coordinates.Coord2D;
-import org.droidplanner.services.android.core.helpers.coordinates.Coord3D;
 import org.droidplanner.services.android.core.helpers.geoTools.GeoTools;
-import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -78,20 +79,28 @@ public class ROIEstimator implements LocationReceiver {
             return;
         }
 
-        Coord2D gcsCoord = realLocation.getCoord();
+        LatLong gcsCoord = realLocation.getCoord();
 
         double bearing = realLocation.getBearing();
         double distanceTraveledSinceLastPoint = realLocation.getSpeed()
                 * (System.currentTimeMillis() - timeOfLastLocation) / 1000f;
-        Coord2D goCoord = GeoTools.newCoordFromBearingAndDistance(gcsCoord, bearing, distanceTraveledSinceLastPoint);
+        LatLong goCoord = GeoTools.newCoordFromBearingAndDistance(gcsCoord, bearing, distanceTraveledSinceLastPoint);
 
-        MavLinkDoCmds.setROI(drone, new Coord3D(goCoord.getLat(), goCoord.getLng(), (0.0)), null);
+        sendUpdateROI(goCoord);
 
         if (realLocation.getSpeed() > 0)
-            watchdog.postDelayed(watchdogCallback, TIMEOUT);
+            watchdog.postDelayed(watchdogCallback, getUpdatePeriod());
+    }
+
+    protected void sendUpdateROI(LatLong goCoord) {
+        MavLinkDoCmds.setROI(drone, new LatLongAlt(goCoord.getLatitude(), goCoord.getLongitude(), (0.0)), null);
     }
 
     public boolean isFollowEnabled() {
         return isFollowEnabled.get();
+    }
+
+    protected long getUpdatePeriod(){
+        return TIMEOUT;
     }
 }

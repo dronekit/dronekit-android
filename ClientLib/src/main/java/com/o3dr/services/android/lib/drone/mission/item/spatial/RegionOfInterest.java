@@ -7,6 +7,7 @@ import com.o3dr.services.android.lib.drone.mission.MissionItemType;
 import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
 
 /**
+ * Points the nose of the vehicle and camera gimbal at the “region of interest”.
  * Created by fhuya on 11/6/14.
  */
 public class RegionOfInterest extends BaseSpatialItem implements android.os.Parcelable {

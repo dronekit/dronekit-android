@@ -2,12 +2,12 @@ package org.droidplanner.services.android.core.mission.waypoints;
 
 import com.MAVLink.common.msg_mission_item;
 import com.MAVLink.enums.MAV_CMD;
+import com.o3dr.services.android.lib.coordinate.LatLong;
+import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 
-import org.droidplanner.services.android.core.helpers.coordinates.Coord2D;
-import org.droidplanner.services.android.core.helpers.coordinates.Coord3D;
 import org.droidplanner.services.android.core.helpers.geoTools.GeoTools;
 import org.droidplanner.services.android.core.mission.Mission;
-import org.droidplanner.services.android.core.mission.MissionItem;
+import org.droidplanner.services.android.core.mission.MissionItemImpl;
 import org.droidplanner.services.android.core.mission.MissionItemType;
 import org.droidplanner.services.android.core.mission.survey.SurveyImpl;
 import org.droidplanner.services.android.core.polygon.Polygon;
@@ -25,11 +25,11 @@ public class StructureScannerImpl extends SpatialCoordItem {
     private boolean crossHatch = false;
     SurveyData survey = new SurveyData();
 
-    public StructureScannerImpl(Mission mission, Coord3D coord) {
+    public StructureScannerImpl(Mission mission, LatLongAlt coord) {
         super(mission, coord);
     }
 
-    public StructureScannerImpl(MissionItem item) {
+    public StructureScannerImpl(MissionItemImpl item) {
         super(item);
     }
 
@@ -45,14 +45,13 @@ public class StructureScannerImpl extends SpatialCoordItem {
     }
 
     private void packROI(List<msg_mission_item> list) {
-        RegionOfInterestImpl roi = new RegionOfInterestImpl(mission, new Coord3D(
-                coordinate, (0.0)));
+        RegionOfInterestImpl roi = new RegionOfInterestImpl(mission, new LatLongAlt(coordinate, (0.0)));
         list.addAll(roi.packMissionItem());
     }
 
     private void packCircles(List<msg_mission_item> list) {
         for (double altitude = coordinate.getAltitude(); altitude <= getTopHeight(); altitude += heightStep) {
-            CircleImpl circleImpl = new CircleImpl(mission, new Coord3D(coordinate, (altitude)));
+            CircleImpl circleImpl = new CircleImpl(mission, new LatLongAlt(coordinate, (altitude)));
             circleImpl.setRadius(radius);
             list.addAll(circleImpl.packMissionItem());
         }
@@ -61,26 +60,23 @@ public class StructureScannerImpl extends SpatialCoordItem {
     private void packHatch(List<msg_mission_item> list) {
         Polygon polygon = new Polygon();
         for (double angle = 0; angle <= 360; angle += 10) {
-            polygon.addPoint(GeoTools.newCoordFromBearingAndDistance(coordinate,
-                    angle, radius));
+            polygon.addPoint(GeoTools.newCoordFromBearingAndDistance(coordinate, angle, radius));
         }
 
-        Coord2D corner = GeoTools.newCoordFromBearingAndDistance(coordinate,
-                -45, radius * 2);
-
+        LatLong corner = GeoTools.newCoordFromBearingAndDistance(coordinate, -45, radius * 2);
 
         survey.setAltitude(getTopHeight());
 
         try {
             survey.update(0.0, survey.getAltitude(), survey.getOverlap(), survey.getSidelap());
             GridBuilder grid = new GridBuilder(polygon, survey, corner);
-            for (Coord2D point : grid.generate(false).gridPoints) {
+            for (LatLong point : grid.generate(false).gridPoints) {
                 list.add(SurveyImpl.packSurveyPoint(point, getTopHeight()));
             }
 
             survey.update(90.0, survey.getAltitude(), survey.getOverlap(), survey.getSidelap());
             GridBuilder grid2 = new GridBuilder(polygon, survey, corner);
-            for (Coord2D point : grid2.generate(false).gridPoints) {
+            for (LatLong point : grid2.generate(false).gridPoints) {
                 list.add(SurveyImpl.packSurveyPoint(point, getTopHeight()));
             }
         } catch (Exception e) { // Should never fail, since it has good polygons
@@ -88,11 +84,11 @@ public class StructureScannerImpl extends SpatialCoordItem {
 
     }
 
-    public List<Coord2D> getPath() {
-        List<Coord2D> path = new ArrayList<Coord2D>();
+    public List<LatLong> getPath() {
+        List<LatLong> path = new ArrayList<LatLong>();
         for (msg_mission_item msg_mission_item : packMissionItem()) {
             if (msg_mission_item.command == MAV_CMD.MAV_CMD_NAV_WAYPOINT) {
-                path.add(new Coord2D(msg_mission_item.x, msg_mission_item.y));
+                path.add(new LatLong(msg_mission_item.x, msg_mission_item.y));
             }
             if (msg_mission_item.command == MAV_CMD.MAV_CMD_NAV_LOITER_TURNS) {
                 for (double angle = 0; angle <= 360; angle += 12) {
@@ -131,7 +127,7 @@ public class StructureScannerImpl extends SpatialCoordItem {
         return radius;
     }
 
-    public Coord2D getCenter() {
+    public LatLong getCenter() {
         return coordinate;
     }
 

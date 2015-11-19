@@ -233,17 +233,23 @@ public class Drone {
         handler.post(action);
     }
 
+    /**
+     * Reset the vehicle flight timer.
+     */
     public void resetFlightTimer() {
         elapsedFlightTime = 0;
         startTime = SystemClock.elapsedRealtime();
     }
 
-    public void stopTimer() {
+    private void stopTimer() {
         // lets calc the final elapsed timer
         elapsedFlightTime += SystemClock.elapsedRealtime() - startTime;
         startTime = SystemClock.elapsedRealtime();
     }
 
+    /**
+     * @return Vehicle flight time in seconds.
+     */
     public long getFlightTime() {
         State droneState = getAttribute(AttributeType.STATE);
         if (droneState != null && droneState.isFlying()) {

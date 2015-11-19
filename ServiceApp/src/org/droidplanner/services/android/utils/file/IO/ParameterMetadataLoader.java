@@ -3,8 +3,7 @@ package org.droidplanner.services.android.utils.file.IO;
 import android.content.Context;
 import android.util.Xml;
 
-import com.o3dr.services.android.lib.drone.property.Parameter;
-
+import org.droidplanner.services.android.core.drone.profiles.ParameterMetadata;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -17,89 +16,98 @@ import java.util.Map;
  */
 public class ParameterMetadataLoader {
 
-	private static final String PARAMETERMETADATA_PATH = "Parameters/ParameterMetaData.xml";
+    private static final String PARAMETERMETADATA_PATH = "Parameters/ParameterMetaData.xml";
 
-	private static final String METADATA_DISPLAYNAME = "DisplayName";
-	private static final String METADATA_DESCRIPTION = "Description";
-	private static final String METADATA_UNITS = "Units";
-	private static final String METADATA_VALUES = "Values";
-	private static final String METADATA_RANGE = "Range";
+    private static final String METADATA_DISPLAYNAME = "DisplayName";
+    private static final String METADATA_DESCRIPTION = "Description";
+    private static final String METADATA_UNITS = "Units";
+    private static final String METADATA_VALUES = "Values";
+    private static final String METADATA_RANGE = "Range";
 
-	public static void load(Context context, String metadataType, Map<String, Parameter> parameters)
-			throws IOException, XmlPullParserException {
-		final InputStream inputStream = context.getAssets().open(PARAMETERMETADATA_PATH);
-		open(inputStream, metadataType, parameters);
-	}
+    public static void load(Context context, String metadataType, Map<String, ParameterMetadata> metadata)
+            throws IOException, XmlPullParserException {
+        InputStream inputStream = context.getAssets().open(PARAMETERMETADATA_PATH);
+        open(inputStream, metadataType, metadata);
+    }
 
-	private static void open(InputStream inputStream, String metadataType, Map<String, Parameter>
-                             parameters) throws XmlPullParserException, IOException {
-		try {
-			XmlPullParser parser = Xml.newPullParser();
-			parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
-			parser.setInput(inputStream, null);
-			parseMetadata(parser, metadataType, parameters);
+    private static void open(InputStream inputStream, String metadataType, Map<String, ParameterMetadata> metadataMap)
+            throws XmlPullParserException, IOException {
+        try {
+            XmlPullParser parser = Xml.newPullParser();
+            parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
+            parser.setInput(inputStream, null);
+            parseMetadata(parser, metadataType, metadataMap);
 
-		} finally {
-			try {
-				inputStream.close();
-			} catch (IOException e) { /* nop */
-			}
-		}
-	}
+        } finally {
+            try {
+                inputStream.close();
+            } catch (IOException e) { /* nop */
+            }
+        }
+    }
 
-	private static void parseMetadata(XmlPullParser parser, String metadataType,
-			Map<String, Parameter> parameters) throws XmlPullParserException, IOException {
+    private static void parseMetadata(XmlPullParser parser, String metadataType, Map<String, ParameterMetadata> metadataMap)
+            throws XmlPullParserException, IOException {
+        String name;
+        boolean parsing = false;
+        ParameterMetadata metadata = null;
+        metadataMap.clear();
 
-		boolean parsing = false;
-        Parameter parameter = null;
+        int eventType = parser.getEventType();
+        while (eventType != XmlPullParser.END_DOCUMENT) {
 
-		int eventType = parser.getEventType();
-		while (eventType != XmlPullParser.END_DOCUMENT) {
-			switch (eventType) {
-			case XmlPullParser.START_TAG: {
-				String name = parser.getName();
-				// name == metadataType: start updating parameters' metadata(s)
-				if (metadataType.equals(name)) {
-					parsing = true;
-				} else if (parsing) {
-                    if(parameter == null) {
-                        parameter = parameters.get(name);
+            switch (eventType) {
+                case XmlPullParser.START_TAG:
+                    name = parser.getName();
+                    // name == metadataType: start collecting metadata(s)
+                    // metadata == null: create new metadata w/ name
+                    // metadata != null: add to metadata as property
+                    if (metadataType.equals(name)) {
+                        parsing = true;
+                    } else if (parsing) {
+                        if (metadata == null) {
+                            metadata = new ParameterMetadata();
+                            metadata.setName(name);
+                        } else {
+                            addMetaDataProperty(metadata, name, parser.nextText());
+                        }
                     }
-					else {
-                        addMetaDataProperty(parameter, name, parser.nextText());
+                    break;
+
+                case XmlPullParser.END_TAG:
+                    name = parser.getName();
+                    // name == metadataType: done
+                    // name == metadata.name: add metadata to metadataMap
+                    if (metadataType.equals(name)) {
+                        return;
+                    } else if (metadata != null && metadata.getName().equals(name)) {
+                        metadataMap.put(metadata.getName(), metadata);
+                        metadata = null;
                     }
-				}
-				break;
-			}
+                    break;
+            }
+            eventType = parser.next();
+        }
+        // no metadata
+    }
 
-			case XmlPullParser.END_TAG: {
-				String name = parser.getName();
-				// name == metadataType: done
-				if (metadataType.equals(name)) {
-					return;
-				} else if(parameter != null){
-                    parameter = null;
-                }
-				break;
-			}
-			}
-			eventType = parser.next();
-		}
-
-		// no metadata
-	}
-
-	private static void addMetaDataProperty(Parameter parameter, String name, String text) {
-		if (name.equals(METADATA_DISPLAYNAME))
-			parameter.setDisplayName(text);
-		else if (name.equals(METADATA_DESCRIPTION))
-			parameter.setDescription(text);
-
-		else if (name.equals(METADATA_UNITS))
-			parameter.setUnits(text);
-		else if (name.equals(METADATA_RANGE))
-			parameter.setRange(text);
-		else if (name.equals(METADATA_VALUES))
-			parameter.setValues(text);
-	}
+    private static void addMetaDataProperty(ParameterMetadata metaData, String name, String text) {
+        switch (name) {
+            case METADATA_DISPLAYNAME:
+                metaData.setDisplayName(text);
+                break;
+            case METADATA_DESCRIPTION:
+                metaData.setDescription(text);
+                break;
+            case METADATA_UNITS:
+                metaData.setUnits(text);
+                break;
+            case METADATA_RANGE:
+                metaData.setRange(text);
+                break;
+            case METADATA_VALUES:
+                metaData.setValues(text);
+                break;
+        }
+    }
 }

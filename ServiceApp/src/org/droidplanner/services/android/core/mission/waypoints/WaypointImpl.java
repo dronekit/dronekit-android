@@ -2,13 +2,13 @@ package org.droidplanner.services.android.core.mission.waypoints;
 
 import java.util.List;
 
-import org.droidplanner.services.android.core.helpers.coordinates.Coord3D;
 import org.droidplanner.services.android.core.mission.Mission;
-import org.droidplanner.services.android.core.mission.MissionItem;
+import org.droidplanner.services.android.core.mission.MissionItemImpl;
 import org.droidplanner.services.android.core.mission.MissionItemType;
 
 import com.MAVLink.common.msg_mission_item;
 import com.MAVLink.enums.MAV_CMD;
+import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 
 public class WaypointImpl extends SpatialCoordItem {
 
@@ -18,11 +18,11 @@ public class WaypointImpl extends SpatialCoordItem {
 	private double orbitalRadius;
 	private boolean orbitCCW;
 
-	public WaypointImpl(MissionItem item) {
+	public WaypointImpl(MissionItemImpl item) {
 		super(item);
 	}
 
-	public WaypointImpl(Mission mission, Coord3D coord) {
+	public WaypointImpl(Mission mission, LatLongAlt coord) {
 		super(mission, coord);
 	}
 

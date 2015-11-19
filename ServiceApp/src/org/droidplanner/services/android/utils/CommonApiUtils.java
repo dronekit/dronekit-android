@@ -1,6 +1,5 @@
 package org.droidplanner.services.android.utils;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.RemoteException;
@@ -11,12 +10,11 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.ardupilotmega.msg_ekf_status_report;
 import com.MAVLink.ardupilotmega.msg_mag_cal_progress;
 import com.MAVLink.ardupilotmega.msg_mag_cal_report;
-import com.MAVLink.common.msg_command_long;
 import com.MAVLink.enums.MAG_CAL_STATUS;
-import com.MAVLink.enums.MAV_CMD;
 import com.MAVLink.enums.MAV_TYPE;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
+import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.drone.calibration.magnetometer.MagnetometerCalibrationProgress;
 import com.o3dr.services.android.lib.drone.calibration.magnetometer.MagnetometerCalibrationResult;
@@ -32,7 +30,6 @@ import com.o3dr.services.android.lib.drone.property.EkfStatus;
 import com.o3dr.services.android.lib.drone.property.FootPrint;
 import com.o3dr.services.android.lib.drone.property.Gps;
 import com.o3dr.services.android.lib.drone.property.GuidedState;
-import com.o3dr.services.android.lib.drone.property.Home;
 import com.o3dr.services.android.lib.drone.property.Parameter;
 import com.o3dr.services.android.lib.drone.property.Parameters;
 import com.o3dr.services.android.lib.drone.property.State;
@@ -45,37 +42,31 @@ import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
 import com.o3dr.services.android.lib.model.AbstractCommandListener;
 import com.o3dr.services.android.lib.model.ICommandListener;
 
-import org.droidplanner.services.android.core.MAVLink.MavLinkArm;
+import org.droidplanner.services.android.core.MAVLink.MavLinkCommands;
 import org.droidplanner.services.android.core.MAVLink.command.doCmd.MavLinkDoCmds;
 import org.droidplanner.services.android.core.drone.DroneManager;
 import org.droidplanner.services.android.core.drone.autopilot.Drone;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
-import org.droidplanner.services.android.core.drone.autopilot.apm.ArduSolo;
+import org.droidplanner.services.android.core.drone.autopilot.apm.ArduPilot;
 import org.droidplanner.services.android.core.drone.autopilot.generic.GenericMavLinkDrone;
-import org.droidplanner.services.android.core.drone.profiles.VehicleProfile;
+import org.droidplanner.services.android.core.drone.profiles.ParameterManager;
 import org.droidplanner.services.android.core.drone.variables.ApmModes;
 import org.droidplanner.services.android.core.drone.variables.Camera;
-import org.droidplanner.services.android.core.drone.variables.GPS;
 import org.droidplanner.services.android.core.drone.variables.GuidedPoint;
 import org.droidplanner.services.android.core.drone.variables.calibration.AccelCalibration;
 import org.droidplanner.services.android.core.drone.variables.calibration.MagnetometerCalibrationImpl;
 import org.droidplanner.services.android.core.firmware.FirmwareType;
 import org.droidplanner.services.android.core.gcs.follow.Follow;
 import org.droidplanner.services.android.core.gcs.follow.FollowAlgorithm;
-import org.droidplanner.services.android.core.helpers.coordinates.Coord2D;
-import org.droidplanner.services.android.core.helpers.coordinates.Coord3D;
+import org.droidplanner.services.android.core.mission.MissionItemImpl;
 import org.droidplanner.services.android.core.mission.survey.SplineSurveyImpl;
 import org.droidplanner.services.android.core.mission.survey.SurveyImpl;
 import org.droidplanner.services.android.core.mission.waypoints.StructureScannerImpl;
 import org.droidplanner.services.android.core.survey.Footprint;
-import org.droidplanner.services.android.utils.file.IO.ParameterMetadataLoader;
-import org.xmlpull.v1.XmlPullParserException;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -259,12 +250,11 @@ public class CommonApiUtils {
     public static FootPrint getProxyCameraFootPrint(Footprint footprint) {
         if (footprint == null) return null;
 
-        return new FootPrint(footprint.getGSD(),
-                MathUtils.coord2DToLatLong(footprint.getVertexInGlobalFrame()));
+        return new FootPrint(footprint.getGSD(), footprint.getVertexInGlobalFrame());
     }
 
     public static FollowAlgorithm.FollowModes followTypeToMode(MavLinkDrone drone, FollowType followType) {
-        final FollowAlgorithm.FollowModes followMode;
+        FollowAlgorithm.FollowModes followMode;
 
         switch (followType) {
             case ABOVE:
@@ -279,7 +269,7 @@ public class CommonApiUtils {
 
             default:
             case LEASH:
-                followMode =  (drone.getFirmwareType() == FirmwareType.ARDU_SOLO)
+                followMode = (drone.getFirmwareType() == FirmwareType.ARDU_SOLO)
                         ? FollowAlgorithm.FollowModes.SPLINE_LEASH
                         : FollowAlgorithm.FollowModes.LEASH;
                 break;
@@ -312,7 +302,7 @@ public class CommonApiUtils {
     }
 
     public static FollowType followModeToType(FollowAlgorithm.FollowModes followMode) {
-        final FollowType followType;
+        FollowType followType;
 
         switch (followMode) {
             default:
@@ -359,9 +349,9 @@ public class CommonApiUtils {
     }
 
     public static CameraProxy getCameraProxy(MavLinkDrone drone, List<CameraDetail> cameraDetails) {
-        final CameraDetail camDetail;
-        final FootPrint currentFieldOfView;
-        final List<FootPrint> proxyPrints = new ArrayList<>();
+        CameraDetail camDetail;
+        FootPrint currentFieldOfView;
+        List<FootPrint> proxyPrints = new ArrayList<>();
 
         if (drone == null) {
             camDetail = new CameraDetail();
@@ -376,26 +366,13 @@ public class CommonApiUtils {
                 proxyPrints.add(CommonApiUtils.getProxyCameraFootPrint(footprint));
             }
 
-            GPS droneGps = drone.getGps();
-            currentFieldOfView = droneGps.isPositionValid()
+            Gps droneGps = (Gps) drone.getAttribute(AttributeType.GPS);
+            currentFieldOfView = droneGps != null && droneGps.isValid()
                     ? CommonApiUtils.getProxyCameraFootPrint(droneCamera.getCurrentFieldOfView())
                     : new FootPrint();
         }
 
         return new CameraProxy(camDetail, currentFieldOfView, proxyPrints, cameraDetails);
-    }
-
-    public static Gps getGps(MavLinkDrone drone) {
-        if (drone == null)
-            return new Gps();
-
-        final GPS droneGps = drone.getGps();
-        LatLong dronePosition = droneGps.isPositionValid()
-                ? new LatLong(droneGps.getPosition().getLat(), droneGps.getPosition().getLng())
-                : null;
-
-        return new Gps(dronePosition, droneGps.getGpsEPH(), droneGps.getSatCount(),
-                droneGps.getFixTypeNumeric());
     }
 
     public static State getState(MavLinkDrone drone, boolean isConnected, Vibration vibration) {
@@ -409,8 +386,8 @@ public class CommonApiUtils {
                 ? accelCalibration.getMessage()
                 : null;
 
-        final msg_ekf_status_report ekfStatus = droneState.getEkfStatus();
-        final EkfStatus proxyEkfStatus = ekfStatus == null
+        msg_ekf_status_report ekfStatus = droneState.getEkfStatus();
+        EkfStatus proxyEkfStatus = ekfStatus == null
                 ? new EkfStatus()
                 : new EkfStatus(ekfStatus.flags, ekfStatus.compass_variance, ekfStatus.pos_horiz_variance, ekfStatus
                 .terrain_alt_variance, ekfStatus.velocity_variance, ekfStatus.pos_vert_variance);
@@ -422,75 +399,18 @@ public class CommonApiUtils {
                 vibration);
     }
 
-    public static Parameters getParameters(MavLinkDrone drone, Context context, Map<String, Parameter> cachedParameters) {
-        if (drone == null)
-            return new Parameters();
-
-        final Map<String, Parameter> incompleteParams = new HashMap<>();
-        final List<Parameter> parametersList = new ArrayList<>();
-
-        Map<String, org.droidplanner.services.android.core.parameters.Parameter> droneParameters = drone.getParameters().getParameters();
-        if (!droneParameters.isEmpty()) {
-            for (org.droidplanner.services.android.core.parameters.Parameter param : droneParameters.values()) {
-                if (param.name != null) {
-                    Parameter cachedParam = cachedParameters.get(param.name);
-                    if (cachedParam == null) {
-                        cachedParam = new Parameter(param.name, param.value, param.type);
-                        incompleteParams.put(param.name, cachedParam);
-                        cachedParameters.put(param.name, cachedParam);
-                    }else {
-                        cachedParam.setValue(param.value);
-                        cachedParam.setType(param.type);
-                    }
-
-                    parametersList.add(cachedParam);
-                }
-            }
-
-            final VehicleProfile profile = drone.getVehicleProfile();
-            if (!incompleteParams.isEmpty() && profile != null) {
-                try {
-                    String metadataType = profile.getParameterMetadataType();
-                    if (metadataType != null) {
-                        ParameterMetadataLoader.load(context, metadataType, incompleteParams);
-                    }
-                } catch (IOException | XmlPullParserException e) {
-                    Timber.e(e, e.getMessage());
-                }
-            }
-        }
-
-        return new Parameters(new ArrayList<>(parametersList));
-    }
-
-    public static float fromRadToDeg(float rad) {
-        return (float) (rad * 180f / Math.PI);
-    }
-
-    public static float fromDegToRad(float deg) {
-        return (float) (deg * Math.PI / 180f);
-    }
-
-    public static Home getHome(MavLinkDrone drone) {
-        if (drone == null)
-            return new Home();
-
-        org.droidplanner.services.android.core.drone.variables.Home droneHome = drone.getHome();
-        return new Home(droneHome.getCoord());
-    }
-
     public static Mission getMission(MavLinkDrone drone) {
         Mission proxyMission = new Mission();
         if (drone == null)
             return proxyMission;
 
         org.droidplanner.services.android.core.mission.Mission droneMission = drone.getMission();
-        List<org.droidplanner.services.android.core.mission.MissionItem> droneMissionItems = droneMission.getComponentItems();
+        List<MissionItemImpl> droneMissionItemImpls = droneMission.getComponentItems();
 
 
         proxyMission.setCurrentMissionItem((short) drone.getMissionStats().getCurrentWP());
-        if (!droneMissionItems.isEmpty()) {
-            for (org.droidplanner.services.android.core.mission.MissionItem item : droneMissionItems) {
+        if (!droneMissionItemImpls.isEmpty()) {
+            for (MissionItemImpl item : droneMissionItemImpls) {
                 proxyMission.addMissionItem(ProxyUtils.getProxyMissionItem(item));
             }
         }
@@ -509,7 +429,7 @@ public class CommonApiUtils {
         if (drone == null)
             return new GuidedState();
 
-        final GuidedPoint guidedPoint = drone.getGuidedPoint();
+        GuidedPoint guidedPoint = drone.getGuidedPoint();
         int guidedState;
         switch (guidedPoint.getState()) {
             default:
@@ -526,11 +446,13 @@ public class CommonApiUtils {
                 break;
         }
 
-        Coord2D guidedCoord = guidedPoint.getCoord() == null
-                ? new Coord2D(0, 0)
-                : guidedPoint.getCoord();
+        LatLong guidedCoord = guidedPoint.getCoord();
+        if (guidedCoord == null) {
+            guidedCoord = new LatLong(0, 0);
+        }
+
         double guidedAlt = guidedPoint.getAltitude();
-        return new GuidedState(guidedState, new LatLongAlt(guidedCoord.getLat(), guidedCoord.getLng(), guidedAlt));
+        return new GuidedState(guidedState, new LatLongAlt(guidedCoord, guidedAlt));
     }
 
     public static void changeVehicleMode(MavLinkDrone drone, VehicleMode newMode, ICommandListener listener) {
@@ -560,7 +482,7 @@ public class CommonApiUtils {
         if (followMe == null)
             return new FollowState();
 
-        final int state;
+        int state;
         switch (followMe.getState()) {
 
             default:
@@ -589,16 +511,15 @@ public class CommonApiUtils {
                 break;
         }
 
-        final FollowAlgorithm currentAlg = followMe.getFollowAlgorithm();
+        FollowAlgorithm currentAlg = followMe.getFollowAlgorithm();
         Map<String, Object> modeParams = currentAlg.getParams();
         Bundle params = new Bundle();
         for (Map.Entry<String, Object> entry : modeParams.entrySet()) {
             switch (entry.getKey()) {
                 case FollowType.EXTRA_FOLLOW_ROI_TARGET:
-                    Coord3D target = (Coord3D) entry.getValue();
+                    LatLongAlt target = (LatLongAlt) entry.getValue();
                     if (target != null) {
-                        params.putParcelable(entry.getKey(), new LatLongAlt(target.getLat(), target.getLng(),
-                                target.getAltitude()));
+                        params.putParcelable(entry.getKey(), target);
                     }
                     break;
 
@@ -642,7 +563,7 @@ public class CommonApiUtils {
     public static void refreshParameters(MavLinkDrone drone) {
         if (drone == null)
             return;
-        drone.getParameters().refreshParameters();
+        drone.getParameterManager().refreshParameters();
     }
 
     public static void writeParameters(MavLinkDrone drone, Parameters parameters) {
@@ -652,9 +573,9 @@ public class CommonApiUtils {
         if (parametersList.isEmpty())
             return;
 
-        org.droidplanner.services.android.core.drone.profiles.Parameters droneParams = drone.getParameters();
+        ParameterManager droneParams = drone.getParameterManager();
         for (Parameter proxyParam : parametersList) {
-            droneParams.sendParameter(new org.droidplanner.services.android.core.parameters.Parameter(proxyParam.getName(), proxyParam.getValue(), proxyParam.getType()));
+            droneParams.sendParameter(proxyParam);
         }
     }
 
@@ -674,7 +595,7 @@ public class CommonApiUtils {
             droneMission.sendMissionToAPM();
     }
 
-    public static void startMission(final MavLinkDrone drone, final boolean forceModeChange, final boolean forceArm, final ICommandListener listener) {
+    public static void startMission(final ArduPilot drone, final boolean forceModeChange, boolean forceArm, final ICommandListener listener) {
         if (drone == null) {
             return;
         }
@@ -682,12 +603,7 @@ public class CommonApiUtils {
         final Runnable sendCommandRunnable = new Runnable() {
             @Override
             public void run() {
-                msg_command_long msg = new msg_command_long();
-                msg.target_system = drone.getSysid();
-                msg.target_component = drone.getCompid();
-                msg.command = MAV_CMD.MAV_CMD_MISSION_START;
-
-                drone.getMavClient().sendMavMessage(msg, listener);
+                MavLinkCommands.startMission(drone, listener);
             }
         };
 
@@ -756,11 +672,11 @@ public class CommonApiUtils {
         return (float) drone.getMission().makeAndUploadDronie();
     }
 
-    public static void arm(MavLinkDrone drone, boolean arm, ICommandListener listener) {
+    public static void arm(ArduPilot drone, boolean arm, ICommandListener listener) {
         arm(drone, arm, false, listener);
     }
 
-    public static void arm(final MavLinkDrone drone, final boolean arm, final boolean emergencyDisarm, final ICommandListener listener) {
+    public static void arm(final ArduPilot drone, final boolean arm, final boolean emergencyDisarm, final ICommandListener listener) {
         if (drone == null)
             return;
 
@@ -770,7 +686,7 @@ public class CommonApiUtils {
                 changeVehicleMode(drone, VehicleMode.COPTER_STABILIZE, new AbstractCommandListener() {
                     @Override
                     public void onSuccess() {
-                        MavLinkArm.sendArmMessage(drone, arm, emergencyDisarm, listener);
+                        MavLinkCommands.sendArmMessage(drone, arm, emergencyDisarm, listener);
                     }
 
                     @Override
@@ -800,7 +716,7 @@ public class CommonApiUtils {
             }
         }
 
-        MavLinkArm.sendArmMessage(drone, arm, emergencyDisarm, listener);
+        MavLinkCommands.sendArmMessage(drone, arm, emergencyDisarm, listener);
     }
 
     /**
@@ -816,17 +732,14 @@ public class CommonApiUtils {
         if (!org.droidplanner.services.android.core.drone.variables.Type.isCopter(drone.getType()))
             return false;
 
-        final String firmwareVersion = drone.getFirmwareVersion();
+        String firmwareVersion = drone.getFirmwareVersion();
         if (TextUtils.isEmpty(firmwareVersion))
             return false;
 
-        if (!firmwareVersion.startsWith("APM:Copter V3.3")
+        return !(!firmwareVersion.startsWith("APM:Copter V3.3")
                 && !firmwareVersion.startsWith("APM:Copter V3.4")
-                && !firmwareVersion.startsWith("Solo")) {
-            return false;
-        }
+                && !firmwareVersion.startsWith("Solo"));
 
-        return true;
     }
 
     public static void startMagnetometerCalibration(MavLinkDrone drone, boolean retryOnFailure, boolean saveAutomatically, int
@@ -903,10 +816,10 @@ public class CommonApiUtils {
 
         GuidedPoint guidedPoint = drone.getGuidedPoint();
         if (guidedPoint.isInitialized()) {
-            guidedPoint.newGuidedCoord(MathUtils.latLongToCoord2D(point));
+            guidedPoint.newGuidedCoord(point);
         } else if (force) {
             try {
-                guidedPoint.forcedGuidedCoordinate(MathUtils.latLongToCoord2D(point), listener);
+                guidedPoint.forcedGuidedCoordinate(point, listener);
             } catch (Exception e) {
                 Timber.e(e, e.getMessage());
             }
@@ -924,10 +837,10 @@ public class CommonApiUtils {
         if (droneMgr == null)
             return;
 
-        final FollowAlgorithm.FollowModes selectedMode = CommonApiUtils.followTypeToMode(droneMgr.getDrone(), followType);
+        FollowAlgorithm.FollowModes selectedMode = CommonApiUtils.followTypeToMode(droneMgr.getDrone(), followType);
 
         if (selectedMode != null) {
-            final Follow followMe = droneMgr.getFollowMe();
+            Follow followMe = droneMgr.getFollowMe();
             if (followMe == null)
                 return;
 
@@ -936,7 +849,8 @@ public class CommonApiUtils {
 
             FollowAlgorithm currentAlg = followMe.getFollowAlgorithm();
             if (currentAlg.getType() != selectedMode) {
-                if (selectedMode == FollowAlgorithm.FollowModes.SOLO_SHOT && !SoloApiUtils.isSoloLinkFeatureAvailable(droneMgr, listener))
+                if (selectedMode == FollowAlgorithm.FollowModes.SOLO_SHOT &&
+                        !SoloApiUtils.isSoloLinkFeatureAvailable(droneMgr.getDrone(), listener))
                     return;
 
                 followMe.setAlgorithm(selectedMode.getAlgorithmType(droneMgr, droneHandler));
@@ -960,7 +874,7 @@ public class CommonApiUtils {
         if (missionItem == null || !(missionItem instanceof MissionItem.ComplexItem))
             return;
 
-        final MissionItemType itemType = missionItem.getType();
+        MissionItemType itemType = missionItem.getType();
         switch (itemType) {
             case SURVEY:
                 Survey updatedSurvey = buildSurvey(drone, (Survey) missionItem);
@@ -1012,9 +926,9 @@ public class CommonApiUtils {
     }
 
     public static MagnetometerCalibrationStatus getMagnetometerCalibrationStatus(MavLinkDrone drone) {
-        final MagnetometerCalibrationStatus calStatus = new MagnetometerCalibrationStatus();
+        MagnetometerCalibrationStatus calStatus = new MagnetometerCalibrationStatus();
         if (drone != null) {
-            final MagnetometerCalibrationImpl magCalImpl = drone.getMagnetometerCalibration();
+            MagnetometerCalibrationImpl magCalImpl = drone.getMagnetometerCalibration();
             calStatus.setCalibrationCancelled(magCalImpl.isCancelled());
 
             Collection<MagnetometerCalibrationImpl.Info> calibrationInfo = magCalImpl.getMagCalibrationTracker().values();
@@ -1049,22 +963,22 @@ public class CommonApiUtils {
     public static void startVideoStream(Drone drone, Bundle videoProps, String appId, String videoTag, Surface videoSurface,
                                         ICommandListener listener) {
 
-        if(!(drone instanceof GenericMavLinkDrone)){
+        if (!(drone instanceof GenericMavLinkDrone)) {
             postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
             return;
         }
 
-        final GenericMavLinkDrone mavLinkDrone = (GenericMavLinkDrone) drone;
+        GenericMavLinkDrone mavLinkDrone = (GenericMavLinkDrone) drone;
         mavLinkDrone.startVideoStream(videoProps, appId, videoTag, videoSurface, listener);
     }
 
     public static void stopVideoStream(Drone drone, String appId, String videoTag, ICommandListener listener) {
-        if(!(drone instanceof GenericMavLinkDrone)){
+        if (!(drone instanceof GenericMavLinkDrone)) {
             postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
             return;
         }
 
-        final GenericMavLinkDrone mavLinkDrone = (GenericMavLinkDrone) drone;
+        GenericMavLinkDrone mavLinkDrone = (GenericMavLinkDrone) drone;
         mavLinkDrone.stopVideoStream(appId, videoTag, listener);
     }
 }

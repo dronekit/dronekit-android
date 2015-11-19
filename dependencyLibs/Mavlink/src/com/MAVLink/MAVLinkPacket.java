@@ -252,6 +252,12 @@ public class MAVLinkPacket implements Serializable {
             case msg_autopilot_version_request.MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST:
                 return  new msg_autopilot_version_request(this);
             
+            case msg_remote_log_data_block.MAVLINK_MSG_ID_REMOTE_LOG_DATA_BLOCK:
+                return  new msg_remote_log_data_block(this);
+            
+            case msg_remote_log_block_status.MAVLINK_MSG_ID_REMOTE_LOG_BLOCK_STATUS:
+                return  new msg_remote_log_block_status(this);
+            
             case msg_led_control.MAVLINK_MSG_ID_LED_CONTROL:
                 return  new msg_led_control(this);
             
@@ -264,47 +270,17 @@ public class MAVLinkPacket implements Serializable {
             case msg_ekf_status_report.MAVLINK_MSG_ID_EKF_STATUS_REPORT:
                 return  new msg_ekf_status_report(this);
             
+            case msg_pid_tuning.MAVLINK_MSG_ID_PID_TUNING:
+                return  new msg_pid_tuning(this);
+            
             case msg_gimbal_report.MAVLINK_MSG_ID_GIMBAL_REPORT:
                 return  new msg_gimbal_report(this);
             
             case msg_gimbal_control.MAVLINK_MSG_ID_GIMBAL_CONTROL:
                 return  new msg_gimbal_control(this);
             
-            case msg_gimbal_reset.MAVLINK_MSG_ID_GIMBAL_RESET:
-                return  new msg_gimbal_reset(this);
-            
-            case msg_gimbal_axis_calibration_progress.MAVLINK_MSG_ID_GIMBAL_AXIS_CALIBRATION_PROGRESS:
-                return  new msg_gimbal_axis_calibration_progress(this);
-            
-            case msg_gimbal_set_home_offsets.MAVLINK_MSG_ID_GIMBAL_SET_HOME_OFFSETS:
-                return  new msg_gimbal_set_home_offsets(this);
-            
-            case msg_gimbal_home_offset_calibration_result.MAVLINK_MSG_ID_GIMBAL_HOME_OFFSET_CALIBRATION_RESULT:
-                return  new msg_gimbal_home_offset_calibration_result(this);
-            
-            case msg_gimbal_set_factory_parameters.MAVLINK_MSG_ID_GIMBAL_SET_FACTORY_PARAMETERS:
-                return  new msg_gimbal_set_factory_parameters(this);
-            
-            case msg_gimbal_factory_parameters_loaded.MAVLINK_MSG_ID_GIMBAL_FACTORY_PARAMETERS_LOADED:
-                return  new msg_gimbal_factory_parameters_loaded(this);
-            
-            case msg_gimbal_erase_firmware_and_config.MAVLINK_MSG_ID_GIMBAL_ERASE_FIRMWARE_AND_CONFIG:
-                return  new msg_gimbal_erase_firmware_and_config(this);
-            
-            case msg_gimbal_perform_factory_tests.MAVLINK_MSG_ID_GIMBAL_PERFORM_FACTORY_TESTS:
-                return  new msg_gimbal_perform_factory_tests(this);
-            
-            case msg_gimbal_report_factory_tests_progress.MAVLINK_MSG_ID_GIMBAL_REPORT_FACTORY_TESTS_PROGRESS:
-                return  new msg_gimbal_report_factory_tests_progress(this);
-            
-            case msg_gimbal_request_axis_calibration_status.MAVLINK_MSG_ID_GIMBAL_REQUEST_AXIS_CALIBRATION_STATUS:
-                return  new msg_gimbal_request_axis_calibration_status(this);
-            
-            case msg_gimbal_report_axis_calibration_status.MAVLINK_MSG_ID_GIMBAL_REPORT_AXIS_CALIBRATION_STATUS:
-                return  new msg_gimbal_report_axis_calibration_status(this);
-            
-            case msg_gimbal_request_axis_calibration.MAVLINK_MSG_ID_GIMBAL_REQUEST_AXIS_CALIBRATION:
-                return  new msg_gimbal_request_axis_calibration(this);
+            case msg_gimbal_torque_cmd_report.MAVLINK_MSG_ID_GIMBAL_TORQUE_CMD_REPORT:
+                return  new msg_gimbal_torque_cmd_report(this);
             
             case msg_gopro_heartbeat.MAVLINK_MSG_ID_GOPRO_HEARTBEAT:
                 return  new msg_gopro_heartbeat(this);
@@ -320,6 +296,9 @@ public class MAVLinkPacket implements Serializable {
             
             case msg_gopro_set_response.MAVLINK_MSG_ID_GOPRO_SET_RESPONSE:
                 return  new msg_gopro_set_response(this);
+            
+            case msg_gps_accuracy.MAVLINK_MSG_ID_GPS_ACCURACY:
+                return  new msg_gps_accuracy(this);
             
                         
             case msg_heartbeat.MAVLINK_MSG_ID_HEARTBEAT:
@@ -556,6 +535,9 @@ public class MAVLinkPacket implements Serializable {
             case msg_timesync.MAVLINK_MSG_ID_TIMESYNC:
                 return  new msg_timesync(this);
             
+            case msg_camera_trigger.MAVLINK_MSG_ID_CAMERA_TRIGGER:
+                return  new msg_camera_trigger(this);
+            
             case msg_hil_gps.MAVLINK_MSG_ID_HIL_GPS:
                 return  new msg_hil_gps(this);
             
@@ -640,8 +622,17 @@ public class MAVLinkPacket implements Serializable {
             case msg_actuator_control_target.MAVLINK_MSG_ID_ACTUATOR_CONTROL_TARGET:
                 return  new msg_actuator_control_target(this);
             
+            case msg_altitude.MAVLINK_MSG_ID_ALTITUDE:
+                return  new msg_altitude(this);
+            
+            case msg_resource_request.MAVLINK_MSG_ID_RESOURCE_REQUEST:
+                return  new msg_resource_request(this);
+            
             case msg_scaled_pressure3.MAVLINK_MSG_ID_SCALED_PRESSURE3:
                 return  new msg_scaled_pressure3(this);
+            
+            case msg_control_system_state.MAVLINK_MSG_ID_CONTROL_SYSTEM_STATE:
+                return  new msg_control_system_state(this);
             
             case msg_battery_status.MAVLINK_MSG_ID_BATTERY_STATUS:
                 return  new msg_battery_status(this);
@@ -654,6 +645,18 @@ public class MAVLinkPacket implements Serializable {
             
             case msg_vibration.MAVLINK_MSG_ID_VIBRATION:
                 return  new msg_vibration(this);
+            
+            case msg_home_position.MAVLINK_MSG_ID_HOME_POSITION:
+                return  new msg_home_position(this);
+            
+            case msg_set_home_position.MAVLINK_MSG_ID_SET_HOME_POSITION:
+                return  new msg_set_home_position(this);
+            
+            case msg_message_interval.MAVLINK_MSG_ID_MESSAGE_INTERVAL:
+                return  new msg_message_interval(this);
+            
+            case msg_extended_sys_state.MAVLINK_MSG_ID_EXTENDED_SYS_STATE:
+                return  new msg_extended_sys_state(this);
             
             case msg_v2_extension.MAVLINK_MSG_ID_V2_EXTENSION:
                 return  new msg_v2_extension(this);

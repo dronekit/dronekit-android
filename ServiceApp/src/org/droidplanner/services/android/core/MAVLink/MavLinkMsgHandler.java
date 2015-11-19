@@ -39,7 +39,6 @@ public class MavLinkMsgHandler {
 
     private void handleHeartbeat(msg_heartbeat heartbeat) {
         switch (heartbeat.autopilot) {
-            case MAV_AUTOPILOT.MAV_AUTOPILOT_PIXHAWK:
             case MAV_AUTOPILOT.MAV_AUTOPILOT_ARDUPILOTMEGA:
                 switch (heartbeat.type) {
 
@@ -66,6 +65,14 @@ public class MavLinkMsgHandler {
 
             case MAV_AUTOPILOT.MAV_AUTOPILOT_PX4:
                 droneMgr.onVehicleTypeReceived(FirmwareType.PX4_NATIVE);
+                break;
+
+            case MAV_AUTOPILOT.MAV_AUTOPILOT_GENERIC:
+            case MAV_AUTOPILOT.MAV_AUTOPILOT_GENERIC_MISSION_FULL:
+            case MAV_AUTOPILOT.MAV_AUTOPILOT_GENERIC_WAYPOINTS_ONLY:
+            case MAV_AUTOPILOT.MAV_AUTOPILOT_GENERIC_WAYPOINTS_AND_SIMPLE_NAVIGATION_ONLY:
+            default:
+                droneMgr.onVehicleTypeReceived(FirmwareType.GENERIC);
                 break;
         }
 

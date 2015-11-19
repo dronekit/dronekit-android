@@ -2,9 +2,10 @@ package org.droidplanner.services.android.core.drone;
 
 import android.os.Bundle;
 
+import com.o3dr.services.android.lib.drone.property.Parameter;
+
 import org.droidplanner.services.android.core.MAVLink.WaypointManager;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
-import org.droidplanner.services.android.core.parameters.Parameter;
 
 public class DroneInterfaces {
 
@@ -96,21 +97,6 @@ public class DroneInterfaces {
          *
          */
 		HOME,
-
-		/**
-		 * Broadcast to notify of updates to the drone's gps location.
-		 */
-		GPS,
-
-		/**
-         *
-         */
-		GPS_FIX,
-
-		/**
-         *
-         */
-		GPS_COUNT,
 
 		/**
          *
