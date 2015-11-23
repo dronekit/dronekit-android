@@ -18,9 +18,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import timber.log.Timber;
@@ -31,6 +33,7 @@ import timber.log.Timber;
 class StreamRecorder {
 
     private final AtomicReference<String> recordingFilename = new AtomicReference<>();
+    private final AtomicBoolean areParametersSet = new AtomicBoolean(false);
 
     private final File mediaRootDir;
     private final Context context;
@@ -75,6 +78,7 @@ class StreamRecorder {
 
     boolean enableRecording(String mediaFilename) {
         if (!isRecordingEnabled()) {
+            areParametersSet.set(false);
             recordingFilename.set(mediaFilename);
 
             Timber.i("Enabling local recording to %s", mediaFilename);
@@ -117,18 +121,48 @@ class StreamRecorder {
             }
         }
 
+        areParametersSet.set(false);
+
         return true;
     }
 
     //TODO: Maybe put this on a background thread to avoid blocking on the write to file.
-    void onNaluChunkUpdated(byte[] payload, int index, int payloadLength) {
+    void onNaluChunkUpdated(NALUChunk parametersSet, NALUChunk dataChunk) {
         if (isRecordingEnabled() && h264Writer != null) {
-            try {
-                h264Writer.write(payload, index, payloadLength);
-            } catch (IOException e) {
-                Timber.e(e, e.getMessage());
+            if(areParametersSet.get()) {
+                try {
+                    writeNaluChunk(h264Writer, dataChunk);
+                } catch (IOException e) {
+                    Timber.e(e, e.getMessage());
+                }
+            }
+            else{
+                try {
+                    areParametersSet.set(writeNaluChunk(h264Writer, parametersSet));
+                } catch (IOException e) {
+                    Timber.e(e, e.getMessage());
+                }
             }
         }
+    }
+
+    private boolean writeNaluChunk(BufferedOutputStream bos, NALUChunk naluChunk) throws IOException {
+        if(naluChunk == null)
+            return false;
+
+        int payloadCount = naluChunk.payloads.length;
+        for (int i = 0; i < payloadCount; i++) {
+            ByteBuffer payload = naluChunk.payloads[i];
+
+            if (payload.capacity() == 0)
+                continue;
+
+            final int dataLength = payload.position();
+            byte[] payloadData = payload.array();
+            bos.write(payloadData, 0, dataLength);
+        }
+
+        return true;
     }
 
     void convertToMp4(final String filename) {
