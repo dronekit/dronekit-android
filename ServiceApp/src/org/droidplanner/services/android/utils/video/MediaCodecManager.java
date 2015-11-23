@@ -94,12 +94,14 @@ public class MediaCodecManager {
     private final NALUChunkAssembler naluChunkAssembler;
 
     private final Handler handler;
+    private final StreamRecorder streamRecorder;
 
     private DequeueCodec dequeueRunner;
 
-    public MediaCodecManager(Handler handler) {
+    public MediaCodecManager(Handler handler, StreamRecorder recorder) {
         this.handler = handler;
         this.naluChunkAssembler = new NALUChunkAssembler();
+        this.streamRecorder = recorder;
     }
 
     Surface getSurface(){
@@ -201,9 +203,12 @@ public class MediaCodecManager {
 
                     inputBuffer.order(payload.order());
                     final int dataLength = payload.position();
-                    inputBuffer.put(payload.array(), 0, dataLength);
+                    byte[] payloadData = payload.array();
+                    inputBuffer.put(payloadData, 0, dataLength);
 
                     totalLength += dataLength;
+
+                    streamRecorder.onNaluChunkUpdated(payloadData, 0, dataLength);
                 }
 
                 mediaCodec.queueInputBuffer(index, 0, totalLength, naluChunk.presentationTime, naluChunk.flags);

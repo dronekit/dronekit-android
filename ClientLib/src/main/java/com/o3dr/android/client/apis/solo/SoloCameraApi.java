@@ -15,6 +15,9 @@ import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloGoproSetExtend
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloGoproSetRequest;
 import com.o3dr.services.android.lib.model.AbstractCommandListener;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -25,7 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class SoloCameraApi extends SoloApi {
 
-    private static final String TAG = SoloCameraApi.class.getSimpleName();
+    private static final SimpleDateFormat FILE_DATE_FORMAT = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss", Locale.US);
 
     private static final ConcurrentHashMap<Drone, SoloCameraApi> soloCameraApiCache = new ConcurrentHashMap<>();
     private static final Builder<SoloCameraApi> apiBuilder = new Builder<SoloCameraApi>() {
@@ -144,17 +147,22 @@ public class SoloCameraApi extends SoloApi {
         });
     }
 
+    public void startVideoStream(final Surface surface, final String tag, final AbstractCommandListener listener) {
+        startVideoStream(surface, tag, false, listener);
+    }
+
     /**
      * Attempt to grab ownership and start the video stream from the connected drone. Can fail if
      * the video stream is already owned by another client.
      *
      * @param surface  Surface object onto which the video is decoded.
      * @param tag      Video tag.
+     * @param enableLocalRecording  Set to true to enable local recording, false to disable it.
      * @param listener Register a callback to receive update of the command execution status.
      *
      * @since 2.5.0
      */
-    public void startVideoStream(final Surface surface, final String tag, final AbstractCommandListener listener) {
+    public void startVideoStream(final Surface surface, final String tag, final boolean enableLocalRecording, final AbstractCommandListener listener) {
         if (surface == null) {
             postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
             return;
@@ -169,6 +177,13 @@ public class SoloCameraApi extends SoloApi {
                             case CapabilityApi.FEATURE_SUPPORTED:
                                 final Bundle videoProps = new Bundle();
                                 videoProps.putInt(CameraApi.VIDEO_PROPS_UDP_PORT, SOLO_STREAM_UDP_PORT);
+
+                                videoProps.putBoolean(CameraApi.VIDEO_ENABLE_LOCAL_RECORDING, enableLocalRecording);
+                                if(enableLocalRecording){
+                                    String localRecordingFilename = "solo_stream_" + FILE_DATE_FORMAT.format(new Date());
+                                    videoProps.putString(CameraApi.VIDEO_LOCAL_RECORDING_FILENAME, localRecordingFilename);
+                                }
+
                                 cameraApi.startVideoStream(surface, tag, videoProps, listener);
                                 break;
 
