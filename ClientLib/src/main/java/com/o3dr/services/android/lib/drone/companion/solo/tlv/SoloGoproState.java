@@ -410,6 +410,43 @@ public class SoloGoproState extends TLVPacket implements DroneAttribute {
         this.extra5 = (short) in.readInt();
     }
 
+    @Override
+    public String toString() {
+        return "SoloGoproState{" +
+                "batteryRemaining=" + batteryRemaining +
+                ", version=" + version +
+                ", model=" + model +
+                ", status=" + status +
+                ", recording=" + recording +
+                ", captureMode=" + captureMode +
+                ", fov=" + fov +
+                ", videoResolution=" + videoResolution +
+                ", fps=" + fps +
+                ", whiteBalance=" + whiteBalance +
+                ", proTune=" + proTune +
+                ", videoExposure=" + videoExposure +
+                ", photoResolution=" + photoResolution +
+                ", photoExposure=" + photoExposure +
+                ", ntsc_pal=" + ntsc_pal +
+                ", lowLight=" + lowLight +
+                ", spotMeter=" + spotMeter +
+                ", photoRemaining=" + photoRemaining +
+                ", photoTaken=" + photoTaken +
+                ", videoRemaining=" + videoRemaining +
+                ", videoTaken=" + videoTaken +
+                ", color=" + color +
+                ", sharpness=" + sharpness +
+                ", burstShutterRate=" + burstShutterRate +
+                ", continuousShutterSpeed=" + continuousShutterSpeed +
+                ", timeLapseInterval=" + timeLapseInterval +
+                ", extra1=" + extra1 +
+                ", extra2=" + extra2 +
+                ", extra3=" + extra3 +
+                ", extra4=" + extra4 +
+                ", extra5=" + extra5 +
+                '}';
+    }
+
     public static final Creator<SoloGoproState> CREATOR = new Creator<SoloGoproState>() {
         public SoloGoproState createFromParcel(Parcel source) {
             return new SoloGoproState(source);

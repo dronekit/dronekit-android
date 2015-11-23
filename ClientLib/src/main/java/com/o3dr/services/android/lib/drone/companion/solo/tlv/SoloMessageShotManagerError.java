@@ -45,4 +45,11 @@ public class SoloMessageShotManagerError extends TLVPacket {
             return new SoloMessageShotManagerError[size];
         }
     };
+
+    @Override
+    public String toString() {
+        return "SoloMessageShotManagerError{" +
+                "exceptionInfo='" + exceptionInfo + '\'' +
+                '}';
+    }
 }

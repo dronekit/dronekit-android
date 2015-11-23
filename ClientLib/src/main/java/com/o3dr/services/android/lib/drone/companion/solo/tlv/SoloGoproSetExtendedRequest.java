@@ -3,6 +3,7 @@ package com.o3dr.services.android.lib.drone.companion.solo.tlv;
 import android.os.Parcel;
 
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 /**
  * Created by chavi on 11/16/15.
@@ -53,4 +54,11 @@ public class SoloGoproSetExtendedRequest extends TLVPacket {
         }
     };
 
+    @Override
+    public String toString() {
+        return "SoloGoproSetExtendedRequest{" +
+                "command=" + command +
+                ", values=" + Arrays.toString(values) +
+                '}';
+    }
 }
