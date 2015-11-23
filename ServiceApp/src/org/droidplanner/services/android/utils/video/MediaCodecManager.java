@@ -207,9 +207,9 @@ public class MediaCodecManager {
                     inputBuffer.put(payloadData, 0, dataLength);
 
                     totalLength += dataLength;
-
-                    streamRecorder.onNaluChunkUpdated(payloadData, 0, dataLength);
                 }
+
+                streamRecorder.onNaluChunkUpdated(naluChunkAssembler.getParametersSet(), naluChunk);
 
                 mediaCodec.queueInputBuffer(index, 0, totalLength, naluChunk.presentationTime, naluChunk.flags);
             }
