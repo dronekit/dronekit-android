@@ -5,6 +5,7 @@ import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Environment;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.coremedia.iso.boxes.Container;
 import com.googlecode.mp4parser.FileDataSourceImpl;
@@ -32,29 +33,25 @@ class StreamRecorder {
     private final AtomicReference<String> recordingFilename = new AtomicReference<>();
 
     private final File mediaRootDir;
-    private final MediaScannerConnection mediaScanner;
+    private final Context context;
+
+    private final MediaScannerConnection.OnScanCompletedListener scanCompletedListener = new MediaScannerConnection.OnScanCompletedListener() {
+        @Override
+        public void onScanCompleted(String path, Uri uri) {
+            Timber.i("Media file %s was scanned successfully: %s", path, uri);
+        }
+    };
 
     private ExecutorService asyncExecutor;
 
     private BufferedOutputStream h264Writer;
 
     StreamRecorder(Context context) {
+        this.context = context;
         this.mediaRootDir = new File(context.getExternalFilesDir(Environment.DIRECTORY_MOVIES), "stream");
         if (!this.mediaRootDir.exists()) {
             this.mediaRootDir.mkdirs();
         }
-
-        this.mediaScanner = new MediaScannerConnection(context, new MediaScannerConnection.MediaScannerConnectionClient() {
-            @Override
-            public void onMediaScannerConnected() {
-
-            }
-
-            @Override
-            public void onScanCompleted(String path, Uri uri) {
-                Timber.i("Media file %s was scanned successfully: %s", path, uri);
-            }
-        });
     }
 
     String getRecordingFilename(){
@@ -135,22 +132,21 @@ class StreamRecorder {
     }
 
     void convertToMp4(final String filename) {
+        if (TextUtils.isEmpty(filename)) {
+            Timber.w("Invalid media filename.");
+            return;
+        }
+
+        final File rawMedia = new File(mediaRootDir, filename);
+        if (!rawMedia.exists()) {
+            Timber.w("Media file doesn't exists.");
+            return;
+        }
+
         asyncExecutor.execute(new Runnable() {
             @Override
             public void run() {
-                Timber.i("Starting h264 conversion process.");
-
-                Timber.i("Converting media file %s", filename);
-                if (TextUtils.isEmpty(filename)) {
-                    Timber.w("Invalid media filename.");
-                    return;
-                }
-
-                File rawMedia = new File(mediaRootDir, filename);
-                if (!rawMedia.exists()) {
-                    Timber.w("Media file doesn't exists.");
-                    return;
-                }
+                Timber.i("Starting h264 conversion process for media file %s.", filename);
 
                 try {
                     H264TrackImpl h264Track = new H264TrackImpl(new FileDataSourceImpl(rawMedia));
@@ -171,7 +167,8 @@ class StreamRecorder {
 
                     //Add the generated file to the mediastore
                     Timber.i("Adding the generated mp4 file to the media store.");
-                    mediaScanner.scanFile(mp4Media.getAbsolutePath(), null);
+                    MediaScannerConnection.scanFile(context,
+                            new String[]{mp4Media.getAbsolutePath()}, null, scanCompletedListener);
 
                 } catch (IOException e) {
                     Timber.e(e, e.getMessage());
