@@ -126,7 +126,7 @@ public class GenericMavLinkDrone implements MavLinkDrone {
 
         this.attributeListener = listener;
 
-        this.videoMgr = new VideoManager(handler);
+        this.videoMgr = new VideoManager(context, handler);
     }
 
     @Override
@@ -172,8 +172,6 @@ public class GenericMavLinkDrone implements MavLinkDrone {
 
     @Override
     public void destroy(){
-        events.removeAllDroneListeners();
-
         ParameterManager parameterManager = getParameterManager();
         if (parameterManager != null)
             parameterManager.setParameterListener(null);
