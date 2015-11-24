@@ -263,6 +263,43 @@ public class SoloGoproStateV2 extends TLVPacket implements DroneAttribute {
         }
     };
 
+    @Override
+    public String toString() {
+        return "SoloGoproStateV2{" +
+                "captureMode=" + captureMode +
+                ", version=" + version +
+                ", model=" + model +
+                ", status=" + status +
+                ", recording=" + recording +
+                ", ntsc_pal=" + ntsc_pal +
+                ", fov=" + fov +
+                ", videoResolution=" + videoResolution +
+                ", fps=" + fps +
+                ", lowLight=" + lowLight +
+                ", photoResolution=" + photoResolution +
+                ", photoBurstRate=" + photoBurstRate +
+                ", videoProtune=" + videoProtune +
+                ", videoWhiteBalance=" + videoWhiteBalance +
+                ", videoColor=" + videoColor +
+                ", videoGain=" + videoGain +
+                ", videoSharpness=" + videoSharpness +
+                ", videoExposure=" + videoExposure +
+                ", gimbalEnabled=" + gimbalEnabled +
+                ", extra1=" + extra1 +
+                ", extra2=" + extra2 +
+                ", extra3=" + extra3 +
+                ", extra4=" + extra4 +
+                ", extra5=" + extra5 +
+                ", extra6=" + extra6 +
+                ", extra7=" + extra7 +
+                ", extra8=" + extra8 +
+                ", extra9=" + extra9 +
+                ", extra10=" + extra10 +
+                ", extra11=" + extra11 +
+                ", extra12=" + extra12 +
+                '}';
+    }
+
     public byte getFov() {
         return fov;
     }

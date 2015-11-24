@@ -66,4 +66,12 @@ public class SoloGoproSetRequest extends TLVPacket {
             return new SoloGoproSetRequest[size];
         }
     };
+
+    @Override
+    public String toString() {
+        return "SoloGoproSetRequest{" +
+                "command=" + command +
+                ", value=" + value +
+                '}';
+    }
 }
