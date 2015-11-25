@@ -51,6 +51,14 @@ public abstract class TLVPacket implements Parcelable {
     }
 
     @Override
+    public String toString() {
+        return "TLVPacket{" +
+                "messageLength=" + messageLength +
+                ", messageType=" + messageType +
+                '}';
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof TLVPacket)) return false;

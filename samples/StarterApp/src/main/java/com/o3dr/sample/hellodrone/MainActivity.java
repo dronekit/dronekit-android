@@ -492,7 +492,7 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
     }
 
     private void startVideoStream(Surface videoSurface){
-        SoloCameraApi.getApi(drone).startVideoStream(videoSurface, new AbstractCommandListener() {
+        SoloCameraApi.getApi(drone).startVideoStream(videoSurface, "", true, new AbstractCommandListener() {
             @Override
             public void onSuccess() {
                 if(stopVideoStream != null)

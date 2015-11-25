@@ -19,6 +19,7 @@ import com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControl
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSetting;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSettingSetter;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloGoproState;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloGoproStateV2;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloMessageLocation;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
@@ -78,6 +79,7 @@ public class SoloComp implements SoloLinkListener, ControllerLinkListener {
     private SoloCompListener compListener;
 
     private SoloGoproState goproState;
+    private SoloGoproStateV2 goproStateV2;
 
     /**
      * Solo companion computer implementation
@@ -96,6 +98,10 @@ public class SoloComp implements SoloLinkListener, ControllerLinkListener {
 
     public SoloGoproState getGoproState() {
         return goproState;
+    }
+
+    public SoloGoproStateV2 getGoproStateV2(){
+        return goproStateV2;
     }
 
     public boolean hasStreamingPermission(){
@@ -158,6 +164,11 @@ public class SoloComp implements SoloLinkListener, ControllerLinkListener {
             case TLVMessageTypes.TYPE_SOLO_GOPRO_STATE:
                 goproState = (SoloGoproState) packet;
                 Timber.d("Updated gopro state.");
+                break;
+
+            case TLVMessageTypes.TYPE_SOLO_GOPRO_STATE_V2:
+                goproStateV2 = (SoloGoproStateV2) packet;
+                Timber.i("Updated gopro state.");
                 break;
         }
 
