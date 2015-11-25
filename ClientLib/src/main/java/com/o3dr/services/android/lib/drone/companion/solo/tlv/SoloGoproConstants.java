@@ -2,6 +2,8 @@ package com.o3dr.services.android.lib.drone.companion.solo.tlv;
 
 import android.support.annotation.IntDef;
 
+import com.MAVLink.enums.GOPRO_CAPTURE_MODE;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
@@ -14,20 +16,13 @@ import java.lang.annotation.RetentionPolicy;
 public class SoloGoproConstants {
 
     //Private constructor to prevent instantiation.
-    private SoloGoproConstants(){}
-
-
-    @IntDef({POWER, CAPTURE_MODE})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface RequestCommand{}
-
-    public static final short POWER = 0;
-    public static final short CAPTURE_MODE = 1;
-
+    private SoloGoproConstants() {
+    }
 
     @IntDef({STOP_RECORDING, START_RECORDING, TOGGLE_RECORDING})
     @Retention(RetentionPolicy.SOURCE)
-    public @interface RecordCommand{}
+    public @interface RecordCommand {
+    }
 
     public static final int STOP_RECORDING = 0;
     public static final int START_RECORDING = 1;
@@ -35,7 +30,8 @@ public class SoloGoproConstants {
 
     @IntDef({STATUS_NO_GOPRO, STATUS_INCOMPATIBLE_GOPRO, STATUS_GOPRO_CONNECTED, STATUS_ERROR_OVER_TEMPERATURE, STATUS_ERROR_NO_STORAGE})
     @Retention(RetentionPolicy.SOURCE)
-    public @interface GoproStatus{}
+    public @interface GoproStatus {
+    }
 
     public static final byte STATUS_NO_GOPRO = 0;
     public static final byte STATUS_INCOMPATIBLE_GOPRO = 1;
@@ -46,15 +42,18 @@ public class SoloGoproConstants {
 
     @IntDef({RECORDING_OFF, RECORDING_ON})
     @Retention(RetentionPolicy.SOURCE)
-    public @interface RecordingStatus{}
+    public @interface RecordingStatus {
+    }
 
     public static final byte RECORDING_OFF = 0;
     public static final byte RECORDING_ON = 1;
 
 
-    @IntDef({CAPTURE_MODE_VIDEO, CAPTURE_MODE_PHOTO, CAPTURE_MODE_BURST, CAPTURE_MODE_TIME_LAPSE})
+    @IntDef({CAPTURE_MODE_VIDEO, CAPTURE_MODE_PHOTO, CAPTURE_MODE_BURST, CAPTURE_MODE_TIME_LAPSE,
+            CAPTURE_MODE_MULTI_SHOT, CAPTURE_MODE_PLAYBACK, CAPTURE_MODE_SETUP})
     @Retention(RetentionPolicy.SOURCE)
-    public @interface CaptureMode{}
+    public @interface CaptureMode {
+    }
 
     /**
      * Camera video mode.
@@ -76,12 +75,7 @@ public class SoloGoproConstants {
      */
     public static final byte CAPTURE_MODE_TIME_LAPSE = 3;
 
-
-    @IntDef({POWER_OFF, POWER_ON,
-            CAPTURE_MODE_VIDEO, CAPTURE_MODE_PHOTO, CAPTURE_MODE_BURST, CAPTURE_MODE_TIME_LAPSE})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface RequestCommandValue{}
-
-    public static final short POWER_OFF = 0;
-    public static final short POWER_ON = 1;
+    public static final byte CAPTURE_MODE_MULTI_SHOT = 4;
+    public static final byte CAPTURE_MODE_PLAYBACK = 5;
+    public static final byte CAPTURE_MODE_SETUP = 6;
 }

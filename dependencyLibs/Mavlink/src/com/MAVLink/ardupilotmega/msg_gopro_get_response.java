@@ -16,7 +16,7 @@ import com.MAVLink.Messages.MAVLinkPayload;
 public class msg_gopro_get_response extends MAVLinkMessage{
 
     public static final int MAVLINK_MSG_ID_GOPRO_GET_RESPONSE = 217;
-    public static final int MAVLINK_MSG_LENGTH = 2;
+    public static final int MAVLINK_MSG_LENGTH = 6;
     private static final long serialVersionUID = MAVLINK_MSG_ID_GOPRO_GET_RESPONSE;
 
 
@@ -27,9 +27,14 @@ public class msg_gopro_get_response extends MAVLinkMessage{
     public short cmd_id;
     
     /**
+    * Status
+    */
+    public short status;
+    
+    /**
     * Value
     */
-    public short value;
+    public short value[] = new short[4];
     
 
     /**
@@ -44,7 +49,13 @@ public class msg_gopro_get_response extends MAVLinkMessage{
         
         packet.payload.putUnsignedByte(cmd_id);
         
-        packet.payload.putUnsignedByte(value);
+        packet.payload.putUnsignedByte(status);
+        
+        
+        for (int i = 0; i < value.length; i++) {
+            packet.payload.putUnsignedByte(value[i]);
+        }
+                    
         
         return packet;
     }
@@ -59,7 +70,13 @@ public class msg_gopro_get_response extends MAVLinkMessage{
         
         this.cmd_id = payload.getUnsignedByte();
         
-        this.value = payload.getUnsignedByte();
+        this.status = payload.getUnsignedByte();
+        
+        
+        for (int i = 0; i < this.value.length; i++) {
+            this.value[i] = payload.getUnsignedByte();
+        }
+                
         
     }
 
@@ -82,12 +99,12 @@ public class msg_gopro_get_response extends MAVLinkMessage{
         unpack(mavLinkPacket.payload);
     }
 
-        
+          
     /**
     * Returns a string with the MSG name and data
     */
     public String toString(){
-        return "MAVLINK_MSG_ID_GOPRO_GET_RESPONSE -"+" cmd_id:"+cmd_id+" value:"+value+"";
+        return "MAVLINK_MSG_ID_GOPRO_GET_RESPONSE -"+" cmd_id:"+cmd_id+" status:"+status+" value:"+value+"";
     }
 }
         

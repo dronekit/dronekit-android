@@ -517,38 +517,6 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream, DroneInt
                 }
                 return true;
 
-            //**************** CAPABILITY ACTIONS **************//
-            case CapabilityActions.ACTION_CHECK_FEATURE_SUPPORT:
-                if (listener != null) {
-                    String featureId = data.getString(CapabilityActions.EXTRA_FEATURE_ID);
-                    if (!TextUtils.isEmpty(featureId)) {
-                        switch (featureId) {
-
-                            case CapabilityApi.FeatureIds.SOLO_VIDEO_STREAMING:
-                            case CapabilityApi.FeatureIds.COMPASS_CALIBRATION:
-                                if (this.isCompanionComputerEnabled()) {
-                                    CommonApiUtils.postSuccessEvent(listener);
-                                } else {
-                                    CommonApiUtils.postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
-                                }
-                                break;
-
-                            case CapabilityApi.FeatureIds.KILL_SWITCH:
-                                if (CommonApiUtils.isKillSwitchSupported(drone)) {
-                                    CommonApiUtils.postSuccessEvent(listener);
-                                } else {
-                                    CommonApiUtils.postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
-                                }
-                                break;
-
-                            default:
-                                CommonApiUtils.postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
-                                break;
-                        }
-                    }
-                }
-                return true;
-
             //***************** CONTROL ACTIONS *****************//
             case ControlActions.ACTION_ENABLE_MANUAL_CONTROL:
                 if(drone != null){

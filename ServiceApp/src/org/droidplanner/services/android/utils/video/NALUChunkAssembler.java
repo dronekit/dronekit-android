@@ -64,6 +64,13 @@ public class NALUChunkAssembler {
     private int naluCounter = 0;
     private final static long DELTA_PRESENTATION_TIME = 42000L;
 
+    NALUChunk getParametersSet(){
+        if(areParametersSet())
+            return paramsNaluChunk;
+
+        return null;
+    }
+
     NALUChunk assembleNALUChunk(byte[] buffer, int bufferLength) {
 
         //The first 12 bytes are the rtp header.

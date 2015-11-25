@@ -23,6 +23,7 @@ import com.MAVLink.enums.MAV_MODE_FLAG;
 import com.MAVLink.enums.MAV_STATE;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
+import com.o3dr.services.android.lib.drone.action.CapabilityActions;
 import com.o3dr.services.android.lib.drone.action.ControlActions;
 import com.o3dr.services.android.lib.drone.action.ExperimentalActions;
 import com.o3dr.services.android.lib.drone.action.StateActions;
@@ -125,7 +126,7 @@ public class GenericMavLinkDrone implements MavLinkDrone {
 
         this.attributeListener = listener;
 
-        this.videoMgr = new VideoManager(handler);
+        this.videoMgr = new VideoManager(context, handler);
     }
 
     @Override
@@ -171,8 +172,6 @@ public class GenericMavLinkDrone implements MavLinkDrone {
 
     @Override
     public void destroy(){
-        events.removeAllDroneListeners();
-
         ParameterManager parameterManager = getParameterManager();
         if (parameterManager != null)
             parameterManager.setParameterListener(null);
@@ -363,10 +362,34 @@ public class GenericMavLinkDrone implements MavLinkDrone {
                 requestHomeUpdate();
                 return true;
 
+            //**************** CAPABILITY ACTIONS **************//
+            case CapabilityActions.ACTION_CHECK_FEATURE_SUPPORT:
+                return checkFeatureSupport(data, listener);
+
             default:
                 CommonApiUtils.postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
                 return true;
         }
+    }
+
+    private boolean checkFeatureSupport(Bundle data, ICommandListener listener) {
+            String featureId = data.getString(CapabilityActions.EXTRA_FEATURE_ID);
+            if (!TextUtils.isEmpty(featureId)) {
+                if(isFeatureSupported(featureId)){
+                    CommonApiUtils.postSuccessEvent(listener);
+                }else{
+                    CommonApiUtils.postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
+                }
+            }
+            else{
+                CommonApiUtils.postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
+            }
+
+        return true;
+    }
+
+    protected boolean isFeatureSupported(String featureId){
+        return false;
     }
 
     protected boolean enableManualControl(Bundle data, ICommandListener listener) {

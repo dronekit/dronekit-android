@@ -72,4 +72,14 @@ public class ControllerMessageInputReport extends TLVPacket {
             return new ControllerMessageInputReport[size];
         }
     };
+
+    @Override
+    public String toString() {
+        return "ControllerMessageInputReport{" +
+                "battery=" + battery +
+                ", timestamp=" + timestamp +
+                ", gimbalY=" + gimbalY +
+                ", gimbalRate=" + gimbalRate +
+                '}';
+    }
 }

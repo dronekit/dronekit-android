@@ -9,6 +9,7 @@ import android.view.Surface;
 
 import com.MAVLink.common.msg_statustext;
 import com.MAVLink.enums.MAV_TYPE;
+import com.o3dr.android.client.apis.CapabilityApi;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
@@ -103,6 +104,10 @@ public class ArduSolo extends ArduCopter {
                         notifyAttributeListener(SoloEvents.SOLO_GOPRO_STATE_UPDATED);
                         break;
 
+                    case TLVMessageTypes.TYPE_SOLO_GOPRO_STATE_V2:
+                        notifyAttributeListener(SoloEvents.SOLO_GOPRO_STATE_V2_UPDATED);
+                        break;
+
                     default:
                         final Bundle messageInfo = new Bundle();
                         messageInfo.putParcelable(SoloEventExtras.EXTRA_SOLO_MESSAGE_DATA, packet);
@@ -192,6 +197,9 @@ public class ArduSolo extends ArduCopter {
 
             case SoloAttributes.SOLO_GOPRO_STATE:
                 return soloComp.getGoproState();
+
+            case SoloAttributes.SOLO_GOPRO_STATE_V2:
+                return soloComp.getGoproStateV2();
 
             case AttributeType.STATE:
                 final State stateAttr = (State) super.getAttribute(attributeType);
@@ -328,6 +336,20 @@ public class ArduSolo extends ArduCopter {
 
             default:
                 return super.executeAsyncAction(action, listener);
+        }
+    }
+
+    @Override
+    protected boolean isFeatureSupported(String featureId){
+        switch (featureId) {
+
+            case CapabilityApi.FeatureIds.SOLO_VIDEO_STREAMING:
+            case CapabilityApi.FeatureIds.COMPASS_CALIBRATION:
+            case CapabilityApi.FeatureIds.KILL_SWITCH:
+                return true;
+
+            default:
+                return super.isFeatureSupported(featureId);
         }
     }
 

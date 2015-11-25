@@ -4,12 +4,10 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 
+import com.o3dr.android.client.apis.CapabilityApi;
 import com.o3dr.services.android.lib.drone.action.ControlActions;
-import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
-import com.o3dr.services.android.lib.drone.property.Attitude;
 import com.o3dr.services.android.lib.drone.property.Parameter;
-import com.o3dr.services.android.lib.model.AbstractCommandListener;
 import com.o3dr.services.android.lib.model.ICommandListener;
 
 import org.droidplanner.services.android.core.MAVLink.MAVLinkStreams;
@@ -17,7 +15,6 @@ import org.droidplanner.services.android.core.MAVLink.MavLinkCommands;
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
 import org.droidplanner.services.android.core.drone.DroneManager;
 import org.droidplanner.services.android.core.drone.LogMessageListener;
-import org.droidplanner.services.android.core.drone.Preferences;
 import org.droidplanner.services.android.core.drone.profiles.ParameterManager;
 import org.droidplanner.services.android.core.drone.variables.ApmModes;
 import org.droidplanner.services.android.core.drone.variables.State;
@@ -135,5 +132,17 @@ public class ArduCopter extends ArduPilot {
         }
 
         super.notifyDroneEvent(event);
+    }
+
+    @Override
+    protected boolean isFeatureSupported(String featureId){
+        switch(featureId){
+
+            case CapabilityApi.FeatureIds.KILL_SWITCH:
+                return CommonApiUtils.isKillSwitchSupported(this);
+
+            default:
+                return super.isFeatureSupported(featureId);
+        }
     }
 }

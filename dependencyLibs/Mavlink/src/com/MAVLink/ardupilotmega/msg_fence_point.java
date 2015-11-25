@@ -12,7 +12,7 @@ import com.MAVLink.Messages.MAVLinkPayload;
 
 /**
 * A fence point. Used to set a point when from
-	      GCS -> MAV. Also used to return a point from MAV -> GCS
+        GCS -> MAV. Also used to return a point from MAV -> GCS
 */
 public class msg_fence_point extends MAVLinkMessage{
 

@@ -43,7 +43,7 @@ public byte[] generateTestPacket(){
     payload.put((byte)190); //comp id
     payload.put((byte)MAVLINK_MSG_ID_GOPRO_SET_RESPONSE); //msg id
     payload.put((byte)5); //cmd_id
-    payload.put((byte)72); //result
+    payload.put((byte)72); //status
     
     CRC crc = generateCRC(payload.array());
     payload.put((byte)crc.getLSB());

@@ -15,8 +15,10 @@ import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageT
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_GET_BUTTON_SETTING;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_GOPRO_RECORD;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_GOPRO_REQUEST_STATE;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_GOPRO_SET_EXTENDED_REQUEST;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_GOPRO_SET_REQUEST;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_GOPRO_STATE;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_GOPRO_STATE_V2;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_MESSAGE_GET_CURRENT_SHOT;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_MESSAGE_LOCATION;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_MESSAGE_RECORD_POSITION;
@@ -163,8 +165,8 @@ public class TLVMessageParser {
                     }
 
                     case TYPE_SOLO_GOPRO_SET_REQUEST: {
-                        @SoloGoproConstants.RequestCommand final short command = packetBuffer.getShort();
-                        @SoloGoproConstants.RequestCommandValue final short value = packetBuffer.getShort();
+                        final short command = packetBuffer.getShort();
+                        final short value = packetBuffer.getShort();
                         packet = new SoloGoproSetRequest(command, value);
                         break;
                     }
@@ -180,8 +182,21 @@ public class TLVMessageParser {
                         break;
                     }
 
+                    case TYPE_SOLO_GOPRO_STATE_V2:{
+                        packet = new SoloGoproStateV2(packetBuffer);
+                        break;
+                    }
+
                     case TYPE_SOLO_GOPRO_REQUEST_STATE: {
                         packet = new SoloGoproRequestState();
+                        break;
+                    }
+
+                    case TYPE_SOLO_GOPRO_SET_EXTENDED_REQUEST: {
+                        final short command = packetBuffer.getShort();
+                        final byte[] values = new byte[4];
+                        packetBuffer.get(values);
+                        packet = new SoloGoproSetExtendedRequest(command, values);
                         break;
                     }
 
