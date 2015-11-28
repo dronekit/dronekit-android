@@ -48,11 +48,9 @@ import org.droidplanner.services.android.core.MAVLink.MavLinkParameters;
 import org.droidplanner.services.android.core.MAVLink.WaypointManager;
 import org.droidplanner.services.android.core.MAVLink.command.doCmd.MavLinkDoCmds;
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
-import org.droidplanner.services.android.core.drone.DroneManager;
 import org.droidplanner.services.android.core.drone.LogMessageListener;
 import org.droidplanner.services.android.core.drone.autopilot.apm.variables.APMHeartBeat;
 import org.droidplanner.services.android.core.drone.autopilot.generic.GenericMavLinkDrone;
-import org.droidplanner.services.android.core.drone.profiles.ParameterManager;
 import org.droidplanner.services.android.core.drone.variables.ApmModes;
 import org.droidplanner.services.android.core.drone.variables.Camera;
 import org.droidplanner.services.android.core.drone.variables.GuidedPoint;
@@ -196,6 +194,11 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
                 boolean forceModeChange = data.getBoolean(MissionActions.EXTRA_FORCE_MODE_CHANGE);
                 boolean forceArm = data.getBoolean(MissionActions.EXTRA_FORCE_ARM);
                 CommonApiUtils.startMission(this, forceModeChange, forceArm, listener);
+                return true;
+
+            case MissionActions.ACTION_CHANGE_MISSION_SPEED:
+                float missionSpeed = data.getFloat(MissionActions.EXTRA_MISSION_SPEED);
+                MavLinkCommands.changeMissionSpeed(this, missionSpeed, listener);
                 return true;
 
             //EXPERIMENTAL ACTIONS

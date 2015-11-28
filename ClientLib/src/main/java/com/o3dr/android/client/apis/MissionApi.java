@@ -128,4 +128,16 @@ public class MissionApi extends Api {
         else
             return null;
     }
+
+    public void pauseMission(AbstractCommandListener listener) {
+        Bundle params = new Bundle();
+        params.putFloat(EXTRA_MISSION_SPEED, 0);
+        drone.performAsyncActionOnDroneThread(new Action(ACTION_CHANGE_MISSION_SPEED, params), listener);
+    }
+
+    public void setMissionSpeed(float speed, AbstractCommandListener listener) {
+        Bundle params = new Bundle();
+        params.putFloat(EXTRA_MISSION_SPEED, speed);
+        drone.performAsyncActionOnDroneThread(new Action(ACTION_CHANGE_MISSION_SPEED, params), listener);
+    }
 }

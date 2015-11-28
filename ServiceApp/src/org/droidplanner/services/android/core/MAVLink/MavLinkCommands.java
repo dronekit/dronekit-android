@@ -22,6 +22,18 @@ public class MavLinkCommands {
     private static final int MAVLINK_SET_POS_TYPE_MASK_VEL_IGNORE = ((1 << 3) | (1 << 4) | (1 << 5));
     private static final int MAVLINK_SET_POS_TYPE_MASK_ACC_IGNORE = ((1 << 6) | (1 << 7) | (1 << 8));
 
+    public static void changeMissionSpeed(MavLinkDrone drone, float speed, ICommandListener listener) {
+        msg_command_long msg = new msg_command_long();
+        msg.target_system = drone.getSysid();
+        msg.target_component = drone.getCompid();
+        msg.command = MAV_CMD.MAV_CMD_DO_CHANGE_SPEED;
+        msg.param1 = 0; // TODO use correct parameter
+        msg.param2 = speed;
+        msg.param3 = 0; // TODO use correct parameter
+
+        drone.getMavClient().sendMavMessage(msg, listener);
+    }
+
     public static void setGuidedMode(MavLinkDrone drone, double latitude, double longitude, double d) {
         msg_mission_item msg = new msg_mission_item();
         msg.seq = 0;
