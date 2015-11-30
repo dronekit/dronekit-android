@@ -313,6 +313,11 @@ public class GenericMavLinkDrone implements MavLinkDrone {
                 CommonApiUtils.gotoWaypoint(this, missionItemIndex, listener);
                 return true;
 
+            case MissionActions.ACTION_CHANGE_MISSION_SPEED:
+                float missionSpeed = data.getFloat(MissionActions.EXTRA_MISSION_SPEED);
+                MavLinkCommands.changeMissionSpeed(this, missionSpeed, listener);
+                return true;
+
             //STATE ACTIONS
             case StateActions.ACTION_ARM:
                 return performArming(data, listener);

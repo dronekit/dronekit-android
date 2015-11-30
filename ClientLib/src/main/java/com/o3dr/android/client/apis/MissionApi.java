@@ -129,12 +129,25 @@ public class MissionApi extends Api {
             return null;
     }
 
+    /**
+     * Stops the vehicle at the current location. The vehicle will remain in Auto mode
+     * @param listener
+     *
+     * @since 2.8.0
+     */
     public void pauseMission(AbstractCommandListener listener) {
         Bundle params = new Bundle();
         params.putFloat(EXTRA_MISSION_SPEED, 0);
         drone.performAsyncActionOnDroneThread(new Action(ACTION_CHANGE_MISSION_SPEED, params), listener);
     }
 
+    /**
+     * Sets the mission to a specified speed
+     * @param speed Speed to set mission in m/s
+     * @param listener
+     *
+     * @since 2.8.0
+     */
     public void setMissionSpeed(float speed, AbstractCommandListener listener) {
         Bundle params = new Bundle();
         params.putFloat(EXTRA_MISSION_SPEED, speed);

@@ -43,7 +43,6 @@ import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
 
 import org.droidplanner.services.android.core.MAVLink.MAVLinkStreams;
-import org.droidplanner.services.android.core.MAVLink.MavLinkCommands;
 import org.droidplanner.services.android.core.MAVLink.MavLinkParameters;
 import org.droidplanner.services.android.core.MAVLink.WaypointManager;
 import org.droidplanner.services.android.core.MAVLink.command.doCmd.MavLinkDoCmds;
@@ -194,11 +193,6 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
                 boolean forceModeChange = data.getBoolean(MissionActions.EXTRA_FORCE_MODE_CHANGE);
                 boolean forceArm = data.getBoolean(MissionActions.EXTRA_FORCE_ARM);
                 CommonApiUtils.startMission(this, forceModeChange, forceArm, listener);
-                return true;
-
-            case MissionActions.ACTION_CHANGE_MISSION_SPEED:
-                float missionSpeed = data.getFloat(MissionActions.EXTRA_MISSION_SPEED);
-                MavLinkCommands.changeMissionSpeed(this, missionSpeed, listener);
                 return true;
 
             //EXPERIMENTAL ACTIONS
