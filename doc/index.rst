@@ -23,5 +23,6 @@ Contents:
    getting_started
    first_app
    pebble_app
+   contributing_working_with_releases
    resources
 
