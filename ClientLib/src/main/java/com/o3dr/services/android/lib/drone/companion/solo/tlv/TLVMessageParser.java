@@ -11,6 +11,7 @@ import java.util.List;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_ARTOO_INPUT_REPORT_MESSAGE;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_CABLE_CAM_OPTIONS;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_CABLE_CAM_WAYPOINT;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_MULTIPOINT_CABLE_CAM_WAYPOINT;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_FOLLOW_OPTIONS;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_GET_BUTTON_SETTING;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_GOPRO_RECORD;
@@ -151,6 +152,18 @@ public class TLVMessageParser {
                         final float pitch = packetBuffer.getFloat();
 
                         packet = new SoloCableCamWaypoint(latitude, longitude, altitude, degreesYaw, pitch);
+                        break;
+                    }
+
+                    case TYPE_SOLO_MULTIPOINT_CABLE_CAM_WAYPOINT: {
+                        final double latitude = packetBuffer.getDouble();
+                        final double longitude = packetBuffer.getDouble();
+                        final float altitude = packetBuffer.getFloat();
+                        final float degreesYaw = packetBuffer.getFloat();
+                        final float pitch = packetBuffer.getFloat();
+
+                        packet = new SoloMultiPointCableCamWaypoint(latitude, longitude, altitude,
+                                degreesYaw, pitch);
                         break;
                     }
 

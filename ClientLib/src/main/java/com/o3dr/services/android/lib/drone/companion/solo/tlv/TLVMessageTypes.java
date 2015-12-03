@@ -19,6 +19,7 @@ public class TLVMessageTypes {
 
     public static final int TYPE_SOLO_MESSAGE_SHOT_MANAGER_ERROR = 1000;
     public static final int TYPE_SOLO_CABLE_CAM_WAYPOINT = 1001;
+    public static final int TYPE_SOLO_MULTIPOINT_CABLE_CAM_WAYPOINT= 1002;
 
     public static final int TYPE_ARTOO_INPUT_REPORT_MESSAGE = 2003;
 
