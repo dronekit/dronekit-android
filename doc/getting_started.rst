@@ -48,6 +48,7 @@ For an existing app:
        }
 
        dependencies {
+           // Definition for the 3DR Services Client Library
            compile 'com.o3dr.android:dronekit-android:2.3.+'
            ...
        }

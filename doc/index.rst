@@ -24,5 +24,6 @@ Contents:
    first_app
    pebble_app
    contributing_working_with_releases
+   contributing_building_from_source
    resources
 
