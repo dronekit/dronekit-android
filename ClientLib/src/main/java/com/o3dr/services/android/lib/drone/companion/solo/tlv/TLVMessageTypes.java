@@ -29,6 +29,11 @@ public class TLVMessageTypes {
     public static final int TYPE_SOLO_GOPRO_REQUEST_STATE = 5007;
     public static final int TYPE_SOLO_GOPRO_SET_EXTENDED_REQUEST = 5009;
 
+    /*
+    Multi point cable cam message types
+     */
+    public static final int TYPE_SOLO_SPLINE_RECORD = 50;
+
     //Private constructor to prevent instantiation
     private TLVMessageTypes(){}
 }

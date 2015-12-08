@@ -2,6 +2,8 @@ package com.o3dr.services.android.lib.drone.companion.solo.tlv;
 
 import android.util.Log;
 
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.mpcc.SoloSplineRecord;
+
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -27,6 +29,7 @@ import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageT
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SET_BUTTON_SETTING;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SHOT_ERROR;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SHOT_OPTIONS;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SPLINE_RECORD;
 
 /**
  * Utility class to generate tlv packet from received bytes.
@@ -197,6 +200,11 @@ public class TLVMessageParser {
                         final byte[] values = new byte[4];
                         packetBuffer.get(values);
                         packet = new SoloGoproSetExtendedRequest(command, values);
+                        break;
+                    }
+
+                    case TYPE_SOLO_SPLINE_RECORD: {
+                        packet = new SoloSplineRecord();
                         break;
                     }
 
