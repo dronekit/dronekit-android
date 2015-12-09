@@ -8,7 +8,11 @@ import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
 import java.nio.ByteBuffer;
 
 /**
+ * App to Shotmanager
+ * Tells Shotmanager to enter Record mode and clear the current Path.
+ *
  * Created by Fredia Huya-Kouadio on 12/8/15.
+ * @since 2.8.0
  */
 public class SoloSplineRecord extends TLVPacket {
 

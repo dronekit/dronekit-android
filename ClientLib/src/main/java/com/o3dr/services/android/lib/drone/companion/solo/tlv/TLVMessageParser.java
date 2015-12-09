@@ -3,8 +3,10 @@ package com.o3dr.services.android.lib.drone.companion.solo.tlv;
 import android.util.Log;
 
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.mpcc.SoloSplinePlay;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.mpcc.SoloSplinePlaybackStatus;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.mpcc.SoloSplinePoint;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.mpcc.SoloSplineRecord;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.mpcc.SoloSplineSeek;
 
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
@@ -32,8 +34,10 @@ import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageT
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SHOT_ERROR;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SHOT_OPTIONS;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SPLINE_PLAY;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SPLINE_PLAYBACK_STATUS;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SPLINE_POINT;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SPLINE_RECORD;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SPLINE_SEEK;
 
 /**
  * Utility class to generate tlv packet from received bytes.
@@ -219,6 +223,16 @@ public class TLVMessageParser {
 
                     case TYPE_SOLO_SPLINE_POINT:{
                         packet = new SoloSplinePoint(packetBuffer);
+                        break;
+                    }
+
+                    case TYPE_SOLO_SPLINE_SEEK:{
+                        packet = new SoloSplineSeek(packetBuffer);
+                        break;
+                    }
+
+                    case TYPE_SOLO_SPLINE_PLAYBACK_STATUS:{
+                        packet = new SoloSplinePlaybackStatus(packetBuffer);
                         break;
                     }
 

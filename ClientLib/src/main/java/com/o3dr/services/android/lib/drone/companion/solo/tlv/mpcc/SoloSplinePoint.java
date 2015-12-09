@@ -9,12 +9,30 @@ import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
 import java.nio.ByteBuffer;
 
 /**
+ * Bidirectional
+ * <p/>
+ * Used to transmit proposed or actual Keypoints on the current camera Path.
+ * <p/>
+ * Shotmanager uses this message for two things:
+ * To transmit Keypoints it creates in response to Artoo button presses or SOLO_MESSAGE_RECORD_POSITION messages.
+ * To confirm the validity of Keypoints it receives from the app;  to ACK those Keypoints.
+ * <p/>
+ * When shotmanager creates a Keypoint, it assigns an index.  When the app receives this message and a Keypoint with the index already exists, it updates the Keypoint to the values in this message;  it replaces the existing Keypoint.
+ * <p/>
+ * The app uses this message to load Keypoints from previously recorded, known valid Paths into shotmanager.
+ * <p/>
+ * In every case, shotmanager sends a SOLO_SPLINE_POINT message back to the app to confirm it was able to create the Keypoint.  If it can't create the Keypoint, it sends a failure status.
+ * <p/>
+ * <p/>
  * Created by Fredia Huya-Kouadio on 12/8/15.
+ *
+ * @since 2.8.0
  */
 public class SoloSplinePoint extends TLVPacket {
 
     public static final int MESSAGE_LENGTH = 38;
 
+    public static final short STATUS_SUCCESS = 0;
     public static final short STATUS_MODE_ERROR = -1; //tried setting a spline point when we were already in PLAY mode
     public static final short STATUS_KEYPOINTS_TOO_CLOSE_ERROR = -2; //Keypoint too close to a previous keypoint
     public static final short STATUS_DUPLICATE_INDEX_ERROR = -3; //Received multiple keypoints for a single index.
@@ -24,7 +42,20 @@ public class SoloSplinePoint extends TLVPacket {
 
     private float pitch;
     private float yaw;
+
+    /**
+     * Parametric offset of the Keypoint along the Path.
+     * In Record mode, these values have no meaning since they can't be assigned until the Path is complete.
+     * In Play mode, shotmanager assigns these values and sends messages to the app.
+     * The app never creates these values.
+     */
     private float uPosition;
+
+    /**
+     * Shotmanager sends this value to indicate success or failure when creating a Keypoint.
+     * Negative values are failure;
+     * 0 or positive is success.
+     */
     private short status;
 
     public SoloSplinePoint(int index, LatLongAlt coordinate, float pitch, float yaw, float uPosition, short status) {
