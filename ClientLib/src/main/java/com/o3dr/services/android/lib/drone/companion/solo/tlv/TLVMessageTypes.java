@@ -33,6 +33,7 @@ public class TLVMessageTypes {
     Multi point cable cam message types
      */
     public static final int TYPE_SOLO_SPLINE_RECORD = 50;
+    public static final int TYPE_SOLO_SPLINE_PLAY = 51;
 
     //Private constructor to prevent instantiation
     private TLVMessageTypes(){}
