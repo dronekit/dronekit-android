@@ -34,6 +34,7 @@ public class TLVMessageTypes {
      */
     public static final int TYPE_SOLO_SPLINE_RECORD = 50;
     public static final int TYPE_SOLO_SPLINE_PLAY = 51;
+    public static final int TYPE_SOLO_SPLINE_POINT = 52;
 
     //Private constructor to prevent instantiation
     private TLVMessageTypes(){}

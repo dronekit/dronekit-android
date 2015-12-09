@@ -3,6 +3,7 @@ package com.o3dr.services.android.lib.drone.companion.solo.tlv;
 import android.util.Log;
 
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.mpcc.SoloSplinePlay;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.mpcc.SoloSplinePoint;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.mpcc.SoloSplineRecord;
 
 import java.nio.BufferUnderflowException;
@@ -31,6 +32,7 @@ import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageT
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SHOT_ERROR;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SHOT_OPTIONS;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SPLINE_PLAY;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SPLINE_POINT;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SPLINE_RECORD;
 
 /**
@@ -212,6 +214,11 @@ public class TLVMessageParser {
 
                     case TYPE_SOLO_SPLINE_PLAY: {
                         packet = new SoloSplinePlay();
+                        break;
+                    }
+
+                    case TYPE_SOLO_SPLINE_POINT:{
+                        packet = new SoloSplinePoint(packetBuffer);
                         break;
                     }
 
