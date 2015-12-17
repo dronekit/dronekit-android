@@ -29,6 +29,8 @@ Once you have the simulated vehicle running, enter the following commands (you o
        STABILIZE>param set ARMING_CHECK 0
 
 
+.. _getting_started_setting_up_android_studio_project:
+
 Setting up your Android Studio Project
 ======================================
 
@@ -49,7 +51,7 @@ For an existing app:
 
        dependencies {
            // Definition for the 3DR Services Client Library
-           compile 'com.o3dr.android:dronekit-android:2.3.+'
+           compile 'com.o3dr.android:dronekit-android:2.7.+'
            ...
        }
 

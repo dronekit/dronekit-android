@@ -2,8 +2,8 @@
 Building DroneKit-Android from Source
 =====================================
 
-Developers who want to contribute to DroneKit-Android will need to to modify and build the 
-*3DR Services* (**ServiceApp**) source code, which contains the DroneKit-Android client library (**ClientLib**).
+Developers who want to contribute to DroneKit-Android will need to modify and build the 
+*3DR Services* source code, which contains the DroneKit-Android client library (**ClientLib**).
 
 The build process creates a 
 `.aar file <https://sites.google.com/a/android.com/tools/tech-docs/new-build-system/aar-format>`_ 

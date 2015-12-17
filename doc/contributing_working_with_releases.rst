@@ -39,23 +39,19 @@ Installation steps
        List of devices attached
        3204672ab49bc1f5        device
 
-#. Download the `adk file/release of interest <https://github.com/dronekit/dronekit-android/releases>`_ and install it.
-   For example, running adb from the **platform-tools** directory, we might install a file as shown
+#. Download the `adk file/release of interest <https://github.com/dronekit/dronekit-android/releases>`_ and install it 
+   (replacing any exciting version). For example, running adb from the **platform-tools** directory, 
+   we might install a file as shown
 
    
    .. code-block:: bash
    
-       > adb install D:\MyFiles\3dr-services-release.104022.apk
+       > adb install -r D:\MyFiles\3dr-services-release.104022.apk
        
        5331 KB/s (3762561 bytes in 0.689s)
                pkg: /data/local/tmp/3dr-services-release.104022.apk
        Success
-       
-   .. note:: 
-   
-       Installation will fail if a version of the file already exists. 
-       If you need to install a new version, manually uninstall the old
-       version first/.
+
 
 After installation the *3DR Services* app icon will appear on your device. You can confirm the version is 
 correct by viewing the version string in the app footer.
