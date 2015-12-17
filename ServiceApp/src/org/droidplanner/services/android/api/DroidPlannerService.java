@@ -276,6 +276,17 @@ public class DroidPlannerService extends Service {
                     Timber.d("Connecting over udp.");
                     break;
 
+                case ConnectionType.TYPE_SOLO:{
+                    final String soloLinkId = paramsBundle.getString(ConnectionType.EXTRA_SOLO_LINK_ID, null);
+                    if(TextUtils.isEmpty(soloLinkId)){
+                        Timber.e("Invalid sololink id %s", soloLinkId);
+                        return;
+                    }
+
+
+                    break;
+                }
+
                 default:
                     Timber.e("Unrecognized connection type: %s", connectionType);
                     return;
