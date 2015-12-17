@@ -121,36 +121,36 @@ public class DroneManager implements DataStreams.DataInputStream<MAVLinkPacket>,
             case ARDU_COPTER:
                 if (isCompanionComputerEnabled()) {
                     Timber.i("Instantiating ArduSolo autopilot.");
-                    this.drone = new ArduSolo(context, mavClient, handler, new AndroidApWarningParser(), this, this);
+                    this.drone = new ArduSolo(context, mavClient, handler, new AndroidApWarningParser(), this);
                 } else {
                     Timber.i("Instantiating ArduCopter autopilot.");
-                    this.drone = new ArduCopter(context, mavClient, handler, new AndroidApWarningParser(), this, this);
+                    this.drone = new ArduCopter(context, mavClient, handler, new AndroidApWarningParser(), this);
                 }
                 break;
 
             case ARDU_SOLO:
                 Timber.i("Instantiating ArduCopter autopilot.");
-                this.drone = new ArduSolo(context, mavClient, handler, new AndroidApWarningParser(), this, this);
+                this.drone = new ArduSolo(context, mavClient, handler, new AndroidApWarningParser(), this);
                 break;
 
             case ARDU_PLANE:
                 Timber.i("Instantiating ArduPlane autopilot.");
-                this.drone = new ArduPlane(context, mavClient, handler, new AndroidApWarningParser(), this, this);
+                this.drone = new ArduPlane(context, mavClient, handler, new AndroidApWarningParser(), this);
                 break;
 
             case ARDU_ROVER:
                 Timber.i("Instantiating ArduPlane autopilot.");
-                this.drone = new ArduRover(context, mavClient, handler, new AndroidApWarningParser(), this, this);
+                this.drone = new ArduRover(context, mavClient, handler, new AndroidApWarningParser(), this);
                 break;
 
             case PX4_NATIVE:
                 Timber.i("Instantiating PX4 Native autopilot.");
-                this.drone = new Px4Native(context, handler, mavClient, new AndroidApWarningParser(), this, this);
+                this.drone = new Px4Native(context, handler, mavClient, new AndroidApWarningParser(), this);
                 break;
 
             case GENERIC:
                 Timber.i("Instantiating Generic mavlink autopilot.");
-                this.drone = new GenericMavLinkDrone(context, handler, mavClient, new AndroidApWarningParser(), this, this);
+                this.drone = new GenericMavLinkDrone(context, handler, mavClient, new AndroidApWarningParser(), this);
                 break;
         }
 
@@ -165,6 +165,7 @@ public class DroneManager implements DataStreams.DataInputStream<MAVLinkPacket>,
         }
 
         drone.addDroneListener(this);
+        drone.setAttributeListener(this);
 
         ParameterManager parameterManager = drone.getParameterManager();
         if (parameterManager != null) {
@@ -458,15 +459,6 @@ public class DroneManager implements DataStreams.DataInputStream<MAVLinkPacket>,
         Bundle data = action.getData();
 
         switch (type) {
-            // MISSION ACTIONS
-            case MissionActions.ACTION_GENERATE_DRONIE:
-                float bearing = CommonApiUtils.generateDronie(drone);
-                if (bearing != -1) {
-                    Bundle bundle = new Bundle(1);
-                    bundle.putFloat(AttributeEventExtra.EXTRA_MISSION_DRONIE_BEARING, bearing);
-                    notifyDroneAttributeEvent(AttributeEvent.MISSION_DRONIE_CREATED, bundle);
-                }
-                return true;
 
             //FOLLOW-ME ACTIONS
             case FollowMeActions.ACTION_ENABLE_FOLLOW_ME:

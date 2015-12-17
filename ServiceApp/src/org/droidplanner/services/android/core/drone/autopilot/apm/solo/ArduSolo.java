@@ -7,6 +7,7 @@ import android.os.RemoteException;
 import android.text.TextUtils;
 import android.view.Surface;
 
+import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.common.msg_statustext;
 import com.MAVLink.enums.MAV_TYPE;
 import com.o3dr.android.client.apis.CapabilityApi;
@@ -69,9 +70,9 @@ public class ArduSolo extends ArduCopter {
 
     private final SoloComp soloComp;
 
-    public ArduSolo(Context context, DataStreams.DataOutputStream mavClient, Handler handler,
-                    AutopilotWarningParser warningParser, LogMessageListener logListener, DroneInterfaces.AttributeEventListener listener) {
-        super(context, mavClient, handler, warningParser, logListener, listener);
+    public ArduSolo(Context context, DataStreams.DataOutputStream<MAVLinkMessage> mavClient, Handler handler,
+                    AutopilotWarningParser warningParser, LogMessageListener logListener) {
+        super(context, mavClient, handler, warningParser, logListener);
         this.soloComp = new SoloComp(context, handler);
         this.soloComp.setListener(new SoloComp.SoloCompListener() {
             @Override

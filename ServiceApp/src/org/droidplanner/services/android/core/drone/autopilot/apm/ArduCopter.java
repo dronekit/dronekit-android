@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 
+import com.MAVLink.Messages.MAVLinkMessage;
 import com.o3dr.android.client.apis.CapabilityApi;
 import com.o3dr.services.android.lib.drone.action.ControlActions;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
@@ -31,8 +32,8 @@ public class ArduCopter extends ArduPilot {
 
     private final ConcurrentHashMap<String, ICommandListener> manualControlStateListeners = new ConcurrentHashMap<>();
 
-    public ArduCopter(Context context, DataStreams.DataOutputStream mavClient, Handler handler, AutopilotWarningParser warningParser, LogMessageListener logListener, DroneInterfaces.AttributeEventListener listener) {
-        super(context, mavClient, handler, warningParser, logListener, listener);
+    public ArduCopter(Context context, DataStreams.DataOutputStream<MAVLinkMessage> mavClient, Handler handler, AutopilotWarningParser warningParser, LogMessageListener logListener) {
+        super(context, mavClient, handler, warningParser, logListener);
     }
 
     @Override

@@ -3,6 +3,7 @@ package org.droidplanner.services.android.core.drone.autopilot.apm;
 import android.content.Context;
 import android.os.Handler;
 
+import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.common.msg_global_position_int;
 import com.MAVLink.common.msg_vfr_hud;
 import com.MAVLink.enums.MAV_TYPE;
@@ -18,8 +19,8 @@ import org.droidplanner.services.android.core.model.AutopilotWarningParser;
  */
 public class ArduPlane extends ArduPilot {
 
-    public ArduPlane(Context context, DataStreams.DataOutputStream mavClient, Handler handler, AutopilotWarningParser warningParser, LogMessageListener logListener, DroneInterfaces.AttributeEventListener listener) {
-        super(context, mavClient, handler, warningParser, logListener, listener);
+    public ArduPlane(Context context, DataStreams.DataOutputStream<MAVLinkMessage> mavClient, Handler handler, AutopilotWarningParser warningParser, LogMessageListener logListener) {
+        super(context, mavClient, handler, warningParser, logListener);
     }
 
     @Override

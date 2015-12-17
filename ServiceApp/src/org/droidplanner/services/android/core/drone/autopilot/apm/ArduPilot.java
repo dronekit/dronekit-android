@@ -83,11 +83,11 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
 
     private final MagnetometerCalibrationImpl magCalibration;
 
-    public ArduPilot(Context context, DataStreams.DataOutputStream mavClient,
+    public ArduPilot(Context context, DataStreams.DataOutputStream<MAVLinkMessage> mavClient,
                      Handler handler, AutopilotWarningParser warningParser,
-                     LogMessageListener logListener, DroneInterfaces.AttributeEventListener listener) {
+                     LogMessageListener logListener) {
 
-        super(context, handler, mavClient, warningParser, logListener, listener);
+        super(context, handler, mavClient, warningParser, logListener);
 
         this.waypointManager = new WaypointManager(this, handler);
 

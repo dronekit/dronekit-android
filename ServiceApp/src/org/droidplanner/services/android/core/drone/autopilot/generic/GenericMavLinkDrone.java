@@ -28,6 +28,7 @@ import com.o3dr.services.android.lib.drone.action.ControlActions;
 import com.o3dr.services.android.lib.drone.action.ExperimentalActions;
 import com.o3dr.services.android.lib.drone.action.StateActions;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
+import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.drone.mission.action.MissionActions;
@@ -82,7 +83,7 @@ import org.droidplanner.services.android.utils.video.VideoManager;
  */
 public class GenericMavLinkDrone implements MavLinkDrone {
 
-    private final DataStreams.DataOutputStream mavClient;
+    private final DataStreams.DataOutputStream<MAVLinkMessage> mavClient;
 
     protected final VideoManager videoMgr;
 
@@ -95,7 +96,7 @@ public class GenericMavLinkDrone implements MavLinkDrone {
     private final LogMessageListener logListener;
     private final MissionStats missionStats;
 
-    private final DroneInterfaces.AttributeEventListener attributeListener;
+    private DroneInterfaces.AttributeEventListener attributeListener;
 
     private final Home vehicleHome = new Home();
     private final Gps vehicleGps = new Gps();
@@ -109,8 +110,8 @@ public class GenericMavLinkDrone implements MavLinkDrone {
 
     protected final Handler handler;
 
-    public GenericMavLinkDrone(Context context, Handler handler, DataStreams.DataOutputStream mavClient,
-                               AutopilotWarningParser warningParser, LogMessageListener logListener, DroneInterfaces.AttributeEventListener listener) {
+    public GenericMavLinkDrone(Context context, Handler handler, DataStreams.DataOutputStream<MAVLinkMessage> mavClient,
+                               AutopilotWarningParser warningParser, LogMessageListener logListener) {
         this.handler = handler;
         this.mavClient = mavClient;
 
@@ -124,9 +125,12 @@ public class GenericMavLinkDrone implements MavLinkDrone {
         this.state = new State(this, handler, warningParser);
         parameterManager = new ParameterManager(this, context, handler);
 
-        this.attributeListener = listener;
-
         this.videoMgr = new VideoManager(context, handler);
+    }
+
+    @Override
+    public void setAttributeListener(DroneInterfaces.AttributeEventListener attributeListener) {
+        this.attributeListener = attributeListener;
     }
 
     @Override
@@ -308,6 +312,15 @@ public class GenericMavLinkDrone implements MavLinkDrone {
 
         switch (type) {
             //MISSION ACTIONS
+            case MissionActions.ACTION_GENERATE_DRONIE:
+                float bearing = CommonApiUtils.generateDronie(this);
+                if (bearing != -1) {
+                    Bundle bundle = new Bundle(1);
+                    bundle.putFloat(AttributeEventExtra.EXTRA_MISSION_DRONIE_BEARING, bearing);
+                    notifyAttributeListener(AttributeEvent.MISSION_DRONIE_CREATED, bundle);
+                }
+                return true;
+
             case MissionActions.ACTION_GOTO_WAYPOINT:
                 int missionItemIndex = data.getInt(MissionActions.EXTRA_MISSION_ITEM_INDEX);
                 CommonApiUtils.gotoWaypoint(this, missionItemIndex, listener);
