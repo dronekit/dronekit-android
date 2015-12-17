@@ -245,8 +245,10 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream, DroneInt
      * @return True if we can expect to find a companion computer on the connected channel.
      */
     private boolean isCompanionComputerEnabled() {
+        final int connectionType = connectionParameter.getConnectionType();
+
         return drone instanceof ArduSolo
-                || this.connectionParameter.getConnectionType() == ConnectionType.TYPE_UDP
+                || connectionType == ConnectionType.TYPE_UDP || connectionType == ConnectionType.TYPE_SOLO
                 && SoloComp.isAvailable(context)
                 && doAnyListenersSupportSoloLinkApi();
 

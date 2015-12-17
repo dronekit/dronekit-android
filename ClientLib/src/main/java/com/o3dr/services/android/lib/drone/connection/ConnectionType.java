@@ -78,4 +78,15 @@ public class ConnectionType {
      */
     public static final String EXTRA_BLUETOOTH_ADDRESS = "extra_bluetooth_address";
 
+    /**
+     * Solo vehicle connection type
+     */
+    public static final int TYPE_SOLO = 101;
+
+    /**
+     * Used to retrieve the id (wifi ssid) of the solo vehicle link.
+     * If this argument is null/empty, 3DR Services will pop up a dialog listing the available solo link ids.
+     */
+    public static final String EXTRA_SOLO_LINK_ID = "extra_solo_link_id";
+
 }

@@ -13,6 +13,12 @@ public class ConnectionParameter implements Parcelable {
     private final Bundle paramsBundle;
     private final DroneSharePrefs droneSharePrefs;
 
+    public ConnectionParameter(int connectionType, Bundle paramsBundle){
+        this.connectionType = connectionType;
+        this.paramsBundle = paramsBundle;
+        this.droneSharePrefs = null;
+    }
+
     public ConnectionParameter(int connectionType, Bundle paramsBundle, DroneSharePrefs droneSharePrefs){
         this.connectionType = connectionType;
         this.paramsBundle = paramsBundle;
@@ -65,6 +71,14 @@ public class ConnectionParameter implements Parcelable {
 
             case ConnectionType.TYPE_USB:
                 uniqueId = "usb";
+                break;
+
+            case ConnectionType.TYPE_SOLO:
+                String soloLinkId = null;
+                if(paramsBundle != null){
+                    soloLinkId = paramsBundle.getString(ConnectionType.EXTRA_SOLO_LINK_ID, "");
+                }
+                uniqueId = "solo." + soloLinkId;
                 break;
 
             default:
