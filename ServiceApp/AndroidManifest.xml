@@ -102,8 +102,6 @@
             android:enabled="false"
             android:exported="false"/>
 
-        <service android:name=".communication.service.UploaderService"/>
-
         <service
             android:name=".api.DroidPlannerService"
             android:enabled="true"
@@ -117,14 +115,6 @@
                 android:name="com.o3dr.dronekit.android.core.version"
                 android:value="@integer/core_lib_version"/>
         </service>
-
-        <receiver
-            android:name=".communication.service.NetworkConnectivityReceiver"
-            android:enabled="false">
-            <intent-filter>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
-            </intent-filter>
-        </receiver>
 
         <receiver
             android:name=".utils.apps.AppsUpdateReceiver">
