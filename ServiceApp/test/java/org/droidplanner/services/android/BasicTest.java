@@ -16,6 +16,7 @@ import org.droidplanner.services.android.core.drone.DroneInterfaces;
 import org.droidplanner.services.android.core.drone.LogMessageListener;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.core.drone.autopilot.apm.ArduCopter;
+import org.droidplanner.services.android.core.firmware.FirmwareType;
 import org.droidplanner.services.android.mock.MockMAVLinkClient;
 import org.droidplanner.services.android.utils.AndroidApWarningParser;
 import org.junit.Assert;
@@ -65,17 +66,12 @@ public class BasicTest {
     public void setUp() throws Exception {
         final Context context = RuntimeEnvironment.application.getApplicationContext();
 
-        ConnectionParameter connParams = new ConnectionParameter(0, new Bundle(), null);
+        ConnectionParameter connParams = new ConnectionParameter(0, new Bundle());
         mavClient = new MockMAVLinkClient(context, inputStreamListener, connParams);
 
-        drone = new ArduCopter(context, mavClient, dpHandler, new AndroidApWarningParser(), new LogMessageListener() {
+        drone = new ArduCopter("test:" + FirmwareType.ARDU_COPTER.getType(), context, mavClient, dpHandler, new AndroidApWarningParser(), new LogMessageListener() {
             @Override
             public void onMessageLogged(int logLevel, String message) {
-
-            }
-        }, new DroneInterfaces.AttributeEventListener() {
-            @Override
-            public void onAttributeEvent(String attributeEvent, Bundle eventInfo, boolean checkForSololinkApi) {
 
             }
         });
