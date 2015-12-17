@@ -22,7 +22,6 @@ import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionType;
-import com.o3dr.services.android.lib.drone.connection.DroneSharePrefs;
 import com.o3dr.services.android.lib.drone.mission.action.MissionActions;
 import com.o3dr.services.android.lib.drone.property.DroneAttribute;
 import com.o3dr.services.android.lib.drone.property.Parameter;
@@ -33,9 +32,7 @@ import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
 
 import org.droidplanner.services.android.api.DroneApi;
-import org.droidplanner.services.android.communication.connection.DroneshareClient;
 import org.droidplanner.services.android.communication.service.MAVLinkClient;
-import org.droidplanner.services.android.communication.service.UploaderService;
 import org.droidplanner.services.android.communication.model.DataStreams;
 import org.droidplanner.services.android.core.MAVLink.MavLinkMsgHandler;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
@@ -43,9 +40,9 @@ import org.droidplanner.services.android.core.drone.autopilot.apm.ArduCopter;
 import org.droidplanner.services.android.core.drone.autopilot.apm.ArduPlane;
 import org.droidplanner.services.android.core.drone.autopilot.apm.ArduRover;
 import org.droidplanner.services.android.core.drone.autopilot.apm.solo.ArduSolo;
+import org.droidplanner.services.android.core.drone.autopilot.apm.solo.SoloComp;
 import org.droidplanner.services.android.core.drone.autopilot.generic.GenericMavLinkDrone;
 import org.droidplanner.services.android.core.drone.autopilot.px4.Px4Native;
-import org.droidplanner.services.android.core.drone.autopilot.apm.solo.SoloComp;
 import org.droidplanner.services.android.core.drone.profiles.ParameterManager;
 import org.droidplanner.services.android.core.drone.variables.StreamRates;
 import org.droidplanner.services.android.core.drone.variables.calibration.MagnetometerCalibrationImpl;
@@ -81,7 +78,6 @@ public class DroneManager implements DataStreams.DataInputStream<MAVLinkPacket>,
     private static final int SOLOLINK_API_MIN_VERSION = 20412;
 
     private final ConcurrentHashMap<String, DroneApi> connectedApps = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<String, DroneshareClient> tlogUploaders = new ConcurrentHashMap<>();
 
     private final Context context;
     private final Handler handler;
@@ -193,7 +189,6 @@ public class DroneManager implements DataStreams.DataInputStream<MAVLinkPacket>,
         destroyAutopilot();
 
         connectedApps.clear();
-        tlogUploaders.clear();
 
         if (followMe != null && followMe.isEnabled())
             followMe.toggleFollowMeState();
@@ -288,29 +283,6 @@ public class DroneManager implements DataStreams.DataInputStream<MAVLinkPacket>,
     private void notifyConnected(String appId, DroneApi listener) {
         if (TextUtils.isEmpty(appId) || listener == null)
             return;
-
-        DroneSharePrefs droneSharePrefs = listener.getDroneSharePrefs();
-
-        //TODO: restore live upload functionality when issue
-        // 'https://github.com/diydrones/droneapi-java/issues/2' is fixed.
-        boolean isLiveUploadEnabled = false; //droneSharePrefs.isLiveUploadEnabled();
-        if (droneSharePrefs != null && isLiveUploadEnabled && droneSharePrefs.areLoginCredentialsSet()) {
-
-            Log.i(TAG, "Starting live upload for " + appId);
-            try {
-                DroneshareClient uploader = tlogUploaders.get(appId);
-                if (uploader == null) {
-                    uploader = new DroneshareClient();
-                    tlogUploaders.put(appId, uploader);
-                }
-
-                uploader.connect(droneSharePrefs.getUsername(), droneSharePrefs.getPassword());
-            } catch (Exception e) {
-                Log.e(TAG, "DroneShare uploader error for " + appId, e);
-            }
-        } else {
-            Log.i(TAG, "Skipping live upload for " + appId);
-        }
     }
 
     @Override
@@ -328,36 +300,9 @@ public class DroneManager implements DataStreams.DataInputStream<MAVLinkPacket>,
         }
     }
 
-    public void kickStartDroneShareUpload() {
-        // See if we can at least do a delayed upload
-        if (!connectedApps.isEmpty()) {
-            for (Map.Entry<String, DroneApi> entry : connectedApps.entrySet()) {
-                kickStartDroneShareUpload(entry.getKey(), entry.getValue().getDroneSharePrefs());
-            }
-        }
-    }
-
-    private void kickStartDroneShareUpload(String appId, DroneSharePrefs prefs) {
-        if (TextUtils.isEmpty(appId) || prefs == null)
-            return;
-
-        UploaderService.kickStart(context, appId, prefs);
-    }
-
     private void notifyDisconnected(String appId, DroneApi listener) {
         if (TextUtils.isEmpty(appId) || listener == null)
             return;
-
-        kickStartDroneShareUpload(appId, listener.getDroneSharePrefs());
-
-        DroneshareClient uploader = tlogUploaders.remove(appId);
-        if (uploader != null) {
-            try {
-                uploader.close();
-            } catch (Exception e) {
-                Log.e(TAG, "Error while closing the drone share upload handler.", e);
-            }
-        }
     }
 
     @Override
@@ -404,17 +349,6 @@ public class DroneManager implements DataStreams.DataInputStream<MAVLinkPacket>,
         if (!connectedApps.isEmpty()) {
             for (DroneApi droneEventsListener : connectedApps.values()) {
                 droneEventsListener.onReceivedMavLinkMessage(receivedMsg);
-            }
-        }
-
-        if (!tlogUploaders.isEmpty()) {
-            byte[] packetData = packet.encodePacket();
-            for (DroneshareClient uploader : tlogUploaders.values()) {
-                try {
-                    uploader.filterMavlink(uploader.interfaceNum, packetData);
-                } catch (Exception e) {
-                    Log.e(TAG, e.getMessage(), e);
-                }
             }
         }
     }
@@ -506,11 +440,10 @@ public class DroneManager implements DataStreams.DataInputStream<MAVLinkPacket>,
 
             //***************** CONTROL ACTIONS *****************//
             case ControlActions.ACTION_ENABLE_MANUAL_CONTROL:
-                if(drone != null){
+                if (drone != null) {
                     action.getData().putString(EXTRA_CLIENT_APP_ID, clientInfo.appId);
                     drone.executeAsyncAction(action, listener);
-                }
-                else{
+                } else {
                     CommonApiUtils.postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
                 }
                 return true;
