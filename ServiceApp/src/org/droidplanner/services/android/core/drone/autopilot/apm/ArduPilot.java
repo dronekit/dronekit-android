@@ -42,7 +42,7 @@ import com.o3dr.services.android.lib.model.AbstractCommandListener;
 import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
 
-import org.droidplanner.services.android.communication.model.DataStreams;
+import org.droidplanner.services.android.communication.model.DataLink;
 import org.droidplanner.services.android.core.MAVLink.MavLinkParameters;
 import org.droidplanner.services.android.core.MAVLink.WaypointManager;
 import org.droidplanner.services.android.core.MAVLink.command.doCmd.MavLinkDoCmds;
@@ -83,11 +83,11 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
 
     private final MagnetometerCalibrationImpl magCalibration;
 
-    public ArduPilot(Context context, DataStreams.DataOutputStream<MAVLinkMessage> mavClient,
+    public ArduPilot(String droneId, Context context, DataLink.DataLinkProvider<MAVLinkMessage> mavClient,
                      Handler handler, AutopilotWarningParser warningParser,
                      LogMessageListener logListener) {
 
-        super(context, handler, mavClient, warningParser, logListener);
+        super(droneId, context, handler, mavClient, warningParser, logListener);
 
         this.waypointManager = new WaypointManager(this, handler);
 

@@ -16,11 +16,11 @@ import org.droidplanner.services.android.communication.connection.AndroidTcpConn
 import org.droidplanner.services.android.communication.connection.AndroidUdpConnection;
 import org.droidplanner.services.android.communication.connection.BluetoothConnection;
 import org.droidplanner.services.android.communication.connection.usb.UsbConnection;
-import org.droidplanner.services.android.communication.model.DataStreams;
+import org.droidplanner.services.android.communication.model.DataLink;
 import org.droidplanner.services.android.core.MAVLink.connection.MavLinkConnection;
 import org.droidplanner.services.android.core.MAVLink.connection.MavLinkConnectionListener;
 import org.droidplanner.services.android.core.MAVLink.connection.MavLinkConnectionTypes;
-import org.droidplanner.services.android.core.drone.CommandTracker;
+import org.droidplanner.services.android.core.drone.manager.DroneCommandTracker;
 import org.droidplanner.services.android.data.SessionDB;
 import org.droidplanner.services.android.utils.analytics.GAUtils;
 import org.droidplanner.services.android.utils.file.DirectoryPath;
@@ -36,7 +36,7 @@ import timber.log.Timber;
 /**
  * Provide a common class for some ease of use functionality
  */
-public class MAVLinkClient implements DataStreams.DataOutputStream<MAVLinkMessage> {
+public class MAVLinkClient implements DataLink.DataLinkProvider<MAVLinkMessage> {
 
     private static final int DEFAULT_SYS_ID = 255;
     private static final int DEFAULT_COMP_ID = 190;
@@ -82,16 +82,16 @@ public class MAVLinkClient implements DataStreams.DataOutputStream<MAVLinkMessag
 
     private AndroidMavLinkConnection mavlinkConn;
 
-    private final DataStreams.DataInputStream<MAVLinkPacket> listener;
+    private final DataLink.DataLinkListener<MAVLinkPacket> listener;
     private final SessionDB sessionDB;
     private final Context context;
 
     private int packetSeqNumber = 0;
     private final ConnectionParameter connParams;
 
-    private CommandTracker commandTracker;
+    private DroneCommandTracker commandTracker;
 
-    public MAVLinkClient(Context context, DataStreams.DataInputStream<MAVLinkPacket> listener,
+    public MAVLinkClient(Context context, DataLink.DataLinkListener<MAVLinkPacket> listener,
                          ConnectionParameter connParams) {
         this.context = context;
         this.listener = listener;
@@ -99,7 +99,7 @@ public class MAVLinkClient implements DataStreams.DataOutputStream<MAVLinkMessag
         this.sessionDB = new SessionDB(context);
     }
 
-    public void setCommandTracker(CommandTracker commandTracker) {
+    public void setCommandTracker(DroneCommandTracker commandTracker) {
         this.commandTracker = commandTracker;
     }
 

@@ -49,7 +49,7 @@ import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
 import com.o3dr.services.android.lib.util.MathUtils;
 
-import org.droidplanner.services.android.communication.model.DataStreams;
+import org.droidplanner.services.android.communication.model.DataLink;
 import org.droidplanner.services.android.core.MAVLink.MavLinkCommands;
 import org.droidplanner.services.android.core.MAVLink.MavLinkWaypoint;
 import org.droidplanner.services.android.core.MAVLink.WaypointManager;
@@ -83,7 +83,7 @@ import org.droidplanner.services.android.utils.video.VideoManager;
  */
 public class GenericMavLinkDrone implements MavLinkDrone {
 
-    private final DataStreams.DataOutputStream<MAVLinkMessage> mavClient;
+    private final DataLink.DataLinkProvider<MAVLinkMessage> mavClient;
 
     protected final VideoManager videoMgr;
 
@@ -110,8 +110,11 @@ public class GenericMavLinkDrone implements MavLinkDrone {
 
     protected final Handler handler;
 
-    public GenericMavLinkDrone(Context context, Handler handler, DataStreams.DataOutputStream<MAVLinkMessage> mavClient,
+    private final String droneId;
+
+    public GenericMavLinkDrone(String droneId, Context context, Handler handler, DataLink.DataLinkProvider<MAVLinkMessage> mavClient,
                                AutopilotWarningParser warningParser, LogMessageListener logListener) {
+        this.droneId = droneId;
         this.handler = handler;
         this.mavClient = mavClient;
 
@@ -126,6 +129,11 @@ public class GenericMavLinkDrone implements MavLinkDrone {
         parameterManager = new ParameterManager(this, context, handler);
 
         this.videoMgr = new VideoManager(context, handler);
+    }
+
+    @Override
+    public String getId(){
+        return droneId;
     }
 
     @Override
@@ -306,7 +314,7 @@ public class GenericMavLinkDrone implements MavLinkDrone {
     }
 
     @Override
-    public DataStreams.DataOutputStream<MAVLinkMessage> getMavClient() {
+    public DataLink.DataLinkProvider<MAVLinkMessage> getMavClient() {
         return mavClient;
     }
 

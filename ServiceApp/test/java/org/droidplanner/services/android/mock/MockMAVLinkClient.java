@@ -7,7 +7,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.model.ICommandListener;
 
-import org.droidplanner.services.android.communication.model.DataStreams;
+import org.droidplanner.services.android.communication.model.DataLink;
 import org.droidplanner.services.android.communication.service.MAVLinkClient;
 
 /**
@@ -17,7 +17,7 @@ public class MockMAVLinkClient extends MAVLinkClient {
 
     private MAVLinkPacket data;
 
-    public MockMAVLinkClient(Context context, DataStreams.DataInputStream listener, ConnectionParameter connParams) {
+    public MockMAVLinkClient(Context context, DataLink.DataLinkListener listener, ConnectionParameter connParams) {
         super(context, listener, connParams);
     }
 

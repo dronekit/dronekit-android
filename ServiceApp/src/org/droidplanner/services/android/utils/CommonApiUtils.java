@@ -44,7 +44,7 @@ import com.o3dr.services.android.lib.model.ICommandListener;
 
 import org.droidplanner.services.android.core.MAVLink.MavLinkCommands;
 import org.droidplanner.services.android.core.MAVLink.command.doCmd.MavLinkDoCmds;
-import org.droidplanner.services.android.core.drone.DroneManager;
+import org.droidplanner.services.android.core.drone.manager.DroneManager;
 import org.droidplanner.services.android.core.drone.autopilot.Drone;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.core.drone.autopilot.apm.ArduPilot;
@@ -348,16 +348,16 @@ public class CommonApiUtils {
         return followType;
     }
 
-    public static CameraProxy getCameraProxy(MavLinkDrone drone, List<CameraDetail> cameraDetails) {
+    public static CameraProxy getCameraProxy(Drone drone, List<CameraDetail> cameraDetails) {
         CameraDetail camDetail;
         FootPrint currentFieldOfView;
         List<FootPrint> proxyPrints = new ArrayList<>();
 
-        if (drone == null) {
+        if (!(drone instanceof MavLinkDrone)) {
             camDetail = new CameraDetail();
             currentFieldOfView = new FootPrint();
         } else {
-            Camera droneCamera = drone.getCamera();
+            Camera droneCamera = ((MavLinkDrone) drone).getCamera();
 
             camDetail = ProxyUtils.getCameraDetail(droneCamera.getCamera());
 
@@ -831,32 +831,6 @@ public class CommonApiUtils {
             return;
 
         drone.getGuidedPoint().changeGuidedAltitude(altitude);
-    }
-
-    public static void enableFollowMe(DroneManager droneMgr, Handler droneHandler, FollowType followType, ICommandListener listener) {
-        if (droneMgr == null)
-            return;
-
-        FollowAlgorithm.FollowModes selectedMode = CommonApiUtils.followTypeToMode(droneMgr.getDrone(), followType);
-
-        if (selectedMode != null) {
-            Follow followMe = droneMgr.getFollowMe();
-            if (followMe == null)
-                return;
-
-            if (!followMe.isEnabled())
-                followMe.toggleFollowMeState();
-
-            FollowAlgorithm currentAlg = followMe.getFollowAlgorithm();
-            if (currentAlg.getType() != selectedMode) {
-                if (selectedMode == FollowAlgorithm.FollowModes.SOLO_SHOT &&
-                        !SoloApiUtils.isSoloLinkFeatureAvailable(droneMgr.getDrone(), listener))
-                    return;
-
-                followMe.setAlgorithm(selectedMode.getAlgorithmType(droneMgr, droneHandler));
-                postSuccessEvent(listener);
-            }
-        }
     }
 
     public static void gotoWaypoint(MavLinkDrone drone, int waypoint, ICommandListener listener) {

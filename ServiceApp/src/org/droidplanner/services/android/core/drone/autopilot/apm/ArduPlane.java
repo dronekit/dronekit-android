@@ -8,8 +8,7 @@ import com.MAVLink.common.msg_global_position_int;
 import com.MAVLink.common.msg_vfr_hud;
 import com.MAVLink.enums.MAV_TYPE;
 
-import org.droidplanner.services.android.communication.model.DataStreams;
-import org.droidplanner.services.android.core.drone.DroneInterfaces;
+import org.droidplanner.services.android.communication.model.DataLink;
 import org.droidplanner.services.android.core.drone.LogMessageListener;
 import org.droidplanner.services.android.core.firmware.FirmwareType;
 import org.droidplanner.services.android.core.model.AutopilotWarningParser;
@@ -19,8 +18,8 @@ import org.droidplanner.services.android.core.model.AutopilotWarningParser;
  */
 public class ArduPlane extends ArduPilot {
 
-    public ArduPlane(Context context, DataStreams.DataOutputStream<MAVLinkMessage> mavClient, Handler handler, AutopilotWarningParser warningParser, LogMessageListener logListener) {
-        super(context, mavClient, handler, warningParser, logListener);
+    public ArduPlane(String droneId, Context context, DataLink.DataLinkProvider<MAVLinkMessage> mavClient, Handler handler, AutopilotWarningParser warningParser, LogMessageListener logListener) {
+        super(droneId, context, mavClient, handler, warningParser, logListener);
     }
 
     @Override

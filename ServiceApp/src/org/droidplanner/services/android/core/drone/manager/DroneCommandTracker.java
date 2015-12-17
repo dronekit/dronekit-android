@@ -1,4 +1,4 @@
-package org.droidplanner.services.android.core.drone;
+package org.droidplanner.services.android.core.drone.manager;
 
 import android.os.Handler;
 import android.os.RemoteException;
@@ -17,7 +17,7 @@ import timber.log.Timber;
  * Handles tracking and dispatching of the command listener events.
  * Created by Fredia Huya-Kouadio on 6/24/15.
  */
-public class DroneCommandTracker implements CommandTracker {
+public class DroneCommandTracker {
 
     private static final long COMMAND_TIMEOUT_PERIOD = 2000l; //2 seconds
 
@@ -30,7 +30,6 @@ public class DroneCommandTracker implements CommandTracker {
         this.handler = handler;
     }
 
-    @Override
     public void onCommandSubmitted(MAVLinkMessage command, ICommandListener listener) {
         if (command == null || listener == null)
             return;
@@ -76,7 +75,6 @@ public class DroneCommandTracker implements CommandTracker {
         handler.postDelayed(callback, COMMAND_TIMEOUT_PERIOD);
     }
 
-    @Override
     public void onCommandAck(int commandId, Object ack) {
         switch (commandId) {
             case msg_command_ack.MAVLINK_MSG_ID_COMMAND_ACK:

@@ -27,4 +27,10 @@ public interface Drone {
     void setAttributeListener(DroneInterfaces.AttributeEventListener listener);
 
     void destroy();
+
+    void addDroneListener(DroneInterfaces.OnDroneListener listener);
+
+    void removeDroneListener(DroneInterfaces.OnDroneListener listener);
+
+    void notifyDroneEvent(DroneInterfaces.DroneEventsType event);
 }

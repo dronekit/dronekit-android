@@ -10,7 +10,7 @@ import com.MAVLink.common.msg_command_long;
 import com.MAVLink.enums.MAV_CMD;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 
-import org.droidplanner.services.android.communication.model.DataStreams;
+import org.droidplanner.services.android.communication.model.DataLink;
 import org.droidplanner.services.android.core.MAVLink.MavLinkCommands;
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
 import org.droidplanner.services.android.core.drone.LogMessageListener;
@@ -39,7 +39,7 @@ public class BasicTest {
 
     private final Handler dpHandler = new Handler();
 
-    private final DataStreams.DataInputStream inputStreamListener = new DataStreams.DataInputStream() {
+    private final DataLink.DataLinkListener inputStreamListener = new DataLink.DataLinkListener() {
         @Override
         public void notifyStartingConnection() {
         }

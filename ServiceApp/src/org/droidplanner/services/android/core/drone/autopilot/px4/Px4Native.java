@@ -5,8 +5,7 @@ import android.os.Handler;
 
 import com.MAVLink.Messages.MAVLinkMessage;
 
-import org.droidplanner.services.android.communication.model.DataStreams;
-import org.droidplanner.services.android.core.drone.DroneInterfaces;
+import org.droidplanner.services.android.communication.model.DataLink;
 import org.droidplanner.services.android.core.drone.LogMessageListener;
 import org.droidplanner.services.android.core.drone.autopilot.generic.GenericMavLinkDrone;
 import org.droidplanner.services.android.core.firmware.FirmwareType;
@@ -17,8 +16,8 @@ import org.droidplanner.services.android.core.model.AutopilotWarningParser;
  */
 public class Px4Native extends GenericMavLinkDrone {
 
-    public Px4Native(Context context, Handler handler, DataStreams.DataOutputStream<MAVLinkMessage> mavClient, AutopilotWarningParser warningParser, LogMessageListener logListener) {
-        super(context, handler, mavClient, warningParser, logListener);
+    public Px4Native(String droneId, Context context, Handler handler, DataLink.DataLinkProvider<MAVLinkMessage> mavClient, AutopilotWarningParser warningParser, LogMessageListener logListener) {
+        super(droneId, context, handler, mavClient, warningParser, logListener);
     }
 
     @Override

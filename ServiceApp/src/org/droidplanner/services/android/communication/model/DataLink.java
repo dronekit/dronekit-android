@@ -2,9 +2,9 @@ package org.droidplanner.services.android.communication.model;
 
 import com.o3dr.services.android.lib.model.ICommandListener;
 
-public class DataStreams {
+public class DataLink {
 
-    public interface DataOutputStream<T> {
+    public interface DataLinkProvider<T> {
 
         void sendMessage(T message, ICommandListener listener);
 
@@ -16,7 +16,7 @@ public class DataStreams {
 
     }
 
-    public interface DataInputStream<T> {
+    public interface DataLinkListener<T> {
         void notifyStartingConnection();
 
         void notifyConnected();

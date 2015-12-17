@@ -12,39 +12,26 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
-import com.google.android.gms.analytics.HitBuilders;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
-import com.o3dr.services.android.lib.drone.connection.ConnectionType;
 import com.o3dr.services.android.lib.drone.mission.item.complex.CameraDetail;
 import com.o3dr.services.android.lib.model.IApiListener;
 import com.o3dr.services.android.lib.model.IDroidPlannerServices;
 
 import org.droidplanner.services.android.DroidPlannerServicesApp;
-import org.droidplanner.services.android.core.MAVLink.connection.MavLinkConnection;
-import org.droidplanner.services.android.core.MAVLink.connection.MavLinkConnectionListener;
 import org.droidplanner.services.android.core.survey.CameraInfo;
 import org.droidplanner.services.android.R;
-import org.droidplanner.services.android.communication.connection.AndroidMavLinkConnection;
-import org.droidplanner.services.android.communication.connection.AndroidTcpConnection;
-import org.droidplanner.services.android.communication.connection.AndroidUdpConnection;
-import org.droidplanner.services.android.communication.connection.BluetoothConnection;
-import org.droidplanner.services.android.communication.connection.usb.UsbConnection;
-import org.droidplanner.services.android.core.drone.DroneManager;
+import org.droidplanner.services.android.core.drone.manager.DroneManager;
 import org.droidplanner.services.android.exception.ConnectionException;
 import org.droidplanner.services.android.ui.activity.MainActivity;
 import org.droidplanner.services.android.utils.Utils;
-import org.droidplanner.services.android.utils.analytics.GAUtils;
 import org.droidplanner.services.android.utils.file.IO.CameraInfoLoader;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -192,7 +179,7 @@ public class DroidPlannerService extends Service {
         DroneManager droneMgr = droneManagers.get(connParams);
         if (droneMgr == null) {
             Timber.d("Generating new drone manager.");
-            droneMgr = new DroneManager(getApplicationContext(), connParams, new Handler(Looper.getMainLooper()));
+            droneMgr = DroneManager.generateDroneManager(getApplicationContext(), connParams, new Handler(Looper.getMainLooper()));
             droneManagers.put(connParams, droneMgr);
         }
 
