@@ -7,6 +7,7 @@ import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import org.droidplanner.services.android.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.services.android.core.drone.DroneInterfaces.OnDroneListener;
 import org.droidplanner.services.android.core.drone.manager.DroneManager;
+import org.droidplanner.services.android.core.drone.manager.MavLinkDroneManager;
 import org.droidplanner.services.android.core.drone.variables.GuidedPoint;
 import org.droidplanner.services.android.core.drone.variables.State;
 import org.droidplanner.services.android.core.gcs.location.Location;
@@ -14,7 +15,7 @@ import org.droidplanner.services.android.core.gcs.location.Location.LocationFind
 import org.droidplanner.services.android.core.gcs.location.Location.LocationReceiver;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 
-public class Follow implements OnDroneListener, LocationReceiver {
+public class Follow implements OnDroneListener<MavLinkDrone>, LocationReceiver {
 
     private static final String TAG = Follow.class.getSimpleName();
     private Location lastLocation;
@@ -27,12 +28,12 @@ public class Follow implements OnDroneListener, LocationReceiver {
     }
 
     private FollowStates state = FollowStates.FOLLOW_INVALID_STATE;
-    private final DroneManager droneMgr;
+    private final MavLinkDroneManager droneMgr;
 
     private final LocationFinder locationFinder;
     private FollowAlgorithm followAlgorithm;
 
-    public Follow(DroneManager droneMgr, Handler handler, LocationFinder locationFinder) {
+    public Follow(MavLinkDroneManager droneMgr, Handler handler, LocationFinder locationFinder) {
         this.droneMgr = droneMgr;
         final MavLinkDrone drone = droneMgr.getDrone();
         if(drone != null)

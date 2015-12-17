@@ -4,6 +4,7 @@ import android.os.Handler;
 
 import org.droidplanner.services.android.core.drone.manager.DroneManager;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
+import org.droidplanner.services.android.core.drone.manager.MavLinkDroneManager;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,7 +19,7 @@ public abstract class FollowWithRadiusAlgorithm extends FollowAlgorithm {
     protected final MavLinkDrone drone;
     protected double radius;
 
-    public FollowWithRadiusAlgorithm(DroneManager droneMgr, Handler handler, double radius) {
+    public FollowWithRadiusAlgorithm(MavLinkDroneManager droneMgr, Handler handler, double radius) {
         super(droneMgr, handler);
         this.radius = radius;
         this.drone = droneMgr.getDrone();

@@ -5,6 +5,7 @@ import android.os.Handler;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 
 import org.droidplanner.services.android.core.drone.manager.DroneManager;
+import org.droidplanner.services.android.core.drone.manager.MavLinkDroneManager;
 import org.droidplanner.services.android.core.gcs.location.Location;
 import org.droidplanner.services.android.core.helpers.geoTools.GeoTools;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
@@ -14,7 +15,7 @@ public abstract class FollowHeadingAngle extends FollowWithRadiusAlgorithm {
     protected double angleOffset;
     protected final MavLinkDrone drone;
 
-    protected FollowHeadingAngle(DroneManager droneMgr, Handler handler, double radius, double angleOffset) {
+    protected FollowHeadingAngle(MavLinkDroneManager droneMgr, Handler handler, double radius, double angleOffset) {
         super(droneMgr, handler, radius);
         this.angleOffset = angleOffset;
 

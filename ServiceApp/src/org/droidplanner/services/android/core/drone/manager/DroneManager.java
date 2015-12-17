@@ -180,7 +180,7 @@ public class DroneManager<T extends Drone, D> implements DataLink.DataLinkListen
         }
     }
 
-    public Drone getDrone() {
+    public T getDrone() {
         return this.drone;
     }
 

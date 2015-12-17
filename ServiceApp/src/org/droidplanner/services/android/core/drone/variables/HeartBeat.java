@@ -12,7 +12,7 @@ import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 
 import timber.log.Timber;
 
-public class HeartBeat extends DroneVariable implements OnDroneListener {
+public class HeartBeat extends DroneVariable implements OnDroneListener<MavLinkDrone> {
 
     public static final long HEARTBEAT_NORMAL_TIMEOUT = 5000l; //ms
     private static final long HEARTBEAT_LOST_TIMEOUT = 15000l; //ms

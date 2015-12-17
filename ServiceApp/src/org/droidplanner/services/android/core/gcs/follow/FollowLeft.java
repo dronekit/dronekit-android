@@ -3,10 +3,11 @@ package org.droidplanner.services.android.core.gcs.follow;
 import android.os.Handler;
 
 import org.droidplanner.services.android.core.drone.manager.DroneManager;
+import org.droidplanner.services.android.core.drone.manager.MavLinkDroneManager;
 
 public class FollowLeft extends FollowHeadingAngle {
 
-    public FollowLeft(DroneManager droneMgr, Handler handler, double radius) {
+    public FollowLeft(MavLinkDroneManager droneMgr, Handler handler, double radius) {
         super(droneMgr, handler, radius, -90.0);
     }
 

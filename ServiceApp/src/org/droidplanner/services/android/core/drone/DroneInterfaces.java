@@ -204,8 +204,8 @@ public class DroneInterfaces {
 		MISSION_WP_REACHED,
 	}
 
-	public interface OnDroneListener {
-		public void onDroneEvent(DroneEventsType event, Drone drone);
+	public interface OnDroneListener<T extends Drone> {
+		public void onDroneEvent(DroneEventsType event, T drone);
 	}
 
 	public interface AttributeEventListener {

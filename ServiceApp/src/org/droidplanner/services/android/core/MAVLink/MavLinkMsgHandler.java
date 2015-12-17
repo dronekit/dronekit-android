@@ -5,6 +5,7 @@ import com.MAVLink.common.msg_heartbeat;
 import com.MAVLink.enums.MAV_AUTOPILOT;
 import com.MAVLink.enums.MAV_TYPE;
 
+import org.droidplanner.services.android.core.drone.manager.MavLinkDroneManager;
 import org.droidplanner.services.android.core.firmware.FirmwareType;
 import org.droidplanner.services.android.core.drone.manager.DroneManager;
 
@@ -15,9 +16,9 @@ public class MavLinkMsgHandler {
 
     public static final int AUTOPILOT_COMPONENT_ID = 1;
 
-    private final DroneManager droneMgr;
+    private final MavLinkDroneManager droneMgr;
 
-    public MavLinkMsgHandler(DroneManager droneMgr) {
+    public MavLinkMsgHandler(MavLinkDroneManager droneMgr) {
         this.droneMgr = droneMgr;
     }
 
