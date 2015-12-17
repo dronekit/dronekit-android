@@ -11,6 +11,13 @@ import org.droidplanner.services.android.core.drone.DroneInterfaces;
  */
 public interface Drone {
 
+    /**
+     * Gets the vehicle id.
+     * The format used for the vehicle id is autopilot specific.
+     * @return Vehicle id
+     */
+    String getId();
+
     boolean isConnected();
 
     DroneAttribute getAttribute(String attributeType);

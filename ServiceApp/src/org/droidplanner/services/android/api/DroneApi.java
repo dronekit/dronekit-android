@@ -402,7 +402,9 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
 
     @Override
     public void onDroneEvent(DroneInterfaces.DroneEventsType event, MavLinkDrone drone) {
-        Bundle extrasBundle = null;
+        final Bundle extrasBundle = new Bundle();
+        extrasBundle.putString(AttributeEventExtra.EXTRA_VEHICLE_ID, drone.getId());
+
         String droneEvent = null;
         List<Pair<String, Bundle>> attributesInfo = new ArrayList<>();
 
@@ -434,7 +436,6 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
                 break;
 
             case AUTOPILOT_WARNING:
-                extrasBundle = new Bundle(1);
                 extrasBundle.putString(AttributeEventExtra.EXTRA_AUTOPILOT_ERROR_ID, drone.getState().getErrorId());
                 droneEvent = AttributeEvent.AUTOPILOT_ERROR;
                 break;
@@ -479,7 +480,6 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
 
             case CALIBRATION_IMU:
                 String calIMUMessage = drone.getCalibrationSetup().getMessage();
-                extrasBundle = new Bundle(1);
                 extrasBundle.putString(AttributeEventExtra.EXTRA_CALIBRATION_IMU_MESSAGE, calIMUMessage);
                 droneEvent = AttributeEvent.CALIBRATION_IMU;
                 break;
@@ -498,7 +498,6 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
                     accelCalibration.cancelCalibration();
                     droneEvent = AttributeEvent.HEARTBEAT_TIMEOUT;
                 } else {
-                    extrasBundle = new Bundle(1);
                     extrasBundle.putString(AttributeEventExtra.EXTRA_CALIBRATION_IMU_MESSAGE, message);
                     droneEvent = AttributeEvent.CALIBRATION_IMU_TIMEOUT;
                 }
@@ -519,24 +518,24 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
                 break;
 
             case HEARTBEAT_FIRST:
-                Bundle heartBeatExtras = new Bundle(1);
+                Bundle heartBeatExtras = new Bundle();
+                heartBeatExtras.putString(AttributeEventExtra.EXTRA_VEHICLE_ID, drone.getId());
                 heartBeatExtras.putInt(AttributeEventExtra.EXTRA_MAVLINK_VERSION, drone.getMavlinkVersion());
                 attributesInfo.add(Pair.create(AttributeEvent.HEARTBEAT_FIRST, heartBeatExtras));
 
             case CONNECTED:
                 //Broadcast the vehicle connection.
                 ConnectionParameter sanitizedParameter = new ConnectionParameter(connectionParams
-                        .getConnectionType(), connectionParams.getParamsBundle(), null);
+                        .getConnectionType(), connectionParams.getParamsBundle());
 
                 context.sendBroadcast(new Intent(GCSEvent.ACTION_VEHICLE_CONNECTION)
                         .putExtra(GCSEvent.EXTRA_APP_ID, ownerId)
                         .putExtra(GCSEvent.EXTRA_VEHICLE_CONNECTION_PARAMETER, sanitizedParameter));
 
-                attributesInfo.add(Pair.<String, Bundle>create(AttributeEvent.STATE_CONNECTED, null));
+                attributesInfo.add(Pair.<String, Bundle>create(AttributeEvent.STATE_CONNECTED, extrasBundle));
                 break;
 
             case HEARTBEAT_RESTORED:
-                extrasBundle = new Bundle(1);
                 extrasBundle.putInt(AttributeEventExtra.EXTRA_MAVLINK_VERSION, drone.getMavlinkVersion());
                 droneEvent = AttributeEvent.HEARTBEAT_RESTORED;
                 break;
@@ -550,14 +549,12 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
 
             case MISSION_WP_UPDATE:
                 int currentWaypoint = drone.getMissionStats().getCurrentWP();
-                extrasBundle = new Bundle(1);
                 extrasBundle.putInt(AttributeEventExtra.EXTRA_MISSION_CURRENT_WAYPOINT, currentWaypoint);
                 droneEvent = AttributeEvent.MISSION_ITEM_UPDATED;
                 break;
 
             case MISSION_WP_REACHED:
                 int lastReachedWaypoint = drone.getMissionStats().getLastReachedWP();
-                extrasBundle = new Bundle(1);
                 extrasBundle.putInt(AttributeEventExtra.EXTRA_MISSION_LAST_REACHED_WAYPOINT, lastReachedWaypoint);
                 droneEvent = AttributeEvent.MISSION_ITEM_REACHED;
                 break;

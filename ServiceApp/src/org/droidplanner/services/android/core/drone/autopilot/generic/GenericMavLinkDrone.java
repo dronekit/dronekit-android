@@ -285,6 +285,11 @@ public class GenericMavLinkDrone implements MavLinkDrone {
 
     protected void notifyAttributeListener(String attributeEvent, Bundle eventInfo, boolean checkForSololinkApi) {
         if (attributeListener != null) {
+            if(eventInfo == null){
+                eventInfo = new Bundle();
+            }
+            eventInfo.putString(AttributeEventExtra.EXTRA_VEHICLE_ID, getId());
+
             attributeListener.onAttributeEvent(attributeEvent, eventInfo, checkForSololinkApi);
         }
     }
