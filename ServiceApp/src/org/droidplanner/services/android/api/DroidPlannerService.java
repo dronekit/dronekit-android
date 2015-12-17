@@ -131,18 +131,12 @@ public class DroidPlannerService extends Service {
     final ConcurrentHashMap<String, DroneApi> droneApiStore = new ConcurrentHashMap<>();
 
     /**
-     * Caches mavlink connections per connection type.
-     */
-    final ConcurrentHashMap<String, AndroidMavLinkConnection> mavConnections = new ConcurrentHashMap<>();
-
-    /**
      * Caches drone managers per connection type.
      */
     final ConcurrentHashMap<ConnectionParameter, DroneManager> droneManagers = new ConcurrentHashMap<>();
 
     private DPServices dpServices;
     private DroneAccess droneAccess;
-    private MavLinkServiceApi mavlinkApi;
 
     private CameraInfoLoader cameraInfoLoader;
     private List<CameraDetail> cachedCameraDetails;
@@ -199,8 +193,7 @@ public class DroidPlannerService extends Service {
         DroneManager droneMgr = droneManagers.get(connParams);
         if (droneMgr == null) {
             Timber.d("Generating new drone manager.");
-            droneMgr = new DroneManager(getApplicationContext(), connParams, new Handler(Looper.getMainLooper()),
-                    mavlinkApi);
+            droneMgr = new DroneManager(getApplicationContext(), connParams, new Handler(Looper.getMainLooper()));
             droneManagers.put(connParams, droneMgr);
         }
 
@@ -228,145 +221,6 @@ public class DroidPlannerService extends Service {
             droneMgr.destroy();
             droneManagers.remove(droneMgr.getConnectionParameter());
         }
-    }
-
-    /**
-     * Setup a MAVLink connection using the given parameter.
-     *
-     * @param connParams  Parameter used to setup the MAVLink connection.
-     * @param listenerTag Used to identify the connection requester.
-     * @param listener    Callback to receive the connection events.
-     */
-    void connectMAVConnection(ConnectionParameter connParams, String listenerTag, MavLinkConnectionListener listener) {
-        AndroidMavLinkConnection conn = mavConnections.get(connParams.getUniqueId());
-        final int connectionType = connParams.getConnectionType();
-        final Bundle paramsBundle = connParams.getParamsBundle();
-        if (conn == null) {
-
-            //Create a new mavlink connection
-
-            switch (connectionType) {
-                case ConnectionType.TYPE_USB:
-                    final int baudRate = paramsBundle.getInt(ConnectionType.EXTRA_USB_BAUD_RATE,
-                            ConnectionType.DEFAULT_USB_BAUD_RATE);
-                    conn = new UsbConnection(getApplicationContext(), baudRate);
-                    Timber.d("Connecting over usb.");
-                    break;
-
-                case ConnectionType.TYPE_BLUETOOTH:
-                    //Retrieve the bluetooth address to connect to
-                    final String bluetoothAddress = paramsBundle.getString(ConnectionType.EXTRA_BLUETOOTH_ADDRESS);
-                    conn = new BluetoothConnection(getApplicationContext(), bluetoothAddress);
-                    Timber.d("Connecting over bluetooth.");
-                    break;
-
-                case ConnectionType.TYPE_TCP:
-                    //Retrieve the server ip and port
-                    final String tcpServerIp = paramsBundle.getString(ConnectionType.EXTRA_TCP_SERVER_IP);
-                    final int tcpServerPort = paramsBundle.getInt(ConnectionType
-                            .EXTRA_TCP_SERVER_PORT, ConnectionType.DEFAULT_TCP_SERVER_PORT);
-                    conn = new AndroidTcpConnection(getApplicationContext(), tcpServerIp, tcpServerPort);
-                    Timber.d("Connecting over tcp.");
-                    break;
-
-                case ConnectionType.TYPE_UDP:
-                    final int udpServerPort = paramsBundle
-                            .getInt(ConnectionType.EXTRA_UDP_SERVER_PORT, ConnectionType.DEFAULT_UDP_SERVER_PORT);
-                    conn = new AndroidUdpConnection(getApplicationContext(), udpServerPort);
-                    Timber.d("Connecting over udp.");
-                    break;
-
-                default:
-                    Timber.e("Unrecognized connection type: %s", connectionType);
-                    return;
-            }
-
-            mavConnections.put(connParams.getUniqueId(), conn);
-        }
-
-        if (connectionType == ConnectionType.TYPE_UDP) {
-            final String pingIpAddress = paramsBundle.getString(ConnectionType.EXTRA_UDP_PING_RECEIVER_IP);
-            if (!TextUtils.isEmpty(pingIpAddress)) {
-                try {
-                    final InetAddress resolvedAddress = InetAddress.getByName(pingIpAddress);
-
-                    final int pingPort = paramsBundle.getInt(ConnectionType.EXTRA_UDP_PING_RECEIVER_PORT);
-                    final long pingPeriod = paramsBundle.getLong(ConnectionType.EXTRA_UDP_PING_PERIOD,
-                            ConnectionType.DEFAULT_UDP_PING_PERIOD);
-                    final byte[] pingPayload = paramsBundle.getByteArray(ConnectionType.EXTRA_UDP_PING_PAYLOAD);
-
-                    ((AndroidUdpConnection) conn).addPingTarget(resolvedAddress, pingPort, pingPeriod, pingPayload);
-
-                } catch (UnknownHostException e) {
-                    Timber.e(e, "Unable to resolve UDP ping server ip address.");
-                }
-            }
-        }
-
-        conn.addMavLinkConnectionListener(listenerTag, listener);
-        if (conn.getConnectionStatus() == MavLinkConnection.MAVLINK_DISCONNECTED) {
-            conn.connect();
-
-            // Record which connection type is used.
-            GAUtils.sendEvent(new HitBuilders.EventBuilder()
-                    .setCategory(GAUtils.Category.MAVLINK_CONNECTION)
-                    .setAction("MavLink connect")
-                    .setLabel(connParams.toString()));
-        }
-    }
-
-    /**
-     * Disconnect the MAVLink connection for the given listener.
-     *
-     * @param connParams  Connection parameters
-     * @param listenerTag Listener to be disconnected.
-     */
-    void disconnectMAVConnection(ConnectionParameter connParams, String listenerTag) {
-        final AndroidMavLinkConnection conn = mavConnections.get(connParams.getUniqueId());
-        if (conn == null)
-            return;
-
-        conn.removeMavLinkConnectionListener(listenerTag);
-
-        if (conn.getMavLinkConnectionListenersCount() == 0 && conn.getConnectionStatus() !=
-                MavLinkConnection.MAVLINK_DISCONNECTED) {
-            Timber.d("Disconnecting...");
-            conn.disconnect();
-
-            GAUtils.sendEvent(new HitBuilders.EventBuilder()
-                    .setCategory(GAUtils.Category.MAVLINK_CONNECTION)
-                    .setAction("MavLink disconnect")
-                    .setLabel(connParams.toString()));
-        }
-    }
-
-    /**
-     * Register a log listener.
-     *
-     * @param connParams      Parameters whose connection's data to log.
-     * @param tag             Tag for the listener.
-     * @param loggingFilePath File path for the logging file.
-     */
-    void addLoggingFile(ConnectionParameter connParams, String tag, String loggingFilePath) {
-        AndroidMavLinkConnection conn = mavConnections.get(connParams.getUniqueId());
-        if (conn == null)
-            return;
-
-        conn.addLoggingPath(tag, loggingFilePath);
-    }
-
-    /**
-     * Unregister a log listener.
-     *
-     * @param connParams Connection parameters from whom to stop the logging.
-     * @param tag        Tag for the listener.
-     */
-    void removeLoggingFile(ConnectionParameter connParams, String tag) {
-        AndroidMavLinkConnection conn = mavConnections.get(connParams.getUniqueId());
-        if (conn == null)
-            return;
-
-        conn.removeLoggingPath(tag);
     }
 
     /**
@@ -431,7 +285,6 @@ public class DroidPlannerService extends Service {
         Timber.i("Acquiring wifi wake lock.");
         wifiLock.acquire();
 
-        mavlinkApi = new MavLinkServiceApi(this);
         droneAccess = new DroneAccess(this);
         dpServices = new DPServices(this);
         lbm = LocalBroadcastManager.getInstance(context);
@@ -480,12 +333,11 @@ public class DroidPlannerService extends Service {
         }
         droneApiStore.clear();
 
-        for (AndroidMavLinkConnection conn : mavConnections.values()) {
-            conn.disconnect();
-            conn.removeAllMavLinkConnectionListeners();
+        for(DroneManager droneMgr : droneManagers.values()){
+            droneMgr.destroy();
         }
+        droneManagers.clear();
 
-        mavConnections.clear();
         dpServices.destroy();
 
         stopForeground(true);

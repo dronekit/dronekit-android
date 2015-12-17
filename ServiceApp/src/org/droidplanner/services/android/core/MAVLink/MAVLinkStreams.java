@@ -8,13 +8,9 @@ public class MAVLinkStreams {
 
 	public interface MAVLinkOutputStream {
 
-		void sendMavMessage(MAVLinkMessage message, int sysId, int compId, ICommandListener listener);
-
-		void sendMavMessage(MAVLinkMessage message, ICommandListener listener);
+		void sendMessage(MAVLinkMessage message, ICommandListener listener);
 
 		boolean isConnected();
-
-		void toggleConnectionState();
 
         void openConnection();
 

@@ -8,7 +8,6 @@ import org.droidplanner.services.android.core.MAVLink.connection.MavLinkConnecti
 import org.droidplanner.services.android.core.MAVLink.connection.MavLinkConnectionListener;
 
 import org.droidplanner.services.android.api.DroidPlannerService;
-import org.droidplanner.services.android.api.MavLinkServiceApi;
 
 
 /**

@@ -807,7 +807,7 @@ public class CommonApiUtils {
             Timber.e(e, e.getMessage());
         }
 
-        drone.getMavClient().sendMavMessage(message, null);
+        drone.getMavClient().sendMessage(message, null);
     }
 
     public static void sendGuidedPoint(MavLinkDrone drone, LatLong point, boolean force, ICommandListener listener) {

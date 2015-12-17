@@ -12,9 +12,7 @@ import com.MAVLink.ardupilotmega.msg_mag_cal_progress;
 import com.MAVLink.ardupilotmega.msg_mag_cal_report;
 import com.MAVLink.common.msg_command_ack;
 import com.google.android.gms.location.LocationRequest;
-import com.o3dr.android.client.apis.CapabilityApi;
 import com.o3dr.services.android.lib.coordinate.LatLong;
-import com.o3dr.services.android.lib.drone.action.CapabilityActions;
 import com.o3dr.services.android.lib.drone.action.ControlActions;
 import com.o3dr.services.android.lib.drone.action.GimbalActions;
 import com.o3dr.services.android.lib.drone.action.StateActions;
@@ -35,13 +33,11 @@ import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
 
 import org.droidplanner.services.android.api.DroneApi;
-import org.droidplanner.services.android.api.MavLinkServiceApi;
 import org.droidplanner.services.android.communication.connection.DroneshareClient;
 import org.droidplanner.services.android.communication.service.MAVLinkClient;
 import org.droidplanner.services.android.communication.service.UploaderService;
 import org.droidplanner.services.android.core.MAVLink.MAVLinkStreams;
 import org.droidplanner.services.android.core.MAVLink.MavLinkMsgHandler;
-import org.droidplanner.services.android.core.drone.autopilot.Drone;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.core.drone.autopilot.apm.ArduCopter;
 import org.droidplanner.services.android.core.drone.autopilot.apm.ArduPlane;
@@ -101,15 +97,14 @@ public class DroneManager implements MAVLinkStreams.MavlinkInputStream, DroneInt
 
     private final GCSHeartbeat gcsHeartbeat;
 
-    public DroneManager(Context context, ConnectionParameter connParams, Handler handler,
-                        MavLinkServiceApi mavlinkApi) {
+    public DroneManager(Context context, ConnectionParameter connParams, Handler handler) {
         this.context = context;
         this.handler = handler;
         this.connectionParameter = connParams;
 
         commandTracker = new DroneCommandTracker(handler);
 
-        mavClient = new MAVLinkClient(context, this, connParams, mavlinkApi);
+        mavClient = new MAVLinkClient(context, this, connParams);
         mavClient.setCommandTracker(commandTracker);
 
         this.gcsHeartbeat = new GCSHeartbeat(mavClient, 1);

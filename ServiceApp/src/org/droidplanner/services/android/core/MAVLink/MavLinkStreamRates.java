@@ -36,6 +36,6 @@ public class MavLinkStreamRates {
 		} else {
 			msg.start_stop = 0;
 		}
-		mAVClient.sendMavMessage(msg, null);
+		mAVClient.sendMessage(msg, null);
 	}
 }

@@ -323,7 +323,7 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
                     msg.stab_pitch = 0;
                     msg.stab_roll = 0;
                     msg.stab_yaw = 0;
-                    getMavClient().sendMavMessage(msg, listener);
+                    getMavClient().sendMessage(msg, listener);
                 } else {
                     MavLinkParameters.sendParameter(this, "MNT_MODE", 1, mountMode);
                 }

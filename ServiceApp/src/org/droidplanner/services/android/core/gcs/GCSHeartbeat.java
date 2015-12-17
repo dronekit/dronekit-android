@@ -42,7 +42,7 @@ public class GCSHeartbeat {
     private final Runnable heartbeatRunnable = new Runnable() {
         @Override
         public void run() {
-            mavClient.sendMavMessage(sMsg, null);
+            mavClient.sendMessage(sMsg, null);
         }
     };
 
