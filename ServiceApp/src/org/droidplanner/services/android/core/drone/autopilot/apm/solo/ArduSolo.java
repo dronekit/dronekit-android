@@ -30,7 +30,7 @@ import com.o3dr.services.android.lib.drone.property.State;
 import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
 
-import org.droidplanner.services.android.core.MAVLink.MAVLinkStreams;
+import org.droidplanner.services.android.communication.model.DataStreams;
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
 import org.droidplanner.services.android.core.drone.LogMessageListener;
 import org.droidplanner.services.android.core.drone.autopilot.apm.ArduCopter;
@@ -69,7 +69,7 @@ public class ArduSolo extends ArduCopter {
 
     private final SoloComp soloComp;
 
-    public ArduSolo(Context context, MAVLinkStreams.MAVLinkOutputStream mavClient, Handler handler,
+    public ArduSolo(Context context, DataStreams.DataOutputStream mavClient, Handler handler,
                     AutopilotWarningParser warningParser, LogMessageListener logListener, DroneInterfaces.AttributeEventListener listener) {
         super(context, mavClient, handler, warningParser, logListener, listener);
         this.soloComp = new SoloComp(context, handler);

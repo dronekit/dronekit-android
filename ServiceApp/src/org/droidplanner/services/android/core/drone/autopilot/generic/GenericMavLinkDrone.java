@@ -48,7 +48,7 @@ import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
 import com.o3dr.services.android.lib.util.MathUtils;
 
-import org.droidplanner.services.android.core.MAVLink.MAVLinkStreams;
+import org.droidplanner.services.android.communication.model.DataStreams;
 import org.droidplanner.services.android.core.MAVLink.MavLinkCommands;
 import org.droidplanner.services.android.core.MAVLink.MavLinkWaypoint;
 import org.droidplanner.services.android.core.MAVLink.WaypointManager;
@@ -82,7 +82,7 @@ import org.droidplanner.services.android.utils.video.VideoManager;
  */
 public class GenericMavLinkDrone implements MavLinkDrone {
 
-    private final MAVLinkStreams.MAVLinkOutputStream mavClient;
+    private final DataStreams.DataOutputStream mavClient;
 
     protected final VideoManager videoMgr;
 
@@ -109,7 +109,7 @@ public class GenericMavLinkDrone implements MavLinkDrone {
 
     protected final Handler handler;
 
-    public GenericMavLinkDrone(Context context, Handler handler, MAVLinkStreams.MAVLinkOutputStream mavClient,
+    public GenericMavLinkDrone(Context context, Handler handler, DataStreams.DataOutputStream mavClient,
                                AutopilotWarningParser warningParser, LogMessageListener logListener, DroneInterfaces.AttributeEventListener listener) {
         this.handler = handler;
         this.mavClient = mavClient;
@@ -297,7 +297,7 @@ public class GenericMavLinkDrone implements MavLinkDrone {
     }
 
     @Override
-    public MAVLinkStreams.MAVLinkOutputStream getMavClient() {
+    public DataStreams.DataOutputStream<MAVLinkMessage> getMavClient() {
         return mavClient;
     }
 

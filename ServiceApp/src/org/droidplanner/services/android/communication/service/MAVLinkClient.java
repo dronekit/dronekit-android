@@ -16,7 +16,7 @@ import org.droidplanner.services.android.communication.connection.AndroidTcpConn
 import org.droidplanner.services.android.communication.connection.AndroidUdpConnection;
 import org.droidplanner.services.android.communication.connection.BluetoothConnection;
 import org.droidplanner.services.android.communication.connection.usb.UsbConnection;
-import org.droidplanner.services.android.core.MAVLink.MAVLinkStreams;
+import org.droidplanner.services.android.communication.model.DataStreams;
 import org.droidplanner.services.android.core.MAVLink.connection.MavLinkConnection;
 import org.droidplanner.services.android.core.MAVLink.connection.MavLinkConnectionListener;
 import org.droidplanner.services.android.core.MAVLink.connection.MavLinkConnectionTypes;
@@ -36,7 +36,7 @@ import timber.log.Timber;
 /**
  * Provide a common class for some ease of use functionality
  */
-public class MAVLinkClient implements MAVLinkStreams.MAVLinkOutputStream {
+public class MAVLinkClient implements DataStreams.DataOutputStream<MAVLinkMessage> {
 
     private static final int DEFAULT_SYS_ID = 255;
     private static final int DEFAULT_COMP_ID = 190;
@@ -82,7 +82,7 @@ public class MAVLinkClient implements MAVLinkStreams.MAVLinkOutputStream {
 
     private AndroidMavLinkConnection mavlinkConn;
 
-    private final MAVLinkStreams.MavlinkInputStream listener;
+    private final DataStreams.DataInputStream<MAVLinkPacket> listener;
     private final SessionDB sessionDB;
     private final Context context;
 
@@ -91,7 +91,7 @@ public class MAVLinkClient implements MAVLinkStreams.MAVLinkOutputStream {
 
     private CommandTracker commandTracker;
 
-    public MAVLinkClient(Context context, MAVLinkStreams.MavlinkInputStream listener,
+    public MAVLinkClient(Context context, DataStreams.DataInputStream<MAVLinkPacket> listener,
                          ConnectionParameter connParams) {
         this.context = context;
         this.listener = listener;
@@ -223,7 +223,7 @@ public class MAVLinkClient implements MAVLinkStreams.MAVLinkOutputStream {
         sendMavMessage(message, DEFAULT_SYS_ID, DEFAULT_COMP_ID, listener);
     }
 
-    private void sendMavMessage(MAVLinkMessage message, int sysId, int compId, ICommandListener listener){
+    protected void sendMavMessage(MAVLinkMessage message, int sysId, int compId, ICommandListener listener){
         if (isDisconnected() || message == null) {
             return;
         }

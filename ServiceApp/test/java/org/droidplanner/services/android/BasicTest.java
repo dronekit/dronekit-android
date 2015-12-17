@@ -10,24 +10,21 @@ import com.MAVLink.common.msg_command_long;
 import com.MAVLink.enums.MAV_CMD;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 
-import org.droidplanner.services.android.communication.service.MAVLinkClient;
-import org.droidplanner.services.android.core.MAVLink.MAVLinkStreams;
+import org.droidplanner.services.android.communication.model.DataStreams;
 import org.droidplanner.services.android.core.MAVLink.MavLinkCommands;
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
 import org.droidplanner.services.android.core.drone.LogMessageListener;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.core.drone.autopilot.apm.ArduCopter;
-import org.droidplanner.services.android.mock.MockMavLinkServiceAPI;
+import org.droidplanner.services.android.mock.MockMAVLinkClient;
 import org.droidplanner.services.android.utils.AndroidApWarningParser;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricGradleTestRunner;
-import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
-import org.robolectric.shadows.ShadowApplication;
 
 /**
  * Created by djmedina on 3/5/15.
@@ -38,11 +35,11 @@ import org.robolectric.shadows.ShadowApplication;
 public class BasicTest {
 
     private MavLinkDrone drone;
-    private MockMavLinkServiceAPI mavlinkApi;
+    private MockMAVLinkClient mavClient;
 
     private final Handler dpHandler = new Handler();
 
-    private final MAVLinkStreams.MavlinkInputStream inputStreamListener = new MAVLinkStreams.MavlinkInputStream() {
+    private final DataStreams.DataInputStream inputStreamListener = new DataStreams.DataInputStream() {
         @Override
         public void notifyStartingConnection() {
         }
@@ -56,7 +53,7 @@ public class BasicTest {
         }
 
         @Override
-        public void notifyReceivedData(MAVLinkPacket packet) {
+        public void notifyReceivedData(Object packet) {
         }
 
         @Override
@@ -69,8 +66,7 @@ public class BasicTest {
         final Context context = RuntimeEnvironment.application.getApplicationContext();
 
         ConnectionParameter connParams = new ConnectionParameter(0, new Bundle(), null);
-        mavlinkApi = new MockMavLinkServiceAPI();
-        MAVLinkClient mavClient = new MAVLinkClient(context, inputStreamListener, connParams, mavlinkApi);
+        mavClient = new MockMAVLinkClient(context, inputStreamListener, connParams);
 
         drone = new ArduCopter(context, mavClient, dpHandler, new AndroidApWarningParser(), new LogMessageListener() {
             @Override
@@ -101,7 +97,7 @@ public class BasicTest {
     @Test
     public void testArm() {
         MavLinkCommands.sendArmMessage(drone, true, false, null);
-        MAVLinkPacket data = mavlinkApi.getData();
+        MAVLinkPacket data = mavClient.getData();
         Assert.assertTrue(data != null);
 
         //Unpack the message into the right MAVLink message type
