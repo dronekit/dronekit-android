@@ -68,7 +68,7 @@ public class WifiConnectionHandler {
                             }
 
                             if (wifiSSID != null) {
-                                final Runnable onConnection = onConnectionActions.get(wifiSSID);
+                                final Runnable onConnection = onConnectionActions.remove(wifiSSID);
 
                                 if (wifiSSID.startsWith("\"SoloLink")) {
                                     //Attempt to connect to the vehicle.
