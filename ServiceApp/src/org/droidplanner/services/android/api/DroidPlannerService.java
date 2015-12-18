@@ -226,6 +226,7 @@ public class DroidPlannerService extends Service {
                     break;
 
                 case ConnectionType.TYPE_SOLO: {
+                    Timber.i("Creating solo connection");
                     final String soloLinkId = paramsBundle.getString(ConnectionType.EXTRA_SOLO_LINK_ID, null);
                     final String linkPassword = paramsBundle.getString(ConnectionType.EXTRA_SOLO_LINK_PASSWORD, null);
                     conn = new SoloConnection(getApplicationContext(), soloLinkId, linkPassword);
