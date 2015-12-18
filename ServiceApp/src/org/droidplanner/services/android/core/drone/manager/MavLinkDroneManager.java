@@ -69,7 +69,7 @@ public class MavLinkDroneManager extends DroneManager<MavLinkDrone, MAVLinkPacke
 
     private final GCSHeartbeat gcsHeartbeat;
 
-    protected MavLinkDroneManager(Context context, ConnectionParameter connParams, Handler handler) {
+    public MavLinkDroneManager(Context context, ConnectionParameter connParams, Handler handler) {
         super(context, connParams, handler);
 
         commandTracker = new DroneCommandTracker(handler);
