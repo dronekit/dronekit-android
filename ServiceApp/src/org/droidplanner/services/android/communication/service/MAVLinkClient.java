@@ -15,6 +15,7 @@ import org.droidplanner.services.android.communication.connection.AndroidMavLink
 import org.droidplanner.services.android.communication.connection.AndroidTcpConnection;
 import org.droidplanner.services.android.communication.connection.AndroidUdpConnection;
 import org.droidplanner.services.android.communication.connection.BluetoothConnection;
+import org.droidplanner.services.android.communication.connection.SoloConnection;
 import org.droidplanner.services.android.communication.connection.usb.UsbConnection;
 import org.droidplanner.services.android.communication.model.DataLink;
 import org.droidplanner.services.android.core.MAVLink.connection.MavLinkConnection;
@@ -158,6 +159,14 @@ public class MAVLinkClient implements DataLink.DataLinkProvider<MAVLinkMessage> 
                     Timber.i("Connecting over udp.");
                     break;
 
+                case ConnectionType.TYPE_SOLO: {
+                    Timber.i("Creating solo connection");
+                    final String soloLinkId = paramsBundle.getString(ConnectionType.EXTRA_SOLO_LINK_ID, null);
+                    final String linkPassword = paramsBundle.getString(ConnectionType.EXTRA_SOLO_LINK_PASSWORD, null);
+                    mavlinkConn = new SoloConnection(context, soloLinkId, linkPassword);
+                    break;
+                }
+
                 default:
                     Timber.e("Unrecognized connection type: %s", connectionType);
                     return;
@@ -184,7 +193,7 @@ public class MAVLinkClient implements DataLink.DataLinkProvider<MAVLinkMessage> 
             }
         }
 
-        mavlinkConn.addMavLinkConnectionListener(tag, mConnectionListener);
+            mavlinkConn.addMavLinkConnectionListener(tag, mConnectionListener);
         if (mavlinkConn.getConnectionStatus() == MavLinkConnection.MAVLINK_DISCONNECTED) {
             mavlinkConn.connect();
 
