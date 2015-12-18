@@ -4,13 +4,8 @@ import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.net.NetworkInfo;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -27,20 +22,21 @@ import com.o3dr.services.android.lib.model.IApiListener;
 import com.o3dr.services.android.lib.model.IDroidPlannerServices;
 
 import org.droidplanner.services.android.DroidPlannerServicesApp;
-import org.droidplanner.services.android.core.MAVLink.connection.MavLinkConnection;
-import org.droidplanner.services.android.core.MAVLink.connection.MavLinkConnectionListener;
-import org.droidplanner.services.android.core.survey.CameraInfo;
 import org.droidplanner.services.android.R;
 import org.droidplanner.services.android.communication.connection.AndroidMavLinkConnection;
 import org.droidplanner.services.android.communication.connection.AndroidTcpConnection;
 import org.droidplanner.services.android.communication.connection.AndroidUdpConnection;
 import org.droidplanner.services.android.communication.connection.BluetoothConnection;
 import org.droidplanner.services.android.communication.connection.usb.UsbConnection;
+import org.droidplanner.services.android.core.MAVLink.connection.MavLinkConnection;
+import org.droidplanner.services.android.core.MAVLink.connection.MavLinkConnectionListener;
 import org.droidplanner.services.android.core.drone.DroneManager;
+import org.droidplanner.services.android.core.survey.CameraInfo;
 import org.droidplanner.services.android.exception.ConnectionException;
 import org.droidplanner.services.android.ui.activity.MainActivity;
 import org.droidplanner.services.android.utils.Utils;
 import org.droidplanner.services.android.utils.analytics.GAUtils;
+import org.droidplanner.services.android.utils.connection.WifiConnectionHandler;
 import org.droidplanner.services.android.utils.file.IO.CameraInfoLoader;
 
 import java.net.InetAddress;
@@ -71,58 +67,15 @@ public class DroidPlannerService extends Service {
     public static final String ACTION_RELEASE_API_INSTANCE = Utils.PACKAGE_NAME + ".action.RELEASE_API_INSTANCE";
     public static final String EXTRA_API_INSTANCE_APP_ID = "extra_api_instance_app_id";
 
-    private static final IntentFilter networkFilter = new IntentFilter();
-
-    static {
-        networkFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
-        networkFilter.addAction(WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION);
-    }
-
-    private final BroadcastReceiver networkReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            final String action = intent.getAction();
-            switch(action){
-                case WifiManager.NETWORK_STATE_CHANGED_ACTION:
-                    NetworkInfo netInfo = intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
-                    NetworkInfo.State networkState = netInfo == null
-                            ? NetworkInfo.State.DISCONNECTED
-                            : netInfo.getState();
-
-                    switch (networkState) {
-                        case CONNECTED:
-                            final WifiInfo wifiInfo = intent.getParcelableExtra(WifiManager.EXTRA_WIFI_INFO);
-                            final String wifiSSID = wifiInfo.getSSID();
-                            Timber.i("Connected to " + wifiSSID);
-                            break;
-
-                        case DISCONNECTED:
-                            Timber.i("Disconnected from wifi network.");
-                            break;
-
-                        case CONNECTING:
-                            Timber.i( "Connecting to wifi network.");
-                            break;
-                    }
-                    break;
-
-                case WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION:
-                    final boolean isConnected = intent.getBooleanExtra(WifiManager.EXTRA_SUPPLICANT_CONNECTED, false);
-                    Timber.i("Supplicant connection " + (isConnected ? "established" : "broken"));
-                    break;
-            }
-        }
-    };
-
     /**
      * Used to broadcast service events.
      */
     private LocalBroadcastManager lbm;
 
     /**
-     * Wifi wake lock.
+     * Handles monitoring of wifi state changes.
      */
-    private WifiManager.WifiLock wifiLock;
+    private WifiConnectionHandler wifiHandler;
 
     /**
      * Stores drone api instances per connected client. The client are denoted by their app id.
@@ -211,8 +164,8 @@ public class DroidPlannerService extends Service {
     /**
      * Disconnect the given client from the vehicle managed by the given drone manager.
      *
-     * @param droneMgr Handler for the connected vehicle.
-     * @param clientInfo    Info of the disconnecting client.
+     * @param droneMgr   Handler for the connected vehicle.
+     * @param clientInfo Info of the disconnecting client.
      * @throws ConnectionException
      */
     void disconnectDroneManager(DroneManager droneMgr, DroneApi.ClientInfo clientInfo) throws ConnectionException {
@@ -236,7 +189,7 @@ public class DroidPlannerService extends Service {
      * @param listenerTag Used to identify the connection requester.
      * @param listener    Callback to receive the connection events.
      */
-    void connectMAVConnection(ConnectionParameter connParams, String listenerTag, MavLinkConnectionListener listener) {
+    void connectMAVConnection(final ConnectionParameter connParams, final String listenerTag, final MavLinkConnectionListener listener) {
         AndroidMavLinkConnection conn = mavConnections.get(connParams.getUniqueId());
         final int connectionType = connParams.getConnectionType();
         final Bundle paramsBundle = connParams.getParamsBundle();
@@ -275,14 +228,34 @@ public class DroidPlannerService extends Service {
                     Timber.d("Connecting over udp.");
                     break;
 
-                case ConnectionType.TYPE_SOLO:{
+                case ConnectionType.TYPE_SOLO: {
                     final String soloLinkId = paramsBundle.getString(ConnectionType.EXTRA_SOLO_LINK_ID, null);
-                    if(TextUtils.isEmpty(soloLinkId)){
+                    if (TextUtils.isEmpty(soloLinkId)) {
                         Timber.e("Invalid sololink id %s", soloLinkId);
                         return;
                     }
 
-
+                    if(wifiHandler.isConnected(soloLinkId)){
+                        Timber.i("Connecting to solo.");
+                        //Proceed with establishing the udp connection
+                        conn = new AndroidUdpConnection(getApplicationContext(), 14550);
+                    }
+                    else{
+                        //Request connection to the sololink wifi
+                        if (wifiHandler.connectToWifi(soloLinkId, new Runnable() {
+                            @Override
+                            public void run() {
+                                //Call this method again.
+                                connectMAVConnection(connParams, listenerTag, listener);
+                            }
+                        })) {
+                            if (listener != null)
+                                listener.onStartingConnection();
+                        } else {
+                            Timber.w("Unable to attempt solo wifi connection");
+                        }
+                        return;
+                    }
                     break;
                 }
 
@@ -435,11 +408,8 @@ public class DroidPlannerService extends Service {
 
         final Context context = getApplicationContext();
 
-        final WifiManager wifiMgr = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-        wifiLock = wifiMgr.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, TAG);
-
-        Timber.i("Acquiring wifi wake lock.");
-        wifiLock.acquire();
+        wifiHandler = new WifiConnectionHandler(context);
+        wifiHandler.start();
 
         mavlinkApi = new MavLinkServiceApi(this);
         droneAccess = new DroneAccess(this);
@@ -448,8 +418,6 @@ public class DroidPlannerService extends Service {
         this.cameraInfoLoader = new CameraInfoLoader(context);
 
         updateForegroundNotification();
-
-        registerReceiver(networkReceiver, networkFilter);
     }
 
     @SuppressLint("NewApi")
@@ -483,8 +451,6 @@ public class DroidPlannerService extends Service {
         super.onDestroy();
         Timber.d("Destroying 3DR Services.");
 
-        unregisterReceiver(networkReceiver);
-
         for (DroneApi droneApi : droneApiStore.values()) {
             droneApi.destroy();
         }
@@ -498,13 +464,9 @@ public class DroidPlannerService extends Service {
         mavConnections.clear();
         dpServices.destroy();
 
-        stopForeground(true);
+        wifiHandler.stop();
 
-        if(wifiLock != null){
-            Timber.i("Releasing wifi wake lock.");
-            wifiLock.release();
-            wifiLock = null;
-        }
+        stopForeground(true);
 
         final DroidPlannerServicesApp dpApp = (DroidPlannerServicesApp) getApplication();
         dpApp.closeLogFile();

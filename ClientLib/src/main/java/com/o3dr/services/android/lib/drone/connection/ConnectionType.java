@@ -80,6 +80,7 @@ public class ConnectionType {
 
     /**
      * Solo vehicle connection type
+     * Opens a UDP connection at port 14550 once on the correct wifi network.
      */
     public static final int TYPE_SOLO = 101;
 

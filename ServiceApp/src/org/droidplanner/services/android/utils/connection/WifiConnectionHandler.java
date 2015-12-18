@@ -17,13 +17,14 @@ import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
-import android.support.v4.content.LocalBroadcastManager;
+import android.text.TextUtils;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import timber.log.Timber;
 
@@ -31,14 +32,6 @@ import timber.log.Timber;
  * Used to handle connection with the sololink wifi network.
  */
 public class WifiConnectionHandler {
-
-    private static final String PACKAGE_NAME = "org.droidplanner.services.android.utils.connection";
-
-    public static final String ACTION_STARTING_VEHICLE_CONNECTION = PACKAGE_NAME + ".action" +
-            ".STARTING_VEHICLE_CONNECTION";
-
-    public static final String ACTION_VEHICLE_CONNECTION_COMPLETED = PACKAGE_NAME + ".action" +
-            ".VEHICLE_CONNECTION_COMPLETED";
 
     public interface WifiConnectionListener {
         void onWifiConnecting();
@@ -87,58 +80,85 @@ public class WifiConnectionHandler {
                                 Timber.w("Dhcp info is not available.");
                             }
 
-                            if (wifiSSID != null && wifiSSID.startsWith("\"SoloLink")) {
-                                //Attempt to connect to the vehicle.
-                                if (wifiConnectionListener != null)
-                                    wifiConnectionListener.onWifiConnected(wifiSSID);
+                            if (wifiSSID != null) {
+                                final Runnable onConnection = onConnectionActions.get(wifiSSID);
 
-                                Timber.i("Requesting route to sololink network");
-                                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-                                    NetworkRequest netReq = new NetworkRequest.Builder()
-                                            .addCapability(NetworkCapabilities.NET_CAPABILITY_TRUSTED)
-                                            .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-                                            .addCapability(NetworkCapabilities.NET_CAPABILITY_NOT_RESTRICTED)
-                                            .addCapability(NetworkCapabilities.NET_CAPABILITY_NOT_VPN)
-                                            .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
-                                            .build();
-                                    connMgr.requestNetwork(netReq, new ConnectivityManager.NetworkCallback() {
+                                if (wifiSSID.startsWith("\"SoloLink")) {
+                                    //Attempt to connect to the vehicle.
+                                    Timber.i("Requesting route to sololink network");
+                                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                                        NetworkRequest netReq = new NetworkRequest.Builder()
+                                                .addCapability(NetworkCapabilities.NET_CAPABILITY_TRUSTED)
+                                                .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                                                .addCapability(NetworkCapabilities.NET_CAPABILITY_NOT_RESTRICTED)
+                                                .addCapability(NetworkCapabilities.NET_CAPABILITY_NOT_VPN)
+                                                .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+                                                .build();
+                                        connMgr.requestNetwork(netReq, new ConnectivityManager.NetworkCallback() {
 
-                                        @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-                                        private void getNetworkInfo(Network network){
-                                            if(network == null){
-                                                Timber.i("Network is null.");
+                                            @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+                                            private void getNetworkInfo(Network network) {
+                                                if (network == null) {
+                                                    Timber.i("Network is null.");
+                                                } else {
+                                                    Timber.i("Network: %s, active : %s", network, connMgr.isDefaultNetworkActive());
+                                                    LinkProperties linkProps = connMgr.getLinkProperties(network);
+                                                    Timber.i("Network link properties: %s", linkProps.toString());
+                                                    Timber.i("Network capabilities: %s", connMgr.getNetworkCapabilities(network));
+                                                }
                                             }
-                                            else{
-                                                Timber.i("Network: %s, active : %s", network, connMgr.isDefaultNetworkActive());
-                                                LinkProperties linkProps = connMgr.getLinkProperties(network);
-                                                Timber.i("Network link properties: %s", linkProps.toString());
-                                                Timber.i("Network capabilities: %s", connMgr.getNetworkCapabilities(network));
+
+                                            @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+                                            @Override
+                                            public void onAvailable(Network network) {
+                                                Timber.i("Network %s is available", network);
+                                                getNetworkInfo(network);
+
+                                                final boolean wasBound;
+                                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                                    wasBound = connMgr.bindProcessToNetwork(network);
+                                                } else {
+                                                    wasBound = ConnectivityManager.setProcessDefaultNetwork(network);
+                                                }
+
+                                                if (wasBound) {
+                                                    Timber.i("Bound process to network %s", network);
+                                                    if (wifiConnectionListener != null)
+                                                        wifiConnectionListener.onWifiConnected(wifiSSID);
+
+                                                    if(onConnection != null){
+                                                        onConnection.run();
+                                                    }
+                                                } else {
+                                                    Timber.w("Unable to bind process to network %s", network);
+                                                }
                                             }
-                                        }
 
-                                        @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-                                        @Override
-                                        public void onAvailable(Network network) {
-                                            Timber.i("Network %s is available", network);
-                                            getNetworkInfo(network);
-                                            if (ConnectivityManager.setProcessDefaultNetwork(network)) {
-                                                Timber.i("Bound process to network %s", network);
-                                            } else {
-                                                Timber.w("Unable to bind process to network %s", network);
+                                            @Override
+                                            public void onLosing(Network network, int maxMsToLive) {
+                                                Timber.w("Losing network %s", network);
                                             }
+
+                                            @Override
+                                            public void onLost(Network network) {
+                                                Timber.w("Lost network %s", network);
+                                            }
+
+                                        });
+                                    } else {
+                                        if (wifiConnectionListener != null) {
+                                            wifiConnectionListener.onWifiConnected(wifiSSID);
                                         }
 
-                                        @Override
-                                        public void onLosing(Network network, int maxMsToLive) {
-                                            Timber.w("Losing network %s", network);
+                                        if(onConnection != null){
+                                            onConnection.run();
                                         }
-
-                                        @Override
-                                        public void onLost(Network network) {
-                                            Timber.w("Lost network %s", network);
-                                        }
-
-                                    });
+                                    }
+                                }
+                                else{
+                                    if(onConnection != null){
+                                        onConnection.run();
+                                    }
                                 }
                             }
                             break;
@@ -162,18 +182,16 @@ public class WifiConnectionHandler {
         }
     };
 
+    private final ConcurrentHashMap<String, Runnable> onConnectionActions = new ConcurrentHashMap<>();
+
     private final Context context;
-    private final LocalBroadcastManager lbm;
 
     private final WifiManager wifiMgr;
     private final ConnectivityManager connMgr;
     private WifiConnectionListener wifiConnectionListener;
 
-    private String targetSSID;
-
     public WifiConnectionHandler(Context context) {
         this.context = context;
-        this.lbm = LocalBroadcastManager.getInstance(this.context);
         this.wifiMgr = (WifiManager) this.context.getSystemService(Context.WIFI_SERVICE);
         this.connMgr = (ConnectivityManager) this.context.getSystemService(Context.CONNECTIVITY_SERVICE);
     }
@@ -246,7 +264,53 @@ public class WifiConnectionHandler {
         }
     }
 
-    public boolean connectToWifi(ScanResult scanResult) {
+    public boolean isConnected(String wifiSSID){
+        if(TextUtils.isEmpty(wifiSSID))
+            throw new IllegalStateException("Invalid wifi ssid.");
+
+        if(!wifiSSID.equalsIgnoreCase(getCurrentWifiLink()))
+            return false;
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            Network network;
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+                network = connMgr.getBoundNetworkForProcess();
+            }
+            else{
+                network = ConnectivityManager.getProcessDefaultNetwork();
+            }
+
+            if(network == null)
+                return false;
+
+            NetworkCapabilities netCapabilities = connMgr.getNetworkCapabilities(network);
+            return netCapabilities != null && netCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI);
+        }
+        else{
+            return true;
+        }
+    }
+
+    public boolean connectToWifi(String soloLinkId, Runnable onConnection) {
+        if(TextUtils.isEmpty(soloLinkId))
+            return false;
+
+        ScanResult targetScanResult = null;
+        final List<ScanResult> scanResults = wifiMgr.getScanResults();
+        for(ScanResult result: scanResults){
+            if(result.SSID.equalsIgnoreCase(soloLinkId)) {
+                targetScanResult = result;
+                break;
+            }
+        }
+
+        if(targetScanResult == null)
+            return false;
+
+        return connectToWifi(targetScanResult, onConnection);
+    }
+
+    private boolean connectToWifi(ScanResult scanResult, Runnable onConnection) {
         if (scanResult == null)
             return false;
 
@@ -254,6 +318,7 @@ public class WifiConnectionHandler {
 
         //Check if we're already connected to the given network.
         WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
+        String targetSSID;
         if (wifiInfo.getSSID().equals("\"" + scanResult.SSID + "\"")) {
             Timber.d("Already connected to " + wifiInfo.getSSID());
 
@@ -261,6 +326,10 @@ public class WifiConnectionHandler {
 
             if (wifiConnectionListener != null)
                 wifiConnectionListener.onWifiConnected(targetSSID);
+
+            if(onConnection != null){
+                onConnection.run();
+            }
             return true;
         }
 
@@ -277,8 +346,11 @@ public class WifiConnectionHandler {
         if (updatedConf != null) {
             targetSSID = "\"" + scanResult.SSID + "\"";
 
+            if(onConnection != null) {
+                onConnectionActions.put(targetSSID, onConnection);
+            }
+
             wifiMgr.enableNetwork(updatedConf.networkId, true);
-            lbm.sendBroadcast(new Intent(ACTION_STARTING_VEHICLE_CONNECTION));
             return true;
         }
         return false;
@@ -308,5 +380,11 @@ public class WifiConnectionHandler {
         }
 
         return true;
+    }
+
+    private String getCurrentWifiLink() {
+        final WifiInfo connectedWifi = wifiMgr.getConnectionInfo();
+        final String connectedSSID = connectedWifi == null ? null : connectedWifi.getSSID();
+        return connectedSSID == null ? "" : connectedSSID.replace("\"", "");
     }
 }
