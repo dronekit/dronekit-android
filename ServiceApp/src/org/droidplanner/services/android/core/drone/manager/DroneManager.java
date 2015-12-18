@@ -107,7 +107,7 @@ public class DroneManager<T extends Drone, D> implements DataLink.DataLinkListen
     /**
      * @return True if we can expect to find a companion computer on the connected channel.
      */
-    private boolean isCompanionComputerEnabled() {
+    protected boolean isCompanionComputerEnabled() {
         final int connectionType = connectionParameter.getConnectionType();
 
         return drone instanceof ArduSolo
