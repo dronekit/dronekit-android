@@ -148,9 +148,7 @@ public class WifiConnectionHandler {
                     //Check if we're still connected to solo. If not, unregister the callbacks
                     final String currentWifi = getCurrentWifiLink();
                     if (!isSoloWifi(currentWifi)) {
-                        Timber.i("Unregistering network callbacks.");
-                        connMgr.unregisterNetworkCallback(this);
-                        connectedSoloWifi.set("");
+                        resetNetworkBindings(this);
                         return;
                     }
 
@@ -211,13 +209,26 @@ public class WifiConnectionHandler {
             Timber.w(e, "Receiver was not registered.");
         }
 
-        try {
-            connectedSoloWifi.set("");
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                connMgr.unregisterNetworkCallback((ConnectivityManager.NetworkCallback) netReqCb);
+        resetNetworkBindings((ConnectivityManager.NetworkCallback) netReqCb);
+    }
+
+    private void resetNetworkBindings(ConnectivityManager.NetworkCallback netCb) {
+        Timber.i("Unregistering network callbacks.");
+
+        connectedSoloWifi.set("");
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            try {
+                connMgr.unregisterNetworkCallback(netCb);
+            } catch (IllegalArgumentException e) {
+                Timber.w(e, "Network callback was not registered.");
             }
-        } catch (IllegalArgumentException e) {
-            Timber.w(e, "Network callback was not registered.");
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                connMgr.bindProcessToNetwork(null);
+            } else {
+                ConnectivityManager.setProcessDefaultNetwork(null);
+            }
         }
     }
 
