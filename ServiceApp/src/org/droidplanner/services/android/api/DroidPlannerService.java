@@ -27,6 +27,7 @@ import org.droidplanner.services.android.communication.connection.AndroidMavLink
 import org.droidplanner.services.android.communication.connection.AndroidTcpConnection;
 import org.droidplanner.services.android.communication.connection.AndroidUdpConnection;
 import org.droidplanner.services.android.communication.connection.BluetoothConnection;
+import org.droidplanner.services.android.communication.connection.SoloConnection;
 import org.droidplanner.services.android.communication.connection.usb.UsbConnection;
 import org.droidplanner.services.android.core.MAVLink.connection.MavLinkConnection;
 import org.droidplanner.services.android.core.MAVLink.connection.MavLinkConnectionListener;
@@ -71,11 +72,6 @@ public class DroidPlannerService extends Service {
      * Used to broadcast service events.
      */
     private LocalBroadcastManager lbm;
-
-    /**
-     * Handles monitoring of wifi state changes.
-     */
-    private WifiConnectionHandler wifiHandler;
 
     /**
      * Stores drone api instances per connected client. The client are denoted by their app id.
@@ -230,32 +226,8 @@ public class DroidPlannerService extends Service {
 
                 case ConnectionType.TYPE_SOLO: {
                     final String soloLinkId = paramsBundle.getString(ConnectionType.EXTRA_SOLO_LINK_ID, null);
-                    if (TextUtils.isEmpty(soloLinkId)) {
-                        Timber.e("Invalid sololink id %s", soloLinkId);
-                        return;
-                    }
-
-                    if(wifiHandler.isConnected(soloLinkId)){
-                        Timber.i("Connecting to solo.");
-                        //Proceed with establishing the udp connection
-                        conn = new AndroidUdpConnection(getApplicationContext(), 14550);
-                    }
-                    else{
-                        //Request connection to the sololink wifi
-                        if (wifiHandler.connectToWifi(soloLinkId, new Runnable() {
-                            @Override
-                            public void run() {
-                                //Call this method again.
-                                connectMAVConnection(connParams, listenerTag, listener);
-                            }
-                        })) {
-                            if (listener != null)
-                                listener.onStartingConnection();
-                        } else {
-                            Timber.w("Unable to attempt solo wifi connection");
-                        }
-                        return;
-                    }
+                    final String linkPassword = paramsBundle.getString(ConnectionType.EXTRA_SOLO_LINK_PASSWORD, null);
+                    conn = new SoloConnection(getApplicationContext(), soloLinkId, linkPassword);
                     break;
                 }
 
@@ -408,9 +380,6 @@ public class DroidPlannerService extends Service {
 
         final Context context = getApplicationContext();
 
-        wifiHandler = new WifiConnectionHandler(context);
-        wifiHandler.start();
-
         mavlinkApi = new MavLinkServiceApi(this);
         droneAccess = new DroneAccess(this);
         dpServices = new DPServices(this);
@@ -463,8 +432,6 @@ public class DroidPlannerService extends Service {
 
         mavConnections.clear();
         dpServices.destroy();
-
-        wifiHandler.stop();
 
         stopForeground(true);
 

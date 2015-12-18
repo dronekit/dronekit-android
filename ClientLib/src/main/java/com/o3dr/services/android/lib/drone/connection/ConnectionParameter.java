@@ -3,6 +3,7 @@ package com.o3dr.services.android.lib.drone.connection;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.TextUtils;
 
 /**
  * Base type used to pass the drone connection parameters over ipc.
@@ -50,27 +51,27 @@ public class ConnectionParameter implements Parcelable {
                 if(paramsBundle != null){
                     udpPort = paramsBundle.getInt(ConnectionType.EXTRA_UDP_SERVER_PORT, udpPort);
                 }
-                uniqueId = "udp." + udpPort;
+                uniqueId = "udp:" + udpPort;
                 break;
 
             case ConnectionType.TYPE_BLUETOOTH:
-                String btAddress = null;
+                String btAddress = "";
                 if(paramsBundle != null){
-                    btAddress = paramsBundle.getString(ConnectionType.EXTRA_BLUETOOTH_ADDRESS);
+                    btAddress = paramsBundle.getString(ConnectionType.EXTRA_BLUETOOTH_ADDRESS, "");
                 }
 
-                uniqueId = btAddress == null ? "bluetooth" : "bluetooth." + btAddress;
+                uniqueId = TextUtils.isEmpty(btAddress) ? "bluetooth" : "bluetooth:" + btAddress;
                 break;
 
             case ConnectionType.TYPE_TCP:
-                String tcpIp = null;
+                String tcpIp = "";
                 int tcpPort = ConnectionType.DEFAULT_TCP_SERVER_PORT;
                 if(paramsBundle != null){
-                    tcpIp = paramsBundle.getString(ConnectionType.EXTRA_TCP_SERVER_IP);
+                    tcpIp = paramsBundle.getString(ConnectionType.EXTRA_TCP_SERVER_IP, "");
                     tcpPort = paramsBundle.getInt(ConnectionType.EXTRA_TCP_SERVER_PORT, tcpPort);
                 }
 
-                uniqueId = "tcp"  + "." + tcpPort + (tcpIp == null ? "" : "." + tcpIp);
+                uniqueId = "tcp"  + ":" + tcpIp + ":" + tcpPort;
                 break;
 
             case ConnectionType.TYPE_USB:
@@ -78,11 +79,13 @@ public class ConnectionParameter implements Parcelable {
                 break;
 
             case ConnectionType.TYPE_SOLO:
-                String soloLinkId = null;
+                String soloLinkId = "";
+                String linkPassword = "";
                 if(paramsBundle != null){
                     soloLinkId = paramsBundle.getString(ConnectionType.EXTRA_SOLO_LINK_ID, "");
+                    linkPassword = paramsBundle.getString(ConnectionType.EXTRA_SOLO_LINK_PASSWORD, "");
                 }
-                uniqueId = "solo." + soloLinkId;
+                uniqueId = "solo:" + soloLinkId + ":" + linkPassword;
                 break;
 
             default:

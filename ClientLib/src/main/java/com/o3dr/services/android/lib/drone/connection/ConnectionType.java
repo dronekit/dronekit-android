@@ -86,8 +86,12 @@ public class ConnectionType {
 
     /**
      * Used to retrieve the id (wifi ssid) of the solo vehicle link.
-     * If this argument is null/empty, 3DR Services will pop up a dialog listing the available solo link ids.
      */
     public static final String EXTRA_SOLO_LINK_ID = "extra_solo_link_id";
+
+    /**
+     * Used to retrieve the password to access the solo wifi network.
+     */
+    public static final String EXTRA_SOLO_LINK_PASSWORD = "extra_solo_link_password";
 
 }
