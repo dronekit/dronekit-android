@@ -20,7 +20,7 @@ import com.o3dr.services.android.lib.model.IDroidPlannerServices;
 
 import org.droidplanner.services.android.DroidPlannerServicesApp;
 import org.droidplanner.services.android.R;
-import org.droidplanner.services.android.core.drone.DroneManager;
+import org.droidplanner.services.android.core.drone.manager.DroneManager;
 import org.droidplanner.services.android.core.survey.CameraInfo;
 import org.droidplanner.services.android.exception.ConnectionException;
 import org.droidplanner.services.android.ui.activity.MainActivity;

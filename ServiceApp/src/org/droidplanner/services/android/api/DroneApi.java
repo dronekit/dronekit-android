@@ -40,7 +40,7 @@ import com.o3dr.services.android.lib.model.action.Action;
 
 import org.droidplanner.services.android.communication.connection.SoloConnection;
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
-import org.droidplanner.services.android.core.drone.DroneManager;
+import org.droidplanner.services.android.core.drone.manager.DroneManager;
 import org.droidplanner.services.android.core.drone.autopilot.Drone;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.core.drone.variables.calibration.AccelCalibration;
