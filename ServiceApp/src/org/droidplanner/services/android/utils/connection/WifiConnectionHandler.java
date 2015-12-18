@@ -80,70 +80,7 @@ public class WifiConnectionHandler {
                             }
 
                             if (wifiSSID != null) {
-                                final String trimmedSsid = trimWifiSsid(wifiSSID);
-                                if (trimmedSsid.startsWith(SOLO_LINK_WIFI_PREFIX)) {
-                                    //Attempt to connect to the vehicle.
-                                    Timber.i("Requesting route to sololink network");
-                                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-                                        NetworkRequest netReq = new NetworkRequest.Builder()
-                                                .addCapability(NetworkCapabilities.NET_CAPABILITY_TRUSTED)
-                                                .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-                                                .addCapability(NetworkCapabilities.NET_CAPABILITY_NOT_RESTRICTED)
-                                                .addCapability(NetworkCapabilities.NET_CAPABILITY_NOT_VPN)
-                                                .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
-                                                .build();
-                                        connMgr.requestNetwork(netReq, new ConnectivityManager.NetworkCallback() {
-
-                                            @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-                                            private void getNetworkInfo(Network network) {
-                                                if (network == null) {
-                                                    Timber.i("Network is null.");
-                                                } else {
-                                                    Timber.i("Network: %s, active : %s", network, connMgr.isDefaultNetworkActive());
-                                                    LinkProperties linkProps = connMgr.getLinkProperties(network);
-                                                    Timber.i("Network link properties: %s", linkProps.toString());
-                                                    Timber.i("Network capabilities: %s", connMgr.getNetworkCapabilities(network));
-                                                }
-                                            }
-
-                                            @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-                                            @Override
-                                            public void onAvailable(Network network) {
-                                                Timber.i("Network %s is available", network);
-                                                getNetworkInfo(network);
-
-                                                final boolean wasBound;
-                                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                                    wasBound = connMgr.bindProcessToNetwork(network);
-                                                } else {
-                                                    wasBound = ConnectivityManager.setProcessDefaultNetwork(network);
-                                                }
-
-                                                if (wasBound) {
-                                                    Timber.i("Bound process to network %s", network);
-                                                    notifyWifiConnected(trimmedSsid);
-                                                } else {
-                                                    Timber.w("Unable to bind process to network %s", network);
-                                                }
-                                            }
-
-                                            @Override
-                                            public void onLosing(Network network, int maxMsToLive) {
-                                                Timber.w("Losing network %s", network);
-                                            }
-
-                                            @Override
-                                            public void onLost(Network network) {
-                                                Timber.w("Lost network %s", network);
-                                            }
-
-                                        });
-                                    } else {
-                                        notifyWifiConnected(trimmedSsid);
-                                    }
-                                } else {
-                                    notifyWifiConnected(trimmedSsid);
-                                }
+                                setDefaultNetworkIfNecessary(wifiSSID);
                             }
                             break;
 
@@ -217,11 +154,15 @@ public class WifiConnectionHandler {
         return wifiMgr.startScan();
     }
 
-    public boolean isConnected(String wifiSSID) throws IOException {
-        if (TextUtils.isEmpty(wifiSSID))
-            throw new IOException("Invalid wifi ssid.");
+    public boolean isOnNetwork(String wifiSsid){
+        if (TextUtils.isEmpty(wifiSsid))
+            throw new IllegalArgumentException("Invalid wifi ssid " + wifiSsid);
 
-        if (!wifiSSID.equalsIgnoreCase(getCurrentWifiLink()))
+        return wifiSsid.equalsIgnoreCase(getCurrentWifiLink());
+    }
+
+    public boolean isConnected(String wifiSSID) {
+        if(!isOnNetwork(wifiSSID))
             return false;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -246,7 +187,7 @@ public class WifiConnectionHandler {
         return wifiMgr.getScanResults();
     }
 
-    public boolean connectToWifi(String soloLinkId, String password) throws IOException {
+    public boolean connectToWifi(String soloLinkId, String password) {
         if (TextUtils.isEmpty(soloLinkId) || TextUtils.isEmpty(password))
             return false;
 
@@ -267,7 +208,7 @@ public class WifiConnectionHandler {
         return connectToWifi(targetScanResult, password);
     }
 
-    public boolean connectToWifi(ScanResult scanResult, String password) throws IOException {
+    public boolean connectToWifi(ScanResult scanResult, String password)  {
         if (scanResult == null || TextUtils.isEmpty(password))
             return false;
 
@@ -278,6 +219,10 @@ public class WifiConnectionHandler {
             Timber.d("Already connected to " + scanResult.SSID);
 
             notifyWifiConnected(scanResult.SSID);
+            return true;
+        }
+        else if(isOnNetwork(scanResult.SSID)){
+            setDefaultNetworkIfNecessary(scanResult.SSID);
             return true;
         }
 
@@ -331,6 +276,78 @@ public class WifiConnectionHandler {
         final WifiInfo connectedWifi = wifiMgr.getConnectionInfo();
         final String connectedSSID = connectedWifi == null ? null : connectedWifi.getSSID();
         return trimWifiSsid(connectedSSID);
+    }
+
+    private void setDefaultNetworkIfNecessary(String wifiSsid){
+        final String trimmedSsid = trimWifiSsid(wifiSsid);
+        if(isConnected(wifiSsid)){
+            notifyWifiConnected(wifiSsid);
+            return;
+        }
+
+        if (trimmedSsid.startsWith(SOLO_LINK_WIFI_PREFIX)) {
+            //Attempt to connect to the vehicle.
+            Timber.i("Requesting route to sololink network");
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                NetworkRequest netReq = new NetworkRequest.Builder()
+                        .addCapability(NetworkCapabilities.NET_CAPABILITY_TRUSTED)
+                        .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                        .addCapability(NetworkCapabilities.NET_CAPABILITY_NOT_RESTRICTED)
+                        .addCapability(NetworkCapabilities.NET_CAPABILITY_NOT_VPN)
+                        .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+                        .build();
+                connMgr.requestNetwork(netReq, new ConnectivityManager.NetworkCallback() {
+
+                    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+                    private void getNetworkInfo(Network network) {
+                        if (network == null) {
+                            Timber.i("Network is null.");
+                        } else {
+                            Timber.i("Network: %s, active : %s", network, connMgr.isDefaultNetworkActive());
+                            LinkProperties linkProps = connMgr.getLinkProperties(network);
+                            Timber.i("Network link properties: %s", linkProps.toString());
+                            Timber.i("Network capabilities: %s", connMgr.getNetworkCapabilities(network));
+                        }
+                    }
+
+                    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+                    @Override
+                    public void onAvailable(Network network) {
+                        Timber.i("Network %s is available", network);
+                        getNetworkInfo(network);
+
+                        final boolean wasBound;
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            wasBound = connMgr.bindProcessToNetwork(network);
+                        } else {
+                            wasBound = ConnectivityManager.setProcessDefaultNetwork(network);
+                        }
+
+                        if (wasBound) {
+                            Timber.i("Bound process to network %s", network);
+                            notifyWifiConnected(trimmedSsid);
+                        } else {
+                            Timber.w("Unable to bind process to network %s", network);
+                        }
+                    }
+
+                    @Override
+                    public void onLosing(Network network, int maxMsToLive) {
+                        Timber.w("Losing network %s", network);
+                    }
+
+                    @Override
+                    public void onLost(Network network) {
+                        Timber.w("Lost network %s", network);
+                    }
+
+                });
+            } else {
+                notifyWifiConnected(trimmedSsid);
+            }
+        } else {
+            notifyWifiConnected(trimmedSsid);
+        }
     }
 
     private void notifyWifiConnected(String wifiSsid) {

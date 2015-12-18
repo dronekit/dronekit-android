@@ -137,7 +137,7 @@ public class SoloConnection extends AndroidMavLinkConnection implements WifiConn
                 if (!wifiHandler.connectToWifi(targetResult, soloLinkPassword)) {
                     onConnectionFailed("Unable to connect to the target wifi " + soloLinkId);
                 }
-            } catch (IOException e) {
+            } catch (IllegalArgumentException e) {
                 Timber.e(e, e.getMessage());
                 onConnectionFailed(e.getMessage());
             }
