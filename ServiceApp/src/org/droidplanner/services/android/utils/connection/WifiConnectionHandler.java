@@ -22,7 +22,6 @@ import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 
 import timber.log.Timber;
 
@@ -30,6 +29,18 @@ import timber.log.Timber;
  * Used to handle connection with the sololink wifi network.
  */
 public class WifiConnectionHandler {
+
+    public interface WifiConnectionListener {
+        void onWifiConnected(String wifiSsid);
+
+        void onWifiConnecting();
+
+        void onWifiDisconnected();
+
+        void onWifiScanResultsAvailable(List<ScanResult> results);
+    }
+
+    public static final String SOLO_LINK_WIFI_PREFIX = "SoloLink_";
 
     private static final IntentFilter intentFilter = new IntentFilter();
 
@@ -46,6 +57,7 @@ public class WifiConnectionHandler {
             switch (action) {
 
                 case WifiManager.SCAN_RESULTS_AVAILABLE_ACTION:
+                    notifyWifiScanResultsAvailable(wifiMgr.getScanResults());
                     break;
 
                 case WifiManager.NETWORK_STATE_CHANGED_ACTION:
@@ -68,9 +80,8 @@ public class WifiConnectionHandler {
                             }
 
                             if (wifiSSID != null) {
-                                final Runnable onConnection = onConnectionActions.remove(wifiSSID);
-
-                                if (wifiSSID.startsWith("\"SoloLink")) {
+                                final String trimmedSsid = trimWifiSsid(wifiSSID);
+                                if (trimmedSsid.startsWith(SOLO_LINK_WIFI_PREFIX)) {
                                     //Attempt to connect to the vehicle.
                                     Timber.i("Requesting route to sololink network");
                                     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
@@ -110,9 +121,7 @@ public class WifiConnectionHandler {
 
                                                 if (wasBound) {
                                                     Timber.i("Bound process to network %s", network);
-                                                    if (onConnection != null) {
-                                                        onConnection.run();
-                                                    }
+                                                    notifyWifiConnected(trimmedSsid);
                                                 } else {
                                                     Timber.w("Unable to bind process to network %s", network);
                                                 }
@@ -130,42 +139,38 @@ public class WifiConnectionHandler {
 
                                         });
                                     } else {
-                                        if (onConnection != null) {
-                                            onConnection.run();
-                                        }
+                                        notifyWifiConnected(trimmedSsid);
                                     }
                                 } else {
-                                    if (onConnection != null) {
-                                        onConnection.run();
-                                    }
+                                    notifyWifiConnected(trimmedSsid);
                                 }
                             }
                             break;
 
                         case DISCONNECTED:
                             Timber.i("Disconnected from wifi network.");
-                            refreshWifiAPs();
+                            notifyWifiDisconnected();
                             break;
 
                         case CONNECTING:
                             Timber.d("Connecting to wifi network.");
+                            notifyWifiConnecting();
                             break;
                     }
                     break;
 
                 case WifiManager.WIFI_STATE_CHANGED_ACTION:
-                    refreshWifiAPs();
                     break;
             }
         }
     };
 
-    private final ConcurrentHashMap<String, Runnable> onConnectionActions = new ConcurrentHashMap<>();
-
     private final Context context;
 
     private final WifiManager wifiMgr;
     private final ConnectivityManager connMgr;
+
+    private WifiConnectionListener listener;
 
     public WifiConnectionHandler(Context context) {
         this.context = context;
@@ -173,12 +178,15 @@ public class WifiConnectionHandler {
         this.connMgr = (ConnectivityManager) this.context.getSystemService(Context.CONNECTIVITY_SERVICE);
     }
 
+    public void setListener(WifiConnectionListener listener) {
+        this.listener = listener;
+    }
+
     /**
      * Start the wifi connection handler process.
      * It will start listening for wifi connectivity updates, and will handle them as needed.
      */
     public void start() {
-        refreshWifiAPs();
         this.context.registerReceiver(broadcastReceiver, intentFilter);
     }
 
@@ -196,19 +204,17 @@ public class WifiConnectionHandler {
     /**
      * Query available wifi networks
      */
-    private void refreshWifiAPs() {
+    public boolean refreshWifiAPs() {
         Timber.d("Querying wifi access points.");
         if (wifiMgr == null)
-            return;
+            return false;
 
         if (!wifiMgr.isWifiEnabled() && !wifiMgr.setWifiEnabled(true)) {
             Toast.makeText(context, "Unable to activate Wi-Fi!", Toast.LENGTH_LONG).show();
-            return;
+            return false;
         }
 
-        if (!wifiMgr.startScan()) {
-            Toast.makeText(context, "Unable to scan for Wi-Fi networks!", Toast.LENGTH_LONG).show();
-        }
+        return wifiMgr.startScan();
     }
 
     public boolean isConnected(String wifiSSID) throws IOException {
@@ -236,7 +242,11 @@ public class WifiConnectionHandler {
         }
     }
 
-    public boolean connectToWifi(String soloLinkId, String password, Runnable onConnection) throws IOException {
+    public List<ScanResult> getScanResults(){
+        return wifiMgr.getScanResults();
+    }
+
+    public boolean connectToWifi(String soloLinkId, String password) throws IOException {
         if (TextUtils.isEmpty(soloLinkId) || TextUtils.isEmpty(password))
             return false;
 
@@ -254,10 +264,10 @@ public class WifiConnectionHandler {
             return false;
         }
 
-        return connectToWifi(targetScanResult, password, onConnection);
+        return connectToWifi(targetScanResult, password);
     }
 
-    private boolean connectToWifi(ScanResult scanResult, String password, Runnable onConnection) throws IOException {
+    public boolean connectToWifi(ScanResult scanResult, String password) throws IOException {
         if (scanResult == null || TextUtils.isEmpty(password))
             return false;
 
@@ -267,9 +277,7 @@ public class WifiConnectionHandler {
         if (isConnected(scanResult.SSID)) {
             Timber.d("Already connected to " + scanResult.SSID);
 
-            if (onConnection != null) {
-                onConnection.run();
-            }
+            notifyWifiConnected(scanResult.SSID);
             return true;
         }
 
@@ -281,12 +289,6 @@ public class WifiConnectionHandler {
 
         WifiConfiguration updatedConf = getWifiConfigs(scanResult.SSID);
         if (updatedConf != null) {
-            String targetSSID = "\"" + scanResult.SSID + "\"";
-
-            if (onConnection != null) {
-                onConnectionActions.put(targetSSID, onConnection);
-            }
-
             wifiMgr.enableNetwork(updatedConf.networkId, true);
             return true;
         }
@@ -311,17 +313,44 @@ public class WifiConnectionHandler {
 
         final int netId = wifiMgr.addNetwork(wifiConf);
         if (netId == -1) {
-            Toast.makeText(context, "Unable to connect to Wi-Fi " + scanResult.SSID, Toast.LENGTH_LONG).show();
-            Timber.e("Unable to add wifi configuration for " + scanResult.SSID);
+            Timber.e("Unable to add wifi configuration for %s", scanResult.SSID);
             return false;
         }
 
         return true;
     }
 
+    private static String trimWifiSsid(String wifiSsid) {
+        if (TextUtils.isEmpty(wifiSsid))
+            return "";
+
+        return wifiSsid.replace("\"", "");
+    }
+
     private String getCurrentWifiLink() {
         final WifiInfo connectedWifi = wifiMgr.getConnectionInfo();
         final String connectedSSID = connectedWifi == null ? null : connectedWifi.getSSID();
-        return connectedSSID == null ? "" : connectedSSID.replace("\"", "");
+        return trimWifiSsid(connectedSSID);
+    }
+
+    private void notifyWifiConnected(String wifiSsid) {
+        if (listener != null) {
+            listener.onWifiConnected(wifiSsid);
+        }
+    }
+
+    private void notifyWifiConnecting() {
+        if (listener != null)
+            listener.onWifiConnecting();
+    }
+
+    private void notifyWifiDisconnected() {
+        if (listener != null)
+            listener.onWifiDisconnected();
+    }
+
+    private void notifyWifiScanResultsAvailable(List<ScanResult> results) {
+        if (listener != null)
+            listener.onWifiScanResultsAvailable(results);
     }
 }

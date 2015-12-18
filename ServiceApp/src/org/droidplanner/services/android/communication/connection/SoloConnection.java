@@ -1,11 +1,13 @@
 package org.droidplanner.services.android.communication.connection;
 
 import android.content.Context;
+import android.net.wifi.ScanResult;
 import android.text.TextUtils;
 
 import org.droidplanner.services.android.utils.connection.WifiConnectionHandler;
 
 import java.io.IOException;
+import java.util.List;
 
 import timber.log.Timber;
 
@@ -13,7 +15,7 @@ import timber.log.Timber;
  * Abstract the connection to a Solo vehicle.
  * Created by Fredia Huya-Kouadio on 12/17/15.
  */
-public class SoloConnection extends AndroidMavLinkConnection {
+public class SoloConnection extends AndroidMavLinkConnection implements WifiConnectionHandler.WifiConnectionListener {
 
     private static final int SOLO_UDP_PORT = 14550;
 
@@ -22,21 +24,11 @@ public class SoloConnection extends AndroidMavLinkConnection {
     private final String soloLinkId;
     private final String soloLinkPassword;
 
-    private final Runnable completeDataLinkConnection = new Runnable() {
-        @Override
-        public void run() {
-            try {
-                dataLink.openConnection();
-            } catch (IOException e) {
-                Timber.e(e, e.getMessage());
-                onConnectionFailed(e.getMessage());
-            }
-        }
-    };
-
     public SoloConnection(Context applicationContext, String soloLinkId, String password) {
         super(applicationContext);
         this.wifiHandler = new WifiConnectionHandler(applicationContext);
+        wifiHandler.setListener(this);
+
         this.soloLinkId = soloLinkId;
         this.soloLinkPassword = password;
         this.dataLink = new AndroidUdpConnection(applicationContext, SOLO_UDP_PORT) {
@@ -59,10 +51,12 @@ public class SoloConnection extends AndroidMavLinkConnection {
         }
 
         wifiHandler.start();
+        checkScanResults(wifiHandler.getScanResults());
+    }
 
-        boolean isConnecting = wifiHandler.connectToWifi(soloLinkId, soloLinkPassword, completeDataLinkConnection);
-        if (!isConnecting) {
-            throw new IOException("Unable to connect to solo wifi " + soloLinkId);
+    private void refreshWifiAps() {
+        if (!wifiHandler.refreshWifiAPs()) {
+            onConnectionFailed("Unable to refresh wifi access points");
         }
     }
 
@@ -90,5 +84,70 @@ public class SoloConnection extends AndroidMavLinkConnection {
     @Override
     public int getConnectionType() {
         return dataLink.getConnectionType();
+    }
+
+    @Override
+    public void onWifiConnected(String wifiSsid) {
+        if (isConnecting()) {
+            //Let's see if we're connected to our target wifi
+            if (wifiSsid.equalsIgnoreCase(soloLinkId)) {
+                //We're good to go
+                try {
+                    dataLink.openConnection();
+                } catch (IOException e) {
+                    Timber.e(e, e.getMessage());
+                    onConnectionFailed(e.getMessage());
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onWifiConnecting() {
+
+    }
+
+    @Override
+    public void onWifiDisconnected() {
+
+    }
+
+    @Override
+    public void onWifiScanResultsAvailable(List<ScanResult> results) {
+        checkScanResults(results);
+    }
+
+    private void checkScanResults(List<ScanResult> results) {
+        if (!isConnecting())
+            return;
+
+        //We're in the connection process, let's see if the wifi we want is available
+        ScanResult targetResult = null;
+        for (ScanResult result : results) {
+            if (result.SSID.equalsIgnoreCase(this.soloLinkId)) {
+                //bingo
+                targetResult = result;
+                break;
+            }
+        }
+
+        if (targetResult != null) {
+            //We're good to go
+            try {
+                if (!wifiHandler.connectToWifi(targetResult, soloLinkPassword)) {
+                    onConnectionFailed("Unable to connect to the target wifi " + soloLinkId);
+                }
+            } catch (IOException e) {
+                Timber.e(e, e.getMessage());
+                onConnectionFailed(e.getMessage());
+            }
+        } else {
+            //Let's try again
+            refreshWifiAps();
+        }
+    }
+
+    private boolean isConnecting() {
+        return getConnectionStatus() == MAVLINK_CONNECTING;
     }
 }
