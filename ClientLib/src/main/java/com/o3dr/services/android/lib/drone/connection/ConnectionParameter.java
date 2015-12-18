@@ -13,6 +13,16 @@ public class ConnectionParameter implements Parcelable {
     private final Bundle paramsBundle;
     private final DroneSharePrefs droneSharePrefs;
 
+    public ConnectionParameter(int connectionType, Bundle paramsBundle){
+        this.connectionType = connectionType;
+        this.paramsBundle = paramsBundle;
+        this.droneSharePrefs = null;
+    }
+
+    /**
+     * @deprecated Use {@link ConnectionParameter#ConnectionParameter(int, Bundle)} instead.
+     * @since 2.8.0
+     */
     public ConnectionParameter(int connectionType, Bundle paramsBundle, DroneSharePrefs droneSharePrefs){
         this.connectionType = connectionType;
         this.paramsBundle = paramsBundle;

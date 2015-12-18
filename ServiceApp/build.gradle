@@ -12,9 +12,6 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:22.2.1'
 
     compile files('libs/d2xx.jar')
-    compile files('libs/jeromq-0.3.4.jar')
-    compile files('libs/droneapi-java.jar')
-    compile files('libs/protobuf-java-2.5.0.jar')
 
     compile project(':ClientLib')
     compile project(':dependencyLibs:usb-serial-for-android:UsbSerialLibrary')

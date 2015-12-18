@@ -619,13 +619,6 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
         notifyAttributeUpdate(AttributeEvent.PARAMETERS_REFRESH_COMPLETED, null);
     }
 
-    public DroneSharePrefs getDroneSharePrefs() {
-        if (connectionParams == null)
-            return null;
-
-        return connectionParams.getDroneSharePrefs();
-    }
-
     public void onConnectionFailed(String error) {
         notifyConnectionFailed(new ConnectionResult(0, error));
     }

@@ -68,7 +68,6 @@ public class DroidPlannerService extends Service {
      */
     public static final String ACTION_DRONE_CREATED = Utils.PACKAGE_NAME + ".ACTION_DRONE_CREATED";
     public static final String ACTION_DRONE_DESTROYED = Utils.PACKAGE_NAME + ".ACTION_DRONE_DESTROYED";
-    public static final String ACTION_KICK_START_DRONESHARE_UPLOADS = Utils.PACKAGE_NAME + ".ACTION_KICK_START_DRONESHARE_UPLOADS";
     public static final String ACTION_RELEASE_API_INSTANCE = Utils.PACKAGE_NAME + ".action.RELEASE_API_INSTANCE";
     public static final String EXTRA_API_INSTANCE_APP_ID = "extra_api_instance_app_id";
 
@@ -505,11 +504,6 @@ public class DroidPlannerService extends Service {
         if (intent != null) {
             final String action = intent.getAction();
             switch (action) {
-                case ACTION_KICK_START_DRONESHARE_UPLOADS:
-                    for (DroneManager droneMgr : droneManagers.values()) {
-                        droneMgr.kickStartDroneShareUpload();
-                    }
-                    break;
 
                 case ACTION_RELEASE_API_INSTANCE:
                     final String appId = intent.getStringExtra(EXTRA_API_INSTANCE_APP_ID);
