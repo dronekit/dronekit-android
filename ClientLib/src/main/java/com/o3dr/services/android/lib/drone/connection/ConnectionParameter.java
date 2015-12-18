@@ -80,12 +80,10 @@ public class ConnectionParameter implements Parcelable {
 
             case ConnectionType.TYPE_SOLO:
                 String soloLinkId = "";
-                String linkPassword = "";
                 if(paramsBundle != null){
                     soloLinkId = paramsBundle.getString(ConnectionType.EXTRA_SOLO_LINK_ID, "");
-                    linkPassword = paramsBundle.getString(ConnectionType.EXTRA_SOLO_LINK_PASSWORD, "");
                 }
-                uniqueId = "solo:" + soloLinkId + ":" + linkPassword;
+                uniqueId = "solo:" + soloLinkId;
                 break;
 
             default:

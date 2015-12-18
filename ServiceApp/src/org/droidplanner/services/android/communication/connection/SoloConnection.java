@@ -2,7 +2,12 @@ package org.droidplanner.services.android.communication.connection;
 
 import android.content.Context;
 import android.net.wifi.ScanResult;
+import android.net.wifi.WifiManager;
+import android.os.Bundle;
 import android.text.TextUtils;
+
+import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
+import com.o3dr.services.android.lib.drone.connection.ConnectionType;
 
 import org.droidplanner.services.android.utils.connection.WifiConnectionHandler;
 
@@ -46,7 +51,7 @@ public class SoloConnection extends AndroidMavLinkConnection implements WifiConn
 
     @Override
     protected void openConnection() throws IOException {
-        if (TextUtils.isEmpty(soloLinkId) || TextUtils.isEmpty(soloLinkPassword)) {
+        if (TextUtils.isEmpty(soloLinkId)) {
             throw new IOException("Invalid connection credentials!");
         }
 
@@ -149,5 +154,42 @@ public class SoloConnection extends AndroidMavLinkConnection implements WifiConn
 
     private boolean isConnecting() {
         return getConnectionStatus() == MAVLINK_CONNECTING;
+    }
+
+    public static boolean isSoloConnection(Context context, ConnectionParameter connParam){
+        if(connParam == null)
+            return false;
+
+        final int connectionType = connParam.getConnectionType();
+        switch(connectionType){
+            case ConnectionType.TYPE_SOLO:
+                return true;
+
+            case ConnectionType.TYPE_UDP:
+                Bundle paramsBundle = connParam.getParamsBundle();
+                if(paramsBundle == null)
+                    return false;
+
+                final int serverPort = paramsBundle.getInt(ConnectionType.EXTRA_UDP_SERVER_PORT, ConnectionType.DEFAULT_UDP_SERVER_PORT);
+                final String wifiSsid = WifiConnectionHandler.getCurrentWifiLink((WifiManager) context.getSystemService(Context.WIFI_SERVICE));
+                return WifiConnectionHandler.isSoloWifi(wifiSsid) && serverPort == SOLO_UDP_PORT;
+
+            default:
+                return false;
+        }
+    }
+
+    public static ConnectionParameter getSoloConnectionParameterIfPossible(Context context){
+        if(context == null)
+            return null;
+
+        final String wifiSsid = WifiConnectionHandler.getCurrentWifiLink((WifiManager) context.getSystemService(Context.WIFI_SERVICE));
+        if(WifiConnectionHandler.isSoloWifi(wifiSsid)){
+            Bundle paramsBundle = new Bundle();
+            paramsBundle.putString(ConnectionType.EXTRA_SOLO_LINK_ID, wifiSsid);
+            return new ConnectionParameter(ConnectionType.TYPE_SOLO, paramsBundle);
+        }
+
+        return null;
     }
 }

@@ -144,10 +144,18 @@ public class DroidPlannerService extends Service {
         if (connParams == null || TextUtils.isEmpty(appId) || listener == null)
             return null;
 
+        final Context context = getApplicationContext();
+        if(SoloConnection.isSoloConnection(context, connParams)){
+            ConnectionParameter update = SoloConnection.getSoloConnectionParameterIfPossible(context);
+            if(update != null){
+                connParams = update;
+            }
+        }
+
         DroneManager droneMgr = droneManagers.get(connParams);
         if (droneMgr == null) {
             Timber.d("Generating new drone manager.");
-            droneMgr = new DroneManager(getApplicationContext(), connParams, new Handler(Looper.getMainLooper()),
+            droneMgr = new DroneManager(context, connParams, new Handler(Looper.getMainLooper()),
                     mavlinkApi);
             droneManagers.put(connParams, droneMgr);
         }

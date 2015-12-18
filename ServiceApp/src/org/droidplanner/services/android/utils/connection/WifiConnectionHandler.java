@@ -188,7 +188,7 @@ public class WifiConnectionHandler {
     }
 
     public boolean connectToWifi(String soloLinkId, String password) {
-        if (TextUtils.isEmpty(soloLinkId) || TextUtils.isEmpty(password))
+        if (TextUtils.isEmpty(soloLinkId))
             return false;
 
         ScanResult targetScanResult = null;
@@ -209,7 +209,7 @@ public class WifiConnectionHandler {
     }
 
     public boolean connectToWifi(ScanResult scanResult, String password)  {
-        if (scanResult == null || TextUtils.isEmpty(password))
+        if (scanResult == null)
             return false;
 
         Timber.d("Connecting to wifi " + scanResult.SSID);
@@ -227,6 +227,9 @@ public class WifiConnectionHandler {
         }
 
         Timber.d("Connecting to closed wifi network.");
+        if(TextUtils.isEmpty(password))
+            return false;
+
         if (!connectToClosedWifi(scanResult, password))
             return false;
 
@@ -273,9 +276,17 @@ public class WifiConnectionHandler {
     }
 
     private String getCurrentWifiLink() {
+        return getCurrentWifiLink(wifiMgr);
+    }
+
+    public static String getCurrentWifiLink(WifiManager wifiMgr){
         final WifiInfo connectedWifi = wifiMgr.getConnectionInfo();
         final String connectedSSID = connectedWifi == null ? null : connectedWifi.getSSID();
         return trimWifiSsid(connectedSSID);
+    }
+
+    public static boolean isSoloWifi(String wifiSsid){
+        return !TextUtils.isEmpty(wifiSsid) && wifiSsid.startsWith(SOLO_LINK_WIFI_PREFIX);
     }
 
     private void setDefaultNetworkIfNecessary(String wifiSsid){
@@ -285,7 +296,7 @@ public class WifiConnectionHandler {
             return;
         }
 
-        if (trimmedSsid.startsWith(SOLO_LINK_WIFI_PREFIX)) {
+        if (isSoloWifi(trimmedSsid)) {
             //Attempt to connect to the vehicle.
             Timber.i("Requesting route to sololink network");
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
