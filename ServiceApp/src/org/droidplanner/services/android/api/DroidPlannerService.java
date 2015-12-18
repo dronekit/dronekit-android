@@ -145,13 +145,6 @@ public class DroidPlannerService extends Service {
             return null;
 
         final Context context = getApplicationContext();
-        if(SoloConnection.isSoloConnection(context, connParams)){
-            ConnectionParameter update = SoloConnection.getSoloConnectionParameterIfPossible(context);
-            if(update != null){
-                connParams = update;
-            }
-        }
-
         DroneManager droneMgr = droneManagers.get(connParams);
         if (droneMgr == null) {
             Timber.d("Generating new drone manager.");
