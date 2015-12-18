@@ -38,6 +38,7 @@ import com.o3dr.services.android.lib.model.IMavlinkObserver;
 import com.o3dr.services.android.lib.model.IObserver;
 import com.o3dr.services.android.lib.model.action.Action;
 
+import org.droidplanner.services.android.communication.connection.SoloConnection;
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
 import org.droidplanner.services.android.core.drone.DroneManager;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
@@ -181,10 +182,24 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
         return droneMgr != null && droneMgr.isConnected();
     }
 
+    private ConnectionParameter checkConnectionParameter(ConnectionParameter connParams) throws ConnectionException {
+        if(connParams == null){
+            throw new ConnectionException("Invalid connection parameters");
+        }
+
+        if(SoloConnection.isSoloConnection(context, connParams)){
+            ConnectionParameter update = SoloConnection.getSoloConnectionParameterIfPossible(context);
+            if(update != null){
+                return update;
+            }
+        }
+        return connParams;
+    }
+
     public void connect(ConnectionParameter connParams) {
         try {
-            this.connectionParams = connParams;
-            this.droneMgr = service.connectDroneManager(connParams, ownerId, this);
+            this.connectionParams = checkConnectionParameter(connParams);
+            this.droneMgr = service.connectDroneManager(this.connectionParams, ownerId, this);
         } catch (ConnectionException e) {
             notifyConnectionFailed(new ConnectionResult(0, e.getMessage()));
             disconnect();
