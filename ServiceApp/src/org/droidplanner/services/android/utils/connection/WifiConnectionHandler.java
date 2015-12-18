@@ -168,6 +168,8 @@ public class WifiConnectionHandler {
                             //Maybe disconnect from the vehicle.
                             if (wifiConnectionListener != null)
                                 wifiConnectionListener.onWifiDisconnected();
+
+                            refreshWifiAPs();
                             break;
 
                         case CONNECTING:
@@ -177,6 +179,7 @@ public class WifiConnectionHandler {
                     break;
 
                 case WifiManager.WIFI_STATE_CHANGED_ACTION:
+                    refreshWifiAPs();
                     break;
             }
         }
@@ -205,6 +208,7 @@ public class WifiConnectionHandler {
      * It will start listening for wifi connectivity updates, and will handle them as needed.
      */
     public void start() {
+        refreshWifiAPs();
         this.context.registerReceiver(broadcastReceiver, intentFilter);
     }
 
@@ -222,7 +226,7 @@ public class WifiConnectionHandler {
     /**
      * Query available wifi networks
      */
-    public void refreshWifiAPs() {
+    private void refreshWifiAPs() {
         Timber.d("Querying wifi access points.");
         if (wifiMgr == null)
             return;
@@ -304,8 +308,10 @@ public class WifiConnectionHandler {
             }
         }
 
-        if(targetScanResult == null)
+        if(targetScanResult == null) {
+            Timber.i("No matching scan result was found for id %s", soloLinkId);
             return false;
+        }
 
         return connectToWifi(targetScanResult, onConnection);
     }
