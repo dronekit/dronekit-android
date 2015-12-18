@@ -1,7 +1,6 @@
 package org.droidplanner.services.android.utils;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.RemoteException;
 import android.text.TextUtils;
 import android.view.Surface;
@@ -44,7 +43,6 @@ import com.o3dr.services.android.lib.model.ICommandListener;
 
 import org.droidplanner.services.android.core.MAVLink.MavLinkCommands;
 import org.droidplanner.services.android.core.MAVLink.command.doCmd.MavLinkDoCmds;
-import org.droidplanner.services.android.core.drone.manager.DroneManager;
 import org.droidplanner.services.android.core.drone.autopilot.Drone;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.core.drone.autopilot.apm.ArduPilot;

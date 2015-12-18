@@ -16,7 +16,6 @@ import com.o3dr.services.android.lib.model.action.Action;
 import org.droidplanner.services.android.core.MAVLink.command.doCmd.MavLinkDoCmds;
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
 import org.droidplanner.services.android.core.drone.DroneInterfaces.AttributeEventListener;
-import org.droidplanner.services.android.core.drone.manager.DroneManager;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.core.drone.manager.MavLinkDroneManager;
 import org.droidplanner.services.android.core.gcs.location.Location;

@@ -1,4 +1,4 @@
-package org.droidplanner.services.android.core.drone.manager;
+package org.droidplanner.services.android.core.drone;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -18,11 +18,10 @@ import com.o3dr.services.android.lib.model.action.Action;
 
 import org.droidplanner.services.android.api.DroneApi;
 import org.droidplanner.services.android.communication.model.DataLink;
-import org.droidplanner.services.android.core.drone.DroneInterfaces;
-import org.droidplanner.services.android.core.drone.LogMessageListener;
 import org.droidplanner.services.android.core.drone.autopilot.Drone;
 import org.droidplanner.services.android.core.drone.autopilot.apm.solo.ArduSolo;
 import org.droidplanner.services.android.core.drone.autopilot.apm.solo.SoloComp;
+import org.droidplanner.services.android.core.drone.manager.MavLinkDroneManager;
 import org.droidplanner.services.android.exception.ConnectionException;
 import org.droidplanner.services.android.utils.CommonApiUtils;
 import org.droidplanner.services.android.utils.analytics.GAUtils;

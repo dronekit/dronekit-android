@@ -7,7 +7,6 @@ import com.MAVLink.enums.MAV_TYPE;
 
 import org.droidplanner.services.android.core.drone.manager.MavLinkDroneManager;
 import org.droidplanner.services.android.core.firmware.FirmwareType;
-import org.droidplanner.services.android.core.drone.manager.DroneManager;
 
 /**
  * Parse the received mavlink messages, and update the drone state appropriately.
