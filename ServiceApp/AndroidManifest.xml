@@ -2,16 +2,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="org.droidplanner.services.android">
 
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.BLUETOOTH"/>
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <!-- Support devices without Bluetooth since there are other connection types -->
     <uses-feature
@@ -101,8 +102,6 @@
             android:enabled="false"
             android:exported="false"/>
 
-        <service android:name=".communication.service.UploaderService"/>
-
         <service
             android:name=".api.DroidPlannerService"
             android:enabled="true"
@@ -116,14 +115,6 @@
                 android:name="com.o3dr.dronekit.android.core.version"
                 android:value="@integer/core_lib_version"/>
         </service>
-
-        <receiver
-            android:name=".communication.service.NetworkConnectivityReceiver"
-            android:enabled="false">
-            <intent-filter>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
-            </intent-filter>
-        </receiver>
 
         <receiver
             android:name=".utils.apps.AppsUpdateReceiver">
