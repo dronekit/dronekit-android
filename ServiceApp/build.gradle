@@ -51,13 +51,13 @@ def logLevelError = 6;
 def logLevelAssert = 7;
 
 android {
-    compileSdkVersion Integer.parseInt(project.ANDROID_BUILD_SDK_VERSION)
-    buildToolsVersion project.ANDROID_BUILD_TOOLS_VERSION
+    compileSdkVersion android_build_sdk_version
+    buildToolsVersion android_build_tools_version
 
     defaultConfig {
         applicationId 'org.droidplanner.services.android'
-        minSdkVersion Integer.parseInt(project.ANDROID_BUILD_MIN_SDK_VERSION)
-        targetSdkVersion Integer.parseInt(project.ANDROID_BUILD_TARGET_SDK_VERSION)
+        minSdkVersion android_build_min_sdk_version
+        targetSdkVersion android_build_target_sdk_version
         buildConfigField "boolean", "SITL_DEBUG", "false"
         buildConfigField "String", "SOLO_LINK_LOCAL_IP" , getLocalIp()
 
