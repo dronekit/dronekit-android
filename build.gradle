@@ -1,5 +1,11 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
+
+    ext.android_build_sdk_version = 23
+    ext.android_build_tools_version = '23.0.2'
+    ext.android_build_target_sdk_version = 22
+    ext.android_build_min_sdk_version = 14
+
     repositories {
         jcenter()
         maven { url 'https://maven.fabric.io/public' }
