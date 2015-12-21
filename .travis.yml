@@ -29,7 +29,7 @@ android:
 before_script:
     - export GRADLE_OPTS="-XX:MaxPermSize=2048m -Xmx1536m"
 
-script: ./gradlew clean testDebug assembleDebug -PdisablePreDex
+script: ./gradlew clean cleanJar jar testDebug assembleDebug -PdisablePreDex
 
 after_success:
 - chmod a+x .utility/push-docs-to-gh-pages.sh
