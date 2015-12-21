@@ -4,7 +4,7 @@ ext {
     VERSION_MAJOR = 2
     VERSION_MINOR = 8
     VERSION_PATCH = 0
-    VERSION_SUFFIX = "beta3"
+    VERSION_SUFFIX = "beta4"
 
     PUBLISH_ARTIFACT_ID = 'dronekit-android'
     PUBLISH_VERSION = generateVersionName("", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH, VERSION_SUFFIX)
@@ -55,8 +55,8 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:22.2.1'
-    compile 'com.google.android.gms:play-services-base:7.3.0'
+    compile "com.android.support:support-v4:${support_lib_version}"
+    compile "com.google.android.gms:play-services-base:${play_services_version}"
 
     compile project(':dependencyLibs:Mavlink')
     compile files('libs/Mavlink.jar')
