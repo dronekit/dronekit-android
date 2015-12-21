@@ -58,8 +58,8 @@ dependencies {
     compile "com.android.support:support-v4:${support_lib_version}"
     compile "com.google.android.gms:play-services-base:${play_services_version}"
 
-    compile project(':dependencyLibs:Mavlink')
-    compile files('libs/Mavlink.jar')
+    debugCompile project(':dependencyLibs:Mavlink')
+    releaseCompile files('libs/Mavlink.jar')
 }
 
 assemble.dependsOn ':dependencyLibs:Mavlink:jar'
