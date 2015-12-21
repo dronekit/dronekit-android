@@ -3,13 +3,13 @@ apply plugin: 'io.fabric'
 
 dependencies {
 
-    compile 'com.google.android.gms:play-services-analytics:7.3.0'
-    compile 'com.google.android.gms:play-services-location:7.3.0'
+    compile "com.google.android.gms:play-services-analytics:${play_services_version}"
+    compile "com.google.android.gms:play-services-location:${play_services_version}"
 
-    compile 'com.android.support:support-v4:22.2.1'
-    compile 'com.android.support:appcompat-v7:22.2.1'
-    compile 'com.android.support:cardview-v7:22.2.1'
-    compile 'com.android.support:recyclerview-v7:22.2.1'
+    compile "com.android.support:support-v4:${support_lib_version}"
+    compile "com.android.support:appcompat-v7:${support_lib_version}"
+    compile "com.android.support:cardview-v7:${support_lib_version}"
+    compile "com.android.support:recyclerview-v7:${support_lib_version}"
 
     compile files('libs/d2xx.jar')
 
@@ -22,8 +22,8 @@ dependencies {
     compile 'com.jakewharton.timber:timber:3.1.0'
     compile 'com.jcraft:jsch:0.1.51'
 
-    compile 'com.squareup.okhttp:okhttp:2.3.0'
-    compile 'com.squareup.okhttp:okhttp-urlconnection:2.3.0'
+    compile "com.squareup.okhttp:okhttp:${okhttp_version}"
+    compile "com.squareup.okhttp:okhttp-urlconnection:${okhttp_version}"
 
     //Java semver library
     compile 'com.github.zafarkhaja:java-semver:0.9.0'
@@ -51,13 +51,13 @@ def logLevelError = 6;
 def logLevelAssert = 7;
 
 android {
-    compileSdkVersion Integer.parseInt(project.ANDROID_BUILD_SDK_VERSION)
-    buildToolsVersion project.ANDROID_BUILD_TOOLS_VERSION
+    compileSdkVersion android_build_sdk_version
+    buildToolsVersion android_build_tools_version
 
     defaultConfig {
         applicationId 'org.droidplanner.services.android'
-        minSdkVersion Integer.parseInt(project.ANDROID_BUILD_MIN_SDK_VERSION)
-        targetSdkVersion Integer.parseInt(project.ANDROID_BUILD_TARGET_SDK_VERSION)
+        minSdkVersion android_build_min_sdk_version
+        targetSdkVersion android_build_target_sdk_version
         buildConfigField "boolean", "SITL_DEBUG", "false"
         buildConfigField "String", "SOLO_LINK_LOCAL_IP" , getLocalIp()
 
