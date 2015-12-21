@@ -64,4 +64,4 @@ dependencies {
 
 assemble.dependsOn ':Mavlink:jar'
 
-apply from: "${rootDir}/release_android_library.gradle"
+apply from: "../release_android_library.gradle"
