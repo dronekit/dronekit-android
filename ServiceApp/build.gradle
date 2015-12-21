@@ -14,7 +14,7 @@ dependencies {
     compile files('libs/d2xx.jar')
 
     compile project(':ClientLib')
-    compile project(':dependencyLibs:usb-serial-for-android:UsbSerialLibrary')
+    compile project(':UsbSerialLibrary')
     compile('com.crashlytics.sdk.android:crashlytics:2.2.2@aar') {
         transitive = true;
     }
