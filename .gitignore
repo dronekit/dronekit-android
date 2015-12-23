@@ -45,3 +45,6 @@ crashlytics.properties
 
 # Vagrant
 .vagrant/
+
+# Fabric (crashlytics)
+fabric.properties

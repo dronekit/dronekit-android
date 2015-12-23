@@ -6,6 +6,8 @@ import android.text.TextUtils;
 
 /**
  * Created by fhuya on 11/14/14.
+ * @deprecated DroneShare uploads are no longer supported.
+ * @since 2.8.0
  */
 public class DroneSharePrefs implements Parcelable {
 

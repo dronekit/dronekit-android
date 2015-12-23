@@ -78,4 +78,20 @@ public class ConnectionType {
      */
     public static final String EXTRA_BLUETOOTH_ADDRESS = "extra_bluetooth_address";
 
+    /**
+     * Solo vehicle connection type
+     * Opens a UDP connection at port 14550 once on the correct wifi network.
+     */
+    public static final int TYPE_SOLO = 101;
+
+    /**
+     * Used to retrieve the id (wifi ssid) of the solo vehicle link.
+     */
+    public static final String EXTRA_SOLO_LINK_ID = "extra_solo_link_id";
+
+    /**
+     * Used to retrieve the password to access the solo wifi network.
+     */
+    public static final String EXTRA_SOLO_LINK_PASSWORD = "extra_solo_link_password";
+
 }
