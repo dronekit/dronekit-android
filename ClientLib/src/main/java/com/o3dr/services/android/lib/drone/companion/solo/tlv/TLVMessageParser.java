@@ -21,6 +21,7 @@ import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageT
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_CABLE_CAM_OPTIONS;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_CABLE_CAM_WAYPOINT;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_FOLLOW_OPTIONS;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_FOLLOW_OPTIONS_V2;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_GET_BUTTON_SETTING;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_GOPRO_RECORD;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_GOPRO_REQUEST_STATE;
@@ -135,9 +136,12 @@ public class TLVMessageParser {
                     }
 
                     case TYPE_SOLO_FOLLOW_OPTIONS: {
-                        final float cruiseSpeed = packetBuffer.getFloat();
-                        final int lookAtValue = packetBuffer.getInt();
-                        packet = new SoloFollowOptions(cruiseSpeed, lookAtValue);
+                        packet = new SoloFollowOptions(packetBuffer);
+                        break;
+                    }
+
+                    case TYPE_SOLO_FOLLOW_OPTIONS_V2: {
+                        packet = new SoloFollowOptionsV2(packetBuffer);
                         break;
                     }
 

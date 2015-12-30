@@ -14,6 +14,7 @@ public class TLVMessageTypes {
     public static final int TYPE_SOLO_SET_BUTTON_SETTING = 6;
 
     public static final int TYPE_SOLO_FOLLOW_OPTIONS = 19;
+    public static final int TYPE_SOLO_FOLLOW_OPTIONS_V2 = 119;
     public static final int TYPE_SOLO_SHOT_OPTIONS = 20;
     public static final int TYPE_SOLO_SHOT_ERROR = 21;
 
