@@ -14,6 +14,10 @@ public class SoloFollowOptionsV2 extends SoloFollowOptions {
 
     private boolean freeLook;
 
+    public SoloFollowOptionsV2() {
+        this(PAUSED_CRUISE_SPEED, true, false);
+    }
+
     public SoloFollowOptionsV2(float cruiseSpeed, boolean lookAt, boolean freeLook){
         super(TLVMessageTypes.TYPE_SOLO_FOLLOW_OPTIONS_V2, 12, cruiseSpeed, lookAt);
         this.freeLook = freeLook;
