@@ -51,7 +51,7 @@ public class SoloFollowOptionsV2 extends SoloFollowOptions {
     @Override
     public int hashCode() {
         int result = super.hashCode();
-        result = 31 * result + (freeLook ? 1 : 0);
+        result = 31 * result + (freeLook ? FREE_LOOK_ENABLED_VALUE : FREE_LOOK_DISABLED_VALUE);
         return result;
     }
 
@@ -64,12 +64,12 @@ public class SoloFollowOptionsV2 extends SoloFollowOptions {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         super.writeToParcel(dest, flags);
-        dest.writeByte(freeLook ? (byte) 1 : (byte) 0);
+        dest.writeByte(freeLook ? (byte) FREE_LOOK_ENABLED_VALUE : (byte) FREE_LOOK_DISABLED_VALUE);
     }
 
     protected SoloFollowOptionsV2(Parcel in) {
         super(in);
-        this.freeLook = in.readByte() != 0;
+        this.freeLook = in.readByte() != FREE_LOOK_DISABLED_VALUE;
     }
 
     public static final Creator<SoloFollowOptionsV2> CREATOR = new Creator<SoloFollowOptionsV2>() {
