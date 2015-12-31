@@ -123,13 +123,20 @@ android {
 
     buildTypes {
         debug {
-            versionNameSuffix generateVersionNameSuffix(versionBuild, "dev")
+            versionNameSuffix generateVersionNameSuffix(versionBuild, "dev", true)
             buildConfigField "boolean", "WRITE_LOG_FILE", "true"
         }
 
         beta {
             signingConfig signingConfigs.release
             versionNameSuffix generateVersionNameSuffix(versionBuild, "beta")
+            buildConfigField "boolean", "WRITE_LOG_FILE", "true"
+            buildConfigField "boolean", "ENABLE_CRASHLYTICS", "true"
+        }
+
+        alpha {
+            signingConfig signingConfigs.release
+            versionNameSuffix generateVersionNameSuffix(versionBuild, "alpha")
             buildConfigField "boolean", "WRITE_LOG_FILE", "true"
             buildConfigField "boolean", "ENABLE_CRASHLYTICS", "true"
         }
