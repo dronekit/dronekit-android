@@ -38,8 +38,12 @@ def generateVersionName(String versionPrefix, int versionMajor, int versionMinor
     return versionName
 }
 
-def generateVersionNameSuffix(int versionBuild, String releaseType){
-    return ".${releaseType}.${versionBuild} (${getGitShortHash()})"
+def generateVersionNameSuffix(int versionBuild, String releaseType, boolean includeHash = false){
+    def versionNameSuffix = ".${releaseType}.${versionBuild}"
+    if(includeHash){
+        versionNameSuffix += " (${getGitShortHash()})"
+    }
+    return versionNameSuffix
 }
 
 /**
