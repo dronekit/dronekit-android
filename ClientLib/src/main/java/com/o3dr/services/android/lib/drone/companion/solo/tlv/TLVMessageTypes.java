@@ -42,6 +42,14 @@ public class TLVMessageTypes {
     public static final int TYPE_SOLO_SPLINE_PATH_STATUS = 56;
     public static final int TYPE_SOLO_SPLINE_ATTACH = 57;
 
+    /*
+    Site scan inspect shot message types
+     */
+    public static final int TYPE_SOLO_INSPECT_START = 10001;
+    public static final int TYPE_SOLO_INSPECT_SET_WAYPOINT = 10002;
+    public static final int TYPE_SOLO_INSPECT_MOVE_GIMBAL = 10003;
+    public static final int TYPE_SOLO_INSPECT_MOVE_VEHICLE = 10004;
+
     //Private constructor to prevent instantiation
     private TLVMessageTypes(){}
 }

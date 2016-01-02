@@ -2,6 +2,10 @@ package com.o3dr.services.android.lib.drone.companion.solo.tlv;
 
 import android.util.Log;
 
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.inspect.SoloInspectStart;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.inspect.SoloInspectSetWaypoint;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.inspect.SoloInspectMoveGimbal;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.inspect.SoloInspectMoveVehicle;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.mpcc.SoloSplineAttach;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.mpcc.SoloSplinePathSettings;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.mpcc.SoloSplinePathStatus;
@@ -29,6 +33,10 @@ import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageT
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_GOPRO_SET_REQUEST;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_GOPRO_STATE;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_GOPRO_STATE_V2;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_INSPECT_MOVE_GIMBAL;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_INSPECT_MOVE_VEHICLE;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_INSPECT_SET_WAYPOINT;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_INSPECT_START;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_MESSAGE_GET_CURRENT_SHOT;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_MESSAGE_LOCATION;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_MESSAGE_RECORD_POSITION;
@@ -258,6 +266,27 @@ public class TLVMessageParser {
 
                     case TYPE_SOLO_SPLINE_ATTACH: {
                         packet = new SoloSplineAttach(packetBuffer);
+                        break;
+                    }
+
+                    /************************ Site Scan tlv packets **************/
+                    case TYPE_SOLO_INSPECT_START:{
+                        packet = new SoloInspectStart(packetBuffer);
+                        break;
+                    }
+
+                    case TYPE_SOLO_INSPECT_SET_WAYPOINT:{
+                        packet = new SoloInspectSetWaypoint(packetBuffer);
+                        break;
+                    }
+
+                    case TYPE_SOLO_INSPECT_MOVE_GIMBAL:{
+                        packet = new SoloInspectMoveGimbal(packetBuffer);
+                        break;
+                    }
+
+                    case TYPE_SOLO_INSPECT_MOVE_VEHICLE:{
+                        packet = new SoloInspectMoveVehicle(packetBuffer);
                         break;
                     }
 

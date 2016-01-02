@@ -19,9 +19,13 @@ public abstract class SoloMessageShot extends TLVPacket {
     public static final int SHOT_ORBIT = 1;
     public static final int SHOT_CABLECAM = 2;
     public static final int SHOT_FOLLOW = 5;
-    public static final int SHOT_INSPECT = 6;
-    public static final int SHOT_SURVEY = 7;
-    public static final int SHOT_SCAN = 8;
+
+    /*
+    Site Scan shots
+     */
+    public static final int SHOT_INSPECT = 10000;
+    public static final int SHOT_SURVEY = 10200;
+    public static final int SHOT_SCAN = 10100;
 
     private int shotType;
 
