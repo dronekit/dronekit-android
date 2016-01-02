@@ -1,4 +1,4 @@
-package com.o3dr.services.android.lib.drone.companion.solo.tlv.inspect;
+package com.o3dr.services.android.lib.drone.companion.solo.tlv.sitescan.inspect;
 
 import android.os.Parcel;
 

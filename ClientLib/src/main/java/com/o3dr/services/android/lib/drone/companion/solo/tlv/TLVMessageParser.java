@@ -2,10 +2,10 @@ package com.o3dr.services.android.lib.drone.companion.solo.tlv;
 
 import android.util.Log;
 
-import com.o3dr.services.android.lib.drone.companion.solo.tlv.inspect.SoloInspectStart;
-import com.o3dr.services.android.lib.drone.companion.solo.tlv.inspect.SoloInspectSetWaypoint;
-import com.o3dr.services.android.lib.drone.companion.solo.tlv.inspect.SoloInspectMoveGimbal;
-import com.o3dr.services.android.lib.drone.companion.solo.tlv.inspect.SoloInspectMoveVehicle;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.sitescan.inspect.SoloInspectStart;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.sitescan.inspect.SoloInspectSetWaypoint;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.sitescan.inspect.SoloInspectMoveGimbal;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.sitescan.inspect.SoloInspectMoveVehicle;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.mpcc.SoloSplineAttach;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.mpcc.SoloSplinePathSettings;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.mpcc.SoloSplinePathStatus;
