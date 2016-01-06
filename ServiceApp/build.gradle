@@ -38,8 +38,8 @@ dependencies {
 //Decomposed version name and code (https://plus.google.com/+JakeWharton/posts/6f5TcVPRZij)
 def versionMajor = 1
 def versionMinor = 5
-def versionPatch = 0
-def versionBuild = 4 //bump for dogfood builds, public betas, etc.
+def versionPatch = 1
+def versionBuild = 6 //bump for dogfood builds, public betas, etc.
 def versionPrefix = "3DR Services v"
 
 //Log levels values
@@ -123,13 +123,20 @@ android {
 
     buildTypes {
         debug {
-            versionNameSuffix generateVersionNameSuffix(versionBuild, "dev")
+            versionNameSuffix generateVersionNameSuffix(versionBuild, "dev", true)
             buildConfigField "boolean", "WRITE_LOG_FILE", "true"
         }
 
         beta {
             signingConfig signingConfigs.release
             versionNameSuffix generateVersionNameSuffix(versionBuild, "beta")
+            buildConfigField "boolean", "WRITE_LOG_FILE", "true"
+            buildConfigField "boolean", "ENABLE_CRASHLYTICS", "true"
+        }
+
+        alpha {
+            signingConfig signingConfigs.release
+            versionNameSuffix generateVersionNameSuffix(versionBuild, "alpha")
             buildConfigField "boolean", "WRITE_LOG_FILE", "true"
             buildConfigField "boolean", "ENABLE_CRASHLYTICS", "true"
         }
