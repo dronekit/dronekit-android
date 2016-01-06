@@ -255,23 +255,6 @@ public class WifiConnectionHandler {
         return wifiSsid.equalsIgnoreCase(getCurrentWifiLink());
     }
 
-    /**
-     * If the network is saved on the device, it can be be connected to without a password
-     * @param ssid
-     * @return whether the ssid is part of the wifi config
-     */
-    private boolean networkIsSaved(String ssid) {
-        WifiConfiguration wifiConfig = getWifiConfigs(ssid);
-        if (wifiConfig == null) {
-            return false;
-        }
-
-        wifiMgr.disconnect();
-        wifiMgr.enableNetwork(wifiConfig.networkId, true);
-        wifiMgr.reconnect();
-        return true;
-    }
-
     public boolean isConnected(String wifiSSID) {
         if (!isOnNetwork(wifiSSID))
             return false;
@@ -325,6 +308,8 @@ public class WifiConnectionHandler {
 
         Timber.d("Connecting to wifi " + scanResult.SSID);
 
+        WifiConfiguration wifiConfig = getWifiConfigs(scanResult.SSID);
+
         //Check if we're already connected to the given network.
         if (isConnected(scanResult.SSID)) {
             Timber.d("Already connected to " + scanResult.SSID);
@@ -334,8 +319,12 @@ public class WifiConnectionHandler {
         } else if (isOnNetwork(scanResult.SSID)) {
             setDefaultNetworkIfNecessary(scanResult.SSID);
             return true;
-        } else if (networkIsSaved(scanResult.SSID)) {
-            setDefaultNetworkIfNecessary(scanResult.SSID);
+
+        //Network is already configured and can be connected to without a password
+        } else if (wifiConfig != null) {
+            wifiMgr.disconnect();
+            wifiMgr.enableNetwork(wifiConfig.networkId, true);
+            wifiMgr.reconnect();
             return true;
         }
 
