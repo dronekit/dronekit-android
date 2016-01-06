@@ -255,6 +255,23 @@ public class WifiConnectionHandler {
         return wifiSsid.equalsIgnoreCase(getCurrentWifiLink());
     }
 
+    /**
+     * If the network is saved on the device, it can be be connected to without a password
+     * @param ssid
+     * @return whether the ssid is part of the wifi config
+     */
+    private boolean networkIsSaved(String ssid) {
+        WifiConfiguration wifiConfig = getWifiConfigs(ssid);
+        if (wifiConfig == null) {
+            return false;
+        }
+
+        wifiMgr.disconnect();
+        wifiMgr.enableNetwork(wifiConfig.networkId, true);
+        wifiMgr.reconnect();
+        return true;
+    }
+
     public boolean isConnected(String wifiSSID) {
         if (!isOnNetwork(wifiSSID))
             return false;
@@ -315,6 +332,9 @@ public class WifiConnectionHandler {
             notifyWifiConnected(scanResult.SSID);
             return true;
         } else if (isOnNetwork(scanResult.SSID)) {
+            setDefaultNetworkIfNecessary(scanResult.SSID);
+            return true;
+        } else if (networkIsSaved(scanResult.SSID)) {
             setDefaultNetworkIfNecessary(scanResult.SSID);
             return true;
         }
