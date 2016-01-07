@@ -7,6 +7,7 @@ import android.os.RemoteException;
 import android.text.TextUtils;
 import android.view.Surface;
 
+import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.common.msg_statustext;
 import com.MAVLink.enums.MAV_TYPE;
 import com.o3dr.android.client.apis.CapabilityApi;
@@ -30,7 +31,7 @@ import com.o3dr.services.android.lib.drone.property.State;
 import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
 
-import org.droidplanner.services.android.core.MAVLink.MAVLinkStreams;
+import org.droidplanner.services.android.communication.model.DataLink;
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
 import org.droidplanner.services.android.core.drone.LogMessageListener;
 import org.droidplanner.services.android.core.drone.autopilot.apm.ArduCopter;
@@ -69,9 +70,9 @@ public class ArduSolo extends ArduCopter {
 
     private final SoloComp soloComp;
 
-    public ArduSolo(Context context, MAVLinkStreams.MAVLinkOutputStream mavClient, Handler handler,
-                    AutopilotWarningParser warningParser, LogMessageListener logListener, DroneInterfaces.AttributeEventListener listener) {
-        super(context, mavClient, handler, warningParser, logListener, listener);
+    public ArduSolo(String droneId, Context context, DataLink.DataLinkProvider<MAVLinkMessage> mavClient, Handler handler,
+                    AutopilotWarningParser warningParser, LogMessageListener logListener) {
+        super(droneId, context, mavClient, handler, warningParser, logListener);
         this.soloComp = new SoloComp(context, handler);
         this.soloComp.setListener(new SoloComp.SoloCompListener() {
             @Override

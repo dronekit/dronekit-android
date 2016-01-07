@@ -1,10 +1,11 @@
 package org.droidplanner.services.android.core.gcs;
 
+import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.common.msg_heartbeat;
 import com.MAVLink.enums.MAV_AUTOPILOT;
 import com.MAVLink.enums.MAV_TYPE;
 
-import org.droidplanner.services.android.communication.service.MAVLinkClient;
+import org.droidplanner.services.android.communication.model.DataLink;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -42,14 +43,14 @@ public class GCSHeartbeat {
     private final Runnable heartbeatRunnable = new Runnable() {
         @Override
         public void run() {
-            mavClient.sendMavMessage(sMsg, null);
+            dataLink.sendMessage(sMsg, null);
         }
     };
 
-    private final MAVLinkClient mavClient;
+    private final DataLink.DataLinkProvider<MAVLinkMessage> dataLink;
 
-    public GCSHeartbeat(MAVLinkClient mavClient, int freqHz) {
-        this.mavClient = mavClient;
+    public GCSHeartbeat(DataLink.DataLinkProvider<MAVLinkMessage> dataLink, int freqHz) {
+        this.dataLink = dataLink;
         this.period = freqHz;
     }
 

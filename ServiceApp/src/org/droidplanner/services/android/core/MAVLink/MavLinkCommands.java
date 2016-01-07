@@ -31,7 +31,7 @@ public class MavLinkCommands {
         msg.param2 = speed;
         msg.param3 = 0; // TODO use correct parameter
 
-        drone.getMavClient().sendMavMessage(msg, listener);
+        drone.getMavClient().sendMessage(msg, listener);
     }
 
     public static void setGuidedMode(MavLinkDrone drone, double latitude, double longitude, double d) {
@@ -50,7 +50,7 @@ public class MavLinkCommands {
         msg.autocontinue = 1; // TODO use correct parameter
         msg.target_system = drone.getSysid();
         msg.target_component = drone.getCompid();
-        drone.getMavClient().sendMavMessage(msg, null);
+        drone.getMavClient().sendMessage(msg, null);
     }
 
     public static void sendGuidedPosition(MavLinkDrone drone, double latitude, double longitude, double altitude){
@@ -62,7 +62,7 @@ public class MavLinkCommands {
         msg.alt = (float) altitude;
         msg.target_system = drone.getSysid();
         msg.target_component = drone.getCompid();
-        drone.getMavClient().sendMavMessage(msg, null);
+        drone.getMavClient().sendMessage(msg, null);
     }
 
     public static void sendGuidedVelocity(MavLinkDrone drone, double xVel, double yVel, double zVel){
@@ -74,7 +74,7 @@ public class MavLinkCommands {
         msg.vz = (float) zVel;
         msg.target_system = drone.getSysid();
         msg.target_component = drone.getCompid();
-        drone.getMavClient().sendMavMessage(msg, null);
+        drone.getMavClient().sendMessage(msg, null);
     }
 
     public static void setVelocityInLocalFrame(MavLinkDrone drone, float xVel, float yVel, float zVel, ICommandListener listener){
@@ -85,7 +85,7 @@ public class MavLinkCommands {
         msg.vz = zVel;
         msg.target_system = drone.getSysid();
         msg.target_component = drone.getCompid();
-        drone.getMavClient().sendMavMessage(msg, listener);
+        drone.getMavClient().sendMessage(msg, listener);
     }
 
     public static void sendGuidedPositionAndVelocity(MavLinkDrone drone, double latitude, double longitude, double altitude,
@@ -101,7 +101,7 @@ public class MavLinkCommands {
         msg.vz = (float) zVel;
         msg.target_system = drone.getSysid();
         msg.target_component = drone.getCompid();
-        drone.getMavClient().sendMavMessage(msg, null);
+        drone.getMavClient().sendMessage(msg, null);
     }
 
     public static void changeFlightMode(MavLinkDrone drone, ApmModes mode, ICommandListener listener) {
@@ -109,7 +109,7 @@ public class MavLinkCommands {
         msg.target_system = drone.getSysid();
         msg.base_mode = 1; // TODO use meaningful constant
         msg.custom_mode = mode.getNumber();
-        drone.getMavClient().sendMavMessage(msg, listener);
+        drone.getMavClient().sendMessage(msg, listener);
     }
 
     public static void setConditionYaw(MavLinkDrone drone, float targetAngle, float yawRate, boolean isClockwise,
@@ -124,7 +124,7 @@ public class MavLinkCommands {
         msg.param3 = isClockwise ? 1 : -1;
         msg.param4 = isRelative ? 1 : 0;
 
-        drone.getMavClient().sendMavMessage(msg, listener);
+        drone.getMavClient().sendMessage(msg, listener);
     }
 
     /**
@@ -148,7 +148,7 @@ public class MavLinkCommands {
         msg.z = z;
         msg.r = r;
         msg.buttons = buttons;
-        drone.getMavClient().sendMavMessage(msg, listener);
+        drone.getMavClient().sendMessage(msg, listener);
     }
 
     public static void sendTakeoff(MavLinkDrone drone, double alt, ICommandListener listener) {
@@ -159,7 +159,7 @@ public class MavLinkCommands {
 
         msg.param7 = (float) alt;
 
-        drone.getMavClient().sendMavMessage(msg, listener);
+        drone.getMavClient().sendMessage(msg, listener);
     }
 
     public static void sendNavLand(MavLinkDrone drone, ICommandListener listener){
@@ -168,7 +168,7 @@ public class MavLinkCommands {
         msg.target_component = drone.getCompid();
         msg.command = MAV_CMD.MAV_CMD_NAV_LAND;
 
-        drone.getMavClient().sendMavMessage(msg, listener);
+        drone.getMavClient().sendMessage(msg, listener);
     }
 
     public static void sendNavRTL(MavLinkDrone drone, ICommandListener listener){
@@ -177,7 +177,7 @@ public class MavLinkCommands {
         msg.target_component = drone.getCompid();
         msg.command = MAV_CMD.MAV_CMD_NAV_RETURN_TO_LAUNCH;
 
-        drone.getMavClient().sendMavMessage(msg, listener);
+        drone.getMavClient().sendMessage(msg, listener);
     }
 
     public static void sendPause(MavLinkDrone drone, ICommandListener listener){
@@ -189,7 +189,7 @@ public class MavLinkCommands {
         msg.param1 = MAV_GOTO.MAV_GOTO_DO_HOLD;
         msg.param2 = MAV_GOTO.MAV_GOTO_HOLD_AT_CURRENT_POSITION;
 
-        drone.getMavClient().sendMavMessage(msg, listener);
+        drone.getMavClient().sendMessage(msg, listener);
     }
 
     public static void startMission(MavLinkDrone drone, ICommandListener listener){
@@ -198,7 +198,7 @@ public class MavLinkCommands {
         msg.target_component = drone.getCompid();
         msg.command = MAV_CMD.MAV_CMD_MISSION_START;
 
-        drone.getMavClient().sendMavMessage(msg, listener);
+        drone.getMavClient().sendMessage(msg, listener);
     }
 
     public static void sendArmMessage(MavLinkDrone drone, boolean arm, boolean emergencyDisarm, ICommandListener listener) {
@@ -215,7 +215,7 @@ public class MavLinkCommands {
         msg.param6 = 0;
         msg.param7 = 0;
         msg.confirmation = 0;
-        drone.getMavClient().sendMavMessage(msg, listener);
+        drone.getMavClient().sendMessage(msg, listener);
     }
 
     public static void sendFlightTermination(MavLinkDrone drone, ICommandListener listener) {
@@ -226,6 +226,6 @@ public class MavLinkCommands {
         msg.command = MAV_CMD.MAV_CMD_DO_FLIGHTTERMINATION;
         msg.param1 = 1;
 
-        drone.getMavClient().sendMavMessage(msg, listener);
+        drone.getMavClient().sendMessage(msg, listener);
     }
 }
