@@ -110,9 +110,10 @@ public class DroneManager<T extends Drone, D> implements DataLink.DataLinkListen
         final int connectionType = connectionParameter.getConnectionType();
 
         return drone instanceof ArduSolo
-                || connectionType == ConnectionType.TYPE_UDP || connectionType == ConnectionType.TYPE_SOLO
-                && SoloComp.isAvailable(context)
-                && doAnyListenersSupportSoloLinkApi();
+                ||
+                (connectionType == ConnectionType.TYPE_UDP && SoloComp.isAvailable(context) && doAnyListenersSupportSoloLinkApi())
+                ||
+                connectionType == ConnectionType.TYPE_SOLO;
 
     }
 

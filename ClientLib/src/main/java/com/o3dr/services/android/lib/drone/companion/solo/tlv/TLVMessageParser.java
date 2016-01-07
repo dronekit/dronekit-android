@@ -2,6 +2,7 @@ package com.o3dr.services.android.lib.drone.companion.solo.tlv;
 
 import android.util.Log;
 
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.mpcc.SoloSplineAttach;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.mpcc.SoloSplinePathSettings;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.mpcc.SoloSplinePathStatus;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.mpcc.SoloSplinePlay;
@@ -20,6 +21,7 @@ import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageT
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_CABLE_CAM_OPTIONS;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_CABLE_CAM_WAYPOINT;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_FOLLOW_OPTIONS;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_FOLLOW_OPTIONS_V2;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_GET_BUTTON_SETTING;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_GOPRO_RECORD;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_GOPRO_REQUEST_STATE;
@@ -35,6 +37,7 @@ import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageT
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SET_BUTTON_SETTING;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SHOT_ERROR;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SHOT_OPTIONS;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SPLINE_ATTACH;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SPLINE_PATH_SETTINGS;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SPLINE_PATH_STATUS;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SPLINE_PLAY;
@@ -133,9 +136,12 @@ public class TLVMessageParser {
                     }
 
                     case TYPE_SOLO_FOLLOW_OPTIONS: {
-                        final float cruiseSpeed = packetBuffer.getFloat();
-                        final int lookAtValue = packetBuffer.getInt();
-                        packet = new SoloFollowOptions(cruiseSpeed, lookAtValue);
+                        packet = new SoloFollowOptions(packetBuffer);
+                        break;
+                    }
+
+                    case TYPE_SOLO_FOLLOW_OPTIONS_V2: {
+                        packet = new SoloFollowOptionsV2(packetBuffer);
                         break;
                     }
 
@@ -247,6 +253,11 @@ public class TLVMessageParser {
 
                     case TYPE_SOLO_SPLINE_PATH_STATUS:{
                         packet = new SoloSplinePathStatus(packetBuffer);
+                        break;
+                    }
+
+                    case TYPE_SOLO_SPLINE_ATTACH: {
+                        packet = new SoloSplineAttach(packetBuffer);
                         break;
                     }
 
