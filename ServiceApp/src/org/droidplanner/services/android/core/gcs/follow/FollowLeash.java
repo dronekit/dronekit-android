@@ -6,13 +6,13 @@ import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.property.Gps;
 
-import org.droidplanner.services.android.core.drone.DroneManager;
+import org.droidplanner.services.android.core.drone.manager.MavLinkDroneManager;
 import org.droidplanner.services.android.core.gcs.location.Location;
 import org.droidplanner.services.android.core.helpers.geoTools.GeoTools;
 
 public class FollowLeash extends FollowWithRadiusAlgorithm {
 
-    public FollowLeash(DroneManager droneMgr, Handler handler, double radius) {
+    public FollowLeash(MavLinkDroneManager droneMgr, Handler handler, double radius) {
         super(droneMgr, handler, radius);
     }
 

@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Created by Fredia Huya-Kouadio on 5/3/15.
  */
-public class MagnetometerCalibrationImpl extends DroneVariable implements DroneInterfaces.OnDroneListener {
+public class MagnetometerCalibrationImpl extends DroneVariable implements DroneInterfaces.OnDroneListener<MavLinkDrone> {
 
     public interface OnMagnetometerCalibrationListener {
         void onCalibrationCancelled();

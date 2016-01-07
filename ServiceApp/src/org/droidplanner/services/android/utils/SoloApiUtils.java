@@ -39,7 +39,7 @@ public class SoloApiUtils {
                 soloComp.getControllerMode(), soloComp.getControllerUnit());
     }
 
-    static boolean isSoloLinkFeatureAvailable(Drone drone, ICommandListener listener) {
+    public static boolean isSoloLinkFeatureAvailable(Drone drone, ICommandListener listener) {
         if (drone == null)
             return false;
 
