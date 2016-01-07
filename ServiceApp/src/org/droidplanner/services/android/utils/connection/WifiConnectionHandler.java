@@ -308,6 +308,7 @@ public class WifiConnectionHandler {
 
         Timber.d("Connecting to wifi " + scanResult.SSID);
 
+
         //Check if we're already connected to the given network.
         if (isConnected(scanResult.SSID)) {
             Timber.d("Already connected to " + scanResult.SSID);
@@ -317,20 +318,26 @@ public class WifiConnectionHandler {
         } else if (isOnNetwork(scanResult.SSID)) {
             setDefaultNetworkIfNecessary(scanResult.SSID);
             return true;
+
         }
 
-        Timber.d("Connecting to closed wifi network.");
-        if (TextUtils.isEmpty(password))
-            return false;
+        WifiConfiguration wifiConfig = getWifiConfigs(scanResult.SSID);
 
-        if (!connectToClosedWifi(scanResult, password))
-            return false;
+        //Network is not configured and needs a password to connect
+        if (wifiConfig == null) {
+            Timber.d("Connecting to closed wifi network.");
+            if (TextUtils.isEmpty(password))
+                return false;
 
-        wifiMgr.saveConfiguration();
+            if (!connectToClosedWifi(scanResult, password))
+                return false;
 
-        WifiConfiguration updatedConf = getWifiConfigs(scanResult.SSID);
-        if (updatedConf != null) {
-            wifiMgr.enableNetwork(updatedConf.networkId, true);
+            wifiMgr.saveConfiguration();
+            wifiConfig = getWifiConfigs(scanResult.SSID);
+        }
+
+        if (wifiConfig != null) {
+            wifiMgr.enableNetwork(wifiConfig.networkId, true);
             return true;
         }
         return false;

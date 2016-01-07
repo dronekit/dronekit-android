@@ -40,6 +40,25 @@ public class SoloShotOptions extends TLVPacket {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SoloShotOptions)) return false;
+        if (!super.equals(o)) return false;
+
+        SoloShotOptions that = (SoloShotOptions) o;
+
+        return Float.compare(that.cruiseSpeed, cruiseSpeed) == 0;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + (cruiseSpeed != +0.0f ? Float.floatToIntBits(cruiseSpeed) : 0);
+        return result;
+    }
+
+    @Override
     protected void getMessageValue(ByteBuffer valueCarrier) {
         valueCarrier.putFloat(cruiseSpeed);
     }
