@@ -425,7 +425,12 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
     @Override
     public void onDroneEvent(DroneInterfaces.DroneEventsType event, Drone drone) {
         final Bundle extrasBundle = new Bundle();
-        extrasBundle.putString(AttributeEventExtra.EXTRA_VEHICLE_ID, drone.getId());
+        String droneId = "";
+        if (drone != null) {
+            droneId = drone.getId();
+        }
+
+        extrasBundle.putString(AttributeEventExtra.EXTRA_VEHICLE_ID, droneId);
 
         String droneEvent = null;
         List<Pair<String, Bundle>> attributesInfo = new ArrayList<>();
@@ -513,13 +518,13 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
 
             case CALIBRATION_TIMEOUT:
                 if(drone instanceof MavLinkDrone) {
-                    /*
+                /*
                  * here we will check if we are in calibration mode but if at
-				 * the same time 'msg' is empty - then it is actually not doing
-				 * calibration what we should do is to reset the calibration
-				 * flag and re-trigger the HEARBEAT_TIMEOUT this however should
-				 * not be happening
-				 */
+                 * the same time 'msg' is empty - then it is actually not doing
+                 * calibration what we should do is to reset the calibration
+                 * flag and re-trigger the HEARTBEAT_TIMEOUT this however should
+                 * not be happening
+                 */
                     AccelCalibration accelCalibration = ((MavLinkDrone) drone).getCalibrationSetup();
                     String message = accelCalibration.getMessage();
                     if (accelCalibration.isCalibrating() && TextUtils.isEmpty(message)) {
