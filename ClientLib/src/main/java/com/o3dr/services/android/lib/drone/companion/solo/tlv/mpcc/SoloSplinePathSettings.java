@@ -19,86 +19,57 @@ import java.nio.ByteBuffer;
  */
 public class SoloSplinePathSettings extends TLVPacket {
 
-    public static final int MESSAGE_LENGTH = 6;
+    public static final int MESSAGE_LENGTH = 8;
 
     /**
      * cameraControl: (DEFAULT 0)
      * 0 : Shotmanager controls camera interpolation;  automatically points camera
      * 1 : No camera interpolation - camera is controlled with Artoo only.
      */
-    private short cameraControl;
+    private int cameraControl;
 
     /**
      * queryUVelocity: (DEFAULT 1.0)
      * The app uses this value to query how long it will take to fly the Path at a specific speed.
      * This value is echoed back in SOLO_SPLINE_PATH_STATUS messages.
      */
-    private float queryUVelocity;
+    private float desiredTime;
 
-    public SoloSplinePathSettings(short cameraControl, float queryUVelocity){
+    public SoloSplinePathSettings(int cameraControl, float desiredTime){
         super(TLVMessageTypes.TYPE_SOLO_SPLINE_PATH_SETTINGS, MESSAGE_LENGTH);
         this.cameraControl = cameraControl;
-        this.queryUVelocity = queryUVelocity;
+        this.desiredTime = desiredTime;
     }
 
     public SoloSplinePathSettings(ByteBuffer buffer){
-        this(buffer.getShort(), buffer.getFloat());
+        this(buffer.getInt(), buffer.getInt());
     }
 
-    public short getCameraControl() {
+    public int getCameraControl() {
         return cameraControl;
     }
 
-    public float getQueryUVelocity() {
-        return queryUVelocity;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof SoloSplinePathSettings)) return false;
-        if (!super.equals(o)) return false;
-
-        SoloSplinePathSettings that = (SoloSplinePathSettings) o;
-
-        if (cameraControl != that.cameraControl) return false;
-        return Float.compare(that.queryUVelocity, queryUVelocity) == 0;
-
-    }
-
-    @Override
-    public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + (int) cameraControl;
-        result = 31 * result + (queryUVelocity != +0.0f ? Float.floatToIntBits(queryUVelocity) : 0);
-        return result;
-    }
-
-    @Override
-    public String toString() {
-        return "SoloSplinePathSettings{" +
-                "cameraControl=" + cameraControl +
-                ", queryUVelocity=" + queryUVelocity +
-                '}';
+    public float getDesiredTime() {
+        return desiredTime;
     }
 
     @Override
     protected void getMessageValue(ByteBuffer valueCarrier) {
-        valueCarrier.putShort(cameraControl);
-        valueCarrier.putFloat(queryUVelocity);
+        valueCarrier.putInt(cameraControl);
+        valueCarrier.putFloat(desiredTime);
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         super.writeToParcel(dest, flags);
         dest.writeInt(this.cameraControl);
-        dest.writeFloat(this.queryUVelocity);
+        dest.writeFloat(this.desiredTime);
     }
 
     protected SoloSplinePathSettings(Parcel in) {
         super(in);
-        this.cameraControl = (short) in.readInt();
-        this.queryUVelocity = in.readFloat();
+        this.cameraControl = in.readInt();
+        this.desiredTime = in.readFloat();
     }
 
     public static final Creator<SoloSplinePathSettings> CREATOR = new Creator<SoloSplinePathSettings>() {
@@ -110,4 +81,41 @@ public class SoloSplinePathSettings extends TLVPacket {
             return new SoloSplinePathSettings[size];
         }
     };
+
+    @Override
+    public String toString() {
+        return "SoloSplinePathSettings{" +
+            "cameraControl=" + cameraControl +
+            ", desiredTime=" + desiredTime +
+            '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
+
+        SoloSplinePathSettings that = (SoloSplinePathSettings) o;
+
+        if (cameraControl != that.cameraControl) {
+            return false;
+        }
+        return Float.compare(that.desiredTime, desiredTime) == 0;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + cameraControl;
+        result = 31 * result + (desiredTime != +0.0f ? Float.floatToIntBits(desiredTime) : 0);
+        return result;
+    }
 }

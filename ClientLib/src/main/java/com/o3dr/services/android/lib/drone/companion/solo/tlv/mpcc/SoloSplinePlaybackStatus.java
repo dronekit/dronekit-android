@@ -36,72 +36,43 @@ public class SoloSplinePlaybackStatus extends TLVPacket {
     /**
      * A velocity along the path in terms of uPosition;  du/dt.  This value must be positive.
      */
-    private float uVelocity;
+    private int cruiseState;
 
-    public SoloSplinePlaybackStatus(float uPosition, float uVelocity){
+    public SoloSplinePlaybackStatus(float uPosition, int cruiseState){
         super(TLVMessageTypes.TYPE_SOLO_SPLINE_PLAYBACK_STATUS, MESSAGE_LENGTH);
         this.uPosition = uPosition;
-        this.uVelocity = uVelocity;
+        this.cruiseState = cruiseState;
     }
 
     public SoloSplinePlaybackStatus(ByteBuffer buffer){
-        this(buffer.getFloat(), buffer.getFloat());
+        this(buffer.getFloat(), buffer.getInt());
     }
 
     @Override
     protected void getMessageValue(ByteBuffer valueCarrier){
         valueCarrier.putFloat(uPosition);
-        valueCarrier.putFloat(uVelocity);
+        valueCarrier.putInt(cruiseState);
     }
 
     public float getUPosition() {
         return uPosition;
     }
 
-    public float getUVelocity() {
-        return uVelocity;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof SoloSplinePlaybackStatus)) return false;
-        if (!super.equals(o)) return false;
-
-        SoloSplinePlaybackStatus that = (SoloSplinePlaybackStatus) o;
-
-        if (Float.compare(that.uPosition, uPosition) != 0) return false;
-        return Float.compare(that.uVelocity, uVelocity) == 0;
-
-    }
-
-    @Override
-    public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + (uPosition != +0.0f ? Float.floatToIntBits(uPosition) : 0);
-        result = 31 * result + (uVelocity != +0.0f ? Float.floatToIntBits(uVelocity) : 0);
-        return result;
-    }
-
-    @Override
-    public String toString() {
-        return "SoloSplinePlaybackStatus{" +
-                "uPosition=" + uPosition +
-                ", uVelocity=" + uVelocity +
-                '}';
+    public int getCruiseState() {
+        return cruiseState;
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         super.writeToParcel(dest, flags);
         dest.writeFloat(this.uPosition);
-        dest.writeFloat(this.uVelocity);
+        dest.writeInt(this.cruiseState);
     }
 
     protected SoloSplinePlaybackStatus(Parcel in) {
         super(in);
         this.uPosition = in.readFloat();
-        this.uVelocity = in.readFloat();
+        this.cruiseState = in.readInt();
     }
 
     public static final Creator<SoloSplinePlaybackStatus> CREATOR = new Creator<SoloSplinePlaybackStatus>() {
@@ -113,4 +84,41 @@ public class SoloSplinePlaybackStatus extends TLVPacket {
             return new SoloSplinePlaybackStatus[size];
         }
     };
+
+    @Override
+    public String toString() {
+        return "SoloSplinePlaybackStatus{" +
+            "uPosition=" + uPosition +
+            ", cruiseState=" + cruiseState +
+            '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
+
+        SoloSplinePlaybackStatus that = (SoloSplinePlaybackStatus) o;
+
+        if (Float.compare(that.uPosition, uPosition) != 0) {
+            return false;
+        }
+        return cruiseState == that.cruiseState;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + (uPosition != +0.0f ? Float.floatToIntBits(uPosition) : 0);
+        result = 31 * result + cruiseState;
+        return result;
+    }
 }
