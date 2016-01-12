@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -25,10 +26,12 @@ import java.util.Map;
  */
 public abstract class GeoTagAsyncTask extends AsyncTask<Void, Integer, GeoTagAsyncTask.ResultObject> {
     private static final String STORE_PHOTO_PREFIX = "GeoTag";
-    private static final SimpleDateFormat formatter = new SimpleDateFormat("MM-dd-yy-HH");
+    private static final SimpleDateFormat formatter = new SimpleDateFormat("MM-dd-yy-HH", Locale.US);
+
     private final File rootDir;
     private final List<TLogParser.Event> events;
     private final ArrayList<File> photos;
+    private final GeoTagAlgorithm geoTagAlg;
 
     /**
      * Asynchronous method to geotag a list of images using a list of Events as coordinate data.
@@ -40,9 +43,14 @@ public abstract class GeoTagAsyncTask extends AsyncTask<Void, Integer, GeoTagAsy
      * @param photos   {@link List<File>} list of files of photos to geotag.
      */
     public GeoTagAsyncTask(File rootDir, List<TLogParser.Event> events, ArrayList<File> photos) {
+        this(rootDir, events, photos, new SimpleGeoTagAlgorithm());
+    }
+
+    public GeoTagAsyncTask(File rootDir, List<TLogParser.Event> events, ArrayList<File> photos, GeoTagAlgorithm geotagAlg){
         this.rootDir = rootDir;
         this.events = events;
         this.photos = photos;
+        this.geoTagAlg = geotagAlg;
     }
 
     @Override
@@ -72,8 +80,11 @@ public abstract class GeoTagAsyncTask extends AsyncTask<Void, Integer, GeoTagAsy
             if (isCancelled()) {
                 return resultObject;
             }
-            GeoTagAlgorithm geoTagAlgorithm = new GeoTagAlgorithmImpl();
-            HashMap<TLogParser.Event, File> matchedPhotos = geoTagAlgorithm.match(events, photos);
+            HashMap<TLogParser.Event, File> matchedPhotos = geoTagAlg.match(events, photos);
+            if(matchedPhotos == null || matchedPhotos.isEmpty()){
+                resultObject.setException(new IllegalStateException("Unable to match the media set for geotagging."));
+                return resultObject;
+            }
 
             if (isCancelled()) {
                 return resultObject;
