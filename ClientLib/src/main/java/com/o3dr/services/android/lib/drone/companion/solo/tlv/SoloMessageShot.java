@@ -19,6 +19,7 @@ public abstract class SoloMessageShot extends TLVPacket {
     public static final int SHOT_ORBIT = 1;
     public static final int SHOT_CABLECAM = 2;
     public static final int SHOT_FOLLOW = 5;
+    public static final int SHOT_MPCC = 6;
 
     /*
     Site Scan shots
@@ -62,6 +63,7 @@ public abstract class SoloMessageShot extends TLVPacket {
                 return context.getText(R.string.label_orbit);
 
             case SHOT_CABLECAM:
+            case SHOT_MPCC:
                 return context.getText(R.string.label_cable_cam);
 
             case SHOT_FOLLOW:
