@@ -125,9 +125,16 @@ public class DroidPlannerService extends Service {
 
         DroneManager droneMgr = droneManagers.get(connParams);
         if (droneMgr == null) {
-            Timber.d("Generating new drone manager.");
-            droneMgr = DroneManager.generateDroneManager(getApplicationContext(), connParams, new Handler(Looper.getMainLooper()));
-            droneManagers.put(connParams, droneMgr);
+            final DroneManager temp = DroneManager.generateDroneManager(getApplicationContext(), connParams, new Handler(Looper.getMainLooper()));
+
+            droneMgr = droneManagers.putIfAbsent(connParams, temp);
+            if(droneMgr == null){
+                Timber.d("Generating new drone manager.");
+                droneMgr = temp;
+            }
+            else{
+                temp.destroy();
+            }
         }
 
         Timber.d("Drone manager connection for " + appId);

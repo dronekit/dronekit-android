@@ -79,7 +79,7 @@ public class DroneManager<T extends Drone, D> implements DataLink.DataLinkListen
 
     }
 
-    public void connect(String appId, DroneApi listener) throws ConnectionException {
+    public synchronized void connect(String appId, DroneApi listener) throws ConnectionException {
         if (listener == null || TextUtils.isEmpty(appId))
             return;
 
