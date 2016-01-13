@@ -12,7 +12,6 @@ import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 
 import org.droidplanner.services.android.communication.model.DataLink;
 import org.droidplanner.services.android.core.MAVLink.MavLinkCommands;
-import org.droidplanner.services.android.core.drone.DroneInterfaces;
 import org.droidplanner.services.android.core.drone.LogMessageListener;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.core.drone.autopilot.apm.ArduCopter;
