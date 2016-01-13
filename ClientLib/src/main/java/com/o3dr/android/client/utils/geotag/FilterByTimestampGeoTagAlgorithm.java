@@ -79,11 +79,21 @@ public class FilterByTimestampGeoTagAlgorithm implements GeoTagAsyncTask.GeoTagA
 
         //Get the end time.
         long endTime = filteredEvents.lastKey();
+        if(endTime <= startTime){
+            //Invalid time span.
+            return null;
+        }
 
         //Filter and sort the media
+
+        // Correct the timestamp as the gopro seems to apply the difference between the local timezone
+        // and the UTC timezone to actual timestamp
+        //TODO: remove correction once the behavior is fixed.
+        long offset = -8 * 3600 * 1000; //-8 hours in milliseconds (PST - GMT).
         for(File photo: photos){
             //Get the file timestamp
-            long modifiedTime = photo.lastModified();
+            long modifiedTime = photo.lastModified() + offset;
+
             if(startTime <= modifiedTime && modifiedTime <= endTime){
                 filteredPhotos.put(modifiedTime, photo);
             }
