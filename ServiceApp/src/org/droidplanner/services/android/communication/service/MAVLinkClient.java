@@ -93,19 +93,22 @@ public class MAVLinkClient implements DataLink.DataLinkProvider<MAVLinkMessage> 
     private DroneCommandTracker commandTracker;
 
     public MAVLinkClient(Context context, DataLink.DataLinkListener<MAVLinkPacket> listener,
-                         ConnectionParameter connParams) {
+                         ConnectionParameter connParams, DroneCommandTracker commandTracker) {
         this.context = context;
         this.listener = listener;
+
+        if(connParams == null){
+            throw new NullPointerException("Invalid connection parameter argument.");
+        }
+
         this.connParams = connParams;
         this.sessionDB = new SessionDB(context);
-    }
 
-    public void setCommandTracker(DroneCommandTracker commandTracker) {
         this.commandTracker = commandTracker;
     }
 
     private int getConnectionStatus(){
-        return mavlinkConn == null || !mavlinkConn.hasMavLinkConnectionListener(toString())
+        return mavlinkConn == null
                 ? MavLinkConnection.MAVLINK_DISCONNECTED
                 : mavlinkConn.getConnectionStatus();
     }
@@ -114,11 +117,8 @@ public class MAVLinkClient implements DataLink.DataLinkProvider<MAVLinkMessage> 
      * Setup a MAVLink connection based on the connection parameters.
      */
     @Override
-    public void openConnection() {
-        if (this.connParams == null)
-            return;
-
-        if(isConnected())
+    public synchronized void openConnection() {
+        if(isConnected() || isConnecting())
             return;
 
         final String tag = toString();
@@ -173,6 +173,8 @@ public class MAVLinkClient implements DataLink.DataLinkProvider<MAVLinkMessage> 
             }
         }
 
+        mavlinkConn.addMavLinkConnectionListener(tag, mConnectionListener);
+
         //Check if we need to ping a server to receive UDP data stream.
         if (connectionType == ConnectionType.TYPE_UDP) {
             final String pingIpAddress = paramsBundle.getString(ConnectionType.EXTRA_UDP_PING_RECEIVER_IP);
@@ -193,7 +195,6 @@ public class MAVLinkClient implements DataLink.DataLinkProvider<MAVLinkMessage> 
             }
         }
 
-            mavlinkConn.addMavLinkConnectionListener(tag, mConnectionListener);
         if (mavlinkConn.getConnectionStatus() == MavLinkConnection.MAVLINK_DISCONNECTED) {
             mavlinkConn.connect();
 
@@ -209,11 +210,11 @@ public class MAVLinkClient implements DataLink.DataLinkProvider<MAVLinkMessage> 
      * Disconnect the MAVLink connection for the given listener.
      */
     @Override
-    public void closeConnection() {
+    public synchronized void closeConnection() {
         if (isDisconnected())
             return;
 
-        mavlinkConn.removeLoggingPath(toString());
+        mavlinkConn.removeMavLinkConnectionListener(toString());
         if(mavlinkConn.getMavLinkConnectionListenersCount() == 0){
             Timber.i("Disconnecting...");
             mavlinkConn.disconnect();
@@ -228,7 +229,7 @@ public class MAVLinkClient implements DataLink.DataLinkProvider<MAVLinkMessage> 
     }
 
     @Override
-    public void sendMessage(MAVLinkMessage message, ICommandListener listener) {
+    public synchronized void sendMessage(MAVLinkMessage message, ICommandListener listener) {
         sendMavMessage(message, DEFAULT_SYS_ID, DEFAULT_COMP_ID, listener);
     }
 
@@ -251,17 +252,17 @@ public class MAVLinkClient implements DataLink.DataLinkProvider<MAVLinkMessage> 
         }
     }
 
-    private boolean isDisconnected(){
-        return this.connParams == null || getConnectionStatus() == MavLinkConnection.MAVLINK_DISCONNECTED;
+    public synchronized boolean isDisconnected(){
+        return getConnectionStatus() == MavLinkConnection.MAVLINK_DISCONNECTED;
     }
 
     @Override
-    public boolean isConnected() {
-        return this.connParams != null && getConnectionStatus() == MavLinkConnection.MAVLINK_CONNECTED;
+    public synchronized boolean isConnected() {
+        return getConnectionStatus() == MavLinkConnection.MAVLINK_CONNECTED;
     }
 
     private boolean isConnecting(){
-        return this.connParams != null && getConnectionStatus() == MavLinkConnection.MAVLINK_CONNECTING;
+        return getConnectionStatus() == MavLinkConnection.MAVLINK_CONNECTING;
     }
 
     private File getTLogDir(String appId) {
@@ -282,7 +283,7 @@ public class MAVLinkClient implements DataLink.DataLinkProvider<MAVLinkMessage> 
      *
      * @param appId             Tag for the listener.
      */
-    public void addLoggingFile(String appId){
+    public synchronized void addLoggingFile(String appId){
         if(isConnecting() || isConnected()) {
             final File logFile = getTempTLogFile(appId, System.currentTimeMillis());
             mavlinkConn.addLoggingPath(appId, logFile.getAbsolutePath());
@@ -294,7 +295,7 @@ public class MAVLinkClient implements DataLink.DataLinkProvider<MAVLinkMessage> 
      *
      * @param appId        Tag for the listener.
      */
-    public void removeLoggingFile(String appId){
+    public synchronized void removeLoggingFile(String appId){
         if(isConnecting() || isConnected()){
             mavlinkConn.removeLoggingPath(appId);
         }

@@ -18,7 +18,7 @@ public class MockMAVLinkClient extends MAVLinkClient {
     private MAVLinkPacket data;
 
     public MockMAVLinkClient(Context context, DataLink.DataLinkListener listener, ConnectionParameter connParams) {
-        super(context, listener, connParams);
+        super(context, listener, connParams, null);
     }
 
     public MAVLinkPacket getData() {

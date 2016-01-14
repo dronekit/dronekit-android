@@ -74,8 +74,7 @@ public class MavLinkDroneManager extends DroneManager<MavLinkDrone, MAVLinkPacke
 
         commandTracker = new DroneCommandTracker(handler);
 
-        mavClient = new MAVLinkClient(context, this, connParams);
-        mavClient.setCommandTracker(commandTracker);
+        mavClient = new MAVLinkClient(context, this, connParams, commandTracker);
 
         this.gcsHeartbeat = new GCSHeartbeat(mavClient, 1);
 
@@ -92,17 +91,16 @@ public class MavLinkDroneManager extends DroneManager<MavLinkDrone, MAVLinkPacke
         switch (type) {
             case ARDU_COPTER:
                 if (isCompanionComputerEnabled()) {
-                    Timber.i("Instantiating ArduSolo autopilot.");
                     onVehicleTypeReceived(FirmwareType.ARDU_SOLO);
                     return;
                 }
 
-                    Timber.i("Instantiating ArduCopter autopilot.");
-                    this.drone = new ArduCopter(droneId, context, mavClient, handler, new AndroidApWarningParser(), this);
+                Timber.i("Instantiating ArduCopter autopilot.");
+                this.drone = new ArduCopter(droneId, context, mavClient, handler, new AndroidApWarningParser(), this);
                 break;
 
             case ARDU_SOLO:
-                Timber.i("Instantiating ArduCopter autopilot.");
+                Timber.i("Instantiating ArduSolo autopilot.");
                 this.drone = new ArduSolo(droneId, context, mavClient, handler, new AndroidApWarningParser(), this);
                 break;
 
@@ -163,11 +161,11 @@ public class MavLinkDroneManager extends DroneManager<MavLinkDrone, MAVLinkPacke
 
     @Override
     protected void doConnect(String appId, DroneApi listener) {
-        if (!mavClient.isConnected()) {
+        if (mavClient.isDisconnected()) {
+            Timber.i("Opening connection for %s", appId);
             mavClient.openConnection();
         } else {
             if (isConnected()) {
-
                 listener.onDroneEvent(DroneInterfaces.DroneEventsType.CONNECTED, drone);
                 if (!drone.isConnectionAlive())
                     listener.onDroneEvent(DroneInterfaces.DroneEventsType.HEARTBEAT_TIMEOUT, drone);
