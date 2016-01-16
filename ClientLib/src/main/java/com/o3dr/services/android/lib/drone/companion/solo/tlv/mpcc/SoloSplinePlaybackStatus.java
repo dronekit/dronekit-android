@@ -8,18 +8,17 @@ import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
 import java.nio.ByteBuffer;
 
 /**
- * Shotmanager to App.  Valid only in playback mode.
+ * ShotManager sends this message to the app to indicate the vehicle's parametric position and cruise state along the Path. The source, precision, and accuracy of these values is solely determined by ShotManager. They are for visualization in the app, but not control; they are intended to convey the information, "the vehicle was at this point, trying to move at this cruise speed when the message was sent" with as much certainty as practically possible. But there are no guarantees.
  * <p/>
- * Shotmanager sends this message to the app to indicate the vehicle's parametric position and parametric velocity along the Path.  The source, precision, and accuracy of these values is solely determined by shotmanager.  They are for visualization in the app, but not control;  they are intended to convey the information, "the vehicle was at this point, moving at this rate when the message was sent" with as much certainty as practically possible.  But there are no guarantees.
+ * The frequency at which ShotManager sends these messages is currently 10Hz. At a minimum, in playback mode ShotManager will send this message:
  * <p/>
- * The frequency at which shotmanager sends these messages is variable.  At a minimum, in playback mode shotmanager will send this message:
  * When the vehicle attaches to the path in response to the first SOLO_SPLINE_SEEK message received after entering Play mode.
  * Each time the vehicle passes a Keypoint, including the beginning and end of the path
- * When the vehicle’s parametric acceleration exceeds a threshold value:ifd2udt2>threshold, send message
- * <p/>
- * The threshold is implementation-specific, exact value TBD.  (Ideally, it should be “tuneable”)
- * <p/>
- * <p/>
+ * When the vehicle starts or stops moving.
+ * When the vehicle’s parametric acceleration exceeds a threshold value:
+ * The threshold is implementation-specific, exact value TBD (ideally, it should be "tuneable").
+ *
+ *
  * Created by Fredia Huya-Kouadio on 12/8/15.
  *
  * @since 2.8.0
@@ -29,12 +28,15 @@ public class SoloSplinePlaybackStatus extends TLVPacket {
     public static final int MESSAGE_LENGTH = 8;
 
     /**
-     * A parametric offset along the Path normalized to (0,1)
+     * A parametric offset along the Path normalized to (0,1).
      */
     private float uPosition;
 
     /**
-     * A velocity along the path in terms of uPosition;  du/dt.  This value must be positive.
+     * Used by the app to determine the state of the cruise play/pause buttons.
+     * -1: Cruising to the start of the cable (negative cruise speed).
+     * 0 : Not moving/paused (cruise speed == 0). (DEFAULT)
+     * 1 : Cruising to the end of the cable (positive cruise speed).
      */
     private int cruiseState;
 
@@ -95,21 +97,13 @@ public class SoloSplinePlaybackStatus extends TLVPacket {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        if (!super.equals(o)) {
-            return false;
-        }
+        if (this == o) return true;
+        if (!(o instanceof SoloSplinePlaybackStatus)) return false;
+        if (!super.equals(o)) return false;
 
         SoloSplinePlaybackStatus that = (SoloSplinePlaybackStatus) o;
 
-        if (Float.compare(that.uPosition, uPosition) != 0) {
-            return false;
-        }
+        if (Float.compare(that.uPosition, uPosition) != 0) return false;
         return cruiseState == that.cruiseState;
 
     }

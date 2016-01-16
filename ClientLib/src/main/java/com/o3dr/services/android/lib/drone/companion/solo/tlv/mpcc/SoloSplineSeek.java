@@ -8,12 +8,10 @@ import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
 import java.nio.ByteBuffer;
 
 /**
- * App to Shotmanager.  Valid only in playback mode.
- * <p/>
- * This message tells shotmanager to fly the vehicle to a position along the normalized length of the Path.  It should attempt to to fly at uVelocity, but there is no guarantee.
- * <p/>
- * uVelocity must be positive -- there is no way to direct shotmanger to fly away from a particular uPosition, only toward it.
- * <p/>
+ * Sent by: App -> ShotManager.
+ * Valid: Valid only in Play mode when the vehicle is attached to the Path. Ignored at other times.
+ * This message tells ShotManager to fly the vehicle to a position along the normalized length of the Path.
+ * The cruiseState value indicates pause/play state of the vehicle. This does not overwrite the stored cruise speed set by SOLO_SPLINE_PATH_SETTINGS.
  * Created by Fredia Huya-Kouadio on 12/8/15.
  *
  * @since 2.8.0
@@ -28,7 +26,10 @@ public class SoloSplineSeek extends TLVPacket {
     private float uPosition;
 
     /**
-     * A velocity along the path in terms of uPosition;  du/dt.  This value must be positive.
+     * Used by the app to determine the state of the cruise play/pause buttons.
+     * -1: Cruising to the start of the cable(negative cruise speed).
+     * 0 : Not moving/paused (cruise speed == 0). (DEFAULT)
+     * 1 : Cruising to the end of the cable (positive cruise speed).
      */
     private int cruiseState;
 

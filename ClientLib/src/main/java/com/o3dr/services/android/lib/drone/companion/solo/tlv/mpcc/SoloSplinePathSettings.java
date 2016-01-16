@@ -12,7 +12,7 @@ import java.nio.ByteBuffer;
  *
  * The app sends this message to configure various aspects of how Shotmanager interprets the current Path.
  * This message is optional -- if the app never sends it, Shotmanager will use the assumed default values listed below.
- * Values stay in effect until the Path is reset by a SOLO_PATH_RECORD message
+ * Values stay in effect until the Path is reset by a SOLO_SPLINE_RECORD message
  *
  * Created by Fredia Huya-Kouadio on 12/8/15.
  * @since 2.8.0
@@ -29,9 +29,7 @@ public class SoloSplinePathSettings extends TLVPacket {
     private int cameraControl;
 
     /**
-     * queryUVelocity: (DEFAULT 1.0)
-     * The app uses this value to query how long it will take to fly the Path at a specific speed.
-     * This value is echoed back in SOLO_SPLINE_PATH_STATUS messages.
+     * The app-requested total cable completion time, in seconds.
      */
     private float desiredTime;
 
@@ -85,28 +83,20 @@ public class SoloSplinePathSettings extends TLVPacket {
     @Override
     public String toString() {
         return "SoloSplinePathSettings{" +
-            "cameraControl=" + cameraControl +
-            ", desiredTime=" + desiredTime +
-            '}';
+                "cameraControl=" + cameraControl +
+                ", desiredTime=" + desiredTime +
+                '}';
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        if (!super.equals(o)) {
-            return false;
-        }
+        if (this == o) return true;
+        if (!(o instanceof SoloSplinePathSettings)) return false;
+        if (!super.equals(o)) return false;
 
         SoloSplinePathSettings that = (SoloSplinePathSettings) o;
 
-        if (cameraControl != that.cameraControl) {
-            return false;
-        }
+        if (cameraControl != that.cameraControl) return false;
         return Float.compare(that.desiredTime, desiredTime) == 0;
 
     }
