@@ -24,9 +24,9 @@ public abstract class SoloMessageShot extends TLVPacket {
     /*
     Site Scan shots
      */
-    public static final int SHOT_INSPECT = 10000;
-    public static final int SHOT_SURVEY = 10200;
-    public static final int SHOT_SCAN = 10100;
+    public static final int SHOT_INSPECT = 100;
+    public static final int SHOT_SURVEY = 102;
+    public static final int SHOT_SCAN = 101;
 
     private int shotType;
 

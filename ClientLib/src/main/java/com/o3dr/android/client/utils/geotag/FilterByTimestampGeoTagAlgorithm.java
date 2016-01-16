@@ -10,9 +10,12 @@ import com.o3dr.android.client.utils.data.tlog.TLogParser.Event;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -35,6 +38,9 @@ public class FilterByTimestampGeoTagAlgorithm implements GeoTagAsyncTask.GeoTagA
      */
     @Override
     public HashMap<TLogParser.Event, File> match(List<TLogParser.Event> events, ArrayList<File> photos) {
+        if(events.isEmpty() || photos.isEmpty())
+            return null;
+
         TreeMap<Long, Event> sortedEvents = new TreeMap<>();
         TreeMap<Long, File> filteredPhotos = new TreeMap<>();
 
@@ -84,17 +90,17 @@ public class FilterByTimestampGeoTagAlgorithm implements GeoTagAsyncTask.GeoTagA
             return null;
         }
 
-        //Filter and sort the media
+        //Get the timezone offset, and apply it to the photo modified time.
+        final Calendar calendar = Calendar.getInstance();
+        final long timezoneOffset = (calendar.get(Calendar.ZONE_OFFSET) + calendar.get(Calendar.DST_OFFSET)); //Timezone offset in milliseconds
 
-        // Correct the timestamp as the gopro seems to apply the difference between the local timezone
-        // and the UTC timezone to actual timestamp
-        //TODO: remove correction once the behavior is fixed.
-        long offset = -8 * 3600 * 1000; //-8 hours in milliseconds (PST - GMT).
+        //Filter and sort the media
         for(File photo: photos){
             //Get the file timestamp
-            long modifiedTime = photo.lastModified() + offset;
+            long modifiedTime = photo.lastModified();
+            long updatedTime = modifiedTime + timezoneOffset;
 
-            if(startTime <= modifiedTime && modifiedTime <= endTime){
+            if(startTime <= updatedTime && updatedTime <= endTime){
                 filteredPhotos.put(modifiedTime, photo);
             }
         }
