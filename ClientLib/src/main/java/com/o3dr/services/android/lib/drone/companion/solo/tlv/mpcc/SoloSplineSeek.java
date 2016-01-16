@@ -8,12 +8,10 @@ import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
 import java.nio.ByteBuffer;
 
 /**
- * App to Shotmanager.  Valid only in playback mode.
- * <p/>
- * This message tells shotmanager to fly the vehicle to a position along the normalized length of the Path.  It should attempt to to fly at uVelocity, but there is no guarantee.
- * <p/>
- * uVelocity must be positive -- there is no way to direct shotmanger to fly away from a particular uPosition, only toward it.
- * <p/>
+ * Sent by: App -> ShotManager.
+ * Valid: Valid only in Play mode when the vehicle is attached to the Path. Ignored at other times.
+ * This message tells ShotManager to fly the vehicle to a position along the normalized length of the Path.
+ * The cruiseState value indicates pause/play state of the vehicle. This does not overwrite the stored cruise speed set by SOLO_SPLINE_PATH_SETTINGS.
  * Created by Fredia Huya-Kouadio on 12/8/15.
  *
  * @since 2.8.0
@@ -28,60 +26,42 @@ public class SoloSplineSeek extends TLVPacket {
     private float uPosition;
 
     /**
-     * A velocity along the path in terms of uPosition;  du/dt.  This value must be positive.
+     * Used by the app to determine the state of the cruise play/pause buttons.
+     * -1: Cruising to the start of the cable(negative cruise speed).
+     * 0 : Not moving/paused (cruise speed == 0). (DEFAULT)
+     * 1 : Cruising to the end of the cable (positive cruise speed).
      */
-    private float uVelocity;
+    private int cruiseState;
 
-    public SoloSplineSeek(float uPosition, float uVelocity){
+    public SoloSplineSeek(float uPosition, int cruiseState){
         super(TLVMessageTypes.TYPE_SOLO_SPLINE_SEEK, MESSAGE_LENGTH);
         this.uPosition = uPosition;
-        this.uVelocity = uVelocity;
+        this.cruiseState = cruiseState;
     }
 
     public SoloSplineSeek(ByteBuffer buffer){
-        this(buffer.getFloat(), buffer.getFloat());
+        this(buffer.getFloat(), buffer.getInt());
     }
 
     @Override
     protected void getMessageValue(ByteBuffer valueCarrier){
         valueCarrier.putFloat(uPosition);
-        valueCarrier.putFloat(uVelocity);
+        valueCarrier.putInt(cruiseState);
     }
 
     public float getUPosition() {
         return uPosition;
     }
 
-    public float getUVelocity() {
-        return uVelocity;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof SoloSplineSeek)) return false;
-        if (!super.equals(o)) return false;
-
-        SoloSplineSeek that = (SoloSplineSeek) o;
-
-        if (Float.compare(that.uPosition, uPosition) != 0) return false;
-        return Float.compare(that.uVelocity, uVelocity) == 0;
-
-    }
-
-    @Override
-    public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + (uPosition != +0.0f ? Float.floatToIntBits(uPosition) : 0);
-        result = 31 * result + (uVelocity != +0.0f ? Float.floatToIntBits(uVelocity) : 0);
-        return result;
+    public int getCruiseState() {
+        return cruiseState;
     }
 
     @Override
     public String toString() {
         return "SoloSplineSeek{" +
                 "uPosition=" + uPosition +
-                ", uVelocity=" + uVelocity +
+                ", cruiseState=" + cruiseState +
                 '}';
     }
 
@@ -89,13 +69,13 @@ public class SoloSplineSeek extends TLVPacket {
     public void writeToParcel(Parcel dest, int flags) {
         super.writeToParcel(dest, flags);
         dest.writeFloat(this.uPosition);
-        dest.writeFloat(this.uVelocity);
+        dest.writeInt(this.cruiseState);
     }
 
     protected SoloSplineSeek(Parcel in) {
         super(in);
         this.uPosition = in.readFloat();
-        this.uVelocity = in.readFloat();
+        this.cruiseState = in.readInt();
     }
 
     public static final Creator<SoloSplineSeek> CREATOR = new Creator<SoloSplineSeek>() {
@@ -107,4 +87,33 @@ public class SoloSplineSeek extends TLVPacket {
             return new SoloSplineSeek[size];
         }
     };
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
+
+        SoloSplineSeek that = (SoloSplineSeek) o;
+
+        if (Float.compare(that.uPosition, uPosition) != 0) {
+            return false;
+        }
+        return cruiseState == that.cruiseState;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + (uPosition != +0.0f ? Float.floatToIntBits(uPosition) : 0);
+        result = 31 * result + cruiseState;
+        return result;
+    }
 }
