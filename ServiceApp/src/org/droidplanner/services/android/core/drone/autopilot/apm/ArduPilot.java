@@ -42,17 +42,14 @@ import com.o3dr.services.android.lib.model.AbstractCommandListener;
 import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
 
-import org.droidplanner.services.android.core.MAVLink.MAVLinkStreams;
-import org.droidplanner.services.android.core.MAVLink.MavLinkCommands;
+import org.droidplanner.services.android.communication.model.DataLink;
 import org.droidplanner.services.android.core.MAVLink.MavLinkParameters;
 import org.droidplanner.services.android.core.MAVLink.WaypointManager;
 import org.droidplanner.services.android.core.MAVLink.command.doCmd.MavLinkDoCmds;
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
-import org.droidplanner.services.android.core.drone.DroneManager;
 import org.droidplanner.services.android.core.drone.LogMessageListener;
 import org.droidplanner.services.android.core.drone.autopilot.apm.variables.APMHeartBeat;
 import org.droidplanner.services.android.core.drone.autopilot.generic.GenericMavLinkDrone;
-import org.droidplanner.services.android.core.drone.profiles.ParameterManager;
 import org.droidplanner.services.android.core.drone.variables.ApmModes;
 import org.droidplanner.services.android.core.drone.variables.Camera;
 import org.droidplanner.services.android.core.drone.variables.GuidedPoint;
@@ -86,11 +83,11 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
 
     private final MagnetometerCalibrationImpl magCalibration;
 
-    public ArduPilot(Context context, MAVLinkStreams.MAVLinkOutputStream mavClient,
+    public ArduPilot(String droneId, Context context, DataLink.DataLinkProvider<MAVLinkMessage> mavClient,
                      Handler handler, AutopilotWarningParser warningParser,
-                     LogMessageListener logListener, DroneInterfaces.AttributeEventListener listener) {
+                     LogMessageListener logListener) {
 
-        super(context, handler, mavClient, warningParser, logListener, listener);
+        super(droneId, context, handler, mavClient, warningParser, logListener);
 
         this.waypointManager = new WaypointManager(this, handler);
 
@@ -326,7 +323,7 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
                     msg.stab_pitch = 0;
                     msg.stab_roll = 0;
                     msg.stab_yaw = 0;
-                    getMavClient().sendMavMessage(msg, listener);
+                    getMavClient().sendMessage(msg, listener);
                 } else {
                     MavLinkParameters.sendParameter(this, "MNT_MODE", 1, mountMode);
                 }

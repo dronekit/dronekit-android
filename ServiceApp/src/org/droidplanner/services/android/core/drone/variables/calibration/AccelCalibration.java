@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import timber.log.Timber;
 
-public class AccelCalibration extends DroneVariable implements DroneInterfaces.OnDroneListener {
+public class AccelCalibration extends DroneVariable implements DroneInterfaces.OnDroneListener<MavLinkDrone> {
 
     private final Runnable onCalibrationStart = new Runnable() {
         @Override

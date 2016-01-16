@@ -2,6 +2,15 @@ package com.o3dr.services.android.lib.drone.companion.solo.tlv;
 
 import android.util.Log;
 
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.mpcc.SoloSplineAttach;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.mpcc.SoloSplineDurations;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.mpcc.SoloSplinePathSettings;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.mpcc.SoloSplinePlay;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.mpcc.SoloSplinePlaybackStatus;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.mpcc.SoloSplinePoint;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.mpcc.SoloSplineRecord;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.mpcc.SoloSplineSeek;
+
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -12,6 +21,7 @@ import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageT
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_CABLE_CAM_OPTIONS;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_CABLE_CAM_WAYPOINT;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_FOLLOW_OPTIONS;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_FOLLOW_OPTIONS_V2;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_GET_BUTTON_SETTING;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_GOPRO_RECORD;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_GOPRO_REQUEST_STATE;
@@ -27,6 +37,14 @@ import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageT
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SET_BUTTON_SETTING;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SHOT_ERROR;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SHOT_OPTIONS;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SPLINE_ATTACH;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SPLINE_PATH_SETTINGS;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SPLINE_DURATIONS;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SPLINE_PLAY;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SPLINE_PLAYBACK_STATUS;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SPLINE_POINT;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SPLINE_RECORD;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SPLINE_SEEK;
 
 /**
  * Utility class to generate tlv packet from received bytes.
@@ -118,9 +136,12 @@ public class TLVMessageParser {
                     }
 
                     case TYPE_SOLO_FOLLOW_OPTIONS: {
-                        final float cruiseSpeed = packetBuffer.getFloat();
-                        final int lookAtValue = packetBuffer.getInt();
-                        packet = new SoloFollowOptions(cruiseSpeed, lookAtValue);
+                        packet = new SoloFollowOptions(packetBuffer);
+                        break;
+                    }
+
+                    case TYPE_SOLO_FOLLOW_OPTIONS_V2: {
+                        packet = new SoloFollowOptionsV2(packetBuffer);
                         break;
                     }
 
@@ -197,6 +218,46 @@ public class TLVMessageParser {
                         final byte[] values = new byte[4];
                         packetBuffer.get(values);
                         packet = new SoloGoproSetExtendedRequest(command, values);
+                        break;
+                    }
+
+                    case TYPE_SOLO_SPLINE_RECORD: {
+                        packet = new SoloSplineRecord();
+                        break;
+                    }
+
+                    case TYPE_SOLO_SPLINE_PLAY: {
+                        packet = new SoloSplinePlay();
+                        break;
+                    }
+
+                    case TYPE_SOLO_SPLINE_POINT:{
+                        packet = new SoloSplinePoint(packetBuffer);
+                        break;
+                    }
+
+                    case TYPE_SOLO_SPLINE_SEEK:{
+                        packet = new SoloSplineSeek(packetBuffer);
+                        break;
+                    }
+
+                    case TYPE_SOLO_SPLINE_PLAYBACK_STATUS:{
+                        packet = new SoloSplinePlaybackStatus(packetBuffer);
+                        break;
+                    }
+
+                    case TYPE_SOLO_SPLINE_PATH_SETTINGS:{
+                        packet = new SoloSplinePathSettings(packetBuffer);
+                        break;
+                    }
+
+                    case TYPE_SOLO_SPLINE_DURATIONS:{
+                        packet = new SoloSplineDurations(packetBuffer);
+                        break;
+                    }
+
+                    case TYPE_SOLO_SPLINE_ATTACH: {
+                        packet = new SoloSplineAttach(packetBuffer);
                         break;
                     }
 

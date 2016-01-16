@@ -26,22 +26,40 @@ public class MathUtils {
      *
      * @return distance in meters
      */
-    public static double getDistance3D(LatLongAlt from, LatLongAlt to){
-        if(from == null || to == null)
+    public static double getDistance3D(LatLongAlt from, LatLongAlt to) {
+        if (from == null || to == null) {
             return -1;
+        }
 
         final double distance2d = getDistance2D(from, to);
-            double distanceSqr = Math.pow(distance2d, 2);
-            double altitudeSqr = Math.pow(to.getAltitude() - from.getAltitude(), 2);
+        double distanceSqr = Math.pow(distance2d, 2);
+        double altitudeSqr = Math.pow(to.getAltitude() - from.getAltitude(), 2);
 
-            return Math.sqrt(altitudeSqr + distanceSqr);
+        return Math.sqrt(altitudeSqr + distanceSqr);
     }
 
-    public static double getDistance2D(LatLong from, LatLong to){
-        if(from == null || to == null)
+    public static double getDistance2D(LatLong from, LatLong to) {
+        if (from == null || to == null) {
             return -1;
+        }
 
         return RADIUS_OF_EARTH * Math.toRadians(getArcInRadians(from, to));
+    }
+
+    public static LatLong addDistance(LatLong from, double xMeters, double yMeters) {
+
+        double lat = from.getLatitude();
+        double lon = from.getLongitude();
+
+        //Coordinate offsets in radians
+        double dLat = yMeters / RADIUS_OF_EARTH;
+        double dLon = xMeters / (RADIUS_OF_EARTH * Math.cos(Math.PI * lat / 180));
+
+        //OffsetPosition, decimal degrees
+        double latO = lat + dLat * 180 / Math.PI;
+        double lonO = lon + dLon * 180 / Math.PI;
+
+        return new LatLong(latO, lonO);
     }
 
     /**
@@ -61,7 +79,7 @@ public class MathUtils {
         lontitudeH *= lontitudeH;
 
         double tmp = Math.cos(Math.toRadians(from.getLatitude()))
-                * Math.cos(Math.toRadians(to.getLatitude()));
+            * Math.cos(Math.toRadians(to.getLatitude()));
         return Math.toDegrees(2.0 * Math.asin(Math.sqrt(latitudeH + tmp * lontitudeH)));
     }
 
@@ -72,7 +90,7 @@ public class MathUtils {
      */
     public static int getSignalStrength(double fadeMargin, double remFadeMargin) {
         return (int) (MathUtils.Normalize(Math.min(fadeMargin, remFadeMargin),
-                SIGNAL_MIN_FADE_MARGIN, SIGNAL_MAX_FADE_MARGIN) * 100);
+            SIGNAL_MIN_FADE_MARGIN, SIGNAL_MAX_FADE_MARGIN) * 100);
     }
 
     private static double Constrain(double value, double min, double max) {
@@ -130,12 +148,9 @@ public class MathUtils {
      * through A-B. If the point is not on the side of the line, returns the
      * distance to the closest point
      *
-     * @param L1
-     *            First point of the line
-     * @param L2
-     *            Second point of the line
-     * @param P
-     *            Point to measure the distance
+     * @param L1 First point of the line
+     * @param L2 Second point of the line
+     * @param P  Point to measure the distance
      */
     public static double pointToLineDistance(LatLong L1, LatLong L2, LatLong P) {
         double A = P.getLatitude() - L1.getLatitude();
@@ -181,8 +196,7 @@ public class MathUtils {
          * Process the given map coordinates, and return a set of coordinates
          * describing the spline path.
          *
-         * @param points
-         *            map coordinates decimation factor
+         * @param points map coordinates decimation factor
          * @return set of coordinates describing the spline path
          */
         public static List<LatLong> process(List<LatLong> points) {
@@ -202,7 +216,7 @@ public class MathUtils {
             final List<LatLong> results = new ArrayList<LatLong>();
             for (int i = 3; i < points.size(); i++) {
                 results.addAll(processPathSegment(points.get(i - 3), points.get(i - 2),
-                        points.get(i - 1), points.get(i)));
+                    points.get(i - 1), points.get(i)));
             }
             return results;
         }
@@ -267,9 +281,9 @@ public class MathUtils {
         double tLng = Math.toRadians(toLoc.getLongitude());
 
         double degree = Math.toDegrees(Math.atan2(
-                Math.sin(tLng - fLng) * Math.cos(tLat),
-                Math.cos(fLat) * Math.sin(tLat) - Math.sin(fLat) * Math.cos(tLat)
-                        * Math.cos(tLng - fLng)));
+            Math.sin(tLng - fLng) * Math.cos(tLat),
+            Math.cos(fLat) * Math.sin(tLat) - Math.sin(fLat) * Math.cos(tLat)
+                * Math.cos(tLng - fLng)));
 
         if (degree >= 0) {
             return degree;
@@ -282,12 +296,9 @@ public class MathUtils {
      * Extrapolate latitude/longitude given a heading and distance thanks to
      * http://www.movable-type.co.uk/scripts/latlong.html
      *
-     * @param origin
-     *            Point of origin
-     * @param bearing
-     *            bearing to navigate
-     * @param distance
-     *            distance to be added
+     * @param origin   Point of origin
+     * @param bearing  bearing to navigate
+     * @param distance distance to be added
      * @return New point with the added distance
      */
     public static LatLong newCoordFromBearingAndDistance(LatLong origin, double bearing,
@@ -301,10 +312,10 @@ public class MathUtils {
         double dr = distance / RADIUS_OF_EARTH;
 
         double lat2 = Math.asin(Math.sin(lat1) * Math.cos(dr) + Math.cos(lat1) * Math.sin(dr)
-                * Math.cos(brng));
+            * Math.cos(brng));
         double lon2 = lon1
-                + Math.atan2(Math.sin(brng) * Math.sin(dr) * Math.cos(lat1),
-                Math.cos(dr) - Math.sin(lat1) * Math.sin(lat2));
+            + Math.atan2(Math.sin(brng) * Math.sin(dr) * Math.cos(lat1),
+            Math.cos(dr) - Math.sin(lat1) * Math.sin(lat2));
 
         return (new LatLong(Math.toDegrees(lat2), Math.toDegrees(lon2)));
     }

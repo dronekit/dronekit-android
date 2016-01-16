@@ -14,6 +14,7 @@ public class TLVMessageTypes {
     public static final int TYPE_SOLO_SET_BUTTON_SETTING = 6;
 
     public static final int TYPE_SOLO_FOLLOW_OPTIONS = 19;
+    public static final int TYPE_SOLO_FOLLOW_OPTIONS_V2 = 119;
     public static final int TYPE_SOLO_SHOT_OPTIONS = 20;
     public static final int TYPE_SOLO_SHOT_ERROR = 21;
 
@@ -28,6 +29,18 @@ public class TLVMessageTypes {
     public static final int TYPE_SOLO_GOPRO_STATE_V2 = 5006;
     public static final int TYPE_SOLO_GOPRO_REQUEST_STATE = 5007;
     public static final int TYPE_SOLO_GOPRO_SET_EXTENDED_REQUEST = 5009;
+
+    /*
+    Multi point cable cam message types
+     */
+    public static final int TYPE_SOLO_SPLINE_RECORD = 50;
+    public static final int TYPE_SOLO_SPLINE_PLAY = 51;
+    public static final int TYPE_SOLO_SPLINE_POINT = 52;
+    public static final int TYPE_SOLO_SPLINE_SEEK = 53;
+    public static final int TYPE_SOLO_SPLINE_PLAYBACK_STATUS = 54;
+    public static final int TYPE_SOLO_SPLINE_PATH_SETTINGS = 55;
+    public static final int TYPE_SOLO_SPLINE_DURATIONS = 56;
+    public static final int TYPE_SOLO_SPLINE_ATTACH = 57;
 
     //Private constructor to prevent instantiation
     private TLVMessageTypes(){}

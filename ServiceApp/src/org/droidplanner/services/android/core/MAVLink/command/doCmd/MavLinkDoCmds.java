@@ -26,7 +26,7 @@ public class MavLinkDoCmds {
         msg.param6 = (float) location.getLongitude();
         msg.param7 = (float) location.getAltitude();
 
-        drone.getMavClient().sendMavMessage(msg, listener);
+        drone.getMavClient().sendMessage(msg, listener);
     }
 
     public static void setROI(MavLinkDrone drone, LatLongAlt coord, ICommandListener listener) {
@@ -42,7 +42,7 @@ public class MavLinkDoCmds {
         msg.param6 = (float) coord.getLongitude();
         msg.param7 = (float) coord.getAltitude();
 
-        drone.getMavClient().sendMavMessage(msg, listener);
+        drone.getMavClient().sendMessage(msg, listener);
     }
 
     public static void resetROI(MavLinkDrone drone, ICommandListener listener) {
@@ -60,7 +60,7 @@ public class MavLinkDoCmds {
         msg.target_system = drone.getSysid();
         msg.target_component = drone.getCompid();
         msg.shot = 1;
-        drone.getMavClient().sendMavMessage(msg, null);
+        drone.getMavClient().sendMessage(msg, null);
     }
 
     public static void empCommand(MavLinkDrone drone, boolean release, ICommandListener listener) {
@@ -73,7 +73,7 @@ public class MavLinkDoCmds {
         msg.command = MAV_CMD.MAV_CMD_DO_GRIPPER;
         msg.param2 = release ? GRIPPER_ACTIONS.GRIPPER_ACTION_RELEASE : GRIPPER_ACTIONS.GRIPPER_ACTION_GRAB;
 
-        drone.getMavClient().sendMavMessage(msg, listener);
+        drone.getMavClient().sendMessage(msg, listener);
     }
 
     /**
@@ -94,7 +94,7 @@ public class MavLinkDoCmds {
         msg.param1 = relayNumber;
         msg.param2 = enabled ? 1 : 0;
 
-        drone.getMavClient().sendMavMessage(msg, listener);
+        drone.getMavClient().sendMessage(msg, listener);
     }
 
     /**
@@ -115,7 +115,7 @@ public class MavLinkDoCmds {
         msg.param1 = channel;
         msg.param2 = pwm;
 
-        drone.getMavClient().sendMavMessage(msg, listener);
+        drone.getMavClient().sendMessage(msg, listener);
     }
 
     /**
@@ -139,7 +139,7 @@ public class MavLinkDoCmds {
         msg.input_b = (int) (roll * 100);
         msg.input_c = (int) (yaw * 100);
 
-        drone.getMavClient().sendMavMessage(msg, listener);
+        drone.getMavClient().sendMessage(msg, listener);
     }
 
     /**
@@ -154,7 +154,7 @@ public class MavLinkDoCmds {
             return;
         msg_mission_set_current msg = new msg_mission_set_current();
         msg.seq = waypoint;
-        drone.getMavClient().sendMavMessage(msg, listener);
+        drone.getMavClient().sendMessage(msg, listener);
     }
 
 }
