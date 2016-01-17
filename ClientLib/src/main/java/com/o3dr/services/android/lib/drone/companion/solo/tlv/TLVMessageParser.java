@@ -7,8 +7,8 @@ import com.o3dr.services.android.lib.drone.companion.solo.tlv.sitescan.inspect.S
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.sitescan.inspect.SoloInspectMoveGimbal;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.sitescan.inspect.SoloInspectMoveVehicle;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.mpcc.SoloSplineAttach;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.mpcc.SoloSplineDurations;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.mpcc.SoloSplinePathSettings;
-import com.o3dr.services.android.lib.drone.companion.solo.tlv.mpcc.SoloSplinePathStatus;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.mpcc.SoloSplinePlay;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.mpcc.SoloSplinePlaybackStatus;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.mpcc.SoloSplinePoint;
@@ -50,7 +50,7 @@ import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageT
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SHOT_OPTIONS;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SPLINE_ATTACH;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SPLINE_PATH_SETTINGS;
-import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SPLINE_PATH_STATUS;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SPLINE_DURATIONS;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SPLINE_PLAY;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SPLINE_PLAYBACK_STATUS;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SPLINE_POINT;
@@ -263,8 +263,8 @@ public class TLVMessageParser {
                         break;
                     }
 
-                    case TYPE_SOLO_SPLINE_PATH_STATUS:{
-                        packet = new SoloSplinePathStatus(packetBuffer);
+                    case TYPE_SOLO_SPLINE_DURATIONS:{
+                        packet = new SoloSplineDurations(packetBuffer);
                         break;
                     }
 
