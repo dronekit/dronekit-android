@@ -20,7 +20,7 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:2.0.0-alpha3'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.2'
-        classpath 'io.fabric.tools:gradle:1.15.2'
+        classpath 'io.fabric.tools:gradle:1.21.2'
     }
 }
 
@@ -39,7 +39,7 @@ def generateVersionName(String versionPrefix, int versionMajor, int versionMinor
 }
 
 def generateVersionNameSuffix(int versionBuild, String releaseType, boolean includeHash = false){
-    def versionNameSuffix = ".${releaseType}.${versionBuild}"
+    def versionNameSuffix = "${releaseType}.${versionBuild}"
     if(includeHash){
         versionNameSuffix += " (${getGitShortHash()})"
     }
