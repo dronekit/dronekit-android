@@ -2,8 +2,8 @@ package org.droidplanner.services.android.core.helpers.geoTools;
 
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
+import com.o3dr.services.android.lib.util.MathUtils;
 
-import org.droidplanner.services.android.core.helpers.math.MathUtil;
 import org.droidplanner.services.android.core.helpers.units.Area;
 import org.droidplanner.services.android.core.polygon.Polygon;
 
@@ -139,7 +139,7 @@ public class GeoTools {
     public static double get3DDistance(LatLongAlt end, LatLongAlt start) {
         double horizontalDistance = getDistance(end, start);
         double altitudeDiff = Math.abs((end.getAltitude() - start.getAltitude()));
-        return MathUtil.hypot(horizontalDistance, altitudeDiff);
+        return MathUtils.hypot(horizontalDistance, altitudeDiff);
     }
 
     /**

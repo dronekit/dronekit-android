@@ -2,9 +2,9 @@ package org.droidplanner.services.android.core.survey;
 
 import com.MAVLink.ardupilotmega.msg_camera_feedback;
 import com.o3dr.services.android.lib.coordinate.LatLong;
+import com.o3dr.services.android.lib.util.MathUtils;
 
 import org.droidplanner.services.android.core.helpers.geoTools.GeoTools;
-import org.droidplanner.services.android.core.helpers.math.MathUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +29,7 @@ public class Footprint {
         double sx = camera.getSensorLateralSize() / 2;
         double sy = camera.getSensorLongitudinalSize() / 2;
         double f = camera.focalLength;
-        double[][] dcm = MathUtil.dcmFromEuler(Math.toRadians(pitch), Math.toRadians(-roll + 180), Math.toRadians(-yaw));
+        double[][] dcm = MathUtils.dcmFromEuler(Math.toRadians(pitch), Math.toRadians(-roll + 180), Math.toRadians(-yaw));
         vertex.add(cameraFrameToLocalFrame(new LatLong(-sx, -sy), dcm, alt, f, center));
         vertex.add(cameraFrameToLocalFrame(new LatLong(+sx, -sy), dcm, alt, f, center));
         vertex.add(cameraFrameToLocalFrame(new LatLong(+sx, +sy), dcm, alt, f, center));
