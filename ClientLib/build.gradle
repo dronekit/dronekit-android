@@ -4,7 +4,7 @@ ext {
     VERSION_MAJOR = 2
     VERSION_MINOR = 8
     VERSION_PATCH = 0
-    VERSION_SUFFIX = "beta5"
+    VERSION_SUFFIX = "beta7"
 
     PUBLISH_ARTIFACT_ID = 'dronekit-android'
     PUBLISH_VERSION = generateVersionName("", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH, VERSION_SUFFIX)
@@ -38,6 +38,10 @@ android {
 
     lintOptions {
         abortOnError false
+    }
+
+    dexOptions {
+        dexInProcess = true
     }
 
     testOptions {
