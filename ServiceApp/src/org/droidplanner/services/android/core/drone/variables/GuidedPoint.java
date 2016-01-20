@@ -10,6 +10,7 @@ import com.o3dr.services.android.lib.drone.property.Altitude;
 import com.o3dr.services.android.lib.drone.property.Gps;
 import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.model.SimpleCommandListener;
+import com.o3dr.services.android.lib.model.action.Action;
 
 import org.droidplanner.services.android.core.MAVLink.MavLinkCommands;
 import org.droidplanner.services.android.core.drone.DroneInterfaces.DroneEventsType;
@@ -88,7 +89,7 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener {
         if (state == GuidedStates.UNINITIALIZED) {
             changeToGuidedMode(myDrone, listener);
         } else {
-            newGuidedCoord(getGpsPosition());
+            myDrone.executeAsyncAction(new Action(MavLinkDrone.ACTION_REQUEST_HOME_UPDATE), listener);
             state = GuidedStates.IDLE;
         }
     }

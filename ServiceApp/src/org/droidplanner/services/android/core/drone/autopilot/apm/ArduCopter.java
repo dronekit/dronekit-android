@@ -145,4 +145,10 @@ public class ArduCopter extends ArduPilot {
                 return super.isFeatureSupported(featureId);
         }
     }
+
+    @Override
+    protected boolean brakeVehicle(ICommandListener listener) {
+        getState().changeFlightMode(ApmModes.ROTOR_BRAKE, listener);
+        return true;
+    }
 }

@@ -34,6 +34,7 @@ import org.droidplanner.services.android.core.MAVLink.MAVLinkStreams;
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
 import org.droidplanner.services.android.core.drone.LogMessageListener;
 import org.droidplanner.services.android.core.drone.autopilot.apm.ArduCopter;
+import org.droidplanner.services.android.core.drone.variables.ApmModes;
 import org.droidplanner.services.android.core.drone.variables.HeartBeat;
 import org.droidplanner.services.android.core.firmware.FirmwareType;
 import org.droidplanner.services.android.core.model.AutopilotWarningParser;
@@ -393,5 +394,11 @@ public class ArduSolo extends ArduCopter {
                 }
             }
         }
+    }
+
+    @Override
+    protected boolean brakeVehicle(ICommandListener listener) {
+        getState().changeFlightMode(ApmModes.ROTOR_BRAKE, listener);
+        return true;
     }
 }
