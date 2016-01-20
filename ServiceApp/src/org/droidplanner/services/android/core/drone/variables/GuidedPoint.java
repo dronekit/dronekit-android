@@ -4,6 +4,7 @@ import android.os.Handler;
 import android.os.RemoteException;
 
 import com.o3dr.services.android.lib.coordinate.LatLong;
+import com.o3dr.services.android.lib.drone.action.ControlActions;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.drone.property.Altitude;
@@ -89,7 +90,7 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener {
         if (state == GuidedStates.UNINITIALIZED) {
             changeToGuidedMode(myDrone, listener);
         } else {
-            myDrone.executeAsyncAction(new Action(MavLinkDrone.ACTION_REQUEST_HOME_UPDATE), listener);
+            myDrone.executeAsyncAction(new Action(ControlActions.ACTION_SEND_BRAKE_VEHICLE), listener);
             state = GuidedStates.IDLE;
         }
     }

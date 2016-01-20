@@ -21,6 +21,7 @@ import com.MAVLink.common.msg_sys_status;
 import com.MAVLink.common.msg_vibration;
 import com.MAVLink.enums.MAV_MODE_FLAG;
 import com.MAVLink.enums.MAV_STATE;
+import com.github.zafarkhaja.semver.Version;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.action.CapabilityActions;
@@ -81,7 +82,6 @@ import org.droidplanner.services.android.utils.video.VideoManager;
  * Created by Fredia Huya-Kouadio on 9/10/15.
  */
 public class GenericMavLinkDrone implements MavLinkDrone {
-
     private final MAVLinkStreams.MAVLinkOutputStream mavClient;
 
     protected final VideoManager videoMgr;

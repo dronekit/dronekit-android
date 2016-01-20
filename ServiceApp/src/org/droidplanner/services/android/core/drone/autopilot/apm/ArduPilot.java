@@ -22,6 +22,7 @@ import com.MAVLink.common.msg_sys_status;
 import com.MAVLink.common.msg_vfr_hud;
 import com.MAVLink.enums.MAV_MOUNT_MODE;
 import com.MAVLink.enums.MAV_SYS_STATUS_SENSOR;
+import com.github.zafarkhaja.semver.Version;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.action.ControlActions;
@@ -43,16 +44,13 @@ import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
 
 import org.droidplanner.services.android.core.MAVLink.MAVLinkStreams;
-import org.droidplanner.services.android.core.MAVLink.MavLinkCommands;
 import org.droidplanner.services.android.core.MAVLink.MavLinkParameters;
 import org.droidplanner.services.android.core.MAVLink.WaypointManager;
 import org.droidplanner.services.android.core.MAVLink.command.doCmd.MavLinkDoCmds;
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
-import org.droidplanner.services.android.core.drone.DroneManager;
 import org.droidplanner.services.android.core.drone.LogMessageListener;
 import org.droidplanner.services.android.core.drone.autopilot.apm.variables.APMHeartBeat;
 import org.droidplanner.services.android.core.drone.autopilot.generic.GenericMavLinkDrone;
-import org.droidplanner.services.android.core.drone.profiles.ParameterManager;
 import org.droidplanner.services.android.core.drone.variables.ApmModes;
 import org.droidplanner.services.android.core.drone.variables.Camera;
 import org.droidplanner.services.android.core.drone.variables.GuidedPoint;
@@ -65,16 +63,20 @@ import org.droidplanner.services.android.core.mission.Mission;
 import org.droidplanner.services.android.core.model.AutopilotWarningParser;
 import org.droidplanner.services.android.utils.CommonApiUtils;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import timber.log.Timber;
 
 /**
  * Base class for the ArduPilot autopilots
  */
 public abstract class ArduPilot extends GenericMavLinkDrone {
-
     public static final int AUTOPILOT_COMPONENT_ID = 1;
     public static final int ARTOO_COMPONENT_ID = 0;
     public static final int TELEMETRY_RADIO_COMPONENT_ID = 68;
+
+    public static final String FIRMWARE_VERSION_NUMBER_REGEX = "\\d+(\\.\\d{1,2})?";
 
     private final org.droidplanner.services.android.core.drone.variables.RC rc;
     private final Mission mission;
@@ -85,6 +87,8 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
     private final Camera footprints;
 
     private final MagnetometerCalibrationImpl magCalibration;
+
+    protected Version firmwareVersionNumber;
 
     public ArduPilot(Context context, MAVLinkStreams.MAVLinkOutputStream mavClient,
                      Handler handler, AutopilotWarningParser warningParser,
@@ -452,6 +456,33 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
     protected void processSysStatus(msg_sys_status m_sys) {
         super.processSysStatus(m_sys);
         checkControlSensorsHealth(m_sys);
+    }
+
+    @Override
+    protected void setFirmwareVersion(String message) {
+        super.setFirmwareVersion(message);
+        setFirmwareVersionNumber(message);
+    }
+
+    protected Version getFirmwareVersionNumber() {
+        return firmwareVersionNumber;
+    }
+
+    protected void setFirmwareVersionNumber(String message) {
+        firmwareVersionNumber = Version.forIntegers(0, 0, 0);
+    }
+
+    protected static Version extractVersionNumber(String firmwareVersion) {
+        Version version = Version.forIntegers(0, 0, 0);
+
+        Pattern pattern = Pattern.compile(FIRMWARE_VERSION_NUMBER_REGEX);
+        Matcher matcher = pattern.matcher(firmwareVersion);
+        if (matcher.find()) {
+            String versionNumber = matcher.group(0) + ".0";
+            version = Version.valueOf(versionNumber);
+        }
+
+        return version;
     }
 
     private void checkControlSensorsHealth(msg_sys_status sysStatus) {
