@@ -36,13 +36,13 @@ public abstract class FollowAlgorithm {
     }
 
     public void disableFollow() {
-        if(isFollowEnabled.compareAndSet(true, false)) {
+        if (isFollowEnabled.compareAndSet(true, false)) {
             final MavLinkDrone drone = droneMgr.getDrone();
             if (GuidedPoint.isGuidedMode(drone)) {
                 drone.getGuidedPoint().pauseAtCurrentLocation(null);
             }
 
-            if(roiEstimator != null)
+            if (roiEstimator != null)
                 roiEstimator.disableFollow();
         }
     }

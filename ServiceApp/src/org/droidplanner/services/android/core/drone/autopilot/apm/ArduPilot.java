@@ -198,7 +198,7 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
                 CommonApiUtils.startMission(this, forceModeChange, forceArm, listener);
                 return true;
 
-            //EXPERIMENTAL ACTIONS
+            // EXPERIMENTAL ACTIONS
             case ExperimentalActions.ACTION_EPM_COMMAND:
                 boolean release = data.getBoolean(ExperimentalActions.EXTRA_EPM_RELEASE);
                 CommonApiUtils.epmCommand(this, release, listener);
@@ -227,7 +227,7 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
                 MavLinkDoCmds.setServo(this, channel, pwm, listener);
                 return true;
 
-            //CONTROL ACTIONS
+            // CONTROL ACTIONS
             case ControlActions.ACTION_SEND_GUIDED_POINT:
                 data.setClassLoader(LatLong.class.getClassLoader());
                 boolean force = data.getBoolean(ControlActions.EXTRA_FORCE_GUIDED_POINT);
@@ -240,7 +240,7 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
                 CommonApiUtils.setGuidedAltitude(this, guidedAltitude);
                 return true;
 
-            //PARAMETER ACTIONS
+            // PARAMETER ACTIONS
             case ParameterActions.ACTION_REFRESH_PARAMETERS:
                 CommonApiUtils.refreshParameters(this);
                 return true;
@@ -251,7 +251,7 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
                 CommonApiUtils.writeParameters(this, parameters);
                 return true;
 
-            //DRONE STATE ACTIONS
+            // DRONE STATE ACTIONS
             case StateActions.ACTION_SET_VEHICLE_HOME:
                 LatLongAlt homeLoc = data.getParcelable(StateActions.EXTRA_VEHICLE_HOME_LOCATION);
                 if (homeLoc != null) {
