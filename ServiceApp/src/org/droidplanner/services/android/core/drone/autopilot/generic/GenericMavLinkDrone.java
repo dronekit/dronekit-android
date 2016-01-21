@@ -537,7 +537,7 @@ public class GenericMavLinkDrone implements MavLinkDrone {
 
             //*************** EKF State handling ******************//
             case msg_ekf_status_report.MAVLINK_MSG_ID_EKF_STATUS_REPORT:
-                state.setEkfStatus((msg_ekf_status_report) message);
+                processEfkStatus((msg_ekf_status_report) message);
                 break;
 
             case msg_sys_status.MAVLINK_MSG_ID_SYS_STATUS:
@@ -574,7 +574,7 @@ public class GenericMavLinkDrone implements MavLinkDrone {
 
     protected void processSysStatus(msg_sys_status m_sys) {
         processBatteryUpdate(m_sys.voltage_battery / 1000.0, m_sys.battery_remaining,
-                m_sys.current_battery / 100.0);
+            m_sys.current_battery / 100.0);
     }
 
     private void processHeartbeat(msg_heartbeat msg_heart) {
@@ -779,13 +779,22 @@ public class GenericMavLinkDrone implements MavLinkDrone {
         }
     }
 
+    private void processEfkStatus(msg_ekf_status_report ekf_status_report) {
+        state.setEkfStatus(ekf_status_report);
+
+        vehicleGps.setVehicleArmed(state.isArmed());
+        vehicleGps.setEkfStatus(CommonApiUtils.generateEkfStatus(ekf_status_report));
+
+        notifyDroneEvent(DroneInterfaces.DroneEventsType.EKF_STATUS_UPDATE);
+    }
+
     private void processGpsState(msg_gps_raw_int gpsState) {
         if (gpsState == null)
             return;
 
         double newEph = gpsState.eph / 100.0; // convert from eph(cm) to gps_eph(m)
         if (vehicleGps.getSatellitesCount() != gpsState.satellites_visible
-                || vehicleGps.getGpsEph() != newEph) {
+            || vehicleGps.getGpsEph() != newEph) {
             vehicleGps.setSatCount(gpsState.satellites_visible);
             vehicleGps.setGpsEph(newEph);
             notifyAttributeListener(AttributeEvent.GPS_COUNT);

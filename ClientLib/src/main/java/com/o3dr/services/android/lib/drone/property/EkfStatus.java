@@ -8,11 +8,9 @@ import com.MAVLink.enums.EKF_STATUS_FLAGS;
 import java.util.BitSet;
 
 /**
- * Created by Fredia Huya-Kouadio on 5/22/15.
+ * Abstraction for vehicle EFK status. See http://copter.ardupilot.com/wiki/common-apm-navigation-extended-kalman-filter-overview/
  */
 public class EkfStatus implements DroneAttribute {
-
-    private static final String TAG = EkfStatus.class.getSimpleName();
     private static final int FLAGS_BIT_COUNT = 16;
 
     public enum EkfFlags {
@@ -33,8 +31,6 @@ public class EkfStatus implements DroneAttribute {
             this.value = value;
         }
     }
-
-    ;
 
     private float velocityVariance;
     private float horizontalPositionVariance;
