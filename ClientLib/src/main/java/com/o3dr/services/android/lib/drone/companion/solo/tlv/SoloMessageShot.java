@@ -115,7 +115,8 @@ public abstract class SoloMessageShot extends TLVPacket {
 
             case COPTER_AUTO:
                 //Mission
-                return context.getText(R.string.copter_auto_label);
+//                return context.getText(R.string.copter_auto_label);
+                return null;
 
             default:
                 return flightMode.getLabel();

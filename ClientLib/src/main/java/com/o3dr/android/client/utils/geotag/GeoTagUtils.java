@@ -25,9 +25,6 @@ import java.util.Map;
  */
 public class GeoTagUtils {
 
-    private static final String STORE_PHOTO_PREFIX = "GeoTag";
-    private static final SimpleDateFormat formatter = new SimpleDateFormat("MM-dd-yy-HH", Locale.US);
-
     //Prevent instantiation
     private GeoTagUtils(){}
 
@@ -37,22 +34,20 @@ public class GeoTagUtils {
 
     /**
      *
-     * @param rootDir
+     * @param saveDir
      * @param events
      * @param photos
      * @param geoTagAlg
      * @param listener
      * @return
      */
-    public static ResultObject geotag(File rootDir, List<TLogParser.Event> events, ArrayList<File> photos, GeoTagAsyncTask.GeoTagAlgorithm geoTagAlg, GeoTagListener listener){
+    public static ResultObject geotag(File saveDir, List<TLogParser.Event> events, ArrayList<File> photos, GeoTagAsyncTask.GeoTagAlgorithm geoTagAlg, GeoTagListener listener){
         ResultObject resultObject = new ResultObject();
 
         try {
             HashMap<File, File> geoTaggedFiles = new HashMap<>();
             HashMap<File, Exception> failedFiles = new HashMap<>();
             resultObject.setResult(geoTaggedFiles, failedFiles);
-
-            File saveDir = findNextDirName(rootDir);
 
             if (!saveDir.mkdirs()) {
                 resultObject.setException(new IllegalStateException("Failed to create directory for images"));
@@ -139,19 +134,6 @@ public class GeoTagUtils {
         exifInterface.setAttribute(ExifInterface.TAG_GPS_LONGITUDE_REF, lng < 0 ? "W" : "E");
         exifInterface.setAttribute(ExifInterface.TAG_GPS_ALTITUDE, alt);
         exifInterface.saveAttributes();
-    }
-
-    private static File findNextDirName(File rootDir) {
-        Date date = new Date();
-        File file;
-        int i = 0;
-        do {
-            String dirName = STORE_PHOTO_PREFIX + "_" + formatter.format(date) + "_" + i;
-            file = new File(rootDir, dirName);
-            i++;
-        } while (file.exists());
-
-        return file;
     }
 
     private static String convertLatLngToDMS(double coord) {
