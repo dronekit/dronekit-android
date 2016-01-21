@@ -214,9 +214,9 @@ android {
         unitTests.returnDefaultValues = true
     }
 
-    dexOptions {
-        dexInProcess = true
-    }
+    //dexOptions {
+    //    dexInProcess = true
+    //}
 }
 
 def getAppKeystoreFile() {

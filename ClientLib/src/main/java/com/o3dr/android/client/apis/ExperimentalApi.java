@@ -3,11 +3,17 @@ package com.o3dr.android.client.apis;
 import android.os.Bundle;
 
 import com.o3dr.android.client.Drone;
+import com.o3dr.android.client.VideoStreamObserver;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
+import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
 import com.o3dr.services.android.lib.model.AbstractCommandListener;
+import com.o3dr.services.android.lib.model.VideoStreamListener;
 import com.o3dr.services.android.lib.model.action.Action;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.ACTION_SEND_MAVLINK_MESSAGE;
@@ -22,12 +28,11 @@ import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.EXT
 import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.EXTRA_SERVO_PWM;
 import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.EXTRA_SET_ROI_LAT_LONG_ALT;
 
-
 /**
  * Contains drone commands with no defined interaction model yet.
  */
 public class ExperimentalApi extends Api {
-
+    private static final SimpleDateFormat FILE_DATE_FORMAT = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss", Locale.US);
     private static final ConcurrentHashMap<Drone, ExperimentalApi> experimentalApiCache = new ConcurrentHashMap<>();
     private static final Builder<ExperimentalApi> apiBuilder = new Builder<ExperimentalApi>() {
         @Override
@@ -35,6 +40,11 @@ public class ExperimentalApi extends Api {
             return new ExperimentalApi(drone);
         }
     };
+
+    private static final int SOLO_STREAM_UDP_PORT = 5600;
+
+    private final CapabilityApi capabilityChecker;
+    private final CameraApi cameraApi;
 
     /**
      * Retrieves an ExperimentalApi instance.
@@ -50,6 +60,8 @@ public class ExperimentalApi extends Api {
 
     private ExperimentalApi(Drone drone) {
         this.drone = drone;
+        this.capabilityChecker = CapabilityApi.getApi(drone);
+        this.cameraApi = CameraApi.getApi(drone);
     }
 
     /**
@@ -148,5 +160,79 @@ public class ExperimentalApi extends Api {
         params.putInt(EXTRA_SERVO_CHANNEL, channel);
         params.putInt(EXTRA_SERVO_PWM, pwm);
         drone.performAsyncActionOnDroneThread(new Action(ACTION_SET_SERVO, params), listener);
+    }
+
+    /**
+     * Attempt to grab ownership and start the video stream from the connected drone. Can fail if
+     * the video stream is already owned by another client.
+     *
+     * @param tag                   Video tag.
+     * @param enableLocalRecording  Set to true to enable local recording, false to disable it.
+     * @param listener              Register a callback to receive update of the command execution status.
+     *
+     * @since 2.5.0
+     */
+    public void startVideoStream(final String tag, final boolean enableLocalRecording,
+                                 final VideoStreamListener listener) {
+        capabilityChecker.checkFeatureSupport(CapabilityApi.FeatureIds.SOLO_VIDEO_STREAMING,
+            new CapabilityApi.FeatureSupportListener() {
+                @Override
+                public void onFeatureSupportResult(String featureId, int result, Bundle resultInfo) {
+                    switch (result) {
+                        case CapabilityApi.FEATURE_SUPPORTED:
+                            final Bundle videoProps = new Bundle();
+                            videoProps.putInt(CameraApi.VIDEO_PROPS_UDP_PORT, SOLO_STREAM_UDP_PORT);
+
+                            videoProps.putBoolean(CameraApi.VIDEO_ENABLE_LOCAL_RECORDING, enableLocalRecording);
+                            if (enableLocalRecording) {
+                                String localRecordingFilename = "solo_stream_" + FILE_DATE_FORMAT.format(new Date());
+                                videoProps.putString(CameraApi.VIDEO_LOCAL_RECORDING_FILENAME, localRecordingFilename);
+                            }
+
+                            cameraApi.startVideoStream(tag, videoProps, listener);
+                            break;
+
+                        case CapabilityApi.FEATURE_UNSUPPORTED:
+                            postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
+                            break;
+
+                        default:
+                            postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
+                            break;
+                    }
+                }
+            });
+
+    }
+
+    /**
+     * Stop the video stream from the connected drone, and release ownership.
+     *
+     * @param tag                   Video tag.
+     * @param listener              Register a callback to receive update of the command execution status.
+     *
+     * @since 2.5.0
+     */
+    public void stopVideoStream(final String tag, final VideoStreamListener listener) {
+        capabilityChecker.checkFeatureSupport(CapabilityApi.FeatureIds.SOLO_VIDEO_STREAMING,
+            new CapabilityApi.FeatureSupportListener() {
+                @Override
+                public void onFeatureSupportResult(String featureId, int result, Bundle resultInfo) {
+                    switch (result) {
+
+                        case CapabilityApi.FEATURE_SUPPORTED:
+                            cameraApi.stopVideoStream(tag, listener);
+                            break;
+
+                        case CapabilityApi.FEATURE_UNSUPPORTED:
+                            postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
+                            break;
+
+                        default:
+                            postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
+                            break;
+                    }
+                }
+            });
     }
 }

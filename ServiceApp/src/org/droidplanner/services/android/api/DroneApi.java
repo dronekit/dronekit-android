@@ -12,6 +12,7 @@ import android.view.Surface;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.ardupilotmega.msg_mag_cal_progress;
 import com.MAVLink.ardupilotmega.msg_mag_cal_report;
+import com.o3dr.android.client.VideoStreamObserver;
 import com.o3dr.services.android.lib.drone.action.CameraActions;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.action.ConnectionActions;
@@ -31,11 +32,13 @@ import com.o3dr.services.android.lib.drone.property.Parameter;
 import com.o3dr.services.android.lib.drone.property.State;
 import com.o3dr.services.android.lib.gcs.event.GCSEvent;
 import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
+import com.o3dr.services.android.lib.model.AbstractCommandListener;
 import com.o3dr.services.android.lib.model.IApiListener;
 import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.model.IDroneApi;
 import com.o3dr.services.android.lib.model.IMavlinkObserver;
 import com.o3dr.services.android.lib.model.IObserver;
+import com.o3dr.services.android.lib.model.VideoStreamListener;
 import com.o3dr.services.android.lib.model.action.Action;
 
 import org.droidplanner.services.android.communication.connection.SoloConnection;
@@ -52,6 +55,7 @@ import org.droidplanner.services.android.utils.video.VideoManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import timber.log.Timber;
@@ -184,11 +188,11 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
     }
 
     private ConnectionParameter checkConnectionParameter(ConnectionParameter connParams) throws ConnectionException {
-        if(connParams == null){
+        if (connParams == null){
             throw new ConnectionException("Invalid connection parameters");
         }
 
-        if(SoloConnection.isSoloConnection(context, connParams)){
+        if (SoloConnection.isSoloConnection(context, connParams)){
             ConnectionParameter update = SoloConnection.getSoloConnectionParameterIfPossible(context);
             if(update != null){
                 return update;
@@ -272,7 +276,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
 
         Drone drone = getDrone();
         switch (type) {
-            //CONNECTION ACTIONS
+            // CONNECTION ACTIONS
             case ConnectionActions.ACTION_CONNECT:
                 ConnectionParameter parameter = data.getParcelable(ConnectionActions.EXTRA_CONNECT_PARAMETER);
                 connect(parameter);
@@ -282,7 +286,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
                 disconnect();
                 break;
 
-            //CAMERA ACTIONS
+            // CAMERA ACTIONS
             case CameraActions.ACTION_START_VIDEO_STREAM: {
                 Surface videoSurface = data.getParcelable(CameraActions.EXTRA_VIDEO_DISPLAY);
                 String videoTag = data.getString(CameraActions.EXTRA_VIDEO_TAG, "");
@@ -296,13 +300,36 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
                     videoProps.putInt(CameraActions.EXTRA_VIDEO_PROPS_UDP_PORT, VideoManager.ARTOO_UDP_PORT);
                 }
 
-                CommonApiUtils.startVideoStream(drone, videoProps, ownerId, videoTag, videoSurface, listener);
+                CommonApiUtils.startVideoStream(drone, videoProps, ownerId, videoTag, videoSurface,
+                    (AbstractCommandListener) listener);
+                break;
+            }
+
+            case CameraActions.ACTION_START_VIDEO_STREAM_FOR_OBSERVER: {
+                String videoTag = data.getString(CameraActions.EXTRA_VIDEO_TAG, "");
+
+                Bundle videoProps = data.getBundle(CameraActions.EXTRA_VIDEO_PROPERTIES);
+                if (videoProps == null) {
+                    //Only case where it's null is when interacting with a deprecated client version.
+                    //In this case, we assume that the client is attempting to start a solo stream, since that's
+                    //the only api that was exposed.
+                    videoProps = new Bundle();
+                    videoProps.putInt(CameraActions.EXTRA_VIDEO_PROPS_UDP_PORT, VideoManager.ARTOO_UDP_PORT);
+                }
+
+                CommonApiUtils.startVideoStream(drone, videoProps, ownerId, videoTag, (VideoStreamListener) listener);
                 break;
             }
 
             case CameraActions.ACTION_STOP_VIDEO_STREAM: {
                 String videoTag = data.getString(CameraActions.EXTRA_VIDEO_TAG, "");
-                CommonApiUtils.stopVideoStream(drone, ownerId, videoTag, listener);
+                CommonApiUtils.stopVideoStream(drone, ownerId, videoTag, (AbstractCommandListener) listener);
+                break;
+            }
+
+            case CameraActions.ACTION_STOP_VIDEO_STREAM_FOR_OBSERVER: {
+                String videoTag = data.getString(CameraActions.EXTRA_VIDEO_TAG, "");
+                CommonApiUtils.stopVideoStream(drone, ownerId, videoTag, (VideoStreamListener) listener);
                 break;
             }
 

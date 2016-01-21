@@ -28,6 +28,7 @@ import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
 import com.o3dr.services.android.lib.drone.property.DroneAttribute;
 import com.o3dr.services.android.lib.drone.property.State;
+import com.o3dr.services.android.lib.model.AbstractCommandListener;
 import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
 
@@ -219,7 +220,8 @@ public class ArduSolo extends ArduCopter {
     }
 
     @Override
-    public void startVideoStream(Bundle videoProps, String appId, String newVideoTag, Surface videoSurface, final ICommandListener listener) {
+    public void startVideoStream(Bundle videoProps, String appId, String newVideoTag, Surface videoSurface,
+                                 final AbstractCommandListener listener) {
         if (!soloComp.hasStreamingPermission()) {
             postErrorEvent(CommandExecutionError.COMMAND_DENIED, listener);
             return;

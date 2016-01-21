@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.SurfaceTexture;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Surface;
@@ -18,7 +19,10 @@ import android.widget.Toast;
 
 import com.o3dr.android.client.ControlTower;
 import com.o3dr.android.client.Drone;
+import com.o3dr.android.client.IVideoStreamCallback;
+import com.o3dr.android.client.VideoStreamObserver;
 import com.o3dr.android.client.apis.ControlApi;
+import com.o3dr.android.client.apis.ExperimentalApi;
 import com.o3dr.android.client.apis.solo.SoloCameraApi;
 import com.o3dr.android.client.apis.VehicleApi;
 import com.o3dr.android.client.interfaces.DroneListener;
@@ -41,6 +45,7 @@ import com.o3dr.services.android.lib.drone.property.Type;
 import com.o3dr.services.android.lib.drone.property.VehicleMode;
 import com.o3dr.services.android.lib.model.AbstractCommandListener;
 import com.o3dr.services.android.lib.model.SimpleCommandListener;
+import com.o3dr.services.android.lib.model.VideoStreamListener;
 
 import java.util.List;
 
@@ -60,6 +65,8 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
     private Spinner modeSelector;
     private Button startVideoStream;
     private Button stopVideoStream;
+
+    VideoStreamObserver videoStreamObserver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,13 +131,23 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
             }
         });
 
+        HandlerThread thread = new HandlerThread("MyHandlerThread");
+        thread.start();
+        Handler handler = new Handler(thread.getLooper());
+        videoStreamObserver = new VideoStreamObserver(this, handler, new IVideoStreamCallback() {
+            @Override
+            public void getVideoStreamPackets(byte[] packets) {
+                alertUser("Video packet received. Size is: " + packets.length);
+            }
+        });
+
         startVideoStream = (Button) findViewById(R.id.start_video_stream);
         startVideoStream.setEnabled(false);
         startVideoStream.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 alertUser("Starting video stream.");
-                startVideoStream(new Surface(videoView.getSurfaceTexture()));
+                //startVideoStream(new Surface(videoView.getSurfaceTexture()));
             }
         });
 
@@ -140,7 +157,7 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
             @Override
             public void onClick(View v) {
                 alertUser("Stopping video stream.");
-                stopVideoStream();
+                //stopVideoStream();
             }
         });
     }
@@ -495,10 +512,44 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
         SoloCameraApi.getApi(drone).startVideoStream(videoSurface, "", true, new AbstractCommandListener() {
             @Override
             public void onSuccess() {
-                if(stopVideoStream != null)
+                if (stopVideoStream != null)
                     stopVideoStream.setEnabled(true);
 
-                if(startVideoStream != null)
+                if (startVideoStream != null)
+                    startVideoStream.setEnabled(false);
+            }
+
+            @Override
+            public void onError(int executionError) {
+                alertUser("Error while starting the video stream: " + executionError);
+            }
+
+            @Override
+            public void onTimeout() {
+                alertUser("Timed out while attempting to start the video stream.");
+            }
+        });
+    }
+
+    private void startVideoStreamForObserver() {
+        ExperimentalApi.getApi(drone).startVideoStream("", true,
+            new VideoStreamListener() {
+            @Override
+            public void onVideoStarted() {
+                alertUser("Video streaming has started...");
+            }
+
+            @Override
+            public void onVideoStopped() {
+                alertUser("Video streaming has stopped...");
+            }
+
+            @Override
+            public void onSuccess() {
+                if (stopVideoStream != null)
+                    stopVideoStream.setEnabled(true);
+
+                if (startVideoStream != null)
                     startVideoStream.setEnabled(false);
             }
 
@@ -515,16 +566,53 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
     }
 
     private void stopVideoStream() {
-        SoloCameraApi.getApi(drone).stopVideoStream(new SimpleCommandListener() {
+        SoloCameraApi.getApi(drone).stopVideoStream(new AbstractCommandListener() {
             @Override
             public void onSuccess() {
                 if (stopVideoStream != null)
                     stopVideoStream.setEnabled(false);
 
-                if(startVideoStream != null)
+                if (startVideoStream != null)
                     startVideoStream.setEnabled(true);
+            }
+
+            @Override
+            public void onError(int executionError) {
+            }
+
+            @Override
+            public void onTimeout() {
             }
         });
     }
 
+    private void stopVideoStreamForObserver() {
+        ExperimentalApi.getApi(drone).stopVideoStream("",
+            new VideoStreamListener() {
+            @Override
+            public void onVideoStarted() {
+                alertUser("Video streaming has started...");
+            }
+
+            @Override
+            public void onVideoStopped() {
+                alertUser("Video streaming has stopped...");
+            }
+
+            @Override
+            public void onSuccess() {
+                if (stopVideoStream != null)
+                    stopVideoStream.setEnabled(false);
+
+                if (startVideoStream != null)
+                    startVideoStream.setEnabled(true);
+            }
+
+            @Override
+            public void onError(int executionError) {  }
+
+            @Override
+            public void onTimeout() {  }
+        });
+    }
 }

@@ -57,7 +57,6 @@ import java.util.concurrent.atomic.AtomicReference;
  * Created by fhuya on 11/4/14.
  */
 public class Drone {
-
     private static final String CLAZZ_NAME = Drone.class.getName();
     private static final String TAG = Drone.class.getSimpleName();
 
@@ -132,7 +131,7 @@ public class Drone {
         this.droneObserver = new DroneObserver(this);
     }
 
-    Context getContext(){
+    Context getContext() {
         return this.context;
     }
 

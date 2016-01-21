@@ -21,6 +21,7 @@ import com.MAVLink.common.msg_sys_status;
 import com.MAVLink.common.msg_vibration;
 import com.MAVLink.enums.MAV_MODE_FLAG;
 import com.MAVLink.enums.MAV_STATE;
+import com.o3dr.android.client.VideoStreamObserver;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.action.CapabilityActions;
@@ -45,7 +46,9 @@ import com.o3dr.services.android.lib.drone.property.Speed;
 import com.o3dr.services.android.lib.drone.property.VehicleMode;
 import com.o3dr.services.android.lib.drone.property.Vibration;
 import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
+import com.o3dr.services.android.lib.model.AbstractCommandListener;
 import com.o3dr.services.android.lib.model.ICommandListener;
+import com.o3dr.services.android.lib.model.VideoStreamListener;
 import com.o3dr.services.android.lib.model.action.Action;
 import com.o3dr.services.android.lib.util.MathUtils;
 
@@ -266,11 +269,21 @@ public class GenericMavLinkDrone implements MavLinkDrone {
         events.removeDroneListener(listener);
     }
 
-    public void startVideoStream(Bundle videoProps, String appId, String newVideoTag, Surface videoSurface, ICommandListener listener) {
+    public void startVideoStream(Bundle videoProps, String appId, String newVideoTag, Surface videoSurface,
+                                 AbstractCommandListener listener) {
         videoMgr.startVideoStream(videoProps, appId, newVideoTag, videoSurface, listener);
     }
 
-    public void stopVideoStream(String appId, String currentVideoTag, ICommandListener listener) {
+    public void stopVideoStream(String appId, String currentVideoTag, AbstractCommandListener listener) {
+        videoMgr.stopVideoStream(appId, currentVideoTag, listener);
+    }
+
+    public void startVideoStream(Bundle videoProps, String appId, String newVideoTag,
+                                 VideoStreamListener listener) {
+        videoMgr.startVideoStream(videoProps, appId, newVideoTag, listener);
+    }
+
+    public void stopVideoStream(String appId, String currentVideoTag, VideoStreamListener listener) {
         videoMgr.stopVideoStream(appId, currentVideoTag, listener);
     }
 

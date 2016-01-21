@@ -7,7 +7,6 @@ import com.MAVLink.enums.GOPRO_COMMAND;
 import com.o3dr.android.client.Drone;
 import com.o3dr.android.client.apis.CameraApi;
 import com.o3dr.android.client.apis.CapabilityApi;
-import com.o3dr.services.android.lib.drone.action.CameraActions;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloGoproConstants;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloGoproRecord;
@@ -27,7 +26,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 2.5.0
  */
 public class SoloCameraApi extends SoloApi {
-
     private static final SimpleDateFormat FILE_DATE_FORMAT = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss", Locale.US);
 
     private static final ConcurrentHashMap<Drone, SoloCameraApi> soloCameraApiCache = new ConcurrentHashMap<>();
@@ -121,8 +119,9 @@ public class SoloCameraApi extends SoloApi {
         sendVideoRecordingCommand(SoloGoproConstants.STOP_RECORDING, listener);
     }
 
-    private void sendVideoRecordingCommand(@SoloGoproConstants.RecordCommand final int recordCommand, final AbstractCommandListener listener) {
-        //Set the gopro to video mode
+    private void sendVideoRecordingCommand(@SoloGoproConstants.RecordCommand final int recordCommand,
+                                           final AbstractCommandListener listener) {
+        // Set the gopro to video mode.
         switchCameraCaptureMode(SoloGoproConstants.CAPTURE_MODE_VIDEO, new AbstractCommandListener() {
             @Override
             public void onSuccess() {
@@ -147,7 +146,8 @@ public class SoloCameraApi extends SoloApi {
         });
     }
 
-    public void startVideoStream(final Surface surface, final String tag, final AbstractCommandListener listener) {
+    public void startVideoStream(final Surface surface, final String tag,
+                                 final AbstractCommandListener listener) {
         startVideoStream(surface, tag, false, listener);
     }
 
@@ -155,14 +155,15 @@ public class SoloCameraApi extends SoloApi {
      * Attempt to grab ownership and start the video stream from the connected drone. Can fail if
      * the video stream is already owned by another client.
      *
-     * @param surface  Surface object onto which the video is decoded.
-     * @param tag      Video tag.
+     * @param surface               Surface object onto which the video is decoded.
+     * @param tag                   Video tag.
      * @param enableLocalRecording  Set to true to enable local recording, false to disable it.
-     * @param listener Register a callback to receive update of the command execution status.
+     * @param listener              Register a callback to receive update of the command execution status.
      *
      * @since 2.5.0
      */
-    public void startVideoStream(final Surface surface, final String tag, final boolean enableLocalRecording, final AbstractCommandListener listener) {
+    public void startVideoStream(final Surface surface, final String tag, final boolean enableLocalRecording,
+                                 final AbstractCommandListener listener) {
         if (surface == null) {
             postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
             return;
@@ -265,14 +266,18 @@ public class SoloCameraApi extends SoloApi {
      * @param listener    Register a callback to receive update of the command execution status.
      * @since 2.6.8
      */
-    public void switchCameraCaptureMode(@SoloGoproConstants.CaptureMode byte captureMode, final AbstractCommandListener listener) {
-        final SoloGoproSetRequest captureModeRequest = new SoloGoproSetRequest((short) GOPRO_COMMAND.GOPRO_COMMAND_CAPTURE_MODE, captureMode);
+    public void switchCameraCaptureMode(@SoloGoproConstants.CaptureMode byte captureMode,
+                                        final AbstractCommandListener listener) {
+        final SoloGoproSetRequest captureModeRequest =
+            new SoloGoproSetRequest((short) GOPRO_COMMAND.GOPRO_COMMAND_CAPTURE_MODE, captureMode);
         sendMessage(captureModeRequest, listener);
     }
 
-    private void sendExtendedRequest(AbstractCommandListener listener, int command, byte value1, byte value2, byte value3, byte value4){
+    private void sendExtendedRequest(AbstractCommandListener listener, int command, byte value1,
+                                     byte value2, byte value3, byte value4){
         byte[] values = {value1, value2, value3, value4};
-        SoloGoproSetExtendedRequest extendedRequest = new SoloGoproSetExtendedRequest((short) command, values);
+        SoloGoproSetExtendedRequest extendedRequest =
+            new SoloGoproSetExtendedRequest((short) command, values);
         sendMessage(extendedRequest, listener);
     }
 
@@ -288,8 +293,10 @@ public class SoloCameraApi extends SoloApi {
      * @param fieldOfView
      * @param flags
      */
-    public void updateVideoSettings(byte resolution, byte frameRate, byte fieldOfView, byte flags, AbstractCommandListener listener){
-        sendExtendedRequest(listener, GOPRO_COMMAND.GOPRO_COMMAND_VIDEO_SETTINGS, resolution, frameRate, fieldOfView, flags);
+    public void updateVideoSettings(byte resolution, byte frameRate, byte fieldOfView, byte flags,
+                                    AbstractCommandListener listener){
+        sendExtendedRequest(listener, GOPRO_COMMAND.GOPRO_COMMAND_VIDEO_SETTINGS, resolution,
+            frameRate, fieldOfView, flags);
     }
 
     public void setCameraPhotoResolution(byte photoResolution, AbstractCommandListener listener){
