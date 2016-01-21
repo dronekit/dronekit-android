@@ -22,11 +22,6 @@ android {
     lintOptions {
         abortOnError false
     }
-
-    dexOptions {
-        dexInProcess = true
-    }
-
 }
 
 dependencies {
