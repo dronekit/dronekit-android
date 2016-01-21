@@ -9,12 +9,32 @@ import junit.framework.TestCase;
  */
 public class ArduPilotTest extends TestCase {
     public void testExtractVersionNumber() throws Exception {
-        Version version = ArduPilot.extractVersionNumber("APM:Copter V3.2");
+        Version version = ArduPilot.extractVersionNumber("APM:Copter V3.3");
         assertEquals(3, version.getMajorVersion());
-        assertEquals(2, version.getMinorVersion());
+        assertEquals(3, version.getMinorVersion());
         assertEquals(0, version.getPatchVersion());
 
-        version = ArduPilot.extractVersionNumber("APM:Copter V3.3");
+        version = ArduPilot.extractVersionNumber("APM:Plane V3.3");
+        assertEquals(3, version.getMajorVersion());
+        assertEquals(3, version.getMinorVersion());
+        assertEquals(0, version.getPatchVersion());
+
+        version = ArduPilot.extractVersionNumber("APM:Rover V3.3");
+        assertEquals(3, version.getMajorVersion());
+        assertEquals(3, version.getMinorVersion());
+        assertEquals(0, version.getPatchVersion());
+
+        version = ArduPilot.extractVersionNumber("ArduCopter 3.3.0");
+        assertEquals(3, version.getMajorVersion());
+        assertEquals(3, version.getMinorVersion());
+        assertEquals(0, version.getPatchVersion());
+
+        version = ArduPilot.extractVersionNumber("ArduPlane 3.3.0");
+        assertEquals(3, version.getMajorVersion());
+        assertEquals(3, version.getMinorVersion());
+        assertEquals(0, version.getPatchVersion());
+
+        version = ArduPilot.extractVersionNumber("ArduRover 3.3.0");
         assertEquals(3, version.getMajorVersion());
         assertEquals(3, version.getMinorVersion());
         assertEquals(0, version.getPatchVersion());

@@ -31,6 +31,7 @@ import java.util.regex.Pattern;
  * Created by Fredia Huya-Kouadio on 7/27/15.
  */
 public class ArduCopter extends ArduPilot {
+    private static final Version BRAKE_FEATURE_VERSION = Version.forIntegers(3, 3, 0);
 
     private final ConcurrentHashMap<String, ICommandListener> manualControlStateListeners = new ConcurrentHashMap<>();
 
@@ -151,17 +152,12 @@ public class ArduCopter extends ArduPilot {
 
     @Override
     protected boolean brakeVehicle(ICommandListener listener) {
-        if (getFirmwareVersionNumber().greaterThan(Version.forIntegers(3, 2, 0))) {
+        if (getFirmwareVersionNumber().greaterThan(BRAKE_FEATURE_VERSION)) {
             getState().changeFlightMode(ApmModes.ROTOR_BRAKE, listener);
         } else {
             super.brakeVehicle(listener);
         }
 
         return true;
-    }
-
-    @Override
-    protected void setFirmwareVersionNumber(String firmwareVersion) {
-        firmwareVersionNumber = extractVersionNumber(firmwareVersion);
     }
 }

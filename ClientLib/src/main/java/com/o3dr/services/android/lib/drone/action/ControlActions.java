@@ -25,7 +25,7 @@ public class ControlActions {
 
     public static final String ACTION_SET_VELOCITY = PACKAGE_NAME + ".SET_VELOCITY";
 
-    public static final String ACTION_SEND_BRAKE_VEHICLE = Utils.PACKAGE_NAME + ".action.SEND_BRAKE_VEHICLE";
+    public static final String ACTION_SEND_BRAKE_VEHICLE = PACKAGE_NAME + ".action.SEND_BRAKE_VEHICLE";
 
     /**
      * X velocity in meters per second.

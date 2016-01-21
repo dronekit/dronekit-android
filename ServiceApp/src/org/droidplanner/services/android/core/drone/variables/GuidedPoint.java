@@ -90,7 +90,7 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener {
         if (state == GuidedStates.UNINITIALIZED) {
             changeToGuidedMode(myDrone, listener);
         } else {
-            myDrone.executeAsyncAction(new Action(ControlActions.ACTION_SEND_BRAKE_VEHICLE), listener);
+            newGuidedCoord(getGpsPosition());
             state = GuidedStates.IDLE;
         }
     }

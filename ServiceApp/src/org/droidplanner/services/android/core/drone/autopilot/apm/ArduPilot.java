@@ -469,7 +469,7 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
     }
 
     protected void setFirmwareVersionNumber(String message) {
-        firmwareVersionNumber = Version.forIntegers(0, 0, 0);
+        firmwareVersionNumber = extractVersionNumber(message);
     }
 
     protected static Version extractVersionNumber(String firmwareVersion) {
@@ -479,7 +479,12 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
         Matcher matcher = pattern.matcher(firmwareVersion);
         if (matcher.find()) {
             String versionNumber = matcher.group(0) + ".0"; // Adding a default patch version number for successful parsing.
-            version = Version.valueOf(versionNumber);
+
+            try {
+                version = Version.valueOf(versionNumber);
+            } catch (Exception e){
+                Timber.e(e, "Firmware version invalid");
+            }
         }
 
         return version;

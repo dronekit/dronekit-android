@@ -463,7 +463,7 @@ public class GenericMavLinkDrone implements MavLinkDrone {
     }
 
     protected boolean brakeVehicle(ICommandListener listener) {
-        getGuidedPoint().newGuidedCoord(vehicleGps.getPosition());
+        getGuidedPoint().pauseAtCurrentLocation(listener);
         return true;
     }
 
