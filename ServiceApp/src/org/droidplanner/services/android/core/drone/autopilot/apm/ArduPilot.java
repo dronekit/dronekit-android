@@ -478,7 +478,7 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
         Pattern pattern = Pattern.compile(FIRMWARE_VERSION_NUMBER_REGEX);
         Matcher matcher = pattern.matcher(firmwareVersion);
         if (matcher.find()) {
-            String versionNumber = matcher.group(0) + ".0";
+            String versionNumber = matcher.group(0) + ".0"; // Adding a default patch version number for successful parsing.
             version = Version.valueOf(versionNumber);
         }
 

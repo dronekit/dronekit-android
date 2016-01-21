@@ -151,8 +151,7 @@ public class ArduCopter extends ArduPilot {
 
     @Override
     protected boolean brakeVehicle(ICommandListener listener) {
-        Version versionNumber = getFirmwareVersionNumber();
-        if (versionNumber.greaterThan(Version.forIntegers(3, 2, 0))) {
+        if (getFirmwareVersionNumber().greaterThan(Version.forIntegers(3, 2, 0))) {
             getState().changeFlightMode(ApmModes.ROTOR_BRAKE, listener);
         } else {
             super.brakeVehicle(listener);
