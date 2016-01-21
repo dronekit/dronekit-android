@@ -9,7 +9,6 @@ import com.o3dr.services.android.lib.coordinate.LatLong;
  * Stores GPS information.
  */
 public class Gps implements DroneAttribute {
-
     public static final String LOCK_2D = "2D";
     public static final String LOCK_3D = "3D";
     public static final String LOCK_3D_DGPS = "3D+DGPS";
@@ -21,18 +20,21 @@ public class Gps implements DroneAttribute {
     private final static int LOCK_3D_DGPS_TYPE = 4;
     private final static int LOCK_3D_RTK_TYPE = 5;
 
-    private double mGpsEph;
-    private int mSatCount;
-    private int mFixType;
-    private LatLong mPosition;
+    private double gpsEph;
+    private int satCount;
+    private int fixType;
+    private LatLong position;
 
-    public Gps(){}
+    private boolean vehicleArmed;
+    private EkfStatus ekfStatus;
+
+    public Gps() {  }
 
     public Gps(LatLong position, double gpsEph, int satCount, int fixType){
-        mPosition = position;
-        mGpsEph = gpsEph;
-        mSatCount = satCount;
-        mFixType = fixType;
+        this.position = position;
+        this.gpsEph = gpsEph;
+        this.satCount = satCount;
+        this.fixType = fixType;
     }
 
     public Gps(double latitude, double longitude, double gpsEph, int satCount, int fixType){
@@ -40,23 +42,23 @@ public class Gps implements DroneAttribute {
     }
 
     public boolean isValid(){
-        return mPosition != null;
+        return position != null;
     }
 
     public double getGpsEph(){
-        return mGpsEph;
+        return gpsEph;
     }
 
     public int getSatellitesCount(){
-        return mSatCount;
+        return satCount;
     }
 
-    public int getFixType(){
-        return mFixType;
+    public int getFixType() {
+        return fixType;
     }
 
     public String getFixStatus(){
-        switch (mFixType) {
+        switch (fixType) {
             case LOCK_2D_TYPE:
                 return LOCK_2D;
 
@@ -74,24 +76,36 @@ public class Gps implements DroneAttribute {
         }
     }
 
-    public LatLong getPosition(){
-        return mPosition;
+    public LatLong getPosition() {
+        if (ekfStatus.isPositionOk(vehicleArmed) && position != null) {
+            return position;
+        } else {
+            return null;
+        }
     }
 
-    public void setGpsEph(double mGpsEph) {
-        this.mGpsEph = mGpsEph;
+    public void setGpsEph(double gpsEph) {
+        this.gpsEph = gpsEph;
     }
 
-    public void setSatCount(int mSatCount) {
-        this.mSatCount = mSatCount;
+    public void setSatCount(int satCount) {
+        this.satCount = satCount;
     }
 
-    public void setFixType(int mFixType) {
-        this.mFixType = mFixType;
+    public void setFixType(int fixType) {
+        this.fixType = fixType;
     }
 
-    public void setPosition(LatLong mPosition) {
-        this.mPosition = mPosition;
+    public void setPosition(LatLong position) {
+        this.position = position;
+    }
+
+    public void setEkfStatus(EkfStatus ekfStatus) {
+        this.ekfStatus = ekfStatus;
+    }
+
+    public void setVehicleArmed(boolean vehicleArmed) {
+        this.vehicleArmed = vehicleArmed;
     }
 
     /**
@@ -99,7 +113,9 @@ public class Gps implements DroneAttribute {
      * @since 2.6.8
      */
     public boolean has3DLock(){
-        return (mFixType == LOCK_3D_TYPE) || (mFixType == LOCK_3D_DGPS_TYPE) || (mFixType == LOCK_3D_RTK_TYPE);
+        return (fixType == LOCK_3D_TYPE) ||
+            (fixType == LOCK_3D_DGPS_TYPE) ||
+            (fixType == LOCK_3D_RTK_TYPE);
     }
 
     @Override
@@ -109,10 +125,10 @@ public class Gps implements DroneAttribute {
 
         Gps gps = (Gps) o;
 
-        if (mFixType != gps.mFixType) return false;
-        if (Double.compare(gps.mGpsEph, mGpsEph) != 0) return false;
-        if (mSatCount != gps.mSatCount) return false;
-        if (mPosition != null ? !mPosition.equals(gps.mPosition) : gps.mPosition != null)
+        if (fixType != gps.fixType) return false;
+        if (Double.compare(gps.gpsEph, gpsEph) != 0) return false;
+        if (satCount != gps.satCount) return false;
+        if (position != null ? !position.equals(gps.position) : gps.position != null)
             return false;
 
         return true;
@@ -122,21 +138,21 @@ public class Gps implements DroneAttribute {
     public int hashCode() {
         int result;
         long temp;
-        temp = Double.doubleToLongBits(mGpsEph);
+        temp = Double.doubleToLongBits(gpsEph);
         result = (int) (temp ^ (temp >>> 32));
-        result = 31 * result + mSatCount;
-        result = 31 * result + mFixType;
-        result = 31 * result + (mPosition != null ? mPosition.hashCode() : 0);
+        result = 31 * result + satCount;
+        result = 31 * result + fixType;
+        result = 31 * result + (position != null ? position.hashCode() : 0);
         return result;
     }
 
     @Override
     public String toString() {
         return "Gps{" +
-                "mGpsEph=" + mGpsEph +
-                ", mSatCount=" + mSatCount +
-                ", mFixType=" + mFixType +
-                ", mPosition=" + mPosition +
+                "gpsEph=" + gpsEph +
+                ", mSatCount=" + satCount +
+                ", mFixType=" + fixType +
+                ", mPosition=" + position +
                 '}';
     }
 
@@ -147,17 +163,17 @@ public class Gps implements DroneAttribute {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeDouble(this.mGpsEph);
-        dest.writeInt(this.mSatCount);
-        dest.writeInt(this.mFixType);
-        dest.writeParcelable(this.mPosition, 0);
+        dest.writeDouble(this.gpsEph);
+        dest.writeInt(this.satCount);
+        dest.writeInt(this.fixType);
+        dest.writeParcelable(this.position, 0);
     }
 
     private Gps(Parcel in) {
-        this.mGpsEph = in.readDouble();
-        this.mSatCount = in.readInt();
-        this.mFixType = in.readInt();
-        this.mPosition = in.readParcelable(LatLong.class.getClassLoader());
+        this.gpsEph = in.readDouble();
+        this.satCount = in.readInt();
+        this.fixType = in.readInt();
+        this.position = in.readParcelable(LatLong.class.getClassLoader());
     }
 
     public static final Parcelable.Creator<Gps> CREATOR = new Parcelable.Creator<Gps>() {

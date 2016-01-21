@@ -537,7 +537,11 @@ public class GenericMavLinkDrone implements MavLinkDrone {
 
             //*************** EKF State handling ******************//
             case msg_ekf_status_report.MAVLINK_MSG_ID_EKF_STATUS_REPORT:
-                state.setEkfStatus((msg_ekf_status_report) message);
+                msg_ekf_status_report ekf_status_report = (msg_ekf_status_report) message;
+                state.setEkfStatus(ekf_status_report);
+
+                vehicleGps.setVehicleArmed(state.isArmed());
+                vehicleGps.setEkfStatus(CommonApiUtils.generateEkfStatus(ekf_status_report));
                 break;
 
             case msg_sys_status.MAVLINK_MSG_ID_SYS_STATUS:

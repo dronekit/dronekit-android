@@ -386,17 +386,19 @@ public class CommonApiUtils {
                 ? accelCalibration.getMessage()
                 : null;
 
-        msg_ekf_status_report ekfStatus = droneState.getEkfStatus();
-        EkfStatus proxyEkfStatus = ekfStatus == null
-                ? new EkfStatus()
-                : new EkfStatus(ekfStatus.flags, ekfStatus.compass_variance, ekfStatus.pos_horiz_variance, ekfStatus
-                .terrain_alt_variance, ekfStatus.velocity_variance, ekfStatus.pos_vert_variance);
+        return new State(isConnected, CommonApiUtils.getVehicleMode(droneMode), droneState.isArmed(),
+            droneState.isFlying(), droneState.getErrorId(), drone.getMavlinkVersion(), calibrationMessage,
+            droneState.getFlightStartTime(), generateEkfStatus(droneState.getEkfStatus()),
+            isConnected && drone.isConnectionAlive(), vibration);
+    }
 
-        return new State(isConnected, CommonApiUtils.getVehicleMode(droneMode), droneState.isArmed(), droneState.isFlying(),
-                droneState.getErrorId(), drone.getMavlinkVersion(), calibrationMessage,
-                droneState.getFlightStartTime(), proxyEkfStatus,
-                isConnected && drone.isConnectionAlive(),
-                vibration);
+    public static EkfStatus generateEkfStatus(msg_ekf_status_report ekfStatus) {
+        EkfStatus proxyEkfStatus = ekfStatus == null
+            ? new EkfStatus()
+            : new EkfStatus(ekfStatus.flags, ekfStatus.compass_variance, ekfStatus.pos_horiz_variance,
+            ekfStatus.terrain_alt_variance, ekfStatus.velocity_variance, ekfStatus.pos_vert_variance);
+
+        return proxyEkfStatus;
     }
 
     public static Mission getMission(MavLinkDrone drone) {
