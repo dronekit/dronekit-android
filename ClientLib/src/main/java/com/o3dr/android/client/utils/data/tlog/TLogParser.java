@@ -160,6 +160,50 @@ public class TLogParser {
     };
 
     /**
+     * * Returns a list of all events in specified TLog uri
+     * @param uri
+     * @return
+     * @throws Exception
+     */
+    public static List<TLogParser.Event> getAllEvents(final Uri uri) throws Exception {
+        return getAllEvents(uri, DEFAULT_FILTER);
+    }
+
+    /**
+     * Returns a list of all events in specified TLog uri using the specified filter
+     * @param uri {@link Uri}
+     * @param filter {@link TLogParserFilter}
+     * @return
+     * @throws Exception
+     */
+    public static List<TLogParser.Event> getAllEvents(final Uri uri, final TLogParserFilter filter) throws Exception {
+        File file = new File(uri.getPath());
+        DataInputStream in = null;
+        try {
+            in = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
+            ArrayList<Event> eventList = new ArrayList<>();
+            Event event = next(in);
+            while (event != null && filter.shouldIterate()) {
+                if (filter.includeEvent(event)) {
+                    eventList.add(event);
+                }
+                event = next(in);
+            }
+
+            return eventList;
+        }
+        finally{
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException e) {
+                    Log.e(LOG_TAG, "Failed to close file " + uri, e);
+                }
+            }
+        }
+    }
+
+    /**
      * Returns a list of all events in specified TLog uri
      *
      * @param handler {@link Handler} Handler to specify what thread to callback on. This cannot be null.
@@ -182,18 +226,8 @@ public class TLogParser {
         getInstance().execute(new Runnable() {
             @Override
             public void run() {
-                File file = new File(uri.getPath());
-                DataInputStream in = null;
                 try {
-                    in = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
-                    ArrayList<Event> eventList = new ArrayList<>();
-                    Event event = next(in);
-                    while (event != null && filter.shouldIterate()) {
-                        if (filter.includeEvent(event)) {
-                            eventList.add(event);
-                        }
-                        event = next(in);
-                    }
+                    List<Event> eventList = getAllEvents(uri, filter);
 
                     if (eventList.isEmpty()) {
                         sendFailed(handler, callback, new NoSuchElementException());
@@ -202,14 +236,6 @@ public class TLogParser {
                     }
                 } catch (Exception e) {
                     sendFailed(handler, callback, e);
-                } finally {
-                    if (in != null) {
-                        try {
-                            in.close();
-                        } catch (IOException e) {
-                            Log.e(LOG_TAG, "Failed to close file " + uri, e);
-                        }
-                    }
                 }
             }
         });

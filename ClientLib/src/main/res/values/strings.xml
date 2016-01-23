@@ -56,6 +56,9 @@
     <string name="label_orbit">Orbit</string>
     <string name="label_preset_selfie">Selfie</string>
     <string name="label_follow">Follow</string>
+    <string name="label_inspect">Inspect</string>
+    <string name="label_survey">Survey</string>
+    <string name="label_scan">Scan</string>
 
     <!-- Shot type indicator -->
     <string name="copter_alt_hold_label">FLY: Manual</string>

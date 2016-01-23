@@ -2,6 +2,10 @@ package com.o3dr.services.android.lib.drone.companion.solo.tlv;
 
 import android.util.Log;
 
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.sitescan.inspect.SoloInspectStart;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.sitescan.inspect.SoloInspectSetWaypoint;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.sitescan.inspect.SoloInspectMoveGimbal;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.sitescan.inspect.SoloInspectMoveVehicle;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.mpcc.SoloSplineAttach;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.mpcc.SoloSplineDurations;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.mpcc.SoloSplinePathSettings;
@@ -10,6 +14,8 @@ import com.o3dr.services.android.lib.drone.companion.solo.tlv.mpcc.SoloSplinePla
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.mpcc.SoloSplinePoint;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.mpcc.SoloSplineRecord;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.mpcc.SoloSplineSeek;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.sitescan.scan.SoloScanStart;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.sitescan.survey.SoloSurveyStart;
 
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
@@ -29,11 +35,16 @@ import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageT
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_GOPRO_SET_REQUEST;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_GOPRO_STATE;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_GOPRO_STATE_V2;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_INSPECT_MOVE_GIMBAL;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_INSPECT_MOVE_VEHICLE;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_INSPECT_SET_WAYPOINT;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_INSPECT_START;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_MESSAGE_GET_CURRENT_SHOT;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_MESSAGE_LOCATION;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_MESSAGE_RECORD_POSITION;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_MESSAGE_SET_CURRENT_SHOT;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_MESSAGE_SHOT_MANAGER_ERROR;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SCAN_START;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SET_BUTTON_SETTING;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SHOT_ERROR;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SHOT_OPTIONS;
@@ -45,6 +56,7 @@ import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageT
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SPLINE_POINT;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SPLINE_RECORD;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SPLINE_SEEK;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SURVEY_START;
 
 /**
  * Utility class to generate tlv packet from received bytes.
@@ -258,6 +270,37 @@ public class TLVMessageParser {
 
                     case TYPE_SOLO_SPLINE_ATTACH: {
                         packet = new SoloSplineAttach(packetBuffer);
+                        break;
+                    }
+
+                    /************************ Site Scan tlv packets **************/
+                    case TYPE_SOLO_INSPECT_START:{
+                        packet = new SoloInspectStart(packetBuffer);
+                        break;
+                    }
+
+                    case TYPE_SOLO_INSPECT_SET_WAYPOINT:{
+                        packet = new SoloInspectSetWaypoint(packetBuffer);
+                        break;
+                    }
+
+                    case TYPE_SOLO_INSPECT_MOVE_GIMBAL:{
+                        packet = new SoloInspectMoveGimbal(packetBuffer);
+                        break;
+                    }
+
+                    case TYPE_SOLO_INSPECT_MOVE_VEHICLE:{
+                        packet = new SoloInspectMoveVehicle(packetBuffer);
+                        break;
+                    }
+
+                    case TYPE_SOLO_SCAN_START:{
+                        packet = new SoloScanStart();
+                        break;
+                    }
+
+                    case TYPE_SOLO_SURVEY_START:{
+                        packet = new SoloSurveyStart();
                         break;
                     }
 
