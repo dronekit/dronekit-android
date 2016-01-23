@@ -45,9 +45,10 @@ public class GeoTagUtils {
         ResultObject resultObject = new ResultObject();
 
         try {
+            HashMap<TLogParser.Event, File> eventsPhotos = new HashMap<>();
             HashMap<File, File> geoTaggedFiles = new HashMap<>();
             HashMap<File, Exception> failedFiles = new HashMap<>();
-            resultObject.setResult(geoTaggedFiles, failedFiles);
+            resultObject.setResult(eventsPhotos, geoTaggedFiles, failedFiles);
 
             if (!saveDir.mkdirs()) {
                 resultObject.setException(new IllegalStateException("Failed to create directory for images"));
@@ -70,10 +71,13 @@ public class GeoTagUtils {
             for (Map.Entry<TLogParser.Event, File> entry : matchedPhotos.entrySet()) {
                 File photo = entry.getValue();
 
+                TLogParser.Event event = entry.getKey();
                 File newFile = new File(saveDir, photo.getName());
                 try {
                     copyFile(photo, newFile);
-                    updateExif(entry.getKey(), newFile);
+                    updateExif(event, newFile);
+
+                    eventsPhotos.put(event, newFile);
                     geoTaggedFiles.put(photo, newFile);
                 } catch (Exception e) {
                     failedFiles.put(photo, e);
@@ -151,6 +155,7 @@ public class GeoTagUtils {
 
     public static class ResultObject {
         private boolean didSucceed;
+        private HashMap<TLogParser.Event, File> eventsPhotos;
         private HashMap<File, File> geoTaggedPhotos;
         private HashMap<File, Exception> failedFiles;
         private Exception exception;
@@ -159,14 +164,19 @@ public class GeoTagUtils {
             return didSucceed;
         }
 
-        public void setResult(HashMap<File, File> geoTaggedPhotos, HashMap<File, Exception> failedFiles) {
+        public void setResult(HashMap<TLogParser.Event, File> eventsPhotos, HashMap<File, File> geoTaggedPhotos, HashMap<File, Exception> failedFiles) {
             didSucceed = true;
+            this.eventsPhotos = eventsPhotos;
             this.geoTaggedPhotos = geoTaggedPhotos;
             this.failedFiles = failedFiles;
         }
 
         public HashMap<File, File> getGeoTaggedPhotos() {
             return geoTaggedPhotos;
+        }
+
+        public HashMap<TLogParser.Event, File> getEventsPhotos() {
+            return eventsPhotos;
         }
 
         public HashMap<File, Exception> getFailedFiles() {
