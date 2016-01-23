@@ -1,6 +1,7 @@
 package com.o3dr.services.android.lib.drone.companion.solo.tlv.mpcc;
 
 import android.os.Parcel;
+import android.support.annotation.IntDef;
 
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
@@ -21,6 +22,13 @@ public class SoloSplinePathSettings extends TLVPacket {
 
     public static final int MESSAGE_LENGTH = 8;
 
+    @IntDef({
+        AUTO_POINT_CAMERA,
+        FREE_LOOK
+    })
+    public @interface CameraControl{};
+    public static final int AUTO_POINT_CAMERA = 0;
+    public static final int FREE_LOOK = 1;
     /**
      * cameraControl: (DEFAULT 0)
      * 0 : Shotmanager controls camera interpolation;  automatically points camera

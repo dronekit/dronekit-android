@@ -40,10 +40,6 @@ android {
         abortOnError false
     }
 
-    dexOptions {
-        dexInProcess = true
-    }
-
     testOptions {
         unitTests.returnDefaultValues = true
     }
