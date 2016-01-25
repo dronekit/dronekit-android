@@ -61,7 +61,7 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
     private final AtomicReference<String> controllerVersion = new AtomicReference<>("");
     private final AtomicReference<String> stm32Version = new AtomicReference<>("");
 
-    private final AtomicBoolean isEUTxPowerCompliant = new AtomicBoolean(false);
+    private final AtomicReference<String> txPowerCompliantCountry = new AtomicReference<>("US");
     private final AtomicInteger controllerMode = new AtomicInteger(SoloControllerMode.UNKNOWN_MODE);
 
     private final AtomicReference<String> controllerUnits = new AtomicReference<>("");
@@ -143,17 +143,17 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
     private final Runnable checkEUTxPowerCompliance = new Runnable() {
         @Override
         public void run() {
-            boolean isCompliant;
+            String compliantCountry;
             try {
-                isCompliant = !sshLink.execute(SOLOLINK_SSID_CONFIG_PATH + " --get-wifi-country").trim().equals("US");
+                compliantCountry = sshLink.execute(SOLOLINK_SSID_CONFIG_PATH + " --get-wifi-country").trim();
                 if (linkListener != null)
-                    linkListener.onEUTxPowerComplianceUpdated(isCompliant);
+                    linkListener.onTxPowerComplianceCountryUpdated(compliantCountry);
             } catch (IOException e) {
                 Timber.e(e, "Error occurred while querying wifi country.");
-                isCompliant = false; //because most users will have it disabled by default
+                compliantCountry = "US"; //because most users will have US by default
             }
 
-            isEUTxPowerCompliant.set(isCompliant);
+            txPowerCompliantCountry.set(compliantCountry);
         }
     };
 
@@ -298,10 +298,10 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
     }
 
     /**
-     * @return true if the controller is compliant to the EX tx power levels.
+     * @return the country the controller is compliant with tx power levels.
      */
-    public boolean isEUTxPowerCompliant() {
-        return isEUTxPowerCompliant.get();
+    public String getTxPowerCompliantCountry() {
+        return txPowerCompliantCountry.get();
     }
 
     /**
@@ -542,8 +542,8 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
                 try {
                     final boolean supportControllerMode = doesSupportControllerMode();
                     final String command = supportControllerMode
-                            ? SOLOLINK_SSID_CONFIG_PATH + " --set-ui-mode %d"
-                            : "runStickMapperMode%d.sh";
+                        ? SOLOLINK_SSID_CONFIG_PATH + " --set-ui-mode %d"
+                        : "runStickMapperMode%d.sh";
                     final String response;
                     switch (mode) {
                         case SoloControllerMode.MODE_1:
@@ -581,26 +581,21 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
             linkListener.onControllerModeUpdated();
     }
 
-    public void setEUTxPowerCompliance(final boolean compliant, final ICommandListener listener) {
+    public void setTxPowerComplianceCountry(final String compliantCountry, final ICommandListener listener) {
         postAsyncTask(new Runnable() {
             @Override
             public void run() {
-                Timber.d("%s EU Tx power compliance mode", compliant ? "Enabling" : "Disabling");
+                Timber.d("Enabling %s Tx power compliance mode", compliantCountry);
                 try {
-                    final boolean currentCompliance = !sshLink.execute(SOLOLINK_SSID_CONFIG_PATH + " --get-wifi-country").trim().equals("US");
-                    if (currentCompliance != compliant) {
+                    final String currentCompliance = sshLink.execute(SOLOLINK_SSID_CONFIG_PATH + " --get-wifi-country").trim();
+                    if (!currentCompliance.equals(compliantCountry)) {
                         final String response;
-                        if (compliant) {
-                            response = sshLink.execute(SOLOLINK_SSID_CONFIG_PATH + " --set-wifi-country FR; echo $?");
-
-                        } else {
-                            response = sshLink.execute(SOLOLINK_SSID_CONFIG_PATH + " --set-wifi-country US; echo $?");
-                        }
+                            response = sshLink.execute(SOLOLINK_SSID_CONFIG_PATH + " --set-wifi-country " + compliantCountry + "; echo $?");
                         if (response.trim().equals("0")) {
                             restartController();
                             Timber.d("wifi country successfully set, rebooting artoo");
 
-                            isEUTxPowerCompliant.set(compliant);
+                            txPowerCompliantCountry.set(compliantCountry);
                             postSuccessEvent(listener);
 
                         } else {

@@ -1,7 +1,5 @@
 package com.o3dr.services.android.lib.drone.companion.solo.action;
 
-import com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerMode;
-
 /**
  * Created by Fredia Huya-Kouadio on 7/31/15.
  */
@@ -36,11 +34,11 @@ public class SoloConfigActions {
     public static final String EXTRA_CONTROLLER_MODE = "extra_controller_mode";
 
 
-    public static final String ACTION_UPDATE_EU_TX_POWER_COMPLIANCE = PACKAGE_NAME + ".UPDATE_EU_TX_POWER_COMPLIANCE";
+    public static final String ACTION_UPDATE_TX_POWER_COMPLIANCE_COUNTRY = PACKAGE_NAME + ".UPDATE_TX_POWER_COMPLIANCE_COUNTRY";
     /**
-     * Boolean value. true if the controller should be made compliant, false otherwise.
+     * String value. The country the controller should be made compliant with.
      */
-    public static final String EXTRA_EU_TX_POWER_COMPLIANT = "extra_eu_tx_power_compliant";
+    public static final String EXTRA_TX_POWER_COMPLIANT_COUNTRY_CODE = "extra_tx_power_compliant_country_code";
 
     public static final String ACTION_REFRESH_SOLO_VERSIONS = PACKAGE_NAME + ".REFRESH_SOLO_VERSIONS";
 

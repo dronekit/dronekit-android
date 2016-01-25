@@ -136,10 +136,10 @@ public class ArduSolo extends ArduCopter {
             }
 
             @Override
-            public void onEUTxPowerComplianceUpdated(boolean isCompliant) {
+            public void onTxPowerComplianceCountryUpdated(String compliantCountry) {
                 final Bundle eventInfo = new Bundle(1);
-                eventInfo.putBoolean(SoloEventExtras.EXTRA_SOLO_EU_TX_POWER_COMPLIANT, isCompliant);
-                notifyAttributeListener(SoloEvents.SOLO_EU_TX_POWER_COMPLIANCE_UPDATED, eventInfo, true);
+                eventInfo.putString(SoloEventExtras.EXTRA_SOLO_TX_POWER_COMPLIANT_COUNTRY, compliantCountry);
+                notifyAttributeListener(SoloEvents.SOLO_TX_POWER_COMPLIANCE_COUNTRY_UPDATED, eventInfo, true);
             }
 
             @Override
@@ -321,9 +321,9 @@ public class ArduSolo extends ArduCopter {
                 SoloApiUtils.updateSoloLinkControllerMode(this, mode, listener);
                 return true;
 
-            case SoloConfigActions.ACTION_UPDATE_EU_TX_POWER_COMPLIANCE:
-                final boolean isCompliant = data.getBoolean(SoloConfigActions.EXTRA_EU_TX_POWER_COMPLIANT, false);
-                SoloApiUtils.updateSoloLinkEUTxPowerCompliance(this, isCompliant, listener);
+            case SoloConfigActions.ACTION_UPDATE_TX_POWER_COMPLIANCE_COUNTRY:
+                final String compliantCountry = data.getString(SoloConfigActions.EXTRA_TX_POWER_COMPLIANT_COUNTRY_CODE);
+                SoloApiUtils.updateSoloLinkTxPowerComplianceCountry(this, compliantCountry, listener);
                 return true;
 
             case SoloConfigActions.ACTION_REFRESH_SOLO_VERSIONS:

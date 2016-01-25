@@ -15,11 +15,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.ACTION_REFRESH_SOLO_VERSIONS;
 import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.ACTION_UPDATE_BUTTON_SETTINGS;
 import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.ACTION_UPDATE_CONTROLLER_MODE;
-import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.ACTION_UPDATE_EU_TX_POWER_COMPLIANCE;
+import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.ACTION_UPDATE_TX_POWER_COMPLIANCE_COUNTRY;
 import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.ACTION_UPDATE_WIFI_SETTINGS;
 import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.EXTRA_BUTTON_SETTINGS;
 import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.EXTRA_CONTROLLER_MODE;
-import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.EXTRA_EU_TX_POWER_COMPLIANT;
+import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.EXTRA_TX_POWER_COMPLIANT_COUNTRY_CODE;
 import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.EXTRA_WIFI_PASSWORD;
 import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.EXTRA_WIFI_SSID;
 import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.ACTION_UPDATE_CONTROLLER_UNIT;
@@ -91,15 +91,15 @@ public class SoloConfigApi extends SoloApi {
     }
 
     /**
-     * Updates the EU tx power compliance.
+     * Updates the tx power compliance to the specified country.
      *
-     * @param isCompliant true for the controller to be made compliant, false otherwise.
+     * @param compliantCountry Country which the controller will be compliant.
      * @param listener    Register a callback to receive update of the command execution status.
      */
-    public void updateEUTxPowerCompliance(boolean isCompliant, AbstractCommandListener listener) {
+    public void updateTxPowerComplianceCountry(String compliantCountry, AbstractCommandListener listener) {
         Bundle params = new Bundle();
-        params.putBoolean(EXTRA_EU_TX_POWER_COMPLIANT, isCompliant);
-        drone.performAsyncActionOnDroneThread(new Action(ACTION_UPDATE_EU_TX_POWER_COMPLIANCE, params), listener);
+        params.putString(EXTRA_TX_POWER_COMPLIANT_COUNTRY_CODE, compliantCountry);
+        drone.performAsyncActionOnDroneThread(new Action(ACTION_UPDATE_TX_POWER_COMPLIANCE_COUNTRY, params), listener);
     }
 
     /**
