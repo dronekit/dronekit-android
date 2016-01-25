@@ -15,15 +15,15 @@ import java.util.concurrent.ConcurrentHashMap;
 import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.ACTION_REFRESH_SOLO_VERSIONS;
 import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.ACTION_UPDATE_BUTTON_SETTINGS;
 import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.ACTION_UPDATE_CONTROLLER_MODE;
+import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.ACTION_UPDATE_CONTROLLER_UNIT;
 import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.ACTION_UPDATE_TX_POWER_COMPLIANCE_COUNTRY;
 import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.ACTION_UPDATE_WIFI_SETTINGS;
 import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.EXTRA_BUTTON_SETTINGS;
 import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.EXTRA_CONTROLLER_MODE;
+import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.EXTRA_CONTROLLER_UNIT;
 import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.EXTRA_TX_POWER_COMPLIANT_COUNTRY_CODE;
 import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.EXTRA_WIFI_PASSWORD;
 import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.EXTRA_WIFI_SSID;
-import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.ACTION_UPDATE_CONTROLLER_UNIT;
-import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.EXTRA_CONTROLLER_UNIT;
 
 /**
  * Created by Fredia Huya-Kouadio on 7/31/15.
@@ -91,9 +91,23 @@ public class SoloConfigApi extends SoloApi {
     }
 
     /**
+     * @deprecated Use {@link #updateTxPowerComplianceCountry(String compliantCountry, AbstractCommandListener listener)} instead.
+     */
+    public void updateEUTxPowerCompliance(boolean isCompliant, AbstractCommandListener listener) {
+        String compliantCountry;
+        if (isCompliant) {
+            compliantCountry = "FR";
+        } else {
+            compliantCountry = "US";
+        }
+
+        updateTxPowerComplianceCountry(compliantCountry, listener);
+    }
+
+    /**
      * Updates the tx power compliance to the specified country.
      *
-     * @param compliantCountry Country which the controller will be compliant.
+     * @param compliantCountry Country code which the controller will be compliant.
      * @param listener    Register a callback to receive update of the command execution status.
      */
     public void updateTxPowerComplianceCountry(String compliantCountry, AbstractCommandListener listener) {

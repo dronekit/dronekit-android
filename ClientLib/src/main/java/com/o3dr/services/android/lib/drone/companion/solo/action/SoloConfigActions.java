@@ -33,7 +33,6 @@ public class SoloConfigActions {
      */
     public static final String EXTRA_CONTROLLER_MODE = "extra_controller_mode";
 
-
     public static final String ACTION_UPDATE_TX_POWER_COMPLIANCE_COUNTRY = PACKAGE_NAME + ".UPDATE_TX_POWER_COMPLIANCE_COUNTRY";
     /**
      * String value. The country the controller should be made compliant with.

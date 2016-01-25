@@ -21,6 +21,8 @@ import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.calibration.magnetometer.MagnetometerCalibrationStatus;
 import com.o3dr.services.android.lib.drone.companion.solo.SoloAttributes;
+import com.o3dr.services.android.lib.drone.companion.solo.SoloEventExtras;
+import com.o3dr.services.android.lib.drone.companion.solo.SoloEvents;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionResult;
 import com.o3dr.services.android.lib.drone.mission.Mission;
@@ -728,8 +730,19 @@ public class Drone {
             });
         } else if (AttributeEvent.SPEED_UPDATED.equals(attributeEvent)) {
             checkForGroundCollision();
+        } else if (SoloEvents.SOLO_TX_POWER_COMPLIANCE_COUNTRY_UPDATED.equals(attributeEvent)) {
+            //This ensures that the api is backwards compatible
+            String compliantCountry = extras.getString(SoloEventExtras.EXTRA_SOLO_TX_POWER_COMPLIANT_COUNTRY);
+            final Bundle eventInfo = new Bundle(1);
+            boolean isCompliant = !"US".equals(compliantCountry);
+            eventInfo.putBoolean(SoloEventExtras.EXTRA_SOLO_EU_TX_POWER_COMPLIANT, isCompliant);
+            sendEventToListeners(SoloEvents.SOLO_EU_TX_POWER_COMPLIANCE_UPDATED, eventInfo);
         }
 
+        sendEventToListeners(attributeEvent, extras);
+    }
+
+    private void sendEventToListeners(final String attributeEvent, final Bundle extras) {
         if (droneListeners.isEmpty())
             return;
 

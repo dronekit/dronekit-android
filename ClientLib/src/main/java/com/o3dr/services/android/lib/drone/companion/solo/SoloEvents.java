@@ -49,6 +49,12 @@ public class SoloEvents {
      * @see {@link SoloEventExtras#EXTRA_SOLO_MESSAGE_DATA}
      */
     public static final String SOLO_MESSAGE_RECEIVED = PACKAGE_NAME + ".SOLO_MESSAGE_RECEIVED";
+
+    /**
+     * @deprecated Use {@link #SOLO_TX_POWER_COMPLIANCE_COUNTRY_UPDATED} instead.
+     */
+    public static final String SOLO_EU_TX_POWER_COMPLIANCE_UPDATED = PACKAGE_NAME + ".SOLO_EU_TX_POWER_COMPLIANCE_UPDATED";
+
     /**
      * Triggers upon updates to the tx power compliance.
      */
