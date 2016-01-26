@@ -3,6 +3,7 @@ package com.o3dr.services.android.lib.drone.companion.solo;
 import android.os.Parcel;
 import android.util.SparseArray;
 
+import com.o3dr.android.client.apis.solo.SoloConfigApi;
 import com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerMode.ControllerMode;
 import com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerUnits.ControllerUnit;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSetting;
@@ -18,7 +19,6 @@ import java.util.List;
  * Created by Fredia Huya-Kouadio on 7/10/15.
  */
 public class SoloState implements DroneAttribute {
-
     private String wifiSsid;
     private String wifiPassword;
 
@@ -88,6 +88,13 @@ public class SoloState implements DroneAttribute {
         return wifiSsid;
     }
 
+    /**
+     * @deprecated Use {@link #getTxPowerCompliantCountry()} instead.
+     */
+    public boolean isEUTxPowerCompliant() {
+        return txPowerCompliantCountry != SoloConfigApi.DEFAULT_TX_POWER_COMPLIANT_COUNTRY;
+    }
+
     public String getTxPowerCompliantCountry() {
         return txPowerCompliantCountry;
     }
@@ -117,7 +124,7 @@ public class SoloState implements DroneAttribute {
         dest.writeString(this.controllerFirmwareVersion);
         dest.writeString(this.vehicleVersion);
         dest.writeString(this.autopilotVersion);
-        dest.writeString(txPowerCompliantCountry);
+        dest.writeByte(isEUTxPowerCompliant() ? (byte) 1 : (byte) 0);
 
         final int buttonCount = buttonSettings.size();
         dest.writeInt(buttonCount);
@@ -137,6 +144,7 @@ public class SoloState implements DroneAttribute {
         dest.writeString(this.gimbalVersion);
         dest.writeInt(this.controllerMode);
         dest.writeString(this.controllerUnit);
+        dest.writeString(txPowerCompliantCountry);
     }
 
     protected SoloState(Parcel in) {
@@ -146,7 +154,8 @@ public class SoloState implements DroneAttribute {
         this.controllerFirmwareVersion = in.readString();
         this.vehicleVersion = in.readString();
         this.autopilotVersion = in.readString();
-        this.txPowerCompliantCountry = in.readString();
+        //Throw away byte that was added to ensure backwards compatibility
+        in.readByte();
 
         final int buttonCount = in.readInt();
 
@@ -177,6 +186,7 @@ public class SoloState implements DroneAttribute {
 
         @ControllerUnit final String tempUnit = in.readString();
         this.controllerUnit = tempUnit;
+        this.txPowerCompliantCountry = in.readString();
     }
 
     public static final Creator<SoloState> CREATOR = new Creator<SoloState>() {

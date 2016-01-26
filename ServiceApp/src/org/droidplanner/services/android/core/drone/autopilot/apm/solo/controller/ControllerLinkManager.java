@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import android.util.Pair;
 
 import com.github.zafarkhaja.semver.Version;
+import com.o3dr.android.client.apis.solo.SoloConfigApi;
 import com.o3dr.android.client.utils.connection.IpConnectionListener;
 import com.o3dr.android.client.utils.connection.TcpConnection;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
@@ -61,7 +62,8 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
     private final AtomicReference<String> controllerVersion = new AtomicReference<>("");
     private final AtomicReference<String> stm32Version = new AtomicReference<>("");
 
-    private final AtomicReference<String> txPowerCompliantCountry = new AtomicReference<>("US");
+    private final AtomicReference<String> txPowerCompliantCountry =
+        new AtomicReference<>(SoloConfigApi.DEFAULT_TX_POWER_COMPLIANT_COUNTRY);
     private final AtomicInteger controllerMode = new AtomicInteger(SoloControllerMode.UNKNOWN_MODE);
 
     private final AtomicReference<String> controllerUnits = new AtomicReference<>("");
@@ -150,7 +152,7 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
                     linkListener.onTxPowerComplianceCountryUpdated(compliantCountry);
             } catch (IOException e) {
                 Timber.e(e, "Error occurred while querying wifi country.");
-                compliantCountry = "US"; //because most users will have US by default
+                compliantCountry = SoloConfigApi.DEFAULT_TX_POWER_COMPLIANT_COUNTRY;
             }
 
             txPowerCompliantCountry.set(compliantCountry);

@@ -15,6 +15,7 @@ import com.o3dr.android.client.apis.ExperimentalApi;
 import com.o3dr.android.client.apis.FollowApi;
 import com.o3dr.android.client.apis.MissionApi;
 import com.o3dr.android.client.apis.VehicleApi;
+import com.o3dr.android.client.apis.solo.SoloConfigApi;
 import com.o3dr.android.client.interfaces.DroneListener;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
@@ -134,17 +135,19 @@ public class Drone {
         this.droneObserver = new DroneObserver(this);
     }
 
-    Context getContext(){
+    Context getContext() {
         return this.context;
     }
 
     synchronized void start() {
-        if (!serviceMgr.isTowerConnected())
+        if (!serviceMgr.isTowerConnected()) {
             throw new IllegalStateException("Service manager must be connected.");
+        }
 
         IDroneApi droneApi = droneApiRef.get();
-        if (isStarted(droneApi))
+        if (isStarted(droneApi)) {
             return;
+        }
 
         try {
             droneApi = serviceMgr.get3drServices().registerDroneApi(this.apiListener, serviceMgr.getApplicationId());
@@ -153,8 +156,9 @@ public class Drone {
             throw new IllegalStateException("Unable to retrieve a valid drone handle.");
         }
 
-        if (asyncScheduler == null || asyncScheduler.isShutdown())
+        if (asyncScheduler == null || asyncScheduler.isShutdown()) {
             asyncScheduler = Executors.newFixedThreadPool(1);
+        }
 
         addAttributesObserver(droneApi, this.droneObserver);
         resetFlightTimer();
@@ -187,16 +191,17 @@ public class Drone {
     private void checkForGroundCollision() {
         Speed speed = getAttribute(AttributeType.SPEED);
         Altitude altitude = getAttribute(AttributeType.ALTITUDE);
-        if (speed == null || altitude == null)
+        if (speed == null || altitude == null) {
             return;
+        }
 
         double verticalSpeed = speed.getVerticalSpeed();
         double altitudeValue = altitude.getAltitude();
 
         boolean isCollisionImminent = altitudeValue
-                + (verticalSpeed * COLLISION_SECONDS_BEFORE_COLLISION) < 0
-                && verticalSpeed < COLLISION_DANGEROUS_SPEED_METERS_PER_SECOND
-                && altitudeValue > COLLISION_SAFE_ALTITUDE_METERS;
+            + (verticalSpeed * COLLISION_SECONDS_BEFORE_COLLISION) < 0
+            && verticalSpeed < COLLISION_DANGEROUS_SPEED_METERS_PER_SECOND
+            && altitudeValue > COLLISION_SAFE_ALTITUDE_METERS;
 
         Bundle extrasBundle = new Bundle(1);
         extrasBundle.putBoolean(EXTRA_IS_GROUND_COLLISION_IMMINENT, isCollisionImminent);
@@ -216,8 +221,9 @@ public class Drone {
         Parameters params = getAttribute(AttributeType.PARAMETERS);
         if (params != null) {
             Parameter speedParam = params.getParameter("WPNAV_SPEED");
-            if (speedParam != null)
+            if (speedParam != null) {
                 return speedParam.getValue();
+            }
         }
 
         return 0;
@@ -229,8 +235,9 @@ public class Drone {
      * @param action Runnabl that will be executed.
      */
     public void post(Runnable action) {
-        if (handler == null || action == null)
+        if (handler == null || action == null) {
             return;
+        }
 
         handler.post(action);
     }
@@ -264,8 +271,9 @@ public class Drone {
 
     public <T extends Parcelable> T getAttribute(String type) {
         final IDroneApi droneApi = droneApiRef.get();
-        if (!isStarted(droneApi) || type == null)
+        if (!isStarted(droneApi) || type == null) {
             return this.getAttributeDefaultValue(type);
+        }
 
         T attribute = null;
         Bundle carrier = null;
@@ -279,7 +287,7 @@ public class Drone {
             try {
                 carrier.setClassLoader(contextClassLoader);
                 attribute = carrier.getParcelable(type);
-            }catch(Exception e){
+            } catch (Exception e) {
                 Log.e(TAG, e.getMessage(), e);
             }
         }
@@ -289,8 +297,9 @@ public class Drone {
 
     public <T extends Parcelable> void getAttributeAsync(final String attributeType,
                                                          final OnAttributeRetrievedCallback<T> callback) {
-        if (callback == null)
+        if (callback == null) {
             throw new IllegalArgumentException("Callback must be non-null.");
+        }
 
         final IDroneApi droneApi = droneApiRef.get();
         if (!isStarted(droneApi)) {
@@ -311,10 +320,11 @@ public class Drone {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        if (attribute == null)
+                        if (attribute == null) {
                             callback.onRetrievalFailed();
-                        else
+                        } else {
                             callback.onRetrievalSucceed(attribute);
+                        }
                     }
                 });
             }
@@ -322,8 +332,9 @@ public class Drone {
     }
 
     private <T extends Parcelable> T getAttributeDefaultValue(String attributeType) {
-        if (attributeType == null)
+        if (attributeType == null) {
             return null;
+        }
 
         switch (attributeType) {
             case AttributeType.ALTITUDE:
@@ -477,7 +488,7 @@ public class Drone {
         return droneApi != null && droneApi.asBinder().pingBinder();
     }
 
-    public boolean isStarted(){
+    public boolean isStarted() {
         return isStarted(droneApiRef.get());
     }
 
@@ -493,11 +504,13 @@ public class Drone {
 
     public <T extends MissionItem> void buildMissionItemsAsync(final MissionItem.ComplexItem<T>[] missionItems,
                                                                final OnMissionItemsBuiltCallback<T> callback) {
-        if (callback == null)
+        if (callback == null) {
             throw new IllegalArgumentException("Callback must be non-null.");
+        }
 
-        if (missionItems == null || missionItems.length == 0)
+        if (missionItems == null || missionItems.length == 0) {
             return;
+        }
 
         asyncScheduler.execute(new Runnable() {
             @Override
@@ -516,11 +529,13 @@ public class Drone {
     }
 
     public void registerDroneListener(DroneListener listener) {
-        if (listener == null)
+        if (listener == null) {
             return;
+        }
 
-        if (!droneListeners.contains(listener))
+        if (!droneListeners.contains(listener)) {
             droneListeners.add(listener);
+        }
     }
 
     private void addAttributesObserver(IDroneApi droneApi, IObserver observer) {
@@ -556,8 +571,9 @@ public class Drone {
     }
 
     public void unregisterDroneListener(DroneListener listener) {
-        if (listener == null)
+        if (listener == null) {
             return;
+        }
 
         droneListeners.remove(listener);
     }
@@ -691,13 +707,14 @@ public class Drone {
         MissionApi.getApi(this).loadWaypoints();
     }
 
-    public Handler getHandler(){
+    public Handler getHandler() {
         return handler;
     }
 
     void notifyDroneConnectionFailed(final ConnectionResult result) {
-        if (droneListeners.isEmpty())
+        if (droneListeners.isEmpty()) {
             return;
+        }
 
         handler.post(new Runnable() {
             @Override
@@ -710,41 +727,51 @@ public class Drone {
 
     void notifyAttributeUpdated(final String attributeEvent, final Bundle extras) {
         //Update the bundle classloader
-        if (extras != null)
+        if (extras != null) {
             extras.setClassLoader(contextClassLoader);
+        }
 
-        if (AttributeEvent.STATE_UPDATED.equals(attributeEvent)) {
-            getAttributeAsync(AttributeType.STATE, new OnAttributeRetrievedCallback<State>() {
-                @Override
-                public void onRetrievalSucceed(State state) {
-                    if (state.isFlying())
-                        resetFlightTimer();
-                    else
+        switch (attributeEvent) {
+            case AttributeEvent.STATE_UPDATED:
+                getAttributeAsync(AttributeType.STATE, new OnAttributeRetrievedCallback<State>() {
+                    @Override
+                    public void onRetrievalSucceed(State state) {
+                        if (state.isFlying()) {
+                            resetFlightTimer();
+                        } else {
+                            stopTimer();
+                        }
+                    }
+
+                    @Override
+                    public void onRetrievalFailed() {
                         stopTimer();
-                }
+                    }
+                });
+                break;
 
-                @Override
-                public void onRetrievalFailed() {
-                    stopTimer();
-                }
-            });
-        } else if (AttributeEvent.SPEED_UPDATED.equals(attributeEvent)) {
-            checkForGroundCollision();
-        } else if (SoloEvents.SOLO_TX_POWER_COMPLIANCE_COUNTRY_UPDATED.equals(attributeEvent)) {
-            //This ensures that the api is backwards compatible
-            String compliantCountry = extras.getString(SoloEventExtras.EXTRA_SOLO_TX_POWER_COMPLIANT_COUNTRY);
-            final Bundle eventInfo = new Bundle(1);
-            boolean isCompliant = !"US".equals(compliantCountry);
-            eventInfo.putBoolean(SoloEventExtras.EXTRA_SOLO_EU_TX_POWER_COMPLIANT, isCompliant);
-            sendEventToListeners(SoloEvents.SOLO_EU_TX_POWER_COMPLIANCE_UPDATED, eventInfo);
+            case AttributeEvent.SPEED_UPDATED:
+                checkForGroundCollision();
+                break;
+
+            //TODO remove this when deprecated methods are deleted in 3.0
+            // This ensures that the api is backwards compatible
+            case SoloEvents.SOLO_TX_POWER_COMPLIANCE_COUNTRY_UPDATED:
+                String compliantCountry = extras.getString(SoloEventExtras.EXTRA_SOLO_TX_POWER_COMPLIANT_COUNTRY);
+                final Bundle eventInfo = new Bundle(1);
+                boolean isEUCompliant = !SoloConfigApi.DEFAULT_TX_POWER_COMPLIANT_COUNTRY.equals(compliantCountry);
+                eventInfo.putBoolean(SoloEventExtras.EXTRA_SOLO_EU_TX_POWER_COMPLIANT, isEUCompliant);
+                sendEventToListeners(SoloEvents.SOLO_EU_TX_POWER_COMPLIANCE_UPDATED, eventInfo);
+                break;
         }
 
         sendEventToListeners(attributeEvent, extras);
     }
 
     private void sendEventToListeners(final String attributeEvent, final Bundle extras) {
-        if (droneListeners.isEmpty())
+        if (droneListeners.isEmpty()) {
             return;
+        }
 
         handler.post(new Runnable() {
             @Override
@@ -752,7 +779,7 @@ public class Drone {
                 for (DroneListener listener : droneListeners) {
                     try {
                         listener.onDroneEvent(attributeEvent, extras);
-                    }catch(Exception e){
+                    } catch (Exception e) {
                         Log.e(TAG, e.getMessage(), e);
                     }
                 }
@@ -761,8 +788,9 @@ public class Drone {
     }
 
     void notifyDroneServiceInterrupted(final String errorMsg) {
-        if (droneListeners.isEmpty())
+        if (droneListeners.isEmpty()) {
             return;
+        }
 
         handler.post(new Runnable() {
             @Override

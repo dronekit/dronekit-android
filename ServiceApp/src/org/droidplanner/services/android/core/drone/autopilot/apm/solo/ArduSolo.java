@@ -11,6 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.common.msg_statustext;
 import com.MAVLink.enums.MAV_TYPE;
 import com.o3dr.android.client.apis.CapabilityApi;
+import com.o3dr.android.client.apis.solo.SoloConfigApi;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
@@ -162,7 +163,7 @@ public class ArduSolo extends ArduCopter {
     }
 
     @Override
-    public void destroy(){
+    public void destroy() {
         super.destroy();
         soloComp.destroy();
     }
@@ -278,9 +279,9 @@ public class ArduSolo extends ArduCopter {
                 Timber.i("Vehicle heartbeat restored.");
                 //Dismiss the countdown to disconnect the solo companion computer.
                 handler.removeCallbacks(disconnectSoloCompTask);
-                if (!soloComp.isConnected())
+                if (!soloComp.isConnected()) {
                     soloComp.start();
-                else {
+                } else {
                     soloComp.refreshState();
                 }
                 break;
@@ -321,6 +322,14 @@ public class ArduSolo extends ArduCopter {
                 SoloApiUtils.updateSoloLinkControllerMode(this, mode, listener);
                 return true;
 
+            //TODO remove this when deprecated methods are deleted in 3.0
+            case SoloConfigActions.ACTION_UPDATE_EU_TX_POWER_COMPLIANCE:
+                final boolean isCompliant = data.getBoolean(SoloConfigActions.EXTRA_EU_TX_POWER_COMPLIANT);
+                String compliantCountryCode = isCompliant ? SoloConfigApi.DEFAULT_EU_TX_POWER_COMPLIANT_COUNTRY :
+                    SoloConfigApi.DEFAULT_TX_POWER_COMPLIANT_COUNTRY;
+                SoloApiUtils.updateSoloLinkTxPowerComplianceCountry(this, compliantCountryCode, listener);
+                return true;
+
             case SoloConfigActions.ACTION_UPDATE_TX_POWER_COMPLIANCE_COUNTRY:
                 final String compliantCountry = data.getString(SoloConfigActions.EXTRA_TX_POWER_COMPLIANT_COUNTRY_CODE);
                 SoloApiUtils.updateSoloLinkTxPowerComplianceCountry(this, compliantCountry, listener);
@@ -341,7 +350,7 @@ public class ArduSolo extends ArduCopter {
     }
 
     @Override
-    protected boolean isFeatureSupported(String featureId){
+    protected boolean isFeatureSupported(String featureId) {
         switch (featureId) {
 
             case CapabilityApi.FeatureIds.SOLO_VIDEO_STREAMING:
