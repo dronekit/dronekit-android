@@ -38,11 +38,29 @@ public class SoloSplinePoint extends TLVPacket {
     public static final short STATUS_DUPLICATE_INDEX_ERROR = -3; //Received multiple keypoints for a single index.
 
     private short version;
+
+    /**
+     * Absolute altitude of home location when cable was recorded, in meters.
+     */
     private float absAltReference;
+    /**
+     * starting at 0
+     */
     private int index;
+
+    /**
+     * Latitude (decimal degrees). Longitude (decimal degrees). Relative altitude in meters.
+     */
     private LatLongAlt coordinate;
 
+    /**
+     * Pitch (degrees).
+     */
     private float pitch;
+
+    /**
+     * Yaw (degrees)
+     */
     private float yaw;
 
     /**
@@ -57,6 +75,11 @@ public class SoloSplinePoint extends TLVPacket {
      * Shotmanager sends this value to indicate success or failure when creating a Keypoint.
      * Negative values are failure;
      * 0 or positive is success.
+     *
+     * -1 : mode error (tried setting a spline point when we were already in PLAY mode).
+     * -2 : keypoint too close to a previous keypoint
+     * -3 : duplicate index error (received multiple Keypoints for a single index)
+     * -4..-MAXINT16 : unspecified failure
      */
     private short status;
 
