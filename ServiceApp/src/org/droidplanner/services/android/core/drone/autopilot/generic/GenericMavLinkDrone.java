@@ -21,6 +21,7 @@ import com.MAVLink.common.msg_sys_status;
 import com.MAVLink.common.msg_vibration;
 import com.MAVLink.enums.MAV_MODE_FLAG;
 import com.MAVLink.enums.MAV_STATE;
+import com.github.zafarkhaja.semver.Version;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.action.CapabilityActions;
@@ -81,7 +82,6 @@ import org.droidplanner.services.android.utils.video.VideoManager;
  * Created by Fredia Huya-Kouadio on 9/10/15.
  */
 public class GenericMavLinkDrone implements MavLinkDrone {
-
     private final MAVLinkStreams.MAVLinkOutputStream mavClient;
 
     protected final VideoManager videoMgr;
@@ -307,26 +307,29 @@ public class GenericMavLinkDrone implements MavLinkDrone {
         Bundle data = action.getData();
 
         switch (type) {
-            //MISSION ACTIONS
+            // MISSION ACTIONS
             case MissionActions.ACTION_GOTO_WAYPOINT:
                 int missionItemIndex = data.getInt(MissionActions.EXTRA_MISSION_ITEM_INDEX);
                 CommonApiUtils.gotoWaypoint(this, missionItemIndex, listener);
                 return true;
 
-            //STATE ACTIONS
+            // STATE ACTIONS
             case StateActions.ACTION_ARM:
                 return performArming(data, listener);
 
             case StateActions.ACTION_SET_VEHICLE_MODE:
                 return setVehicleMode(data, listener);
 
-            //CONTROL ACTIONS
+            // CONTROL ACTIONS
             case ControlActions.ACTION_DO_GUIDED_TAKEOFF:
                 return performTakeoff(data, listener);
 
+            case ControlActions.ACTION_SEND_BRAKE_VEHICLE:
+                return brakeVehicle(listener);
+
             case ControlActions.ACTION_SET_CONDITION_YAW:
-                //Retrieve the yaw turn speed.
-                float turnSpeed = 2; //default turn speed.
+                // Retrieve the yaw turn speed.
+                float turnSpeed = 2; // Default turn speed.
 
                 ParameterManager parameterManager = getParameterManager();
                 if (parameterManager != null) {
@@ -350,14 +353,14 @@ public class GenericMavLinkDrone implements MavLinkDrone {
             case ControlActions.ACTION_ENABLE_MANUAL_CONTROL:
                 return enableManualControl(data, listener);
 
-            //EXPERIMENTAL ACTIONS
+            // EXPERIMENTAL ACTIONS
             case ExperimentalActions.ACTION_SEND_MAVLINK_MESSAGE:
                 data.setClassLoader(MavlinkMessageWrapper.class.getClassLoader());
                 MavlinkMessageWrapper messageWrapper = data.getParcelable(ExperimentalActions.EXTRA_MAVLINK_MESSAGE);
                 CommonApiUtils.sendMavlinkMessage(this, messageWrapper);
                 return true;
 
-            //INTERNAL DRONE ACTIONS
+            // INTERNAL DRONE ACTIONS
             case ACTION_REQUEST_HOME_UPDATE:
                 requestHomeUpdate();
                 return true;
@@ -456,6 +459,11 @@ public class GenericMavLinkDrone implements MavLinkDrone {
     protected boolean performTakeoff(Bundle data, ICommandListener listener) {
         double takeoffAltitude = data.getDouble(ControlActions.EXTRA_ALTITUDE);
         MavLinkCommands.sendTakeoff(this, takeoffAltitude, listener);
+        return true;
+    }
+
+    protected boolean brakeVehicle(ICommandListener listener) {
+        getGuidedPoint().pauseAtCurrentLocation(listener);
         return true;
     }
 
