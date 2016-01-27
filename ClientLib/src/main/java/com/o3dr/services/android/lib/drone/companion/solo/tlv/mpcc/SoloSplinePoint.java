@@ -30,17 +30,37 @@ import java.nio.ByteBuffer;
  */
 public class SoloSplinePoint extends TLVPacket {
 
-    public static final int MESSAGE_LENGTH = 38;
+    public static final int MESSAGE_LENGTH = 44;
 
     public static final short STATUS_SUCCESS = 0;
     public static final short STATUS_MODE_ERROR = -1; //tried setting a spline point when we were already in PLAY mode
     public static final short STATUS_KEYPOINTS_TOO_CLOSE_ERROR = -2; //Keypoint too close to a previous keypoint
     public static final short STATUS_DUPLICATE_INDEX_ERROR = -3; //Received multiple keypoints for a single index.
 
+    private short version;
+
+    /**
+     * Absolute altitude of home location when cable was recorded, in meters.
+     */
+    private float absAltReference;
+    /**
+     * starting at 0
+     */
     private int index;
+
+    /**
+     * Latitude (decimal degrees). Longitude (decimal degrees). Relative altitude in meters.
+     */
     private LatLongAlt coordinate;
 
+    /**
+     * Pitch (degrees).
+     */
     private float pitch;
+
+    /**
+     * Yaw (degrees)
+     */
     private float yaw;
 
     /**
@@ -55,11 +75,19 @@ public class SoloSplinePoint extends TLVPacket {
      * Shotmanager sends this value to indicate success or failure when creating a Keypoint.
      * Negative values are failure;
      * 0 or positive is success.
+     *
+     * -1 : mode error (tried setting a spline point when we were already in PLAY mode).
+     * -2 : keypoint too close to a previous keypoint
+     * -3 : duplicate index error (received multiple Keypoints for a single index)
+     * -4..-MAXINT16 : unspecified failure
      */
     private short status;
 
-    public SoloSplinePoint(int index, LatLongAlt coordinate, float pitch, float yaw, float uPosition, short status) {
+    public SoloSplinePoint(short version, float absAltReference, int index, LatLongAlt coordinate,
+                           float pitch, float yaw, float uPosition, short status) {
         super(TLVMessageTypes.TYPE_SOLO_SPLINE_POINT, MESSAGE_LENGTH);
+        this.version = version;
+        this.absAltReference = absAltReference;
         this.coordinate = coordinate;
         this.index = index;
         this.pitch = pitch;
@@ -69,7 +97,9 @@ public class SoloSplinePoint extends TLVPacket {
     }
 
     public SoloSplinePoint(ByteBuffer dataBuffer){
-        this(dataBuffer.getInt(),
+        this(dataBuffer.getShort(),
+                dataBuffer.getFloat(),
+                dataBuffer.getInt(),
                 new LatLongAlt(dataBuffer.getDouble(), dataBuffer.getDouble(), dataBuffer.getFloat()),
                 dataBuffer.getFloat(),
                 dataBuffer.getFloat(),
@@ -79,6 +109,8 @@ public class SoloSplinePoint extends TLVPacket {
 
     @Override
     protected void getMessageValue(ByteBuffer valueCarrier){
+        valueCarrier.putShort(version);
+        valueCarrier.putFloat(absAltReference);
         valueCarrier.putInt(index);
         valueCarrier.putDouble(coordinate.getLatitude());
         valueCarrier.putDouble(coordinate.getLongitude());
@@ -87,6 +119,14 @@ public class SoloSplinePoint extends TLVPacket {
         valueCarrier.putFloat(yaw);
         valueCarrier.putFloat(uPosition);
         valueCarrier.putShort(status);
+    }
+
+    public short getVersion() {
+        return version;
+    }
+
+    public float getAbsAltReference() {
+        return absAltReference;
     }
 
     public LatLongAlt getCoordinate() {
@@ -114,49 +154,10 @@ public class SoloSplinePoint extends TLVPacket {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof SoloSplinePoint)) return false;
-        if (!super.equals(o)) return false;
-
-        SoloSplinePoint that = (SoloSplinePoint) o;
-
-        if (index != that.index) return false;
-        if (Float.compare(that.pitch, pitch) != 0) return false;
-        if (Float.compare(that.yaw, yaw) != 0) return false;
-        if (Float.compare(that.uPosition, uPosition) != 0) return false;
-        if (status != that.status) return false;
-        return !(coordinate != null ? !coordinate.equals(that.coordinate) : that.coordinate != null);
-
-    }
-
-    @Override
-    public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + index;
-        result = 31 * result + (coordinate != null ? coordinate.hashCode() : 0);
-        result = 31 * result + (pitch != +0.0f ? Float.floatToIntBits(pitch) : 0);
-        result = 31 * result + (yaw != +0.0f ? Float.floatToIntBits(yaw) : 0);
-        result = 31 * result + (uPosition != +0.0f ? Float.floatToIntBits(uPosition) : 0);
-        result = 31 * result + (int) status;
-        return result;
-    }
-
-    @Override
-    public String toString() {
-        return "SoloSplinePoint{" +
-                "coordinate=" + coordinate +
-                ", index=" + index +
-                ", pitch=" + pitch +
-                ", yaw=" + yaw +
-                ", uPosition=" + uPosition +
-                ", status=" + status +
-                '}';
-    }
-
-    @Override
     public void writeToParcel(Parcel dest, int flags) {
         super.writeToParcel(dest, flags);
+        dest.writeInt(version);
+        dest.writeFloat(absAltReference);
         dest.writeInt(this.index);
         dest.writeParcelable(this.coordinate, 0);
         dest.writeFloat(this.pitch);
@@ -167,6 +168,8 @@ public class SoloSplinePoint extends TLVPacket {
 
     protected SoloSplinePoint(Parcel in) {
         super(in);
+        this.version = (short) in.readInt();
+        this.absAltReference = in.readFloat();
         this.index = in.readInt();
         this.coordinate = in.readParcelable(LatLongAlt.class.getClassLoader());
         this.pitch = in.readFloat();
@@ -184,4 +187,71 @@ public class SoloSplinePoint extends TLVPacket {
             return new SoloSplinePoint[size];
         }
     };
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
+
+        SoloSplinePoint that = (SoloSplinePoint) o;
+
+        if (version != that.version) {
+            return false;
+        }
+        if (Float.compare(that.absAltReference, absAltReference) != 0) {
+            return false;
+        }
+        if (index != that.index) {
+            return false;
+        }
+        if (Float.compare(that.pitch, pitch) != 0) {
+            return false;
+        }
+        if (Float.compare(that.yaw, yaw) != 0) {
+            return false;
+        }
+        if (Float.compare(that.uPosition, uPosition) != 0) {
+            return false;
+        }
+        if (status != that.status) {
+            return false;
+        }
+        return coordinate.equals(that.coordinate);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + (int) version;
+        result = 31 * result + (absAltReference != +0.0f ? Float.floatToIntBits(absAltReference) : 0);
+        result = 31 * result + index;
+        result = 31 * result + coordinate.hashCode();
+        result = 31 * result + (pitch != +0.0f ? Float.floatToIntBits(pitch) : 0);
+        result = 31 * result + (yaw != +0.0f ? Float.floatToIntBits(yaw) : 0);
+        result = 31 * result + (uPosition != +0.0f ? Float.floatToIntBits(uPosition) : 0);
+        result = 31 * result + (int) status;
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "SoloSplinePoint{" +
+            "version=" + version +
+            ", absAltReference=" + absAltReference +
+            ", index=" + index +
+            ", coordinate=" + coordinate +
+            ", pitch=" + pitch +
+            ", yaw=" + yaw +
+            ", uPosition=" + uPosition +
+            ", status=" + status +
+            '}';
+    }
 }
