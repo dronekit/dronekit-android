@@ -15,8 +15,8 @@ import com.o3dr.android.client.apis.ExperimentalApi;
 import com.o3dr.android.client.apis.FollowApi;
 import com.o3dr.android.client.apis.MissionApi;
 import com.o3dr.android.client.apis.VehicleApi;
-import com.o3dr.android.client.apis.solo.SoloConfigApi;
 import com.o3dr.android.client.interfaces.DroneListener;
+import com.o3dr.android.client.utils.TxPowerComplianceCountries;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
@@ -759,7 +759,7 @@ public class Drone {
             case SoloEvents.SOLO_TX_POWER_COMPLIANCE_COUNTRY_UPDATED:
                 String compliantCountry = extras.getString(SoloEventExtras.EXTRA_SOLO_TX_POWER_COMPLIANT_COUNTRY);
                 final Bundle eventInfo = new Bundle(1);
-                boolean isEUCompliant = !SoloConfigApi.DEFAULT_TX_POWER_COMPLIANT_COUNTRY.equals(compliantCountry);
+                boolean isEUCompliant = !TxPowerComplianceCountries.getDefaultCountry().name().equals(compliantCountry);
                 eventInfo.putBoolean(SoloEventExtras.EXTRA_SOLO_EU_TX_POWER_COMPLIANT, isEUCompliant);
                 sendEventToListeners(SoloEvents.SOLO_EU_TX_POWER_COMPLIANCE_UPDATED, eventInfo);
                 break;

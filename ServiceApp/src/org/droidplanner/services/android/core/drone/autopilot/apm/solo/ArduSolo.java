@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.common.msg_statustext;
 import com.MAVLink.enums.MAV_TYPE;
 import com.o3dr.android.client.apis.CapabilityApi;
-import com.o3dr.android.client.apis.solo.SoloConfigApi;
+import com.o3dr.android.client.utils.TxPowerComplianceCountries;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
@@ -325,8 +325,8 @@ public class ArduSolo extends ArduCopter {
             //TODO remove this when deprecated methods are deleted in 3.0
             case SoloConfigActions.ACTION_UPDATE_EU_TX_POWER_COMPLIANCE:
                 final boolean isCompliant = data.getBoolean(SoloConfigActions.EXTRA_EU_TX_POWER_COMPLIANT);
-                String compliantCountryCode = isCompliant ? SoloConfigApi.DEFAULT_EU_TX_POWER_COMPLIANT_COUNTRY :
-                    SoloConfigApi.DEFAULT_TX_POWER_COMPLIANT_COUNTRY;
+                String compliantCountryCode = isCompliant ? TxPowerComplianceCountries.getDefaultEUCountry().name() :
+                    TxPowerComplianceCountries.getDefaultCountry().name();
                 SoloApiUtils.updateSoloLinkTxPowerComplianceCountry(this, compliantCountryCode, listener);
                 return true;
 

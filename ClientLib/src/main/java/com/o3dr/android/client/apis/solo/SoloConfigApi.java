@@ -3,6 +3,7 @@ package com.o3dr.android.client.apis.solo;
 import android.os.Bundle;
 
 import com.o3dr.android.client.Drone;
+import com.o3dr.android.client.utils.TxPowerComplianceCountries;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerMode;
 import com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerUnits;
@@ -29,8 +30,6 @@ import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConf
  * Created by Fredia Huya-Kouadio on 7/31/15.
  */
 public class SoloConfigApi extends SoloApi {
-    public static final String DEFAULT_TX_POWER_COMPLIANT_COUNTRY = "US";
-    public static final String DEFAULT_EU_TX_POWER_COMPLIANT_COUNTRY = "FR";
 
     private static final ConcurrentHashMap<Drone, SoloConfigApi> soloConfigApiCache = new ConcurrentHashMap<>();
     private static final Builder<SoloConfigApi> apiBuilder = new Builder<SoloConfigApi>() {
@@ -93,14 +92,14 @@ public class SoloConfigApi extends SoloApi {
     }
 
     /**
-     * @deprecated Use {@link #updateTxPowerComplianceCountry(String compliantCountry, AbstractCommandListener listener)} instead.
+     * @deprecated Use {@link #updateTxPowerComplianceCountry(TxPowerComplianceCountries compliantCountry, AbstractCommandListener listener)} instead.
      */
     public void updateEUTxPowerCompliance(boolean isEUCompliant, AbstractCommandListener listener) {
-        String compliantCountry;
+        TxPowerComplianceCountries compliantCountry;
         if (isEUCompliant) {
-            compliantCountry = DEFAULT_EU_TX_POWER_COMPLIANT_COUNTRY;
+            compliantCountry = TxPowerComplianceCountries.getDefaultEUCountry();
         } else {
-            compliantCountry = DEFAULT_TX_POWER_COMPLIANT_COUNTRY;
+            compliantCountry = TxPowerComplianceCountries.getDefaultCountry();
         }
 
         updateTxPowerComplianceCountry(compliantCountry, listener);
@@ -112,9 +111,9 @@ public class SoloConfigApi extends SoloApi {
      * @param compliantCountry Country code which the controller will be compliant.
      * @param listener    Register a callback to receive update of the command execution status.
      */
-    public void updateTxPowerComplianceCountry(String compliantCountry, AbstractCommandListener listener) {
+    public void updateTxPowerComplianceCountry(TxPowerComplianceCountries compliantCountry, AbstractCommandListener listener) {
         Bundle params = new Bundle();
-        params.putString(EXTRA_TX_POWER_COMPLIANT_COUNTRY_CODE, compliantCountry);
+        params.putString(EXTRA_TX_POWER_COMPLIANT_COUNTRY_CODE, compliantCountry.name());
         drone.performAsyncActionOnDroneThread(new Action(ACTION_UPDATE_TX_POWER_COMPLIANCE_COUNTRY, params), listener);
     }
 

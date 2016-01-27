@@ -3,7 +3,7 @@ package com.o3dr.services.android.lib.drone.companion.solo;
 import android.os.Parcel;
 import android.util.SparseArray;
 
-import com.o3dr.android.client.apis.solo.SoloConfigApi;
+import com.o3dr.android.client.utils.TxPowerComplianceCountries;
 import com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerMode.ControllerMode;
 import com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerUnits.ControllerUnit;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSetting;
@@ -92,7 +92,7 @@ public class SoloState implements DroneAttribute {
      * @deprecated Use {@link #getTxPowerCompliantCountry()} instead.
      */
     public boolean isEUTxPowerCompliant() {
-        return txPowerCompliantCountry != SoloConfigApi.DEFAULT_TX_POWER_COMPLIANT_COUNTRY;
+        return !TxPowerComplianceCountries.getDefaultCountry().name().equals(txPowerCompliantCountry);
     }
 
     public String getTxPowerCompliantCountry() {
