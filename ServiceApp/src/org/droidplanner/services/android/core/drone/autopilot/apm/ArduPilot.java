@@ -88,7 +88,7 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
 
     private final MagnetometerCalibrationImpl magCalibration;
 
-    protected Version firmwareVersionNumber;
+    protected Version firmwareVersionNumber = Version.forIntegers(0, 0, 0);
 
     public ArduPilot(Context context, MAVLinkStreams.MAVLinkOutputStream mavClient,
                      Handler handler, AutopilotWarningParser warningParser,
@@ -459,7 +459,7 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
     }
 
     @Override
-    protected void setFirmwareVersion(String message) {
+    protected final void setFirmwareVersion(String message) {
         super.setFirmwareVersion(message);
         setFirmwareVersionNumber(message);
     }
@@ -468,7 +468,7 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
         return firmwareVersionNumber;
     }
 
-    protected void setFirmwareVersionNumber(String message) {
+    private void setFirmwareVersionNumber(String message) {
         firmwareVersionNumber = extractVersionNumber(message);
     }
 
