@@ -42,10 +42,10 @@ public class Gps implements DroneAttribute {
     }
 
     public boolean isValid() {
-        if (ekfStatus != null) {
-            return ekfStatus.isPositionOk(vehicleArmed) && position != null;
+        if (ekfStatus == null) {
+            return position != null;
         } else {
-            return false;
+            return ekfStatus.isPositionOk(vehicleArmed) && position != null;
         }
     }
 
@@ -135,7 +135,8 @@ public class Gps implements DroneAttribute {
         if (position != null ? !position.equals(gps.position) : gps.position != null)
             return false;
         if (vehicleArmed != gps.vehicleArmed) return false;
-        if (!ekfStatus.equals(gps.ekfStatus)) return false;
+        if (ekfStatus != null ? !ekfStatus.equals(gps.ekfStatus) : gps.ekfStatus != null)
+            return false;
 
         return true;
     }
@@ -186,6 +187,8 @@ public class Gps implements DroneAttribute {
         this.satCount = in.readInt();
         this.fixType = in.readInt();
         this.position = in.readParcelable(LatLong.class.getClassLoader());
+        this.vehicleArmed = in.readByte() != 0;
+        this.ekfStatus = in.readParcelable(EkfStatus.class.getClassLoader());
     }
 
     public static final Parcelable.Creator<Gps> CREATOR = new Parcelable.Creator<Gps>() {

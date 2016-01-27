@@ -785,7 +785,7 @@ public class GenericMavLinkDrone implements MavLinkDrone {
         vehicleGps.setVehicleArmed(state.isArmed());
         vehicleGps.setEkfStatus(CommonApiUtils.generateEkfStatus(ekf_status_report));
 
-        notifyDroneEvent(DroneInterfaces.DroneEventsType.EKF_STATUS_UPDATE);
+        notifyAttributeListener(AttributeEvent.GPS_POSITION);
     }
 
     private void processGpsState(msg_gps_raw_int gpsState) {
