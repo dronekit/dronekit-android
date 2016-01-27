@@ -4,14 +4,12 @@ import android.os.Handler;
 import android.os.RemoteException;
 
 import com.o3dr.services.android.lib.coordinate.LatLong;
-import com.o3dr.services.android.lib.drone.action.ControlActions;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.drone.property.Altitude;
 import com.o3dr.services.android.lib.drone.property.Gps;
 import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.model.SimpleCommandListener;
-import com.o3dr.services.android.lib.model.action.Action;
 
 import org.droidplanner.services.android.core.MAVLink.MavLinkCommands;
 import org.droidplanner.services.android.core.drone.DroneInterfaces.DroneEventsType;
