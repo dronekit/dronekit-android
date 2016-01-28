@@ -23,9 +23,8 @@ public class SoloFollowOptionsV2 extends SoloFollowOptions {
         this.freeLook = freeLook;
     }
 
-    SoloFollowOptionsV2(float cruiseSpeed, int lookAtValue, int freeLook){
-        super(cruiseSpeed, lookAtValue);
-        this.freeLook = freeLook == FREE_LOOK_ENABLED_VALUE;
+    SoloFollowOptionsV2(float cruiseSpeed, int lookAtValue, int freeLookValue){
+        this(cruiseSpeed, lookAtValue == LOOK_AT_ENABLED_VALUE, freeLookValue == FREE_LOOK_ENABLED_VALUE);
     }
 
     SoloFollowOptionsV2(ByteBuffer buffer){
