@@ -34,7 +34,7 @@ public class SoloApiUtils {
         final Pair<String, String> wifiSettings = soloComp.getWifiSettings();
         return new SoloState(soloComp.getAutopilotVersion(), soloComp.getControllerFirmwareVersion(),
                 soloComp.getControllerVersion(), soloComp.getVehicleVersion(),
-                wifiSettings.second, wifiSettings.first, soloComp.isEUTxPowerCompliant(),
+                wifiSettings.second, wifiSettings.first, soloComp.getTxPowerCompliantCountry(),
                 soloComp.getButtonSettings(), soloComp.getGimbalVersion(),
                 soloComp.getControllerMode(), soloComp.getControllerUnit());
     }
@@ -107,12 +107,12 @@ public class SoloApiUtils {
         soloComp.updateControllerUnit(unit, listener);
     }
 
-    public static void updateSoloLinkEUTxPowerCompliance(ArduSolo arduSolo, boolean isCompliant, ICommandListener listener){
+    public static void updateSoloLinkTxPowerComplianceCountry(ArduSolo arduSolo, String compliantCountry, ICommandListener listener){
         if(!isSoloLinkFeatureAvailable(arduSolo, listener))
             return;
 
         final SoloComp soloComp = arduSolo.getSoloComp();
-        soloComp.updateEUTxPowerCompliance(isCompliant, listener);
+        soloComp.updateTxPowerComplianceCountry(compliantCountry, listener);
     }
 
 }
