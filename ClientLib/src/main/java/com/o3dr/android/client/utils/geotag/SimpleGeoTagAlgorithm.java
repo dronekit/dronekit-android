@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Basic Algorithm that traverses backwards, matching Events to photo files
  */
-class GeoTagAlgorithmImpl implements GeoTagAsyncTask.GeoTagAlgorithm {
+class SimpleGeoTagAlgorithm implements GeoTagAsyncTask.GeoTagAlgorithm {
 
     @Override
     public HashMap<TLogParser.Event, File> match(List<TLogParser.Event> events, ArrayList<File> photos) {

@@ -14,6 +14,7 @@ public class TLVMessageTypes {
     public static final int TYPE_SOLO_SET_BUTTON_SETTING = 6;
 
     public static final int TYPE_SOLO_FOLLOW_OPTIONS = 19;
+    public static final int TYPE_SOLO_FOLLOW_OPTIONS_V2 = 119;
     public static final int TYPE_SOLO_SHOT_OPTIONS = 20;
     public static final int TYPE_SOLO_SHOT_ERROR = 21;
 
@@ -28,6 +29,36 @@ public class TLVMessageTypes {
     public static final int TYPE_SOLO_GOPRO_STATE_V2 = 5006;
     public static final int TYPE_SOLO_GOPRO_REQUEST_STATE = 5007;
     public static final int TYPE_SOLO_GOPRO_SET_EXTENDED_REQUEST = 5009;
+
+    /*
+    Multi point cable cam message types
+     */
+    public static final int TYPE_SOLO_SPLINE_RECORD = 50;
+    public static final int TYPE_SOLO_SPLINE_PLAY = 51;
+    public static final int TYPE_SOLO_SPLINE_POINT = 52;
+    public static final int TYPE_SOLO_SPLINE_SEEK = 53;
+    public static final int TYPE_SOLO_SPLINE_PLAYBACK_STATUS = 54;
+    public static final int TYPE_SOLO_SPLINE_PATH_SETTINGS = 55;
+    public static final int TYPE_SOLO_SPLINE_DURATIONS = 56;
+    public static final int TYPE_SOLO_SPLINE_ATTACH = 57;
+
+    /*
+    Site scan inspect shot message types
+     */
+    public static final int TYPE_SOLO_INSPECT_START = 10001;
+    public static final int TYPE_SOLO_INSPECT_SET_WAYPOINT = 10002;
+    public static final int TYPE_SOLO_INSPECT_MOVE_GIMBAL = 10003;
+    public static final int TYPE_SOLO_INSPECT_MOVE_VEHICLE = 10004;
+
+    /*
+    Site scan scan shot message types
+     */
+    public static final int TYPE_SOLO_SCAN_START = 10101;
+
+    /*
+    Site scan survey shot message types
+     */
+    public static final int TYPE_SOLO_SURVEY_START = 10201;
 
     //Private constructor to prevent instantiation
     private TLVMessageTypes(){}

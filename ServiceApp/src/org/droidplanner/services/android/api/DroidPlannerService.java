@@ -4,47 +4,29 @@ import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.net.NetworkInfo;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
-import com.google.android.gms.analytics.HitBuilders;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
-import com.o3dr.services.android.lib.drone.connection.ConnectionType;
 import com.o3dr.services.android.lib.drone.mission.item.complex.CameraDetail;
 import com.o3dr.services.android.lib.model.IApiListener;
 import com.o3dr.services.android.lib.model.IDroidPlannerServices;
 
 import org.droidplanner.services.android.DroidPlannerServicesApp;
-import org.droidplanner.services.android.core.MAVLink.connection.MavLinkConnection;
-import org.droidplanner.services.android.core.MAVLink.connection.MavLinkConnectionListener;
-import org.droidplanner.services.android.core.survey.CameraInfo;
 import org.droidplanner.services.android.R;
-import org.droidplanner.services.android.communication.connection.AndroidMavLinkConnection;
-import org.droidplanner.services.android.communication.connection.AndroidTcpConnection;
-import org.droidplanner.services.android.communication.connection.AndroidUdpConnection;
-import org.droidplanner.services.android.communication.connection.BluetoothConnection;
-import org.droidplanner.services.android.communication.connection.usb.UsbConnection;
 import org.droidplanner.services.android.core.drone.DroneManager;
+import org.droidplanner.services.android.core.survey.CameraInfo;
 import org.droidplanner.services.android.exception.ConnectionException;
 import org.droidplanner.services.android.ui.activity.MainActivity;
 import org.droidplanner.services.android.utils.Utils;
-import org.droidplanner.services.android.utils.analytics.GAUtils;
 import org.droidplanner.services.android.utils.file.IO.CameraInfoLoader;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -68,52 +50,8 @@ public class DroidPlannerService extends Service {
      */
     public static final String ACTION_DRONE_CREATED = Utils.PACKAGE_NAME + ".ACTION_DRONE_CREATED";
     public static final String ACTION_DRONE_DESTROYED = Utils.PACKAGE_NAME + ".ACTION_DRONE_DESTROYED";
-    public static final String ACTION_KICK_START_DRONESHARE_UPLOADS = Utils.PACKAGE_NAME + ".ACTION_KICK_START_DRONESHARE_UPLOADS";
     public static final String ACTION_RELEASE_API_INSTANCE = Utils.PACKAGE_NAME + ".action.RELEASE_API_INSTANCE";
     public static final String EXTRA_API_INSTANCE_APP_ID = "extra_api_instance_app_id";
-
-    private static final IntentFilter networkFilter = new IntentFilter();
-
-    static {
-        networkFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
-        networkFilter.addAction(WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION);
-    }
-
-    private final BroadcastReceiver networkReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            final String action = intent.getAction();
-            switch(action){
-                case WifiManager.NETWORK_STATE_CHANGED_ACTION:
-                    NetworkInfo netInfo = intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
-                    NetworkInfo.State networkState = netInfo == null
-                            ? NetworkInfo.State.DISCONNECTED
-                            : netInfo.getState();
-
-                    switch (networkState) {
-                        case CONNECTED:
-                            final WifiInfo wifiInfo = intent.getParcelableExtra(WifiManager.EXTRA_WIFI_INFO);
-                            final String wifiSSID = wifiInfo.getSSID();
-                            Timber.i("Connected to " + wifiSSID);
-                            break;
-
-                        case DISCONNECTED:
-                            Timber.i("Disconnected from wifi network.");
-                            break;
-
-                        case CONNECTING:
-                            Timber.i( "Connecting to wifi network.");
-                            break;
-                    }
-                    break;
-
-                case WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION:
-                    final boolean isConnected = intent.getBooleanExtra(WifiManager.EXTRA_SUPPLICANT_CONNECTED, false);
-                    Timber.i("Supplicant connection " + (isConnected ? "established" : "broken"));
-                    break;
-            }
-        }
-    };
 
     /**
      * Used to broadcast service events.
@@ -121,19 +59,9 @@ public class DroidPlannerService extends Service {
     private LocalBroadcastManager lbm;
 
     /**
-     * Wifi wake lock.
-     */
-    private WifiManager.WifiLock wifiLock;
-
-    /**
      * Stores drone api instances per connected client. The client are denoted by their app id.
      */
     final ConcurrentHashMap<String, DroneApi> droneApiStore = new ConcurrentHashMap<>();
-
-    /**
-     * Caches mavlink connections per connection type.
-     */
-    final ConcurrentHashMap<String, AndroidMavLinkConnection> mavConnections = new ConcurrentHashMap<>();
 
     /**
      * Caches drone managers per connection type.
@@ -142,7 +70,6 @@ public class DroidPlannerService extends Service {
 
     private DPServices dpServices;
     private DroneAccess droneAccess;
-    private MavLinkServiceApi mavlinkApi;
 
     private CameraInfoLoader cameraInfoLoader;
     private List<CameraDetail> cachedCameraDetails;
@@ -198,10 +125,16 @@ public class DroidPlannerService extends Service {
 
         DroneManager droneMgr = droneManagers.get(connParams);
         if (droneMgr == null) {
-            Timber.d("Generating new drone manager.");
-            droneMgr = new DroneManager(getApplicationContext(), connParams, new Handler(Looper.getMainLooper()),
-                    mavlinkApi);
-            droneManagers.put(connParams, droneMgr);
+            final DroneManager temp = DroneManager.generateDroneManager(getApplicationContext(), connParams, new Handler(Looper.getMainLooper()));
+
+            droneMgr = droneManagers.putIfAbsent(connParams, temp);
+            if(droneMgr == null){
+                Timber.d("Generating new drone manager.");
+                droneMgr = temp;
+            }
+            else{
+                temp.destroy();
+            }
         }
 
         Timber.d("Drone manager connection for " + appId);
@@ -212,8 +145,8 @@ public class DroidPlannerService extends Service {
     /**
      * Disconnect the given client from the vehicle managed by the given drone manager.
      *
-     * @param droneMgr Handler for the connected vehicle.
-     * @param clientInfo    Info of the disconnecting client.
+     * @param droneMgr   Handler for the connected vehicle.
+     * @param clientInfo Info of the disconnecting client.
      * @throws ConnectionException
      */
     void disconnectDroneManager(DroneManager droneMgr, DroneApi.ClientInfo clientInfo) throws ConnectionException {
@@ -228,145 +161,6 @@ public class DroidPlannerService extends Service {
             droneMgr.destroy();
             droneManagers.remove(droneMgr.getConnectionParameter());
         }
-    }
-
-    /**
-     * Setup a MAVLink connection using the given parameter.
-     *
-     * @param connParams  Parameter used to setup the MAVLink connection.
-     * @param listenerTag Used to identify the connection requester.
-     * @param listener    Callback to receive the connection events.
-     */
-    void connectMAVConnection(ConnectionParameter connParams, String listenerTag, MavLinkConnectionListener listener) {
-        AndroidMavLinkConnection conn = mavConnections.get(connParams.getUniqueId());
-        final int connectionType = connParams.getConnectionType();
-        final Bundle paramsBundle = connParams.getParamsBundle();
-        if (conn == null) {
-
-            //Create a new mavlink connection
-
-            switch (connectionType) {
-                case ConnectionType.TYPE_USB:
-                    final int baudRate = paramsBundle.getInt(ConnectionType.EXTRA_USB_BAUD_RATE,
-                            ConnectionType.DEFAULT_USB_BAUD_RATE);
-                    conn = new UsbConnection(getApplicationContext(), baudRate);
-                    Timber.d("Connecting over usb.");
-                    break;
-
-                case ConnectionType.TYPE_BLUETOOTH:
-                    //Retrieve the bluetooth address to connect to
-                    final String bluetoothAddress = paramsBundle.getString(ConnectionType.EXTRA_BLUETOOTH_ADDRESS);
-                    conn = new BluetoothConnection(getApplicationContext(), bluetoothAddress);
-                    Timber.d("Connecting over bluetooth.");
-                    break;
-
-                case ConnectionType.TYPE_TCP:
-                    //Retrieve the server ip and port
-                    final String tcpServerIp = paramsBundle.getString(ConnectionType.EXTRA_TCP_SERVER_IP);
-                    final int tcpServerPort = paramsBundle.getInt(ConnectionType
-                            .EXTRA_TCP_SERVER_PORT, ConnectionType.DEFAULT_TCP_SERVER_PORT);
-                    conn = new AndroidTcpConnection(getApplicationContext(), tcpServerIp, tcpServerPort);
-                    Timber.d("Connecting over tcp.");
-                    break;
-
-                case ConnectionType.TYPE_UDP:
-                    final int udpServerPort = paramsBundle
-                            .getInt(ConnectionType.EXTRA_UDP_SERVER_PORT, ConnectionType.DEFAULT_UDP_SERVER_PORT);
-                    conn = new AndroidUdpConnection(getApplicationContext(), udpServerPort);
-                    Timber.d("Connecting over udp.");
-                    break;
-
-                default:
-                    Timber.e("Unrecognized connection type: %s", connectionType);
-                    return;
-            }
-
-            mavConnections.put(connParams.getUniqueId(), conn);
-        }
-
-        if (connectionType == ConnectionType.TYPE_UDP) {
-            final String pingIpAddress = paramsBundle.getString(ConnectionType.EXTRA_UDP_PING_RECEIVER_IP);
-            if (!TextUtils.isEmpty(pingIpAddress)) {
-                try {
-                    final InetAddress resolvedAddress = InetAddress.getByName(pingIpAddress);
-
-                    final int pingPort = paramsBundle.getInt(ConnectionType.EXTRA_UDP_PING_RECEIVER_PORT);
-                    final long pingPeriod = paramsBundle.getLong(ConnectionType.EXTRA_UDP_PING_PERIOD,
-                            ConnectionType.DEFAULT_UDP_PING_PERIOD);
-                    final byte[] pingPayload = paramsBundle.getByteArray(ConnectionType.EXTRA_UDP_PING_PAYLOAD);
-
-                    ((AndroidUdpConnection) conn).addPingTarget(resolvedAddress, pingPort, pingPeriod, pingPayload);
-
-                } catch (UnknownHostException e) {
-                    Timber.e(e, "Unable to resolve UDP ping server ip address.");
-                }
-            }
-        }
-
-        conn.addMavLinkConnectionListener(listenerTag, listener);
-        if (conn.getConnectionStatus() == MavLinkConnection.MAVLINK_DISCONNECTED) {
-            conn.connect();
-
-            // Record which connection type is used.
-            GAUtils.sendEvent(new HitBuilders.EventBuilder()
-                    .setCategory(GAUtils.Category.MAVLINK_CONNECTION)
-                    .setAction("MavLink connect")
-                    .setLabel(connParams.toString()));
-        }
-    }
-
-    /**
-     * Disconnect the MAVLink connection for the given listener.
-     *
-     * @param connParams  Connection parameters
-     * @param listenerTag Listener to be disconnected.
-     */
-    void disconnectMAVConnection(ConnectionParameter connParams, String listenerTag) {
-        final AndroidMavLinkConnection conn = mavConnections.get(connParams.getUniqueId());
-        if (conn == null)
-            return;
-
-        conn.removeMavLinkConnectionListener(listenerTag);
-
-        if (conn.getMavLinkConnectionListenersCount() == 0 && conn.getConnectionStatus() !=
-                MavLinkConnection.MAVLINK_DISCONNECTED) {
-            Timber.d("Disconnecting...");
-            conn.disconnect();
-
-            GAUtils.sendEvent(new HitBuilders.EventBuilder()
-                    .setCategory(GAUtils.Category.MAVLINK_CONNECTION)
-                    .setAction("MavLink disconnect")
-                    .setLabel(connParams.toString()));
-        }
-    }
-
-    /**
-     * Register a log listener.
-     *
-     * @param connParams      Parameters whose connection's data to log.
-     * @param tag             Tag for the listener.
-     * @param loggingFilePath File path for the logging file.
-     */
-    void addLoggingFile(ConnectionParameter connParams, String tag, String loggingFilePath) {
-        AndroidMavLinkConnection conn = mavConnections.get(connParams.getUniqueId());
-        if (conn == null)
-            return;
-
-        conn.addLoggingPath(tag, loggingFilePath);
-    }
-
-    /**
-     * Unregister a log listener.
-     *
-     * @param connParams Connection parameters from whom to stop the logging.
-     * @param tag        Tag for the listener.
-     */
-    void removeLoggingFile(ConnectionParameter connParams, String tag) {
-        AndroidMavLinkConnection conn = mavConnections.get(connParams.getUniqueId());
-        if (conn == null)
-            return;
-
-        conn.removeLoggingPath(tag);
     }
 
     /**
@@ -425,21 +219,12 @@ public class DroidPlannerService extends Service {
 
         final Context context = getApplicationContext();
 
-        final WifiManager wifiMgr = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-        wifiLock = wifiMgr.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, TAG);
-
-        Timber.i("Acquiring wifi wake lock.");
-        wifiLock.acquire();
-
-        mavlinkApi = new MavLinkServiceApi(this);
         droneAccess = new DroneAccess(this);
         dpServices = new DPServices(this);
         lbm = LocalBroadcastManager.getInstance(context);
         this.cameraInfoLoader = new CameraInfoLoader(context);
 
         updateForegroundNotification();
-
-        registerReceiver(networkReceiver, networkFilter);
     }
 
     @SuppressLint("NewApi")
@@ -473,28 +258,19 @@ public class DroidPlannerService extends Service {
         super.onDestroy();
         Timber.d("Destroying 3DR Services.");
 
-        unregisterReceiver(networkReceiver);
-
         for (DroneApi droneApi : droneApiStore.values()) {
             droneApi.destroy();
         }
         droneApiStore.clear();
 
-        for (AndroidMavLinkConnection conn : mavConnections.values()) {
-            conn.disconnect();
-            conn.removeAllMavLinkConnectionListeners();
+        for (DroneManager droneMgr : droneManagers.values()) {
+            droneMgr.destroy();
         }
+        droneManagers.clear();
 
-        mavConnections.clear();
         dpServices.destroy();
 
         stopForeground(true);
-
-        if(wifiLock != null){
-            Timber.i("Releasing wifi wake lock.");
-            wifiLock.release();
-            wifiLock = null;
-        }
 
         final DroidPlannerServicesApp dpApp = (DroidPlannerServicesApp) getApplication();
         dpApp.closeLogFile();
@@ -505,11 +281,6 @@ public class DroidPlannerService extends Service {
         if (intent != null) {
             final String action = intent.getAction();
             switch (action) {
-                case ACTION_KICK_START_DRONESHARE_UPLOADS:
-                    for (DroneManager droneMgr : droneManagers.values()) {
-                        droneMgr.kickStartDroneShareUpload();
-                    }
-                    break;
 
                 case ACTION_RELEASE_API_INSTANCE:
                     final String appId = intent.getStringExtra(EXTRA_API_INSTANCE_APP_ID);

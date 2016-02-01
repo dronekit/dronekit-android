@@ -21,7 +21,6 @@ import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionResult;
-import com.o3dr.services.android.lib.drone.connection.DroneSharePrefs;
 import com.o3dr.services.android.lib.drone.mission.Mission;
 import com.o3dr.services.android.lib.drone.mission.action.MissionActions;
 import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
@@ -29,6 +28,7 @@ import com.o3dr.services.android.lib.drone.mission.item.command.ResetROI;
 import com.o3dr.services.android.lib.drone.mission.item.spatial.RegionOfInterest;
 import com.o3dr.services.android.lib.drone.property.DroneAttribute;
 import com.o3dr.services.android.lib.drone.property.Parameter;
+import com.o3dr.services.android.lib.drone.property.State;
 import com.o3dr.services.android.lib.gcs.event.GCSEvent;
 import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
 import com.o3dr.services.android.lib.model.IApiListener;
@@ -38,8 +38,10 @@ import com.o3dr.services.android.lib.model.IMavlinkObserver;
 import com.o3dr.services.android.lib.model.IObserver;
 import com.o3dr.services.android.lib.model.action.Action;
 
+import org.droidplanner.services.android.communication.connection.SoloConnection;
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
 import org.droidplanner.services.android.core.drone.DroneManager;
+import org.droidplanner.services.android.core.drone.autopilot.Drone;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.core.drone.variables.calibration.AccelCalibration;
 import org.droidplanner.services.android.core.drone.variables.calibration.MagnetometerCalibrationImpl;
@@ -130,7 +132,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
         return this.droneMgr;
     }
 
-    private MavLinkDrone getDrone() {
+    private Drone getDrone() {
         if (this.droneMgr == null)
             return null;
 
@@ -181,10 +183,24 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
         return droneMgr != null && droneMgr.isConnected();
     }
 
+    private ConnectionParameter checkConnectionParameter(ConnectionParameter connParams) throws ConnectionException {
+        if(connParams == null){
+            throw new ConnectionException("Invalid connection parameters");
+        }
+
+        if(SoloConnection.isSoloConnection(context, connParams)){
+            ConnectionParameter update = SoloConnection.getSoloConnectionParameterIfPossible(context);
+            if(update != null){
+                return update;
+            }
+        }
+        return connParams;
+    }
+
     public void connect(ConnectionParameter connParams) {
         try {
-            this.connectionParams = connParams;
-            this.droneMgr = service.connectDroneManager(connParams, ownerId, this);
+            this.connectionParams = checkConnectionParameter(connParams);
+            this.droneMgr = service.connectDroneManager(this.connectionParams, ownerId, this);
         } catch (ConnectionException e) {
             notifyConnectionFailed(new ConnectionResult(0, e.getMessage()));
             disconnect();
@@ -254,6 +270,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
         if (data != null)
             data.setClassLoader(context.getClassLoader());
 
+        Drone drone = getDrone();
         switch (type) {
             //CONNECTION ACTIONS
             case ConnectionActions.ACTION_CONNECT:
@@ -279,19 +296,24 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
                     videoProps.putInt(CameraActions.EXTRA_VIDEO_PROPS_UDP_PORT, VideoManager.ARTOO_UDP_PORT);
                 }
 
-                CommonApiUtils.startVideoStream(getDrone(), videoProps, ownerId, videoTag, videoSurface, listener);
+                CommonApiUtils.startVideoStream(drone, videoProps, ownerId, videoTag, videoSurface, listener);
                 break;
             }
 
             case CameraActions.ACTION_STOP_VIDEO_STREAM: {
                 String videoTag = data.getString(CameraActions.EXTRA_VIDEO_TAG, "");
-                CommonApiUtils.stopVideoStream(getDrone(), ownerId, videoTag, listener);
+                CommonApiUtils.stopVideoStream(drone, ownerId, videoTag, listener);
                 break;
             }
 
             // MISSION ACTIONS
             case MissionActions.ACTION_BUILD_COMPLEX_MISSION_ITEM:
-                CommonApiUtils.buildComplexMissionItem(getDrone(), data);
+                if(drone instanceof MavLinkDrone) {
+                    CommonApiUtils.buildComplexMissionItem((MavLinkDrone)drone, data);
+                }
+                else{
+                    CommonApiUtils.postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
+                }
                 break;
 
             default:
@@ -401,8 +423,15 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
     }
 
     @Override
-    public void onDroneEvent(DroneInterfaces.DroneEventsType event, MavLinkDrone drone) {
-        Bundle extrasBundle = null;
+    public void onDroneEvent(DroneInterfaces.DroneEventsType event, Drone drone) {
+        final Bundle extrasBundle = new Bundle();
+        String droneId = "";
+        if (drone != null) {
+            droneId = drone.getId();
+        }
+
+        extrasBundle.putString(AttributeEventExtra.EXTRA_VEHICLE_ID, droneId);
+
         String droneEvent = null;
         List<Pair<String, Bundle>> attributesInfo = new ArrayList<>();
 
@@ -434,8 +463,10 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
                 break;
 
             case AUTOPILOT_WARNING:
-                extrasBundle = new Bundle(1);
-                extrasBundle.putString(AttributeEventExtra.EXTRA_AUTOPILOT_ERROR_ID, drone.getState().getErrorId());
+                State droneState = (State) drone.getAttribute(AttributeType.STATE);
+                if(droneState != null) {
+                    extrasBundle.putString(AttributeEventExtra.EXTRA_AUTOPILOT_ERROR_ID, droneState.getAutopilotErrorId());
+                }
                 droneEvent = AttributeEvent.AUTOPILOT_ERROR;
                 break;
 
@@ -478,31 +509,32 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
                 break;
 
             case CALIBRATION_IMU:
-                String calIMUMessage = drone.getCalibrationSetup().getMessage();
-                extrasBundle = new Bundle(1);
-                extrasBundle.putString(AttributeEventExtra.EXTRA_CALIBRATION_IMU_MESSAGE, calIMUMessage);
-                droneEvent = AttributeEvent.CALIBRATION_IMU;
+                if(drone instanceof MavLinkDrone) {
+                    String calIMUMessage = ((MavLinkDrone) drone).getCalibrationSetup().getMessage();
+                    extrasBundle.putString(AttributeEventExtra.EXTRA_CALIBRATION_IMU_MESSAGE, calIMUMessage);
+                    droneEvent = AttributeEvent.CALIBRATION_IMU;
+                }
                 break;
 
             case CALIBRATION_TIMEOUT:
-                    /*
+                if(drone instanceof MavLinkDrone) {
+                /*
                  * here we will check if we are in calibration mode but if at
-				 * the same time 'msg' is empty - then it is actually not doing
-				 * calibration what we should do is to reset the calibration
-				 * flag and re-trigger the HEARBEAT_TIMEOUT this however should
-				 * not be happening
-				 */
-                AccelCalibration accelCalibration = drone.getCalibrationSetup();
-                String message = accelCalibration.getMessage();
-                if (accelCalibration.isCalibrating() && TextUtils.isEmpty(message)) {
-                    accelCalibration.cancelCalibration();
-                    droneEvent = AttributeEvent.HEARTBEAT_TIMEOUT;
-                } else {
-                    extrasBundle = new Bundle(1);
-                    extrasBundle.putString(AttributeEventExtra.EXTRA_CALIBRATION_IMU_MESSAGE, message);
-                    droneEvent = AttributeEvent.CALIBRATION_IMU_TIMEOUT;
+                 * the same time 'msg' is empty - then it is actually not doing
+                 * calibration what we should do is to reset the calibration
+                 * flag and re-trigger the HEARTBEAT_TIMEOUT this however should
+                 * not be happening
+                 */
+                    AccelCalibration accelCalibration = ((MavLinkDrone) drone).getCalibrationSetup();
+                    String message = accelCalibration.getMessage();
+                    if (accelCalibration.isCalibrating() && TextUtils.isEmpty(message)) {
+                        accelCalibration.cancelCalibration();
+                        droneEvent = AttributeEvent.HEARTBEAT_TIMEOUT;
+                    } else {
+                        extrasBundle.putString(AttributeEventExtra.EXTRA_CALIBRATION_IMU_MESSAGE, message);
+                        droneEvent = AttributeEvent.CALIBRATION_IMU_TIMEOUT;
+                    }
                 }
-
                 break;
 
             case HEARTBEAT_TIMEOUT:
@@ -519,25 +551,29 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
                 break;
 
             case HEARTBEAT_FIRST:
-                Bundle heartBeatExtras = new Bundle(1);
-                heartBeatExtras.putInt(AttributeEventExtra.EXTRA_MAVLINK_VERSION, drone.getMavlinkVersion());
+                Bundle heartBeatExtras = new Bundle();
+                heartBeatExtras.putString(AttributeEventExtra.EXTRA_VEHICLE_ID, drone.getId());
+                if(drone instanceof MavLinkDrone) {
+                    heartBeatExtras.putInt(AttributeEventExtra.EXTRA_MAVLINK_VERSION, ((MavLinkDrone) drone).getMavlinkVersion());
+                }
                 attributesInfo.add(Pair.create(AttributeEvent.HEARTBEAT_FIRST, heartBeatExtras));
 
             case CONNECTED:
                 //Broadcast the vehicle connection.
                 ConnectionParameter sanitizedParameter = new ConnectionParameter(connectionParams
-                        .getConnectionType(), connectionParams.getParamsBundle(), null);
+                        .getConnectionType(), connectionParams.getParamsBundle());
 
                 context.sendBroadcast(new Intent(GCSEvent.ACTION_VEHICLE_CONNECTION)
                         .putExtra(GCSEvent.EXTRA_APP_ID, ownerId)
                         .putExtra(GCSEvent.EXTRA_VEHICLE_CONNECTION_PARAMETER, sanitizedParameter));
 
-                attributesInfo.add(Pair.<String, Bundle>create(AttributeEvent.STATE_CONNECTED, null));
+                attributesInfo.add(Pair.<String, Bundle>create(AttributeEvent.STATE_CONNECTED, extrasBundle));
                 break;
 
             case HEARTBEAT_RESTORED:
-                extrasBundle = new Bundle(1);
-                extrasBundle.putInt(AttributeEventExtra.EXTRA_MAVLINK_VERSION, drone.getMavlinkVersion());
+                if(drone instanceof MavLinkDrone) {
+                    extrasBundle.putInt(AttributeEventExtra.EXTRA_MAVLINK_VERSION, ((MavLinkDrone) drone).getMavlinkVersion());
+                }
                 droneEvent = AttributeEvent.HEARTBEAT_RESTORED;
                 break;
 
@@ -549,17 +585,19 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
                 break;
 
             case MISSION_WP_UPDATE:
-                int currentWaypoint = drone.getMissionStats().getCurrentWP();
-                extrasBundle = new Bundle(1);
-                extrasBundle.putInt(AttributeEventExtra.EXTRA_MISSION_CURRENT_WAYPOINT, currentWaypoint);
-                droneEvent = AttributeEvent.MISSION_ITEM_UPDATED;
+                if(drone instanceof MavLinkDrone) {
+                    int currentWaypoint = ((MavLinkDrone) drone).getMissionStats().getCurrentWP();
+                    extrasBundle.putInt(AttributeEventExtra.EXTRA_MISSION_CURRENT_WAYPOINT, currentWaypoint);
+                    droneEvent = AttributeEvent.MISSION_ITEM_UPDATED;
+                }
                 break;
 
             case MISSION_WP_REACHED:
-                int lastReachedWaypoint = drone.getMissionStats().getLastReachedWP();
-                extrasBundle = new Bundle(1);
-                extrasBundle.putInt(AttributeEventExtra.EXTRA_MISSION_LAST_REACHED_WAYPOINT, lastReachedWaypoint);
-                droneEvent = AttributeEvent.MISSION_ITEM_REACHED;
+                if(drone instanceof MavLinkDrone) {
+                    int lastReachedWaypoint = ((MavLinkDrone) drone).getMissionStats().getLastReachedWP();
+                    extrasBundle.putInt(AttributeEventExtra.EXTRA_MISSION_LAST_REACHED_WAYPOINT, lastReachedWaypoint);
+                    droneEvent = AttributeEvent.MISSION_ITEM_REACHED;
+                }
                 break;
 
             case ALTITUDE:
@@ -617,13 +655,6 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
     @Override
     public void onEndReceivingParameters() {
         notifyAttributeUpdate(AttributeEvent.PARAMETERS_REFRESH_COMPLETED, null);
-    }
-
-    public DroneSharePrefs getDroneSharePrefs() {
-        if (connectionParams == null)
-            return null;
-
-        return connectionParams.getDroneSharePrefs();
     }
 
     public void onConnectionFailed(String error) {

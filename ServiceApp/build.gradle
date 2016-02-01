@@ -3,30 +3,28 @@ apply plugin: 'io.fabric'
 
 dependencies {
 
-    compile 'com.google.android.gms:play-services-analytics:7.3.0'
-    compile 'com.google.android.gms:play-services-location:7.3.0'
+    compile "com.google.android.gms:play-services-analytics:${play_services_version}"
+    compile "com.google.android.gms:play-services-location:${play_services_version}"
 
-    compile 'com.android.support:support-v4:22.2.1'
-    compile 'com.android.support:appcompat-v7:22.2.1'
-    compile 'com.android.support:cardview-v7:22.2.1'
-    compile 'com.android.support:recyclerview-v7:22.2.1'
+    compile "com.android.support:support-v4:${support_lib_version}"
+    compile "com.android.support:appcompat-v7:${support_lib_version}"
+    compile "com.android.support:cardview-v7:${support_lib_version}"
+    compile "com.android.support:recyclerview-v7:${support_lib_version}"
 
     compile files('libs/d2xx.jar')
-    compile files('libs/jeromq-0.3.4.jar')
-    compile files('libs/droneapi-java.jar')
-    compile files('libs/protobuf-java-2.5.0.jar')
 
     compile project(':ClientLib')
-    compile project(':dependencyLibs:usb-serial-for-android:UsbSerialLibrary')
-    compile('com.crashlytics.sdk.android:crashlytics:2.2.2@aar') {
+    compile project(':UsbSerialLibrary')
+
+    compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
         transitive = true;
     }
 
     compile 'com.jakewharton.timber:timber:3.1.0'
     compile 'com.jcraft:jsch:0.1.51'
 
-    compile 'com.squareup.okhttp:okhttp:2.3.0'
-    compile 'com.squareup.okhttp:okhttp-urlconnection:2.3.0'
+    compile "com.squareup.okhttp:okhttp:${okhttp_version}"
+    compile "com.squareup.okhttp:okhttp-urlconnection:${okhttp_version}"
 
     //Java semver library
     compile 'com.github.zafarkhaja:java-semver:0.9.0'
@@ -42,7 +40,7 @@ dependencies {
 def versionMajor = 1
 def versionMinor = 5
 def versionPatch = 1
-def versionBuild = 0 //bump for dogfood builds, public betas, etc.
+def versionBuild = 9 //bump for dogfood builds, public betas, etc.
 def versionPrefix = "3DR Services v"
 
 //Log levels values
@@ -54,15 +52,15 @@ def logLevelError = 6;
 def logLevelAssert = 7;
 
 android {
-    compileSdkVersion Integer.parseInt(project.ANDROID_BUILD_SDK_VERSION)
-    buildToolsVersion project.ANDROID_BUILD_TOOLS_VERSION
+    compileSdkVersion android_build_sdk_version
+    buildToolsVersion android_build_tools_version
 
     defaultConfig {
         applicationId 'org.droidplanner.services.android'
-        minSdkVersion Integer.parseInt(project.ANDROID_BUILD_MIN_SDK_VERSION)
-        targetSdkVersion Integer.parseInt(project.ANDROID_BUILD_TARGET_SDK_VERSION)
+        minSdkVersion android_build_min_sdk_version
+        targetSdkVersion android_build_target_sdk_version
         buildConfigField "boolean", "SITL_DEBUG", "false"
-        buildConfigField "String", "SOLO_LINK_LOCAL_IP" , getLocalIp()
+        buildConfigField "String", "SOLO_LINK_IP", getSoloLinkIp()
 
         versionCode computeVersionCode(versionMajor, versionMinor, versionPatch, versionBuild)
         versionName generateVersionName(versionPrefix, versionMajor, versionMinor, versionPatch)
@@ -118,31 +116,88 @@ android {
             def file = output.outputFile
             if (file != null && file.name.endsWith('.apk')) {
                 def buildType = variant.buildType.getName()
+                def flavorName = variant.getFlavorName()
                 def versionCode = defaultConfig.versionCode
-                output.outputFile = new File(file.parent, "3dr-services-${buildType}.${versionCode}.apk")
+                output.outputFile = new File(file.parent, "3dr-services-${flavorName}-${buildType}.${versionCode}.apk")
             }
+        }
+    }
+
+    android.variantFilter { variant ->
+        def flavors = variant.getFlavors()
+        if(!flavors.isEmpty()) {
+            def flavorName = flavors.get(0).name
+            def buildTypeName = variant.buildType.name
+
+            //Filter in the variants we interested in building.
+            def ignoreVariant = true
+            switch (buildTypeName) {
+                case "release":
+                    switch (flavorName) {
+                        case "prod":
+                            ignoreVariant = false
+                            break
+                    }
+                    break;
+
+                case "debug":
+                    switch (flavorName) {
+                        case "dev":
+                        case "sitl":
+                            ignoreVariant = false
+                            break
+                    }
+                    break;
+
+                case "staging":
+                    switch (flavorName) {
+                        case "beta":
+                        case "alpha":
+                            ignoreVariant = false
+                            break
+                    }
+                    break
+            }
+
+            variant.setIgnore(ignoreVariant);
+        }
+    }
+
+    productFlavors {
+        prod {
+
+        }
+
+        dev {
+            versionName generateVersionName(versionPrefix, versionMajor, versionMinor, versionPatch, generateVersionNameSuffix(versionBuild, "dev", true))
+        }
+
+        beta {
+            versionName generateVersionName(versionPrefix, versionMajor, versionMinor, versionPatch, generateVersionNameSuffix(versionBuild, "beta"))
+        }
+
+        alpha {
+            versionName generateVersionName(versionPrefix, versionMajor, versionMinor, versionPatch, generateVersionNameSuffix(versionBuild, "alpha"))
+        }
+
+        sitl {
+            versionName generateVersionName(versionPrefix, versionMajor, versionMinor, versionPatch, generateVersionNameSuffix(versionBuild, "sitl"))
+            buildConfigField "String", "SOLO_LINK_IP", getLocalIp()
+            buildConfigField "boolean", "SITL_DEBUG", "true"
         }
     }
 
     buildTypes {
         debug {
-            versionNameSuffix generateVersionNameSuffix(versionBuild, "dev")
-            buildConfigField "boolean", "WRITE_LOG_FILE", "true"
-        }
-
-        beta {
-            signingConfig signingConfigs.release
-            versionNameSuffix generateVersionNameSuffix(versionBuild, "beta")
-            buildConfigField "boolean", "WRITE_LOG_FILE", "true"
-            buildConfigField "boolean", "ENABLE_CRASHLYTICS", "true"
-        }
-
-        sitl {
-            signingConfig signingConfigs.debug
-            versionNameSuffix generateVersionNameSuffix(versionBuild, "sitl")
-            buildConfigField "boolean", "SITL_DEBUG", "true"
-            buildConfigField "boolean", "WRITE_LOG_FILE", "true"
             debuggable true
+            buildConfigField "boolean", "WRITE_LOG_FILE", "true"
+        }
+
+        staging {
+            debuggable true
+            signingConfig signingConfigs.release
+            buildConfigField "boolean", "ENABLE_CRASHLYTICS", "true"
+            buildConfigField "boolean", "WRITE_LOG_FILE", "true"
         }
 
         release {
@@ -178,6 +233,14 @@ def getAppKey() {
     return hasProperty('COM_O3DR_SERVICES_KEY_ALIAS') ? COM_O3DR_SERVICES_KEY_ALIAS : ''
 }
 
+def getSoloLinkIp() {
+    return '\"10.1.1.10\"'
+}
+
 def getLocalIp() {
-    return '\"' + InetAddress.getLocalHost().getCanonicalHostName() +'\"'
+    try {
+        return '\"' + InetAddress.getLocalHost().getCanonicalHostName() + '\"'
+    }catch(Exception e){
+        return '\"\"'
+    }
 }

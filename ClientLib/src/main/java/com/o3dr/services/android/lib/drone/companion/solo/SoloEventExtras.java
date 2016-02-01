@@ -19,11 +19,17 @@ public class SoloEventExtras {
      * Used to retrieve the received sololink message data in bytes.
      */
     public static final String EXTRA_SOLO_MESSAGE_DATA = PACKAGE_NAME + ".EXTRA_SOLO_MESSAGE_DATA";
+
     /**
-     * Used to retrieve the boolean value specifying whether the controller is compliant with the EU tx power levels.
-     * @see {@link SoloEvents#SOLO_EU_TX_POWER_COMPLIANCE_UPDATED}
+     * @deprecated Use {@link #EXTRA_SOLO_TX_POWER_COMPLIANT_COUNTRY} instead.
      */
     public static final String EXTRA_SOLO_EU_TX_POWER_COMPLIANT = PACKAGE_NAME + ".EXTRA_SOLO_EU_TX_POWER_COMPLIANT";
+
+    /**
+     * Used to retrieve the String value specifying which country the controller is compliant with tx power levels.
+     * @see {@link SoloEvents#SOLO_TX_POWER_COMPLIANCE_COUNTRY_UPDATED}
+     */
+    public static final String EXTRA_SOLO_TX_POWER_COMPLIANT_COUNTRY = PACKAGE_NAME + ".EXTRA_SOLO_TX_POWER_COMPLIANT_COUNTRY";
 
     /**
      * Used to retrieve the solo controller version.

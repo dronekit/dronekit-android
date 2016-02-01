@@ -43,7 +43,7 @@ import com.o3dr.services.android.lib.model.AbstractCommandListener;
 import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
 
-import org.droidplanner.services.android.core.MAVLink.MAVLinkStreams;
+import org.droidplanner.services.android.communication.model.DataLink;
 import org.droidplanner.services.android.core.MAVLink.MavLinkParameters;
 import org.droidplanner.services.android.core.MAVLink.WaypointManager;
 import org.droidplanner.services.android.core.MAVLink.command.doCmd.MavLinkDoCmds;
@@ -89,12 +89,12 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
     private final MagnetometerCalibrationImpl magCalibration;
 
     protected Version firmwareVersionNumber = Version.forIntegers(0, 0, 0);
-
-    public ArduPilot(Context context, MAVLinkStreams.MAVLinkOutputStream mavClient,
+    
+    public ArduPilot(String droneId, Context context, DataLink.DataLinkProvider<MAVLinkMessage> mavClient,
                      Handler handler, AutopilotWarningParser warningParser,
-                     LogMessageListener logListener, DroneInterfaces.AttributeEventListener listener) {
+                     LogMessageListener logListener) {
 
-        super(context, handler, mavClient, warningParser, logListener, listener);
+        super(droneId, context, handler, mavClient, warningParser, logListener);
 
         this.waypointManager = new WaypointManager(this, handler);
 
@@ -330,7 +330,7 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
                     msg.stab_pitch = 0;
                     msg.stab_roll = 0;
                     msg.stab_yaw = 0;
-                    getMavClient().sendMavMessage(msg, listener);
+                    getMavClient().sendMessage(msg, listener);
                 } else {
                     MavLinkParameters.sendParameter(this, "MNT_MODE", 1, mountMode);
                 }
@@ -342,7 +342,7 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
     }
 
     @Override
-    protected boolean enableManualControl(Bundle data, ICommandListener listener){
+    protected boolean enableManualControl(Bundle data, ICommandListener listener) {
         CommonApiUtils.postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
         return true;
     }
