@@ -40,7 +40,7 @@ dependencies {
 def versionMajor = 1
 def versionMinor = 5
 def versionPatch = 1
-def versionBuild = 7 //bump for dogfood builds, public betas, etc.
+def versionBuild = 8 //bump for dogfood builds, public betas, etc.
 def versionPrefix = "3DR Services v"
 
 //Log levels values
@@ -60,7 +60,7 @@ android {
         minSdkVersion android_build_min_sdk_version
         targetSdkVersion android_build_target_sdk_version
         buildConfigField "boolean", "SITL_DEBUG", "false"
-        buildConfigField "String", "SOLO_LINK_LOCAL_IP" , getLocalIp()
+        buildConfigField "String", "SOLO_LINK_IP", getSoloLinkIp()
 
         versionCode computeVersionCode(versionMajor, versionMinor, versionPatch, versionBuild)
         versionName generateVersionName(versionPrefix, versionMajor, versionMinor, versionPatch)
@@ -182,6 +182,7 @@ android {
 
         sitl {
             versionName generateVersionName(versionPrefix, versionMajor, versionMinor, versionPatch, generateVersionNameSuffix(versionBuild, "sitl"))
+            buildConfigField "String", "SOLO_LINK_IP", getLocalIp()
             buildConfigField "boolean", "SITL_DEBUG", "true"
         }
     }
@@ -214,9 +215,11 @@ android {
         unitTests.returnDefaultValues = true
     }
 
-    //dexOptions {
-    //    dexInProcess = true
-    //}
+    /*
+    dexOptions {
+        dexInProcess = true
+    }
+    */
 }
 
 def getAppKeystoreFile() {
@@ -234,6 +237,10 @@ def getAppKeyPassword() {
 
 def getAppKey() {
     return hasProperty('COM_O3DR_SERVICES_KEY_ALIAS') ? COM_O3DR_SERVICES_KEY_ALIAS : ''
+}
+
+def getSoloLinkIp() {
+    return '\"10.1.1.10\"'
 }
 
 def getLocalIp() {

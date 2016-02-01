@@ -23,10 +23,11 @@ android {
         abortOnError false
     }
 
-    //dexOptions {
-    //    dexInProcess = true
-    //}
-
+    /*
+    dexOptions {
+        dexInProcess = true
+    }
+    */
 }
 
 dependencies {

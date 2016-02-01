@@ -308,16 +308,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
             case CameraActions.ACTION_START_VIDEO_STREAM_FOR_OBSERVER: {
                 String videoTag = data.getString(CameraActions.EXTRA_VIDEO_TAG, "");
 
-                Bundle videoProps = data.getBundle(CameraActions.EXTRA_VIDEO_PROPERTIES);
-                if (videoProps == null) {
-                    //Only case where it's null is when interacting with a deprecated client version.
-                    //In this case, we assume that the client is attempting to start a solo stream, since that's
-                    //the only api that was exposed.
-                    videoProps = new Bundle();
-                    videoProps.putInt(CameraActions.EXTRA_VIDEO_PROPS_UDP_PORT, VideoManager.ARTOO_UDP_PORT);
-                }
-
-                CommonApiUtils.startVideoStream(drone, videoProps, ownerId, videoTag, (VideoStreamListener) listener);
+                CommonApiUtils.startVideoStream(drone, ownerId, videoTag, (VideoStreamListener) listener);
                 break;
             }
 

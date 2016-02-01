@@ -1,8 +1,8 @@
 package com.o3dr.android.client;
 
 /**
- * TODO
+ * Callback for retrieving video packets from VideoStreamObserver.
  */
 public interface IVideoStreamCallback {
-    void getVideoStreamPackets(byte[] packets);
+    void onVideoStreamPacketRecieved(byte[] data, int dataSize);
 }

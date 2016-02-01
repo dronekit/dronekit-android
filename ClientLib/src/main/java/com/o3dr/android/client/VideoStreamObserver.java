@@ -1,6 +1,5 @@
 package com.o3dr.android.client;
 
-import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
 
@@ -10,24 +9,26 @@ import com.o3dr.android.client.utils.connection.UdpConnection;
 import java.nio.ByteBuffer;
 
 /**
- * TODO
+ * Observer for vehicle video stream. This class also returns attributes related to the video stream.
  */
 public class VideoStreamObserver implements IpConnectionListener {
     private static final String TAG = VideoStreamObserver.class.getSimpleName();
 
     private static final int UDP_BUFFER_SIZE = 1500;
     private static final long RECONNECT_COUNTDOWN_IN_MILLIS = 1000l;
+    private static final int SOLO_STREAM_UDP_PORT = 5600;
 
-    private Context context;
     private UdpConnection linkConn;
     private Handler handler;
 
-    private int linkPort = -1;
-
     private IVideoStreamCallback callback;
 
-    public VideoStreamObserver(Context context, Handler handler, IVideoStreamCallback callback) {
-        this.context = context;
+    // Video stream properties
+    private String aspectRatio;
+    private int framerate;  // In Hz.
+    private String cameraType;
+
+    public VideoStreamObserver(Handler handler, IVideoStreamCallback callback) {
         this.handler = handler;
         this.callback = callback;
     }
@@ -41,31 +42,31 @@ public class VideoStreamObserver implements IpConnectionListener {
         }
     };
 
-    private void start(int udpPort) {
-        if (this.linkConn == null || udpPort != this.linkPort){
-            this.linkConn = new UdpConnection(handler, udpPort, UDP_BUFFER_SIZE, true, 42);
+    public void start() {
+        if (this.linkConn == null) {
+            this.linkConn = new UdpConnection(handler, SOLO_STREAM_UDP_PORT,
+                UDP_BUFFER_SIZE, true, 42);
             this.linkConn.setIpConnectionListener(this);
-            this.linkPort = udpPort;
         }
 
         handler.removeCallbacks(reconnectTask);
 
         Log.d(TAG, "Connecting to video stream...");
         this.linkConn.connect();
+
+        // TODO: Get video stream attributes.
     }
 
-    private void stop() {
+    public void stop() {
         Log.d(TAG, "Stopping video manager");
 
         handler.removeCallbacks(reconnectTask);
 
         if (this.linkConn != null) {
-            // Break the link
+            // Break the link.
             this.linkConn.disconnect();
             this.linkConn = null;
         }
-
-        this.linkPort = -1;
     }
 
     @Override
@@ -84,6 +85,30 @@ public class VideoStreamObserver implements IpConnectionListener {
 
     @Override
     public void onPacketReceived(ByteBuffer packetBuffer) {
-        callback.getVideoStreamPackets(packetBuffer.array());
+        callback.onVideoStreamPacketRecieved(packetBuffer.array(), packetBuffer.limit());
+    }
+
+    public String getAspectRatio() {
+        return aspectRatio;
+    }
+
+    public void setAspectRatio(String aspectRatio) {
+        this.aspectRatio = aspectRatio;
+    }
+
+    public int getFramerate() {
+        return framerate;
+    }
+
+    public void setFramerate(int framerate) {
+        this.framerate = framerate;
+    }
+
+    public String getCameraType() {
+        return cameraType;
+    }
+
+    public void setCameraType(String cameraType) {
+        this.cameraType = cameraType;
     }
 }

@@ -56,7 +56,7 @@ public class SoloComp implements SoloLinkListener, ControllerLinkListener {
 
         void onButtonPacketReceived(ButtonPacket packet);
 
-        void onEUTxPowerComplianceUpdated(boolean isCompliant);
+        void onTxPowerComplianceCountryUpdated(String compliantCountry);
 
         void onVersionsUpdated();
 
@@ -188,9 +188,9 @@ public class SoloComp implements SoloLinkListener, ControllerLinkListener {
     }
 
     @Override
-    public void onEUTxPowerComplianceUpdated(boolean isCompliant) {
+    public void onTxPowerComplianceCountryUpdated(String compliantCountry) {
         if (compListener != null)
-            compListener.onEUTxPowerComplianceUpdated(isCompliant);
+            compListener.onTxPowerComplianceCountryUpdated(compliantCountry);
     }
 
     @Override
@@ -269,8 +269,8 @@ public class SoloComp implements SoloLinkListener, ControllerLinkListener {
         return controllerLinkManager.getSoloLinkWifiInfo();
     }
 
-    public boolean isEUTxPowerCompliant() {
-        return controllerLinkManager.isEUTxPowerCompliant();
+    public String getTxPowerCompliantCountry() {
+        return controllerLinkManager.getTxPowerCompliantCountry();
     }
 
     public void refreshSoloVersions() {
@@ -367,8 +367,8 @@ public class SoloComp implements SoloLinkListener, ControllerLinkListener {
         controllerLinkManager.updateControllerUnit(selectedUnit, listener);
     }
 
-    public void updateEUTxPowerCompliance(boolean isCompliant, ICommandListener listener) {
-        controllerLinkManager.setEUTxPowerCompliance(isCompliant, listener);
+    public void updateTxPowerComplianceCountry(String compliantCountry, ICommandListener listener) {
+        controllerLinkManager.setTxPowerComplianceCountry(compliantCountry, listener);
     }
 
     protected void postAsyncTask(Runnable task) {

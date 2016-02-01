@@ -11,6 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.common.msg_statustext;
 import com.MAVLink.enums.MAV_TYPE;
 import com.o3dr.android.client.apis.CapabilityApi;
+import com.o3dr.android.client.utils.TxPowerComplianceCountries;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
@@ -137,10 +138,10 @@ public class ArduSolo extends ArduCopter {
             }
 
             @Override
-            public void onEUTxPowerComplianceUpdated(boolean isCompliant) {
+            public void onTxPowerComplianceCountryUpdated(String compliantCountry) {
                 final Bundle eventInfo = new Bundle(1);
-                eventInfo.putBoolean(SoloEventExtras.EXTRA_SOLO_EU_TX_POWER_COMPLIANT, isCompliant);
-                notifyAttributeListener(SoloEvents.SOLO_EU_TX_POWER_COMPLIANCE_UPDATED, eventInfo, true);
+                eventInfo.putString(SoloEventExtras.EXTRA_SOLO_TX_POWER_COMPLIANT_COUNTRY, compliantCountry);
+                notifyAttributeListener(SoloEvents.SOLO_TX_POWER_COMPLIANCE_COUNTRY_UPDATED, eventInfo, true);
             }
 
             @Override
@@ -163,7 +164,7 @@ public class ArduSolo extends ArduCopter {
     }
 
     @Override
-    public void destroy(){
+    public void destroy() {
         super.destroy();
         soloComp.destroy();
     }
@@ -280,9 +281,9 @@ public class ArduSolo extends ArduCopter {
                 Timber.i("Vehicle heartbeat restored.");
                 //Dismiss the countdown to disconnect the solo companion computer.
                 handler.removeCallbacks(disconnectSoloCompTask);
-                if (!soloComp.isConnected())
+                if (!soloComp.isConnected()) {
                     soloComp.start();
-                else {
+                } else {
                     soloComp.refreshState();
                 }
                 break;
@@ -323,9 +324,17 @@ public class ArduSolo extends ArduCopter {
                 SoloApiUtils.updateSoloLinkControllerMode(this, mode, listener);
                 return true;
 
+            //TODO remove this when deprecated methods are deleted in 3.0
             case SoloConfigActions.ACTION_UPDATE_EU_TX_POWER_COMPLIANCE:
-                final boolean isCompliant = data.getBoolean(SoloConfigActions.EXTRA_EU_TX_POWER_COMPLIANT, false);
-                SoloApiUtils.updateSoloLinkEUTxPowerCompliance(this, isCompliant, listener);
+                final boolean isCompliant = data.getBoolean(SoloConfigActions.EXTRA_EU_TX_POWER_COMPLIANT);
+                String compliantCountryCode = isCompliant ? TxPowerComplianceCountries.getDefaultEUCountry().name() :
+                    TxPowerComplianceCountries.getDefaultCountry().name();
+                SoloApiUtils.updateSoloLinkTxPowerComplianceCountry(this, compliantCountryCode, listener);
+                return true;
+
+            case SoloConfigActions.ACTION_UPDATE_TX_POWER_COMPLIANCE_COUNTRY:
+                final String compliantCountry = data.getString(SoloConfigActions.EXTRA_TX_POWER_COMPLIANT_COUNTRY_CODE);
+                SoloApiUtils.updateSoloLinkTxPowerComplianceCountry(this, compliantCountry, listener);
                 return true;
 
             case SoloConfigActions.ACTION_REFRESH_SOLO_VERSIONS:
@@ -343,7 +352,7 @@ public class ArduSolo extends ArduCopter {
     }
 
     @Override
-    protected boolean isFeatureSupported(String featureId){
+    protected boolean isFeatureSupported(String featureId) {
         switch (featureId) {
 
             case CapabilityApi.FeatureIds.SOLO_VIDEO_STREAMING:

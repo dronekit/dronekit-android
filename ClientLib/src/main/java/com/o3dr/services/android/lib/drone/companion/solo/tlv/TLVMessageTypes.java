@@ -42,6 +42,24 @@ public class TLVMessageTypes {
     public static final int TYPE_SOLO_SPLINE_DURATIONS = 56;
     public static final int TYPE_SOLO_SPLINE_ATTACH = 57;
 
+    /*
+    Site scan inspect shot message types
+     */
+    public static final int TYPE_SOLO_INSPECT_START = 10001;
+    public static final int TYPE_SOLO_INSPECT_SET_WAYPOINT = 10002;
+    public static final int TYPE_SOLO_INSPECT_MOVE_GIMBAL = 10003;
+    public static final int TYPE_SOLO_INSPECT_MOVE_VEHICLE = 10004;
+
+    /*
+    Site scan scan shot message types
+     */
+    public static final int TYPE_SOLO_SCAN_START = 10101;
+
+    /*
+    Site scan survey shot message types
+     */
+    public static final int TYPE_SOLO_SURVEY_START = 10201;
+
     //Private constructor to prevent instantiation
     private TLVMessageTypes(){}
 }

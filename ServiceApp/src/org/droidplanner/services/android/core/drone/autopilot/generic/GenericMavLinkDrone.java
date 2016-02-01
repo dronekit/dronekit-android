@@ -278,9 +278,8 @@ public class GenericMavLinkDrone implements MavLinkDrone {
         videoMgr.stopVideoStream(appId, currentVideoTag, listener);
     }
 
-    public void startVideoStream(Bundle videoProps, String appId, String newVideoTag,
-                                 VideoStreamListener listener) {
-        videoMgr.startVideoStream(videoProps, appId, newVideoTag, listener);
+    public void startVideoStream(String appId, String newVideoTag, VideoStreamListener listener) {
+        videoMgr.startVideoStream(appId, newVideoTag, listener);
     }
 
     public void stopVideoStream(String appId, String currentVideoTag, VideoStreamListener listener) {

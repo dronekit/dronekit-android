@@ -1,6 +1,7 @@
 package com.o3dr.android.client.apis;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 
 import com.MAVLink.enums.MAV_MOUNT_MODE;
 import com.o3dr.android.client.Drone;
@@ -72,6 +73,44 @@ public final class GimbalApi extends Api implements DroneListener {
             this.roll = roll;
             this.yaw = yaw;
         }
+
+        private GimbalOrientation(){}
+
+        private GimbalOrientation(GimbalOrientation source){
+            this.pitch = source.pitch;
+            this.roll = source.roll;
+            this.yaw = source.yaw;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof GimbalOrientation)) return false;
+
+            GimbalOrientation that = (GimbalOrientation) o;
+
+            if (Float.compare(that.pitch, pitch) != 0) return false;
+            if (Float.compare(that.roll, roll) != 0) return false;
+            return Float.compare(that.yaw, yaw) == 0;
+
+        }
+
+        @Override
+        public int hashCode() {
+            int result = (pitch != +0.0f ? Float.floatToIntBits(pitch) : 0);
+            result = 31 * result + (roll != +0.0f ? Float.floatToIntBits(roll) : 0);
+            result = 31 * result + (yaw != +0.0f ? Float.floatToIntBits(yaw) : 0);
+            return result;
+        }
+
+        @Override
+        public String toString() {
+            return "GimbalOrientation{" +
+                    "pitch=" + pitch +
+                    ", roll=" + roll +
+                    ", yaw=" + yaw +
+                    '}';
+        }
     }
 
     private final ConcurrentLinkedQueue<GimbalOrientationListener> gimbalListeners = new ConcurrentLinkedQueue<>();
@@ -85,7 +124,7 @@ public final class GimbalApi extends Api implements DroneListener {
     }
 
     public GimbalOrientation getGimbalOrientation(){
-        return gimbalOrientation;
+        return new GimbalOrientation(gimbalOrientation);
     }
 
     /**
@@ -116,14 +155,14 @@ public final class GimbalApi extends Api implements DroneListener {
     private void configureGimbalMountMode(final GimbalOrientationListener listener){
         Bundle params = new Bundle(1);
         params.putInt(GIMBAL_MOUNT_MODE, MAV_MOUNT_MODE.MAV_MOUNT_MODE_MAVLINK_TARGETING);
-        drone.performAsyncActionOnDroneThread(new Action(ACTION_SET_GIMBAL_MOUNT_MODE, params), new SimpleCommandListener(){
-           @Override
-            public void onTimeout(){
-               listener.onGimbalOrientationCommandError(CommandExecutionError.COMMAND_FAILED);
-           }
+        drone.performAsyncActionOnDroneThread(new Action(ACTION_SET_GIMBAL_MOUNT_MODE, params), new SimpleCommandListener() {
+            @Override
+            public void onTimeout() {
+                listener.onGimbalOrientationCommandError(CommandExecutionError.COMMAND_FAILED);
+            }
 
             @Override
-            public void onError(int error){
+            public void onError(int error) {
                 listener.onGimbalOrientationCommandError(error);
             }
         });
@@ -132,8 +171,9 @@ public final class GimbalApi extends Api implements DroneListener {
     /**
      * Disables control of the gimbal. After calling this method, no call to {@link GimbalApi#updateGimbalOrientation(float, float, float, GimbalOrientationListener)}
      * will be allowed.
-     * @since 2.5.0
      * @param listener non-null GimbalStatusListener callback.
+     *
+     * @since 2.5.0
      */
     public void stopGimbalControl(final GimbalOrientationListener listener){
         if(listener == null)
@@ -168,14 +208,25 @@ public final class GimbalApi extends Api implements DroneListener {
     }
 
     /**
+     * Set the orientation of the gimbal
+     * @param orientation Desired orientation values.
+     * @param listener Register a callback to receive update of the command execution state. Must be non-null.
+     * @since 2.8.0
+     */
+    public void updateGimbalOrientation(GimbalOrientation orientation, @NonNull final GimbalOrientationListener listener) {
+        updateGimbalOrientation(orientation.pitch, orientation.roll, orientation.yaw, listener);
+    }
+
+    /**
      * Set the orientation of a gimbal
      *
      * @param pitch       the desired gimbal pitch in degrees. 0 is straight forwards, -90 is straight down
      * @param roll       the desired gimbal roll in degrees
      * @param yaw       the desired gimbal yaw in degrees
      * @param listener Register a callback to receive update of the command execution state. Must be non-null.
+     * @since 2.5.0
      */
-    public void updateGimbalOrientation(float pitch, float roll, float yaw, final GimbalOrientationListener listener){
+    public void updateGimbalOrientation(float pitch, float roll, float yaw, @NonNull final GimbalOrientationListener listener){
         if(listener == null)
             throw new NullPointerException("Listener must be non-null.");
 
