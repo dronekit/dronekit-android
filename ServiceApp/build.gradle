@@ -134,6 +134,7 @@ android {
             switch (buildTypeName) {
                 case "release":
                     switch (flavorName) {
+                        case "alpha":
                         case "prod":
                             ignoreVariant = false
                             break
