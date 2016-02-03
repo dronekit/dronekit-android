@@ -13,9 +13,7 @@ import com.o3dr.android.client.utils.connection.IpConnectionListener;
 import com.o3dr.android.client.utils.connection.UdpConnection;
 import com.o3dr.services.android.lib.drone.action.CameraActions;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
-import com.o3dr.services.android.lib.model.AbstractCommandListener;
 import com.o3dr.services.android.lib.model.ICommandListener;
-import com.o3dr.services.android.lib.model.VideoStreamListener;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -295,9 +293,9 @@ public class VideoManager implements IpConnectionListener {
     }
 
     public void startVideoStream(Bundle videoProps, String appId, String newVideoTag, Surface videoSurface,
-                                 final AbstractCommandListener listener) {
+                                 final ICommandListener listener) {
         Timber.d("Video stream start request from %s. Video owner is %s.", appId, videoOwnerId.get());
-        if (TextUtils.isEmpty(appId)){
+        if (TextUtils.isEmpty(appId)) {
             postErrorEvent(CommandExecutionError.COMMAND_DENIED, listener);
             return;
         }
@@ -313,11 +311,11 @@ public class VideoManager implements IpConnectionListener {
 
         if (appId.equals(videoOwnerId.get())) {
             String currentVideoTag = videoTagRef.get();
-            if(currentVideoTag == null)
+            if (currentVideoTag == null)
                 currentVideoTag = "";
 
-            if(newVideoTag.equals(currentVideoTag)){
-                //Check if the local recording state needs to be updated.
+            if (newVideoTag.equals(currentVideoTag)){
+                // Check if the local recording state needs to be updated.
                 checkForLocalRecording(appId, videoProps);
 
                 postSuccessEvent(listener);
@@ -358,9 +356,12 @@ public class VideoManager implements IpConnectionListener {
         }
     }
 
-    public void startVideoStream(String appId, String newVideoTag, final VideoStreamListener listener) {
-        Timber.d("Video stream start request from %s. Video owner is %s.", appId, videoOwnerId.get());
-        if (TextUtils.isEmpty(appId)){
+    public void startVideoStreamForObserver(String appId, String newVideoTag,
+                                            final ICommandListener listener) {
+        Timber.d("Video stream start request from %s. Video owner is %s.", appId,
+            videoOwnerId.get());
+
+        if (TextUtils.isEmpty(appId)) {
             postErrorEvent(CommandExecutionError.COMMAND_DENIED, listener);
             return;
         }
@@ -381,16 +382,18 @@ public class VideoManager implements IpConnectionListener {
 
         if (videoOwnerId.compareAndSet(NO_VIDEO_OWNER, appId)) {
             videoTagRef.set(newVideoTag);
-            Timber.i("Successful lock obtained. Start using video observer...");
+            Timber.i("Successful lock obtained for app with id %s.", appId);
+
             videoStreamObserverUsed = true;
 
-            listener.onVideoStarted();
+            postSuccessEvent(listener);
         } else {
             postErrorEvent(CommandExecutionError.COMMAND_DENIED, listener);
         }
     }
 
-    public void stopVideoStream(String appId, String currentVideoTag, final AbstractCommandListener listener) {
+    public void stopVideoStream(String appId, String currentVideoTag,
+                                final ICommandListener listener) {
         Timber.d("Video stream stop request from %s. Video owner is %s.", appId, videoOwnerId.get());
         if (TextUtils.isEmpty(appId)) {
             Timber.w("Owner id is empty.");
@@ -440,8 +443,10 @@ public class VideoManager implements IpConnectionListener {
         }
     }
 
-    public void stopVideoStream(String appId, String currentVideoTag, final VideoStreamListener listener) {
+    public void stopVideoStreamForObserver(String appId, String currentVideoTag,
+                                           final ICommandListener listener) {
         Timber.d("Video stream stop request from %s. Video owner is %s.", appId, videoOwnerId.get());
+
         if (TextUtils.isEmpty(appId)) {
             Timber.w("Owner id is empty.");
             postErrorEvent(CommandExecutionError.COMMAND_DENIED, listener);
@@ -466,9 +471,10 @@ public class VideoManager implements IpConnectionListener {
             Timber.d("Stopping video decoding. Current owner is %s.", currentVideoOwner);
 
             Timber.i("Stop using video observer...");
+
             videoStreamObserverUsed = false;
 
-            listener.onVideoStopped();
+            postSuccessEvent(listener);
         }
         else {
             postErrorEvent(CommandExecutionError.COMMAND_DENIED, listener);

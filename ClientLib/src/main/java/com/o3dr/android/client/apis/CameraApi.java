@@ -7,7 +7,6 @@ import android.view.Surface;
 import com.o3dr.android.client.Drone;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.model.AbstractCommandListener;
-import com.o3dr.services.android.lib.model.VideoStreamListener;
 import com.o3dr.services.android.lib.model.action.Action;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -15,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import static com.o3dr.services.android.lib.drone.action.CameraActions.ACTION_START_VIDEO_STREAM;
 import static com.o3dr.services.android.lib.drone.action.CameraActions.ACTION_STOP_VIDEO_STREAM;
 import static com.o3dr.services.android.lib.drone.action.CameraActions.ACTION_START_VIDEO_STREAM_FOR_OBSERVER;
+import static com.o3dr.services.android.lib.drone.action.CameraActions.ACTION_STOP_VIDEO_STREAM_FOR_OBSERVER;
 import static com.o3dr.services.android.lib.drone.action.CameraActions.EXTRA_VIDEO_DISPLAY;
 import static com.o3dr.services.android.lib.drone.action.CameraActions.EXTRA_VIDEO_ENABLE_LOCAL_RECORDING;
 import static com.o3dr.services.android.lib.drone.action.CameraActions.EXTRA_VIDEO_LOCAL_RECORDING_FILENAME;
@@ -116,7 +116,7 @@ public class CameraApi extends Api {
      * @param listener  Register a callback to receive update of the command execution status.
      * @since 2.6.8
      */
-    public void startVideoStream(final String tag, final VideoStreamListener listener) {
+    public void startVideoStreamForObserver(final String tag, final AbstractCommandListener listener) {
         final Bundle params = new Bundle();
         params.putString(EXTRA_VIDEO_TAG, tag);
 
@@ -131,10 +131,11 @@ public class CameraApi extends Api {
      * @param listener Register a callback to receive update of the command execution status.
      * @since 2.6.8
      */
-    public void stopVideoStream(final String tag, final VideoStreamListener listener) {
+    public void stopVideoStreamForObserver(final String tag, final AbstractCommandListener listener) {
         final Bundle params = new Bundle();
         params.putString(EXTRA_VIDEO_TAG, tag);
 
-        drone.performAsyncActionOnDroneThread(new Action(ACTION_STOP_VIDEO_STREAM, params), listener);
+        drone.performAsyncActionOnDroneThread(new Action(ACTION_STOP_VIDEO_STREAM_FOR_OBSERVER, params),
+            listener);
     }
 }

@@ -146,11 +146,6 @@ public class SoloCameraApi extends SoloApi {
         });
     }
 
-    public void startVideoStream(final Surface surface, final String tag,
-                                 final AbstractCommandListener listener) {
-        startVideoStream(surface, tag, false, listener);
-    }
-
     /**
      * Attempt to grab ownership and start the video stream from the connected drone. Can fail if
      * the video stream is already owned by another client.
@@ -170,59 +165,35 @@ public class SoloCameraApi extends SoloApi {
         }
 
         capabilityChecker.checkFeatureSupport(CapabilityApi.FeatureIds.SOLO_VIDEO_STREAMING,
-                new CapabilityApi.FeatureSupportListener() {
-                    @Override
-                    public void onFeatureSupportResult(String featureId, int result, Bundle resultInfo) {
-                        switch (result) {
+            new CapabilityApi.FeatureSupportListener() {
+                @Override
+                public void onFeatureSupportResult(String featureId, int result, Bundle resultInfo) {
+                    switch (result) {
 
-                            case CapabilityApi.FEATURE_SUPPORTED:
-                                final Bundle videoProps = new Bundle();
-                                videoProps.putInt(CameraApi.VIDEO_PROPS_UDP_PORT, SOLO_STREAM_UDP_PORT);
+                        case CapabilityApi.FEATURE_SUPPORTED:
+                            final Bundle videoProps = new Bundle();
+                            videoProps.putInt(CameraApi.VIDEO_PROPS_UDP_PORT, SOLO_STREAM_UDP_PORT);
 
-                                videoProps.putBoolean(CameraApi.VIDEO_ENABLE_LOCAL_RECORDING, enableLocalRecording);
-                                if(enableLocalRecording){
-                                    String localRecordingFilename = "solo_stream_" + FILE_DATE_FORMAT.format(new Date());
-                                    videoProps.putString(CameraApi.VIDEO_LOCAL_RECORDING_FILENAME, localRecordingFilename);
-                                }
+                            videoProps.putBoolean(CameraApi.VIDEO_ENABLE_LOCAL_RECORDING, enableLocalRecording);
+                            if (enableLocalRecording) {
+                                String localRecordingFilename = "solo_stream_" + FILE_DATE_FORMAT.format(new Date());
+                                videoProps.putString(CameraApi.VIDEO_LOCAL_RECORDING_FILENAME, localRecordingFilename);
+                            }
 
-                                cameraApi.startVideoStream(surface, tag, videoProps, listener);
-                                break;
+                            cameraApi.startVideoStream(surface, tag, videoProps, listener);
+                            break;
 
-                            case CapabilityApi.FEATURE_UNSUPPORTED:
-                                postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
-                                break;
+                        case CapabilityApi.FEATURE_UNSUPPORTED:
+                            postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
+                            break;
 
-                            default:
-                                postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
-                                break;
-                        }
+                        default:
+                            postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
+                            break;
                     }
-                });
+                }
+            });
 
-    }
-
-    /**
-     * Attempt to grab ownership and start the video stream from the connected drone. Can fail if
-     * the video stream is already owned by another client.
-     *
-     * @param surface  Surface object onto which the video is decoded.
-     * @param listener Register a callback to receive update of the command execution status.
-     *
-     * @since 2.5.0
-     */
-    public void startVideoStream(final Surface surface, final AbstractCommandListener listener) {
-        startVideoStream(surface, "", listener);
-    }
-
-    /**
-     * Stop the video stream from the connected drone, and release ownership.
-     *
-     * @param listener Register a callback to receive update of the command execution status.
-     *
-     * @since 2.5.0
-     */
-    public void stopVideoStream(final AbstractCommandListener listener) {
-        stopVideoStream("", listener);
     }
 
     /**
@@ -235,25 +206,25 @@ public class SoloCameraApi extends SoloApi {
      */
     public void stopVideoStream(final String tag, final AbstractCommandListener listener) {
         capabilityChecker.checkFeatureSupport(CapabilityApi.FeatureIds.SOLO_VIDEO_STREAMING,
-                new CapabilityApi.FeatureSupportListener() {
-                    @Override
-                    public void onFeatureSupportResult(String featureId, int result, Bundle resultInfo) {
-                        switch (result) {
+            new CapabilityApi.FeatureSupportListener() {
+                @Override
+                public void onFeatureSupportResult(String featureId, int result, Bundle resultInfo) {
+                    switch (result) {
 
-                            case CapabilityApi.FEATURE_SUPPORTED:
-                                cameraApi.stopVideoStream(tag, listener);
-                                break;
+                        case CapabilityApi.FEATURE_SUPPORTED:
+                            cameraApi.stopVideoStream(tag, listener);
+                            break;
 
-                            case CapabilityApi.FEATURE_UNSUPPORTED:
-                                postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
-                                break;
+                        case CapabilityApi.FEATURE_UNSUPPORTED:
+                            postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
+                            break;
 
-                            default:
-                                postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
-                                break;
-                        }
+                        default:
+                            postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
+                            break;
                     }
-                });
+                }
+            });
     }
 
     /**

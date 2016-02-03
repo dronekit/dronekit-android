@@ -7,7 +7,6 @@ import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
 import com.o3dr.services.android.lib.model.AbstractCommandListener;
-import com.o3dr.services.android.lib.model.VideoStreamListener;
 import com.o3dr.services.android.lib.model.action.Action;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -164,14 +163,14 @@ public class ExperimentalApi extends Api {
      *
      * @since 2.5.0
      */
-    public void startVideoStream(final String tag, final VideoStreamListener listener) {
+    public void startVideoStream(final String tag, final AbstractCommandListener listener) {
         capabilityChecker.checkFeatureSupport(CapabilityApi.FeatureIds.SOLO_VIDEO_STREAMING,
             new CapabilityApi.FeatureSupportListener() {
                 @Override
                 public void onFeatureSupportResult(String featureId, int result, Bundle resultInfo) {
                     switch (result) {
                         case CapabilityApi.FEATURE_SUPPORTED:
-                            cameraApi.startVideoStream(tag, listener);
+                            cameraApi.startVideoStreamForObserver(tag, listener);
                             break;
 
                         case CapabilityApi.FEATURE_UNSUPPORTED:
@@ -194,14 +193,14 @@ public class ExperimentalApi extends Api {
      *
      * @since 2.5.0
      */
-    public void stopVideoStream(final String tag, final VideoStreamListener listener) {
+    public void stopVideoStream(final String tag, final AbstractCommandListener listener) {
         capabilityChecker.checkFeatureSupport(CapabilityApi.FeatureIds.SOLO_VIDEO_STREAMING,
             new CapabilityApi.FeatureSupportListener() {
                 @Override
                 public void onFeatureSupportResult(String featureId, int result, Bundle resultInfo) {
                     switch (result) {
                         case CapabilityApi.FEATURE_SUPPORTED:
-                            cameraApi.stopVideoStream(tag, listener);
+                            cameraApi.stopVideoStreamForObserver(tag, listener);
                             break;
 
                         case CapabilityApi.FEATURE_UNSUPPORTED:

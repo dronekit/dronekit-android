@@ -23,11 +23,6 @@ public class VideoStreamObserver implements IpConnectionListener {
 
     private IVideoStreamCallback callback;
 
-    // Video stream properties
-    private String aspectRatio;
-    private int framerate;  // In Hz.
-    private String cameraType;
-
     public VideoStreamObserver(Handler handler, IVideoStreamCallback callback) {
         this.handler = handler;
         this.callback = callback;
@@ -86,29 +81,5 @@ public class VideoStreamObserver implements IpConnectionListener {
     @Override
     public void onPacketReceived(ByteBuffer packetBuffer) {
         callback.onVideoStreamPacketRecieved(packetBuffer.array(), packetBuffer.limit());
-    }
-
-    public String getAspectRatio() {
-        return aspectRatio;
-    }
-
-    public void setAspectRatio(String aspectRatio) {
-        this.aspectRatio = aspectRatio;
-    }
-
-    public int getFramerate() {
-        return framerate;
-    }
-
-    public void setFramerate(int framerate) {
-        this.framerate = framerate;
-    }
-
-    public String getCameraType() {
-        return cameraType;
-    }
-
-    public void setCameraType(String cameraType) {
-        this.cameraType = cameraType;
     }
 }
