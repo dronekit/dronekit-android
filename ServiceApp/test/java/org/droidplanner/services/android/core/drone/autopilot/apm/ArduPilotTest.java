@@ -38,5 +38,10 @@ public class ArduPilotTest extends TestCase {
         assertEquals(3, version.getMajorVersion());
         assertEquals(3, version.getMinorVersion());
         assertEquals(0, version.getPatchVersion());
+
+        version = ArduPilot.extractVersionNumber("Invalid Version");
+        assertEquals(0, version.getMajorVersion());
+        assertEquals(0, version.getMinorVersion());
+        assertEquals(0, version.getPatchVersion());
     }
 }
