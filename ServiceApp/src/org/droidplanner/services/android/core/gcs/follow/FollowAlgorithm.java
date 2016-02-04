@@ -2,6 +2,9 @@ package org.droidplanner.services.android.core.gcs.follow;
 
 import android.os.Handler;
 
+import com.o3dr.services.android.lib.drone.action.ControlActions;
+import com.o3dr.services.android.lib.model.action.Action;
+
 import org.droidplanner.services.android.core.drone.manager.MavLinkDroneManager;
 import org.droidplanner.services.android.core.drone.variables.GuidedPoint;
 import org.droidplanner.services.android.core.gcs.location.Location;
@@ -36,13 +39,13 @@ public abstract class FollowAlgorithm {
     }
 
     public void disableFollow() {
-        if(isFollowEnabled.compareAndSet(true, false)) {
+        if (isFollowEnabled.compareAndSet(true, false)) {
             final MavLinkDrone drone = droneMgr.getDrone();
             if (GuidedPoint.isGuidedMode(drone)) {
-                drone.getGuidedPoint().pauseAtCurrentLocation(null);
+                droneMgr.getDrone().executeAsyncAction(new Action(ControlActions.ACTION_SEND_BRAKE_VEHICLE), null);
             }
 
-            if(roiEstimator != null)
+            if (roiEstimator != null)
                 roiEstimator.disableFollow();
         }
     }

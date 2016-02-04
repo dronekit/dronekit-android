@@ -18,6 +18,7 @@ import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_S
 import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_SET_CONDITION_YAW;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_SET_GUIDED_ALTITUDE;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_SET_VELOCITY;
+import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_SEND_BRAKE_VEHICLE;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_ALTITUDE;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_DO_ENABLE;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_FORCE_GUIDED_POINT;
@@ -80,12 +81,8 @@ public class ControlApi extends Api {
      * @param listener Register a callback to receive update of the command execution state.
      */
     public void pauseAtCurrentLocation(final AbstractCommandListener listener) {
-        drone.getAttributeAsync(AttributeType.GPS, new Drone.AttributeRetrievedListener<Gps>() {
-            @Override
-            public void onRetrievalSucceed(Gps gps) {
-                goTo(gps.getPosition(), true, listener);
-            }
-        });
+        Bundle params = new Bundle();
+        drone.performAsyncActionOnDroneThread(new Action(ACTION_SEND_BRAKE_VEHICLE, params), listener);
     }
 
     /**

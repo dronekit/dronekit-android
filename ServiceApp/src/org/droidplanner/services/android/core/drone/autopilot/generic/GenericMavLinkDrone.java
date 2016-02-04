@@ -21,6 +21,7 @@ import com.MAVLink.common.msg_sys_status;
 import com.MAVLink.common.msg_vibration;
 import com.MAVLink.enums.MAV_MODE_FLAG;
 import com.MAVLink.enums.MAV_STATE;
+import com.github.zafarkhaja.semver.Version;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.action.CapabilityActions;
@@ -344,20 +345,23 @@ public class GenericMavLinkDrone implements MavLinkDrone {
                 MavLinkCommands.changeMissionSpeed(this, missionSpeed, listener);
                 return true;
 
-            //STATE ACTIONS
+            // STATE ACTIONS
             case StateActions.ACTION_ARM:
                 return performArming(data, listener);
 
             case StateActions.ACTION_SET_VEHICLE_MODE:
                 return setVehicleMode(data, listener);
 
-            //CONTROL ACTIONS
+            // CONTROL ACTIONS
             case ControlActions.ACTION_DO_GUIDED_TAKEOFF:
                 return performTakeoff(data, listener);
 
+            case ControlActions.ACTION_SEND_BRAKE_VEHICLE:
+                return brakeVehicle(listener);
+
             case ControlActions.ACTION_SET_CONDITION_YAW:
-                //Retrieve the yaw turn speed.
-                float turnSpeed = 2; //default turn speed.
+                // Retrieve the yaw turn speed.
+                float turnSpeed = 2; // Default turn speed.
 
                 ParameterManager parameterManager = getParameterManager();
                 if (parameterManager != null) {
@@ -381,14 +385,14 @@ public class GenericMavLinkDrone implements MavLinkDrone {
             case ControlActions.ACTION_ENABLE_MANUAL_CONTROL:
                 return enableManualControl(data, listener);
 
-            //EXPERIMENTAL ACTIONS
+            // EXPERIMENTAL ACTIONS
             case ExperimentalActions.ACTION_SEND_MAVLINK_MESSAGE:
                 data.setClassLoader(MavlinkMessageWrapper.class.getClassLoader());
                 MavlinkMessageWrapper messageWrapper = data.getParcelable(ExperimentalActions.EXTRA_MAVLINK_MESSAGE);
                 CommonApiUtils.sendMavlinkMessage(this, messageWrapper);
                 return true;
 
-            //INTERNAL DRONE ACTIONS
+            // INTERNAL DRONE ACTIONS
             case ACTION_REQUEST_HOME_UPDATE:
                 requestHomeUpdate();
                 return true;
@@ -490,6 +494,11 @@ public class GenericMavLinkDrone implements MavLinkDrone {
         return true;
     }
 
+    protected boolean brakeVehicle(ICommandListener listener) {
+        getGuidedPoint().pauseAtCurrentLocation(listener);
+        return true;
+    }
+
     @Override
     public DroneAttribute getAttribute(String attributeType) {
         if (TextUtils.isEmpty(attributeType))
@@ -568,7 +577,7 @@ public class GenericMavLinkDrone implements MavLinkDrone {
 
             //*************** EKF State handling ******************//
             case msg_ekf_status_report.MAVLINK_MSG_ID_EKF_STATUS_REPORT:
-                state.setEkfStatus((msg_ekf_status_report) message);
+                processEfkStatus((msg_ekf_status_report) message);
                 break;
 
             case msg_sys_status.MAVLINK_MSG_ID_SYS_STATUS:
@@ -605,7 +614,7 @@ public class GenericMavLinkDrone implements MavLinkDrone {
 
     protected void processSysStatus(msg_sys_status m_sys) {
         processBatteryUpdate(m_sys.voltage_battery / 1000.0, m_sys.battery_remaining,
-                m_sys.current_battery / 100.0);
+            m_sys.current_battery / 100.0);
     }
 
     private void processHeartbeat(msg_heartbeat msg_heart) {
@@ -810,13 +819,22 @@ public class GenericMavLinkDrone implements MavLinkDrone {
         }
     }
 
+    private void processEfkStatus(msg_ekf_status_report ekf_status_report) {
+        state.setEkfStatus(ekf_status_report);
+
+        vehicleGps.setVehicleArmed(state.isArmed());
+        vehicleGps.setEkfStatus(CommonApiUtils.generateEkfStatus(ekf_status_report));
+
+        notifyAttributeListener(AttributeEvent.GPS_POSITION);
+    }
+
     private void processGpsState(msg_gps_raw_int gpsState) {
         if (gpsState == null)
             return;
 
         double newEph = gpsState.eph / 100.0; // convert from eph(cm) to gps_eph(m)
         if (vehicleGps.getSatellitesCount() != gpsState.satellites_visible
-                || vehicleGps.getGpsEph() != newEph) {
+            || vehicleGps.getGpsEph() != newEph) {
             vehicleGps.setSatCount(gpsState.satellites_visible);
             vehicleGps.setGpsEph(newEph);
             notifyAttributeListener(AttributeEvent.GPS_COUNT);
