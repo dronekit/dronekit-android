@@ -107,35 +107,4 @@ public class CameraApi extends Api {
         params.putString(EXTRA_VIDEO_TAG, tag);
         drone.performAsyncActionOnDroneThread(new Action(ACTION_STOP_VIDEO_STREAM, params), listener);
     }
-
-    /**
-     * Attempt to grab ownership and start the video stream from the connected drone. Can fail if
-     * the video stream is already owned by another client.
-     *
-     * @param tag       Video tag.
-     * @param listener  Register a callback to receive update of the command execution status.
-     * @since 2.6.8
-     */
-    public void startVideoStreamForObserver(final String tag, final AbstractCommandListener listener) {
-        final Bundle params = new Bundle();
-        params.putString(EXTRA_VIDEO_TAG, tag);
-
-        drone.performAsyncActionOnDroneThread(new Action(ACTION_START_VIDEO_STREAM_FOR_OBSERVER,
-            params), listener);
-    }
-
-    /**
-     * Stop the video stream from the connected drone, and release ownership.
-     *
-     * @param tag      Video tag.
-     * @param listener Register a callback to receive update of the command execution status.
-     * @since 2.6.8
-     */
-    public void stopVideoStreamForObserver(final String tag, final AbstractCommandListener listener) {
-        final Bundle params = new Bundle();
-        params.putString(EXTRA_VIDEO_TAG, tag);
-
-        drone.performAsyncActionOnDroneThread(new Action(ACTION_STOP_VIDEO_STREAM_FOR_OBSERVER, params),
-            listener);
-    }
 }

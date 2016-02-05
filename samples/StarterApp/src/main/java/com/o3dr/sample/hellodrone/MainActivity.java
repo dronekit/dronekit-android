@@ -19,8 +19,6 @@ import android.widget.Toast;
 
 import com.o3dr.android.client.ControlTower;
 import com.o3dr.android.client.Drone;
-import com.o3dr.android.client.IVideoStreamCallback;
-import com.o3dr.android.client.VideoStreamObserver;
 import com.o3dr.android.client.apis.ControlApi;
 import com.o3dr.android.client.apis.ExperimentalApi;
 import com.o3dr.android.client.apis.solo.SoloCameraApi;
@@ -51,6 +49,8 @@ import com.o3dr.services.android.lib.model.SimpleCommandListener;
 import java.io.IOException;
 import java.util.List;
 
+import static com.o3dr.android.client.apis.ExperimentalApi.*;
+
 public class MainActivity extends AppCompatActivity implements DroneListener, TowerListener {
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
     private Button startVideoStreamUsingObserver;
     private Button stopVideoStreamUsingObserver;
 
-    private VideoStreamObserver videoStreamObserver;
+    private ExperimentalApi.VideoStreamObserver videoStreamObserver;
     private MediaCodecManager mediaCodecManager;
 
     private TextureView videoView;
@@ -190,7 +190,8 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
         HandlerThread videoHandlerThread = new HandlerThread("VideoHandlerThread");
         videoHandlerThread.start();
         Handler videoHandler = new Handler(videoHandlerThread.getLooper());
-        videoStreamObserver = new VideoStreamObserver(videoHandler, new IVideoStreamCallback() {
+        videoStreamObserver = new ExperimentalApi.VideoStreamObserver(videoHandler,
+            new ExperimentalApi.IVideoStreamCallback() {
             @Override
             public void onVideoStreamPacketRecieved(byte[] data, int dataSize) {
                 mediaCodecManager.onInputDataReceived(data, dataSize);
@@ -591,7 +592,7 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
     };
 
     private void startVideoStreamForObserver() {
-        ExperimentalApi.getApi(drone).startVideoStream("", new AbstractCommandListener() {
+        getApi(drone).startVideoStreamForObserver("", new AbstractCommandListener() {
             @Override
             public void onSuccess() {
                 alertUser("Successfully obtained lock for drone video stream. ");
@@ -675,7 +676,7 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
     }
 
     private void stopVideoStreamForObserver() {
-        ExperimentalApi.getApi(drone).stopVideoStream("", new AbstractCommandListener() {
+        getApi(drone).stopVideoStreamForObserver("", new AbstractCommandListener() {
             @Override
             public void onSuccess() {
                 if (stopVideoStreamUsingObserver != null)

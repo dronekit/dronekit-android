@@ -121,7 +121,7 @@ public class SoloCameraApi extends SoloApi {
 
     private void sendVideoRecordingCommand(@SoloGoproConstants.RecordCommand final int recordCommand,
                                            final AbstractCommandListener listener) {
-        // Set the gopro to video mode.
+        //Set the gopro to video mode
         switchCameraCaptureMode(SoloGoproConstants.CAPTURE_MODE_VIDEO, new AbstractCommandListener() {
             @Override
             public void onSuccess() {
@@ -146,14 +146,19 @@ public class SoloCameraApi extends SoloApi {
         });
     }
 
+    public void startVideoStream(final Surface surface, final String tag,
+                                 final AbstractCommandListener listener) {
+        startVideoStream(surface, tag, false, listener);
+    }
+
     /**
      * Attempt to grab ownership and start the video stream from the connected drone. Can fail if
      * the video stream is already owned by another client.
      *
-     * @param surface               Surface object onto which the video is decoded.
-     * @param tag                   Video tag.
+     * @param surface  Surface object onto which the video is decoded.
+     * @param tag      Video tag.
      * @param enableLocalRecording  Set to true to enable local recording, false to disable it.
-     * @param listener              Register a callback to receive update of the command execution status.
+     * @param listener Register a callback to receive update of the command execution status.
      *
      * @since 2.5.0
      */
@@ -175,7 +180,7 @@ public class SoloCameraApi extends SoloApi {
                             videoProps.putInt(CameraApi.VIDEO_PROPS_UDP_PORT, SOLO_STREAM_UDP_PORT);
 
                             videoProps.putBoolean(CameraApi.VIDEO_ENABLE_LOCAL_RECORDING, enableLocalRecording);
-                            if (enableLocalRecording) {
+                            if(enableLocalRecording){
                                 String localRecordingFilename = "solo_stream_" + FILE_DATE_FORMAT.format(new Date());
                                 videoProps.putString(CameraApi.VIDEO_LOCAL_RECORDING_FILENAME, localRecordingFilename);
                             }
@@ -193,7 +198,30 @@ public class SoloCameraApi extends SoloApi {
                     }
                 }
             });
+    }
 
+    /**
+     * Attempt to grab ownership and start the video stream from the connected drone. Can fail if
+     * the video stream is already owned by another client.
+     *
+     * @param surface  Surface object onto which the video is decoded.
+     * @param listener Register a callback to receive update of the command execution status.
+     *
+     * @since 2.5.0
+     */
+    public void startVideoStream(final Surface surface, final AbstractCommandListener listener) {
+        startVideoStream(surface, "", listener);
+    }
+
+    /**
+     * Stop the video stream from the connected drone, and release ownership.
+     *
+     * @param listener Register a callback to receive update of the command execution status.
+     *
+     * @since 2.5.0
+     */
+    public void stopVideoStream(final AbstractCommandListener listener) {
+        stopVideoStream("", listener);
     }
 
     /**
@@ -247,12 +275,11 @@ public class SoloCameraApi extends SoloApi {
     private void sendExtendedRequest(AbstractCommandListener listener, int command, byte value1,
                                      byte value2, byte value3, byte value4){
         byte[] values = {value1, value2, value3, value4};
-        SoloGoproSetExtendedRequest extendedRequest =
-            new SoloGoproSetExtendedRequest((short) command, values);
+        SoloGoproSetExtendedRequest extendedRequest = new SoloGoproSetExtendedRequest((short) command, values);
         sendMessage(extendedRequest, listener);
     }
 
-    private void sendExtendedRequest(AbstractCommandListener listener, int command, byte value){
+    private void sendExtendedRequest(AbstractCommandListener listener, int command, byte value) {
         sendExtendedRequest(listener, command, value, (byte) 0, (byte) 0, (byte) 0);
     }
 
@@ -266,8 +293,8 @@ public class SoloCameraApi extends SoloApi {
      */
     public void updateVideoSettings(byte resolution, byte frameRate, byte fieldOfView, byte flags,
                                     AbstractCommandListener listener){
-        sendExtendedRequest(listener, GOPRO_COMMAND.GOPRO_COMMAND_VIDEO_SETTINGS, resolution,
-            frameRate, fieldOfView, flags);
+        sendExtendedRequest(listener, GOPRO_COMMAND.GOPRO_COMMAND_VIDEO_SETTINGS, resolution, frameRate,
+            fieldOfView, flags);
     }
 
     public void setCameraPhotoResolution(byte photoResolution, AbstractCommandListener listener){

@@ -101,10 +101,6 @@ public class MediaCodecManager {
         this.naluChunkAssembler = new NALUChunkAssembler();
     }
 
-    Surface getSurface(){
-        return surfaceRef.get();
-    }
-
     public void startDecoding(Surface surface, DecoderListener listener) throws IOException {
         if (surface == null)
             throw new IllegalStateException("Surface argument must be non-null.");
@@ -115,7 +111,8 @@ public class MediaCodecManager {
 
             this.decoderListenerRef.set(listener);
 
-            final MediaFormat mediaFormat = MediaFormat.createVideoFormat(MIME_TYPE, DEFAULT_VIDEO_WIDTH, DEFAULT_VIDEO_HEIGHT);
+            final MediaFormat mediaFormat = MediaFormat.createVideoFormat(MIME_TYPE, DEFAULT_VIDEO_WIDTH,
+                DEFAULT_VIDEO_HEIGHT);
 
             final MediaCodec mediaCodec = MediaCodec.createDecoderByType(MIME_TYPE);
             mediaCodec.configure(mediaFormat, surface, null, 0);
@@ -134,7 +131,7 @@ public class MediaCodecManager {
         Log.i(TAG, "Stopping input data processing...");
 
         this.decoderListenerRef.set(listener);
-        if(!isDecoding.get()) {
+        if (!isDecoding.get()) {
             if (listener != null) {
                     notifyDecodingEnded();
             }
@@ -145,7 +142,7 @@ public class MediaCodecManager {
                     sendCompletionFlag.set(!processNALUChunk(naluChunkAssembler.getEndOfStream()));
                 }
             }
-            else{
+            else {
                 handler.post(stopSafely);
             }
         }

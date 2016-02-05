@@ -1,16 +1,24 @@
 package com.o3dr.android.client.apis;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
 
 import com.o3dr.android.client.Drone;
+import com.o3dr.android.client.utils.connection.IpConnectionListener;
+import com.o3dr.android.client.utils.connection.UdpConnection;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
 import com.o3dr.services.android.lib.model.AbstractCommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
 
+import java.nio.ByteBuffer;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static com.o3dr.services.android.lib.drone.action.CameraActions.ACTION_START_VIDEO_STREAM_FOR_OBSERVER;
+import static com.o3dr.services.android.lib.drone.action.CameraActions.ACTION_STOP_VIDEO_STREAM_FOR_OBSERVER;
+import static com.o3dr.services.android.lib.drone.action.CameraActions.EXTRA_VIDEO_TAG;
 import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.ACTION_SEND_MAVLINK_MESSAGE;
 import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.ACTION_SET_RELAY;
 import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.ACTION_SET_ROI;
@@ -36,7 +44,6 @@ public class ExperimentalApi extends Api {
     };
 
     private final CapabilityApi capabilityChecker;
-    private final CameraApi cameraApi;
 
     /**
      * Retrieves an ExperimentalApi instance.
@@ -53,7 +60,6 @@ public class ExperimentalApi extends Api {
     private ExperimentalApi(Drone drone) {
         this.drone = drone;
         this.capabilityChecker = CapabilityApi.getApi(drone);
-        this.cameraApi = CameraApi.getApi(drone);
     }
 
     /**
@@ -170,7 +176,7 @@ public class ExperimentalApi extends Api {
                 public void onFeatureSupportResult(String featureId, int result, Bundle resultInfo) {
                     switch (result) {
                         case CapabilityApi.FEATURE_SUPPORTED:
-                            cameraApi.startVideoStreamForObserver(tag, listener);
+                            startVideoStreamForObserver(tag, listener);
                             break;
 
                         case CapabilityApi.FEATURE_UNSUPPORTED:
@@ -200,7 +206,7 @@ public class ExperimentalApi extends Api {
                 public void onFeatureSupportResult(String featureId, int result, Bundle resultInfo) {
                     switch (result) {
                         case CapabilityApi.FEATURE_SUPPORTED:
-                            cameraApi.stopVideoStreamForObserver(tag, listener);
+                            stopVideoStreamForObserver(tag, listener);
                             break;
 
                         case CapabilityApi.FEATURE_UNSUPPORTED:
@@ -213,5 +219,117 @@ public class ExperimentalApi extends Api {
                     }
                 }
             });
+    }
+
+    /**
+     * Attempt to grab ownership and start the video stream from the connected drone. Can fail if
+     * the video stream is already owned by another client.
+     *
+     * @param tag       Video tag.
+     * @param listener  Register a callback to receive update of the command execution status.
+     * @since 2.6.8
+     */
+    public void startVideoStreamForObserver(final String tag, final AbstractCommandListener listener) {
+        final Bundle params = new Bundle();
+        params.putString(EXTRA_VIDEO_TAG, tag);
+
+        drone.performAsyncActionOnDroneThread(new Action(ACTION_START_VIDEO_STREAM_FOR_OBSERVER,
+            params), listener);
+    }
+
+    /**
+     * Stop the video stream from the connected drone, and release ownership.
+     *
+     * @param tag      Video tag.
+     * @param listener Register a callback to receive update of the command execution status.
+     * @since 2.6.8
+     */
+    public void stopVideoStreamForObserver(final String tag, final AbstractCommandListener listener) {
+        final Bundle params = new Bundle();
+        params.putString(EXTRA_VIDEO_TAG, tag);
+
+        drone.performAsyncActionOnDroneThread(new Action(ACTION_STOP_VIDEO_STREAM_FOR_OBSERVER, params),
+            listener);
+    }
+
+    /**
+     * Observer for vehicle video stream.
+     */
+    public static class VideoStreamObserver implements IpConnectionListener {
+        private final String TAG = VideoStreamObserver.class.getSimpleName();
+
+        private static final int UDP_BUFFER_SIZE = 1500;
+        private static final long RECONNECT_COUNTDOWN_IN_MILLIS = 1000l;
+        private static final int SOLO_STREAM_UDP_PORT = 5600;
+
+        private UdpConnection linkConn;
+        private Handler handler;
+
+        private ExperimentalApi.IVideoStreamCallback callback;
+
+        public VideoStreamObserver(Handler handler, ExperimentalApi.IVideoStreamCallback callback) {
+            this.handler = handler;
+            this.callback = callback;
+        }
+
+        private final Runnable reconnectTask = new Runnable() {
+            @Override
+            public void run() {
+                handler.removeCallbacks(reconnectTask);
+                if(linkConn != null)
+                    linkConn.connect();
+            }
+        };
+
+        public void start() {
+            if (this.linkConn == null) {
+                this.linkConn = new UdpConnection(handler, SOLO_STREAM_UDP_PORT,
+                    UDP_BUFFER_SIZE, true, 42);
+                this.linkConn.setIpConnectionListener(this);
+            }
+
+            handler.removeCallbacks(reconnectTask);
+
+            Log.d(TAG, "Connecting to video stream...");
+            this.linkConn.connect();
+        }
+
+        public void stop() {
+            Log.d(TAG, "Stopping video manager");
+
+            handler.removeCallbacks(reconnectTask);
+
+            if (this.linkConn != null) {
+                // Break the link.
+                this.linkConn.disconnect();
+                this.linkConn = null;
+            }
+        }
+
+        @Override
+        public void onIpConnected() {
+            Log.d(TAG, "Connected to video stream");
+
+            handler.removeCallbacks(reconnectTask);
+        }
+
+        @Override
+        public void onIpDisconnected() {
+            Log.d(TAG, "Video stream disconnected");
+
+            handler.postDelayed(reconnectTask, RECONNECT_COUNTDOWN_IN_MILLIS);
+        }
+
+        @Override
+        public void onPacketReceived(ByteBuffer packetBuffer) {
+            callback.onVideoStreamPacketRecieved(packetBuffer.array(), packetBuffer.limit());
+        }
+    }
+
+    /**
+     * Callback for retrieving video packets from VideoStreamObserver.
+     */
+    public interface IVideoStreamCallback {
+        void onVideoStreamPacketRecieved(byte[] data, int dataSize);
     }
 }
