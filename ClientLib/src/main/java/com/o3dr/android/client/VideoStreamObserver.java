@@ -9,7 +9,7 @@ import com.o3dr.android.client.utils.connection.UdpConnection;
 import java.nio.ByteBuffer;
 
 /**
- * Observer for vehicle video stream. This class also returns attributes related to the video stream.
+ * Observer for vehicle video stream.
  */
 public class VideoStreamObserver implements IpConnectionListener {
     private static final String TAG = VideoStreamObserver.class.getSimpleName();
@@ -48,8 +48,6 @@ public class VideoStreamObserver implements IpConnectionListener {
 
         Log.d(TAG, "Connecting to video stream...");
         this.linkConn.connect();
-
-        // TODO: Get video stream attributes.
     }
 
     public void stop() {
