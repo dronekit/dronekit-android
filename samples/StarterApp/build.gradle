@@ -23,11 +23,9 @@ android {
         abortOnError false
     }
 
-    /*
     dexOptions {
         dexInProcess = true
     }
-    */
 }
 
 dependencies {
