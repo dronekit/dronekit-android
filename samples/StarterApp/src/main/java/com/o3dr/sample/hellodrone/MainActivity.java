@@ -70,7 +70,6 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
     private Button startVideoStreamUsingObserver;
     private Button stopVideoStreamUsingObserver;
 
-    private ExperimentalApi.VideoStreamObserver videoStreamObserver;
     private MediaCodecManager mediaCodecManager;
 
     private TextureView videoView;
@@ -185,18 +184,6 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
         mediaCodecHandlerThread.start();
         Handler mediaCodecHandler = new Handler(mediaCodecHandlerThread.getLooper());
         mediaCodecManager = new MediaCodecManager(mediaCodecHandler);
-
-        // Initialize VideoStreamObserver to connect to vehicle video stream and receive video stream packets.
-        HandlerThread videoHandlerThread = new HandlerThread("VideoHandlerThread");
-        videoHandlerThread.start();
-        Handler videoHandler = new Handler(videoHandlerThread.getLooper());
-        videoStreamObserver = new ExperimentalApi.VideoStreamObserver(videoHandler,
-            new ExperimentalApi.IVideoStreamCallback() {
-            @Override
-            public void onVideoStreamPacketRecieved(byte[] data, int dataSize) {
-                mediaCodecManager.onInputDataReceived(data, dataSize);
-            }
-        });
     }
 
     @Override
@@ -285,7 +272,6 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
                 // Log.i("DRONE_EVENT", event); //Uncomment to see events from the drone
                 break;
         }
-
     }
 
     private void checkSoloState() {
@@ -592,7 +578,7 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
     };
 
     private void startVideoStreamForObserver() {
-        getApi(drone).startVideoStream("", new AbstractCommandListener() {
+        getApi(drone).startVideoStream("", new ExperimentalApi.IVideoStreamCallback() {
             @Override
             public void onSuccess() {
                 alertUser("Successfully obtained lock for drone video stream. ");
@@ -608,9 +594,6 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
 
                 if (startVideoStream != null)
                     startVideoStream.setEnabled(false);
-
-                videoStreamObserver.start();
-                alertUser("Start receiving video stream packets...");
 
                 mediaCodecManager.stopDecoding(new DecoderListener() {
                     @Override
@@ -645,6 +628,11 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
             public void onTimeout() {
                 alertUser("Timed out while attempting to get lock for vehicle video stream.");
             }
+
+            @Override
+            public void onVideoStreamPacketReceived(byte[] data, int dataSize) {
+                mediaCodecManager.onInputDataReceived(data, dataSize);
+            }
         });
     }
 
@@ -676,9 +664,11 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
     }
 
     private void stopVideoStreamForObserver() {
-        getApi(drone).stopVideoStream("", new AbstractCommandListener() {
+        getApi(drone).stopVideoStream("", new ExperimentalApi.IVideoStreamCallback() {
             @Override
             public void onSuccess() {
+                alertUser("Successfully released lock for drone video stream. ");
+
                 if (stopVideoStreamUsingObserver != null)
                     stopVideoStreamUsingObserver.setEnabled(false);
 
@@ -691,10 +681,8 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
                 if (startVideoStream != null)
                     startVideoStream.setEnabled(true);
 
-                videoStreamObserver.stop();
-                alertUser("Video streaming has stopped...");
-
                 mediaCodecManager.stopDecoding(decoderListener);
+                alertUser("Media decoding has stopped...");
             }
 
             @Override
@@ -703,6 +691,11 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
 
             @Override
             public void onTimeout() {
+            }
+
+            @Override
+            public void onVideoStreamPacketReceived(byte[] data, int dataSize) {
+                // Will not be called on stopping video stream.
             }
         });
     }

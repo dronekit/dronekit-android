@@ -1,7 +1,9 @@
 package com.o3dr.android.client.apis;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.util.Log;
 
 import com.o3dr.android.client.Drone;
@@ -44,6 +46,8 @@ public class ExperimentalApi extends Api {
     };
 
     private final CapabilityApi capabilityChecker;
+
+    private VideoStreamObserver videoStreamObserver;
 
     /**
      * Retrieves an ExperimentalApi instance.
@@ -165,15 +169,39 @@ public class ExperimentalApi extends Api {
      * the video stream is already owned by another client.
      *
      * @param tag       Video tag.
-     * @param listener  Register a callback to receive update of the command execution status.
+     * @param callback  Video stream observer callback.
      *
      * @since 2.5.0
      */
-    public void startVideoStream(final String tag, final AbstractCommandListener listener) {
+    public void startVideoStream(final String tag, final IVideoStreamCallback callback) {
         capabilityChecker.checkFeatureSupport(CapabilityApi.FeatureIds.SOLO_VIDEO_STREAMING,
             new CapabilityApi.FeatureSupportListener() {
                 @Override
                 public void onFeatureSupportResult(String featureId, int result, Bundle resultInfo) {
+                    final AbstractCommandListener listener = new AbstractCommandListener() {
+                        @Override
+                        public void onSuccess() {
+                            callback.onSuccess();
+
+                            // Initialize and start VideoStreamObserver to connect to vehicle video stream and receive
+                            // video stream packets.
+                            if (videoStreamObserver == null) {
+                                videoStreamObserver = new VideoStreamObserver(callback);
+                            }
+                            videoStreamObserver.start();
+                        }
+
+                        @Override
+                        public void onError(int executionError) {
+                            callback.onError(executionError);
+                        }
+
+                        @Override
+                        public void onTimeout() {
+                            callback.onTimeout();
+                        }
+                    };
+
                     switch (result) {
                         case CapabilityApi.FEATURE_SUPPORTED:
                             startVideoStreamForObserver(tag, listener);
@@ -195,15 +223,36 @@ public class ExperimentalApi extends Api {
      * Stop the video stream from the connected drone, and release ownership.
      *
      * @param tag       Video tag.
-     * @param listener  Register a callback to receive update of the command execution status.
+     * @param callback  Video stream observer callback.
      *
      * @since 2.5.0
      */
-    public void stopVideoStream(final String tag, final AbstractCommandListener listener) {
+    public void stopVideoStream(final String tag, final IVideoStreamCallback callback) {
         capabilityChecker.checkFeatureSupport(CapabilityApi.FeatureIds.SOLO_VIDEO_STREAMING,
             new CapabilityApi.FeatureSupportListener() {
                 @Override
                 public void onFeatureSupportResult(String featureId, int result, Bundle resultInfo) {
+                    final AbstractCommandListener listener = new AbstractCommandListener() {
+                        @Override
+                        public void onSuccess() {
+                            callback.onSuccess();
+
+                            if (videoStreamObserver != null) {
+                                videoStreamObserver.stop();
+                            }
+                        }
+
+                        @Override
+                        public void onError(int executionError) {
+                            callback.onError(executionError);
+                        }
+
+                        @Override
+                        public void onTimeout() {
+                            callback.onTimeout();
+                        }
+                    };
+
                     switch (result) {
                         case CapabilityApi.FEATURE_SUPPORTED:
                             stopVideoStreamForObserver(tag, listener);
@@ -226,10 +275,10 @@ public class ExperimentalApi extends Api {
      * the video stream is already owned by another client.
      *
      * @param tag       Video tag.
-     * @param listener  Register a callback to receive update of the command execution status.
+     * @param listener  Register a listener to receive update of the command execution status.
      * @since 2.6.8
      */
-    private void startVideoStreamForObserver(final String tag, final AbstractCommandListener listener) {
+    private void startVideoStreamForObserver(final String tag, AbstractCommandListener listener) {
         final Bundle params = new Bundle();
         params.putString(EXTRA_VIDEO_TAG, tag);
 
@@ -241,10 +290,10 @@ public class ExperimentalApi extends Api {
      * Stop the video stream from the connected drone, and release ownership.
      *
      * @param tag      Video tag.
-     * @param listener Register a callback to receive update of the command execution status.
+     * @param listener Register a listener to receive update of the command execution status.
      * @since 2.6.8
      */
-    private void stopVideoStreamForObserver(final String tag, final AbstractCommandListener listener) {
+    private void stopVideoStreamForObserver(final String tag, AbstractCommandListener listener) {
         final Bundle params = new Bundle();
         params.putString(EXTRA_VIDEO_TAG, tag);
 
@@ -263,12 +312,12 @@ public class ExperimentalApi extends Api {
         private static final int SOLO_STREAM_UDP_PORT = 5600;
 
         private UdpConnection linkConn;
+        private HandlerThread handlerThread;
         private Handler handler;
 
         private ExperimentalApi.IVideoStreamCallback callback;
 
-        public VideoStreamObserver(Handler handler, ExperimentalApi.IVideoStreamCallback callback) {
-            this.handler = handler;
+        public VideoStreamObserver(IVideoStreamCallback callback) {
             this.callback = callback;
         }
 
@@ -276,12 +325,16 @@ public class ExperimentalApi extends Api {
             @Override
             public void run() {
                 handler.removeCallbacks(reconnectTask);
-                if(linkConn != null)
+                if (linkConn != null)
                     linkConn.connect();
             }
         };
 
         public void start() {
+            handlerThread = new HandlerThread("VideoStreamObserverThread");
+            handlerThread.start();
+            handler = new Handler(handlerThread.getLooper());
+
             if (this.linkConn == null) {
                 this.linkConn = new UdpConnection(handler, SOLO_STREAM_UDP_PORT,
                     UDP_BUFFER_SIZE, true, 42);
@@ -304,6 +357,10 @@ public class ExperimentalApi extends Api {
                 this.linkConn.disconnect();
                 this.linkConn = null;
             }
+
+            if (handlerThread.isAlive()) {
+                handlerThread.quit();
+            }
         }
 
         @Override
@@ -322,7 +379,7 @@ public class ExperimentalApi extends Api {
 
         @Override
         public void onPacketReceived(ByteBuffer packetBuffer) {
-            callback.onVideoStreamPacketRecieved(packetBuffer.array(), packetBuffer.limit());
+            callback.onVideoStreamPacketReceived(packetBuffer.array(), packetBuffer.limit());
         }
     }
 
@@ -330,6 +387,12 @@ public class ExperimentalApi extends Api {
      * Callback for retrieving video packets from VideoStreamObserver.
      */
     public interface IVideoStreamCallback {
-        void onVideoStreamPacketRecieved(byte[] data, int dataSize);
+        void onSuccess();
+
+        void onError(int executionError);
+
+        void onTimeout();
+
+        void onVideoStreamPacketReceived(byte[] data, int dataSize);
     }
 }
