@@ -229,7 +229,7 @@ public class ExperimentalApi extends Api {
      * @param listener  Register a callback to receive update of the command execution status.
      * @since 2.6.8
      */
-    public void startVideoStreamForObserver(final String tag, final AbstractCommandListener listener) {
+    private void startVideoStreamForObserver(final String tag, final AbstractCommandListener listener) {
         final Bundle params = new Bundle();
         params.putString(EXTRA_VIDEO_TAG, tag);
 
@@ -244,7 +244,7 @@ public class ExperimentalApi extends Api {
      * @param listener Register a callback to receive update of the command execution status.
      * @since 2.6.8
      */
-    public void stopVideoStreamForObserver(final String tag, final AbstractCommandListener listener) {
+    private void stopVideoStreamForObserver(final String tag, final AbstractCommandListener listener) {
         final Bundle params = new Bundle();
         params.putString(EXTRA_VIDEO_TAG, tag);
 

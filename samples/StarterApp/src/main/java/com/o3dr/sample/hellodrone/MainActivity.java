@@ -592,7 +592,7 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
     };
 
     private void startVideoStreamForObserver() {
-        getApi(drone).startVideoStreamForObserver("", new AbstractCommandListener() {
+        getApi(drone).startVideoStream("", new AbstractCommandListener() {
             @Override
             public void onSuccess() {
                 alertUser("Successfully obtained lock for drone video stream. ");
@@ -676,7 +676,7 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
     }
 
     private void stopVideoStreamForObserver() {
-        getApi(drone).stopVideoStreamForObserver("", new AbstractCommandListener() {
+        getApi(drone).stopVideoStream("", new AbstractCommandListener() {
             @Override
             public void onSuccess() {
                 if (stopVideoStreamUsingObserver != null)
