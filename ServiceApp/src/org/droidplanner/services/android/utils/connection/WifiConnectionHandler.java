@@ -209,15 +209,16 @@ public class WifiConnectionHandler {
             Timber.w(e, "Receiver was not registered.");
         }
 
-        resetNetworkBindings((ConnectivityManager.NetworkCallback) netReqCb);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            resetNetworkBindings((ConnectivityManager.NetworkCallback) netReqCb);
+        }
     }
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void resetNetworkBindings(ConnectivityManager.NetworkCallback netCb) {
         Timber.i("Unregistering network callbacks.");
 
         connectedSoloWifi.set("");
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             try {
                 connMgr.unregisterNetworkCallback(netCb);
             } catch (IllegalArgumentException e) {
@@ -229,7 +230,6 @@ public class WifiConnectionHandler {
             } else {
                 ConnectivityManager.setProcessDefaultNetwork(null);
             }
-        }
     }
 
     /**
