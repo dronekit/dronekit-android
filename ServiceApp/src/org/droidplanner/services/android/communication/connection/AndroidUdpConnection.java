@@ -43,12 +43,6 @@ public class AndroidUdpConnection extends AndroidMavLinkConnection {
             protected void onConnectionOpened() {
                 AndroidUdpConnection.this.onConnectionOpened();
             }
-
-            @Override
-            protected void onConnectionFailed(String errMsg) {
-                AndroidUdpConnection.this.onConnectionFailed(errMsg);
-            }
-
         };
     }
 

@@ -1,41 +1,24 @@
 package org.droidplanner.services.android.core.MAVLink.connection;
 
 import com.MAVLink.MAVLinkPacket;
+import com.o3dr.services.android.lib.drone.connection.LinkConnectionStatus;
 
 /**
  * Provides updates about the mavlink connection.
  */
 public interface MavLinkConnectionListener {
+    /**
+     * Called when data is received via the mavlink connection.
+     *
+     * @param packet received data
+     */
+    void onReceivePacket(MAVLinkPacket packet);
 
     /**
-     * Called when a connection is being established.
+     * Provides information about communication error.
+     *
+     * @param connectionStatus error information
      */
-    public void onStartingConnection();
-
-	/**
-	 * Called when the mavlink connection is established.
-	 */
-	public void onConnect(long connectionTime);
-
-	/**
-	 * Called when data is received via the mavlink connection.
-	 * 
-	 * @param packet
-	 *            received data
-	 */
-	public void onReceivePacket(MAVLinkPacket packet);
-
-	/**
-	 * Called when the mavlink connection is disconnected.
-	 */
-	public void onDisconnect(long disconnectionTime);
-
-	/**
-	 * Provides information about communication error.
-	 * 
-	 * @param errMsg
-	 *            error information
-	 */
-	public void onComError(String errMsg);
+    void onConnectionStatus(LinkConnectionStatus connectionStatus);
 
 }

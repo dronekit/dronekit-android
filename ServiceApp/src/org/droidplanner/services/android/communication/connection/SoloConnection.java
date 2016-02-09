@@ -8,6 +8,7 @@ import android.text.TextUtils;
 
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionType;
+import com.o3dr.services.android.lib.drone.connection.LinkConnectionStatus;
 
 import org.droidplanner.services.android.utils.connection.WifiConnectionHandler;
 
@@ -43,8 +44,8 @@ public class SoloConnection extends AndroidMavLinkConnection implements WifiConn
             }
 
             @Override
-            protected void onConnectionFailed(String errMsg) {
-                SoloConnection.this.onConnectionFailed(errMsg);
+            protected void onConnectionStatus(LinkConnectionStatus connectionStatus) {
+                SoloConnection.this.onConnectionStatus(connectionStatus);
             }
         };
     }
@@ -52,16 +53,22 @@ public class SoloConnection extends AndroidMavLinkConnection implements WifiConn
     @Override
     protected void openConnection() throws IOException {
         if (TextUtils.isEmpty(soloLinkId)) {
-            throw new IOException("Invalid connection credentials!");
+            Bundle extras = new Bundle();
+            extras.putInt(LinkConnectionStatus.EXTRA_ERROR_CODE_KEY, LinkConnectionStatus.INVALID_CREDENTIALS);
+            extras.putString(LinkConnectionStatus.EXTRA_ERROR_MSG_KEY, "Invalid connection credentials!");
+            onConnectionStatus(new LinkConnectionStatus(LinkConnectionStatus.FAILED, extras));
+        } else {
+            wifiHandler.start();
+            checkScanResults(wifiHandler.getScanResults());
         }
-
-        wifiHandler.start();
-        checkScanResults(wifiHandler.getScanResults());
     }
 
     private void refreshWifiAps() {
         if (!wifiHandler.refreshWifiAPs()) {
-            onConnectionFailed("Unable to refresh wifi access points");
+            Bundle extras = new Bundle();
+            extras.putInt(LinkConnectionStatus.EXTRA_ERROR_CODE_KEY, LinkConnectionStatus.SYSTEM_UNAVAILABLE);
+            extras.putString(LinkConnectionStatus.EXTRA_ERROR_MSG_KEY, "Unable to refresh wifi access points");
+            onConnectionStatus(new LinkConnectionStatus(LinkConnectionStatus.FAILED, extras));
         }
     }
 
@@ -100,8 +107,8 @@ public class SoloConnection extends AndroidMavLinkConnection implements WifiConn
                 try {
                     dataLink.openConnection();
                 } catch (IOException e) {
+                    reportIOException(e);
                     Timber.e(e, e.getMessage());
-                    onConnectionFailed(e.getMessage());
                 }
             }
         }
@@ -109,12 +116,12 @@ public class SoloConnection extends AndroidMavLinkConnection implements WifiConn
 
     @Override
     public void onWifiConnecting() {
-
+        onConnectionStatus(new LinkConnectionStatus(LinkConnectionStatus.CONNECTING, null));
     }
 
     @Override
     public void onWifiDisconnected() {
-
+        onConnectionStatus(new LinkConnectionStatus(LinkConnectionStatus.DISCONNECTED, null));
     }
 
     @Override
@@ -139,12 +146,19 @@ public class SoloConnection extends AndroidMavLinkConnection implements WifiConn
         if (targetResult != null) {
             //We're good to go
             try {
-                if (!wifiHandler.connectToWifi(targetResult, soloLinkPassword)) {
-                    onConnectionFailed("Unable to connect to the target wifi " + soloLinkId);
+                int connectionResult = wifiHandler.connectToWifi(targetResult, soloLinkPassword);
+                if (connectionResult != 0) {
+                    Bundle extras = new Bundle();
+                    extras.putInt(LinkConnectionStatus.EXTRA_ERROR_CODE_KEY, connectionResult);
+                    extras.putString(LinkConnectionStatus.EXTRA_ERROR_MSG_KEY, "Unable to connect to the target wifi " + soloLinkId);
+                    onConnectionStatus(new LinkConnectionStatus(LinkConnectionStatus.FAILED, extras));
                 }
             } catch (IllegalArgumentException e) {
                 Timber.e(e, e.getMessage());
-                onConnectionFailed(e.getMessage());
+                Bundle extras = new Bundle();
+                extras.putInt(LinkConnectionStatus.EXTRA_ERROR_CODE_KEY, LinkConnectionStatus.UNKNOWN);
+                extras.putString(LinkConnectionStatus.EXTRA_ERROR_MSG_KEY, e.getMessage());
+                onConnectionStatus(new LinkConnectionStatus(LinkConnectionStatus.FAILED, extras));
             }
         } else {
             //Let's try again

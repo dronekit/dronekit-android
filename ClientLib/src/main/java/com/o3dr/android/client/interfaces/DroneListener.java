@@ -9,6 +9,10 @@ import com.o3dr.services.android.lib.drone.connection.ConnectionResult;
  */
 public interface DroneListener {
 
+    /**
+     * @deprecated
+     * @param result
+     */
     void onDroneConnectionFailed(ConnectionResult result);
 
     void onDroneEvent(String event, Bundle extras);

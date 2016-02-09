@@ -1,15 +1,18 @@
 package org.droidplanner.services.android.core.MAVLink.connection;
 
+import android.os.Bundle;
 import android.support.v4.util.Pair;
 
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Parser;
+import com.o3dr.services.android.lib.drone.connection.LinkConnectionStatus;
 
 import org.droidplanner.services.android.core.model.Logger;
 
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.BindException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Map;
@@ -48,7 +51,7 @@ public abstract class MavLinkConnection {
      * Stores the list of log files to be written to.
      */
     private final ConcurrentHashMap<String, Pair<String, BufferedOutputStream>> loggingOutStreams = new
-            ConcurrentHashMap<>();
+        ConcurrentHashMap<>();
 
     /**
      * Queue the set of packets to send via the mavlink connection. A thread
@@ -79,7 +82,8 @@ public abstract class MavLinkConnection {
             } catch (IOException e) {
                 // Ignore errors while shutting down
                 if (mConnectionStatus.get() != MAVLINK_DISCONNECTED) {
-                    reportComError(e.getMessage());
+                    reportIOException(e);
+
                     mLogger.logErr(TAG, e);
                 }
 
@@ -89,6 +93,14 @@ public abstract class MavLinkConnection {
             mLogger.logInfo(TAG, "Exiting connecting thread.");
         }
     };
+
+    private int getErrorCode(IOException e) {
+        if (e instanceof BindException) {
+            return LinkConnectionStatus.ADDRESS_IN_USE;
+        } else {
+            return LinkConnectionStatus.UNKNOWN;
+        }
+    }
 
     /**
      * Manages the receiving and sending of messages.
@@ -127,7 +139,7 @@ public abstract class MavLinkConnection {
             } catch (IOException e) {
                 // Ignore errors while shutting down
                 if (mConnectionStatus.get() != MAVLINK_DISCONNECTED) {
-                    reportComError(e.getMessage());
+                    reportIOException(e);
                     mLogger.logErr(TAG, e);
                 }
             } finally {
@@ -173,7 +185,7 @@ public abstract class MavLinkConnection {
                         sendBuffer(buffer);
                         queueToLog(buffer);
                     } catch (IOException e) {
-                        reportComError(e.getMessage());
+                        reportIOException(e);
                         mLogger.logErr(TAG, e);
                     }
                 }
@@ -204,7 +216,7 @@ public abstract class MavLinkConnection {
                     logBuffer.putLong(System.currentTimeMillis() * 1000);
 
                     for (Map.Entry<String, Pair<String, BufferedOutputStream>> entry : loggingOutStreams
-                            .entrySet()) {
+                        .entrySet()) {
                         final Pair<String, BufferedOutputStream> logInfo = entry.getValue();
                         final String loggingFilePath = logInfo.first;
                         try {
@@ -223,14 +235,16 @@ public abstract class MavLinkConnection {
                 }
             } catch (InterruptedException e) {
                 final String errorMessage = e.getMessage();
-                if (errorMessage != null)
+                if (errorMessage != null) {
                     mLogger.logVerbose(TAG, errorMessage);
+                }
             } finally {
                 for (Pair<String, BufferedOutputStream> entry : loggingOutStreams.values()) {
                     final String loggingFilePath = entry.first;
                     try {
-                        if (entry.second != null)
+                        if (entry.second != null) {
                             entry.second.close();
+                        }
                     } catch (IOException e) {
                         mLogger.logErr(TAG, "IO Exception while closing " + loggingFilePath, e);
                     }
@@ -267,10 +281,15 @@ public abstract class MavLinkConnection {
         }
     }
 
-    protected void onConnectionFailed(String errMsg) {
-        mLogger.logInfo(TAG, "Unable to establish connection: " + errMsg);
-        reportComError(errMsg);
-        disconnect();
+    protected void onConnectionStatus(LinkConnectionStatus connectionStatus) {
+        switch (connectionStatus.getStatusCode()) {
+            case LinkConnectionStatus.FAILED:
+                mLogger.logInfo(TAG, "Unable to establish connection: " + connectionStatus.getStatusCode());
+                disconnect();
+                break;
+        }
+
+        reportConnectionStatus(connectionStatus);
     }
 
     /**
@@ -297,10 +316,10 @@ public abstract class MavLinkConnection {
             }
 
             closeConnection();
-            reportDisconnect(disconnectTime);
+            reportDisconnect();
         } catch (IOException e) {
             mLogger.logErr(TAG, e);
-            reportComError(e.getMessage());
+            reportIOException(e);
         }
     }
 
@@ -316,8 +335,9 @@ public abstract class MavLinkConnection {
     }
 
     private void queueToLog(MAVLinkPacket packet) {
-        if (packet != null)
+        if (packet != null) {
             queueToLog(packet.encodePacket());
+        }
     }
 
     private void queueToLog(byte[] packetData) {
@@ -329,16 +349,19 @@ public abstract class MavLinkConnection {
     }
 
     public void addLoggingPath(String tag, String loggingPath) {
-        if (tag == null || tag.length() == 0 || loggingPath == null || loggingPath.length() == 0)
+        if (tag == null || tag.length() == 0 || loggingPath == null || loggingPath.length() == 0) {
             return;
+        }
 
-        if (!loggingOutStreams.contains(tag))
+        if (!loggingOutStreams.contains(tag)) {
             loggingOutStreams.put(tag, Pair.<String, BufferedOutputStream>create(loggingPath, null));
+        }
     }
 
     public void removeLoggingPath(String tag) {
-        if (tag == null || tag.length() == 0)
+        if (tag == null || tag.length() == 0) {
             return;
+        }
 
         Pair<String, BufferedOutputStream> logInfo = loggingOutStreams.remove(tag);
         if (logInfo != null) {
@@ -363,7 +386,9 @@ public abstract class MavLinkConnection {
         mListeners.put(tag, listener);
 
         if (getConnectionStatus() == MAVLINK_CONNECTED) {
-            listener.onConnect(mConnectionTime.get());
+            Bundle extras = new Bundle();
+            extras.putLong(LinkConnectionStatus.EXTRA_CONNECTION_TIME, mConnectionTime.get());
+            reportConnectionStatus(new LinkConnectionStatus(LinkConnectionStatus.CONNECTED, extras));
         }
     }
 
@@ -425,21 +450,20 @@ public abstract class MavLinkConnection {
      * Utility method to notify the mavlink listeners about communication
      * errors.
      *
-     * @param errMsg
+     * @param connectionStatus
      */
-    protected void reportComError(String errMsg) {
-        if (mListeners.isEmpty())
+    protected void reportConnectionStatus(LinkConnectionStatus connectionStatus) {
+        if (mListeners.isEmpty()) {
             return;
+        }
 
         for (MavLinkConnectionListener listener : mListeners.values()) {
-            listener.onComError(errMsg);
+            listener.onConnectionStatus(connectionStatus);
         }
     }
 
     protected void reportConnecting() {
-        for (MavLinkConnectionListener listener : mListeners.values()) {
-            listener.onStartingConnection();
-        }
+        reportConnectionStatus(new LinkConnectionStatus(LinkConnectionStatus.CONNECTING, null));
     }
 
     /**
@@ -447,22 +471,17 @@ public abstract class MavLinkConnection {
      * connection.
      */
     protected void reportConnect(long connectionTime) {
-        for (MavLinkConnectionListener listener : mListeners.values()) {
-            listener.onConnect(connectionTime);
-        }
+        Bundle extras = new Bundle();
+        extras.putLong(LinkConnectionStatus.EXTRA_CONNECTION_TIME, connectionTime);
+        reportConnectionStatus(new LinkConnectionStatus(LinkConnectionStatus.CONNECTED, extras));
     }
 
     /**
      * Utility method to notify the mavlink listeners about a connection
      * disconnect.
      */
-    protected void reportDisconnect(long disconnectTime) {
-        if (mListeners.isEmpty())
-            return;
-
-        for (MavLinkConnectionListener listener : mListeners.values()) {
-            listener.onDisconnect(disconnectTime);
-        }
+    protected void reportDisconnect() {
+        reportConnectionStatus(new LinkConnectionStatus(LinkConnectionStatus.DISCONNECTED, null));
     }
 
     /**
@@ -471,12 +490,19 @@ public abstract class MavLinkConnection {
      * @param packet received mavlink packet
      */
     private void reportReceivedPacket(MAVLinkPacket packet) {
-        if (mListeners.isEmpty())
+        if (mListeners.isEmpty()) {
             return;
+        }
 
         for (MavLinkConnectionListener listener : mListeners.values()) {
             listener.onReceivePacket(packet);
         }
     }
 
+    protected void reportIOException(IOException e) {
+        Bundle extras = new Bundle();
+        extras.putInt(LinkConnectionStatus.EXTRA_ERROR_CODE_KEY, getErrorCode(e));
+        extras.putSerializable(LinkConnectionStatus.EXTRA_ERROR_MSG_KEY, e.getMessage());
+        reportConnectionStatus(new LinkConnectionStatus(LinkConnectionStatus.FAILED, extras));
+    }
 }

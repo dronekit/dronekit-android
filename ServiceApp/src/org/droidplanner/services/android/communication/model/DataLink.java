@@ -1,5 +1,6 @@
 package org.droidplanner.services.android.communication.model;
 
+import com.o3dr.services.android.lib.drone.connection.LinkConnectionStatus;
 import com.o3dr.services.android.lib.model.ICommandListener;
 
 public class DataLink {
@@ -17,14 +18,9 @@ public class DataLink {
     }
 
     public interface DataLinkListener<T> {
-        void notifyStartingConnection();
-
-        void notifyConnected();
-
-        void notifyDisconnected();
 
         void notifyReceivedData(T packet);
 
-        void onStreamError(String errorMsg);
+        void onConnectionStatus(LinkConnectionStatus connectionStatus);
     }
 }

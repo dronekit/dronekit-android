@@ -20,6 +20,8 @@ import android.os.Build;
 import android.text.TextUtils;
 import android.widget.Toast;
 
+import com.o3dr.services.android.lib.drone.connection.LinkConnectionStatus;
+
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -281,9 +283,9 @@ public class WifiConnectionHandler {
         return wifiMgr.getScanResults();
     }
 
-    public boolean connectToWifi(String soloLinkId, String password) {
+    public int connectToWifi(String soloLinkId, String password) {
         if (TextUtils.isEmpty(soloLinkId))
-            return false;
+            return LinkConnectionStatus.INVALID_CREDENTIALS;
 
         ScanResult targetScanResult = null;
         final List<ScanResult> scanResults = wifiMgr.getScanResults();
@@ -296,15 +298,15 @@ public class WifiConnectionHandler {
 
         if (targetScanResult == null) {
             Timber.i("No matching scan result was found for id %s", soloLinkId);
-            return false;
+            return LinkConnectionStatus.LINK_UNAVAILABLE;
         }
 
         return connectToWifi(targetScanResult, password);
     }
 
-    public boolean connectToWifi(ScanResult scanResult, String password) {
+    public int connectToWifi(ScanResult scanResult, String password) {
         if (scanResult == null)
-            return false;
+            return LinkConnectionStatus.LINK_UNAVAILABLE;
 
         Timber.d("Connecting to wifi " + scanResult.SSID);
 
@@ -314,10 +316,10 @@ public class WifiConnectionHandler {
             Timber.d("Already connected to " + scanResult.SSID);
 
             notifyWifiConnected(scanResult.SSID);
-            return true;
+            return 0;
         } else if (isOnNetwork(scanResult.SSID)) {
             setDefaultNetworkIfNecessary(scanResult.SSID);
-            return true;
+            return 0;
 
         }
 
@@ -327,10 +329,10 @@ public class WifiConnectionHandler {
         if (wifiConfig == null) {
             Timber.d("Connecting to closed wifi network.");
             if (TextUtils.isEmpty(password))
-                return false;
+                return LinkConnectionStatus.INVALID_CREDENTIALS;
 
             if (!connectToClosedWifi(scanResult, password))
-                return false;
+                return LinkConnectionStatus.UNKNOWN;
 
             wifiMgr.saveConfiguration();
             wifiConfig = getWifiConfigs(scanResult.SSID);
@@ -338,9 +340,9 @@ public class WifiConnectionHandler {
 
         if (wifiConfig != null) {
             wifiMgr.enableNetwork(wifiConfig.networkId, true);
-            return true;
+            return 0;
         }
-        return false;
+        return LinkConnectionStatus.UNKNOWN;
     }
 
     private WifiConfiguration getWifiConfigs(String networkSSID) {

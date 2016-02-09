@@ -16,16 +16,20 @@ import com.o3dr.android.client.apis.FollowApi;
 import com.o3dr.android.client.apis.MissionApi;
 import com.o3dr.android.client.apis.VehicleApi;
 import com.o3dr.android.client.interfaces.DroneListener;
+import com.o3dr.android.client.interfaces.LinkListener;
 import com.o3dr.android.client.utils.TxPowerComplianceCountries;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
+import com.o3dr.services.android.lib.link.LinkEvent;
+import com.o3dr.services.android.lib.link.LinkEventExtra;
 import com.o3dr.services.android.lib.drone.calibration.magnetometer.MagnetometerCalibrationStatus;
 import com.o3dr.services.android.lib.drone.companion.solo.SoloAttributes;
 import com.o3dr.services.android.lib.drone.companion.solo.SoloEventExtras;
 import com.o3dr.services.android.lib.drone.companion.solo.SoloEvents;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionResult;
+import com.o3dr.services.android.lib.drone.connection.LinkConnectionStatus;
 import com.o3dr.services.android.lib.drone.mission.Mission;
 import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
 import com.o3dr.services.android.lib.drone.property.Altitude;
@@ -108,6 +112,7 @@ public class Drone {
 
     private final AtomicReference<IDroneApi> droneApiRef = new AtomicReference<>(null);
     private ConnectionParameter connectionParameter;
+    private LinkListener linkListener;
     private ExecutorService asyncScheduler;
 
     // flightTimer
@@ -392,13 +397,19 @@ public class Drone {
     }
 
     public void connect(final ConnectionParameter connParams) {
+        connect(connParams, null);
+    }
+
+    public void connect(ConnectionParameter connParams, LinkListener linkListener) {
         VehicleApi.getApi(this).connect(connParams);
         this.connectionParameter = connParams;
+        this.linkListener = linkListener;
     }
 
     public void disconnect() {
         VehicleApi.getApi(this).disconnect();
         this.connectionParameter = null;
+        this.linkListener = null;
     }
 
     private static AbstractCommandListener wrapListener(final Handler handler, final AbstractCommandListener listener) {
@@ -761,14 +772,18 @@ public class Drone {
                 final Bundle eventInfo = new Bundle(1);
                 boolean isEUCompliant = !TxPowerComplianceCountries.getDefaultCountry().name().equals(compliantCountry);
                 eventInfo.putBoolean(SoloEventExtras.EXTRA_SOLO_EU_TX_POWER_COMPLIANT, isEUCompliant);
-                sendEventToListeners(SoloEvents.SOLO_EU_TX_POWER_COMPLIANCE_UPDATED, eventInfo);
+                sendAttributeEventToListener(SoloEvents.SOLO_EU_TX_POWER_COMPLIANCE_UPDATED, eventInfo);
                 break;
+
+            case LinkEvent.LINK_STATE_UPDATED:
+                sendLinkEventToListener(extras);
+                return;
         }
 
-        sendEventToListeners(attributeEvent, extras);
+        sendAttributeEventToListener(attributeEvent, extras);
     }
 
-    private void sendEventToListeners(final String attributeEvent, final Bundle extras) {
+    private void sendAttributeEventToListener(final String attributeEvent, final Bundle extras) {
         if (droneListeners.isEmpty()) {
             return;
         }
@@ -783,6 +798,24 @@ public class Drone {
                         Log.e(TAG, e.getMessage(), e);
                     }
                 }
+            }
+        });
+    }
+
+    private void sendLinkEventToListener(final Bundle extras) {
+        if (linkListener == null) {
+            return;
+        }
+
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                LinkConnectionStatus status = null;
+                if (extras != null) {
+                    status = extras.getParcelable(LinkEventExtra.EXTRA_CONNECTION_STATUS);
+                }
+
+                linkListener.onLinkStateUpdated(status);
             }
         });
     }

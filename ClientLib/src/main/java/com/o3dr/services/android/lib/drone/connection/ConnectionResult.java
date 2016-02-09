@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 /**
+ * @deprecated
  * Conveys information if the connection attempt fails.
  */
 public final class ConnectionResult implements Parcelable {
