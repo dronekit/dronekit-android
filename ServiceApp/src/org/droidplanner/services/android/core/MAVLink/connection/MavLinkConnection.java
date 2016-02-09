@@ -94,6 +94,7 @@ public abstract class MavLinkConnection {
         }
     };
 
+    @LinkConnectionStatus.FailureCode
     private int getErrorCode(IOException e) {
         if (e instanceof BindException) {
             return LinkConnectionStatus.ADDRESS_IN_USE;
@@ -500,9 +501,6 @@ public abstract class MavLinkConnection {
     }
 
     protected void reportIOException(IOException e) {
-        Bundle extras = new Bundle();
-        extras.putInt(LinkConnectionStatus.EXTRA_ERROR_CODE_KEY, getErrorCode(e));
-        extras.putSerializable(LinkConnectionStatus.EXTRA_ERROR_MSG_KEY, e.getMessage());
-        reportConnectionStatus(new LinkConnectionStatus(LinkConnectionStatus.FAILED, extras));
+        reportConnectionStatus(LinkConnectionStatus.newFailedConnectionStatus(getErrorCode(e), e.getMessage()));
     }
 }

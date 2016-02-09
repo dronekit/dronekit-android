@@ -201,10 +201,9 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
             this.connectionParams = checkConnectionParameter(connParams);
             this.droneMgr = service.connectDroneManager(this.connectionParams, ownerId, this);
         } catch (ConnectionException e) {
-            Bundle extras = new Bundle();
-            extras.putInt(LinkConnectionStatus.EXTRA_ERROR_CODE_KEY, LinkConnectionStatus.INVALID_CREDENTIALS);
-            extras.putString(LinkConnectionStatus.EXTRA_ERROR_MSG_KEY, e.getMessage());
-            notifyConnectionStatus(new LinkConnectionStatus(LinkConnectionStatus.FAILED, extras));
+            LinkConnectionStatus connectionStatus = LinkConnectionStatus
+                .newFailedConnectionStatus(LinkConnectionStatus.INVALID_CREDENTIALS, e.getMessage());
+            onConnectionStatus(connectionStatus);
             disconnect();
         }
     }
@@ -547,9 +546,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
 
             case CONNECTION_FAILED:
                 disconnect();
-                Bundle extras = new Bundle();
-                extras.putInt(LinkConnectionStatus.EXTRA_ERROR_CODE_KEY, LinkConnectionStatus.UNKNOWN);
-                onConnectionStatus(new LinkConnectionStatus(LinkConnectionStatus.FAILED, extras));
+                onConnectionStatus(LinkConnectionStatus.newFailedConnectionStatus(LinkConnectionStatus.UNKNOWN, null));
                 break;
 
             case HEARTBEAT_FIRST:

@@ -53,10 +53,9 @@ public class SoloConnection extends AndroidMavLinkConnection implements WifiConn
     @Override
     protected void openConnection() throws IOException {
         if (TextUtils.isEmpty(soloLinkId)) {
-            Bundle extras = new Bundle();
-            extras.putInt(LinkConnectionStatus.EXTRA_ERROR_CODE_KEY, LinkConnectionStatus.INVALID_CREDENTIALS);
-            extras.putString(LinkConnectionStatus.EXTRA_ERROR_MSG_KEY, "Invalid connection credentials!");
-            onConnectionStatus(new LinkConnectionStatus(LinkConnectionStatus.FAILED, extras));
+            LinkConnectionStatus connectionStatus = LinkConnectionStatus
+                .newFailedConnectionStatus(LinkConnectionStatus.INVALID_CREDENTIALS, "Invalid connection credentials!");
+            onConnectionStatus(connectionStatus);
         } else {
             wifiHandler.start();
             checkScanResults(wifiHandler.getScanResults());
@@ -65,10 +64,9 @@ public class SoloConnection extends AndroidMavLinkConnection implements WifiConn
 
     private void refreshWifiAps() {
         if (!wifiHandler.refreshWifiAPs()) {
-            Bundle extras = new Bundle();
-            extras.putInt(LinkConnectionStatus.EXTRA_ERROR_CODE_KEY, LinkConnectionStatus.SYSTEM_UNAVAILABLE);
-            extras.putString(LinkConnectionStatus.EXTRA_ERROR_MSG_KEY, "Unable to refresh wifi access points");
-            onConnectionStatus(new LinkConnectionStatus(LinkConnectionStatus.FAILED, extras));
+            LinkConnectionStatus connectionStatus = LinkConnectionStatus
+                .newFailedConnectionStatus(LinkConnectionStatus.SYSTEM_UNAVAILABLE, "Unable to refresh wifi access points");
+            onConnectionStatus(connectionStatus);
         }
     }
 
@@ -148,17 +146,14 @@ public class SoloConnection extends AndroidMavLinkConnection implements WifiConn
             try {
                 int connectionResult = wifiHandler.connectToWifi(targetResult, soloLinkPassword);
                 if (connectionResult != 0) {
-                    Bundle extras = new Bundle();
-                    extras.putInt(LinkConnectionStatus.EXTRA_ERROR_CODE_KEY, connectionResult);
-                    extras.putString(LinkConnectionStatus.EXTRA_ERROR_MSG_KEY, "Unable to connect to the target wifi " + soloLinkId);
-                    onConnectionStatus(new LinkConnectionStatus(LinkConnectionStatus.FAILED, extras));
+                    LinkConnectionStatus connectionStatus = LinkConnectionStatus
+                        .newFailedConnectionStatus(connectionResult, "Unable to connect to the target wifi " + soloLinkId);
+                    onConnectionStatus(connectionStatus);
                 }
             } catch (IllegalArgumentException e) {
                 Timber.e(e, e.getMessage());
-                Bundle extras = new Bundle();
-                extras.putInt(LinkConnectionStatus.EXTRA_ERROR_CODE_KEY, LinkConnectionStatus.UNKNOWN);
-                extras.putString(LinkConnectionStatus.EXTRA_ERROR_MSG_KEY, e.getMessage());
-                onConnectionStatus(new LinkConnectionStatus(LinkConnectionStatus.FAILED, extras));
+                LinkConnectionStatus connectionStatus = LinkConnectionStatus.newFailedConnectionStatus(LinkConnectionStatus.UNKNOWN, e.getMessage());
+                onConnectionStatus(connectionStatus);
             }
         } else {
             //Let's try again

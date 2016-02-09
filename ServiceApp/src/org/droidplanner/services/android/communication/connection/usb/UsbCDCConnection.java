@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
-import android.os.Bundle;
 import android.util.Log;
 
 import com.hoho.android.usbserial.driver.UsbSerialDriver;
@@ -50,17 +49,15 @@ class UsbCDCConnection extends UsbConnection.UsbConnectionImpl {
                             Log.e(TAG, e.getMessage(), e);
                         }
                     } else {
-                        Bundle extras = new Bundle();
-                        extras.putInt(LinkConnectionStatus.EXTRA_ERROR_CODE_KEY, LinkConnectionStatus.LINK_UNAVAILABLE);
-                        extras.putString(LinkConnectionStatus.EXTRA_ERROR_MSG_KEY, "Unable to access usb device.");
-                        onUsbConnectionStatus(new LinkConnectionStatus(LinkConnectionStatus.FAILED, extras));
+                        LinkConnectionStatus connectionStatus = LinkConnectionStatus
+                            .newFailedConnectionStatus(LinkConnectionStatus.LINK_UNAVAILABLE, "Unable to access usb device.");
+                        onUsbConnectionStatus(connectionStatus);
                     }
                 } else {
                     Log.d(TAG, "permission denied for device " + device);
-                    Bundle extras = new Bundle();
-                    extras.putInt(LinkConnectionStatus.EXTRA_ERROR_CODE_KEY, LinkConnectionStatus.PERMISSION_DENIED);
-                    extras.putString(LinkConnectionStatus.EXTRA_ERROR_MSG_KEY, "USB Permission denied.");
-                    onUsbConnectionStatus(new LinkConnectionStatus(LinkConnectionStatus.FAILED, extras));
+                    LinkConnectionStatus connectionStatus = LinkConnectionStatus
+                        .newFailedConnectionStatus(LinkConnectionStatus.PERMISSION_DENIED, "USB Permission denied.");
+                    onUsbConnectionStatus(connectionStatus);
                 }
             }
         }
@@ -70,10 +67,9 @@ class UsbCDCConnection extends UsbConnection.UsbConnectionImpl {
         @Override
         public void run() {
             Log.d(TAG, "Permission request timeout.");
-            Bundle extras = new Bundle();
-            extras.putInt(LinkConnectionStatus.EXTRA_ERROR_CODE_KEY, LinkConnectionStatus.TIMEOUT);
-            extras.putString(LinkConnectionStatus.EXTRA_ERROR_MSG_KEY, "Unable to get usb access.");
-            onUsbConnectionStatus(new LinkConnectionStatus(LinkConnectionStatus.FAILED, extras));
+            LinkConnectionStatus connectionStatus = LinkConnectionStatus
+                .newFailedConnectionStatus(LinkConnectionStatus.TIMEOUT, "Unable to get usb access.");
+            onUsbConnectionStatus(connectionStatus);
 
             removeWatchdog();
         }
