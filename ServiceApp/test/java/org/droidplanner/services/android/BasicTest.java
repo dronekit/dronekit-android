@@ -9,6 +9,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.common.msg_command_long;
 import com.MAVLink.enums.MAV_CMD;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
+import com.o3dr.services.android.lib.drone.connection.LinkConnectionStatus;
 
 import org.droidplanner.services.android.communication.model.DataLink;
 import org.droidplanner.services.android.core.MAVLink.MavLinkCommands;
@@ -41,23 +42,11 @@ public class BasicTest {
 
     private final DataLink.DataLinkListener inputStreamListener = new DataLink.DataLinkListener() {
         @Override
-        public void notifyStartingConnection() {
-        }
-
-        @Override
-        public void notifyConnected() {
-        }
-
-        @Override
-        public void notifyDisconnected() {
-        }
-
-        @Override
         public void notifyReceivedData(Object packet) {
         }
 
         @Override
-        public void onStreamError(String errorMsg) {
+        public void onConnectionStatus(LinkConnectionStatus connectionStatus) {
         }
     };
 
