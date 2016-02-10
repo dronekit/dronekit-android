@@ -234,6 +234,7 @@ public class DroidPlannerService extends Service {
         //Put the service in the foreground
         final Notification.Builder notifBuilder = new Notification.Builder(context)
                 .setContentTitle("3DR Services")
+                .setPriority(Notification.PRIORITY_MIN)
                 .setSmallIcon(R.drawable.ic_stat_notify)
                 .setContentIntent(PendingIntent.getActivity(context, 0, new Intent(context,
                         MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK), 0));
