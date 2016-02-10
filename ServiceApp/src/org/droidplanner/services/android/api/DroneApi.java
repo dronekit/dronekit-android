@@ -18,11 +18,10 @@ import com.o3dr.services.android.lib.drone.action.ConnectionActions;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
-import com.o3dr.services.android.lib.gcs.link.LinkEvent;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
-import com.o3dr.services.android.lib.gcs.link.LinkEventExtra;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
-import com.o3dr.services.android.lib.drone.connection.LinkConnectionStatus;
+import com.o3dr.services.android.lib.drone.connection.ConnectionResult;
+import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
 import com.o3dr.services.android.lib.drone.mission.Mission;
 import com.o3dr.services.android.lib.drone.mission.action.MissionActions;
 import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
@@ -32,6 +31,8 @@ import com.o3dr.services.android.lib.drone.property.DroneAttribute;
 import com.o3dr.services.android.lib.drone.property.Parameter;
 import com.o3dr.services.android.lib.drone.property.State;
 import com.o3dr.services.android.lib.gcs.event.GCSEvent;
+import com.o3dr.services.android.lib.gcs.link.LinkEvent;
+import com.o3dr.services.android.lib.gcs.link.LinkEventExtra;
 import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
 import com.o3dr.services.android.lib.model.IApiListener;
 import com.o3dr.services.android.lib.model.ICommandListener;
@@ -652,10 +653,36 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
 
     public void onConnectionStatus(LinkConnectionStatus connectionStatus) {
         if (connectionStatus != null) {
+            switch (connectionStatus.getStatusCode()) {
+                case LinkConnectionStatus.FAILED:
+                    checkForSelfRelease();
+
+                    //This is to ensure backwards compatibility
+                    // TODO: remove this in version 2.0
+                    notifyConnectionFailed(connectionStatus);
+                    break;
+            }
+
             Bundle extras = new Bundle();
             extras.putParcelable(LinkEventExtra.EXTRA_CONNECTION_STATUS, connectionStatus);
             notifyAttributeUpdate(LinkEvent.LINK_STATE_UPDATED, extras);
         }
+    }
+
+    private void notifyConnectionFailed(LinkConnectionStatus connectionStatus) {
+        Bundle extras = connectionStatus.getExtras();
+        String msg = null;
+        if (extras != null) {
+            msg = extras.getString(LinkConnectionStatus.EXTRA_ERROR_MSG);
+        }
+
+        ConnectionResult connectionResult = new ConnectionResult(0, msg);
+        try {
+            apiListener.onConnectionFailed(connectionResult);
+        } catch (RemoteException e) {
+            Timber.w(e, "Unable to forward connection fail to client.");
+        }
+
     }
 
     @Override

@@ -5,7 +5,7 @@ import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 import android.util.Log;
 
-import com.o3dr.services.android.lib.drone.connection.LinkConnectionStatus;
+import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
 
 import org.droidplanner.services.android.communication.connection.AndroidMavLinkConnection;
 import org.droidplanner.services.android.core.MAVLink.connection.MavLinkConnectionTypes;

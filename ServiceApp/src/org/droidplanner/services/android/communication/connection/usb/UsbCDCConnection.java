@@ -11,7 +11,7 @@ import android.util.Log;
 
 import com.hoho.android.usbserial.driver.UsbSerialDriver;
 import com.hoho.android.usbserial.driver.UsbSerialProber;
-import com.o3dr.services.android.lib.drone.connection.LinkConnectionStatus;
+import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
 
 import java.io.IOException;
 import java.util.List;

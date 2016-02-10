@@ -1,7 +1,7 @@
 package org.droidplanner.services.android.core.MAVLink.connection;
 
 import com.MAVLink.MAVLinkPacket;
-import com.o3dr.services.android.lib.drone.connection.LinkConnectionStatus;
+import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
 
 /**
  * Provides updates about the mavlink connection.

@@ -9,7 +9,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.common.msg_command_long;
 import com.MAVLink.enums.MAV_CMD;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
-import com.o3dr.services.android.lib.drone.connection.LinkConnectionStatus;
+import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
 
 import org.droidplanner.services.android.communication.model.DataLink;
 import org.droidplanner.services.android.core.MAVLink.MavLinkCommands;

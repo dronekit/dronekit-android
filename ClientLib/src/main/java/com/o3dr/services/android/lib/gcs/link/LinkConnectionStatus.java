@@ -1,4 +1,4 @@
-package com.o3dr.services.android.lib.drone.connection;
+package com.o3dr.services.android.lib.gcs.link;
 
 import android.os.Bundle;
 import android.os.Parcel;
@@ -60,7 +60,7 @@ public final class LinkConnectionStatus implements Parcelable {
     })
     /**
      * The possible failure codes that can be retrieved from the {@link #getExtras()} using key
-     * {@link #EXTRA_ERROR_CODE}. A {@link com.o3dr.services.android.lib.drone.connection.LinkConnectionStatus.FailureCode}
+     * {@link #EXTRA_ERROR_CODE}. A {@link LinkConnectionStatus.FailureCode}
      * is guaranteed when {@link #FAILED} occurs.
      *
      */
@@ -92,7 +92,7 @@ public final class LinkConnectionStatus implements Parcelable {
      */
     public static final int ADDRESS_IN_USE = -6;
     /**
-     * All errors that are not one of the listed {@link com.o3dr.services.android.lib.drone.connection.LinkConnectionStatus.FailureCode}s.
+     * All errors that are not one of the listed {@link LinkConnectionStatus.FailureCode}s.
      * This is usually due to a device system failure.
      */
     public static final int UNKNOWN = -7;
@@ -107,7 +107,7 @@ public final class LinkConnectionStatus implements Parcelable {
     }
 
     /**
-     * @return Returns the status of the link connection. This value is one of {@link com.o3dr.services.android.lib.drone.connection.LinkConnectionStatus.StatusCode}
+     * @return Returns the status of the link connection. This value is one of {@link LinkConnectionStatus.StatusCode}
      */
     @StatusCode
     public String getStatusCode() {
@@ -184,7 +184,7 @@ public final class LinkConnectionStatus implements Parcelable {
 
     /**
      * Helper method to generate the generic {@link #FAILED} {@link LinkConnectionStatus}
-     * @param failureCode Of type {@link com.o3dr.services.android.lib.drone.connection.LinkConnectionStatus.FailureCode}
+     * @param failureCode Of type {@link LinkConnectionStatus.FailureCode}
      * @param errMsg A message that gives more information to the client about the error. This can be null.
      *
      * @return Returns a {@link LinkConnectionStatus} with statusCode {@link #FAILED}
