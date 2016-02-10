@@ -10,7 +10,9 @@ import com.o3dr.services.android.lib.drone.connection.ConnectionResult;
 public interface DroneListener {
 
     /**
-     * @deprecated
+     * @deprecated Use {@link #onDroneEvent(String, Bundle)} with event
+     * {@link com.o3dr.services.android.lib.gcs.link.LinkEvent#LINK_STATE_UPDATED} instead.
+     *
      * @param result
      */
     void onDroneConnectionFailed(ConnectionResult result);

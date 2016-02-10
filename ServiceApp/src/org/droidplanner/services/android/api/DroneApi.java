@@ -18,9 +18,9 @@ import com.o3dr.services.android.lib.drone.action.ConnectionActions;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
-import com.o3dr.services.android.lib.link.LinkEvent;
+import com.o3dr.services.android.lib.gcs.link.LinkEvent;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
-import com.o3dr.services.android.lib.link.LinkEventExtra;
+import com.o3dr.services.android.lib.gcs.link.LinkEventExtra;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.LinkConnectionStatus;
 import com.o3dr.services.android.lib.drone.mission.Mission;
@@ -373,12 +373,6 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
         }
     }
 
-    private void notifyConnectionStatus(LinkConnectionStatus connectionStatus) {
-        Bundle extras = new Bundle();
-        extras.putParcelable(LinkEventExtra.EXTRA_CONNECTION_STATUS, connectionStatus);
-        notifyAttributeUpdate(LinkEvent.LINK_STATE_UPDATED, extras);
-    }
-
     public void onReceivedMavLinkMessage(MAVLinkMessage msg) {
         if (mavlinkObserversList.isEmpty()) {
             return;
@@ -546,7 +540,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
 
             case CONNECTION_FAILED:
                 disconnect();
-                onConnectionStatus(LinkConnectionStatus.newFailedConnectionStatus(LinkConnectionStatus.UNKNOWN, null));
+                droneEvent = AttributeEvent.HEARTBEAT_TIMEOUT;
                 break;
 
             case HEARTBEAT_FIRST:
@@ -657,7 +651,11 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
     }
 
     public void onConnectionStatus(LinkConnectionStatus connectionStatus) {
-        notifyConnectionStatus(connectionStatus);
+        if (connectionStatus != null) {
+            Bundle extras = new Bundle();
+            extras.putParcelable(LinkEventExtra.EXTRA_CONNECTION_STATUS, connectionStatus);
+            notifyAttributeUpdate(LinkEvent.LINK_STATE_UPDATED, extras);
+        }
     }
 
     @Override

@@ -4,27 +4,28 @@ import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.IntDef;
+import android.support.annotation.Nullable;
 import android.support.annotation.StringDef;
 
 /**
  * Conveys information about the link connection state.
  * <p/>
  * This value is returned in the {@link com.o3dr.android.client.Drone#notifyAttributeUpdated} as the
- * extra value {@link com.o3dr.services.android.lib.link.LinkEventExtra#EXTRA_CONNECTION_STATUS}
- * when the attribute event is {@link com.o3dr.services.android.lib.link.LinkEvent#LINK_STATE_UPDATED}
+ * extra value {@link com.o3dr.services.android.lib.gcs.link.LinkEventExtra#EXTRA_CONNECTION_STATUS}
+ * when the attribute event is {@link com.o3dr.services.android.lib.gcs.link.LinkEvent#LINK_STATE_UPDATED}
  */
 public final class LinkConnectionStatus implements Parcelable {
     /**
      * Key that is used to get the {@link FailureCode} from {@link #getExtras()}
      * to determine what link connection error occurred. This will always be populated when {@link #FAILED} occurs.
      */
-    public static final String EXTRA_ERROR_CODE_KEY = "extra_error_code";
+    public static final String EXTRA_ERROR_CODE = "extra_error_code";
 
     /**
      * Key that is used to retrieve information from {@link #getExtras()} about why the link connection
      * failure occurred. This value may be populated when {@link #FAILED} occurs, or can be null.
      */
-    public static final String EXTRA_ERROR_MSG_KEY = "extra_error_message";
+    public static final String EXTRA_ERROR_MSG = "extra_error_message";
 
     /**
      * Key that is used to retrieve the time a link connection occurred from {@link #getExtras()}.
@@ -59,7 +60,7 @@ public final class LinkConnectionStatus implements Parcelable {
     })
     /**
      * The possible failure codes that can be retrieved from the {@link #getExtras()} using key
-     * {@link #EXTRA_ERROR_CODE_KEY}. A {@link com.o3dr.services.android.lib.drone.connection.LinkConnectionStatus.FailureCode}
+     * {@link #EXTRA_ERROR_CODE}. A {@link com.o3dr.services.android.lib.drone.connection.LinkConnectionStatus.FailureCode}
      * is guaranteed when {@link #FAILED} occurs.
      *
      */
@@ -71,7 +72,7 @@ public final class LinkConnectionStatus implements Parcelable {
      */
     public static final int SYSTEM_UNAVAILABLE = -1;
     /**
-     * Requested device to connect to is not available. See {@link #EXTRA_ERROR_MSG_KEY} for more information.
+     * Requested device to connect to is not available. See {@link #EXTRA_ERROR_MSG} for more information.
      */
     public static final int LINK_UNAVAILABLE = -2;
     /**
@@ -188,10 +189,10 @@ public final class LinkConnectionStatus implements Parcelable {
      *
      * @return Returns a {@link LinkConnectionStatus} with statusCode {@link #FAILED}
      */
-    public static LinkConnectionStatus newFailedConnectionStatus(@FailureCode int failureCode, String errMsg) {
+    public static LinkConnectionStatus newFailedConnectionStatus(@FailureCode int failureCode, @Nullable String errMsg) {
         Bundle extras = new Bundle();
-        extras.putInt(EXTRA_ERROR_CODE_KEY, failureCode);
-        extras.putString(EXTRA_ERROR_MSG_KEY, errMsg);
+        extras.putInt(EXTRA_ERROR_CODE, failureCode);
+        extras.putString(EXTRA_ERROR_MSG, errMsg);
 
         return new LinkConnectionStatus(FAILED, extras);
     }

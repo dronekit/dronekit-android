@@ -4,7 +4,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 /**
- * @deprecated
+ * @deprecated Use {@link LinkConnectionStatus} instead.
+ *
  * Conveys information if the connection attempt fails.
  */
 public final class ConnectionResult implements Parcelable {

@@ -21,8 +21,6 @@ import com.o3dr.android.client.utils.TxPowerComplianceCountries;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
-import com.o3dr.services.android.lib.link.LinkEvent;
-import com.o3dr.services.android.lib.link.LinkEventExtra;
 import com.o3dr.services.android.lib.drone.calibration.magnetometer.MagnetometerCalibrationStatus;
 import com.o3dr.services.android.lib.drone.companion.solo.SoloAttributes;
 import com.o3dr.services.android.lib.drone.companion.solo.SoloEventExtras;
@@ -48,6 +46,8 @@ import com.o3dr.services.android.lib.drone.property.VehicleMode;
 import com.o3dr.services.android.lib.gcs.follow.FollowState;
 import com.o3dr.services.android.lib.gcs.follow.FollowType;
 import com.o3dr.services.android.lib.gcs.returnToMe.ReturnToMeState;
+import com.o3dr.services.android.lib.gcs.link.LinkEvent;
+import com.o3dr.services.android.lib.gcs.link.LinkEventExtra;
 import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
 import com.o3dr.services.android.lib.model.AbstractCommandListener;
 import com.o3dr.services.android.lib.model.IDroneApi;
@@ -772,7 +772,7 @@ public class Drone {
                 final Bundle eventInfo = new Bundle(1);
                 boolean isEUCompliant = !TxPowerComplianceCountries.getDefaultCountry().name().equals(compliantCountry);
                 eventInfo.putBoolean(SoloEventExtras.EXTRA_SOLO_EU_TX_POWER_COMPLIANT, isEUCompliant);
-                sendAttributeEventToListener(SoloEvents.SOLO_EU_TX_POWER_COMPLIANCE_UPDATED, eventInfo);
+                sendDroneEventToListeners(SoloEvents.SOLO_EU_TX_POWER_COMPLIANCE_UPDATED, eventInfo);
                 break;
 
             case LinkEvent.LINK_STATE_UPDATED:
@@ -780,10 +780,10 @@ public class Drone {
                 return;
         }
 
-        sendAttributeEventToListener(attributeEvent, extras);
+        sendDroneEventToListeners(attributeEvent, extras);
     }
 
-    private void sendAttributeEventToListener(final String attributeEvent, final Bundle extras) {
+    private void sendDroneEventToListeners(final String attributeEvent, final Bundle extras) {
         if (droneListeners.isEmpty()) {
             return;
         }
@@ -807,17 +807,15 @@ public class Drone {
             return;
         }
 
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                LinkConnectionStatus status = null;
-                if (extras != null) {
-                    status = extras.getParcelable(LinkEventExtra.EXTRA_CONNECTION_STATUS);
+        if (extras != null) {
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    LinkConnectionStatus status = extras.getParcelable(LinkEventExtra.EXTRA_CONNECTION_STATUS);
+                    linkListener.onLinkStateUpdated(status);
                 }
-
-                linkListener.onLinkStateUpdated(status);
-            }
-        });
+            });
+        }
     }
 
     void notifyDroneServiceInterrupted(final String errorMsg) {
