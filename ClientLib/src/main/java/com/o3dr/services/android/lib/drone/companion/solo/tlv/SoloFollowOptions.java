@@ -9,13 +9,17 @@ import java.nio.ByteBuffer;
  */
 public class SoloFollowOptions extends SoloShotOptions {
 
-    private static final int LOOK_AT_ENABLED_VALUE = 1;
+    protected static final int LOOK_AT_ENABLED_VALUE = 1;
     private static final int LOOK_AT_DISABLED_VALUE = 0;
 
     private boolean lookAt;
 
     public SoloFollowOptions(float cruiseSpeed, boolean lookAt){
-        super(TLVMessageTypes.TYPE_SOLO_FOLLOW_OPTIONS, 8, cruiseSpeed);
+        this(TLVMessageTypes.TYPE_SOLO_FOLLOW_OPTIONS, 8, cruiseSpeed, lookAt);
+    }
+
+    protected SoloFollowOptions(int type, int length, float cruiseSpeed, boolean lookAt){
+        super(type, length, cruiseSpeed);
         this.lookAt = lookAt;
     }
 
@@ -27,12 +31,35 @@ public class SoloFollowOptions extends SoloShotOptions {
         this(cruiseSpeed, lookAtValue == LOOK_AT_ENABLED_VALUE);
     }
 
+    SoloFollowOptions(ByteBuffer buffer){
+        this(buffer.getFloat(), buffer.getInt());
+    }
+
     public boolean isLookAt() {
         return lookAt;
     }
 
     public void setLookAt(boolean lookAt) {
         this.lookAt = lookAt;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SoloFollowOptions)) return false;
+        if (!super.equals(o)) return false;
+
+        SoloFollowOptions that = (SoloFollowOptions) o;
+
+        return lookAt == that.lookAt;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + (lookAt ? 1 : 0);
+        return result;
     }
 
     @Override

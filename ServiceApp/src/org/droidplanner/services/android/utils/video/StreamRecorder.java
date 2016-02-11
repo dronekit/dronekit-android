@@ -177,6 +177,11 @@ class StreamRecorder {
             return;
         }
 
+        if(rawMedia.length() == 0){
+            Timber.w("Media file is empty.");
+            return;
+        }
+
         asyncExecutor.execute(new Runnable() {
             @Override
             public void run() {
@@ -204,7 +209,7 @@ class StreamRecorder {
                     MediaScannerConnection.scanFile(context,
                             new String[]{mp4Media.getAbsolutePath()}, null, scanCompletedListener);
 
-                } catch (IOException e) {
+                } catch (IOException | NullPointerException e) {
                     Timber.e(e, e.getMessage());
                 }
             }

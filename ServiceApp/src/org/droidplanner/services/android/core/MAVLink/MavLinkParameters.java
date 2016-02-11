@@ -12,7 +12,7 @@ public class MavLinkParameters {
 		msg_param_request_list msg = new msg_param_request_list();
 		msg.target_system = drone.getSysid();
 		msg.target_component = drone.getCompid();
-		drone.getMavClient().sendMavMessage(msg, null);
+		drone.getMavClient().sendMessage(msg, null);
 	}
 
 	public static void readParameter(MavLinkDrone drone, String name) {
@@ -21,7 +21,7 @@ public class MavLinkParameters {
 		msg.target_system = drone.getSysid();
 		msg.target_component = drone.getCompid();
 		msg.setParam_Id(name);
-		drone.getMavClient().sendMavMessage(msg, null);
+		drone.getMavClient().sendMessage(msg, null);
 	}
 
 	public static void readParameter(MavLinkDrone drone, int index) {
@@ -29,7 +29,7 @@ public class MavLinkParameters {
 		msg.target_system = drone.getSysid();
 		msg.target_component = drone.getCompid();
 		msg.param_index = (short) index;
-		drone.getMavClient().sendMavMessage(msg, null);
+		drone.getMavClient().sendMessage(msg, null);
 	}
 
 	public static void sendParameter(MavLinkDrone drone, Parameter parameter) {
@@ -43,6 +43,6 @@ public class MavLinkParameters {
 		msg.setParam_Id(name);
 		msg.param_type = (byte) type;
 		msg.param_value = value;
-		drone.getMavClient().sendMavMessage(msg, null);
+		drone.getMavClient().sendMessage(msg, null);
 	}
 }

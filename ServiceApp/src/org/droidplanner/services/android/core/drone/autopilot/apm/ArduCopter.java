@@ -4,13 +4,15 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 
+import com.github.zafarkhaja.semver.Version;
+import com.MAVLink.Messages.MAVLinkMessage;
 import com.o3dr.android.client.apis.CapabilityApi;
 import com.o3dr.services.android.lib.drone.action.ControlActions;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.drone.property.Parameter;
 import com.o3dr.services.android.lib.model.ICommandListener;
 
-import org.droidplanner.services.android.core.MAVLink.MAVLinkStreams;
+import org.droidplanner.services.android.communication.model.DataLink;
 import org.droidplanner.services.android.core.MAVLink.MavLinkCommands;
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
 import org.droidplanner.services.android.core.drone.DroneManager;
@@ -23,16 +25,19 @@ import org.droidplanner.services.android.core.model.AutopilotWarningParser;
 import org.droidplanner.services.android.utils.CommonApiUtils;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by Fredia Huya-Kouadio on 7/27/15.
  */
 public class ArduCopter extends ArduPilot {
+    private static final Version BRAKE_FEATURE_FIRMWARE_VERSION = Version.forIntegers(3, 3, 0);
 
     private final ConcurrentHashMap<String, ICommandListener> manualControlStateListeners = new ConcurrentHashMap<>();
 
-    public ArduCopter(Context context, MAVLinkStreams.MAVLinkOutputStream mavClient, Handler handler, AutopilotWarningParser warningParser, LogMessageListener logListener, DroneInterfaces.AttributeEventListener listener) {
-        super(context, mavClient, handler, warningParser, logListener, listener);
+    public ArduCopter(String droneId, Context context, DataLink.DataLinkProvider<MAVLinkMessage> mavClient, Handler handler, AutopilotWarningParser warningParser, LogMessageListener logListener) {
+        super(droneId, context, mavClient, handler, warningParser, logListener);
     }
 
     @Override
@@ -144,5 +149,16 @@ public class ArduCopter extends ArduPilot {
             default:
                 return super.isFeatureSupported(featureId);
         }
+    }
+
+    @Override
+    protected boolean brakeVehicle(ICommandListener listener) {
+        if (getFirmwareVersionNumber().greaterThanOrEqualTo(BRAKE_FEATURE_FIRMWARE_VERSION)) {
+            getState().changeFlightMode(ApmModes.ROTOR_BRAKE, listener);
+        } else {
+            super.brakeVehicle(listener);
+        }
+
+        return true;
     }
 }

@@ -1,7 +1,8 @@
 package com.o3dr.services.android.lib.drone.property;
 
 import android.os.Parcel;
-import android.os.Parcelable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import java.util.ArrayList;
@@ -26,7 +27,7 @@ public class Parameters implements DroneAttribute {
         return parametersList;
     }
 
-    public Parameter getParameter(String name){
+    public @Nullable Parameter getParameter(String name){
         if(TextUtils.isEmpty(name))
             return null;
 
@@ -43,6 +44,18 @@ public class Parameters implements DroneAttribute {
         if(parametersList != null && !parametersList.isEmpty()) {
             this.parametersList.addAll(parametersList);
         }
+    }
+
+    /**
+     * Adds a parameter to the parameters set.
+     * @param parameter
+     * @since 2.8.0
+     */
+    public void addParameter(@NonNull Parameter parameter){
+        if(parameter == null)
+            throw new NullPointerException("Invalid parameter argument.");
+
+        this.parametersList.add(parameter);
     }
 
     @Override
