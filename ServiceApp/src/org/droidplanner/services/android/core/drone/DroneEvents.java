@@ -9,7 +9,7 @@ import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class DroneEvents extends DroneVariable {
+public class DroneEvents extends DroneVariable<MavLinkDrone> {
 
     private static final long EVENT_DISPATCHING_DELAY = 33l; //milliseconds
 

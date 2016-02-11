@@ -61,7 +61,7 @@ Vagrant.configure(2) do |config|
 		./gradlew :ClientLib:mobile:clean :ClientLib:mobile:androidJavadocs
 
 		#echo "[DroneKit]: Sphinx Docs "
-		cd docs/
+		cd /vagrant/doc
 		make clean
 		make html
 	SHELL

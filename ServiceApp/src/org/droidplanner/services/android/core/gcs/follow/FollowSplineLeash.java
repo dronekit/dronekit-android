@@ -7,7 +7,7 @@ import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.property.Gps;
 
-import org.droidplanner.services.android.core.drone.DroneManager;
+import org.droidplanner.services.android.core.drone.manager.MavLinkDroneManager;
 import org.droidplanner.services.android.core.gcs.location.Location;
 import org.droidplanner.services.android.core.helpers.geoTools.GeoTools;
 
@@ -45,7 +45,7 @@ public class FollowSplineLeash extends FollowWithRadiusAlgorithm {
         return FollowModes.SPLINE_LEASH;
     }
 
-    public FollowSplineLeash(DroneManager droneMgr, Handler handler, double length) {
+    public FollowSplineLeash(MavLinkDroneManager droneMgr, Handler handler, double length) {
         super(droneMgr, handler, length);
     }
 }

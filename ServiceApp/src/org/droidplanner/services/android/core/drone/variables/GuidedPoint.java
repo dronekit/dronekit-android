@@ -20,7 +20,7 @@ import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 
 import timber.log.Timber;
 
-public class GuidedPoint extends DroneVariable implements OnDroneListener {
+public class GuidedPoint extends DroneVariable implements OnDroneListener<MavLinkDrone> {
 
     private GuidedStates state = GuidedStates.UNINITIALIZED;
     private LatLong coord = new LatLong(0, 0);

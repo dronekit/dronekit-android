@@ -12,6 +12,11 @@ public class AttributeEventExtra {
     private static final String PACKAGE_NAME = "com.o3dr.services.android.lib.attribute.event.extra";
 
     /**
+     * Used to access the vehicle id.
+     */
+    public static final String EXTRA_VEHICLE_ID = PACKAGE_NAME + ".VEHICLE_ID";
+
+    /**
      * Used to access autopilot error type.
      *
      * @see {@link com.o3dr.services.android.lib.drone.attribute.error.ErrorType}

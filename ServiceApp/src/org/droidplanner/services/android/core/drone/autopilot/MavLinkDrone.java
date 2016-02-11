@@ -2,15 +2,11 @@ package org.droidplanner.services.android.core.drone.autopilot;
 
 import com.MAVLink.Messages.MAVLinkMessage;
 
-import org.droidplanner.services.android.core.MAVLink.MAVLinkStreams;
+import org.droidplanner.services.android.communication.model.DataLink;
 import org.droidplanner.services.android.core.MAVLink.WaypointManager;
-import org.droidplanner.services.android.core.drone.DroneInterfaces;
-import org.droidplanner.services.android.core.drone.Preferences;
 import org.droidplanner.services.android.core.drone.profiles.ParameterManager;
-import org.droidplanner.services.android.core.drone.profiles.VehicleProfile;
 import org.droidplanner.services.android.core.drone.variables.Camera;
 import org.droidplanner.services.android.core.drone.variables.GuidedPoint;
-import org.droidplanner.services.android.core.drone.variables.Magnetometer;
 import org.droidplanner.services.android.core.drone.variables.MissionStats;
 import org.droidplanner.services.android.core.drone.variables.State;
 import org.droidplanner.services.android.core.drone.variables.StreamRates;
@@ -31,12 +27,6 @@ public interface MavLinkDrone extends Drone {
 
     void onMavLinkMessageReceived(MAVLinkMessage message);
 
-    public void addDroneListener(DroneInterfaces.OnDroneListener listener);
-
-    public void removeDroneListener(DroneInterfaces.OnDroneListener listener);
-
-    public void notifyDroneEvent(DroneInterfaces.DroneEventsType event);
-
     public byte getSysid();
 
     public byte getCompid();
@@ -49,7 +39,7 @@ public interface MavLinkDrone extends Drone {
 
     public FirmwareType getFirmwareType();
 
-    public MAVLinkStreams.MAVLinkOutputStream getMavClient();
+    public DataLink.DataLinkProvider<MAVLinkMessage> getMavClient();
 
     public WaypointManager getWaypointManager();
 

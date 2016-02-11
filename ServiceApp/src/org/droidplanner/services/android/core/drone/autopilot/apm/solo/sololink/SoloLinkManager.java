@@ -126,7 +126,7 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
         if (!BuildConfig.SITL_DEBUG) {
             return SOLO_LINK_IP;
         } else {
-            return BuildConfig.SOLO_LINK_LOCAL_IP;
+            return BuildConfig.SOLO_LINK_IP;
         }
     }
 
