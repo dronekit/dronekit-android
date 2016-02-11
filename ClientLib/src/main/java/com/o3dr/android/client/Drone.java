@@ -396,16 +396,31 @@ public class Drone {
         }
     }
 
+    /**
+     * Connect to a vehicle using a specified {@link ConnectionParameter}.
+     *
+     * @param connParams Specified parameters to determine how to connect the vehicle.
+     */
     public void connect(final ConnectionParameter connParams) {
         connect(connParams, null);
     }
 
+    /**
+     * Connect to a vehicle using a specified {@link ConnectionParameter} and a {@link LinkListener}
+     * callback.
+     *
+     * @param connParams Specified parameters to determine how to connect the vehicle.
+     * @param linkListener A callback that will update the caller on the state of the link connection.
+     */
     public void connect(ConnectionParameter connParams, LinkListener linkListener) {
         VehicleApi.getApi(this).connect(connParams);
         this.connectionParameter = connParams;
         this.linkListener = linkListener;
     }
 
+    /**
+     * Disconnect from the vehicle.
+     */
     public void disconnect() {
         VehicleApi.getApi(this).disconnect();
         this.connectionParameter = null;

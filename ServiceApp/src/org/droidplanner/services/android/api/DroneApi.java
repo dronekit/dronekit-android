@@ -653,7 +653,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
                     checkForSelfRelease();
 
                     //This is to ensure backwards compatibility
-                    // TODO: remove this in version 2.0
+                    // TODO: remove this in version 3.0
                     notifyConnectionFailed(connectionStatus);
                     break;
             }
