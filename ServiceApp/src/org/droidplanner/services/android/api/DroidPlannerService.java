@@ -10,6 +10,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
@@ -232,9 +233,9 @@ public class DroidPlannerService extends Service {
         final Context context = getApplicationContext();
 
         //Put the service in the foreground
-        final Notification.Builder notifBuilder = new Notification.Builder(context)
+        final NotificationCompat.Builder notifBuilder = new NotificationCompat.Builder(context)
                 .setContentTitle("3DR Services")
-                .setPriority(Notification.PRIORITY_MIN)
+                .setPriority(NotificationCompat.PRIORITY_MIN)
                 .setSmallIcon(R.drawable.ic_stat_notify)
                 .setContentIntent(PendingIntent.getActivity(context, 0, new Intent(context,
                         MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK), 0));
@@ -248,9 +249,7 @@ public class DroidPlannerService extends Service {
             }
         }
 
-        final Notification notification = Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN
-                ? notifBuilder.build()
-                : notifBuilder.getNotification();
+        final Notification notification = notifBuilder.build();
         startForeground(FOREGROUND_ID, notification);
     }
 
