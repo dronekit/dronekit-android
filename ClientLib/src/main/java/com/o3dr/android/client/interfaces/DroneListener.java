@@ -3,6 +3,7 @@ package com.o3dr.android.client.interfaces;
 import android.os.Bundle;
 
 import com.o3dr.services.android.lib.drone.connection.ConnectionResult;
+import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
 
 /**
  * Created by fhuya on 11/18/14.
@@ -10,8 +11,7 @@ import com.o3dr.services.android.lib.drone.connection.ConnectionResult;
 public interface DroneListener {
 
     /**
-     * @deprecated Use {@link #onDroneEvent(String, Bundle)} with event
-     * {@link com.o3dr.services.android.lib.gcs.link.LinkEvent#LINK_STATE_UPDATED} instead.
+     * @deprecated Use {@link LinkListener#onLinkStateUpdated(LinkConnectionStatus)} instead.
      *
      * @param result
      */

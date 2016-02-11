@@ -802,19 +802,21 @@ public class Drone {
         });
     }
 
-    private void sendLinkEventToListener(final Bundle extras) {
+    private void sendLinkEventToListener(Bundle extras) {
         if (linkListener == null) {
             return;
         }
 
         if (extras != null) {
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    LinkConnectionStatus status = extras.getParcelable(LinkEventExtra.EXTRA_CONNECTION_STATUS);
-                    linkListener.onLinkStateUpdated(status);
-                }
-            });
+            final LinkConnectionStatus status = extras.getParcelable(LinkEventExtra.EXTRA_CONNECTION_STATUS);
+            if (status != null) {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        linkListener.onLinkStateUpdated(status);
+                    }
+                });
+            }
         }
     }
 

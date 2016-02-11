@@ -2,6 +2,8 @@ package org.droidplanner.services.android.communication.connection;
 
 import android.content.Context;
 
+import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
+
 import org.droidplanner.services.android.core.MAVLink.connection.TcpConnection;
 import org.droidplanner.services.android.core.model.Logger;
 
@@ -37,6 +39,11 @@ public class AndroidTcpConnection extends AndroidMavLinkConnection {
             @Override
             protected void onConnectionOpened() {
                 AndroidTcpConnection.this.onConnectionOpened();
+            }
+
+            @Override
+            protected void onConnectionStatus(LinkConnectionStatus connectionStatus) {
+                AndroidTcpConnection.this.onConnectionStatus(connectionStatus);
             }
         };
     }

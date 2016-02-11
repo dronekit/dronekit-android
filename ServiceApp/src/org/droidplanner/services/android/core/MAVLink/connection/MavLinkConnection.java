@@ -283,14 +283,14 @@ public abstract class MavLinkConnection {
     }
 
     protected void onConnectionStatus(LinkConnectionStatus connectionStatus) {
+        reportConnectionStatus(connectionStatus);
+
         switch (connectionStatus.getStatusCode()) {
             case LinkConnectionStatus.FAILED:
                 mLogger.logInfo(TAG, "Unable to establish connection: " + connectionStatus.getStatusCode());
                 disconnect();
                 break;
         }
-
-        reportConnectionStatus(connectionStatus);
     }
 
     /**
@@ -389,7 +389,7 @@ public abstract class MavLinkConnection {
         if (getConnectionStatus() == MAVLINK_CONNECTED) {
             Bundle extras = new Bundle();
             extras.putLong(LinkConnectionStatus.EXTRA_CONNECTION_TIME, mConnectionTime.get());
-            reportConnectionStatus(new LinkConnectionStatus(LinkConnectionStatus.CONNECTED, extras));
+            listener.onConnectionStatus(new LinkConnectionStatus(LinkConnectionStatus.CONNECTED, extras));
         }
     }
 

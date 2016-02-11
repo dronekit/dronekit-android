@@ -539,11 +539,6 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
                 droneEvent = AttributeEvent.STATE_CONNECTING;
                 break;
 
-            case CONNECTION_FAILED:
-                disconnect();
-                droneEvent = AttributeEvent.HEARTBEAT_TIMEOUT;
-                break;
-
             case HEARTBEAT_FIRST:
                 Bundle heartBeatExtras = new Bundle();
                 heartBeatExtras.putString(AttributeEventExtra.EXTRA_VEHICLE_ID, drone.getId());
