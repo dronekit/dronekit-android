@@ -103,7 +103,6 @@ public class HeartBeat extends DroneVariable implements OnDroneListener<MavLinkD
     @Override
     public void onDroneEvent(DroneEventsType event, MavLinkDrone drone) {
         switch (event) {
-            case HEARTBEAT_TIMEOUT:
             case DISCONNECTED:
                 notifyDisconnected();
                 break;
