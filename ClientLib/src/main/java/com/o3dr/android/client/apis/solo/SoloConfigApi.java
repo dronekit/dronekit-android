@@ -3,6 +3,7 @@ package com.o3dr.android.client.apis.solo;
 import android.os.Bundle;
 
 import com.o3dr.android.client.Drone;
+import com.o3dr.android.client.utils.TxPowerComplianceCountries;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerMode;
 import com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerUnits;
@@ -15,15 +16,15 @@ import java.util.concurrent.ConcurrentHashMap;
 import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.ACTION_REFRESH_SOLO_VERSIONS;
 import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.ACTION_UPDATE_BUTTON_SETTINGS;
 import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.ACTION_UPDATE_CONTROLLER_MODE;
-import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.ACTION_UPDATE_EU_TX_POWER_COMPLIANCE;
+import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.ACTION_UPDATE_CONTROLLER_UNIT;
+import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.ACTION_UPDATE_TX_POWER_COMPLIANCE_COUNTRY;
 import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.ACTION_UPDATE_WIFI_SETTINGS;
 import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.EXTRA_BUTTON_SETTINGS;
 import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.EXTRA_CONTROLLER_MODE;
-import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.EXTRA_EU_TX_POWER_COMPLIANT;
+import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.EXTRA_CONTROLLER_UNIT;
+import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.EXTRA_TX_POWER_COMPLIANT_COUNTRY_CODE;
 import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.EXTRA_WIFI_PASSWORD;
 import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.EXTRA_WIFI_SSID;
-import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.ACTION_UPDATE_CONTROLLER_UNIT;
-import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.EXTRA_CONTROLLER_UNIT;
 
 /**
  * Created by Fredia Huya-Kouadio on 7/31/15.
@@ -91,15 +92,29 @@ public class SoloConfigApi extends SoloApi {
     }
 
     /**
-     * Updates the EU tx power compliance.
+     * @deprecated Use {@link #updateTxPowerComplianceCountry(TxPowerComplianceCountries compliantCountry, AbstractCommandListener listener)} instead.
+     */
+    public void updateEUTxPowerCompliance(boolean isEUCompliant, AbstractCommandListener listener) {
+        TxPowerComplianceCountries compliantCountry;
+        if (isEUCompliant) {
+            compliantCountry = TxPowerComplianceCountries.getDefaultEUCountry();
+        } else {
+            compliantCountry = TxPowerComplianceCountries.getDefaultCountry();
+        }
+
+        updateTxPowerComplianceCountry(compliantCountry, listener);
+    }
+
+    /**
+     * Updates the tx power compliance to the specified country.
      *
-     * @param isCompliant true for the controller to be made compliant, false otherwise.
+     * @param compliantCountry Country code which the controller will be compliant.
      * @param listener    Register a callback to receive update of the command execution status.
      */
-    public void updateEUTxPowerCompliance(boolean isCompliant, AbstractCommandListener listener) {
+    public void updateTxPowerComplianceCountry(TxPowerComplianceCountries compliantCountry, AbstractCommandListener listener) {
         Bundle params = new Bundle();
-        params.putBoolean(EXTRA_EU_TX_POWER_COMPLIANT, isCompliant);
-        drone.performAsyncActionOnDroneThread(new Action(ACTION_UPDATE_EU_TX_POWER_COMPLIANCE, params), listener);
+        params.putString(EXTRA_TX_POWER_COMPLIANT_COUNTRY_CODE, compliantCountry.name());
+        drone.performAsyncActionOnDroneThread(new Action(ACTION_UPDATE_TX_POWER_COMPLIANCE_COUNTRY, params), listener);
     }
 
     /**

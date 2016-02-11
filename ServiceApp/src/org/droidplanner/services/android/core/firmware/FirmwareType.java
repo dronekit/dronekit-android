@@ -29,6 +29,10 @@ public enum FirmwareType {
         this.parameterMetadataGroup = group;
     }
 
+    public String getType() {
+        return type;
+    }
+
     public int getFamily() {
         return family;
     }

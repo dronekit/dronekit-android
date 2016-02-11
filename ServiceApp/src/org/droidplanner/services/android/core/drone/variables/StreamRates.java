@@ -6,7 +6,7 @@ import org.droidplanner.services.android.core.drone.DroneInterfaces.OnDroneListe
 import org.droidplanner.services.android.core.drone.DroneVariable;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 
-public class StreamRates extends DroneVariable implements OnDroneListener {
+public class StreamRates extends DroneVariable<MavLinkDrone> implements OnDroneListener<MavLinkDrone> {
 
     private Rates rates;
 

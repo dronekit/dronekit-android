@@ -22,6 +22,7 @@ import com.MAVLink.common.msg_sys_status;
 import com.MAVLink.common.msg_vfr_hud;
 import com.MAVLink.enums.MAV_MOUNT_MODE;
 import com.MAVLink.enums.MAV_SYS_STATUS_SENSOR;
+import com.github.zafarkhaja.semver.Version;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.action.ControlActions;
@@ -42,7 +43,7 @@ import com.o3dr.services.android.lib.model.AbstractCommandListener;
 import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
 
-import org.droidplanner.services.android.core.MAVLink.MAVLinkStreams;
+import org.droidplanner.services.android.communication.model.DataLink;
 import org.droidplanner.services.android.core.MAVLink.MavLinkParameters;
 import org.droidplanner.services.android.core.MAVLink.WaypointManager;
 import org.droidplanner.services.android.core.MAVLink.command.doCmd.MavLinkDoCmds;
@@ -62,16 +63,20 @@ import org.droidplanner.services.android.core.mission.Mission;
 import org.droidplanner.services.android.core.model.AutopilotWarningParser;
 import org.droidplanner.services.android.utils.CommonApiUtils;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import timber.log.Timber;
 
 /**
  * Base class for the ArduPilot autopilots
  */
 public abstract class ArduPilot extends GenericMavLinkDrone {
-
     public static final int AUTOPILOT_COMPONENT_ID = 1;
     public static final int ARTOO_COMPONENT_ID = 0;
     public static final int TELEMETRY_RADIO_COMPONENT_ID = 68;
+
+    public static final String FIRMWARE_VERSION_NUMBER_REGEX = "\\d+(\\.\\d{1,2})?";
 
     private final org.droidplanner.services.android.core.drone.variables.RC rc;
     private final Mission mission;
@@ -83,11 +88,13 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
 
     private final MagnetometerCalibrationImpl magCalibration;
 
-    public ArduPilot(Context context, MAVLinkStreams.MAVLinkOutputStream mavClient,
+    protected Version firmwareVersionNumber = Version.forIntegers(0, 0, 0);
+    
+    public ArduPilot(String droneId, Context context, DataLink.DataLinkProvider<MAVLinkMessage> mavClient,
                      Handler handler, AutopilotWarningParser warningParser,
-                     LogMessageListener logListener, DroneInterfaces.AttributeEventListener listener) {
+                     LogMessageListener logListener) {
 
-        super(context, handler, mavClient, warningParser, logListener, listener);
+        super(droneId, context, handler, mavClient, warningParser, logListener);
 
         this.waypointManager = new WaypointManager(this, handler);
 
@@ -195,7 +202,7 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
                 CommonApiUtils.startMission(this, forceModeChange, forceArm, listener);
                 return true;
 
-            //EXPERIMENTAL ACTIONS
+            // EXPERIMENTAL ACTIONS
             case ExperimentalActions.ACTION_EPM_COMMAND:
                 boolean release = data.getBoolean(ExperimentalActions.EXTRA_EPM_RELEASE);
                 CommonApiUtils.epmCommand(this, release, listener);
@@ -224,7 +231,7 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
                 MavLinkDoCmds.setServo(this, channel, pwm, listener);
                 return true;
 
-            //CONTROL ACTIONS
+            // CONTROL ACTIONS
             case ControlActions.ACTION_SEND_GUIDED_POINT:
                 data.setClassLoader(LatLong.class.getClassLoader());
                 boolean force = data.getBoolean(ControlActions.EXTRA_FORCE_GUIDED_POINT);
@@ -237,7 +244,7 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
                 CommonApiUtils.setGuidedAltitude(this, guidedAltitude);
                 return true;
 
-            //PARAMETER ACTIONS
+            // PARAMETER ACTIONS
             case ParameterActions.ACTION_REFRESH_PARAMETERS:
                 CommonApiUtils.refreshParameters(this);
                 return true;
@@ -248,7 +255,7 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
                 CommonApiUtils.writeParameters(this, parameters);
                 return true;
 
-            //DRONE STATE ACTIONS
+            // DRONE STATE ACTIONS
             case StateActions.ACTION_SET_VEHICLE_HOME:
                 LatLongAlt homeLoc = data.getParcelable(StateActions.EXTRA_VEHICLE_HOME_LOCATION);
                 if (homeLoc != null) {
@@ -323,7 +330,7 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
                     msg.stab_pitch = 0;
                     msg.stab_roll = 0;
                     msg.stab_yaw = 0;
-                    getMavClient().sendMavMessage(msg, listener);
+                    getMavClient().sendMessage(msg, listener);
                 } else {
                     MavLinkParameters.sendParameter(this, "MNT_MODE", 1, mountMode);
                 }
@@ -335,7 +342,7 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
     }
 
     @Override
-    protected boolean enableManualControl(Bundle data, ICommandListener listener){
+    protected boolean enableManualControl(Bundle data, ICommandListener listener) {
         CommonApiUtils.postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
         return true;
     }
@@ -449,6 +456,38 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
     protected void processSysStatus(msg_sys_status m_sys) {
         super.processSysStatus(m_sys);
         checkControlSensorsHealth(m_sys);
+    }
+
+    @Override
+    protected final void setFirmwareVersion(String message) {
+        super.setFirmwareVersion(message);
+        setFirmwareVersionNumber(message);
+    }
+
+    protected Version getFirmwareVersionNumber() {
+        return firmwareVersionNumber;
+    }
+
+    private void setFirmwareVersionNumber(String message) {
+        firmwareVersionNumber = extractVersionNumber(message);
+    }
+
+    protected static Version extractVersionNumber(String firmwareVersion) {
+        Version version = Version.forIntegers(0, 0, 0);
+
+        Pattern pattern = Pattern.compile(FIRMWARE_VERSION_NUMBER_REGEX);
+        Matcher matcher = pattern.matcher(firmwareVersion);
+        if (matcher.find()) {
+            String versionNumber = matcher.group(0) + ".0"; // Adding a default patch version number for successful parsing.
+
+            try {
+                version = Version.valueOf(versionNumber);
+            } catch (Exception e){
+                Timber.e(e, "Firmware version invalid");
+            }
+        }
+
+        return version;
     }
 
     private void checkControlSensorsHealth(msg_sys_status sysStatus) {

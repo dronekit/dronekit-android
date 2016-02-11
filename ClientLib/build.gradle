@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 
 ext {
     VERSION_MAJOR = 2
-    VERSION_MINOR = 7
+    VERSION_MINOR = 8
     VERSION_PATCH = 0
     VERSION_SUFFIX = "release"
 
@@ -15,12 +15,12 @@ ext {
 }
 
 android {
-    compileSdkVersion Integer.parseInt(project.ANDROID_BUILD_SDK_VERSION)
-    buildToolsVersion project.ANDROID_BUILD_TOOLS_VERSION
+    compileSdkVersion android_build_sdk_version
+    buildToolsVersion android_build_tools_version
 
     defaultConfig {
-        minSdkVersion Integer.parseInt(project.ANDROID_BUILD_MIN_SDK_VERSION)
-        targetSdkVersion Integer.parseInt(project.ANDROID_BUILD_TARGET_SDK_VERSION)
+        minSdkVersion android_build_min_sdk_version
+        targetSdkVersion android_build_target_sdk_version
         versionCode PUBLISH_VERSION_CODE
         versionName PUBLISH_VERSION
     }
@@ -55,13 +55,13 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:22.2.1'
-    compile 'com.google.android.gms:play-services-base:7.3.0'
+    compile "com.android.support:support-v4:${support_lib_version}"
+    compile "com.google.android.gms:play-services-base:${play_services_version}"
 
-    compile project(':dependencyLibs:Mavlink')
-    compile files('libs/Mavlink.jar')
+    compile project(':Mavlink')
+    releaseCompile files('libs/Mavlink.jar')
 }
 
-assemble.dependsOn ':dependencyLibs:Mavlink:jar'
+assemble.dependsOn ':Mavlink:jar'
 
-apply from: "${rootDir}/release_android_library.gradle"
+apply from: "../release_android_library.gradle"

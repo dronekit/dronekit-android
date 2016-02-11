@@ -3,6 +3,7 @@ package com.o3dr.services.android.lib.drone.companion.solo;
 import android.os.Parcel;
 import android.util.SparseArray;
 
+import com.o3dr.android.client.utils.TxPowerComplianceCountries;
 import com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerMode.ControllerMode;
 import com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerUnits.ControllerUnit;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSetting;
@@ -18,7 +19,6 @@ import java.util.List;
  * Created by Fredia Huya-Kouadio on 7/10/15.
  */
 public class SoloState implements DroneAttribute {
-
     private String wifiSsid;
     private String wifiPassword;
 
@@ -29,7 +29,7 @@ public class SoloState implements DroneAttribute {
     private String autopilotVersion;
     private String gimbalVersion;
 
-    private boolean isEUTxPowerCompliant;
+    private String txPowerCompliantCountry;
 
     private SparseArray<SoloButtonSetting> buttonSettings;
 
@@ -43,7 +43,7 @@ public class SoloState implements DroneAttribute {
 
     public SoloState(String autopilotVersion, String controllerFirmwareVersion,
                      String controllerVersion, String vehicleVersion,
-                     String wifiPassword, String wifiSsid, boolean isEUTxPowerCompliant,
+                     String wifiPassword, String wifiSsid, String txPowerCompliantCountry,
                      SparseArray<SoloButtonSetting> buttonSettings, String gimbalVersion,
                      @ControllerMode int controllerMode, @ControllerUnit String controllerUnit) {
         this.autopilotVersion = autopilotVersion;
@@ -52,7 +52,7 @@ public class SoloState implements DroneAttribute {
         this.vehicleVersion = vehicleVersion;
         this.wifiPassword = wifiPassword;
         this.wifiSsid = wifiSsid;
-        this.isEUTxPowerCompliant = isEUTxPowerCompliant;
+        this.txPowerCompliantCountry = txPowerCompliantCountry;
         this.buttonSettings = buttonSettings;
         this.gimbalVersion = gimbalVersion;
         this.controllerMode = controllerMode;
@@ -88,8 +88,15 @@ public class SoloState implements DroneAttribute {
         return wifiSsid;
     }
 
+    /**
+     * @deprecated Use {@link #getTxPowerCompliantCountry()} instead.
+     */
     public boolean isEUTxPowerCompliant() {
-        return isEUTxPowerCompliant;
+        return !TxPowerComplianceCountries.getDefaultCountry().name().equals(txPowerCompliantCountry);
+    }
+
+    public String getTxPowerCompliantCountry() {
+        return txPowerCompliantCountry;
     }
 
     public SoloButtonSetting getButtonSetting(int buttonType){
@@ -117,7 +124,7 @@ public class SoloState implements DroneAttribute {
         dest.writeString(this.controllerFirmwareVersion);
         dest.writeString(this.vehicleVersion);
         dest.writeString(this.autopilotVersion);
-        dest.writeByte(isEUTxPowerCompliant ? (byte) 1 : (byte) 0);
+        dest.writeByte(isEUTxPowerCompliant() ? (byte) 1 : (byte) 0);
 
         final int buttonCount = buttonSettings.size();
         dest.writeInt(buttonCount);
@@ -137,6 +144,7 @@ public class SoloState implements DroneAttribute {
         dest.writeString(this.gimbalVersion);
         dest.writeInt(this.controllerMode);
         dest.writeString(this.controllerUnit);
+        dest.writeString(txPowerCompliantCountry);
     }
 
     protected SoloState(Parcel in) {
@@ -146,7 +154,8 @@ public class SoloState implements DroneAttribute {
         this.controllerFirmwareVersion = in.readString();
         this.vehicleVersion = in.readString();
         this.autopilotVersion = in.readString();
-        this.isEUTxPowerCompliant = in.readByte() != 0;
+        //Throw away byte that was added to ensure backwards compatibility
+        in.readByte();
 
         final int buttonCount = in.readInt();
 
@@ -177,6 +186,7 @@ public class SoloState implements DroneAttribute {
 
         @ControllerUnit final String tempUnit = in.readString();
         this.controllerUnit = tempUnit;
+        this.txPowerCompliantCountry = in.readString();
     }
 
     public static final Creator<SoloState> CREATOR = new Creator<SoloState>() {

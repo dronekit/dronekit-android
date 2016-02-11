@@ -1,13 +1,13 @@
 package org.droidplanner.services.android.core.MAVLink;
 
-import org.droidplanner.services.android.core.MAVLink.MAVLinkStreams.MAVLinkOutputStream;
+import org.droidplanner.services.android.communication.model.DataLink.DataLinkProvider;
 
 import com.MAVLink.common.msg_request_data_stream;
 import com.MAVLink.enums.MAV_DATA_STREAM;
 
 public class MavLinkStreamRates {
 
-	public static void setupStreamRates(MAVLinkOutputStream MAVClient, byte sysid, byte compid,
+	public static void setupStreamRates(DataLinkProvider MAVClient, byte sysid, byte compid,
 			int extendedStatus, int extra1, int extra2, int extra3, int position, int rcChannels,
 			int rawSensors, int rawControler) {
 		requestMavlinkDataStream(MAVClient, sysid, compid, MAV_DATA_STREAM.MAV_DATA_STREAM_EXTENDED_STATUS,
@@ -22,7 +22,7 @@ public class MavLinkStreamRates {
 		requestMavlinkDataStream(MAVClient, sysid, compid, MAV_DATA_STREAM.MAV_DATA_STREAM_RC_CHANNELS, rcChannels);
 	}
 
-	private static void requestMavlinkDataStream(MAVLinkOutputStream mAVClient, byte sysid,
+	private static void requestMavlinkDataStream(DataLinkProvider mAVClient, byte sysid,
 			byte compid, int stream_id, int rate) {
 		msg_request_data_stream msg = new msg_request_data_stream();
 		msg.target_system = sysid;
@@ -36,6 +36,6 @@ public class MavLinkStreamRates {
 		} else {
 			msg.start_stop = 0;
 		}
-		mAVClient.sendMavMessage(msg, null);
+		mAVClient.sendMessage(msg, null);
 	}
 }
