@@ -23,7 +23,6 @@ import org.droidplanner.services.android.DroidPlannerServicesApp;
 import org.droidplanner.services.android.R;
 import org.droidplanner.services.android.core.drone.DroneManager;
 import org.droidplanner.services.android.core.survey.CameraInfo;
-import org.droidplanner.services.android.exception.ConnectionException;
 import org.droidplanner.services.android.ui.activity.MainActivity;
 import org.droidplanner.services.android.utils.Utils;
 import org.droidplanner.services.android.utils.file.IO.CameraInfoLoader;
@@ -118,9 +117,8 @@ public class DroidPlannerService extends Service {
      * @param appId      Application id of the connecting client.
      * @param listener   Callback to receive drone events.
      * @return A DroneManager instance which acts as router between the connected vehicle and the listeneing client(s).
-     * @throws ConnectionException
      */
-    DroneManager connectDroneManager(ConnectionParameter connParams, String appId, DroneApi listener) throws ConnectionException {
+    DroneManager connectDroneManager(ConnectionParameter connParams, String appId, DroneApi listener) {
         if (connParams == null || TextUtils.isEmpty(appId) || listener == null)
             return null;
 
@@ -148,9 +146,8 @@ public class DroidPlannerService extends Service {
      *
      * @param droneMgr   Handler for the connected vehicle.
      * @param clientInfo Info of the disconnecting client.
-     * @throws ConnectionException
      */
-    void disconnectDroneManager(DroneManager droneMgr, DroneApi.ClientInfo clientInfo) throws ConnectionException {
+    void disconnectDroneManager(DroneManager droneMgr, DroneApi.ClientInfo clientInfo) {
         if (droneMgr == null || clientInfo == null || TextUtils.isEmpty(clientInfo.appId))
             return;
 

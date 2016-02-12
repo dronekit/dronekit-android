@@ -12,8 +12,8 @@ import android.view.Surface;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.ardupilotmega.msg_mag_cal_progress;
 import com.MAVLink.ardupilotmega.msg_mag_cal_report;
-import com.o3dr.services.android.lib.drone.action.CameraActions;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
+import com.o3dr.services.android.lib.drone.action.CameraActions;
 import com.o3dr.services.android.lib.drone.action.ConnectionActions;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
@@ -21,6 +21,7 @@ import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionResult;
+import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
 import com.o3dr.services.android.lib.drone.mission.Mission;
 import com.o3dr.services.android.lib.drone.mission.action.MissionActions;
 import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
@@ -30,6 +31,8 @@ import com.o3dr.services.android.lib.drone.property.DroneAttribute;
 import com.o3dr.services.android.lib.drone.property.Parameter;
 import com.o3dr.services.android.lib.drone.property.State;
 import com.o3dr.services.android.lib.gcs.event.GCSEvent;
+import com.o3dr.services.android.lib.gcs.link.LinkEvent;
+import com.o3dr.services.android.lib.gcs.link.LinkEventExtra;
 import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
 import com.o3dr.services.android.lib.model.IApiListener;
 import com.o3dr.services.android.lib.model.ICommandListener;
@@ -60,7 +63,7 @@ import timber.log.Timber;
  * Implementation for the IDroneApi interface.
  */
 public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.OnDroneListener, DroneInterfaces.AttributeEventListener,
-        DroneInterfaces.OnParameterManagerListener, MagnetometerCalibrationImpl.OnMagnetometerCalibrationListener, IBinder.DeathRecipient {
+    DroneInterfaces.OnParameterManagerListener, MagnetometerCalibrationImpl.OnMagnetometerCalibrationListener, IBinder.DeathRecipient {
 
     //The Reset ROI mission item was introduced in version 2.6.8. Any client library older than this do not support it.
     private final static int RESET_ROI_LIB_VERSION = 206080;
@@ -117,11 +120,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
             Timber.e(e, e.getMessage());
         }
 
-        try {
-            this.service.disconnectDroneManager(this.droneMgr, this.clientInfo);
-        } catch (ConnectionException e) {
-            Timber.e(e, e.getMessage());
-        }
+        this.service.disconnectDroneManager(this.droneMgr, this.clientInfo);
     }
 
     public String getOwnerId() {
@@ -133,8 +132,9 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
     }
 
     private Drone getDrone() {
-        if (this.droneMgr == null)
+        if (this.droneMgr == null) {
             return null;
+        }
 
         return this.droneMgr.getDrone();
     }
@@ -149,19 +149,19 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
                 break;
 
             default:
-                if(droneMgr != null) {
+                if (droneMgr != null) {
                     DroneAttribute attribute = droneMgr.getAttribute(clientInfo, type);
                     if (attribute != null) {
 
                         //Check if the client supports the ResetROI mission item.
                         // Replace it with a RegionOfInterest with coordinate set to 0 if it doesn't.
-                        if(clientInfo.clientVersionCode < RESET_ROI_LIB_VERSION && attribute instanceof Mission){
+                        if (clientInfo.clientVersionCode < RESET_ROI_LIB_VERSION && attribute instanceof Mission) {
                             Mission proxyMission = (Mission) attribute;
                             List<MissionItem> missionItems = proxyMission.getMissionItems();
                             int missionItemsCount = missionItems.size();
-                            for(int i = 0; i < missionItemsCount; i++){
+                            for (int i = 0; i < missionItemsCount; i++) {
                                 MissionItem missionItem = missionItems.get(i);
-                                if(missionItem instanceof ResetROI){
+                                if (missionItem instanceof ResetROI) {
                                     missionItems.remove(i);
 
                                     RegionOfInterest replacement = new RegionOfInterest();
@@ -184,13 +184,13 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
     }
 
     private ConnectionParameter checkConnectionParameter(ConnectionParameter connParams) throws ConnectionException {
-        if(connParams == null){
+        if (connParams == null) {
             throw new ConnectionException("Invalid connection parameters");
         }
 
-        if(SoloConnection.isSoloConnection(context, connParams)){
+        if (SoloConnection.isSoloConnection(context, connParams)) {
             ConnectionParameter update = SoloConnection.getSoloConnectionParameterIfPossible(context);
-            if(update != null){
+            if (update != null) {
                 return update;
             }
         }
@@ -202,18 +202,17 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
             this.connectionParams = checkConnectionParameter(connParams);
             this.droneMgr = service.connectDroneManager(this.connectionParams, ownerId, this);
         } catch (ConnectionException e) {
-            notifyConnectionFailed(new ConnectionResult(0, e.getMessage()));
+            LinkConnectionStatus connectionStatus = LinkConnectionStatus
+                .newFailedConnectionStatus(LinkConnectionStatus.INVALID_CREDENTIALS, e.getMessage());
+            onConnectionStatus(connectionStatus);
             disconnect();
         }
     }
 
     public void disconnect() {
-        try {
-            service.disconnectDroneManager(this.droneMgr, clientInfo);
-            this.droneMgr = null;
-        } catch (ConnectionException e) {
-            notifyConnectionFailed(new ConnectionResult(0, e.getMessage()));
-        }
+        service.disconnectDroneManager(this.droneMgr, clientInfo);
+        this.droneMgr = null;
+
     }
 
     private void checkForSelfRelease() {
@@ -221,8 +220,8 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
         if (!apiListener.asBinder().pingBinder()) {
             Timber.w("Client is not longer available.");
             this.context.startService(new Intent(this.context, DroidPlannerService.class)
-                    .setAction(DroidPlannerService.ACTION_RELEASE_API_INSTANCE)
-                    .putExtra(DroidPlannerService.EXTRA_API_INSTANCE_APP_ID, this.ownerId));
+                .setAction(DroidPlannerService.ACTION_RELEASE_API_INSTANCE)
+                .putExtra(DroidPlannerService.EXTRA_API_INSTANCE_APP_ID, this.ownerId));
         }
     }
 
@@ -245,8 +244,9 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
 
     @Override
     public void addMavlinkObserver(IMavlinkObserver observer) throws RemoteException {
-        if (observer != null)
+        if (observer != null) {
             mavlinkObserversList.add(observer);
+        }
     }
 
     @Override
@@ -259,16 +259,19 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
 
     @Override
     public void executeAction(Action action, ICommandListener listener) throws RemoteException {
-        if (action == null)
+        if (action == null) {
             return;
+        }
 
         String type = action.getType();
-        if (type == null)
+        if (type == null) {
             return;
+        }
 
         Bundle data = action.getData();
-        if (data != null)
+        if (data != null) {
             data.setClassLoader(context.getClassLoader());
+        }
 
         Drone drone = getDrone();
         switch (type) {
@@ -308,10 +311,9 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
 
             // MISSION ACTIONS
             case MissionActions.ACTION_BUILD_COMPLEX_MISSION_ITEM:
-                if(drone instanceof MavLinkDrone) {
-                    CommonApiUtils.buildComplexMissionItem((MavLinkDrone)drone, data);
-                }
-                else{
+                if (drone instanceof MavLinkDrone) {
+                    CommonApiUtils.buildComplexMissionItem((MavLinkDrone) drone, data);
+                } else {
                     CommonApiUtils.postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
                 }
                 break;
@@ -342,8 +344,9 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
     }
 
     private void notifyAttributeUpdate(List<Pair<String, Bundle>> attributesInfo) {
-        if (observersList.isEmpty() || attributesInfo == null || attributesInfo.isEmpty())
+        if (observersList.isEmpty() || attributesInfo == null || attributesInfo.isEmpty()) {
             return;
+        }
 
         for (Pair<String, Bundle> info : attributesInfo) {
             notifyAttributeUpdate(info.first, info.second);
@@ -351,8 +354,9 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
     }
 
     private void notifyAttributeUpdate(String attributeEvent, Bundle extrasBundle) {
-        if (observersList.isEmpty())
+        if (observersList.isEmpty()) {
             return;
+        }
 
         if (attributeEvent != null) {
             for (IObserver observer : observersList) {
@@ -370,21 +374,10 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
         }
     }
 
-    private void notifyConnectionFailed(ConnectionResult result) {
-        if (result != null) {
-            try {
-                apiListener.onConnectionFailed(result);
-                return;
-            } catch (RemoteException e) {
-                Timber.w(e, "Unable to forward connection fail to client.");
-            }
-            checkForSelfRelease();
-        }
-    }
-
     public void onReceivedMavLinkMessage(MAVLinkMessage msg) {
-        if (mavlinkObserversList.isEmpty())
+        if (mavlinkObserversList.isEmpty()) {
             return;
+        }
 
         if (msg != null) {
             MavlinkMessageWrapper msgWrapper = new MavlinkMessageWrapper(msg);
@@ -416,8 +409,9 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
 
     @Override
     public void onAttributeEvent(String attributeEvent, Bundle eventInfo, boolean checkForSololinkApi) {
-        if (TextUtils.isEmpty(attributeEvent))
+        if (TextUtils.isEmpty(attributeEvent)) {
             return;
+        }
 
         notifyAttributeUpdate(attributeEvent, eventInfo);
     }
@@ -439,7 +433,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
             case DISCONNECTED:
                 //Broadcast the disconnection with the vehicle.
                 context.sendBroadcast(new Intent(GCSEvent.ACTION_VEHICLE_DISCONNECTION)
-                        .putExtra(GCSEvent.EXTRA_APP_ID, ownerId));
+                    .putExtra(GCSEvent.EXTRA_APP_ID, ownerId));
 
                 droneEvent = AttributeEvent.STATE_DISCONNECTED;
                 break;
@@ -464,7 +458,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
 
             case AUTOPILOT_WARNING:
                 State droneState = (State) drone.getAttribute(AttributeType.STATE);
-                if(droneState != null) {
+                if (droneState != null) {
                     extrasBundle.putString(AttributeEventExtra.EXTRA_AUTOPILOT_ERROR_ID, droneState.getAutopilotErrorId());
                 }
                 droneEvent = AttributeEvent.AUTOPILOT_ERROR;
@@ -509,7 +503,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
                 break;
 
             case CALIBRATION_IMU:
-                if(drone instanceof MavLinkDrone) {
+                if (drone instanceof MavLinkDrone) {
                     String calIMUMessage = ((MavLinkDrone) drone).getCalibrationSetup().getMessage();
                     extrasBundle.putString(AttributeEventExtra.EXTRA_CALIBRATION_IMU_MESSAGE, calIMUMessage);
                     droneEvent = AttributeEvent.CALIBRATION_IMU;
@@ -517,7 +511,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
                 break;
 
             case CALIBRATION_TIMEOUT:
-                if(drone instanceof MavLinkDrone) {
+                if (drone instanceof MavLinkDrone) {
                 /*
                  * here we will check if we are in calibration mode but if at
                  * the same time 'msg' is empty - then it is actually not doing
@@ -545,15 +539,10 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
                 droneEvent = AttributeEvent.STATE_CONNECTING;
                 break;
 
-            case CONNECTION_FAILED:
-                disconnect();
-                onConnectionFailed("");
-                break;
-
             case HEARTBEAT_FIRST:
                 Bundle heartBeatExtras = new Bundle();
                 heartBeatExtras.putString(AttributeEventExtra.EXTRA_VEHICLE_ID, drone.getId());
-                if(drone instanceof MavLinkDrone) {
+                if (drone instanceof MavLinkDrone) {
                     heartBeatExtras.putInt(AttributeEventExtra.EXTRA_MAVLINK_VERSION, ((MavLinkDrone) drone).getMavlinkVersion());
                 }
                 attributesInfo.add(Pair.create(AttributeEvent.HEARTBEAT_FIRST, heartBeatExtras));
@@ -561,17 +550,17 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
             case CONNECTED:
                 //Broadcast the vehicle connection.
                 ConnectionParameter sanitizedParameter = new ConnectionParameter(connectionParams
-                        .getConnectionType(), connectionParams.getParamsBundle());
+                    .getConnectionType(), connectionParams.getParamsBundle());
 
                 context.sendBroadcast(new Intent(GCSEvent.ACTION_VEHICLE_CONNECTION)
-                        .putExtra(GCSEvent.EXTRA_APP_ID, ownerId)
-                        .putExtra(GCSEvent.EXTRA_VEHICLE_CONNECTION_PARAMETER, sanitizedParameter));
+                    .putExtra(GCSEvent.EXTRA_APP_ID, ownerId)
+                    .putExtra(GCSEvent.EXTRA_VEHICLE_CONNECTION_PARAMETER, sanitizedParameter));
 
                 attributesInfo.add(Pair.<String, Bundle>create(AttributeEvent.STATE_CONNECTED, extrasBundle));
                 break;
 
             case HEARTBEAT_RESTORED:
-                if(drone instanceof MavLinkDrone) {
+                if (drone instanceof MavLinkDrone) {
                     extrasBundle.putInt(AttributeEventExtra.EXTRA_MAVLINK_VERSION, ((MavLinkDrone) drone).getMavlinkVersion());
                 }
                 droneEvent = AttributeEvent.HEARTBEAT_RESTORED;
@@ -585,7 +574,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
                 break;
 
             case MISSION_WP_UPDATE:
-                if(drone instanceof MavLinkDrone) {
+                if (drone instanceof MavLinkDrone) {
                     int currentWaypoint = ((MavLinkDrone) drone).getMissionStats().getCurrentWP();
                     extrasBundle.putInt(AttributeEventExtra.EXTRA_MISSION_CURRENT_WAYPOINT, currentWaypoint);
                     droneEvent = AttributeEvent.MISSION_ITEM_UPDATED;
@@ -593,7 +582,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
                 break;
 
             case MISSION_WP_REACHED:
-                if(drone instanceof MavLinkDrone) {
+                if (drone instanceof MavLinkDrone) {
                     int lastReachedWaypoint = ((MavLinkDrone) drone).getMissionStats().getLastReachedWP();
                     extrasBundle.putInt(AttributeEventExtra.EXTRA_MISSION_LAST_REACHED_WAYPOINT, lastReachedWaypoint);
                     droneEvent = AttributeEvent.MISSION_ITEM_REACHED;
@@ -657,8 +646,38 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
         notifyAttributeUpdate(AttributeEvent.PARAMETERS_REFRESH_COMPLETED, null);
     }
 
-    public void onConnectionFailed(String error) {
-        notifyConnectionFailed(new ConnectionResult(0, error));
+    public void onConnectionStatus(LinkConnectionStatus connectionStatus) {
+        if (connectionStatus != null) {
+            switch (connectionStatus.getStatusCode()) {
+                case LinkConnectionStatus.FAILED:
+                    checkForSelfRelease();
+
+                    //This is to ensure backwards compatibility
+                    // TODO: remove this in version 3.0
+                    notifyConnectionFailed(connectionStatus);
+                    break;
+            }
+
+            Bundle extras = new Bundle();
+            extras.putParcelable(LinkEventExtra.EXTRA_CONNECTION_STATUS, connectionStatus);
+            notifyAttributeUpdate(LinkEvent.LINK_STATE_UPDATED, extras);
+        }
+    }
+
+    private void notifyConnectionFailed(LinkConnectionStatus connectionStatus) {
+        Bundle extras = connectionStatus.getExtras();
+        String msg = null;
+        if (extras != null) {
+            msg = extras.getString(LinkConnectionStatus.EXTRA_ERROR_MSG);
+        }
+
+        ConnectionResult connectionResult = new ConnectionResult(0, msg);
+        try {
+            apiListener.onConnectionFailed(connectionResult);
+        } catch (RemoteException e) {
+            Timber.w(e, "Unable to forward connection fail to client.");
+        }
+
     }
 
     @Override
@@ -675,7 +694,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
     public void onCalibrationProgress(msg_mag_cal_progress progress) {
         Bundle progressBundle = new Bundle(1);
         progressBundle.putParcelable(AttributeEventExtra.EXTRA_CALIBRATION_MAG_PROGRESS,
-                CommonApiUtils.getMagnetometerCalibrationProgress(progress));
+            CommonApiUtils.getMagnetometerCalibrationProgress(progress));
 
         notifyAttributeUpdate(AttributeEvent.CALIBRATION_MAG_PROGRESS, progressBundle);
     }
@@ -684,7 +703,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
     public void onCalibrationCompleted(msg_mag_cal_report report) {
         Bundle reportBundle = new Bundle(1);
         reportBundle.putParcelable(AttributeEventExtra.EXTRA_CALIBRATION_MAG_RESULT,
-                CommonApiUtils.getMagnetometerCalibrationResult(report));
+            CommonApiUtils.getMagnetometerCalibrationResult(report));
 
         notifyAttributeUpdate(AttributeEvent.CALIBRATION_MAG_COMPLETED, reportBundle);
     }

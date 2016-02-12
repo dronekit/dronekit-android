@@ -8,6 +8,7 @@ import android.text.TextUtils;
 
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionType;
+import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
 
 import org.droidplanner.services.android.utils.connection.WifiConnectionHandler;
 
@@ -43,8 +44,8 @@ public class SoloConnection extends AndroidMavLinkConnection implements WifiConn
             }
 
             @Override
-            protected void onConnectionFailed(String errMsg) {
-                SoloConnection.this.onConnectionFailed(errMsg);
+            protected void onConnectionStatus(LinkConnectionStatus connectionStatus) {
+                SoloConnection.this.onConnectionStatus(connectionStatus);
             }
         };
     }
@@ -52,16 +53,20 @@ public class SoloConnection extends AndroidMavLinkConnection implements WifiConn
     @Override
     protected void openConnection() throws IOException {
         if (TextUtils.isEmpty(soloLinkId)) {
-            throw new IOException("Invalid connection credentials!");
+            LinkConnectionStatus connectionStatus = LinkConnectionStatus
+                .newFailedConnectionStatus(LinkConnectionStatus.INVALID_CREDENTIALS, "Invalid connection credentials!");
+            onConnectionStatus(connectionStatus);
+        } else {
+            wifiHandler.start();
+            checkScanResults(wifiHandler.getScanResults());
         }
-
-        wifiHandler.start();
-        checkScanResults(wifiHandler.getScanResults());
     }
 
     private void refreshWifiAps() {
         if (!wifiHandler.refreshWifiAPs()) {
-            onConnectionFailed("Unable to refresh wifi access points");
+            LinkConnectionStatus connectionStatus = LinkConnectionStatus
+                .newFailedConnectionStatus(LinkConnectionStatus.SYSTEM_UNAVAILABLE, "Unable to refresh wifi access points");
+            onConnectionStatus(connectionStatus);
         }
     }
 
@@ -100,8 +105,8 @@ public class SoloConnection extends AndroidMavLinkConnection implements WifiConn
                 try {
                     dataLink.openConnection();
                 } catch (IOException e) {
+                    reportIOException(e);
                     Timber.e(e, e.getMessage());
-                    onConnectionFailed(e.getMessage());
                 }
             }
         }
@@ -109,12 +114,12 @@ public class SoloConnection extends AndroidMavLinkConnection implements WifiConn
 
     @Override
     public void onWifiConnecting() {
-
+        onConnectionStatus(new LinkConnectionStatus(LinkConnectionStatus.CONNECTING, null));
     }
 
     @Override
     public void onWifiDisconnected() {
-
+        onConnectionStatus(new LinkConnectionStatus(LinkConnectionStatus.DISCONNECTED, null));
     }
 
     @Override
@@ -139,12 +144,16 @@ public class SoloConnection extends AndroidMavLinkConnection implements WifiConn
         if (targetResult != null) {
             //We're good to go
             try {
-                if (!wifiHandler.connectToWifi(targetResult, soloLinkPassword)) {
-                    onConnectionFailed("Unable to connect to the target wifi " + soloLinkId);
+                int connectionResult = wifiHandler.connectToWifi(targetResult, soloLinkPassword);
+                if (connectionResult != 0) {
+                    LinkConnectionStatus connectionStatus = LinkConnectionStatus
+                        .newFailedConnectionStatus(connectionResult, "Unable to connect to the target wifi " + soloLinkId);
+                    onConnectionStatus(connectionStatus);
                 }
             } catch (IllegalArgumentException e) {
                 Timber.e(e, e.getMessage());
-                onConnectionFailed(e.getMessage());
+                LinkConnectionStatus connectionStatus = LinkConnectionStatus.newFailedConnectionStatus(LinkConnectionStatus.UNKNOWN, e.getMessage());
+                onConnectionStatus(connectionStatus);
             }
         } else {
             //Let's try again

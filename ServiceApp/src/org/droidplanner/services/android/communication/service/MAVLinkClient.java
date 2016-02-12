@@ -9,6 +9,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.google.android.gms.analytics.HitBuilders;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionType;
+import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
 import com.o3dr.services.android.lib.model.ICommandListener;
 
 import org.droidplanner.services.android.communication.connection.AndroidMavLinkConnection;
@@ -52,32 +53,29 @@ public class MAVLinkClient implements DataLink.DataLinkProvider<MAVLinkMessage> 
     private final MavLinkConnectionListener mConnectionListener = new MavLinkConnectionListener() {
 
         @Override
-        public void onStartingConnection() {
-            listener.notifyStartingConnection();
-        }
-
-        @Override
-        public void onConnect(long connectionTime) {
-            startLoggingThread(connectionTime);
-            listener.notifyConnected();
-        }
-
-        @Override
         public void onReceivePacket(final MAVLinkPacket packet) {
             listener.notifyReceivedData(packet);
         }
 
         @Override
-        public void onDisconnect(long disconnectTime) {
-            listener.notifyDisconnected();
-            closeConnection();
-        }
+        public void onConnectionStatus(final LinkConnectionStatus connectionStatus) {
+            switch (connectionStatus.getStatusCode()) {
+                case LinkConnectionStatus.DISCONNECTED:
+                    closeConnection();
+                    break;
 
-        @Override
-        public void onComError(final String errMsg) {
-            if (errMsg != null) {
-                listener.onStreamError(errMsg);
+                case LinkConnectionStatus.CONNECTED:
+                    Bundle extras = connectionStatus.getExtras();
+                    if (extras != null) {
+                        long connectionTime = extras.getLong(LinkConnectionStatus.EXTRA_CONNECTION_TIME);
+                        if (connectionTime != 0) {
+                            startLoggingThread(connectionTime);
+                        }
+                    }
+                    break;
             }
+
+            listener.onConnectionStatus(connectionStatus);
         }
     };
 
@@ -225,7 +223,8 @@ public class MAVLinkClient implements DataLink.DataLinkProvider<MAVLinkMessage> 
         }
 
         stopLoggingThread(System.currentTimeMillis());
-        listener.notifyDisconnected();
+
+        listener.onConnectionStatus(new LinkConnectionStatus(LinkConnectionStatus.DISCONNECTED, null));
     }
 
     @Override

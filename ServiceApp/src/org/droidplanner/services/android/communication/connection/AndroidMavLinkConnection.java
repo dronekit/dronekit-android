@@ -8,8 +8,6 @@ import org.droidplanner.services.android.utils.AndroidLogger;
 
 public abstract class AndroidMavLinkConnection extends MavLinkConnection {
 
-    private static final String TAG = AndroidMavLinkConnection.class.getSimpleName();
-
     protected final Context mContext;
 
     public AndroidMavLinkConnection(Context applicationContext) {
