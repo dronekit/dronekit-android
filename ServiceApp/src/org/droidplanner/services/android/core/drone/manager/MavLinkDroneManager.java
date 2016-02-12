@@ -184,8 +184,9 @@ public class MavLinkDroneManager extends DroneManager<MavLinkDrone, MAVLinkPacke
 
         if (listener != null) {
             mavClient.removeLoggingFile(appId);
-
-            listener.onDroneEvent(DroneInterfaces.DroneEventsType.DISCONNECTED, drone);
+            if (isConnected()) {
+                listener.onDroneEvent(DroneInterfaces.DroneEventsType.DISCONNECTED, drone);
+            }
         }
 
         if (mavClient.isConnected() && connectedApps.isEmpty()) {

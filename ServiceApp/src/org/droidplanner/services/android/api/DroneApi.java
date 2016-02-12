@@ -21,7 +21,6 @@ import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionResult;
-import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
 import com.o3dr.services.android.lib.drone.mission.Mission;
 import com.o3dr.services.android.lib.drone.mission.action.MissionActions;
 import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
@@ -31,6 +30,7 @@ import com.o3dr.services.android.lib.drone.property.DroneAttribute;
 import com.o3dr.services.android.lib.drone.property.Parameter;
 import com.o3dr.services.android.lib.drone.property.State;
 import com.o3dr.services.android.lib.gcs.event.GCSEvent;
+import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
 import com.o3dr.services.android.lib.gcs.link.LinkEvent;
 import com.o3dr.services.android.lib.gcs.link.LinkEventExtra;
 import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
@@ -188,8 +188,8 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
             throw new ConnectionException("Invalid connection parameters");
         }
 
-        if (SoloConnection.isSoloConnection(context, connParams)) {
-            ConnectionParameter update = SoloConnection.getSoloConnectionParameterIfPossible(context);
+        if (SoloConnection.isUdpSoloConnection(context, connParams)) {
+            ConnectionParameter update = SoloConnection.getSoloConnectionParameterFromUdp(context);
             if (update != null) {
                 return update;
             }
@@ -199,8 +199,15 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
 
     public void connect(ConnectionParameter connParams) {
         try {
-            this.connectionParams = checkConnectionParameter(connParams);
-            this.droneMgr = service.connectDroneManager(this.connectionParams, ownerId, this);
+            connParams = checkConnectionParameter(connParams);
+            if (!connParams.equals(this.connectionParams)) {
+                if (this.droneMgr != null) {
+                    throw new ConnectionException("Connection already started with different connection parameters");
+                }
+
+                this.connectionParams = connParams;
+                this.droneMgr = service.connectDroneManager(this.connectionParams, ownerId, this);
+            }
         } catch (ConnectionException e) {
             LinkConnectionStatus connectionStatus = LinkConnectionStatus
                 .newFailedConnectionStatus(LinkConnectionStatus.INVALID_CREDENTIALS, e.getMessage());
@@ -211,6 +218,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
 
     public void disconnect() {
         service.disconnectDroneManager(this.droneMgr, clientInfo);
+        this.connectionParams = null;
         this.droneMgr = null;
 
     }
@@ -647,21 +655,25 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
     }
 
     public void onConnectionStatus(LinkConnectionStatus connectionStatus) {
-        if (connectionStatus != null) {
-            switch (connectionStatus.getStatusCode()) {
-                case LinkConnectionStatus.FAILED:
-                    checkForSelfRelease();
+        switch (connectionStatus.getStatusCode()) {
+            case LinkConnectionStatus.FAILED:
+                disconnect();
+                checkForSelfRelease();
 
-                    //This is to ensure backwards compatibility
-                    // TODO: remove this in version 3.0
-                    notifyConnectionFailed(connectionStatus);
-                    break;
-            }
-
-            Bundle extras = new Bundle();
-            extras.putParcelable(LinkEventExtra.EXTRA_CONNECTION_STATUS, connectionStatus);
-            notifyAttributeUpdate(LinkEvent.LINK_STATE_UPDATED, extras);
+                //This is to ensure backwards compatibility
+                // TODO: remove this in version 3.0
+                notifyConnectionFailed(connectionStatus);
+                break;
+            case LinkConnectionStatus.DISCONNECTED:
+                disconnect();
+                checkForSelfRelease();
+                break;
         }
+
+        Bundle extras = new Bundle();
+        extras.putParcelable(LinkEventExtra.EXTRA_CONNECTION_STATUS, connectionStatus);
+        notifyAttributeUpdate(LinkEvent.LINK_STATE_UPDATED, extras);
+
     }
 
     private void notifyConnectionFailed(LinkConnectionStatus connectionStatus) {
