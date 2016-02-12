@@ -1,6 +1,5 @@
 package com.o3dr.android.client.apis;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -46,8 +45,6 @@ public class ExperimentalApi extends Api {
     };
 
     private final CapabilityApi capabilityChecker;
-
-    private VideoStreamObserver videoStreamObserver;
 
     /**
      * Retrieves an ExperimentalApi instance.
@@ -165,7 +162,7 @@ public class ExperimentalApi extends Api {
     }
 
     /**
-     * Attempt to grab ownership and start the video stream from the connected drone. Can fail if
+     * Attempt to grab ownership and get a lock for the video stream. Can fail if
      * the video stream is already owned by another client.
      *
      * @param tag       Video tag.
@@ -174,6 +171,10 @@ public class ExperimentalApi extends Api {
      * @since 2.5.0
      */
     public void startVideoStream(final String tag, final IVideoStreamCallback callback) {
+        if (callback == null) {
+            throw new NullPointerException("Video stream callback can't be null");
+        }
+
         capabilityChecker.checkFeatureSupport(CapabilityApi.FeatureIds.SOLO_VIDEO_STREAMING,
             new CapabilityApi.FeatureSupportListener() {
                 @Override
@@ -181,24 +182,22 @@ public class ExperimentalApi extends Api {
                     final AbstractCommandListener listener = new AbstractCommandListener() {
                         @Override
                         public void onSuccess() {
-                            callback.onSuccess();
-
-                            // Initialize and start VideoStreamObserver to connect to vehicle video stream and receive
+                            // Start VideoStreamObserver to connect to vehicle video stream and receive
                             // video stream packets.
-                            if (videoStreamObserver == null) {
-                                videoStreamObserver = new VideoStreamObserver(callback);
-                            }
-                            videoStreamObserver.start();
+                            VideoStreamObserver.getInstance().setCallback(callback);
+                            VideoStreamObserver.getInstance().start();
+
+                            VideoStreamObserver.getInstance().getCallback().onVideoConnected();
                         }
 
                         @Override
                         public void onError(int executionError) {
-                            callback.onError(executionError);
+                            VideoStreamObserver.getInstance().getCallback().onError(executionError);
                         }
 
                         @Override
                         public void onTimeout() {
-                            callback.onTimeout();
+                            VideoStreamObserver.getInstance().getCallback().onTimeout();
                         }
                     };
 
@@ -220,14 +219,13 @@ public class ExperimentalApi extends Api {
     }
 
     /**
-     * Stop the video stream from the connected drone, and release ownership.
+     * Release ownership of the video stream.
      *
-     * @param tag       Video tag.
-     * @param callback  Video stream observer callback.
+     * @param tag   Video tag.
      *
      * @since 2.5.0
      */
-    public void stopVideoStream(final String tag, final IVideoStreamCallback callback) {
+    public void stopVideoStream(final String tag) {
         capabilityChecker.checkFeatureSupport(CapabilityApi.FeatureIds.SOLO_VIDEO_STREAMING,
             new CapabilityApi.FeatureSupportListener() {
                 @Override
@@ -235,21 +233,19 @@ public class ExperimentalApi extends Api {
                     final AbstractCommandListener listener = new AbstractCommandListener() {
                         @Override
                         public void onSuccess() {
-                            callback.onSuccess();
+                            VideoStreamObserver.getInstance().getCallback().onVideoDisconnected();
 
-                            if (videoStreamObserver != null) {
-                                videoStreamObserver.stop();
-                            }
+                            VideoStreamObserver.getInstance().stop();
                         }
 
                         @Override
                         public void onError(int executionError) {
-                            callback.onError(executionError);
+                            VideoStreamObserver.getInstance().getCallback().onError(executionError);
                         }
 
                         @Override
                         public void onTimeout() {
-                            callback.onTimeout();
+                            VideoStreamObserver.getInstance().getCallback().onTimeout();
                         }
                     };
 
@@ -315,10 +311,24 @@ public class ExperimentalApi extends Api {
         private HandlerThread handlerThread;
         private Handler handler;
 
-        private ExperimentalApi.IVideoStreamCallback callback;
+        private IVideoStreamCallback callback;
 
-        public VideoStreamObserver(IVideoStreamCallback callback) {
+        private static VideoStreamObserver instance;
+
+        public static synchronized VideoStreamObserver getInstance() {
+            if (instance == null) {
+                instance = new VideoStreamObserver();
+            }
+
+            return instance;
+        }
+
+        public void setCallback(IVideoStreamCallback callback) {
             this.callback = callback;
+        }
+
+        private IVideoStreamCallback getCallback() {
+            return callback;
         }
 
         private final Runnable reconnectTask = new Runnable() {
@@ -384,10 +394,12 @@ public class ExperimentalApi extends Api {
     }
 
     /**
-     * Callback for retrieving video packets from VideoStreamObserver.
+     * Callback for directly observing video stream.
      */
     public interface IVideoStreamCallback {
-        void onSuccess();
+        void onVideoConnected();
+
+        void onVideoDisconnected();
 
         void onError(int executionError);
 

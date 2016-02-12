@@ -74,6 +74,8 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
 
     private TextureView videoView;
 
+    private String videoTag = "testvideotag";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -530,7 +532,7 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
     }
 
     private void startVideoStream(Surface videoSurface){
-        SoloCameraApi.getApi(drone).startVideoStream(videoSurface, "", true, new AbstractCommandListener() {
+        SoloCameraApi.getApi(drone).startVideoStream(videoSurface, videoTag, true, new AbstractCommandListener() {
             @Override
             public void onSuccess() {
                 alertUser("Successfully started the video stream. ");
@@ -578,9 +580,9 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
     };
 
     private void startVideoStreamForObserver() {
-        getApi(drone).startVideoStream("", new ExperimentalApi.IVideoStreamCallback() {
+        getApi(drone).startVideoStream(videoTag, new ExperimentalApi.IVideoStreamCallback() {
             @Override
-            public void onSuccess() {
+            public void onVideoConnected() {
                 alertUser("Successfully obtained lock for drone video stream. ");
 
                 if (stopVideoStreamUsingObserver != null)
@@ -609,7 +611,7 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
                         try {
                             mediaCodecManager.startDecoding(new Surface(videoView.getSurfaceTexture()),
                                 decoderListener);
-                            alertUser("Started video decoding...");
+                            alertUser("Stopped video decoding...");
                         } catch (IOException | IllegalStateException e) {
                             Log.e(TAG, "Unable to create media codec.", e);
                             if (decoderListener != null)
@@ -617,6 +619,26 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
                         }
                     }
                 });
+            }
+
+            @Override
+            public void onVideoDisconnected() {
+                alertUser("Successfully released lock for drone video stream. ");
+
+                if (stopVideoStreamUsingObserver != null)
+                    stopVideoStreamUsingObserver.setEnabled(false);
+
+                if (startVideoStreamUsingObserver != null)
+                    startVideoStreamUsingObserver.setEnabled(true);
+
+                if (stopVideoStream != null)
+                    stopVideoStream.setEnabled(false);
+
+                if (startVideoStream != null)
+                    startVideoStream.setEnabled(true);
+
+                mediaCodecManager.stopDecoding(decoderListener);
+                alertUser("Media decoding has stopped...");
             }
 
             @Override
@@ -637,7 +659,7 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
     }
 
     private void stopVideoStream() {
-        SoloCameraApi.getApi(drone).stopVideoStream("", new AbstractCommandListener() {
+        SoloCameraApi.getApi(drone).stopVideoStream(videoTag, new AbstractCommandListener() {
             @Override
             public void onSuccess() {
                 if (stopVideoStream != null)
@@ -664,39 +686,6 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
     }
 
     private void stopVideoStreamForObserver() {
-        getApi(drone).stopVideoStream("", new ExperimentalApi.IVideoStreamCallback() {
-            @Override
-            public void onSuccess() {
-                alertUser("Successfully released lock for drone video stream. ");
-
-                if (stopVideoStreamUsingObserver != null)
-                    stopVideoStreamUsingObserver.setEnabled(false);
-
-                if (startVideoStreamUsingObserver != null)
-                    startVideoStreamUsingObserver.setEnabled(true);
-
-                if (stopVideoStream != null)
-                    stopVideoStream.setEnabled(false);
-
-                if (startVideoStream != null)
-                    startVideoStream.setEnabled(true);
-
-                mediaCodecManager.stopDecoding(decoderListener);
-                alertUser("Media decoding has stopped...");
-            }
-
-            @Override
-            public void onError(int executionError) {
-            }
-
-            @Override
-            public void onTimeout() {
-            }
-
-            @Override
-            public void onVideoStreamPacketReceived(byte[] data, int dataSize) {
-                // Will not be called on stopping video stream.
-            }
-        });
+        getApi(drone).stopVideoStream(videoTag);
     }
 }
