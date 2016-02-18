@@ -13,8 +13,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static com.o3dr.services.android.lib.drone.action.CameraActions.ACTION_START_VIDEO_STREAM;
 import static com.o3dr.services.android.lib.drone.action.CameraActions.ACTION_STOP_VIDEO_STREAM;
-import static com.o3dr.services.android.lib.drone.action.CameraActions.ACTION_START_VIDEO_STREAM_FOR_OBSERVER;
-import static com.o3dr.services.android.lib.drone.action.CameraActions.ACTION_STOP_VIDEO_STREAM_FOR_OBSERVER;
 import static com.o3dr.services.android.lib.drone.action.CameraActions.EXTRA_VIDEO_DISPLAY;
 import static com.o3dr.services.android.lib.drone.action.CameraActions.EXTRA_VIDEO_ENABLE_LOCAL_RECORDING;
 import static com.o3dr.services.android.lib.drone.action.CameraActions.EXTRA_VIDEO_LOCAL_RECORDING_FILENAME;

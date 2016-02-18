@@ -2,7 +2,6 @@ package com.o3dr.android.client.apis;
 
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.HandlerThread;
 import android.util.Log;
 
 import com.o3dr.android.client.Drone;
@@ -17,8 +16,6 @@ import com.o3dr.services.android.lib.model.action.Action;
 import java.nio.ByteBuffer;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.o3dr.services.android.lib.drone.action.CameraActions.ACTION_START_VIDEO_STREAM_FOR_OBSERVER;
-import static com.o3dr.services.android.lib.drone.action.CameraActions.ACTION_STOP_VIDEO_STREAM_FOR_OBSERVER;
 import static com.o3dr.services.android.lib.drone.action.CameraActions.EXTRA_VIDEO_TAG;
 import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.ACTION_SEND_MAVLINK_MESSAGE;
 import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.ACTION_SET_RELAY;
@@ -46,6 +43,14 @@ public class ExperimentalApi extends Api {
 
     private final CapabilityApi capabilityChecker;
 
+    public static final String ACTION_START_VIDEO_STREAM_FOR_OBSERVER =
+        "com.o3dr.services.android.lib.drone.companion.solo.action.camera.START_VIDEO_STREAM_FOR_OBSERVER";
+
+    public static final String ACTION_STOP_VIDEO_STREAM_FOR_OBSERVER =
+        "com.o3dr.services.android.lib.drone.companion.solo.action.camera.STOP_VIDEO_STREAM_FOR_OBSERVER";
+
+    private final VideoStreamObserver videoStreamObserver;
+
     /**
      * Retrieves an ExperimentalApi instance.
      *
@@ -61,6 +66,8 @@ public class ExperimentalApi extends Api {
     private ExperimentalApi(Drone drone) {
         this.drone = drone;
         this.capabilityChecker = CapabilityApi.getApi(drone);
+
+        videoStreamObserver = new VideoStreamObserver(drone.getHandler());
     }
 
     /**
@@ -184,20 +191,20 @@ public class ExperimentalApi extends Api {
                         public void onSuccess() {
                             // Start VideoStreamObserver to connect to vehicle video stream and receive
                             // video stream packets.
-                            VideoStreamObserver.getInstance().setCallback(callback);
-                            VideoStreamObserver.getInstance().start();
+                            videoStreamObserver.setCallback(callback);
+                            videoStreamObserver.start();
 
-                            VideoStreamObserver.getInstance().getCallback().onVideoConnected();
+                            videoStreamObserver.getCallback().onVideoStreamConnecting();
                         }
 
                         @Override
                         public void onError(int executionError) {
-                            VideoStreamObserver.getInstance().getCallback().onError(executionError);
+                            videoStreamObserver.getCallback().onError(executionError);
                         }
 
                         @Override
                         public void onTimeout() {
-                            VideoStreamObserver.getInstance().getCallback().onTimeout();
+                            videoStreamObserver.getCallback().onTimeout();
                         }
                     };
 
@@ -233,19 +240,19 @@ public class ExperimentalApi extends Api {
                     final AbstractCommandListener listener = new AbstractCommandListener() {
                         @Override
                         public void onSuccess() {
-                            VideoStreamObserver.getInstance().getCallback().onVideoDisconnected();
+                            videoStreamObserver.getCallback().onVideoStreamDisconnecting();
 
-                            VideoStreamObserver.getInstance().stop();
+                            videoStreamObserver.stop();
                         }
 
                         @Override
                         public void onError(int executionError) {
-                            VideoStreamObserver.getInstance().getCallback().onError(executionError);
+                            videoStreamObserver.getCallback().onError(executionError);
                         }
 
                         @Override
                         public void onTimeout() {
-                            VideoStreamObserver.getInstance().getCallback().onTimeout();
+                            videoStreamObserver.getCallback().onTimeout();
                         }
                     };
 
@@ -300,7 +307,7 @@ public class ExperimentalApi extends Api {
     /**
      * Observer for vehicle video stream.
      */
-    public static class VideoStreamObserver implements IpConnectionListener {
+    private static class VideoStreamObserver implements IpConnectionListener {
         private final String TAG = VideoStreamObserver.class.getSimpleName();
 
         private static final int UDP_BUFFER_SIZE = 1500;
@@ -308,19 +315,12 @@ public class ExperimentalApi extends Api {
         private static final int SOLO_STREAM_UDP_PORT = 5600;
 
         private UdpConnection linkConn;
-        private HandlerThread handlerThread;
         private Handler handler;
 
         private IVideoStreamCallback callback;
 
-        private static VideoStreamObserver instance;
-
-        public static synchronized VideoStreamObserver getInstance() {
-            if (instance == null) {
-                instance = new VideoStreamObserver();
-            }
-
-            return instance;
+        public VideoStreamObserver(Handler handler) {
+            this.handler = handler;
         }
 
         public void setCallback(IVideoStreamCallback callback) {
@@ -341,10 +341,6 @@ public class ExperimentalApi extends Api {
         };
 
         public void start() {
-            handlerThread = new HandlerThread("VideoStreamObserverThread");
-            handlerThread.start();
-            handler = new Handler(handlerThread.getLooper());
-
             if (this.linkConn == null) {
                 this.linkConn = new UdpConnection(handler, SOLO_STREAM_UDP_PORT,
                     UDP_BUFFER_SIZE, true, 42);
@@ -367,15 +363,13 @@ public class ExperimentalApi extends Api {
                 this.linkConn.disconnect();
                 this.linkConn = null;
             }
-
-            if (handlerThread.isAlive()) {
-                handlerThread.quit();
-            }
         }
 
         @Override
         public void onIpConnected() {
             Log.d(TAG, "Connected to video stream");
+
+            callback.onVideoStreamConnected();
 
             handler.removeCallbacks(reconnectTask);
         }
@@ -383,6 +377,8 @@ public class ExperimentalApi extends Api {
         @Override
         public void onIpDisconnected() {
             Log.d(TAG, "Video stream disconnected");
+
+            callback.onVideoStreamDisconnected();
 
             handler.postDelayed(reconnectTask, RECONNECT_COUNTDOWN_IN_MILLIS);
         }
@@ -397,9 +393,13 @@ public class ExperimentalApi extends Api {
      * Callback for directly observing video stream.
      */
     public interface IVideoStreamCallback {
-        void onVideoConnected();
+        void onVideoStreamConnecting();
 
-        void onVideoDisconnected();
+        void onVideoStreamConnected();
+
+        void onVideoStreamDisconnecting();
+
+        void onVideoStreamDisconnected();
 
         void onError(int executionError);
 
