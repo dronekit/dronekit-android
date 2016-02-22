@@ -76,7 +76,7 @@ public class WifiConnectionHandler {
                     Timber.d("Supplicant state changed error %s with state %s and ssid %s", supplicationError, supState, ssid);
                     if (supplicationError == WifiManager.ERROR_AUTHENTICATING) {
                         if (NetworkUtils.isSoloNetwork(ssid)) {
-                            notifyWifiConnectionFailed(ssid);
+                            notifyWifiConnectionFailed();
                             WifiConfiguration wifiConfig = getWifiConfigs(ssid);
                             if (wifiConfig != null) {
                                 wifiMgr.removeNetwork(wifiConfig.networkId);
@@ -137,7 +137,7 @@ public class WifiConnectionHandler {
     private final Object netReq;
     private final Object netReqCb;
 
-    private final AtomicReference<String> connectedSoloWifi = new AtomicReference<>("");
+    private final AtomicReference<String> connectedWifi = new AtomicReference<>("");
 
     private final Context context;
 
@@ -250,7 +250,7 @@ public class WifiConnectionHandler {
     private void resetNetworkBindings(ConnectivityManager.NetworkCallback netCb) {
         Timber.i("Unregistering network callbacks.");
 
-        connectedSoloWifi.set(NetworkUtils.getCurrentWifiLink(context));
+        connectedWifi.set(NetworkUtils.getCurrentWifiLink(context));
         try {
             connMgr.unregisterNetworkCallback(netCb);
         } catch (IllegalArgumentException e) {
@@ -437,7 +437,7 @@ public class WifiConnectionHandler {
     private void setDefaultNetworkIfNecessary(String wifiSsid) {
         final String trimmedSsid = trimWifiSsid(wifiSsid);
 
-        if (!trimmedSsid.equals(connectedSoloWifi.get())) {
+        if (!trimmedSsid.equals(connectedWifi.get())) {
             if (isConnected(wifiSsid)) {
                 notifyWifiConnected(wifiSsid);
                 return;
@@ -455,7 +455,7 @@ public class WifiConnectionHandler {
             } else {
                 notifyWifiConnected(trimmedSsid);
             }
-            connectedSoloWifi.set(trimmedSsid);
+            connectedWifi.set(trimmedSsid);
         }
     }
 
@@ -473,9 +473,9 @@ public class WifiConnectionHandler {
 
     private void notifyWifiDisconnected() {
         if (listener != null) {
-            listener.onWifiDisconnected(connectedSoloWifi.get());
+            listener.onWifiDisconnected(connectedWifi.get());
         }
-        connectedSoloWifi.set("");
+        connectedWifi.set("");
     }
 
     private void notifyWifiScanResultsAvailable(List<ScanResult> results) {
@@ -484,7 +484,7 @@ public class WifiConnectionHandler {
         }
     }
 
-    private void notifyWifiConnectionFailed(String ssid) {
+    private void notifyWifiConnectionFailed() {
         if (listener != null) {
             LinkConnectionStatus linkConnectionStatus = LinkConnectionStatus
                 .newFailedConnectionStatus(LinkConnectionStatus.INVALID_CREDENTIALS, null);

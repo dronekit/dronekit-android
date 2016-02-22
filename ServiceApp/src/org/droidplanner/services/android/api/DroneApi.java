@@ -202,7 +202,11 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
             connParams = checkConnectionParameter(connParams);
             if (!connParams.equals(this.connectionParams)) {
                 if (this.droneMgr != null) {
-                    throw new ConnectionException("Connection already started with different connection parameters");
+                    LinkConnectionStatus connectionStatus = LinkConnectionStatus
+                        .newFailedConnectionStatus(LinkConnectionStatus.ADDRESS_IN_USE,
+                            "Connection already started with different connection parameters");
+                    onConnectionStatus(connectionStatus);
+                    return;
                 }
 
                 this.connectionParams = connParams;
