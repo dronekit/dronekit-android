@@ -311,7 +311,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
 
             // MISSION ACTIONS
             case MissionActions.ACTION_BUILD_COMPLEX_MISSION_ITEM:
-                if (drone instanceof MavLinkDrone) {
+                if (drone instanceof MavLinkDrone || drone == null) {
                     CommonApiUtils.buildComplexMissionItem((MavLinkDrone) drone, data);
                 } else {
                     CommonApiUtils.postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
