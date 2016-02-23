@@ -27,6 +27,7 @@ public class Survey extends MissionItem implements MissionItem.ComplexItem<Surve
     private List<LatLong> gridPoints = new ArrayList<LatLong>();
     private List<LatLong> cameraLocations = new ArrayList<LatLong>();
     private boolean isValid;
+    private boolean startCameraBeforeFirstWaypoint;
 
     public Survey(){
         this(MissionItemType.SURVEY);
@@ -48,6 +49,7 @@ public class Survey extends MissionItem implements MissionItem.ComplexItem<Surve
         this.gridPoints = copyPointsList(source.gridPoints);
         this.cameraLocations = copyPointsList(source.cameraLocations);
         this.isValid = source.isValid;
+        this.startCameraBeforeFirstWaypoint = source.startCameraBeforeFirstWaypoint;
     }
 
     private List<LatLong> copyPointsList(List<LatLong> copy){
@@ -115,6 +117,23 @@ public class Survey extends MissionItem implements MissionItem.ComplexItem<Surve
         this.cameraLocations = cameraLocations;
     }
 
+    /**
+     * @since 2.8.1
+     * @return true if the camera trigger should be started before reaching the first survey waypoint.
+     */
+    public boolean isStartCameraBeforeFirstWaypoint() {
+        return startCameraBeforeFirstWaypoint;
+    }
+
+    /**
+     * Enable to start the camera trigger before reaching the first survey waypoint.
+     * @since 2.8.1
+     * @param startCameraBeforeFirstWaypoint
+     */
+    public void setStartCameraBeforeFirstWaypoint(boolean startCameraBeforeFirstWaypoint) {
+        this.startCameraBeforeFirstWaypoint = startCameraBeforeFirstWaypoint;
+    }
+
     public int getCameraCount() {
         return getCameraLocations().size();
     }
@@ -128,6 +147,7 @@ public class Survey extends MissionItem implements MissionItem.ComplexItem<Surve
         dest.writeTypedList(gridPoints);
         dest.writeTypedList(cameraLocations);
         dest.writeByte(isValid ? (byte) 1 : (byte) 0);
+        dest.writeByte(startCameraBeforeFirstWaypoint ? (byte) 1: (byte) 0);
     }
 
     protected Survey(Parcel in) {
@@ -138,6 +158,7 @@ public class Survey extends MissionItem implements MissionItem.ComplexItem<Surve
         in.readTypedList(gridPoints, LatLong.CREATOR);
         in.readTypedList(cameraLocations, LatLong.CREATOR);
         this.isValid = in.readByte() != 0;
+        this.startCameraBeforeFirstWaypoint = in.readByte() != 0;
     }
 
     @Override
