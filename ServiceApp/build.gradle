@@ -135,6 +135,7 @@ android {
                 case "release":
                     switch (flavorName) {
                         case "alpha":
+                        case "beta":
                         case "prod":
                             ignoreVariant = false
                             break
@@ -153,7 +154,6 @@ android {
                 case "staging":
                     switch (flavorName) {
                         case "beta":
-                        case "alpha":
                             ignoreVariant = false
                             break
                     }
