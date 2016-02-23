@@ -1,23 +1,27 @@
 package org.droidplanner.services.android.core.gcs.follow;
 
+import android.content.Context;
 import android.os.Handler;
 
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 
 import org.droidplanner.services.android.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.services.android.core.drone.DroneInterfaces.OnDroneListener;
+import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.core.drone.manager.MavLinkDroneManager;
 import org.droidplanner.services.android.core.drone.variables.GuidedPoint;
 import org.droidplanner.services.android.core.drone.variables.State;
 import org.droidplanner.services.android.core.gcs.location.Location;
 import org.droidplanner.services.android.core.gcs.location.Location.LocationFinder;
 import org.droidplanner.services.android.core.gcs.location.Location.LocationReceiver;
-import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
+
+import timber.log.Timber;
 
 public class Follow implements OnDroneListener<MavLinkDrone>, LocationReceiver {
 
     private static final String TAG = Follow.class.getSimpleName();
     private Location lastLocation;
+    private boolean mUseExternalLocations = false;
 
     /**
      * Set of return value for the 'toggleFollowMeState' method.
@@ -31,8 +35,9 @@ public class Follow implements OnDroneListener<MavLinkDrone>, LocationReceiver {
 
     private final LocationFinder locationFinder;
     private FollowAlgorithm followAlgorithm;
+    private final LocationRelay mLocationRelay;
 
-    public Follow(MavLinkDroneManager droneMgr, Handler handler, LocationFinder locationFinder) {
+    public Follow(Context context, MavLinkDroneManager droneMgr, Handler handler, LocationFinder locationFinder) {
         this.droneMgr = droneMgr;
         final MavLinkDrone drone = droneMgr.getDrone();
         if(drone != null)
@@ -42,6 +47,8 @@ public class Follow implements OnDroneListener<MavLinkDrone>, LocationReceiver {
 
         this.locationFinder = locationFinder;
         locationFinder.addLocationListener(TAG, this);
+
+        mLocationRelay = new LocationRelay(context, this);
     }
 
     public void toggleFollowMeState() {
@@ -94,6 +101,30 @@ public class Follow implements OnDroneListener<MavLinkDrone>, LocationReceiver {
         return state == FollowStates.FOLLOW_RUNNING || state == FollowStates.FOLLOW_START;
     }
 
+    public boolean isUsingExternalLocations() {
+        return mUseExternalLocations;
+    }
+
+    public void useExternalLocations(boolean use) {
+        Timber.d("useExternalLocations(): use=" + use);
+
+        if(mUseExternalLocations != use) {
+            // We're turning external locations off, going back to normal
+            if(mUseExternalLocations) {
+                Timber.d("Turn external OFF");
+                mLocationRelay.unregisterLocationReceiver();
+                locationFinder.addLocationListener(TAG, this);
+            } else {
+                Timber.d("Turn external ON");
+                // We're turning them on, ignoring on-device GPS
+                mLocationRelay.registerLocationReceiver();
+                locationFinder.removeLocationListener(TAG);
+            }
+
+            mUseExternalLocations = use;
+        }
+    }
+
     @Override
     public void onDroneEvent(DroneEventsType event, MavLinkDrone drone) {
         switch (event) {
@@ -114,11 +145,15 @@ public class Follow implements OnDroneListener<MavLinkDrone>, LocationReceiver {
 
     @Override
     public void onLocationUpdate(Location location) {
+        Timber.d("onLocationUpdate(): lat/lng=" + location.getCoord().getLatitude() + "/" + location.getCoord().getLongitude());
+
         if (location.isAccurate()) {
             state = FollowStates.FOLLOW_RUNNING;
             lastLocation = location;
+            Timber.d("Sending location to followAlgorithm " + followAlgorithm);
             followAlgorithm.onLocationReceived(location);
         } else {
+            Timber.d("Location not accurate");
             state = FollowStates.FOLLOW_START;
         }
 

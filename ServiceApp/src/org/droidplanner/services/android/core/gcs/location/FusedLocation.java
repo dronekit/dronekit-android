@@ -145,8 +145,10 @@ public class FusedLocation extends LocationCallback implements LocationFinder, G
     }
 
     private void notifyLocationUpdate(org.droidplanner.services.android.core.gcs.location.Location location) {
-        if (receivers.isEmpty())
+        if (receivers.isEmpty()) {
+            Timber.d(TAG, "notifyLocationUpdate(): No receivers");
             return;
+        }
 
         for (LocationReceiver receiver : receivers.values()) {
             receiver.onLocationUpdate(location);
