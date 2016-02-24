@@ -416,18 +416,34 @@ public class ExperimentalApi extends Api {
      */
     public interface IVideoStreamCallback {
         /**
-         * Invoked upon
+         * Invoked when opening the connection to the video stream endpoint
          */
         void onVideoStreamConnecting();
 
+        /**
+         * Invoked when connected to the video stream endpoint
+         */
         void onVideoStreamConnected();
 
+        /**
+         * Invoked when closing the connection to the video stream endpoint
+         */
         void onVideoStreamDisconnecting();
 
+        /**
+         * Invoked when disconnected from the video stream endpoint
+         */
         void onVideoStreamDisconnected();
 
+        /**
+         * Invoked when detecting an error while connecting to the video stream endpoint
+         * @param executionError
+         */
         void onError(int executionError);
 
+        /**
+         * Invoked when the connection to the video stream endpoint times out
+         */
         void onTimeout();
 
         /**
