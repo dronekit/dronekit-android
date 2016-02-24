@@ -1,18 +1,20 @@
-package org.droidplanner.services.android.utils.video;
+package com.o3dr.android.client.utils.video;
 
 import android.annotation.TargetApi;
 import android.media.MediaCodec;
 import android.os.Build;
+import android.util.Log;
 
 import java.nio.ByteBuffer;
-
-import timber.log.Timber;
+import java.util.Locale;
 
 /**
  * Created by Fredia Huya-Kouadio on 6/1/15.
  */
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 class NaluChunkAssembler {
+
+    private static final String TAG = NaluChunkAssembler.class.getSimpleName();
 
     private final NaluChunk assembledNaluChunk;
     private final NaluChunk paramsNaluChunk;
@@ -76,7 +78,7 @@ class NaluChunkAssembler {
         final byte nalHeaderByte = buffer[12];
         final int forbiddenBit = (nalHeaderByte & 0x80) >> 7;
         if (forbiddenBit != 0) {
-            Timber.w("Forbidden bit is set, indicating possible errors.");
+            Log.w(TAG, "Forbidden bit is set, indicating possible errors.");
             return null;
         }
 
@@ -89,7 +91,7 @@ class NaluChunkAssembler {
         final int sequenceNumber = ((buffer[2] & 0xff) << 8) | (buffer[3] & 0xff);
         final int nalType = nalHeaderByte & 0x1f;
         if (nalType <= 0) {
-            Timber.d("Undefined nal type: " + nalType);
+            Log.d(TAG, "Undefined nal type: " + nalType);
             return null;
         }
 
@@ -97,7 +99,7 @@ class NaluChunkAssembler {
         if(prevSeq != -1){
             final int expectedSeq = prevSeq + 1;
             if(sequenceNumber != expectedSeq){
-                Timber.v("Sequence number is out of order: %d != %d", expectedSeq, sequenceNumber);
+                Log.v(TAG, String.format(Locale.US, "Sequence number is out of order: %d != %d", expectedSeq, sequenceNumber));
             }
         }
         prevSeq = sequenceNumber;

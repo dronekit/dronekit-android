@@ -1,4 +1,4 @@
-package org.droidplanner.services.android.utils.video;
+package com.o3dr.android.client.utils.video;
 
 import android.annotation.TargetApi;
 import android.media.MediaCodec;
@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
+ * Decodes video stream bytes for playing back in a Surface.
  * Created by Fredia Huya-Kouadio on 2/19/15.
  */
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
