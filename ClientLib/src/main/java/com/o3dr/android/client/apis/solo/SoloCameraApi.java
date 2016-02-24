@@ -7,7 +7,6 @@ import com.MAVLink.enums.GOPRO_COMMAND;
 import com.o3dr.android.client.Drone;
 import com.o3dr.android.client.apis.CameraApi;
 import com.o3dr.android.client.apis.CapabilityApi;
-import com.o3dr.services.android.lib.drone.action.CameraActions;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloGoproConstants;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloGoproRecord;
@@ -27,7 +26,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 2.5.0
  */
 public class SoloCameraApi extends SoloApi {
-
     private static final SimpleDateFormat FILE_DATE_FORMAT = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss", Locale.US);
 
     private static final ConcurrentHashMap<Drone, SoloCameraApi> soloCameraApiCache = new ConcurrentHashMap<>();
@@ -121,7 +119,8 @@ public class SoloCameraApi extends SoloApi {
         sendVideoRecordingCommand(SoloGoproConstants.STOP_RECORDING, listener);
     }
 
-    private void sendVideoRecordingCommand(@SoloGoproConstants.RecordCommand final int recordCommand, final AbstractCommandListener listener) {
+    private void sendVideoRecordingCommand(@SoloGoproConstants.RecordCommand final int recordCommand,
+                                           final AbstractCommandListener listener) {
         //Set the gopro to video mode
         switchCameraCaptureMode(SoloGoproConstants.CAPTURE_MODE_VIDEO, new AbstractCommandListener() {
             @Override
@@ -147,7 +146,8 @@ public class SoloCameraApi extends SoloApi {
         });
     }
 
-    public void startVideoStream(final Surface surface, final String tag, final AbstractCommandListener listener) {
+    public void startVideoStream(final Surface surface, final String tag,
+                                 final AbstractCommandListener listener) {
         startVideoStream(surface, tag, false, listener);
     }
 
@@ -162,42 +162,42 @@ public class SoloCameraApi extends SoloApi {
      *
      * @since 2.5.0
      */
-    public void startVideoStream(final Surface surface, final String tag, final boolean enableLocalRecording, final AbstractCommandListener listener) {
+    public void startVideoStream(final Surface surface, final String tag, final boolean enableLocalRecording,
+                                 final AbstractCommandListener listener) {
         if (surface == null) {
             postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
             return;
         }
 
         capabilityChecker.checkFeatureSupport(CapabilityApi.FeatureIds.SOLO_VIDEO_STREAMING,
-                new CapabilityApi.FeatureSupportListener() {
-                    @Override
-                    public void onFeatureSupportResult(String featureId, int result, Bundle resultInfo) {
-                        switch (result) {
+            new CapabilityApi.FeatureSupportListener() {
+                @Override
+                public void onFeatureSupportResult(String featureId, int result, Bundle resultInfo) {
+                    switch (result) {
 
-                            case CapabilityApi.FEATURE_SUPPORTED:
-                                final Bundle videoProps = new Bundle();
-                                videoProps.putInt(CameraApi.VIDEO_PROPS_UDP_PORT, SOLO_STREAM_UDP_PORT);
+                        case CapabilityApi.FEATURE_SUPPORTED:
+                            final Bundle videoProps = new Bundle();
+                            videoProps.putInt(CameraApi.VIDEO_PROPS_UDP_PORT, SOLO_STREAM_UDP_PORT);
 
-                                videoProps.putBoolean(CameraApi.VIDEO_ENABLE_LOCAL_RECORDING, enableLocalRecording);
-                                if(enableLocalRecording){
-                                    String localRecordingFilename = "solo_stream_" + FILE_DATE_FORMAT.format(new Date());
-                                    videoProps.putString(CameraApi.VIDEO_LOCAL_RECORDING_FILENAME, localRecordingFilename);
-                                }
+                            videoProps.putBoolean(CameraApi.VIDEO_ENABLE_LOCAL_RECORDING, enableLocalRecording);
+                            if(enableLocalRecording){
+                                String localRecordingFilename = "solo_stream_" + FILE_DATE_FORMAT.format(new Date());
+                                videoProps.putString(CameraApi.VIDEO_LOCAL_RECORDING_FILENAME, localRecordingFilename);
+                            }
 
-                                cameraApi.startVideoStream(surface, tag, videoProps, listener);
-                                break;
+                            cameraApi.startVideoStream(surface, tag, videoProps, listener);
+                            break;
 
-                            case CapabilityApi.FEATURE_UNSUPPORTED:
-                                postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
-                                break;
+                        case CapabilityApi.FEATURE_UNSUPPORTED:
+                            postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
+                            break;
 
-                            default:
-                                postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
-                                break;
-                        }
+                        default:
+                            postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
+                            break;
                     }
-                });
-
+                }
+            });
     }
 
     /**
@@ -234,25 +234,25 @@ public class SoloCameraApi extends SoloApi {
      */
     public void stopVideoStream(final String tag, final AbstractCommandListener listener) {
         capabilityChecker.checkFeatureSupport(CapabilityApi.FeatureIds.SOLO_VIDEO_STREAMING,
-                new CapabilityApi.FeatureSupportListener() {
-                    @Override
-                    public void onFeatureSupportResult(String featureId, int result, Bundle resultInfo) {
-                        switch (result) {
+            new CapabilityApi.FeatureSupportListener() {
+                @Override
+                public void onFeatureSupportResult(String featureId, int result, Bundle resultInfo) {
+                    switch (result) {
 
-                            case CapabilityApi.FEATURE_SUPPORTED:
-                                cameraApi.stopVideoStream(tag, listener);
-                                break;
+                        case CapabilityApi.FEATURE_SUPPORTED:
+                            cameraApi.stopVideoStream(tag, listener);
+                            break;
 
-                            case CapabilityApi.FEATURE_UNSUPPORTED:
-                                postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
-                                break;
+                        case CapabilityApi.FEATURE_UNSUPPORTED:
+                            postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
+                            break;
 
-                            default:
-                                postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
-                                break;
-                        }
+                        default:
+                            postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
+                            break;
                     }
-                });
+                }
+            });
     }
 
     /**
@@ -265,18 +265,21 @@ public class SoloCameraApi extends SoloApi {
      * @param listener    Register a callback to receive update of the command execution status.
      * @since 2.6.8
      */
-    public void switchCameraCaptureMode(@SoloGoproConstants.CaptureMode byte captureMode, final AbstractCommandListener listener) {
-        final SoloGoproSetRequest captureModeRequest = new SoloGoproSetRequest((short) GOPRO_COMMAND.GOPRO_COMMAND_CAPTURE_MODE, captureMode);
+    public void switchCameraCaptureMode(@SoloGoproConstants.CaptureMode byte captureMode,
+                                        final AbstractCommandListener listener) {
+        final SoloGoproSetRequest captureModeRequest =
+            new SoloGoproSetRequest((short) GOPRO_COMMAND.GOPRO_COMMAND_CAPTURE_MODE, captureMode);
         sendMessage(captureModeRequest, listener);
     }
 
-    private void sendExtendedRequest(AbstractCommandListener listener, int command, byte value1, byte value2, byte value3, byte value4){
+    private void sendExtendedRequest(AbstractCommandListener listener, int command, byte value1,
+                                     byte value2, byte value3, byte value4){
         byte[] values = {value1, value2, value3, value4};
         SoloGoproSetExtendedRequest extendedRequest = new SoloGoproSetExtendedRequest((short) command, values);
         sendMessage(extendedRequest, listener);
     }
 
-    private void sendExtendedRequest(AbstractCommandListener listener, int command, byte value){
+    private void sendExtendedRequest(AbstractCommandListener listener, int command, byte value) {
         sendExtendedRequest(listener, command, value, (byte) 0, (byte) 0, (byte) 0);
     }
 
@@ -288,8 +291,10 @@ public class SoloCameraApi extends SoloApi {
      * @param fieldOfView
      * @param flags
      */
-    public void updateVideoSettings(byte resolution, byte frameRate, byte fieldOfView, byte flags, AbstractCommandListener listener){
-        sendExtendedRequest(listener, GOPRO_COMMAND.GOPRO_COMMAND_VIDEO_SETTINGS, resolution, frameRate, fieldOfView, flags);
+    public void updateVideoSettings(byte resolution, byte frameRate, byte fieldOfView, byte flags,
+                                    AbstractCommandListener listener){
+        sendExtendedRequest(listener, GOPRO_COMMAND.GOPRO_COMMAND_VIDEO_SETTINGS, resolution, frameRate,
+            fieldOfView, flags);
     }
 
     public void setCameraPhotoResolution(byte photoResolution, AbstractCommandListener listener){
