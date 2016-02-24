@@ -41,7 +41,7 @@ public class VideoManager implements IpConnectionListener {
     public static final int ARTOO_UDP_PORT = 5600;
     private static final int UDP_BUFFER_SIZE = 1500;
 
-    private static final AtomicBoolean videoStreamObserverUsed = new AtomicBoolean(false);
+    private final AtomicBoolean videoStreamObserverUsed = new AtomicBoolean(false);
 
     public interface LinkListener {
         void onLinkConnected();
@@ -488,7 +488,13 @@ public class VideoManager implements IpConnectionListener {
 
         if (videoOwner.equals(parentId)){
             Timber.d("Stopping video owned by %s", parentId);
-            stopVideoStream(parentId, videoTagRef.get(), null);
+
+            if(videoStreamObserverUsed.get()){
+                stopVideoStreamForObserver(parentId, videoTagRef.get(), null);
+            }
+            else {
+                stopVideoStream(parentId, videoTagRef.get(), null);
+            }
         }
     }
 
