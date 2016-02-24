@@ -230,43 +230,43 @@ public class ExperimentalApi extends Api {
      */
     public void stopVideoStream(final String tag) {
         capabilityChecker.checkFeatureSupport(CapabilityApi.FeatureIds.SOLO_VIDEO_STREAMING,
-            new CapabilityApi.FeatureSupportListener() {
-                @Override
-                public void onFeatureSupportResult(String featureId, int result, Bundle resultInfo) {
-                    final AbstractCommandListener listener = new AbstractCommandListener() {
-                        @Override
-                        public void onSuccess() {
-                            videoStreamObserver.getCallback().onVideoStreamDisconnecting();
+                new CapabilityApi.FeatureSupportListener() {
+                    @Override
+                    public void onFeatureSupportResult(String featureId, int result, Bundle resultInfo) {
+                        final AbstractCommandListener listener = new AbstractCommandListener() {
+                            @Override
+                            public void onSuccess() {
+                                videoStreamObserver.getCallback().onVideoStreamDisconnecting();
 
-                            videoStreamObserver.stop();
+                                videoStreamObserver.stop();
+                            }
+
+                            @Override
+                            public void onError(int executionError) {
+                                videoStreamObserver.getCallback().onError(executionError);
+                            }
+
+                            @Override
+                            public void onTimeout() {
+                                videoStreamObserver.getCallback().onTimeout();
+                            }
+                        };
+
+                        switch (result) {
+                            case CapabilityApi.FEATURE_SUPPORTED:
+                                stopVideoStreamForObserver(tag, listener);
+                                break;
+
+                            case CapabilityApi.FEATURE_UNSUPPORTED:
+                                postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
+                                break;
+
+                            default:
+                                postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
+                                break;
                         }
-
-                        @Override
-                        public void onError(int executionError) {
-                            videoStreamObserver.getCallback().onError(executionError);
-                        }
-
-                        @Override
-                        public void onTimeout() {
-                            videoStreamObserver.getCallback().onTimeout();
-                        }
-                    };
-
-                    switch (result) {
-                        case CapabilityApi.FEATURE_SUPPORTED:
-                            stopVideoStreamForObserver(tag, listener);
-                            break;
-
-                        case CapabilityApi.FEATURE_UNSUPPORTED:
-                            postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
-                            break;
-
-                        default:
-                            postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
-                            break;
                     }
-                }
-            });
+                });
     }
 
     /**
@@ -306,7 +306,7 @@ public class ExperimentalApi extends Api {
         params.putString(EXTRA_VIDEO_TAG, getObserverTag(tag));
 
         drone.performAsyncActionOnDroneThread(new Action(ExperimentalActions.ACTION_STOP_VIDEO_STREAM_FOR_OBSERVER, params),
-            listener);
+                listener);
     }
 
     /**
@@ -407,12 +407,7 @@ public class ExperimentalApi extends Api {
 
         @Override
         public void onPacketReceived(final ByteBuffer packetBuffer) {
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    callback.onVideoStreamPacketReceived(packetBuffer.array(), packetBuffer.limit());
-                }
-            });
+            callback.onAsyncVideoStreamPacketReceived(packetBuffer.array(), packetBuffer.limit());
         }
     }
 
@@ -420,6 +415,9 @@ public class ExperimentalApi extends Api {
      * Callback for directly observing video stream.
      */
     public interface IVideoStreamCallback {
+        /**
+         * Invoked upon
+         */
         void onVideoStreamConnecting();
 
         void onVideoStreamConnected();
@@ -432,6 +430,12 @@ public class ExperimentalApi extends Api {
 
         void onTimeout();
 
-        void onVideoStreamPacketReceived(byte[] data, int dataSize);
+        /**
+         * Invoked upon receipt of the video stream data packet.
+         * This callback will be invoked on a background thread to avoid blocking the main thread while processing the received data
+         * @param data      Video stream data packet
+         * @param dataSize  Size of the video stream data
+         */
+        void onAsyncVideoStreamPacketReceived(byte[] data, int dataSize);
     }
 }

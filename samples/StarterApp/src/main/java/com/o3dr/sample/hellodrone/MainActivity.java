@@ -688,7 +688,7 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
             }
 
             @Override
-            public void onVideoStreamPacketReceived(byte[] data, int dataSize) {
+            public void onAsyncVideoStreamPacketReceived(byte[] data, int dataSize) {
                 mediaCodecManager.onInputDataReceived(data, dataSize);
             }
         });
