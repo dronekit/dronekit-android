@@ -3,7 +3,6 @@ package org.droidplanner.services.android.utils.video;
 import android.annotation.TargetApi;
 import android.media.MediaCodec;
 import android.os.Build;
-import android.util.Log;
 
 import java.nio.ByteBuffer;
 
@@ -13,11 +12,11 @@ import timber.log.Timber;
  * Created by Fredia Huya-Kouadio on 6/1/15.
  */
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
-public class NALUChunkAssembler {
+class NaluChunkAssembler {
 
-    private final NALUChunk assembledNaluChunk;
-    private final NALUChunk paramsNaluChunk;
-    private final NALUChunk eosNaluChunk;
+    private final NaluChunk assembledNaluChunk;
+    private final NaluChunk paramsNaluChunk;
+    private final NaluChunk eosNaluChunk;
 
     /**
      * Stores the sps data so it can be concatenate with the pps data.
@@ -31,14 +30,14 @@ public class NALUChunkAssembler {
     private final static int PPS_BUFFER_INDEX = 1;
     private boolean isPpsSet = false;
 
-    NALUChunkAssembler(){
-        this.assembledNaluChunk = new NALUChunk(1, 1024 * 1024, NALUChunk.START_CODE);
+    NaluChunkAssembler(){
+        this.assembledNaluChunk = new NaluChunk(1, 1024 * 1024, NaluChunk.START_CODE);
 
-        this.paramsNaluChunk = new NALUChunk(2, 256, NALUChunk.START_CODE);
+        this.paramsNaluChunk = new NaluChunk(2, 256, NaluChunk.START_CODE);
         this.paramsNaluChunk.type = 78;
         this.paramsNaluChunk.flags = MediaCodec.BUFFER_FLAG_CODEC_CONFIG;
 
-        this.eosNaluChunk = new NALUChunk(1, 0, null);
+        this.eosNaluChunk = new NaluChunk(1, 0, null);
         this.eosNaluChunk.flags = MediaCodec.BUFFER_FLAG_END_OF_STREAM;
     }
 
@@ -56,7 +55,7 @@ public class NALUChunkAssembler {
         return isSpsSet && isPpsSet;
     }
 
-    NALUChunk getEndOfStream(){
+    NaluChunk getEndOfStream(){
         return eosNaluChunk;
     }
 
@@ -64,14 +63,14 @@ public class NALUChunkAssembler {
     private int naluCounter = 0;
     private final static long DELTA_PRESENTATION_TIME = 42000L;
 
-    NALUChunk getParametersSet(){
+    NaluChunk getParametersSet(){
         if(areParametersSet())
             return paramsNaluChunk;
 
         return null;
     }
 
-    NALUChunk assembleNALUChunk(byte[] buffer, int bufferLength) {
+    NaluChunk assembleNALUChunk(byte[] buffer, int bufferLength) {
 
         //The first 12 bytes are the rtp header.
         final byte nalHeaderByte = buffer[12];
@@ -113,7 +112,7 @@ public class NALUChunkAssembler {
                 case 8: //PPS parameters set.
                 {
                     ByteBuffer naluData;
-                    if (nalType == NALUChunk.SPS_NAL_TYPE) {
+                    if (nalType == NaluChunk.SPS_NAL_TYPE) {
                         naluData = paramsNaluChunk.payloads[SPS_BUFFER_INDEX];
                         isSpsSet = true;
                     } else {

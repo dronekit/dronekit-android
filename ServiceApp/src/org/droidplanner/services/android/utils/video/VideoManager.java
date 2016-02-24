@@ -78,7 +78,8 @@ public class VideoManager implements IpConnectionListener {
         this.streamRecorder = new StreamRecorder(context);
 
         this.handler = handler;
-        this.mediaCodecManager = new MediaCodecManager(handler, streamRecorder);
+        this.mediaCodecManager = new MediaCodecManager(handler);
+        this.mediaCodecManager.setNaluChunkListener(streamRecorder);
     }
 
     private void enableLocalRecording(String filename) {
