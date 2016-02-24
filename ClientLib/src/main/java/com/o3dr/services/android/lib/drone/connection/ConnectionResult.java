@@ -3,7 +3,11 @@ package com.o3dr.services.android.lib.drone.connection;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
+
 /**
+ * @deprecated Use {@link LinkConnectionStatus} instead.
+ *
  * Conveys information if the connection attempt fails.
  */
 public final class ConnectionResult implements Parcelable {

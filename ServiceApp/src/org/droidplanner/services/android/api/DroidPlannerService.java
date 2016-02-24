@@ -10,6 +10,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
@@ -22,7 +23,6 @@ import org.droidplanner.services.android.DroidPlannerServicesApp;
 import org.droidplanner.services.android.R;
 import org.droidplanner.services.android.core.drone.DroneManager;
 import org.droidplanner.services.android.core.survey.CameraInfo;
-import org.droidplanner.services.android.exception.ConnectionException;
 import org.droidplanner.services.android.ui.activity.MainActivity;
 import org.droidplanner.services.android.utils.Utils;
 import org.droidplanner.services.android.utils.file.IO.CameraInfoLoader;
@@ -117,9 +117,8 @@ public class DroidPlannerService extends Service {
      * @param appId      Application id of the connecting client.
      * @param listener   Callback to receive drone events.
      * @return A DroneManager instance which acts as router between the connected vehicle and the listeneing client(s).
-     * @throws ConnectionException
      */
-    DroneManager connectDroneManager(ConnectionParameter connParams, String appId, DroneApi listener) throws ConnectionException {
+    DroneManager connectDroneManager(ConnectionParameter connParams, String appId, DroneApi listener) {
         if (connParams == null || TextUtils.isEmpty(appId) || listener == null)
             return null;
 
@@ -147,9 +146,8 @@ public class DroidPlannerService extends Service {
      *
      * @param droneMgr   Handler for the connected vehicle.
      * @param clientInfo Info of the disconnecting client.
-     * @throws ConnectionException
      */
-    void disconnectDroneManager(DroneManager droneMgr, DroneApi.ClientInfo clientInfo) throws ConnectionException {
+    void disconnectDroneManager(DroneManager droneMgr, DroneApi.ClientInfo clientInfo) {
         if (droneMgr == null || clientInfo == null || TextUtils.isEmpty(clientInfo.appId))
             return;
 
@@ -232,8 +230,9 @@ public class DroidPlannerService extends Service {
         final Context context = getApplicationContext();
 
         //Put the service in the foreground
-        final Notification.Builder notifBuilder = new Notification.Builder(context)
+        final NotificationCompat.Builder notifBuilder = new NotificationCompat.Builder(context)
                 .setContentTitle("3DR Services")
+                .setPriority(NotificationCompat.PRIORITY_MIN)
                 .setSmallIcon(R.drawable.ic_stat_notify)
                 .setContentIntent(PendingIntent.getActivity(context, 0, new Intent(context,
                         MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK), 0));
@@ -247,9 +246,7 @@ public class DroidPlannerService extends Service {
             }
         }
 
-        final Notification notification = Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN
-                ? notifBuilder.build()
-                : notifBuilder.getNotification();
+        final Notification notification = notifBuilder.build();
         startForeground(FOREGROUND_ID, notification);
     }
 

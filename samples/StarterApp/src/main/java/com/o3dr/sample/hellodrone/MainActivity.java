@@ -292,7 +292,7 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
 
     @Override
     public void onDroneConnectionFailed(ConnectionResult result) {
-        alertUser("Connection Failed:" + result.getErrorMessage());
+        alertUser("Connection Failed:" + result.getErrorCode());
     }
 
     @Override

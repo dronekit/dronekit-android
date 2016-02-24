@@ -232,6 +232,7 @@ public class ProxyUtils {
                 SurveyDetail surveyDetail = proxy.getSurveyDetail();
 
                 SurveyImpl temp = new SurveyImpl(mission, proxy.getPolygonPoints());
+                temp.setStartCameraBeforeFirstWaypoint(proxy.isStartCameraBeforeFirstWaypoint());
 
                 if (surveyDetail != null) {
                     CameraDetail cameraDetail = surveyDetail.getCameraDetail();
@@ -256,6 +257,7 @@ public class ProxyUtils {
                 SurveyDetail surveyDetail = proxy.getSurveyDetail();
 
                 SplineSurveyImpl temp = new SplineSurveyImpl(mission, proxy.getPolygonPoints());
+                temp.setStartCameraBeforeFirstWaypoint(proxy.isStartCameraBeforeFirstWaypoint());
 
                 if (surveyDetail != null) {
                     CameraDetail cameraDetail = surveyDetail.getCameraDetail();
@@ -413,6 +415,7 @@ public class ProxyUtils {
                 }
 
                 Survey temp = new Survey();
+                temp.setStartCameraBeforeFirstWaypoint(source.isStartCameraBeforeFirstWaypoint());
                 temp.setValid(isValid);
                 temp.setSurveyDetail(getSurveyDetail(source.surveyData));
                 temp.setPolygonPoints((source.polygon.getPoints()));
@@ -439,6 +442,7 @@ public class ProxyUtils {
                 }
 
                 Survey temp = new Survey();
+                temp.setStartCameraBeforeFirstWaypoint(source.isStartCameraBeforeFirstWaypoint());
                 temp.setValid(isValid);
                 temp.setSurveyDetail(getSurveyDetail(source.surveyData));
                 temp.setPolygonPoints((source.polygon.getPoints()));
