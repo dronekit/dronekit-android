@@ -46,6 +46,7 @@ import com.o3dr.services.android.lib.drone.property.Speed;
 import com.o3dr.services.android.lib.drone.property.VehicleMode;
 import com.o3dr.services.android.lib.drone.property.Vibration;
 import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
+import com.o3dr.services.android.lib.model.AbstractCommandListener;
 import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
 import com.o3dr.services.android.lib.util.MathUtils;
@@ -267,12 +268,21 @@ public class GenericMavLinkDrone implements MavLinkDrone {
         events.removeDroneListener(listener);
     }
 
-    public void startVideoStream(Bundle videoProps, String appId, String newVideoTag, Surface videoSurface, ICommandListener listener) {
+    public void startVideoStream(Bundle videoProps, String appId, String newVideoTag, Surface videoSurface,
+                                 ICommandListener listener) {
         videoMgr.startVideoStream(videoProps, appId, newVideoTag, videoSurface, listener);
     }
 
     public void stopVideoStream(String appId, String currentVideoTag, ICommandListener listener) {
         videoMgr.stopVideoStream(appId, currentVideoTag, listener);
+    }
+
+    public void startVideoStreamForObserver(String appId, String newVideoTag, ICommandListener listener) {
+        videoMgr.startVideoStreamForObserver(appId, newVideoTag, listener);
+    }
+
+    public void stopVideoStreamForObserver(String appId, String currentVideoTag, ICommandListener listener) {
+        videoMgr.stopVideoStreamForObserver(appId, currentVideoTag, listener);
     }
 
     /**

@@ -12,9 +12,10 @@ import android.view.Surface;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.ardupilotmega.msg_mag_cal_progress;
 import com.MAVLink.ardupilotmega.msg_mag_cal_report;
-import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.action.CameraActions;
+import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.action.ConnectionActions;
+import com.o3dr.services.android.lib.drone.action.ExperimentalActions;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
@@ -275,7 +276,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
 
         Drone drone = getDrone();
         switch (type) {
-            //CONNECTION ACTIONS
+            // CONNECTION ACTIONS
             case ConnectionActions.ACTION_CONNECT:
                 ConnectionParameter parameter = data.getParcelable(ConnectionActions.EXTRA_CONNECT_PARAMETER);
                 connect(parameter);
@@ -285,7 +286,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
                 disconnect();
                 break;
 
-            //CAMERA ACTIONS
+            // CAMERA ACTIONS
             case CameraActions.ACTION_START_VIDEO_STREAM: {
                 Surface videoSurface = data.getParcelable(CameraActions.EXTRA_VIDEO_DISPLAY);
                 String videoTag = data.getString(CameraActions.EXTRA_VIDEO_TAG, "");
@@ -303,9 +304,21 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
                 break;
             }
 
+            case ExperimentalActions.ACTION_START_VIDEO_STREAM_FOR_OBSERVER: {
+                String videoTag = data.getString(CameraActions.EXTRA_VIDEO_TAG, "");
+                CommonApiUtils.startVideoStreamForObserver(drone, ownerId, videoTag, listener);
+                break;
+            }
+
             case CameraActions.ACTION_STOP_VIDEO_STREAM: {
                 String videoTag = data.getString(CameraActions.EXTRA_VIDEO_TAG, "");
                 CommonApiUtils.stopVideoStream(drone, ownerId, videoTag, listener);
+                break;
+            }
+
+            case ExperimentalActions.ACTION_STOP_VIDEO_STREAM_FOR_OBSERVER: {
+                String videoTag = data.getString(CameraActions.EXTRA_VIDEO_TAG, "");
+                CommonApiUtils.stopVideoStreamForObserver(drone, ownerId, videoTag, listener);
                 break;
             }
 
