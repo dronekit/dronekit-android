@@ -438,6 +438,8 @@ public class WifiConnectionHandler {
         final String trimmedSsid = trimWifiSsid(wifiSsid);
 
         if (!trimmedSsid.equals(connectedWifi.get())) {
+            connectedWifi.set(trimmedSsid);
+
             if (isConnected(wifiSsid)) {
                 notifyWifiConnected(wifiSsid);
                 return;
@@ -455,7 +457,6 @@ public class WifiConnectionHandler {
             } else {
                 notifyWifiConnected(trimmedSsid);
             }
-            connectedWifi.set(trimmedSsid);
         }
     }
 
