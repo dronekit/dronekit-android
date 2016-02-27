@@ -41,6 +41,10 @@ public class NetworkUtils {
             return true;
 
         final String connectedSSID = getCurrentWifiLink(context);
-        return connectedSSID != null && connectedSSID.startsWith(SoloComp.SOLO_LINK_WIFI_PREFIX);
+        return isSoloNetwork(connectedSSID);
+    }
+
+    public static boolean isSoloNetwork(String ssid) {
+        return ssid != null && ssid.startsWith(SoloComp.SOLO_LINK_WIFI_PREFIX);
     }
 }

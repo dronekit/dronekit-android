@@ -132,7 +132,7 @@ public class DroneManager<T extends Drone, D> implements DataLink.DataLinkListen
     }
 
     protected void doDisconnect(String appId, DroneApi listener) {
-        if (listener != null) {
+        if (isConnected() && listener != null) {
             listener.onDroneEvent(DroneInterfaces.DroneEventsType.DISCONNECTED, drone);
         }
 
