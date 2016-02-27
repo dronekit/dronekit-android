@@ -5,13 +5,14 @@ import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Environment;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.coremedia.iso.boxes.Container;
 import com.googlecode.mp4parser.FileDataSourceImpl;
 import com.googlecode.mp4parser.authoring.Movie;
 import com.googlecode.mp4parser.authoring.builder.DefaultMp4Builder;
 import com.googlecode.mp4parser.authoring.tracks.h264.H264TrackImpl;
+import com.o3dr.android.client.utils.video.MediaCodecManager;
+import com.o3dr.android.client.utils.video.NaluChunk;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -30,7 +31,7 @@ import timber.log.Timber;
 /**
  * Created by Fredia Huya-Kouadio on 11/22/15.
  */
-class StreamRecorder {
+class StreamRecorder implements MediaCodecManager.NaluChunkListener{
 
     private final AtomicReference<String> recordingFilename = new AtomicReference<>();
     private final AtomicBoolean areParametersSet = new AtomicBoolean(false);
@@ -127,7 +128,8 @@ class StreamRecorder {
     }
 
     //TODO: Maybe put this on a background thread to avoid blocking on the write to file.
-    void onNaluChunkUpdated(NALUChunk parametersSet, NALUChunk dataChunk) {
+    @Override
+    public void onNaluChunkUpdated(NaluChunk parametersSet, NaluChunk dataChunk) {
         if (isRecordingEnabled() && h264Writer != null) {
             if(areParametersSet.get()) {
                 try {
@@ -146,7 +148,7 @@ class StreamRecorder {
         }
     }
 
-    private boolean writeNaluChunk(BufferedOutputStream bos, NALUChunk naluChunk) throws IOException {
+    private boolean writeNaluChunk(BufferedOutputStream bos, NaluChunk naluChunk) throws IOException {
         if(naluChunk == null)
             return false;
 

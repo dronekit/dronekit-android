@@ -29,4 +29,6 @@ public class ExperimentalActions {
     public static final String EXTRA_SERVO_CHANNEL = "extra_servo_channel";
     public static final String EXTRA_SERVO_PWM = "extra_servo_PWM";
 
+    public static final String ACTION_START_VIDEO_STREAM_FOR_OBSERVER = Utils.PACKAGE_NAME + ".action.camera.START_VIDEO_STREAM_FOR_OBSERVER";
+    public static final String ACTION_STOP_VIDEO_STREAM_FOR_OBSERVER = Utils.PACKAGE_NAME + ".action.camera.STOP_VIDEO_STREAM_FOR_OBSERVER";
 }
