@@ -118,13 +118,20 @@ public class SoloConnection extends AndroidMavLinkConnection implements WifiConn
     }
 
     @Override
-    public void onWifiDisconnected() {
-        onConnectionStatus(new LinkConnectionStatus(LinkConnectionStatus.DISCONNECTED, null));
+    public void onWifiDisconnected(String prevSsid) {
+        if (prevSsid.equalsIgnoreCase(soloLinkId)) {
+            onConnectionStatus(new LinkConnectionStatus(LinkConnectionStatus.DISCONNECTED, null));
+        }
     }
 
     @Override
     public void onWifiScanResultsAvailable(List<ScanResult> results) {
         checkScanResults(results);
+    }
+
+    @Override
+    public void onWifiConnectionFailed(LinkConnectionStatus connectionStatus) {
+        onConnectionStatus(connectionStatus);
     }
 
     private void checkScanResults(List<ScanResult> results) {
@@ -146,8 +153,9 @@ public class SoloConnection extends AndroidMavLinkConnection implements WifiConn
             try {
                 int connectionResult = wifiHandler.connectToWifi(targetResult, soloLinkPassword);
                 if (connectionResult != 0) {
+                    @LinkConnectionStatus.FailureCode int failureCode = connectionResult;
                     LinkConnectionStatus connectionStatus = LinkConnectionStatus
-                        .newFailedConnectionStatus(connectionResult, "Unable to connect to the target wifi " + soloLinkId);
+                        .newFailedConnectionStatus(failureCode, "Unable to connect to the target wifi " + soloLinkId);
                     onConnectionStatus(connectionStatus);
                 }
             } catch (IllegalArgumentException e) {
@@ -165,15 +173,12 @@ public class SoloConnection extends AndroidMavLinkConnection implements WifiConn
         return getConnectionStatus() == MAVLINK_CONNECTING;
     }
 
-    public static boolean isSoloConnection(Context context, ConnectionParameter connParam){
+    public static boolean isUdpSoloConnection(Context context, ConnectionParameter connParam){
         if(connParam == null)
             return false;
 
         final int connectionType = connParam.getConnectionType();
         switch(connectionType){
-            case ConnectionType.TYPE_SOLO:
-                return true;
-
             case ConnectionType.TYPE_UDP:
                 Bundle paramsBundle = connParam.getParamsBundle();
                 if(paramsBundle == null)
@@ -188,15 +193,13 @@ public class SoloConnection extends AndroidMavLinkConnection implements WifiConn
         }
     }
 
-    public static ConnectionParameter getSoloConnectionParameterIfPossible(Context context){
+    public static ConnectionParameter getSoloConnectionParameterFromUdp(Context context){
         if(context == null)
             return null;
 
         final String wifiSsid = WifiConnectionHandler.getCurrentWifiLink((WifiManager) context.getSystemService(Context.WIFI_SERVICE));
         if(WifiConnectionHandler.isSoloWifi(wifiSsid)){
-            Bundle paramsBundle = new Bundle();
-            paramsBundle.putString(ConnectionType.EXTRA_SOLO_LINK_ID, wifiSsid);
-            return new ConnectionParameter(ConnectionType.TYPE_SOLO, paramsBundle);
+            return ConnectionParameter.newSoloConnection(wifiSsid, null);
         }
 
         return null;
