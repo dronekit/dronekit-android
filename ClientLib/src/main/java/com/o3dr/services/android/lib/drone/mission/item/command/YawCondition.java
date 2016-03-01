@@ -50,6 +50,41 @@ public class YawCondition extends MissionItem implements MissionItem.Command, an
     }
 
     @Override
+    public String toString() {
+        return "YawCondition{" +
+                "angle=" + angle +
+                ", angularSpeed=" + angularSpeed +
+                ", isRelative=" + isRelative +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof YawCondition)) return false;
+        if (!super.equals(o)) return false;
+
+        YawCondition that = (YawCondition) o;
+
+        if (Double.compare(that.angle, angle) != 0) return false;
+        if (Double.compare(that.angularSpeed, angularSpeed) != 0) return false;
+        return isRelative == that.isRelative;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        long temp;
+        temp = Double.doubleToLongBits(angle);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(angularSpeed);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        result = 31 * result + (isRelative ? 1 : 0);
+        return result;
+    }
+
+    @Override
     public void writeToParcel(Parcel dest, int flags) {
         super.writeToParcel(dest, flags);
         dest.writeDouble(this.angle);
