@@ -67,4 +67,11 @@ public abstract class MissionItem implements Cloneable, Parcelable {
     public int hashCode() {
         return type != null ? type.hashCode() : 0;
     }
+
+    @Override
+    public String toString() {
+        return "MissionItem{" +
+                "type=" + type +
+                '}';
+    }
 }
