@@ -132,7 +132,7 @@ public class StructureScannerImpl extends SpatialCoordItem {
     }
 
     public void setRadius(int newValue) {
-        radius = (newValue);
+        radius = newValue;
     }
 
     public void enableCrossHatch(boolean isEnabled) {

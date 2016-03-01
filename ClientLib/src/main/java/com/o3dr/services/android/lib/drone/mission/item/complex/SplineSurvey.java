@@ -27,6 +27,11 @@ public class SplineSurvey extends Survey {
     }
 
     @Override
+    public String toString() {
+        return "SplineSurvey{" + super.toString() + "}";
+    }
+
+    @Override
     public MissionItem clone() {
         return new SplineSurvey(this);
     }

@@ -30,6 +30,32 @@ public class EpmGripper extends MissionItem implements MissionItem.Command, andr
     }
 
     @Override
+    public String toString() {
+        return "EpmGripper{" +
+                "release=" + release +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof EpmGripper)) return false;
+        if (!super.equals(o)) return false;
+
+        EpmGripper that = (EpmGripper) o;
+
+        return release == that.release;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + (release ? 1 : 0);
+        return result;
+    }
+
+    @Override
     public void writeToParcel(Parcel dest, int flags) {
         super.writeToParcel(dest, flags);
         dest.writeByte(release ? (byte) 1 : (byte) 0);

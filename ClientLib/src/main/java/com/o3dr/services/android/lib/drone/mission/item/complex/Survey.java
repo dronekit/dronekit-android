@@ -139,6 +139,55 @@ public class Survey extends MissionItem implements MissionItem.ComplexItem<Surve
     }
 
     @Override
+    public String toString() {
+        return "Survey{" +
+                "cameraLocations=" + cameraLocations +
+                ", surveyDetail=" + surveyDetail +
+                ", polygonArea=" + polygonArea +
+                ", polygonPoints=" + polygonPoints +
+                ", gridPoints=" + gridPoints +
+                ", isValid=" + isValid +
+                ", startCameraBeforeFirstWaypoint=" + startCameraBeforeFirstWaypoint +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Survey)) return false;
+        if (!super.equals(o)) return false;
+
+        Survey survey = (Survey) o;
+
+        if (Double.compare(survey.polygonArea, polygonArea) != 0) return false;
+        if (isValid != survey.isValid) return false;
+        if (startCameraBeforeFirstWaypoint != survey.startCameraBeforeFirstWaypoint) return false;
+        if (surveyDetail != null ? !surveyDetail.equals(survey.surveyDetail) : survey.surveyDetail != null)
+            return false;
+        if (polygonPoints != null ? !polygonPoints.equals(survey.polygonPoints) : survey.polygonPoints != null)
+            return false;
+        if (gridPoints != null ? !gridPoints.equals(survey.gridPoints) : survey.gridPoints != null)
+            return false;
+        return !(cameraLocations != null ? !cameraLocations.equals(survey.cameraLocations) : survey.cameraLocations != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        long temp;
+        result = 31 * result + (surveyDetail != null ? surveyDetail.hashCode() : 0);
+        temp = Double.doubleToLongBits(polygonArea);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        result = 31 * result + (polygonPoints != null ? polygonPoints.hashCode() : 0);
+        result = 31 * result + (gridPoints != null ? gridPoints.hashCode() : 0);
+        result = 31 * result + (cameraLocations != null ? cameraLocations.hashCode() : 0);
+        result = 31 * result + (isValid ? 1 : 0);
+        result = 31 * result + (startCameraBeforeFirstWaypoint ? 1 : 0);
+        return result;
+    }
+
+    @Override
     public void writeToParcel(Parcel dest, int flags) {
         super.writeToParcel(dest, flags);
         dest.writeParcelable(this.surveyDetail, 0);

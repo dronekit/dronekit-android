@@ -120,6 +120,52 @@ public class StructureScanner extends BaseSpatialItem implements MissionItem.Com
     }
 
     @Override
+    public String toString() {
+        return "StructureScanner{" +
+                "crossHatch=" + crossHatch +
+                ", radius=" + radius +
+                ", heightStep=" + heightStep +
+                ", stepsCount=" + stepsCount +
+                ", surveyDetail=" + surveyDetail +
+                ", path=" + path +
+                ", " + super.toString() +
+        '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof StructureScanner)) return false;
+        if (!super.equals(o)) return false;
+
+        StructureScanner that = (StructureScanner) o;
+
+        if (Double.compare(that.radius, radius) != 0) return false;
+        if (Double.compare(that.heightStep, heightStep) != 0) return false;
+        if (stepsCount != that.stepsCount) return false;
+        if (crossHatch != that.crossHatch) return false;
+        if (surveyDetail != null ? !surveyDetail.equals(that.surveyDetail) : that.surveyDetail != null)
+            return false;
+        return !(path != null ? !path.equals(that.path) : that.path != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        long temp;
+        temp = Double.doubleToLongBits(radius);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(heightStep);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        result = 31 * result + stepsCount;
+        result = 31 * result + (crossHatch ? 1 : 0);
+        result = 31 * result + (surveyDetail != null ? surveyDetail.hashCode() : 0);
+        result = 31 * result + (path != null ? path.hashCode() : 0);
+        return result;
+    }
+
+    @Override
     public MissionItem clone() {
         return new StructureScanner(this);
     }
