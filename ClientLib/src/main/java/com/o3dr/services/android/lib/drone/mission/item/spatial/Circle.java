@@ -41,6 +41,15 @@ public class Circle extends BaseSpatialItem implements android.os.Parcelable {
     }
 
     @Override
+    public String toString() {
+        return "Circle{" +
+                "radius=" + radius +
+                ", turns=" + turns +
+                ", " + super.toString() +
+                '}';
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Circle)) return false;
