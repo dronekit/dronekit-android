@@ -26,6 +26,11 @@ public class ResetROI extends MissionItem implements MissionItem.Command {
     }
 
     @Override
+    public String toString() {
+        return "ResetROI{}";
+    }
+
+    @Override
     public int describeContents() {
         return 0;
     }

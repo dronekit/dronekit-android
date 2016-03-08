@@ -11,6 +11,7 @@ import com.o3dr.services.android.lib.drone.action.GimbalActions;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionType;
+import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
 import com.o3dr.services.android.lib.drone.property.DroneAttribute;
 import com.o3dr.services.android.lib.drone.property.Parameter;
 import com.o3dr.services.android.lib.model.ICommandListener;
@@ -22,7 +23,6 @@ import org.droidplanner.services.android.core.drone.autopilot.Drone;
 import org.droidplanner.services.android.core.drone.autopilot.apm.solo.ArduSolo;
 import org.droidplanner.services.android.core.drone.autopilot.apm.solo.SoloComp;
 import org.droidplanner.services.android.core.drone.manager.MavLinkDroneManager;
-import org.droidplanner.services.android.exception.ConnectionException;
 import org.droidplanner.services.android.utils.CommonApiUtils;
 import org.droidplanner.services.android.utils.analytics.GAUtils;
 
@@ -32,7 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Bridge between the communication channel, the drone instance(s), and the connected client(s).
  */
 public class DroneManager<T extends Drone, D> implements DataLink.DataLinkListener<D>, DroneInterfaces.OnDroneListener,
-        DroneInterfaces.OnParameterManagerListener, LogMessageListener, DroneInterfaces.AttributeEventListener {
+    DroneInterfaces.OnParameterManagerListener, LogMessageListener, DroneInterfaces.AttributeEventListener {
 
     private static final String TAG = DroneManager.class.getSimpleName();
 
@@ -48,8 +48,8 @@ public class DroneManager<T extends Drone, D> implements DataLink.DataLinkListen
     protected T drone;
     protected final ConnectionParameter connectionParameter;
 
-    public static DroneManager generateDroneManager(Context context, ConnectionParameter connParams, Handler handler){
-        switch(connParams.getConnectionType()){
+    public static DroneManager generateDroneManager(Context context, ConnectionParameter connParams, Handler handler) {
+        switch (connParams.getConnectionType()) {
             default:
                 return new MavLinkDroneManager(context, connParams, handler);
         }
@@ -62,8 +62,9 @@ public class DroneManager<T extends Drone, D> implements DataLink.DataLinkListen
     }
 
     private void destroyAutopilot() {
-        if (drone == null)
+        if (drone == null) {
             return;
+        }
 
         drone.destroy();
         drone = null;
@@ -79,9 +80,10 @@ public class DroneManager<T extends Drone, D> implements DataLink.DataLinkListen
 
     }
 
-    public synchronized void connect(String appId, DroneApi listener) throws ConnectionException {
-        if (listener == null || TextUtils.isEmpty(appId))
+    public synchronized void connect(String appId, DroneApi listener) {
+        if (listener == null || TextUtils.isEmpty(appId)) {
             return;
+        }
 
         connectedApps.put(appId, listener);
         doConnect(appId, listener);
@@ -94,11 +96,7 @@ public class DroneManager<T extends Drone, D> implements DataLink.DataLinkListen
     private void disconnect() {
         if (!connectedApps.isEmpty()) {
             for (DroneApi client : connectedApps.values()) {
-                try {
-                    disconnect(client.getClientInfo());
-                } catch (ConnectionException e) {
-                    Log.e(TAG, e.getMessage(), e);
-                }
+                disconnect(client.getClientInfo());
             }
         }
     }
@@ -110,10 +108,10 @@ public class DroneManager<T extends Drone, D> implements DataLink.DataLinkListen
         final int connectionType = connectionParameter.getConnectionType();
 
         return drone instanceof ArduSolo
-                ||
-                (connectionType == ConnectionType.TYPE_UDP && SoloComp.isAvailable(context) && doAnyListenersSupportSoloLinkApi())
-                ||
-                connectionType == ConnectionType.TYPE_SOLO;
+            ||
+            (connectionType == ConnectionType.TYPE_UDP && SoloComp.isAvailable(context) && doAnyListenersSupportSoloLinkApi())
+            ||
+            connectionType == ConnectionType.TYPE_SOLO;
 
     }
 
@@ -121,10 +119,11 @@ public class DroneManager<T extends Drone, D> implements DataLink.DataLinkListen
         return connectedApps.size();
     }
 
-    public void disconnect(DroneApi.ClientInfo clientInfo) throws ConnectionException {
+    public void disconnect(DroneApi.ClientInfo clientInfo) {
         String appId = clientInfo.appId;
-        if (TextUtils.isEmpty(appId))
+        if (TextUtils.isEmpty(appId)) {
             return;
+        }
 
         Log.d(TAG, "Disconnecting client " + appId);
         DroneApi listener = connectedApps.remove(appId);
@@ -133,7 +132,7 @@ public class DroneManager<T extends Drone, D> implements DataLink.DataLinkListen
     }
 
     protected void doDisconnect(String appId, DroneApi listener) {
-        if (listener != null) {
+        if (isConnected() && listener != null) {
             listener.onDroneEvent(DroneInterfaces.DroneEventsType.DISCONNECTED, drone);
         }
 
@@ -141,24 +140,6 @@ public class DroneManager<T extends Drone, D> implements DataLink.DataLinkListen
             //Reset the gimbal mount mode
             executeAsyncAction(null, new Action(GimbalActions.ACTION_RESET_GIMBAL_MOUNT_MODE), null);
         }
-    }
-
-    @Override
-    public void notifyStartingConnection() {
-        if (drone != null)
-            onDroneEvent(DroneInterfaces.DroneEventsType.CONNECTING, drone);
-    }
-
-    @Override
-    public void notifyConnected() {
-        // Start a new ga analytics session. The new session will be tagged
-        // with the mavlink connection mechanism, as well as whether the user has an active droneshare account.
-        GAUtils.startNewSession(null);
-    }
-
-    @Override
-    public void notifyDisconnected() {
-        notifyDroneEvent(DroneInterfaces.DroneEventsType.DISCONNECTED);
     }
 
     protected void notifyDroneEvent(DroneInterfaces.DroneEventsType event) {
@@ -173,12 +154,27 @@ public class DroneManager<T extends Drone, D> implements DataLink.DataLinkListen
     }
 
     @Override
-    public void onStreamError(String errorMsg) {
-        if (connectedApps.isEmpty())
+    public void onConnectionStatus(LinkConnectionStatus connectionStatus) {
+        switch (connectionStatus.getStatusCode()) {
+            case LinkConnectionStatus.DISCONNECTED:
+                notifyDroneEvent(DroneInterfaces.DroneEventsType.DISCONNECTED);
+                break;
+            case LinkConnectionStatus.CONNECTED:
+                // Start a new ga analytics session. The new session will be tagged
+                // with the mavlink connection mechanism, as well as whether the user has an active droneshare account.
+                GAUtils.startNewSession(null);
+                break;
+            case LinkConnectionStatus.CONNECTING:
+                notifyDroneEvent(DroneInterfaces.DroneEventsType.CONNECTING);
+                break;
+        }
+
+        if (connectedApps.isEmpty()) {
             return;
+        }
 
         for (DroneApi droneEventsListener : connectedApps.values()) {
-            droneEventsListener.onConnectionFailed(errorMsg);
+            droneEventsListener.onConnectionStatus(connectionStatus);
         }
     }
 
@@ -246,8 +242,9 @@ public class DroneManager<T extends Drone, D> implements DataLink.DataLinkListen
      * @param checkForSoloLinkApi
      */
     private void notifyDroneAttributeEvent(String attributeEvent, Bundle eventInfo, boolean checkForSoloLinkApi) {
-        if (TextUtils.isEmpty(attributeEvent) || connectedApps.isEmpty())
+        if (TextUtils.isEmpty(attributeEvent) || connectedApps.isEmpty()) {
             return;
+        }
 
         for (DroneApi listener : connectedApps.values()) {
             if (checkForSoloLinkApi && !supportSoloLinkApi(listener)) {
@@ -267,12 +264,14 @@ public class DroneManager<T extends Drone, D> implements DataLink.DataLinkListen
      * @return
      */
     private boolean doAnyListenersSupportSoloLinkApi() {
-        if (connectedApps.isEmpty())
+        if (connectedApps.isEmpty()) {
             return false;
+        }
 
         for (DroneApi listener : connectedApps.values()) {
-            if (supportSoloLinkApi(listener))
+            if (supportSoloLinkApi(listener)) {
                 return true;
+            }
         }
 
         return false;
@@ -287,8 +286,9 @@ public class DroneManager<T extends Drone, D> implements DataLink.DataLinkListen
                 break;
         }
 
-        if (connectedApps.isEmpty())
+        if (connectedApps.isEmpty()) {
             return;
+        }
 
         for (DroneApi droneEventsListener : connectedApps.values()) {
             droneEventsListener.onDroneEvent(event, drone);
@@ -297,8 +297,9 @@ public class DroneManager<T extends Drone, D> implements DataLink.DataLinkListen
 
     @Override
     public void onBeginReceivingParameters() {
-        if (connectedApps.isEmpty())
+        if (connectedApps.isEmpty()) {
             return;
+        }
 
         for (DroneApi droneEventsListener : connectedApps.values()) {
             droneEventsListener.onBeginReceivingParameters();
@@ -307,8 +308,9 @@ public class DroneManager<T extends Drone, D> implements DataLink.DataLinkListen
 
     @Override
     public void onParameterReceived(Parameter parameter, int index, int count) {
-        if (connectedApps.isEmpty())
+        if (connectedApps.isEmpty()) {
             return;
+        }
 
         for (DroneApi droneEventsListener : connectedApps.values()) {
             droneEventsListener.onParameterReceived(parameter, index, count);
@@ -317,8 +319,9 @@ public class DroneManager<T extends Drone, D> implements DataLink.DataLinkListen
 
     @Override
     public void onEndReceivingParameters() {
-        if (connectedApps.isEmpty())
+        if (connectedApps.isEmpty()) {
             return;
+        }
 
         for (DroneApi droneEventsListener : connectedApps.values()) {
             droneEventsListener.onEndReceivingParameters();
@@ -331,8 +334,9 @@ public class DroneManager<T extends Drone, D> implements DataLink.DataLinkListen
 
     @Override
     public void onMessageLogged(int logLevel, String message) {
-        if (connectedApps.isEmpty())
+        if (connectedApps.isEmpty()) {
             return;
+        }
 
         for (DroneApi listener : connectedApps.values()) {
             listener.onMessageLogged(logLevel, message);

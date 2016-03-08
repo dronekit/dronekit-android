@@ -59,6 +59,35 @@ public class SetRelay extends MissionItem implements MissionItem.Command, androi
     }
 
     @Override
+    public String toString() {
+        return "SetRelay{" +
+                "enabled=" + enabled +
+                ", relayNumber=" + relayNumber +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SetRelay)) return false;
+        if (!super.equals(o)) return false;
+
+        SetRelay setRelay = (SetRelay) o;
+
+        if (relayNumber != setRelay.relayNumber) return false;
+        return enabled == setRelay.enabled;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + relayNumber;
+        result = 31 * result + (enabled ? 1 : 0);
+        return result;
+    }
+
+    @Override
     public void writeToParcel(Parcel dest, int flags) {
         super.writeToParcel(dest, flags);
         dest.writeInt(this.relayNumber);

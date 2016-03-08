@@ -35,7 +35,7 @@ public class CircleImpl extends SpatialCoordItem {
     }
 
     public void setRadius(double radius) {
-        this.radius = Math.abs(radius);
+        this.radius = radius;
     }
 
     public int getNumberOfTurns() {

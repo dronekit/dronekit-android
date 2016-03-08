@@ -103,7 +103,6 @@ public class HeartBeat extends DroneVariable implements OnDroneListener<MavLinkD
     @Override
     public void onDroneEvent(DroneEventsType event, MavLinkDrone drone) {
         switch (event) {
-            case CONNECTION_FAILED:
             case DISCONNECTED:
                 notifyDisconnected();
                 break;
@@ -123,7 +122,7 @@ public class HeartBeat extends DroneVariable implements OnDroneListener<MavLinkD
         switch (heartbeatState) {
             case FIRST_HEARTBEAT:
                 Timber.i("First heartbeat timeout.");
-                myDrone.notifyDroneEvent(DroneEventsType.CONNECTION_FAILED);
+                myDrone.notifyDroneEvent(DroneEventsType.HEARTBEAT_TIMEOUT);
                 break;
 
             default:

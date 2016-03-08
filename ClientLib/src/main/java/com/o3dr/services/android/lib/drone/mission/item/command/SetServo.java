@@ -53,6 +53,35 @@ public class SetServo extends MissionItem implements MissionItem.Command, androi
     }
 
     @Override
+    public String toString() {
+        return "SetServo{" +
+                "channel=" + channel +
+                ", pwm=" + pwm +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SetServo)) return false;
+        if (!super.equals(o)) return false;
+
+        SetServo setServo = (SetServo) o;
+
+        if (pwm != setServo.pwm) return false;
+        return channel == setServo.channel;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + pwm;
+        result = 31 * result + channel;
+        return result;
+    }
+
+    @Override
     public void writeToParcel(Parcel dest, int flags) {
         super.writeToParcel(dest, flags);
         dest.writeInt(this.pwm);

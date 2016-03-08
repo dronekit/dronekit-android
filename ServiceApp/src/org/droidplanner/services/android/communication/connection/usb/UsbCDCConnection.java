@@ -11,6 +11,7 @@ import android.util.Log;
 
 import com.hoho.android.usbserial.driver.UsbSerialDriver;
 import com.hoho.android.usbserial.driver.UsbSerialProber;
+import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
 
 import java.io.IOException;
 import java.util.List;
@@ -48,11 +49,15 @@ class UsbCDCConnection extends UsbConnection.UsbConnectionImpl {
                             Log.e(TAG, e.getMessage(), e);
                         }
                     } else {
-                        onUsbConnectionFailed("Unable to access usb device.");
+                        LinkConnectionStatus connectionStatus = LinkConnectionStatus
+                            .newFailedConnectionStatus(LinkConnectionStatus.LINK_UNAVAILABLE, "Unable to access usb device.");
+                        onUsbConnectionStatus(connectionStatus);
                     }
                 } else {
                     Log.d(TAG, "permission denied for device " + device);
-                    onUsbConnectionFailed("USB Permission denied.");
+                    LinkConnectionStatus connectionStatus = LinkConnectionStatus
+                        .newFailedConnectionStatus(LinkConnectionStatus.PERMISSION_DENIED, "USB Permission denied.");
+                    onUsbConnectionStatus(connectionStatus);
                 }
             }
         }
@@ -62,7 +67,9 @@ class UsbCDCConnection extends UsbConnection.UsbConnectionImpl {
         @Override
         public void run() {
             Log.d(TAG, "Permission request timeout.");
-            onUsbConnectionFailed("Unable to get usb access.");
+            LinkConnectionStatus connectionStatus = LinkConnectionStatus
+                .newFailedConnectionStatus(LinkConnectionStatus.TIMEOUT, "Unable to get usb access.");
+            onUsbConnectionStatus(connectionStatus);
 
             removeWatchdog();
         }

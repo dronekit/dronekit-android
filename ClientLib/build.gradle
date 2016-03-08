@@ -3,7 +3,7 @@ apply plugin: 'com.android.library'
 ext {
     VERSION_MAJOR = 2
     VERSION_MINOR = 8
-    VERSION_PATCH = 0
+    VERSION_PATCH = 1
     VERSION_SUFFIX = "release"
 
     PUBLISH_ARTIFACT_ID = 'dronekit-android'
@@ -59,7 +59,7 @@ dependencies {
     compile "com.google.android.gms:play-services-base:${play_services_version}"
 
     compile project(':Mavlink')
-    releaseCompile files('libs/Mavlink.jar')
+    compile files('libs/Mavlink.jar')
 }
 
 assemble.dependsOn ':Mavlink:jar'

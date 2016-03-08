@@ -3,6 +3,8 @@ package org.droidplanner.services.android.communication.connection;
 import android.content.Context;
 import android.util.Log;
 
+import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
+
 import org.droidplanner.services.android.core.MAVLink.connection.UdpConnection;
 import org.droidplanner.services.android.core.model.Logger;
 
@@ -45,10 +47,9 @@ public class AndroidUdpConnection extends AndroidMavLinkConnection {
             }
 
             @Override
-            protected void onConnectionFailed(String errMsg) {
-                AndroidUdpConnection.this.onConnectionFailed(errMsg);
+            protected void onConnectionStatus(LinkConnectionStatus connectionStatus) {
+                AndroidUdpConnection.this.onConnectionStatus(connectionStatus);
             }
-
         };
     }
 

@@ -23,6 +23,32 @@ public abstract class BaseSpatialItem extends MissionItem implements MissionItem
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof BaseSpatialItem)) return false;
+        if (!super.equals(o)) return false;
+
+        BaseSpatialItem that = (BaseSpatialItem) o;
+
+        return !(coordinate != null ? !coordinate.equals(that.coordinate) : that.coordinate != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + (coordinate != null ? coordinate.hashCode() : 0);
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "BaseSpatialItem{" +
+                "coordinate=" + coordinate +
+                '}';
+    }
+
+    @Override
     public LatLongAlt getCoordinate() {
         return coordinate;
     }
