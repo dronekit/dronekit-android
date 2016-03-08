@@ -1,4 +1,4 @@
-package org.droidplanner.services.android.utils.video;
+package com.o3dr.android.client.utils.video;
 
 import android.annotation.TargetApi;
 import android.media.MediaCodec;
@@ -6,18 +6,19 @@ import android.os.Build;
 import android.util.Log;
 
 import java.nio.ByteBuffer;
-
-import timber.log.Timber;
+import java.util.Locale;
 
 /**
  * Created by Fredia Huya-Kouadio on 6/1/15.
  */
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
-public class NALUChunkAssembler {
+class NaluChunkAssembler {
 
-    private final NALUChunk assembledNaluChunk;
-    private final NALUChunk paramsNaluChunk;
-    private final NALUChunk eosNaluChunk;
+    private static final String TAG = NaluChunkAssembler.class.getSimpleName();
+
+    private final NaluChunk assembledNaluChunk;
+    private final NaluChunk paramsNaluChunk;
+    private final NaluChunk eosNaluChunk;
 
     /**
      * Stores the sps data so it can be concatenate with the pps data.
@@ -31,14 +32,14 @@ public class NALUChunkAssembler {
     private final static int PPS_BUFFER_INDEX = 1;
     private boolean isPpsSet = false;
 
-    NALUChunkAssembler(){
-        this.assembledNaluChunk = new NALUChunk(1, 1024 * 1024, NALUChunk.START_CODE);
+    NaluChunkAssembler(){
+        this.assembledNaluChunk = new NaluChunk(1, 1024 * 1024, NaluChunk.START_CODE);
 
-        this.paramsNaluChunk = new NALUChunk(2, 256, NALUChunk.START_CODE);
+        this.paramsNaluChunk = new NaluChunk(2, 256, NaluChunk.START_CODE);
         this.paramsNaluChunk.type = 78;
         this.paramsNaluChunk.flags = MediaCodec.BUFFER_FLAG_CODEC_CONFIG;
 
-        this.eosNaluChunk = new NALUChunk(1, 0, null);
+        this.eosNaluChunk = new NaluChunk(1, 0, null);
         this.eosNaluChunk.flags = MediaCodec.BUFFER_FLAG_END_OF_STREAM;
     }
 
@@ -56,7 +57,7 @@ public class NALUChunkAssembler {
         return isSpsSet && isPpsSet;
     }
 
-    NALUChunk getEndOfStream(){
+    NaluChunk getEndOfStream(){
         return eosNaluChunk;
     }
 
@@ -64,20 +65,20 @@ public class NALUChunkAssembler {
     private int naluCounter = 0;
     private final static long DELTA_PRESENTATION_TIME = 42000L;
 
-    NALUChunk getParametersSet(){
+    NaluChunk getParametersSet(){
         if(areParametersSet())
             return paramsNaluChunk;
 
         return null;
     }
 
-    NALUChunk assembleNALUChunk(byte[] buffer, int bufferLength) {
+    NaluChunk assembleNALUChunk(byte[] buffer, int bufferLength) {
 
         //The first 12 bytes are the rtp header.
         final byte nalHeaderByte = buffer[12];
         final int forbiddenBit = (nalHeaderByte & 0x80) >> 7;
         if (forbiddenBit != 0) {
-            Timber.w("Forbidden bit is set, indicating possible errors.");
+            Log.w(TAG, "Forbidden bit is set, indicating possible errors.");
             return null;
         }
 
@@ -90,7 +91,7 @@ public class NALUChunkAssembler {
         final int sequenceNumber = ((buffer[2] & 0xff) << 8) | (buffer[3] & 0xff);
         final int nalType = nalHeaderByte & 0x1f;
         if (nalType <= 0) {
-            Timber.d("Undefined nal type: " + nalType);
+            Log.d(TAG, "Undefined nal type: " + nalType);
             return null;
         }
 
@@ -98,7 +99,7 @@ public class NALUChunkAssembler {
         if(prevSeq != -1){
             final int expectedSeq = prevSeq + 1;
             if(sequenceNumber != expectedSeq){
-                Timber.v("Sequence number is out of order: %d != %d", expectedSeq, sequenceNumber);
+                Log.v(TAG, String.format(Locale.US, "Sequence number is out of order: %d != %d", expectedSeq, sequenceNumber));
             }
         }
         prevSeq = sequenceNumber;
@@ -113,7 +114,7 @@ public class NALUChunkAssembler {
                 case 8: //PPS parameters set.
                 {
                     ByteBuffer naluData;
-                    if (nalType == NALUChunk.SPS_NAL_TYPE) {
+                    if (nalType == NaluChunk.SPS_NAL_TYPE) {
                         naluData = paramsNaluChunk.payloads[SPS_BUFFER_INDEX];
                         isSpsSet = true;
                     } else {

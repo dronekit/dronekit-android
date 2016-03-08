@@ -46,6 +46,35 @@ public class SplineWaypoint extends BaseSpatialItem implements android.os.Parcel
     }
 
     @Override
+    public String toString() {
+        return "SplineWaypoint{" +
+                "delay=" + delay +
+                ", " + super.toString() +
+        '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SplineWaypoint)) return false;
+        if (!super.equals(o)) return false;
+
+        SplineWaypoint that = (SplineWaypoint) o;
+
+        return Double.compare(that.delay, delay) == 0;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        long temp;
+        temp = Double.doubleToLongBits(delay);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        return result;
+    }
+
+    @Override
     public MissionItem clone() {
         return new SplineWaypoint(this);
     }

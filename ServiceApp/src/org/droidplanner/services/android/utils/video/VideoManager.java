@@ -11,6 +11,8 @@ import android.view.Surface;
 import com.o3dr.android.client.utils.connection.AbstractIpConnection;
 import com.o3dr.android.client.utils.connection.IpConnectionListener;
 import com.o3dr.android.client.utils.connection.UdpConnection;
+import com.o3dr.android.client.utils.video.DecoderListener;
+import com.o3dr.android.client.utils.video.MediaCodecManager;
 import com.o3dr.services.android.lib.drone.action.CameraActions;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.model.ICommandListener;
@@ -78,7 +80,8 @@ public class VideoManager implements IpConnectionListener {
         this.streamRecorder = new StreamRecorder(context);
 
         this.handler = handler;
-        this.mediaCodecManager = new MediaCodecManager(handler, streamRecorder);
+        this.mediaCodecManager = new MediaCodecManager(handler);
+        this.mediaCodecManager.setNaluChunkListener(streamRecorder);
     }
 
     private void enableLocalRecording(String filename) {

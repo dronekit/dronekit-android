@@ -52,6 +52,38 @@ public class Takeoff extends MissionItem implements MissionItem.Command, android
     }
 
     @Override
+    public String toString() {
+        return "Takeoff{" +
+                "takeoffAltitude=" + takeoffAltitude +
+                ", takeoffPitch=" + takeoffPitch +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Takeoff)) return false;
+        if (!super.equals(o)) return false;
+
+        Takeoff takeoff = (Takeoff) o;
+
+        if (Double.compare(takeoff.takeoffAltitude, takeoffAltitude) != 0) return false;
+        return Double.compare(takeoff.takeoffPitch, takeoffPitch) == 0;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        long temp;
+        temp = Double.doubleToLongBits(takeoffAltitude);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(takeoffPitch);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        return result;
+    }
+
+    @Override
     public void writeToParcel(Parcel dest, int flags) {
         super.writeToParcel(dest, flags);
         dest.writeDouble(this.takeoffAltitude);

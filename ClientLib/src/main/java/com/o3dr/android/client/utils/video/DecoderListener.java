@@ -1,4 +1,4 @@
-package org.droidplanner.services.android.utils.video;
+package com.o3dr.android.client.utils.video;
 
 /**
  * Created by fhuya on 12/4/14.
