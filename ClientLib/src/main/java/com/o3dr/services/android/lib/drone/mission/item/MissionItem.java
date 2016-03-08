@@ -52,4 +52,26 @@ public abstract class MissionItem implements Cloneable, Parcelable {
     @Override
     public abstract MissionItem clone();
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof MissionItem)) return false;
+
+        MissionItem that = (MissionItem) o;
+
+        return type == that.type;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return type != null ? type.hashCode() : 0;
+    }
+
+    @Override
+    public String toString() {
+        return "MissionItem{" +
+                "type=" + type +
+                '}';
+    }
 }

@@ -29,6 +29,35 @@ public class DoJump extends MissionItem implements MissionItem.Command, android.
     }
 
     @Override
+    public String toString() {
+        return "DoJump{" +
+                "repeatCount=" + repeatCount +
+                ", waypoint=" + waypoint +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof DoJump)) return false;
+        if (!super.equals(o)) return false;
+
+        DoJump doJump = (DoJump) o;
+
+        if (waypoint != doJump.waypoint) return false;
+        return repeatCount == doJump.repeatCount;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + waypoint;
+        result = 31 * result + repeatCount;
+        return result;
+    }
+
+    @Override
     public void writeToParcel(Parcel dest, int flags) {
         super.writeToParcel(dest, flags);
         dest.writeInt(waypoint);

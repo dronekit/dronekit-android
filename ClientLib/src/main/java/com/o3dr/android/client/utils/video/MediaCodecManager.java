@@ -1,4 +1,4 @@
-package org.droidplanner.services.android.utils.video;
+package com.o3dr.android.client.utils.video;
 
 import android.annotation.TargetApi;
 import android.media.MediaCodec;
@@ -14,10 +14,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
+ * Decodes video stream bytes for playing back in a Surface.
  * Created by Fredia Huya-Kouadio on 2/19/15.
  */
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class MediaCodecManager {
+
+    public interface NaluChunkListener {
+        void onNaluChunkUpdated(NaluChunk parametersSet, NaluChunk dataChunk);
+    }
 
     private static final String TAG = MediaCodecManager.class.getSimpleName();
 
@@ -91,20 +96,24 @@ public class MediaCodecManager {
     private final AtomicReference<Surface> surfaceRef = new AtomicReference<>();
     private final AtomicReference<MediaCodec> mediaCodecRef = new AtomicReference<>();
     private final AtomicReference<DecoderListener> decoderListenerRef = new AtomicReference<>();
-    private final NALUChunkAssembler naluChunkAssembler;
+    private final NaluChunkAssembler naluChunkAssembler;
 
     private final Handler handler;
-    private final StreamRecorder streamRecorder;
+
+    private final AtomicReference<NaluChunkListener> naluChunkListenerRef = new AtomicReference<>();
 
     private DequeueCodec dequeueRunner;
 
-    public MediaCodecManager(Handler handler, StreamRecorder recorder) {
+    public MediaCodecManager(Handler handler) {
         this.handler = handler;
-        this.naluChunkAssembler = new NALUChunkAssembler();
-        this.streamRecorder = recorder;
+        this.naluChunkAssembler = new NaluChunkAssembler();
     }
 
-    Surface getSurface(){
+    public void setNaluChunkListener(NaluChunkListener naluChunkListener) {
+        this.naluChunkListenerRef.set(naluChunkListener);
+    }
+
+    public Surface getSurface(){
         return surfaceRef.get();
     }
 
@@ -158,7 +167,7 @@ public class MediaCodecManager {
         if (isDecoding.get()) {
             if (processInputData.get()) {
                 //Process the received buffer
-                NALUChunk naluChunk = naluChunkAssembler.assembleNALUChunk(data, dataSize);
+                NaluChunk naluChunk = naluChunkAssembler.assembleNALUChunk(data, dataSize);
                 if (naluChunk != null)
                     processNALUChunk(naluChunk);
             } else {
@@ -170,7 +179,7 @@ public class MediaCodecManager {
         }
     }
 
-    private boolean processNALUChunk(NALUChunk naluChunk) {
+    private boolean processNALUChunk(NaluChunk naluChunk) {
         if (naluChunk == null)
             return false;
 
@@ -209,7 +218,10 @@ public class MediaCodecManager {
                     totalLength += dataLength;
                 }
 
-                streamRecorder.onNaluChunkUpdated(naluChunkAssembler.getParametersSet(), naluChunk);
+                NaluChunkListener naluChunkListener = naluChunkListenerRef.get();
+                if(naluChunkListener != null){
+                    naluChunkListener.onNaluChunkUpdated(naluChunkAssembler.getParametersSet(), naluChunk);
+                }
 
                 mediaCodec.queueInputBuffer(index, 0, totalLength, naluChunk.presentationTime, naluChunk.flags);
             }

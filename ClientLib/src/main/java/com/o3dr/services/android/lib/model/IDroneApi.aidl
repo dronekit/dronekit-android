@@ -71,5 +71,4 @@ interface IDroneApi {
     * @param listener Register a callback to be invoken when the action is executed.
     */
     oneway void executeAsyncAction(in Action action, ICommandListener listener);
-
 }

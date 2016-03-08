@@ -25,6 +25,11 @@ public class RegionOfInterest extends BaseSpatialItem implements android.os.Parc
     }
 
     @Override
+    public String toString() {
+        return "RegionOfInterest{ " + super.toString() + " }";
+    }
+
+    @Override
     public MissionItem clone() {
         return new RegionOfInterest(this);
     }

@@ -90,6 +90,50 @@ public class Waypoint extends BaseSpatialItem implements android.os.Parcelable {
     }
 
     @Override
+    public String toString() {
+        return "Waypoint{" +
+                "acceptanceRadius=" + acceptanceRadius +
+                ", delay=" + delay +
+                ", yawAngle=" + yawAngle +
+                ", orbitalRadius=" + orbitalRadius +
+                ", orbitCCW=" + orbitCCW +
+                ", " + super.toString() +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Waypoint)) return false;
+        if (!super.equals(o)) return false;
+
+        Waypoint waypoint = (Waypoint) o;
+
+        if (Double.compare(waypoint.delay, delay) != 0) return false;
+        if (Double.compare(waypoint.acceptanceRadius, acceptanceRadius) != 0) return false;
+        if (Double.compare(waypoint.yawAngle, yawAngle) != 0) return false;
+        if (Double.compare(waypoint.orbitalRadius, orbitalRadius) != 0) return false;
+        return orbitCCW == waypoint.orbitCCW;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        long temp;
+        temp = Double.doubleToLongBits(delay);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(acceptanceRadius);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(yawAngle);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(orbitalRadius);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        result = 31 * result + (orbitCCW ? 1 : 0);
+        return result;
+    }
+
+    @Override
     public MissionItem clone() {
         return new Waypoint(this);
     }

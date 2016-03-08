@@ -16,6 +16,7 @@ import com.o3dr.services.android.lib.drone.action.StateActions;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
+import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
 import com.o3dr.services.android.lib.drone.property.DroneAttribute;
 import com.o3dr.services.android.lib.gcs.action.FollowMeActions;
 import com.o3dr.services.android.lib.gcs.follow.FollowType;
@@ -183,8 +184,9 @@ public class MavLinkDroneManager extends DroneManager<MavLinkDrone, MAVLinkPacke
 
         if (listener != null) {
             mavClient.removeLoggingFile(appId);
-
-            listener.onDroneEvent(DroneInterfaces.DroneEventsType.DISCONNECTED, drone);
+            if (isConnected()) {
+                listener.onDroneEvent(DroneInterfaces.DroneEventsType.DISCONNECTED, drone);
+            }
         }
 
         if (mavClient.isConnected() && connectedApps.isEmpty()) {
@@ -195,17 +197,6 @@ public class MavLinkDroneManager extends DroneManager<MavLinkDrone, MAVLinkPacke
         }
     }
 
-    @Override
-    public void notifyConnected() {
-        super.notifyConnected();
-        this.gcsHeartbeat.setActive(true);
-    }
-
-    @Override
-    public void notifyDisconnected() {
-        super.notifyDisconnected();
-        this.gcsHeartbeat.setActive(false);
-    }
 
     private void handleCommandAck(msg_command_ack ack) {
         if (ack != null) {
@@ -233,6 +224,21 @@ public class MavLinkDroneManager extends DroneManager<MavLinkDrone, MAVLinkPacke
             for (DroneApi droneEventsListener : connectedApps.values()) {
                 droneEventsListener.onReceivedMavLinkMessage(receivedMsg);
             }
+        }
+    }
+
+    @Override
+    public void onConnectionStatus(LinkConnectionStatus connectionStatus) {
+        super.onConnectionStatus(connectionStatus);
+
+        switch (connectionStatus.getStatusCode()) {
+            case LinkConnectionStatus.DISCONNECTED:
+                this.gcsHeartbeat.setActive(false);
+                break;
+
+            case LinkConnectionStatus.CONNECTED:
+                this.gcsHeartbeat.setActive(true);
+                break;
         }
     }
 

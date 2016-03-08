@@ -30,6 +30,34 @@ public class CameraTrigger extends MissionItem implements MissionItem.Command, a
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof CameraTrigger)) return false;
+        if (!super.equals(o)) return false;
+
+        CameraTrigger that = (CameraTrigger) o;
+
+        return Double.compare(that.triggerDistance, triggerDistance) == 0;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        long temp;
+        temp = Double.doubleToLongBits(triggerDistance);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "CameraTrigger{" +
+                "triggerDistance=" + triggerDistance +
+                '}';
+    }
+
+    @Override
     public void writeToParcel(Parcel dest, int flags) {
         super.writeToParcel(dest, flags);
         dest.writeDouble(this.triggerDistance);

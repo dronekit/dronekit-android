@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.SurfaceTexture;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Surface;
@@ -19,10 +20,13 @@ import android.widget.Toast;
 import com.o3dr.android.client.ControlTower;
 import com.o3dr.android.client.Drone;
 import com.o3dr.android.client.apis.ControlApi;
+import com.o3dr.android.client.apis.ExperimentalApi;
 import com.o3dr.android.client.apis.solo.SoloCameraApi;
 import com.o3dr.android.client.apis.VehicleApi;
 import com.o3dr.android.client.interfaces.DroneListener;
 import com.o3dr.android.client.interfaces.TowerListener;
+import com.o3dr.android.client.utils.video.DecoderListener;
+import com.o3dr.android.client.utils.video.MediaCodecManager;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
@@ -42,11 +46,12 @@ import com.o3dr.services.android.lib.drone.property.VehicleMode;
 import com.o3dr.services.android.lib.model.AbstractCommandListener;
 import com.o3dr.services.android.lib.model.SimpleCommandListener;
 
+import java.io.IOException;
 import java.util.List;
 
+import static com.o3dr.android.client.apis.ExperimentalApi.*;
 
 public class MainActivity extends AppCompatActivity implements DroneListener, TowerListener {
-
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private Drone drone;
@@ -58,8 +63,20 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
     private static final int DEFAULT_USB_BAUD_RATE = 57600;
 
     private Spinner modeSelector;
+
     private Button startVideoStream;
     private Button stopVideoStream;
+
+    private Button startVideoStreamUsingObserver;
+    private Button stopVideoStreamUsingObserver;
+
+    private MediaCodecManager mediaCodecManager;
+
+    private TextureView videoView;
+
+    private String videoTag = "testvideotag";
+
+    Handler mainHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,12 +116,13 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
             }
         });
 
-        final TextureView videoView = (TextureView) findViewById(R.id.video_content);
+        videoView = (TextureView) findViewById(R.id.video_content);
         videoView.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
             @Override
             public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
                 alertUser("Video display is available.");
                 startVideoStream.setEnabled(true);
+                startVideoStreamUsingObserver.setEnabled(true);
             }
 
             @Override
@@ -115,6 +133,7 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
             @Override
             public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
                 startVideoStream.setEnabled(false);
+                startVideoStreamUsingObserver.setEnabled(false);
                 return true;
             }
 
@@ -143,6 +162,34 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
                 stopVideoStream();
             }
         });
+
+        startVideoStreamUsingObserver = (Button) findViewById(R.id.start_video_stream_using_observer);
+        startVideoStreamUsingObserver.setEnabled(false);
+        startVideoStreamUsingObserver.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertUser("Starting video stream using observer for video stream packets.");
+                startVideoStreamForObserver();
+            }
+        });
+
+        stopVideoStreamUsingObserver = (Button) findViewById(R.id.stop_video_stream_using_observer);
+        stopVideoStreamUsingObserver.setEnabled(false);
+        stopVideoStreamUsingObserver.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertUser("Stopping video stream using observer for video stream packets.");
+                stopVideoStreamForObserver();
+            }
+        });
+
+        // Initialize media codec manager to decode video stream packets.
+        HandlerThread mediaCodecHandlerThread = new HandlerThread("MediaCodecHandlerThread");
+        mediaCodecHandlerThread.start();
+        Handler mediaCodecHandler = new Handler(mediaCodecHandlerThread.getLooper());
+        mediaCodecManager = new MediaCodecManager(mediaCodecHandler);
+
+        mainHandler = new Handler(getApplicationContext().getMainLooper());
     }
 
     @Override
@@ -184,7 +231,6 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
 
     @Override
     public void onDroneEvent(String event, Bundle extras) {
-
         switch (event) {
             case AttributeEvent.STATE_CONNECTED:
                 alertUser("Drone Connected");
@@ -228,27 +274,25 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
                 updateDistanceFromHome();
                 break;
 
-
             default:
-//                Log.i("DRONE_EVENT", event); //Uncomment to see events from the drone
+                // Log.i("DRONE_EVENT", event); //Uncomment to see events from the drone
                 break;
         }
-
     }
 
     private void checkSoloState() {
         final SoloState soloState = drone.getAttribute(SoloAttributes.SOLO_STATE);
-        if(soloState == null){
+        if (soloState == null){
             alertUser("Unable to retrieve the solo state.");
         }
-        else{
+        else {
             alertUser("Solo state is up to date.");
         }
     }
 
     @Override
     public void onDroneConnectionFailed(ConnectionResult result) {
-        alertUser("Connection Failed:" + result.getErrorMessage());
+        alertUser("Connection Failed:" + result.getErrorCode());
     }
 
     @Override
@@ -443,6 +487,10 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
         Log.d(TAG, message);
     }
 
+    private void runOnMainThread(Runnable runnable) {
+        mainHandler.post(runnable);
+    }
+
     protected double distanceBetweenPoints(LatLongAlt pointA, LatLongAlt pointB) {
         if (pointA == null || pointB == null) {
             return 0;
@@ -491,15 +539,23 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
         });
     }
 
-    private void startVideoStream(Surface videoSurface){
-        SoloCameraApi.getApi(drone).startVideoStream(videoSurface, "", true, new AbstractCommandListener() {
+    private void startVideoStream(Surface videoSurface) {
+        SoloCameraApi.getApi(drone).startVideoStream(videoSurface, videoTag, true, new AbstractCommandListener() {
             @Override
             public void onSuccess() {
-                if(stopVideoStream != null)
+                alertUser("Successfully started the video stream. ");
+
+                if (stopVideoStream != null)
                     stopVideoStream.setEnabled(true);
 
-                if(startVideoStream != null)
+                if (startVideoStream != null)
                     startVideoStream.setEnabled(false);
+
+                if (startVideoStreamUsingObserver != null)
+                    startVideoStreamUsingObserver.setEnabled(false);
+
+                if (stopVideoStreamUsingObserver != null)
+                    stopVideoStreamUsingObserver.setEnabled(false);
             }
 
             @Override
@@ -514,17 +570,158 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
         });
     }
 
+    DecoderListener decoderListener = new DecoderListener() {
+        @Override
+        public void onDecodingStarted() {
+            alertUser("MediaCodecManager: video decoding started...");
+        }
+
+        @Override
+        public void onDecodingError() {
+            alertUser("MediaCodecManager: video decoding error...");
+        }
+
+        @Override
+        public void onDecodingEnded() {
+            alertUser("MediaCodecManager: video decoding ended...");
+        }
+    };
+
+    private void startVideoStreamForObserver() {
+        getApi(drone).startVideoStream(videoTag, new ExperimentalApi.IVideoStreamCallback() {
+            @Override
+            public void onVideoStreamConnecting() {
+                runOnMainThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        alertUser("Successfully obtained lock for drone video stream.");
+                    }
+                });
+            }
+
+            @Override
+            public void onVideoStreamConnected() {
+                runOnMainThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        alertUser("Successfully opened drone video connection.");
+
+                        if (stopVideoStreamUsingObserver != null)
+                            stopVideoStreamUsingObserver.setEnabled(true);
+
+                        if (startVideoStreamUsingObserver != null)
+                            startVideoStreamUsingObserver.setEnabled(false);
+
+                        if (stopVideoStream != null)
+                            stopVideoStream.setEnabled(false);
+
+                        if (startVideoStream != null)
+                            startVideoStream.setEnabled(false);
+                    }
+                });
+
+                mediaCodecManager.stopDecoding(new DecoderListener() {
+                    @Override
+                    public void onDecodingStarted() {
+                    }
+
+                    @Override
+                    public void onDecodingError() {
+                    }
+
+                    @Override
+                    public void onDecodingEnded() {
+                        try {
+                            mediaCodecManager.startDecoding(new Surface(videoView.getSurfaceTexture()),
+                                decoderListener);
+                        } catch (IOException | IllegalStateException e) {
+                            Log.e(TAG, "Unable to create media codec.", e);
+                            if (decoderListener != null)
+                                decoderListener.onDecodingError();
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void onVideoStreamDisconnecting() {
+                runOnMainThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        alertUser("Successfully released lock for drone video stream.");
+                    }
+                });
+            }
+
+            @Override
+            public void onVideoStreamDisconnected() {
+                runOnMainThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        alertUser("Successfully closed drone video connection.");
+
+                        if (stopVideoStreamUsingObserver != null)
+                            stopVideoStreamUsingObserver.setEnabled(false);
+
+                        if (startVideoStreamUsingObserver != null)
+                            startVideoStreamUsingObserver.setEnabled(true);
+
+                        if (stopVideoStream != null)
+                            stopVideoStream.setEnabled(false);
+
+                        if (startVideoStream != null)
+                            startVideoStream.setEnabled(true);
+                    }
+                });
+
+                mediaCodecManager.stopDecoding(decoderListener);
+            }
+
+            @Override
+            public void onError(int executionError) {
+                alertUser("Error while getting lock to vehicle video stream: " + executionError);
+            }
+
+            @Override
+            public void onTimeout() {
+                alertUser("Timed out while attempting to get lock for vehicle video stream.");
+            }
+
+            @Override
+            public void onAsyncVideoStreamPacketReceived(byte[] data, int dataSize) {
+                mediaCodecManager.onInputDataReceived(data, dataSize);
+            }
+        });
+    }
+
     private void stopVideoStream() {
-        SoloCameraApi.getApi(drone).stopVideoStream(new SimpleCommandListener() {
+        SoloCameraApi.getApi(drone).stopVideoStream(videoTag, new AbstractCommandListener() {
             @Override
             public void onSuccess() {
                 if (stopVideoStream != null)
                     stopVideoStream.setEnabled(false);
 
-                if(startVideoStream != null)
+                if (startVideoStream != null)
                     startVideoStream.setEnabled(true);
+
+                if (stopVideoStreamUsingObserver != null)
+                    stopVideoStreamUsingObserver.setEnabled(false);
+
+                if (startVideoStreamUsingObserver != null)
+                    startVideoStreamUsingObserver.setEnabled(true);
+            }
+
+            @Override
+            public void onError(int executionError) {
+            }
+
+            @Override
+            public void onTimeout() {
             }
         });
     }
 
+    private void stopVideoStreamForObserver() {
+        getApi(drone).stopVideoStream(videoTag);
+    }
 }
