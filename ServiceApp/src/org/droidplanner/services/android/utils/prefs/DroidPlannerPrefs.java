@@ -9,10 +9,8 @@ import org.droidplanner.services.android.core.drone.variables.StreamRates.Rates;
 import org.droidplanner.services.android.core.firmware.FirmwareType;
 import org.droidplanner.services.android.utils.file.IO.VehicleProfileReader;
 
-import java.util.UUID;
-
 /**
- * Provides structured access to Droidplanner preferences
+ * Provides structured access to 3DR Services preferences
  * <p/>
  * Over time it might be good to move the various places that are doing
  * prefs.getFoo(blah, default) here - to collect prefs in one place and avoid
@@ -22,29 +20,14 @@ import java.util.UUID;
  */
 public class DroidPlannerPrefs implements org.droidplanner.services.android.core.drone.Preferences {
 
-    // Public for legacy usage
-    public SharedPreferences prefs;
-    private Context context;
+    public static final int DEFAULT_STREAM_RATE = 2; //Hz
+
+    private final SharedPreferences prefs;
+    private final Context context;
 
     public DroidPlannerPrefs(Context context) {
         this.context = context;
         prefs = PreferenceManager.getDefaultSharedPreferences(context);
-    }
-
-    /**
-     * Return a unique ID for the vehicle controlled by this tablet. FIXME,
-     * someday let the users select multiple vehicles
-     */
-    public String getVehicleId() {
-        String r = prefs.getString("vehicle_id", "").trim();
-
-        // No ID yet - pick one
-        if (r.isEmpty()) {
-            r = UUID.randomUUID().toString();
-
-            prefs.edit().putString("vehicle_id", r).apply();
-        }
-        return r;
     }
 
     @Override
@@ -54,23 +37,7 @@ public class DroidPlannerPrefs implements org.droidplanner.services.android.core
 
     @Override
     public Rates getRates() {
-        final int defaultRate = 2;
-
-        Rates rates = new Rates();
-
-        rates.extendedStatus = defaultRate; //Integer.parseInt(prefs.getString("pref_mavlink_stream_rate_ext_stat", "2"));
-        rates.extra1 = defaultRate; //Integer.parseInt(prefs.getString("pref_mavlink_stream_rate_extra1", "2"));
-        rates.extra2 = defaultRate; //Integer.parseInt(prefs.getString("pref_mavlink_stream_rate_extra2", "2"));
-        rates.extra3 = defaultRate; //Integer.parseInt(prefs.getString("pref_mavlink_stream_rate_extra3", "2"));
-        rates.position = defaultRate; //Integer.parseInt(prefs.getString("pref_mavlink_stream_rate_position", "2"));
-        rates.rcChannels = defaultRate; //Integer.parseInt(prefs.getString("pref_mavlink_stream_rate_rc_channels",
-        //"2"));
-        rates.rawSensors = defaultRate; //Integer.parseInt(prefs.getString("pref_mavlink_stream_rate_raw_sensors",
-        //"2"));
-        rates.rawController = defaultRate; //Integer.parseInt(prefs.getString
-        // ("pref_mavlink_stream_rate_raw_controller", "2"));
-
-        return rates;
+        return new Rates(DEFAULT_STREAM_RATE);
     }
 
     /**
