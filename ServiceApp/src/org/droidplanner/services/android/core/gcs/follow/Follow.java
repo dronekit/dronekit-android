@@ -2,17 +2,19 @@ package org.droidplanner.services.android.core.gcs.follow;
 
 import android.os.Handler;
 
+import com.o3dr.services.android.lib.drone.action.ControlActions;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
+import com.o3dr.services.android.lib.model.action.Action;
 
 import org.droidplanner.services.android.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.services.android.core.drone.DroneInterfaces.OnDroneListener;
+import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.core.drone.manager.MavLinkDroneManager;
 import org.droidplanner.services.android.core.drone.variables.GuidedPoint;
 import org.droidplanner.services.android.core.drone.variables.State;
 import org.droidplanner.services.android.core.gcs.location.Location;
 import org.droidplanner.services.android.core.gcs.location.Location.LocationFinder;
 import org.droidplanner.services.android.core.gcs.location.Location.LocationReceiver;
-import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 
 public class Follow implements OnDroneListener<MavLinkDrone>, LocationReceiver {
 
@@ -57,7 +59,6 @@ public class Follow implements OnDroneListener<MavLinkDrone>, LocationReceiver {
         } else {
             if (droneMgr.isConnected()) {
                 if (droneState.isArmed()) {
-                    GuidedPoint.changeToGuidedMode(drone, null);
                     enableFollowMe();
                 } else {
                     state = FollowStates.FOLLOW_DRONE_NOT_ARMED;
@@ -69,7 +70,8 @@ public class Follow implements OnDroneListener<MavLinkDrone>, LocationReceiver {
     }
 
     private void enableFollowMe() {
-        lastLocation = null;
+        GuidedPoint.changeToGuidedMode(droneMgr.getDrone(), null);
+
         state = FollowStates.FOLLOW_START;
 
         locationFinder.enableLocationUpdates();
@@ -87,6 +89,11 @@ public class Follow implements OnDroneListener<MavLinkDrone>, LocationReceiver {
         if (isEnabled()) {
             state = FollowStates.FOLLOW_END;
             droneMgr.onAttributeEvent(AttributeEvent.FOLLOW_STOP, null, false);
+        }
+
+        final MavLinkDrone drone = droneMgr.getDrone();
+        if (GuidedPoint.isGuidedMode(drone)) {
+            droneMgr.getDrone().executeAsyncAction(new Action(ControlActions.ACTION_SEND_BRAKE_VEHICLE), null);
         }
     }
 
