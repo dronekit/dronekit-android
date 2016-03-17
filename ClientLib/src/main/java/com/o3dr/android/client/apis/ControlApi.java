@@ -106,7 +106,7 @@ public class ControlApi extends Api {
      * @param point
      * @param force
      * @param listener
-     * @since 2.8.1
+     * @since 2.9.0
      */
     public void lookAt(LatLongAlt point, boolean force, AbstractCommandListener listener){
         Bundle params = new Bundle();
