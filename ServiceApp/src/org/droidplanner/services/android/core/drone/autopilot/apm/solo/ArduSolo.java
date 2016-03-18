@@ -39,6 +39,7 @@ import org.droidplanner.services.android.core.drone.LogMessageListener;
 import org.droidplanner.services.android.core.drone.autopilot.apm.ArduCopter;
 import org.droidplanner.services.android.core.drone.variables.ApmModes;
 import org.droidplanner.services.android.core.drone.variables.HeartBeat;
+import org.droidplanner.services.android.core.drone.variables.StreamRates;
 import org.droidplanner.services.android.core.firmware.FirmwareType;
 import org.droidplanner.services.android.core.model.AutopilotWarningParser;
 import org.droidplanner.services.android.utils.SoloApiUtils;
@@ -172,6 +173,15 @@ public class ArduSolo extends ArduCopter {
 
     public SoloComp getSoloComp() {
         return soloComp;
+    }
+
+    /**
+     * No need to update the stream rates for Solo as it's being set by the companion computer
+     * @return
+     */
+    @Override
+    public StreamRates getStreamRates() {
+        return null;
     }
 
     @Override

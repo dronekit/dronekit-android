@@ -21,7 +21,6 @@ import com.MAVLink.common.msg_sys_status;
 import com.MAVLink.common.msg_vibration;
 import com.MAVLink.enums.MAV_MODE_FLAG;
 import com.MAVLink.enums.MAV_STATE;
-import com.github.zafarkhaja.semver.Version;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.action.CapabilityActions;
@@ -46,7 +45,6 @@ import com.o3dr.services.android.lib.drone.property.Speed;
 import com.o3dr.services.android.lib.drone.property.VehicleMode;
 import com.o3dr.services.android.lib.drone.property.Vibration;
 import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
-import com.o3dr.services.android.lib.model.AbstractCommandListener;
 import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
 import com.o3dr.services.android.lib.util.MathUtils;
@@ -75,6 +73,7 @@ import org.droidplanner.services.android.core.firmware.FirmwareType;
 import org.droidplanner.services.android.core.mission.Mission;
 import org.droidplanner.services.android.core.model.AutopilotWarningParser;
 import org.droidplanner.services.android.utils.CommonApiUtils;
+import org.droidplanner.services.android.utils.prefs.DroidPlannerPrefs;
 import org.droidplanner.services.android.utils.video.VideoManager;
 
 /**
@@ -362,6 +361,9 @@ public class GenericMavLinkDrone implements MavLinkDrone {
             case StateActions.ACTION_SET_VEHICLE_MODE:
                 return setVehicleMode(data, listener);
 
+            case StateActions.ACTION_UPDATE_VEHICLE_DATA_STREAM_RATE:
+                return updateVehicleDataStreamRate(data, listener);
+
             // CONTROL ACTIONS
             case ControlActions.ACTION_DO_GUIDED_TAKEOFF:
                 return performTakeoff(data, listener);
@@ -415,6 +417,22 @@ public class GenericMavLinkDrone implements MavLinkDrone {
                 CommonApiUtils.postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
                 return true;
         }
+    }
+
+    private boolean updateVehicleDataStreamRate(Bundle data, ICommandListener listener) {
+        StreamRates streamRates = getStreamRates();
+        if(streamRates != null){
+            int rate = data.getInt(StateActions.EXTRA_VEHICLE_DATA_STREAM_RATE, DroidPlannerPrefs.DEFAULT_STREAM_RATE);
+            StreamRates.Rates rates = new StreamRates.Rates(rate);
+            streamRates.setRates(rates);
+
+            streamRates.setupStreamRatesFromPref();
+            CommonApiUtils.postSuccessEvent(listener);
+            return true;
+        }
+
+        CommonApiUtils.postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
+        return false;
     }
 
     private boolean checkFeatureSupport(Bundle data, ICommandListener listener) {
