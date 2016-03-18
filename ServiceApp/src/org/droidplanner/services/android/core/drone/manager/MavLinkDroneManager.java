@@ -73,8 +73,6 @@ public class MavLinkDroneManager extends DroneManager<MavLinkDrone, MAVLinkPacke
     public MavLinkDroneManager(Context context, ConnectionParameter connParams, Handler handler) {
         super(context, connParams, handler);
 
-        Timber.d("HEY STUPID! JUST CHECKING TO SEE IF I'M RUNNING THE RIGHT CODE!");
-
         commandTracker = new DroneCommandTracker(handler);
 
         mavClient = new MAVLinkClient(context, this, connParams, commandTracker);
@@ -294,7 +292,6 @@ public class MavLinkDroneManager extends DroneManager<MavLinkDrone, MAVLinkPacke
                 return true;
 
             case FollowMeActions.ACTION_USE_EXTERNAL_LOCATIONS:
-                Timber.i("ACTION_USE_EXTERNAL_LOCATIONS: followMe=" + followMe + " data=" + data);
                 if(followMe != null && data != null) {
                     boolean external = data.getBoolean(FollowMeActions.EXTRA_USE_EXTERNAL_PROVIDER);
                     Timber.i("useExternalLocations(" + external + ")");
@@ -331,6 +328,8 @@ public class MavLinkDroneManager extends DroneManager<MavLinkDrone, MAVLinkPacke
                 Timber.d("enableFollowMe(): followMe is null");
                 return;
             }
+
+            Timber.d("followMe.enabled=%s followMe.state=%s", followMe.isEnabled(), followMe.getState());
 
             if (!followMe.isEnabled())
                 followMe.toggleFollowMeState();
