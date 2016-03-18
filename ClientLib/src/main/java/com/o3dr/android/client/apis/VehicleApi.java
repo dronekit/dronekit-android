@@ -250,6 +250,10 @@ public class VehicleApi extends Api {
 
     /**
      * Update the vehicle data stream rate.
+     *
+     * Note: This is ineffective for Solo vehicles since their data stream rate is handled
+     * by the onboard companion computer.
+     *
      * @param rate          The new data stream rate
      * @param listener      Register a callback to receive update of the command execution state
      * @since 2.9.0
