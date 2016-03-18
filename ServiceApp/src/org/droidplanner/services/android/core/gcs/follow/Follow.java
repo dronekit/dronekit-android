@@ -86,6 +86,8 @@ public class Follow implements OnDroneListener<MavLinkDrone>, LocationReceiver {
     }
 
     private void disableFollowMe() {
+        Timber.i("disableFollowMe(): state=%s", this.state);
+
         followAlgorithm.disableFollow();
         locationFinder.disableLocationUpdates();
 
@@ -106,7 +108,7 @@ public class Follow implements OnDroneListener<MavLinkDrone>, LocationReceiver {
     }
 
     public void useExternalLocations(boolean use) {
-        Timber.d("useExternalLocations(): use=" + use);
+        Timber.d("useExternalLocations(): use=%s", use);
 
         if(mUseExternalLocations != use) {
             // We're turning external locations off, going back to normal

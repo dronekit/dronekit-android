@@ -20,8 +20,9 @@ import timber.log.Timber;
 public class LocationRelay {
     static final String TAG = LocationRelay.class.getSimpleName();
 
-    private static final float LOCATION_ACCURACY_THRESHOLD = 15.0f;
+    private static final float LOCATION_ACCURACY_THRESHOLD = 10.0f;
     private static final float JUMP_FACTOR = 4.0f;
+    private static boolean VERBOSE = false;
 
     private static final IntentFilter sLocationEventFilter = new IntentFilter();
     static {
@@ -75,7 +76,7 @@ public class LocationRelay {
         @Override
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
-            Timber.d("DroneKit: intent.action=" + action);
+            if(VERBOSE) Timber.d("DroneKit: intent.action=" + action);
 
             switch(action) {
                 case FollowApi.EVT_EXTERNAL_LOCATION: {
@@ -124,7 +125,7 @@ public class LocationRelay {
     public Location toLocation(Intent intent) {
         boolean ok = true;
 
-        Timber.d("toLocation(): intent=" + dumpIntent(intent));
+        if(VERBOSE) Timber.d("toLocation(): intent=" + dumpIntent(intent));
 
         for(String extra: new String[] {
                 FollowApi.EXTRA_LAT, FollowApi.EXTRA_LNG, FollowApi.EXTRA_ACCURACY,
@@ -153,11 +154,11 @@ public class LocationRelay {
                 timeSinceLast = (androidLocationTime - mLastLocation.getTime()) / 1000;
             }
 
-            final float currentSpeed = distanceToLast > 0f && timeSinceLast > 0
+            final float currentSpeed = (distanceToLast > 0f && timeSinceLast > 0)
                     ? (distanceToLast / timeSinceLast)
                     : 0f;
 
-            final boolean isAccurate = true; // TODO: for now! isLocationAccurate(androidLocation.getAccuracy(), currentSpeed);
+            final boolean isAccurate = isLocationAccurate(androidLocation.getAccuracy(), currentSpeed);
             Timber.d("Computed isLocationAccurate(): " + isLocationAccurate(androidLocation.getAccuracy(), currentSpeed));
 
             // Make a new location
@@ -176,7 +177,7 @@ public class LocationRelay {
 
             mLastLocation = androidLocation;
 
-            Timber.d("External location lat/lng=" + getLatLongFromLocation(androidLocation));
+            if(VERBOSE) Timber.d("External location lat/lng=" + getLatLongFromLocation(androidLocation));
         }
 
         return loc;
@@ -184,7 +185,7 @@ public class LocationRelay {
 
     private boolean isLocationAccurate(float accuracy, float currentSpeed) {
         if (accuracy >= LOCATION_ACCURACY_THRESHOLD) {
-            Timber.w("High/bad accuracy: " + accuracy);
+            Timber.w("isLocationAccurate() -- High/bad accuracy: " + accuracy);
             return false;
         }
 
@@ -197,7 +198,7 @@ public class LocationRelay {
             if (avg >= 1.0) {
                 //Reject unreasonable updates.
                 if (currentSpeed >= (avg * JUMP_FACTOR)) {
-                    Timber.w("High current speed: " + currentSpeed);
+                    Timber.w("isLocationAccurate() -- High current speed: " + currentSpeed);
                     return false;
                 }
             }
