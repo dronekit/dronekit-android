@@ -19,6 +19,7 @@ import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
 import com.o3dr.services.android.lib.drone.property.DroneAttribute;
 import com.o3dr.services.android.lib.gcs.action.FollowMeActions;
+import com.o3dr.services.android.lib.gcs.follow.FollowLocation;
 import com.o3dr.services.android.lib.gcs.follow.FollowType;
 import com.o3dr.services.android.lib.gcs.returnToMe.ReturnToMeState;
 import com.o3dr.services.android.lib.model.ICommandListener;
@@ -154,7 +155,7 @@ public class MavLinkDroneManager extends DroneManager<MavLinkDrone, MAVLinkPacke
     public void destroy() {
         super.destroy();
         if (followMe != null && followMe.isEnabled())
-            followMe.toggleFollowMeState();
+            followMe.disableFollowMe();
 
         if (returnToMe != null)
             returnToMe.disable();
@@ -261,12 +262,15 @@ public class MavLinkDroneManager extends DroneManager<MavLinkDrone, MAVLinkPacke
         String type = action.getType();
         Bundle data = action.getData();
 
+        Timber.d("executeAsyncAction(): action=%s", type);
+
         switch (type) {
             //FOLLOW-ME ACTIONS
             case FollowMeActions.ACTION_ENABLE_FOLLOW_ME:
+                boolean external = data.getBoolean(FollowMeActions.EXTRA_USE_EXTERNAL_PROVIDER, false);
                 data.setClassLoader(FollowType.class.getClassLoader());
                 FollowType followType = data.getParcelable(FollowMeActions.EXTRA_FOLLOW_TYPE);
-                enableFollowMe(followType, listener);
+                enableFollowMe(followType, external, listener);
                 return true;
 
             case FollowMeActions.ACTION_UPDATE_FOLLOW_PARAMS:
@@ -291,11 +295,14 @@ public class MavLinkDroneManager extends DroneManager<MavLinkDrone, MAVLinkPacke
                 CommonApiUtils.disableFollowMe(followMe);
                 return true;
 
-            case FollowMeActions.ACTION_USE_EXTERNAL_LOCATIONS:
+            case FollowMeActions.ACTION_NEW_EXTERNAL_LOCATION:
+                data.setClassLoader(FollowLocation.class.getClassLoader());
                 if(followMe != null && data != null) {
-                    boolean external = data.getBoolean(FollowMeActions.EXTRA_USE_EXTERNAL_PROVIDER);
-                    Timber.i("useExternalLocations(" + external + ")");
-                    followMe.useExternalLocations(external);
+                    FollowLocation loc = data.getParcelable(FollowMeActions.EXTRA_LOCATION);
+                    if(loc != null) {
+                        Timber.i("onNewLocation(%s)", loc);
+                        followMe.onFollowNewLocation(loc);
+                    }
                 }
                 return true;
 
@@ -319,8 +326,8 @@ public class MavLinkDroneManager extends DroneManager<MavLinkDrone, MAVLinkPacke
         }
     }
 
-    private void enableFollowMe(FollowType followType, ICommandListener listener) {
-        Timber.d("enableFollowMe(): followType=" + followType);
+    private void enableFollowMe(FollowType followType, boolean useExternal, ICommandListener listener) {
+        Timber.d("enableFollowMe(): followType=%s useExternal=%s", followType, useExternal);
         FollowAlgorithm.FollowModes selectedMode = CommonApiUtils.followTypeToMode(drone, followType);
 
         if (selectedMode != null) {
@@ -331,8 +338,11 @@ public class MavLinkDroneManager extends DroneManager<MavLinkDrone, MAVLinkPacke
 
             Timber.d("followMe.enabled=%s followMe.state=%s", followMe.isEnabled(), followMe.getState());
 
-            if (!followMe.isEnabled())
-                followMe.toggleFollowMeState();
+            if (!followMe.isEnabled()) {
+                followMe.toggleFollowMeState(useExternal);
+            } else {
+                followMe.useExternalLocations(useExternal);
+            }
 
             FollowAlgorithm currentAlg = followMe.getFollowAlgorithm();
             if (currentAlg.getType() != selectedMode) {
@@ -343,8 +353,9 @@ public class MavLinkDroneManager extends DroneManager<MavLinkDrone, MAVLinkPacke
                 }
 
                 FollowAlgorithm algo = selectedMode.getAlgorithmType(this, handler);
-                Timber.d("Setting followAlgorithm to " + algo);
+                Timber.d("Setting followAlgorithm to %s", algo);
                 followMe.setAlgorithm(algo);
+                followMe.useExternalLocations(useExternal);
                 CommonApiUtils.postSuccessEvent(listener);
             }
         }

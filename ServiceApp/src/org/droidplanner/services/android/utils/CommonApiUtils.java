@@ -537,11 +537,9 @@ public class CommonApiUtils {
     }
 
     public static void disableFollowMe(Follow follow) {
-        if (follow == null)
-            return;
-
-        if (follow.isEnabled())
-            follow.toggleFollowMeState();
+        if(follow != null) {
+            follow.disableFollowMe();
+        }
     }
 
     public static void triggerCamera(MavLinkDrone drone) {
