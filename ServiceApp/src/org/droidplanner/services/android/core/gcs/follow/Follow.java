@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Handler;
 
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
+import com.o3dr.services.android.lib.gcs.follow.FollowLocation;
 
 import org.droidplanner.services.android.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.services.android.core.drone.DroneInterfaces.OnDroneListener;
@@ -51,7 +52,7 @@ public class Follow implements OnDroneListener<MavLinkDrone>, LocationReceiver {
         mLocationRelay = new LocationRelay(context, this);
     }
 
-    public void toggleFollowMeState() {
+    public void toggleFollowMeState(boolean useExternal) {
         final MavLinkDrone drone = droneMgr.getDrone();
         final State droneState = drone == null ? null : drone.getState();
         if (droneState == null) {
@@ -79,16 +80,22 @@ public class Follow implements OnDroneListener<MavLinkDrone>, LocationReceiver {
         lastLocation = null;
         state = FollowStates.FOLLOW_START;
 
-        locationFinder.enableLocationUpdates();
+        mLocationRelay.onFollowStart();
+
+        if(!mUseExternalLocations) {
+            locationFinder.enableLocationUpdates();
+        }
+
         followAlgorithm.enableFollow();
 
         droneMgr.onAttributeEvent(AttributeEvent.FOLLOW_START, null, false);
     }
 
-    private void disableFollowMe() {
+    public void disableFollowMe() {
         Timber.i("disableFollowMe(): state=%s", this.state);
 
         followAlgorithm.disableFollow();
+
         locationFinder.disableLocationUpdates();
 
         lastLocation = null;
@@ -114,13 +121,13 @@ public class Follow implements OnDroneListener<MavLinkDrone>, LocationReceiver {
             // We're turning external locations off, going back to normal
             if(mUseExternalLocations) {
                 Timber.d("Turn external OFF");
-                mLocationRelay.unregisterLocationReceiver();
                 locationFinder.addLocationListener(TAG, this);
+                locationFinder.enableLocationUpdates();
             } else {
                 Timber.d("Turn external ON");
                 // We're turning them on, ignoring on-device GPS
-                mLocationRelay.registerLocationReceiver();
                 locationFinder.removeLocationListener(TAG);
+                locationFinder.disableLocationUpdates();
             }
 
             mUseExternalLocations = use;
@@ -145,9 +152,21 @@ public class Follow implements OnDroneListener<MavLinkDrone>, LocationReceiver {
         }
     }
 
+    public void onFollowNewLocation(FollowLocation fl) {
+        Timber.d("onFollowNewLocation(%s)", fl);
+        Location loc = mLocationRelay.toLocation(fl);
+        if(loc != null) {
+            onLocationUpdate(loc);
+        }
+    }
+
     @Override
     public void onLocationUpdate(Location location) {
-        Timber.d("onLocationUpdate(): lat/lng=" + location.getCoord().getLatitude() + "/" + location.getCoord().getLongitude());
+        Timber.d("onLocationUpdate(): lat/lng=%.4f/%.4f accurate=%s",
+                location.getCoord().getLatitude(),
+                location.getCoord().getLongitude(),
+                location.isAccurate()
+        );
 
         if (location.isAccurate()) {
             state = FollowStates.FOLLOW_RUNNING;

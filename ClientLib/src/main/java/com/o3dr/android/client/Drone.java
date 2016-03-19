@@ -680,10 +680,10 @@ public class Drone {
     }
 
     /**
-     * @deprecated Use {@link FollowApi#enableFollowMe(FollowType)} instead.
+     * @deprecated Use {@link FollowApi#enableFollowMe(FollowType, boolean)} instead.
      */
     public void enableFollowMe(FollowType followType) {
-        FollowApi.getApi(this).enableFollowMe(followType);
+        FollowApi.getApi(this).enableFollowMe(followType, false);
     }
 
     /**
