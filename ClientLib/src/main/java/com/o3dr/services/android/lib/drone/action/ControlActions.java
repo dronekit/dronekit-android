@@ -46,6 +46,13 @@ public class ControlActions {
 
     public static final String EXTRA_DO_ENABLE = "extra_do_enable";
 
+    public static final String ACTION_LOOK_AT_TARGET = PACKAGE_NAME + ".action.LOOK_AT_TARGET";
+
+    /**
+     * Geo coordinate to orient the vehicle to
+     */
+    public static final String EXTRA_LOOK_AT_TARGET = "extra_look_at_target";
+
     //Private to prevent instantiation
     private ControlActions(){}
 
