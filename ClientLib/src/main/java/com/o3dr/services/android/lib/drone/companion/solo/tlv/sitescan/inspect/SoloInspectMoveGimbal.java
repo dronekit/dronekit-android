@@ -12,15 +12,15 @@ import java.nio.ByteBuffer;
  */
 public class SoloInspectMoveGimbal extends TLVPacket {
     /**
-     * Pitch in degrees
+     * Body-relative pitch in degrees (0 to -90)
      */
     private float pitch;
     /**
-     * Roll in degrees
+     * Body-relative roll in degrees
      */
     private float roll;
     /**
-     * Yaw (heading) in degrees
+     * Earth frame Yaw (heading) in degrees (0 to 360)
      */
     private float yaw;
 
