@@ -8,11 +8,20 @@ import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
 import java.nio.ByteBuffer;
 
 /**
- * Created by chavi on 12/9/15.
+ * Sent by the app to ShotManager to instruct Solo to actuate gimbal to desired orientation.
  */
 public class SoloInspectMoveGimbal extends TLVPacket {
+    /**
+     * Pitch in degrees
+     */
     private float pitch;
+    /**
+     * Roll in degrees
+     */
     private float roll;
+    /**
+     * Yaw (heading) in degrees
+     */
     private float yaw;
 
     public SoloInspectMoveGimbal(float pitch, float roll, float yaw) {

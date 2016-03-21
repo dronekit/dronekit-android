@@ -8,11 +8,20 @@ import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
 import java.nio.ByteBuffer;
 
 /**
- * Created by chavi on 12/9/15.
+ * Sent by the app to ShotManager to instruct Solo to navigate towards the provided waypoint.
  */
 public class SoloInspectSetWaypoint extends TLVPacket {
+    /**
+     * Latitude in decimal degrees
+     */
     private float lat;
+    /**
+     * Longitude in decimal degrees
+     */
     private float lon;
+    /**
+     * Relative altitude from takeoff (in meters)
+     */
     private float alt;
 
     public SoloInspectSetWaypoint(float lat, float lon, float alt) {
