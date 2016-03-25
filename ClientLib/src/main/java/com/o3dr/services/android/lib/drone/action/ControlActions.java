@@ -25,6 +25,8 @@ public class ControlActions {
 
     public static final String ACTION_SET_VELOCITY = PACKAGE_NAME + ".SET_VELOCITY";
 
+    public static final String ACTION_SEND_BRAKE_VEHICLE = PACKAGE_NAME + ".action.SEND_BRAKE_VEHICLE";
+
     /**
      * X velocity in meters per second.
      */
@@ -39,6 +41,17 @@ public class ControlActions {
      * Z velocity in meters per second.
      */
     public static final String EXTRA_VELOCITY_Z = "extra_velocity_z";
+
+    public static final String ACTION_ENABLE_MANUAL_CONTROL = PACKAGE_NAME + ".ENABLE_MANUAL_CONTROL";
+
+    public static final String EXTRA_DO_ENABLE = "extra_do_enable";
+
+    public static final String ACTION_LOOK_AT_TARGET = PACKAGE_NAME + ".action.LOOK_AT_TARGET";
+
+    /**
+     * Geo coordinate to orient the vehicle to
+     */
+    public static final String EXTRA_LOOK_AT_TARGET = "extra_look_at_target";
 
     //Private to prevent instantiation
     private ControlActions(){}

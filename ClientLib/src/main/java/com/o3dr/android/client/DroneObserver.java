@@ -3,7 +3,6 @@ package com.o3dr.android.client;
 import android.os.Bundle;
 import android.os.RemoteException;
 
-import com.o3dr.services.android.lib.drone.connection.ConnectionResult;
 import com.o3dr.services.android.lib.model.IObserver;
 
 /**

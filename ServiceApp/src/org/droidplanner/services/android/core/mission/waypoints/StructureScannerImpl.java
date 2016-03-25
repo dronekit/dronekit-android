@@ -7,7 +7,7 @@ import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 
 import org.droidplanner.services.android.core.helpers.geoTools.GeoTools;
 import org.droidplanner.services.android.core.mission.Mission;
-import org.droidplanner.services.android.core.mission.MissionItem;
+import org.droidplanner.services.android.core.mission.MissionItemImpl;
 import org.droidplanner.services.android.core.mission.MissionItemType;
 import org.droidplanner.services.android.core.mission.survey.SurveyImpl;
 import org.droidplanner.services.android.core.polygon.Polygon;
@@ -29,7 +29,7 @@ public class StructureScannerImpl extends SpatialCoordItem {
         super(mission, coord);
     }
 
-    public StructureScannerImpl(MissionItem item) {
+    public StructureScannerImpl(MissionItemImpl item) {
         super(item);
     }
 
@@ -132,7 +132,7 @@ public class StructureScannerImpl extends SpatialCoordItem {
     }
 
     public void setRadius(int newValue) {
-        radius = (newValue);
+        radius = newValue;
     }
 
     public void enableCrossHatch(boolean isEnabled) {

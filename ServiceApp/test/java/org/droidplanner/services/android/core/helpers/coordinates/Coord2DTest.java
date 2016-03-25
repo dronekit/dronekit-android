@@ -6,10 +6,10 @@ import junit.framework.TestCase;
 
 public class Coord2DTest extends TestCase {
 
-	public void testConstructor() {
-		LatLong point = new LatLong(10, -5.6);
-		assertEquals(10.0, point.getLatitude());
-		assertEquals(-5.6, point.getLongitude());
-	}
+    public void testConstructor() {
+        LatLong point = new LatLong(10, -5.6);
+        assertEquals(10.0, point.getLatitude());
+        assertEquals(-5.6, point.getLongitude());
+    }
 
 }

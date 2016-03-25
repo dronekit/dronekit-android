@@ -3,17 +3,14 @@ package com.o3dr.services.android.lib.util;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 
-import org.junit.Test;
+import junit.framework.TestCase;
 
 import java.util.Random;
 
-import static org.junit.Assert.*;
-
 /**
- * Created by Fredia Huya-Kouadio on 5/21/15.
+ * Unit tests for math utility functions.
  */
-public class MathUtilsTest {
-
+public class MathUtilsTest extends TestCase {
     private static final int MIN_LATITUDE = -90;
     private static final int MAX_LATITUDE = 90;
 
@@ -45,17 +42,13 @@ public class MathUtilsTest {
     private static final double THIRD_LON = -122.270451;
     private static final double THIRD_RESULT = 202.2891830637083;
 
-    @Test
     public void testGetDistance3D() throws Exception {
-
         //Test get distance altitude only.
         double distance = MathUtils.getDistance3D(new LatLongAlt(0.0, 0.0, 50.0), new LatLongAlt(0.0, 0.0, 100.0));
         assertEquals(distance, 50.0, MARGIN_OF_ERROR);
     }
 
-    @Test
     public void testGetDistance2D() throws Exception {
-
         //Test get distance with Noaa values
         LatLong origin = new LatLong(originLat, originLon);
 
@@ -64,11 +57,8 @@ public class MathUtilsTest {
         assertEquals(THIRD_RESULT, MathUtils.getDistance2D(origin, new LatLong(THIRD_LAT, THIRD_LON)), MARGIN_OF_ERROR);
     }
 
-    @Test
     public void testGetDistance() throws Exception {
-/**
- * Validate that both the 2D and 3D generate the same result when distance is disregarded.
- */
+        // Validate that both the 2D and 3D generate the same result when distance is disregarded.
         double distance1;
         double distance2;
 
@@ -79,7 +69,6 @@ public class MathUtilsTest {
         double toLongitude;
 
         Random rand = new Random();
-
 
         //Generate 500 random locations and test both equations
         for (int index = 0; index < 500; index++){
@@ -113,5 +102,31 @@ public class MathUtilsTest {
         // nextDouble is normally exclusive of the top value,
         // so add 1 to make it inclusive
         return (rand.nextDouble() * (max - min)) + min;
+    }
+
+    public void testNormalize() {
+        double max = 10;
+        double min = 0;
+        assertEquals(0.0, MathUtils.normalize(0, min, max));
+        assertEquals(0.5, MathUtils.normalize(5, min, max));
+        assertEquals(1.0, MathUtils.normalize(10, min, max));
+
+        assertEquals(0.0, MathUtils.normalize(-1, min, max));
+        assertEquals(1.0, MathUtils.normalize(100, min, max));
+    }
+
+    public void testIfCanCreateObject() {
+        assertNotNull(new MathUtils());
+    }
+
+    public void testDCMmatrix(){
+        double [][] dcm = MathUtils.dcmFromEuler(0,0,0);
+        double [][] expected = new double[][] {{1,0,0},{0,1,0},{0,0,1}};
+
+        for (int i = 0; i < dcm.length; i++) {
+            for (int j = 0; j < dcm.length; j++) {
+                assertEquals(expected[i][j], dcm[i][j],1e-10);
+            }
+        }
     }
 }

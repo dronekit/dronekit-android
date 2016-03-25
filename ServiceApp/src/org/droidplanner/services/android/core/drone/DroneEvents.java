@@ -9,7 +9,7 @@ import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class DroneEvents extends DroneVariable {
+public class DroneEvents extends DroneVariable<MavLinkDrone> {
 
     private static final long EVENT_DISPATCHING_DELAY = 33l; //milliseconds
 
@@ -56,6 +56,10 @@ public class DroneEvents extends DroneVariable {
     public void removeDroneListener(OnDroneListener listener) {
         if (listener != null && droneListeners.contains(listener))
             droneListeners.remove(listener);
+    }
+
+    public void removeAllDroneListeners(){
+        droneListeners.clear();
     }
 
     public void notifyDroneEvent(DroneEventsType event) {

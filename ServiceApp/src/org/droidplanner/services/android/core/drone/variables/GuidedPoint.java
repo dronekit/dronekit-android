@@ -12,7 +12,6 @@ import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.model.SimpleCommandListener;
 
 import org.droidplanner.services.android.core.MAVLink.MavLinkCommands;
-import org.droidplanner.services.android.core.MAVLink.MavLinkTakeoff;
 import org.droidplanner.services.android.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.services.android.core.drone.DroneInterfaces.OnDroneListener;
 import org.droidplanner.services.android.core.drone.DroneVariable;
@@ -21,7 +20,7 @@ import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 
 import timber.log.Timber;
 
-public class GuidedPoint extends DroneVariable implements OnDroneListener {
+public class GuidedPoint extends DroneVariable implements OnDroneListener<MavLinkDrone> {
 
     private GuidedStates state = GuidedStates.UNINITIALIZED;
     private LatLong coord = new LatLong(0, 0);
@@ -126,7 +125,7 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener {
             changeToGuidedMode(myDrone, new SimpleCommandListener() {
                 @Override
                 public void onSuccess() {
-                    MavLinkTakeoff.sendTakeoff(myDrone, alt, listener);
+                    MavLinkCommands.sendTakeoff(myDrone, alt, listener);
                     myDrone.notifyDroneEvent(DroneEventsType.GUIDEDPOINT);
                 }
 

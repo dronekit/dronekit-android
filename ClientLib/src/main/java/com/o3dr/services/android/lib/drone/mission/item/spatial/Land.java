@@ -24,6 +24,11 @@ public class Land extends BaseSpatialItem implements android.os.Parcelable {
     }
 
     @Override
+    public String toString() {
+        return "Land{ " + super.toString() + " }";
+    }
+
+    @Override
     public MissionItem clone() {
         return new Land(this);
     }

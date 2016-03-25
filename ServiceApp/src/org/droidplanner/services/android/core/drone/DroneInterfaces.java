@@ -5,133 +5,133 @@ import android.os.Bundle;
 import com.o3dr.services.android.lib.drone.property.Parameter;
 
 import org.droidplanner.services.android.core.MAVLink.WaypointManager;
-import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
+import org.droidplanner.services.android.core.drone.autopilot.Drone;
 
 public class DroneInterfaces {
 
-	/**
-	 * Sets of drone events used for broadcast throughout the app.
-	 */
-	public enum DroneEventsType {
+    /**
+     * Sets of drone events used for broadcast throughout the app.
+     */
+    public enum DroneEventsType {
         /**
          * Denotes vehicle altitude change event.
          */
         ALTITUDE,
 
-		/**
+        /**
          *
          */
-		ORIENTATION,
+        ORIENTATION,
 
-		/**
+        /**
          * Denotes vehicle speed change event.
          */
-		SPEED,
+        SPEED,
 
-		/**
+        /**
          *
          */
-		BATTERY,
+        BATTERY,
 
-		/**
+        /**
          *
          */
-		GUIDEDPOINT,
+        GUIDEDPOINT,
 
-		/**
+        /**
          * Denotes vehicle attitude change event.
          */
-		ATTITUDE,
+        ATTITUDE,
 
-		/**
+        /**
          *
          */
-		RADIO,
+        RADIO,
 
-		/**
+        /**
          *
          */
-		RC_IN,
+        RC_IN,
 
-		/**
+        /**
          *
          */
-		RC_OUT,
+        RC_OUT,
 
-		/**
+        /**
          *
          */
-		ARMING,
+        ARMING,
 
-		/**
+        /**
          *
          */
-		AUTOPILOT_WARNING,
+        AUTOPILOT_WARNING,
 
-		/**
+        /**
          *
          */
-		MODE,
+        MODE,
 
-		/**
+        /**
          *
          */
-		STATE,
+        STATE,
 
-		/**
+        /**
          *
          */
-		MISSION_UPDATE,
+        MISSION_UPDATE,
 
-		/**
+        /**
          *
          */
-		MISSION_RECEIVED,
+        MISSION_RECEIVED,
 
-		/**
+        /**
          *
          */
-		TYPE,
+        TYPE,
 
-		/**
+        /**
          *
          */
-		HOME,
+        HOME,
 
-		/**
+        /**
          *
          */
-		CALIBRATION_IMU,
+        CALIBRATION_IMU,
 
-		/**
+        /**
          *
          */
-		CALIBRATION_TIMEOUT,
+        CALIBRATION_TIMEOUT,
 
-		/**
+        /**
          *
          */
-		HEARTBEAT_TIMEOUT,
+        HEARTBEAT_TIMEOUT,
 
-		/**
+        /**
          *
          */
-		HEARTBEAT_FIRST,
+        HEARTBEAT_FIRST,
 
-		/**
+        /**
          *
          */
-		HEARTBEAT_RESTORED,
+        HEARTBEAT_RESTORED,
 
-		/**
+        /**
          *
          */
-		DISCONNECTED,
+        DISCONNECTED,
 
-		/**
+        /**
          * Successful connection event.
          */
-		CONNECTED,
+        CONNECTED,
 
         /**
          * Connection initiated event.
@@ -139,92 +139,87 @@ public class DroneInterfaces {
         CONNECTING,
 
         /**
-         * Connection failed event.
-         */
-        CONNECTION_FAILED,
-
-		/**
          *
          */
-		MISSION_SENT,
+        MISSION_SENT,
 
-		/**
+        /**
          *
          */
-		ARMING_STARTED,
+        ARMING_STARTED,
 
-		/**
+        /**
          *
          */
-		INVALID_POLYGON,
+        INVALID_POLYGON,
 
-		/**
+        /**
          *
          */
-		MISSION_WP_UPDATE,
+        MISSION_WP_UPDATE,
 
-		/**
-		 *
-		 */
-		WARNING_SIGNAL_WEAK,
-		/**
-		 * Announces that a new version for the firmware has been received
-		 */
-		FIRMWARE,
+        /**
+         *
+         */
+        WARNING_SIGNAL_WEAK,
+        /**
+         * Announces that a new version for the firmware has been received
+         */
+        FIRMWARE,
 
-		/**
-		 * Warn that the drone has no gps signal
-		 */
-		WARNING_NO_GPS, 
-		
-		/**
-		 * New magnetometer data has been received
-		 */
-		MAGNETOMETER,
-		
-		/**
-		 * The drone camera footprints has been updated
-		 */
-		FOOTPRINT,
+        /**
+         * Warn that the drone has no gps signal
+         */
+        WARNING_NO_GPS,
 
-		/**
-		 * The ekf status was updated.
-		 */
-		EKF_STATUS_UPDATE,
+        /**
+         * New magnetometer data has been received
+         */
+        MAGNETOMETER,
 
-		/**
-		 * The horizontal position is ok, and the home position is available.
-		 */
-		EKF_POSITION_STATE_UPDATE,
+        /**
+         * The drone camera footprints has been updated
+         */
+        FOOTPRINT,
 
-		/**
-		 * A mission item has been reached.
-		 */
-		MISSION_WP_REACHED,
-	}
+        /**
+         * The ekf status was updated.
+         */
+        EKF_STATUS_UPDATE,
 
-	public interface OnDroneListener {
-		public void onDroneEvent(DroneEventsType event, MavLinkDrone drone);
-	}
+        /**
+         * The horizontal position is ok, and the home position is available.
+         */
+        EKF_POSITION_STATE_UPDATE,
 
-	public interface AttributeEventListener {
-		void onAttributeEvent(String attributeEvent, Bundle eventInfo, boolean checkForSololinkApi);
-	}
+        /**
+         * A mission item has been reached.
+         */
+        MISSION_WP_REACHED,
+    }
 
-	public interface OnParameterManagerListener {
-		public void onBeginReceivingParameters();
+    public interface OnDroneListener<T extends Drone> {
+        public void onDroneEvent(DroneEventsType event, T drone);
+    }
 
-		public void onParameterReceived(Parameter parameter, int index, int count);
+    public interface AttributeEventListener {
+        void onAttributeEvent(String attributeEvent, Bundle eventInfo, boolean checkForSololinkApi);
+    }
 
-		public void onEndReceivingParameters();
-	}
+    public interface OnParameterManagerListener {
+        public void onBeginReceivingParameters();
 
-	public interface OnWaypointManagerListener {
-		public void onBeginWaypointEvent(WaypointManager.WaypointEvent_Type wpEvent);
+        public void onParameterReceived(Parameter parameter, int index, int count);
 
-		public void onWaypointEvent(WaypointManager.WaypointEvent_Type wpEvent, int index, int count);
+        public void onEndReceivingParameters();
+    }
 
-		public void onEndWaypointEvent(WaypointManager.WaypointEvent_Type wpEvent);
-	}
+    public interface OnWaypointManagerListener {
+        public void onBeginWaypointEvent(WaypointManager.WaypointEvent_Type wpEvent);
+
+        public void onWaypointEvent(WaypointManager.WaypointEvent_Type wpEvent, int index, int count);
+
+        public void onEndWaypointEvent(WaypointManager.WaypointEvent_Type wpEvent);
+    }
 
 }

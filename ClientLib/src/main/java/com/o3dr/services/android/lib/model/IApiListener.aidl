@@ -13,6 +13,7 @@ interface IApiListener {
     int getApiVersionCode();
 
     /**
+    * @deprecated
     * Called when the connection attempt fails.
     * @param result Describe why the connection failed.
     */

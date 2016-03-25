@@ -9,77 +9,57 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.common.msg_command_long;
 import com.MAVLink.enums.MAV_CMD;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
+import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
 
-import org.droidplanner.services.android.communication.service.MAVLinkClient;
-import org.droidplanner.services.android.core.MAVLink.MAVLinkStreams;
-import org.droidplanner.services.android.core.MAVLink.MavLinkArm;
-import org.droidplanner.services.android.core.drone.DroneInterfaces;
+import org.droidplanner.services.android.communication.model.DataLink;
+import org.droidplanner.services.android.core.MAVLink.MavLinkCommands;
 import org.droidplanner.services.android.core.drone.LogMessageListener;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.core.drone.autopilot.apm.ArduCopter;
-import org.droidplanner.services.android.mock.MockMavLinkServiceAPI;
+import org.droidplanner.services.android.core.firmware.FirmwareType;
+import org.droidplanner.services.android.mock.MockMAVLinkClient;
 import org.droidplanner.services.android.utils.AndroidApWarningParser;
-import org.droidplanner.services.android.utils.prefs.DroidPlannerPrefs;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.robolectric.Robolectric;
-import org.robolectric.RobolectricTestRunner;
+import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
 /**
  * Created by djmedina on 3/5/15.
  * This is a simple test case.
  */
-@RunWith(RobolectricTestRunner.class)
-@Config(emulateSdk = 18)
+@RunWith(RobolectricGradleTestRunner.class)
+@Config(constants = BuildConfig.class, sdk = 18)
 public class BasicTest {
 
     private MavLinkDrone drone;
-    private MockMavLinkServiceAPI mavlinkApi;
+    private MockMAVLinkClient mavClient;
 
     private final Handler dpHandler = new Handler();
 
-    private final MAVLinkStreams.MavlinkInputStream inputStreamListener = new MAVLinkStreams.MavlinkInputStream() {
+    private final DataLink.DataLinkListener inputStreamListener = new DataLink.DataLinkListener() {
         @Override
-        public void notifyStartingConnection() {
+        public void notifyReceivedData(Object packet) {
         }
 
         @Override
-        public void notifyConnected() {
-        }
-
-        @Override
-        public void notifyDisconnected() {
-        }
-
-        @Override
-        public void notifyReceivedData(MAVLinkPacket packet) {
-        }
-
-        @Override
-        public void onStreamError(String errorMsg) {
+        public void onConnectionStatus(LinkConnectionStatus connectionStatus) {
         }
     };
 
     @Before
     public void setUp() throws Exception {
-        final Context context = Robolectric.getShadowApplication().getApplicationContext();
+        final Context context = RuntimeEnvironment.application.getApplicationContext();
 
-        ConnectionParameter connParams = new ConnectionParameter(0, new Bundle(), null);
-        mavlinkApi = new MockMavLinkServiceAPI();
-        DroidPlannerPrefs dpPrefs = new DroidPlannerPrefs(context);
-        MAVLinkClient mavClient = new MAVLinkClient(context, inputStreamListener, connParams, mavlinkApi);
+        ConnectionParameter connParams = new ConnectionParameter(0, new Bundle());
+        mavClient = new MockMAVLinkClient(context, inputStreamListener, connParams);
 
-        drone = new ArduCopter(context, mavClient, dpHandler, dpPrefs, new AndroidApWarningParser(), new LogMessageListener() {
+        drone = new ArduCopter("test:" + FirmwareType.ARDU_COPTER.getType(), context, mavClient, dpHandler, new AndroidApWarningParser(), new LogMessageListener() {
             @Override
             public void onMessageLogged(int logLevel, String message) {
-
-            }
-        }, new DroneInterfaces.AttributeEventListener() {
-            @Override
-            public void onAttributeEvent(String attributeEvent, Bundle eventInfo, boolean checkForSololinkApi) {
 
             }
         });
@@ -100,8 +80,8 @@ public class BasicTest {
      */
     @Test
     public void testArm() {
-        MavLinkArm.sendArmMessage(drone, true, false, null);
-        MAVLinkPacket data = mavlinkApi.getData();
+        MavLinkCommands.sendArmMessage(drone, true, false, null);
+        MAVLinkPacket data = mavClient.getData();
         Assert.assertTrue(data != null);
 
         //Unpack the message into the right MAVLink message type

@@ -20,7 +20,7 @@ import static org.junit.Assert.assertArrayEquals;
 public class msg_gopro_set_request_test{
 
 public static final int MAVLINK_MSG_ID_GOPRO_SET_REQUEST = 218;
-public static final int MAVLINK_MSG_LENGTH = 4;
+public static final int MAVLINK_MSG_LENGTH = 7;
 private static final long serialVersionUID = MAVLINK_MSG_ID_GOPRO_SET_REQUEST;
 
 private Parser parser = new Parser();
@@ -45,7 +45,11 @@ public byte[] generateTestPacket(){
     payload.put((byte)5); //target_system
     payload.put((byte)72); //target_component
     payload.put((byte)139); //cmd_id
-    payload.put((byte)206); //value
+    //value
+    payload.put((byte)206);
+    payload.put((byte)207);
+    payload.put((byte)208);
+    payload.put((byte)209);
     
     CRC crc = generateCRC(payload.array());
     payload.put((byte)crc.getLSB());

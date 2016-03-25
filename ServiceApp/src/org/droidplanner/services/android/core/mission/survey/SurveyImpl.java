@@ -6,7 +6,7 @@ import com.MAVLink.enums.MAV_FRAME;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 
 import org.droidplanner.services.android.core.mission.Mission;
-import org.droidplanner.services.android.core.mission.MissionItem;
+import org.droidplanner.services.android.core.mission.MissionItemImpl;
 import org.droidplanner.services.android.core.mission.MissionItemType;
 import org.droidplanner.services.android.core.mission.commands.CameraTriggerImpl;
 import org.droidplanner.services.android.core.polygon.Polygon;
@@ -18,11 +18,13 @@ import org.droidplanner.services.android.core.survey.grid.GridBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SurveyImpl extends MissionItem {
+public class SurveyImpl extends MissionItemImpl {
 
     public Polygon polygon = new Polygon();
     public SurveyData surveyData = new SurveyData();
     public Grid grid;
+
+    private boolean startCameraBeforeFirstWaypoint;
 
     public SurveyImpl(Mission mission, List<LatLong> points) {
         super(mission);
@@ -31,6 +33,14 @@ public class SurveyImpl extends MissionItem {
 
     public void update(double angle, double altitude, double overlap, double sidelap) {
         surveyData.update(angle, altitude, overlap, sidelap);
+    }
+
+    public boolean isStartCameraBeforeFirstWaypoint() {
+        return startCameraBeforeFirstWaypoint;
+    }
+
+    public void setStartCameraBeforeFirstWaypoint(boolean startCameraBeforeFirstWaypoint) {
+        this.startCameraBeforeFirstWaypoint = startCameraBeforeFirstWaypoint;
     }
 
     public void setCameraInfo(CameraInfo camera) {
@@ -51,9 +61,7 @@ public class SurveyImpl extends MissionItem {
             List<msg_mission_item> list = new ArrayList<msg_mission_item>();
             build();
 
-            list.addAll((new CameraTriggerImpl(mission, surveyData.getLongitudinalPictureDistance())).packMissionItem());
-            packGridPoints(list);
-            list.addAll((new CameraTriggerImpl(mission, (0.0)).packMissionItem()));
+            packSurveyPoints(list);
 
             return list;
         } catch (Exception e) {
@@ -61,12 +69,31 @@ public class SurveyImpl extends MissionItem {
         }
     }
 
-    private void packGridPoints(List<msg_mission_item> list) {
+    private void packSurveyPoints(List<msg_mission_item> list) {
+        //Generate the camera trigger
+        CameraTriggerImpl camTrigger = new CameraTriggerImpl(mission, surveyData.getLongitudinalPictureDistance());
+
+        //Add it if the user wants it to start before the first waypoint.
+        if(startCameraBeforeFirstWaypoint){
+            list.addAll(camTrigger.packMissionItem());
+        }
+
         final double altitude = surveyData.getAltitude();
+
+        //Add the camera trigger after the first waypoint if it wasn't added before.
+        boolean addToFirst = !startCameraBeforeFirstWaypoint;
+
         for (LatLong point : grid.gridPoints) {
             msg_mission_item mavMsg = getSurveyPoint(point, altitude);
             list.add(mavMsg);
+
+            if(addToFirst){
+                list.addAll(camTrigger.packMissionItem());
+                addToFirst = false;
+            }
         }
+
+        list.addAll((new CameraTriggerImpl(mission, (0.0)).packMissionItem()));
     }
 
     protected msg_mission_item getSurveyPoint(LatLong point, double altitude){

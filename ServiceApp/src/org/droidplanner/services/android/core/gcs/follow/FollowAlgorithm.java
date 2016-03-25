@@ -2,11 +2,10 @@ package org.droidplanner.services.android.core.gcs.follow;
 
 import android.os.Handler;
 
-import org.droidplanner.services.android.core.drone.DroneManager;
-import org.droidplanner.services.android.core.drone.variables.GuidedPoint;
+import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
+import org.droidplanner.services.android.core.drone.manager.MavLinkDroneManager;
 import org.droidplanner.services.android.core.gcs.location.Location;
 import org.droidplanner.services.android.core.gcs.roi.ROIEstimator;
-import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 
 import java.util.Collections;
 import java.util.Map;
@@ -14,11 +13,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class FollowAlgorithm {
 
-    protected final DroneManager droneMgr;
+    protected final MavLinkDroneManager droneMgr;
     private final ROIEstimator roiEstimator;
     private final AtomicBoolean isFollowEnabled = new AtomicBoolean(false);
 
-    public FollowAlgorithm(DroneManager droneMgr, Handler handler) {
+    public FollowAlgorithm(MavLinkDroneManager droneMgr, Handler handler) {
         this.droneMgr = droneMgr;
 
         final MavLinkDrone drone = droneMgr.getDrone();
@@ -36,13 +35,8 @@ public abstract class FollowAlgorithm {
     }
 
     public void disableFollow() {
-        if(isFollowEnabled.compareAndSet(true, false)) {
-            final MavLinkDrone drone = droneMgr.getDrone();
-            if (GuidedPoint.isGuidedMode(drone)) {
-                drone.getGuidedPoint().pauseAtCurrentLocation(null);
-            }
-
-            if(roiEstimator != null)
+        if (isFollowEnabled.compareAndSet(true, false)) {
+            if (roiEstimator != null)
                 roiEstimator.disableFollow();
         }
     }
@@ -102,7 +96,7 @@ public abstract class FollowAlgorithm {
             return values()[(ordinal() + 1) % values().length];
         }
 
-        public FollowAlgorithm getAlgorithmType(DroneManager droneMgr, Handler handler) {
+        public FollowAlgorithm getAlgorithmType(MavLinkDroneManager droneMgr, Handler handler) {
             switch (this) {
                 case LEASH:
                 default:

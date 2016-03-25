@@ -6,7 +6,7 @@ import com.MAVLink.enums.MAV_FRAME;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 
 import org.droidplanner.services.android.core.mission.Mission;
-import org.droidplanner.services.android.core.mission.MissionItem;
+import org.droidplanner.services.android.core.mission.MissionItemImpl;
 import org.droidplanner.services.android.core.mission.MissionItemType;
 
 import java.util.ArrayList;
@@ -17,7 +17,7 @@ public class CircleImpl extends SpatialCoordItem {
     private double radius = 10.0;
     private int turns = 1;
 
-    public CircleImpl(MissionItem item) {
+    public CircleImpl(MissionItemImpl item) {
         super(item);
     }
 
@@ -35,7 +35,7 @@ public class CircleImpl extends SpatialCoordItem {
     }
 
     public void setRadius(double radius) {
-        this.radius = Math.abs(radius);
+        this.radius = radius;
     }
 
     public int getNumberOfTurns() {

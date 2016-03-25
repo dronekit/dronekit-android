@@ -30,6 +30,34 @@ public class ReturnToLaunch extends MissionItem implements MissionItem.Command, 
     }
 
     @Override
+    public String toString() {
+        return "ReturnToLaunch{" +
+                "returnAltitude=" + returnAltitude +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ReturnToLaunch)) return false;
+        if (!super.equals(o)) return false;
+
+        ReturnToLaunch that = (ReturnToLaunch) o;
+
+        return Double.compare(that.returnAltitude, returnAltitude) == 0;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        long temp;
+        temp = Double.doubleToLongBits(returnAltitude);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        return result;
+    }
+
+    @Override
     public void writeToParcel(Parcel dest, int flags) {
         super.writeToParcel(dest, flags);
         dest.writeDouble(this.returnAltitude);

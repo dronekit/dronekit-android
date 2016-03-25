@@ -27,6 +27,7 @@ public class Survey extends MissionItem implements MissionItem.ComplexItem<Surve
     private List<LatLong> gridPoints = new ArrayList<LatLong>();
     private List<LatLong> cameraLocations = new ArrayList<LatLong>();
     private boolean isValid;
+    private boolean startCameraBeforeFirstWaypoint;
 
     public Survey(){
         this(MissionItemType.SURVEY);
@@ -48,6 +49,7 @@ public class Survey extends MissionItem implements MissionItem.ComplexItem<Surve
         this.gridPoints = copyPointsList(source.gridPoints);
         this.cameraLocations = copyPointsList(source.cameraLocations);
         this.isValid = source.isValid;
+        this.startCameraBeforeFirstWaypoint = source.startCameraBeforeFirstWaypoint;
     }
 
     private List<LatLong> copyPointsList(List<LatLong> copy){
@@ -115,8 +117,74 @@ public class Survey extends MissionItem implements MissionItem.ComplexItem<Surve
         this.cameraLocations = cameraLocations;
     }
 
+    /**
+     * @since 2.8.1
+     * @return true if the camera trigger should be started before reaching the first survey waypoint.
+     */
+    public boolean isStartCameraBeforeFirstWaypoint() {
+        return startCameraBeforeFirstWaypoint;
+    }
+
+    /**
+     * Enable to start the camera trigger before reaching the first survey waypoint.
+     * @since 2.8.1
+     * @param startCameraBeforeFirstWaypoint
+     */
+    public void setStartCameraBeforeFirstWaypoint(boolean startCameraBeforeFirstWaypoint) {
+        this.startCameraBeforeFirstWaypoint = startCameraBeforeFirstWaypoint;
+    }
+
     public int getCameraCount() {
         return getCameraLocations().size();
+    }
+
+    @Override
+    public String toString() {
+        return "Survey{" +
+                "cameraLocations=" + cameraLocations +
+                ", surveyDetail=" + surveyDetail +
+                ", polygonArea=" + polygonArea +
+                ", polygonPoints=" + polygonPoints +
+                ", gridPoints=" + gridPoints +
+                ", isValid=" + isValid +
+                ", startCameraBeforeFirstWaypoint=" + startCameraBeforeFirstWaypoint +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Survey)) return false;
+        if (!super.equals(o)) return false;
+
+        Survey survey = (Survey) o;
+
+        if (Double.compare(survey.polygonArea, polygonArea) != 0) return false;
+        if (isValid != survey.isValid) return false;
+        if (startCameraBeforeFirstWaypoint != survey.startCameraBeforeFirstWaypoint) return false;
+        if (surveyDetail != null ? !surveyDetail.equals(survey.surveyDetail) : survey.surveyDetail != null)
+            return false;
+        if (polygonPoints != null ? !polygonPoints.equals(survey.polygonPoints) : survey.polygonPoints != null)
+            return false;
+        if (gridPoints != null ? !gridPoints.equals(survey.gridPoints) : survey.gridPoints != null)
+            return false;
+        return !(cameraLocations != null ? !cameraLocations.equals(survey.cameraLocations) : survey.cameraLocations != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        long temp;
+        result = 31 * result + (surveyDetail != null ? surveyDetail.hashCode() : 0);
+        temp = Double.doubleToLongBits(polygonArea);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        result = 31 * result + (polygonPoints != null ? polygonPoints.hashCode() : 0);
+        result = 31 * result + (gridPoints != null ? gridPoints.hashCode() : 0);
+        result = 31 * result + (cameraLocations != null ? cameraLocations.hashCode() : 0);
+        result = 31 * result + (isValid ? 1 : 0);
+        result = 31 * result + (startCameraBeforeFirstWaypoint ? 1 : 0);
+        return result;
     }
 
     @Override
@@ -128,6 +196,7 @@ public class Survey extends MissionItem implements MissionItem.ComplexItem<Surve
         dest.writeTypedList(gridPoints);
         dest.writeTypedList(cameraLocations);
         dest.writeByte(isValid ? (byte) 1 : (byte) 0);
+        dest.writeByte(startCameraBeforeFirstWaypoint ? (byte) 1: (byte) 0);
     }
 
     protected Survey(Parcel in) {
@@ -138,6 +207,7 @@ public class Survey extends MissionItem implements MissionItem.ComplexItem<Surve
         in.readTypedList(gridPoints, LatLong.CREATOR);
         in.readTypedList(cameraLocations, LatLong.CREATOR);
         this.isValid = in.readByte() != 0;
+        this.startCameraBeforeFirstWaypoint = in.readByte() != 0;
     }
 
     @Override

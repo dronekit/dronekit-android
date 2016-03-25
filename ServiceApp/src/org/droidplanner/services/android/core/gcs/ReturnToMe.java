@@ -16,8 +16,8 @@ import com.o3dr.services.android.lib.model.action.Action;
 import org.droidplanner.services.android.core.MAVLink.command.doCmd.MavLinkDoCmds;
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
 import org.droidplanner.services.android.core.drone.DroneInterfaces.AttributeEventListener;
-import org.droidplanner.services.android.core.drone.DroneManager;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
+import org.droidplanner.services.android.core.drone.manager.MavLinkDroneManager;
 import org.droidplanner.services.android.core.gcs.location.Location;
 import org.droidplanner.services.android.utils.CommonApiUtils;
 
@@ -30,7 +30,7 @@ import timber.log.Timber;
  * If enabled, listen for user's gps location updates, and accordingly updates the vehicle RTL location.
  * Created by Fredia Huya-Kouadio on 9/21/15.
  */
-public class ReturnToMe implements DroneInterfaces.OnDroneListener, Location.LocationReceiver {
+public class ReturnToMe implements DroneInterfaces.OnDroneListener<MavLinkDrone>, Location.LocationReceiver {
 
     public static final int UPDATE_MINIMAL_DISPLACEMENT = 5; //meters
 
@@ -41,13 +41,13 @@ public class ReturnToMe implements DroneInterfaces.OnDroneListener, Location.Loc
     private final AtomicBoolean isEnabled = new AtomicBoolean(false);
     private final ReturnToMeState currentState;
 
-    private final DroneManager droneMgr;
+    private final MavLinkDroneManager droneMgr;
     private final Location.LocationFinder locationFinder;
     private final AttributeEventListener attributeListener;
 
     private ICommandListener commandListener;
 
-    public ReturnToMe(DroneManager droneMgr, Location.LocationFinder locationFinder, AttributeEventListener listener) {
+    public ReturnToMe(MavLinkDroneManager droneMgr, Location.LocationFinder locationFinder, AttributeEventListener listener) {
         this.droneMgr = droneMgr;
         this.locationFinder = locationFinder;
         locationFinder.addLocationListener(TAG, this);
@@ -114,7 +114,7 @@ public class ReturnToMe implements DroneInterfaces.OnDroneListener, Location.Loc
                             @Override
                             public void onSuccess() {
                                 Timber.i("Updated vehicle home location to %s", locationCoord.toString());
-                                droneMgr.executeAsyncAction(requestHomeUpdateAction, null);
+                                droneMgr.getDrone().executeAsyncAction(requestHomeUpdateAction, null);
                                 CommonApiUtils.postSuccessEvent(commandListener);
                                 updateCurrentState(ReturnToMeState.STATE_UPDATING_HOME);
                             }

@@ -8,6 +8,19 @@ Full Java Doc
 `Java Documentation <http://android.dronekit.io/javadoc/>`_
 
 
+Releases and Source Code
+========================
+
+3DRServices app (delivers DroneKit-Android Client Library).
+
+`Source <https://github.com/dronekit/dronekit-android>`_ | `Play Store <https://play.google.com/store/apps/details?id=org.droidplanner.services.android>`_
+
+Source code and binaries for **all releases**:
+
+`Project Releases <https://github.com/dronekit/dronekit-android/releases>`_
+
+
+
 Example Apps
 ============
 

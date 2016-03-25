@@ -42,16 +42,15 @@ import java.util.List;
 
 /**
  * This implements a mavlink mission. A mavlink mission is a set of
- * commands/mission items to be carried out by the drone. TODO: rename the
- * 'waypoint' method to 'missionItem' (i.e: addMissionItem)
+ * commands/mission items to be carried out by the drone.
  */
 public class Mission extends DroneVariable<GenericMavLinkDrone> {
 
     /**
      * Stores the set of mission items belonging to this mission.
      */
-    private List<MissionItem> items = new ArrayList<MissionItem>();
-    private final List<MissionItem> componentItems = new ArrayList<>();
+    private List<MissionItemImpl> items = new ArrayList<MissionItemImpl>();
+    private final List<MissionItemImpl> componentItems = new ArrayList<>();
 
     public Mission(GenericMavLinkDrone myDrone) {
         super(myDrone);
@@ -62,7 +61,7 @@ public class Mission extends DroneVariable<GenericMavLinkDrone> {
      *
      * @param item waypoint to remove
      */
-    public void removeWaypoint(MissionItem item) {
+    public void removeWaypoint(MissionItemImpl item) {
         items.remove(item);
         notifyMissionUpdate();
     }
@@ -72,7 +71,7 @@ public class Mission extends DroneVariable<GenericMavLinkDrone> {
      *
      * @param toRemove list of waypoints to remove
      */
-    public void removeWaypoints(List<MissionItem> toRemove) {
+    public void removeWaypoints(List<MissionItemImpl> toRemove) {
         items.removeAll(toRemove);
         notifyMissionUpdate();
     }
@@ -80,10 +79,10 @@ public class Mission extends DroneVariable<GenericMavLinkDrone> {
     /**
      * Add a list of waypoints to the mission's set of mission items.
      *
-     * @param missionItems list of waypoints to add
+     * @param missionItemImpls list of waypoints to add
      */
-    public void addMissionItems(List<MissionItem> missionItems) {
-        items.addAll(missionItems);
+    public void addMissionItems(List<MissionItemImpl> missionItemImpls) {
+        items.addAll(missionItemImpls);
         notifyMissionUpdate();
     }
 
@@ -95,15 +94,15 @@ public class Mission extends DroneVariable<GenericMavLinkDrone> {
     /**
      * Add a waypoint to the mission's set of mission item.
      *
-     * @param missionItem waypoint to add
+     * @param missionItemImpl waypoint to add
      */
-    public void addMissionItem(MissionItem missionItem) {
-        items.add(missionItem);
+    public void addMissionItem(MissionItemImpl missionItemImpl) {
+        items.add(missionItemImpl);
         notifyMissionUpdate();
     }
 
-    public void addMissionItem(int index, MissionItem missionItem) {
-        items.add(index, missionItem);
+    public void addMissionItem(int index, MissionItemImpl missionItemImpl) {
+        items.add(index, missionItemImpl);
         notifyMissionUpdate();
     }
 
@@ -122,7 +121,7 @@ public class Mission extends DroneVariable<GenericMavLinkDrone> {
      * @param oldItem mission item to update
      * @param newItem new mission item
      */
-    public void replace(MissionItem oldItem, MissionItem newItem) {
+    public void replace(MissionItemImpl oldItem, MissionItemImpl newItem) {
         final int index = items.indexOf(oldItem);
         if (index == -1) {
             return;
@@ -133,20 +132,20 @@ public class Mission extends DroneVariable<GenericMavLinkDrone> {
         notifyMissionUpdate();
     }
 
-    public void replaceAll(List<Pair<MissionItem, MissionItem>> updatesList) {
+    public void replaceAll(List<Pair<MissionItemImpl, MissionItemImpl>> updatesList) {
         if (updatesList == null || updatesList.isEmpty()) {
             return;
         }
 
         boolean wasUpdated = false;
-        for (Pair<MissionItem, MissionItem> updatePair : updatesList) {
-            final MissionItem oldItem = updatePair.first;
+        for (Pair<MissionItemImpl, MissionItemImpl> updatePair : updatesList) {
+            final MissionItemImpl oldItem = updatePair.first;
             final int index = items.indexOf(oldItem);
             if (index == -1) {
                 continue;
             }
 
-            final MissionItem newItem = updatePair.second;
+            final MissionItemImpl newItem = updatePair.second;
             items.remove(index);
             items.add(index, newItem);
 
@@ -170,14 +169,14 @@ public class Mission extends DroneVariable<GenericMavLinkDrone> {
         myDrone.notifyDroneEvent(DroneEventsType.MISSION_SENT);
     }
 
-    public List<MissionItem> getItems() {
+    public List<MissionItemImpl> getItems() {
         return items;
     }
-    public List<MissionItem> getComponentItems(){
+    public List<MissionItemImpl> getComponentItems(){
         return componentItems;
     }
 
-    public int getOrder(MissionItem waypoint) {
+    public int getOrder(MissionItemImpl waypoint) {
         return items.indexOf(waypoint) + 1; // plus one to account for the fact
         // that this is an index
     }
@@ -185,7 +184,7 @@ public class Mission extends DroneVariable<GenericMavLinkDrone> {
     public double getAltitudeDiffFromPreviousItem(SpatialCoordItem waypoint) throws IllegalArgumentException {
         int i = items.indexOf(waypoint);
         if (i > 0) {
-            MissionItem previous = items.get(i - 1);
+            MissionItemImpl previous = items.get(i - 1);
             if (previous instanceof SpatialCoordItem) {
                 return waypoint.getCoordinate().getAltitude() - ((SpatialCoordItem) previous).getCoordinate()
                         .getAltitude();
@@ -198,7 +197,7 @@ public class Mission extends DroneVariable<GenericMavLinkDrone> {
             throws IllegalArgumentException {
         int i = items.indexOf(waypoint);
         if (i > 0) {
-            MissionItem previous = items.get(i - 1);
+            MissionItemImpl previous = items.get(i - 1);
             if (previous instanceof SpatialCoordItem) {
                 return GeoTools.getDistance(waypoint.getCoordinate(),
                         ((SpatialCoordItem) previous).getCoordinate());
@@ -207,7 +206,7 @@ public class Mission extends DroneVariable<GenericMavLinkDrone> {
         throw new IllegalArgumentException("Last waypoint doesn't have a coordinate");
     }
 
-    public boolean hasItem(MissionItem item) {
+    public boolean hasItem(MissionItemImpl item) {
         return items.contains(item);
     }
 
@@ -233,8 +232,8 @@ public class Mission extends DroneVariable<GenericMavLinkDrone> {
         }
     }
 
-    private List<MissionItem> processMavLinkMessages(List<msg_mission_item> msgs) {
-        List<MissionItem> received = new ArrayList<MissionItem>();
+    private List<MissionItemImpl> processMavLinkMessages(List<msg_mission_item> msgs) {
+        List<MissionItemImpl> received = new ArrayList<MissionItemImpl>();
         for (msg_mission_item msg : msgs) {
             switch (msg.command) {
                 case MAV_CMD.MAV_CMD_DO_SET_SERVO:
@@ -345,7 +344,7 @@ public class Mission extends DroneVariable<GenericMavLinkDrone> {
 
         int size = items.size();
         for (int i = 0; i < size; i++) {
-            MissionItem item = items.get(i);
+            MissionItemImpl item = items.get(i);
             for(msg_mission_item msg_item: item.packMissionItem()){
                 msg_item.seq = waypointCount++;
                 data.add(msg_item);
@@ -388,7 +387,7 @@ public class Mission extends DroneVariable<GenericMavLinkDrone> {
 
     }
 
-    public List<MissionItem> createDronie(LatLong start, LatLong end) {
+    public List<MissionItemImpl> createDronie(LatLong start, LatLong end) {
         final int startAltitude = 4;
         final int roiDistance = -8;
         LatLong slowDownPoint = GeoTools.pointAlongTheLine(start, end, 5);
@@ -398,7 +397,7 @@ public class Mission extends DroneVariable<GenericMavLinkDrone> {
             defaultSpeed = 5;
         }
 
-        List<MissionItem> dronieItems = new ArrayList<MissionItem>();
+        List<MissionItemImpl> dronieItems = new ArrayList<MissionItemImpl>();
         dronieItems.add(new TakeoffImpl(this, startAltitude));
         dronieItems.add(new RegionOfInterestImpl(this,
                 new LatLongAlt(GeoTools.pointAlongTheLine(start, end, roiDistance), (1.0))));
@@ -429,7 +428,7 @@ public class Mission extends DroneVariable<GenericMavLinkDrone> {
         if (items.isEmpty())
             return false;
 
-        MissionItem last = items.get(items.size() - 1);
+        MissionItemImpl last = items.get(items.size() - 1);
         return (last instanceof ReturnToHomeImpl) || (last instanceof LandImpl);
     }
 }

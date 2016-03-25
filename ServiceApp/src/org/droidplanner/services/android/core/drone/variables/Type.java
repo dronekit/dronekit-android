@@ -8,7 +8,7 @@ import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 
 import com.MAVLink.enums.MAV_TYPE;
 
-public class Type extends DroneVariable implements DroneInterfaces.OnDroneListener{
+public class Type extends DroneVariable<MavLinkDrone> implements DroneInterfaces.OnDroneListener<MavLinkDrone>{
 
     private static final int DEFAULT_TYPE = MAV_TYPE.MAV_TYPE_GENERIC;
 
@@ -24,7 +24,6 @@ public class Type extends DroneVariable implements DroneInterfaces.OnDroneListen
 		if (this.type != type) {
 			this.type = type;
 			myDrone.notifyDroneEvent(DroneEventsType.TYPE);
-			myDrone.loadVehicleProfile();
 		}
 	}
 

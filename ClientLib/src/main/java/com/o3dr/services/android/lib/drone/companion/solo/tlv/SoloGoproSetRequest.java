@@ -12,33 +12,29 @@ public class SoloGoproSetRequest extends TLVPacket {
 
     public static final int MESSAGE_LENGTH = 4;
 
-    @SoloGoproConstants.RequestCommand
     private short command;
 
-    @SoloGoproConstants.RequestCommandValue
     private short value;
 
-    public SoloGoproSetRequest(@SoloGoproConstants.RequestCommand short requestCommand, @SoloGoproConstants.RequestCommandValue short value){
+    public SoloGoproSetRequest(short requestCommand, short value){
         super(TLVMessageTypes.TYPE_SOLO_GOPRO_SET_REQUEST, MESSAGE_LENGTH);
         this.command = requestCommand;
         this.value = value;
     }
 
-    @SoloGoproConstants.RequestCommand
     public short getCommand() {
         return command;
     }
 
-    public void setCommand(@SoloGoproConstants.RequestCommand short command) {
+    public void setCommand(short command) {
         this.command = command;
     }
 
-    @SoloGoproConstants.RequestCommandValue
     public short getValue() {
         return value;
     }
 
-    public void setValue(@SoloGoproConstants.RequestCommandValue short value) {
+    public void setValue(short value) {
         this.value = value;
     }
 
@@ -57,11 +53,8 @@ public class SoloGoproSetRequest extends TLVPacket {
 
     protected SoloGoproSetRequest(Parcel in) {
         super(in);
-        @SoloGoproConstants.RequestCommand short readCommand = (short) in.readInt();
-        @SoloGoproConstants.RequestCommandValue short readValue = (short) in.readInt();
-
-        this.command = readCommand;
-        this.value = readValue;
+        this.command = (short) in.readInt();
+        this.value = (short) in.readInt();
     }
 
     public static final Creator<SoloGoproSetRequest> CREATOR = new Creator<SoloGoproSetRequest>() {
@@ -73,4 +66,12 @@ public class SoloGoproSetRequest extends TLVPacket {
             return new SoloGoproSetRequest[size];
         }
     };
+
+    @Override
+    public String toString() {
+        return "SoloGoproSetRequest{" +
+                "command=" + command +
+                ", value=" + value +
+                '}';
+    }
 }

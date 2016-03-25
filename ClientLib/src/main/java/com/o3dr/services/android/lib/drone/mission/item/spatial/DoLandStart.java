@@ -20,6 +20,11 @@ public class DoLandStart extends BaseSpatialItem implements android.os.Parcelabl
     }
 
     @Override
+    public String toString() {
+        return "DoLandStart{ " + super.toString() + " }";
+    }
+
+    @Override
     public MissionItem clone() {
         return new DoLandStart(this);
     }

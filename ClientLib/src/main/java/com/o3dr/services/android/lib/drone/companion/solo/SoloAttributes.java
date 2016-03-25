@@ -20,4 +20,10 @@ public class SoloAttributes {
      * Used to access the sololink gopro state.
      */
     public static final String SOLO_GOPRO_STATE = PACKAGE_NAME + ".SOLO_GOPRO_STATE";
+
+    /**
+     * Used to access the updated sololink gopro state.
+     * @since 2.7.0
+     */
+    public static final String SOLO_GOPRO_STATE_V2 = PACKAGE_NAME + ".SOLO_GOPRO_STATE_V2";
 }

@@ -3,17 +3,17 @@ package org.droidplanner.services.android.core.mission.commands;
 import java.util.List;
 
 import org.droidplanner.services.android.core.mission.Mission;
-import org.droidplanner.services.android.core.mission.MissionItem;
+import org.droidplanner.services.android.core.mission.MissionItemImpl;
 
 import com.MAVLink.common.msg_mission_item;
 
-public abstract class MissionCMD extends MissionItem {
+public abstract class MissionCMD extends MissionItemImpl {
 
 	public MissionCMD(Mission mission) {
 		super(mission);
 	}
 
-	public MissionCMD(MissionItem item) {
+	public MissionCMD(MissionItemImpl item) {
 		super(item);
 	}
 

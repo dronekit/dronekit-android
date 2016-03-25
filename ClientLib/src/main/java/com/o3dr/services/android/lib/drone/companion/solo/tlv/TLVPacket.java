@@ -11,6 +11,7 @@ import java.nio.ByteOrder;
  */
 public abstract class TLVPacket implements Parcelable {
 
+    public static final int MIN_TLV_PACKET_SIZE = 4 + 4; //4 bytes for the message type and 4 bytes for the message length.
     public static final ByteOrder TLV_BYTE_ORDER = ByteOrder.LITTLE_ENDIAN;
 
     private final int messageType;
@@ -22,7 +23,7 @@ public abstract class TLVPacket implements Parcelable {
         this.messageType = type;
         this.messageLength = length;
 
-        byteBuffer = ByteBuffer.allocate(4 + 4 + messageLength);
+        byteBuffer = ByteBuffer.allocate(MIN_TLV_PACKET_SIZE + messageLength);
         byteBuffer.order(TLV_BYTE_ORDER);
     }
 
@@ -47,6 +48,33 @@ public abstract class TLVPacket implements Parcelable {
         byteBuffer.get(bytes);
 
         return bytes;
+    }
+
+    @Override
+    public String toString() {
+        return "TLVPacket{" +
+                "messageLength=" + messageLength +
+                ", messageType=" + messageType +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof TLVPacket)) return false;
+
+        TLVPacket tlvPacket = (TLVPacket) o;
+
+        if (messageType != tlvPacket.messageType) return false;
+        return messageLength == tlvPacket.messageLength;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = messageType;
+        result = 31 * result + messageLength;
+        return result;
     }
 
     protected abstract void getMessageValue(ByteBuffer valueCarrier);

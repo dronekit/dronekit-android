@@ -12,7 +12,7 @@ import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 
 import timber.log.Timber;
 
-public class HeartBeat extends DroneVariable implements OnDroneListener {
+public class HeartBeat extends DroneVariable implements OnDroneListener<MavLinkDrone> {
 
     public static final long HEARTBEAT_NORMAL_TIMEOUT = 5000l; //ms
     private static final long HEARTBEAT_LOST_TIMEOUT = 15000l; //ms
@@ -103,7 +103,6 @@ public class HeartBeat extends DroneVariable implements OnDroneListener {
     @Override
     public void onDroneEvent(DroneEventsType event, MavLinkDrone drone) {
         switch (event) {
-            case CONNECTION_FAILED:
             case DISCONNECTED:
                 notifyDisconnected();
                 break;
@@ -123,7 +122,7 @@ public class HeartBeat extends DroneVariable implements OnDroneListener {
         switch (heartbeatState) {
             case FIRST_HEARTBEAT:
                 Timber.i("First heartbeat timeout.");
-                myDrone.notifyDroneEvent(DroneEventsType.CONNECTION_FAILED);
+                myDrone.notifyDroneEvent(DroneEventsType.HEARTBEAT_TIMEOUT);
                 break;
 
             default:

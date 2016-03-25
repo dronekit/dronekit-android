@@ -114,7 +114,6 @@ public class CapabilityApi extends Api {
 
                     @Override
                     public void onTimeout() {
-                        //TODO: figure out if that's the correct thing to do.
                         resultListener.onFeatureSupportResult(featureId, FEATURE_UNSUPPORTED, null);
                     }
                 });

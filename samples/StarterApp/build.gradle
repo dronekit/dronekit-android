@@ -1,53 +1,13 @@
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
-
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:1.2.3'
-
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
-    }
-}
-
-def getMavenUsername(){
-    return hasProperty('COM_O3DR_MAVEN_USERNAME') ? COM_O3DR_MAVEN_USERNAME : ''
-}
-
-def getMavenApiKey(){
-    return hasProperty('COM_O3DR_MAVEN_APIKEY') ? COM_O3DR_MAVEN_APIKEY : ''
-}
-
-def getMavenRepoUrl(){
-    return hasProperty('COM_O3DR_MAVEN_REPO_URL') ? COM_O3DR_MAVEN_REPO_URL : ''
-}
-
-allprojects {
-    repositories {
-        jcenter()
-
-        maven {
-            url getMavenRepoUrl()
-            credentials {
-                username getMavenUsername()
-                password getMavenApiKey()
-            }
-        }
-    }
-}
-
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion Integer.parseInt(project.ANDROID_BUILD_SDK_VERSION)
-    buildToolsVersion project.ANDROID_BUILD_TOOLS_VERSION
+    compileSdkVersion android_build_sdk_version
+    buildToolsVersion android_build_tools_version
 
     defaultConfig {
         applicationId "com.o3dr.sample.hellodrone"
-        minSdkVersion Integer.parseInt(project.ANDROID_BUILD_MIN_SDK_VERSION)
-        targetSdkVersion Integer.parseInt(project.ANDROID_BUILD_TARGET_SDK_VERSION)
+        minSdkVersion android_build_min_sdk_version
+        targetSdkVersion android_build_target_sdk_version
         versionCode 2
         versionName "3.0"
     }
@@ -62,13 +22,12 @@ android {
     lintOptions {
         abortOnError false
     }
-
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:22.2.0'
-    compile 'com.android.support:cardview-v7:22.2.0'
+    compile "com.android.support:appcompat-v7:${support_lib_version}"
+    compile "com.android.support:cardview-v7:${support_lib_version}"
 
     compile project(':ClientLib')
 }

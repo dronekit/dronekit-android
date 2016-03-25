@@ -1,29 +1,44 @@
 package org.droidplanner.services.android.communication.service;
 
 import android.content.Context;
+import android.os.Bundle;
+import android.text.TextUtils;
 
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
+import com.google.android.gms.analytics.HitBuilders;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
+import com.o3dr.services.android.lib.drone.connection.ConnectionType;
+import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
 import com.o3dr.services.android.lib.model.ICommandListener;
 
-import org.droidplanner.services.android.core.MAVLink.MAVLinkStreams;
+import org.droidplanner.services.android.communication.connection.AndroidMavLinkConnection;
+import org.droidplanner.services.android.communication.connection.AndroidTcpConnection;
+import org.droidplanner.services.android.communication.connection.AndroidUdpConnection;
+import org.droidplanner.services.android.communication.connection.BluetoothConnection;
+import org.droidplanner.services.android.communication.connection.SoloConnection;
+import org.droidplanner.services.android.communication.connection.usb.UsbConnection;
+import org.droidplanner.services.android.communication.model.DataLink;
 import org.droidplanner.services.android.core.MAVLink.connection.MavLinkConnection;
 import org.droidplanner.services.android.core.MAVLink.connection.MavLinkConnectionListener;
 import org.droidplanner.services.android.core.MAVLink.connection.MavLinkConnectionTypes;
-import org.droidplanner.services.android.core.drone.CommandTracker;
-import org.droidplanner.services.android.api.MavLinkServiceApi;
-import org.droidplanner.services.android.data.database.ServicesDb;
+import org.droidplanner.services.android.core.drone.manager.DroneCommandTracker;
+import org.droidplanner.services.android.data.SessionDB;
+import org.droidplanner.services.android.utils.analytics.GAUtils;
 import org.droidplanner.services.android.utils.file.DirectoryPath;
 import org.droidplanner.services.android.utils.file.FileUtils;
 
 import java.io.File;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Date;
+
+import timber.log.Timber;
 
 /**
  * Provide a common class for some ease of use functionality
  */
-public class MAVLinkClient implements MAVLinkStreams.MAVLinkOutputStream {
+public class MAVLinkClient implements DataLink.DataLinkProvider<MAVLinkMessage> {
 
     private static final int DEFAULT_SYS_ID = 255;
     private static final int DEFAULT_COMP_ID = 190;
@@ -38,91 +53,187 @@ public class MAVLinkClient implements MAVLinkStreams.MAVLinkOutputStream {
     private final MavLinkConnectionListener mConnectionListener = new MavLinkConnectionListener() {
 
         @Override
-        public void onStartingConnection() {
-            listener.notifyStartingConnection();
-        }
-
-        @Override
-        public void onConnect(long connectionTime) {
-            startLoggingThread(connectionTime);
-            listener.notifyConnected();
-        }
-
-        @Override
         public void onReceivePacket(final MAVLinkPacket packet) {
             listener.notifyReceivedData(packet);
         }
 
         @Override
-        public void onDisconnect(long disconnectTime) {
-            listener.notifyDisconnected();
-            closeConnection();
-        }
+        public void onConnectionStatus(final LinkConnectionStatus connectionStatus) {
+            listener.onConnectionStatus(connectionStatus);
 
-        @Override
-        public void onComError(final String errMsg) {
-            if (errMsg != null) {
-                listener.onStreamError(errMsg);
+            switch (connectionStatus.getStatusCode()) {
+                case LinkConnectionStatus.DISCONNECTED:
+                    closeConnection();
+                    break;
+
+                case LinkConnectionStatus.CONNECTED:
+                    Bundle extras = connectionStatus.getExtras();
+                    if (extras != null) {
+                        long connectionTime = extras.getLong(LinkConnectionStatus.EXTRA_CONNECTION_TIME);
+                        if (connectionTime != 0) {
+                            startLoggingThread(connectionTime);
+                        }
+                    }
+                    break;
             }
         }
     };
 
-    private final MAVLinkStreams.MavlinkInputStream listener;
-    private final MavLinkServiceApi mavLinkApi;
-    private final ServicesDb servicesDb;
+    private AndroidMavLinkConnection mavlinkConn;
+
+    private final DataLink.DataLinkListener<MAVLinkPacket> listener;
+    private final SessionDB sessionDB;
     private final Context context;
 
     private int packetSeqNumber = 0;
     private final ConnectionParameter connParams;
 
-    private CommandTracker commandTracker;
+    private DroneCommandTracker commandTracker;
 
-    public MAVLinkClient(Context context, MAVLinkStreams.MavlinkInputStream listener,
-                         ConnectionParameter connParams, MavLinkServiceApi serviceApi) {
+    public MAVLinkClient(Context context, DataLink.DataLinkListener<MAVLinkPacket> listener,
+                         ConnectionParameter connParams, DroneCommandTracker commandTracker) {
         this.context = context;
         this.listener = listener;
-        this.mavLinkApi = serviceApi;
-        this.connParams = connParams;
-        this.servicesDb = new ServicesDb(context);
-    }
 
-    public void setCommandTracker(CommandTracker commandTracker) {
+        if(connParams == null){
+            throw new NullPointerException("Invalid connection parameter argument.");
+        }
+
+        this.connParams = connParams;
+        this.sessionDB = new SessionDB(context);
+
         this.commandTracker = commandTracker;
     }
 
+    private int getConnectionStatus(){
+        return mavlinkConn == null
+                ? MavLinkConnection.MAVLINK_DISCONNECTED
+                : mavlinkConn.getConnectionStatus();
+    }
+
+    /**
+     * Setup a MAVLink connection based on the connection parameters.
+     */
     @Override
-    public void openConnection() {
-        if (this.connParams == null)
+    public synchronized void openConnection() {
+        if(isConnected() || isConnecting())
             return;
 
         final String tag = toString();
-        final int connectionStatus = mavLinkApi.getConnectionStatus(this.connParams, tag);
-        if (connectionStatus != MavLinkConnection.MAVLINK_CONNECTED) {
-            mavLinkApi.connectMavLink(this.connParams, tag, mConnectionListener);
+
+        //Create the mavlink connection
+        final int connectionType = connParams.getConnectionType();
+        final Bundle paramsBundle = connParams.getParamsBundle();
+
+        if(mavlinkConn == null) {
+            switch (connectionType) {
+                case ConnectionType.TYPE_USB:
+                    final int baudRate = paramsBundle.getInt(ConnectionType.EXTRA_USB_BAUD_RATE,
+                            ConnectionType.DEFAULT_USB_BAUD_RATE);
+                    mavlinkConn = new UsbConnection(context, baudRate);
+                    Timber.i("Connecting over usb.");
+                    break;
+
+                case ConnectionType.TYPE_BLUETOOTH:
+                    //Retrieve the bluetooth address to connect to
+                    final String bluetoothAddress = paramsBundle.getString(ConnectionType.EXTRA_BLUETOOTH_ADDRESS);
+                    mavlinkConn = new BluetoothConnection(context, bluetoothAddress);
+                    Timber.i("Connecting over bluetooth.");
+                    break;
+
+                case ConnectionType.TYPE_TCP:
+                    //Retrieve the server ip and port
+                    final String tcpServerIp = paramsBundle.getString(ConnectionType.EXTRA_TCP_SERVER_IP);
+                    final int tcpServerPort = paramsBundle.getInt(ConnectionType
+                            .EXTRA_TCP_SERVER_PORT, ConnectionType.DEFAULT_TCP_SERVER_PORT);
+                    mavlinkConn = new AndroidTcpConnection(context, tcpServerIp, tcpServerPort);
+                    Timber.i("Connecting over tcp.");
+                    break;
+
+                case ConnectionType.TYPE_UDP:
+                    final int udpServerPort = paramsBundle
+                            .getInt(ConnectionType.EXTRA_UDP_SERVER_PORT, ConnectionType.DEFAULT_UDP_SERVER_PORT);
+                    mavlinkConn = new AndroidUdpConnection(context, udpServerPort);
+                    Timber.i("Connecting over udp.");
+                    break;
+
+                case ConnectionType.TYPE_SOLO: {
+                    Timber.i("Creating solo connection");
+                    final String soloLinkId = paramsBundle.getString(ConnectionType.EXTRA_SOLO_LINK_ID, null);
+                    final String linkPassword = paramsBundle.getString(ConnectionType.EXTRA_SOLO_LINK_PASSWORD, null);
+                    mavlinkConn = new SoloConnection(context, soloLinkId, linkPassword);
+                    break;
+                }
+
+                default:
+                    Timber.e("Unrecognized connection type: %s", connectionType);
+                    return;
+            }
+        }
+
+        mavlinkConn.addMavLinkConnectionListener(tag, mConnectionListener);
+
+        //Check if we need to ping a server to receive UDP data stream.
+        if (connectionType == ConnectionType.TYPE_UDP) {
+            final String pingIpAddress = paramsBundle.getString(ConnectionType.EXTRA_UDP_PING_RECEIVER_IP);
+            if (!TextUtils.isEmpty(pingIpAddress)) {
+                try {
+                    final InetAddress resolvedAddress = InetAddress.getByName(pingIpAddress);
+
+                    final int pingPort = paramsBundle.getInt(ConnectionType.EXTRA_UDP_PING_RECEIVER_PORT);
+                    final long pingPeriod = paramsBundle.getLong(ConnectionType.EXTRA_UDP_PING_PERIOD,
+                            ConnectionType.DEFAULT_UDP_PING_PERIOD);
+                    final byte[] pingPayload = paramsBundle.getByteArray(ConnectionType.EXTRA_UDP_PING_PAYLOAD);
+
+                    ((AndroidUdpConnection) mavlinkConn).addPingTarget(resolvedAddress, pingPort, pingPeriod, pingPayload);
+
+                } catch (UnknownHostException e) {
+                    Timber.e(e, "Unable to resolve UDP ping server ip address.");
+                }
+            }
+        }
+
+        if (mavlinkConn.getConnectionStatus() == MavLinkConnection.MAVLINK_DISCONNECTED) {
+            mavlinkConn.connect();
+
+            // Record which connection type is used.
+            GAUtils.sendEvent(new HitBuilders.EventBuilder()
+                    .setCategory(GAUtils.Category.MAVLINK_CONNECTION)
+                    .setAction("MavLink connect")
+                    .setLabel(connParams.toString()));
         }
     }
 
+    /**
+     * Disconnect the MAVLink connection for the given listener.
+     */
     @Override
-    public void closeConnection() {
-        if (this.connParams == null)
+    public synchronized void closeConnection() {
+        if (isDisconnected())
             return;
 
-        final String tag = toString();
-        if (mavLinkApi.getConnectionStatus(this.connParams, tag) != MavLinkConnection.MAVLINK_DISCONNECTED) {
-            mavLinkApi.disconnectMavLink(this.connParams, tag);
-            stopLoggingThread(System.currentTimeMillis());
-            listener.notifyDisconnected();
+        mavlinkConn.removeMavLinkConnectionListener(toString());
+        if(mavlinkConn.getMavLinkConnectionListenersCount() == 0){
+            Timber.i("Disconnecting...");
+            mavlinkConn.disconnect();
+            GAUtils.sendEvent(new HitBuilders.EventBuilder()
+                    .setCategory(GAUtils.Category.MAVLINK_CONNECTION)
+                    .setAction("MavLink disconnect")
+                    .setLabel(connParams.toString()));
         }
+
+        stopLoggingThread(System.currentTimeMillis());
+
+        listener.onConnectionStatus(new LinkConnectionStatus(LinkConnectionStatus.DISCONNECTED, null));
     }
 
     @Override
-    public void sendMavMessage(MAVLinkMessage message, ICommandListener listener) {
+    public synchronized void sendMessage(MAVLinkMessage message, ICommandListener listener) {
         sendMavMessage(message, DEFAULT_SYS_ID, DEFAULT_COMP_ID, listener);
     }
 
-    @Override
-    public void sendMavMessage(MAVLinkMessage message, int sysId, int compId, ICommandListener listener){
-        if (this.connParams == null || message == null) {
+    protected void sendMavMessage(MAVLinkMessage message, int sysId, int compId, ICommandListener listener){
+        if (isDisconnected() || message == null) {
             return;
         }
 
@@ -131,33 +242,26 @@ public class MAVLinkClient implements MAVLinkStreams.MAVLinkOutputStream {
         packet.compid = compId;
         packet.seq = packetSeqNumber;
 
-        if(mavLinkApi.sendData(this.connParams, packet)) {
-            packetSeqNumber = (packetSeqNumber + 1) % (MAX_PACKET_SEQUENCE + 1);
+        mavlinkConn.sendMavPacket(packet);
 
-            if (commandTracker != null && listener != null) {
-                commandTracker.onCommandSubmitted(message, listener);
-            }
+        packetSeqNumber = (packetSeqNumber + 1) % (MAX_PACKET_SEQUENCE + 1);
+
+        if (commandTracker != null && listener != null) {
+            commandTracker.onCommandSubmitted(message, listener);
         }
     }
 
-    @Override
-    public boolean isConnected() {
-        return this.connParams != null
-                && mavLinkApi.getConnectionStatus(this.connParams, toString()) == MavLinkConnection.MAVLINK_CONNECTED;
-    }
-
-    public boolean isConnecting(){
-        return this.connParams != null && mavLinkApi.getConnectionStatus(this.connParams,
-                toString()) == MavLinkConnection.MAVLINK_CONNECTING;
+    public synchronized boolean isDisconnected(){
+        return getConnectionStatus() == MavLinkConnection.MAVLINK_DISCONNECTED;
     }
 
     @Override
-    public void toggleConnectionState() {
-        if (isConnected()) {
-            closeConnection();
-        } else {
-            openConnection();
-        }
+    public synchronized boolean isConnected() {
+        return getConnectionStatus() == MavLinkConnection.MAVLINK_CONNECTED;
+    }
+
+    private boolean isConnecting(){
+        return getConnectionStatus() == MavLinkConnection.MAVLINK_CONNECTING;
     }
 
     private File getTLogDir(String appId) {
@@ -173,28 +277,38 @@ public class MAVLinkClient implements MAVLinkStreams.MAVLinkOutputStream {
                 "_" + FileUtils.getTimeStamp(connectionTimestamp) + FileUtils.TLOG_FILENAME_EXT;
     }
 
-    public void addLoggingFile(String appId){
+    /**
+     * Register a log listener.
+     *
+     * @param appId             Tag for the listener.
+     */
+    public synchronized void addLoggingFile(String appId){
         if(isConnecting() || isConnected()) {
             final File logFile = getTempTLogFile(appId, System.currentTimeMillis());
-            mavLinkApi.addLoggingFile(this.connParams, appId, logFile.getAbsolutePath());
+            mavlinkConn.addLoggingPath(appId, logFile.getAbsolutePath());
         }
     }
 
-    public void removeLoggingFile(String appId){
+    /**
+     * Unregister a log listener.
+     *
+     * @param appId        Tag for the listener.
+     */
+    public synchronized void removeLoggingFile(String appId){
         if(isConnecting() || isConnected()){
-            mavLinkApi.removeLoggingFile(this.connParams, appId);
+            mavlinkConn.removeLoggingPath(appId);
         }
     }
 
     private void startLoggingThread(long startTime) {
         //log into the database the connection time.
         final String connectionType = MavLinkConnectionTypes.getConnectionTypeLabel(connParams.getConnectionType());
-        this.servicesDb.getSessionDataTable().startSession(new Date(startTime), connectionType);
+        this.sessionDB.startSession(new Date(startTime), connectionType);
     }
 
     private void stopLoggingThread(long stopTime) {
         //log into the database the disconnection time.
         final String connectionType = MavLinkConnectionTypes.getConnectionTypeLabel(connParams.getConnectionType());
-        this.servicesDb.getSessionDataTable().endSession(new Date(stopTime), connectionType, new Date());
+        this.sessionDB.endSession(new Date(stopTime), connectionType, new Date());
     }
 }
