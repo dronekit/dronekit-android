@@ -107,7 +107,7 @@ public class SshConnection {
 
                 if (execChannel.isClosed()) {
                     if (in.available() > 0) continue;
-                    Timber.d("SSH command exit status: " + execChannel.getExitStatus());
+                    Timber.d("SSH command %s exit status: %d", command, execChannel.getExitStatus());
                     break;
                 }
             }

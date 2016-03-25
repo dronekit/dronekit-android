@@ -336,7 +336,7 @@ public class MavLinkDroneManager extends DroneManager<MavLinkDrone, MAVLinkPacke
                 return;
             }
 
-            Timber.d("followMe.enabled=%s followMe.state=%s", followMe.isEnabled(), followMe.getState());
+            Timber.d("CURRENT: followMe.enabled=%s followMe.state=%s", followMe.isEnabled(), followMe.getState());
 
             if (!followMe.isEnabled()) {
                 followMe.toggleFollowMeState(useExternal);
@@ -358,6 +358,8 @@ public class MavLinkDroneManager extends DroneManager<MavLinkDrone, MAVLinkPacke
                 followMe.useExternalLocations(useExternal);
                 CommonApiUtils.postSuccessEvent(listener);
             }
+
+            Timber.i("AFTER: followMe.state=%s type=%s", followMe.getState(), followType);
         }
     }
 

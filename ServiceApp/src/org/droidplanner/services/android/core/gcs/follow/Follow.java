@@ -9,6 +9,7 @@ import com.o3dr.services.android.lib.gcs.follow.FollowLocation;
 import org.droidplanner.services.android.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.services.android.core.drone.DroneInterfaces.OnDroneListener;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
+import org.droidplanner.services.android.core.drone.autopilot.apm.solo.ArduSolo;
 import org.droidplanner.services.android.core.drone.manager.MavLinkDroneManager;
 import org.droidplanner.services.android.core.drone.variables.GuidedPoint;
 import org.droidplanner.services.android.core.drone.variables.State;
@@ -44,7 +45,9 @@ public class Follow implements OnDroneListener<MavLinkDrone>, LocationReceiver {
         if(drone != null)
             drone.addDroneListener(this);
 
-        followAlgorithm = FollowAlgorithm.FollowModes.LEASH.getAlgorithmType(droneMgr, handler);
+        followAlgorithm = (drone instanceof ArduSolo)?
+                FollowAlgorithm.FollowModes.SOLO_SHOT.getAlgorithmType(droneMgr, handler):
+                FollowAlgorithm.FollowModes.LEASH.getAlgorithmType(droneMgr, handler);
 
         this.locationFinder = locationFinder;
         locationFinder.addLocationListener(TAG, this);
@@ -139,6 +142,7 @@ public class Follow implements OnDroneListener<MavLinkDrone>, LocationReceiver {
         switch (event) {
             case MODE:
                 if (isEnabled() && !GuidedPoint.isGuidedMode(drone)) {
+                    Timber.i("Follow enabled, but current mode is not guided. Disable follow");
                     disableFollowMe();
                 }
                 break;
@@ -187,12 +191,16 @@ public class Follow implements OnDroneListener<MavLinkDrone>, LocationReceiver {
     }
 
     public void setAlgorithm(FollowAlgorithm algorithm) {
-        if(followAlgorithm != null && followAlgorithm != algorithm){
+        Timber.i("setAlgorithm(): algo=" + algorithm);
+
+        if(followAlgorithm != null && followAlgorithm != algorithm) {
+            Timber.i("%s.disableFollow()", followAlgorithm);
             followAlgorithm.disableFollow();
         }
 
         followAlgorithm = algorithm;
         if(isEnabled()){
+            Timber.i("%s.enableFollow()", followAlgorithm);
             followAlgorithm.enableFollow();
 
             if(lastLocation != null)
