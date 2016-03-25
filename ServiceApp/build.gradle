@@ -191,14 +191,14 @@ android {
     buildTypes {
         debug {
             debuggable true
-            buildConfigField "boolean", "WRITE_LOG_FILE", "true"
+            buildConfigField "boolean", "WRITE_LOG_FILE", "false"
         }
 
         staging {
             debuggable true
             signingConfig signingConfigs.release
             buildConfigField "boolean", "ENABLE_CRASHLYTICS", "true"
-            buildConfigField "boolean", "WRITE_LOG_FILE", "true"
+            buildConfigField "boolean", "WRITE_LOG_FILE", "false"
         }
 
         release {
