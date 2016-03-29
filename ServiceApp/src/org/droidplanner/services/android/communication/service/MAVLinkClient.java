@@ -25,6 +25,7 @@ import org.droidplanner.services.android.core.MAVLink.connection.MavLinkConnecti
 import org.droidplanner.services.android.core.drone.manager.DroneCommandTracker;
 import org.droidplanner.services.android.data.SessionDB;
 import org.droidplanner.services.android.utils.analytics.GAUtils;
+import org.droidplanner.services.android.utils.connection.WifiConnectionHandler;
 import org.droidplanner.services.android.utils.file.DirectoryPath;
 import org.droidplanner.services.android.utils.file.FileUtils;
 
@@ -146,14 +147,14 @@ public class MAVLinkClient implements DataLink.DataLinkProvider<MAVLinkMessage> 
                     final String tcpServerIp = paramsBundle.getString(ConnectionType.EXTRA_TCP_SERVER_IP);
                     final int tcpServerPort = paramsBundle.getInt(ConnectionType
                             .EXTRA_TCP_SERVER_PORT, ConnectionType.DEFAULT_TCP_SERVER_PORT);
-                    mavlinkConn = new AndroidTcpConnection(context, tcpServerIp, tcpServerPort);
+                    mavlinkConn = new AndroidTcpConnection(context, tcpServerIp, tcpServerPort, new WifiConnectionHandler(context));
                     Timber.i("Connecting over tcp.");
                     break;
 
                 case ConnectionType.TYPE_UDP:
                     final int udpServerPort = paramsBundle
                             .getInt(ConnectionType.EXTRA_UDP_SERVER_PORT, ConnectionType.DEFAULT_UDP_SERVER_PORT);
-                    mavlinkConn = new AndroidUdpConnection(context, udpServerPort);
+                    mavlinkConn = new AndroidUdpConnection(context, udpServerPort, new WifiConnectionHandler(context));
                     Timber.i("Connecting over udp.");
                     break;
 
