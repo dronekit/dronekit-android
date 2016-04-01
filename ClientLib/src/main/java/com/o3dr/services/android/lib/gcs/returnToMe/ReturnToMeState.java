@@ -52,7 +52,7 @@ public class ReturnToMeState implements DroneAttribute {
     }
 
     public void setCurrentHomeLocation(LatLongAlt currentHomeLocation) {
-        this.currentHomeLocation = currentHomeLocation;
+        this.currentHomeLocation = currentHomeLocation == null ? null : new LatLongAlt(currentHomeLocation);
     }
 
     public LatLongAlt getOriginalHomeLocation() {
@@ -60,7 +60,7 @@ public class ReturnToMeState implements DroneAttribute {
     }
 
     public void setOriginalHomeLocation(LatLongAlt originalHomeLocation) {
-        this.originalHomeLocation = originalHomeLocation;
+        this.originalHomeLocation = originalHomeLocation == null ? null : new LatLongAlt(originalHomeLocation);
     }
 
     @Override

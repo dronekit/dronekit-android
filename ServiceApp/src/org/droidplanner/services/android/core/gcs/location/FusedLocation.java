@@ -34,7 +34,7 @@ public class FusedLocation extends LocationCallback implements LocationFinder, G
 
     private static final long MIN_TIME_MS = 16;
     private static final float MIN_DISTANCE_M = 0.0f;
-    private static final float LOCATION_ACCURACY_THRESHOLD = 15.0f;
+    private static final float LOCATION_ACCURACY_THRESHOLD = 20.0f;
     private static final float JUMP_FACTOR = 4.0f;
 
     private final static Api<? extends Api.ApiOptions.NotRequiredOptions>[] apisList = new Api[]{LocationServices.API};
