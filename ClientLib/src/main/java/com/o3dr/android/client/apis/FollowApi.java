@@ -60,6 +60,10 @@ public class FollowApi extends Api {
         drone.performAsyncAction(new Action(ACTION_ENABLE_FOLLOW_ME, params));
     }
 
+    public void enableFollowMe(FollowType type) {
+        enableFollowMe(type, false);
+    }
+
     /**
      * Updates the parameters for the currently enabled follow me mode.
      *
