@@ -13,7 +13,7 @@ public class Land extends BaseSpatialItem implements android.os.Parcelable {
 
     public Land(){
         super(MissionItemType.LAND);
-        super.coordinate = new LatLongAlt(0.0, 0.0, 0.0);
+        super.setCoordinate(new LatLongAlt(0.0, 0.0, 0.0));
     }
 
     public Land(Land copy){
