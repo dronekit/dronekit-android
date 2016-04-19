@@ -77,6 +77,7 @@ bintray {
     publish = publishFlag //If version should be auto published after an upload
 
     pkg {
+        userOrg = getMavenOrg()
         repo = getMavenRepo()
         name = projectArtifactId
         desc = projectDescription
@@ -95,6 +96,10 @@ bintray {
 }
 
 bintrayUpload.dependsOn(publishToMavenLocal)
+
+def getMavenOrg(){
+    return hasProperty('COM_O3DR_MAVEN_ORG') ? COM_O3DR_MAVEN_ORG : ''
+}
 
 def getMavenUsername(){
     return hasProperty('COM_O3DR_MAVEN_USERNAME') ? COM_O3DR_MAVEN_USERNAME : ''
