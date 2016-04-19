@@ -8,11 +8,20 @@ import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
 import java.nio.ByteBuffer;
 
 /**
- * Created by chavi on 12/9/15.
+ * Sent by the app to ShotManager to instruct Solo to move with a certain velocity (body-relative NED frame).
  */
 public class SoloInspectMoveVehicle extends TLVPacket {
+    /**
+     * Desired velocity in body-x (NED)
+     */
     private float vx;
+    /**
+     * Desired velocity in body-y (NED)
+     */
     private float vy;
+    /**
+     * Desired velocity in body-z (NED)
+     */
     private float vz;
 
     public SoloInspectMoveVehicle(float vx, float vy, float vz) {

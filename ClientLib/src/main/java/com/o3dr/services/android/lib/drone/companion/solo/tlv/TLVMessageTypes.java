@@ -12,6 +12,7 @@ public class TLVMessageTypes {
     public static final int TYPE_SOLO_CABLE_CAM_OPTIONS = 4;
     public static final int TYPE_SOLO_GET_BUTTON_SETTING = 5;
     public static final int TYPE_SOLO_SET_BUTTON_SETTING = 6;
+    public static final int TYPE_SOLO_PAUSE_BUTTON = 7;
 
     public static final int TYPE_SOLO_FOLLOW_OPTIONS = 19;
     public static final int TYPE_SOLO_FOLLOW_OPTIONS_V2 = 119;

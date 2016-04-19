@@ -232,11 +232,18 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
                 return true;
 
             // CONTROL ACTIONS
-            case ControlActions.ACTION_SEND_GUIDED_POINT:
+            case ControlActions.ACTION_SEND_GUIDED_POINT: {
                 data.setClassLoader(LatLong.class.getClassLoader());
                 boolean force = data.getBoolean(ControlActions.EXTRA_FORCE_GUIDED_POINT);
                 LatLong guidedPoint = data.getParcelable(ControlActions.EXTRA_GUIDED_POINT);
                 CommonApiUtils.sendGuidedPoint(this, guidedPoint, force, listener);
+                return true;
+            }
+
+            case ControlActions.ACTION_LOOK_AT_TARGET:
+                boolean force = data.getBoolean(ControlActions.EXTRA_FORCE_GUIDED_POINT);
+                LatLongAlt lookAtTarget = data.getParcelable(ControlActions.EXTRA_LOOK_AT_TARGET);
+                CommonApiUtils.sendLookAtTarget(this, lookAtTarget, force, listener);
                 return true;
 
             case ControlActions.ACTION_SET_GUIDED_ALTITUDE:

@@ -829,6 +829,34 @@ public class CommonApiUtils {
         }
     }
 
+    public static void sendLookAtTarget(final MavLinkDrone drone, final LatLongAlt target, final boolean force, final ICommandListener listener){
+        if(drone == null)
+            return;
+
+        GuidedPoint guidedPoint = drone.getGuidedPoint();
+        if(guidedPoint.isInitialized()){
+            MavLinkDoCmds.setROI(drone, target, listener);
+        }
+        else if (force) {
+            GuidedPoint.changeToGuidedMode(drone, new AbstractCommandListener() {
+                @Override
+                public void onSuccess() {
+                    MavLinkDoCmds.setROI(drone, target, listener);
+                }
+
+                @Override
+                public void onError(int executionError) {
+                    postErrorEvent(executionError, listener);
+                }
+
+                @Override
+                public void onTimeout() {
+                    postTimeoutEvent(listener);
+                }
+            });
+        }
+    }
+
     public static void setGuidedAltitude(MavLinkDrone drone, double altitude) {
         if (drone == null)
             return;

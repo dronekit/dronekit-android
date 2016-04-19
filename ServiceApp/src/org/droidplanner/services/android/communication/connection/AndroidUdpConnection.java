@@ -7,6 +7,7 @@ import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
 
 import org.droidplanner.services.android.core.MAVLink.connection.UdpConnection;
 import org.droidplanner.services.android.core.model.Logger;
+import org.droidplanner.services.android.utils.connection.WifiConnectionHandler;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -15,7 +16,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class AndroidUdpConnection extends AndroidMavLinkConnection {
+public class AndroidUdpConnection extends AndroidIpConnection {
 
     private static final String TAG = AndroidUdpConnection.class.getSimpleName();
 
@@ -26,8 +27,8 @@ public class AndroidUdpConnection extends AndroidMavLinkConnection {
 
     private ScheduledExecutorService pingRunner;
 
-    public AndroidUdpConnection(Context context, int udpServerPort) {
-        super(context);
+    public AndroidUdpConnection(Context context, int udpServerPort, WifiConnectionHandler wifiHandler) {
+        super(context, wifiHandler);
         this.serverPort = udpServerPort;
 
         mConnectionImpl = new UdpConnection() {
@@ -53,6 +54,10 @@ public class AndroidUdpConnection extends AndroidMavLinkConnection {
         };
     }
 
+    public AndroidUdpConnection(Context context, int udpServerPort) {
+        this(context, udpServerPort, null);
+    }
+
     public void addPingTarget(final InetAddress address, final int port, final long period, final byte[] payload) {
         if (address == null || payload == null || period <= 0)
             return;
@@ -66,7 +71,7 @@ public class AndroidUdpConnection extends AndroidMavLinkConnection {
     }
 
     @Override
-    protected void closeConnection() throws IOException {
+    protected void onCloseConnection() throws IOException {
         Log.d(TAG, "Closing udp connection.");
         if (pingRunner != null) {
             Log.d(TAG, "Shutting down pinging tasks.");
@@ -83,7 +88,7 @@ public class AndroidUdpConnection extends AndroidMavLinkConnection {
     }
 
     @Override
-    protected void openConnection() throws IOException {
+    protected void onOpenConnection() throws IOException {
         Log.d(TAG, "Opening udp connection");
         mConnectionImpl.openConnection();
 
