@@ -200,8 +200,15 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
 
     public void connect(ConnectionParameter connParams) {
         try {
+            //Validate the given connection parameter
             connParams = checkConnectionParameter(connParams);
-            if (!connParams.equals(this.connectionParams)) {
+
+            //Validate the current connection parameter for the drone
+            ConnectionParameter currentConnParams = this.connectionParams == null
+                ? this.connectionParams
+                : checkConnectionParameter(this.connectionParams);
+
+            if (!connParams.equals(currentConnParams)) {
                 if (this.droneMgr != null) {
                     LinkConnectionStatus connectionStatus = LinkConnectionStatus
                         .newFailedConnectionStatus(LinkConnectionStatus.ADDRESS_IN_USE,
