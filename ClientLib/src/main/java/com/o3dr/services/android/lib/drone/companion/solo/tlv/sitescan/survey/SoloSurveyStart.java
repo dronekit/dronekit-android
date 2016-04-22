@@ -8,7 +8,7 @@ import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
 import java.nio.ByteBuffer;
 
 /**
- * Created by Fredia Huya-Kouadio on 1/2/16.
+ * Sent by the app to ShotManager to notify that the survey shot is ready to commence.
  */
 public class SoloSurveyStart extends TLVPacket {
 

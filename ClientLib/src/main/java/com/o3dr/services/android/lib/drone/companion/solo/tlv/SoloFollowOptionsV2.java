@@ -1,6 +1,7 @@
 package com.o3dr.services.android.lib.drone.companion.solo.tlv;
 
 import android.os.Parcel;
+import android.support.annotation.IntDef;
 
 import java.nio.ByteBuffer;
 
@@ -9,70 +10,64 @@ import java.nio.ByteBuffer;
  */
 public class SoloFollowOptionsV2 extends SoloFollowOptions {
 
-    private static final int FREE_LOOK_ENABLED_VALUE = 1;
-    private static final int FREE_LOOK_DISABLED_VALUE = 0;
+    @IntDef ({
+        FOLLOW_PREFERENCE_NONE,
+        FOLLOW_PREFERENCE_ORBIT,
+        FOLLOW_PREFERENCE_FREE_LOOK,
+        FOLLOW_PREFERENCE_LEASH
+    })
+    public @interface FollowPreference{}
 
-    private boolean freeLook;
+    public static final int FOLLOW_PREFERENCE_NONE = -1;
+    public static final int FOLLOW_PREFERENCE_ORBIT = 0;
+    public static final int FOLLOW_PREFERENCE_FREE_LOOK = 1;
+    public static final int FOLLOW_PREFERENCE_LEASH = 2;
+
+    @FollowPreference
+    private int followPreference;
 
     public SoloFollowOptionsV2() {
-        this(PAUSED_CRUISE_SPEED, true, false);
+        this(PAUSED_CRUISE_SPEED, true, FOLLOW_PREFERENCE_NONE);
     }
 
-    public SoloFollowOptionsV2(float cruiseSpeed, boolean lookAt, boolean freeLook){
+    public SoloFollowOptionsV2(float cruiseSpeed, boolean lookAt, @FollowPreference int followPreference) {
         super(TLVMessageTypes.TYPE_SOLO_FOLLOW_OPTIONS_V2, 12, cruiseSpeed, lookAt);
-        this.freeLook = freeLook;
+        this.followPreference = followPreference;
     }
 
-    SoloFollowOptionsV2(float cruiseSpeed, int lookAtValue, int freeLookValue){
-        this(cruiseSpeed, lookAtValue == LOOK_AT_ENABLED_VALUE, freeLookValue == FREE_LOOK_ENABLED_VALUE);
+    SoloFollowOptionsV2(float cruiseSpeed, int lookAtValue, int followPreference) {
+        this(cruiseSpeed, lookAtValue == LOOK_AT_ENABLED_VALUE, followPreference);
     }
 
-    SoloFollowOptionsV2(ByteBuffer buffer){
+    SoloFollowOptionsV2(ByteBuffer buffer) {
         this(buffer.getFloat(), buffer.getInt(), buffer.getInt());
     }
 
-    public boolean isFreeLook() {
-        return freeLook;
+    @FollowPreference
+    public int getFollowPreference() {
+        return followPreference;
     }
 
-    public void setFreeLook(boolean freeLook) {
-        this.freeLook = freeLook;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof SoloFollowOptionsV2)) return false;
-        if (!super.equals(o)) return false;
-
-        SoloFollowOptionsV2 that = (SoloFollowOptionsV2) o;
-
-        return freeLook == that.freeLook;
-
+    public void setFollowPreference(@FollowPreference int followPreference) {
+        this.followPreference = followPreference;
     }
 
     @Override
-    public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + (freeLook ? FREE_LOOK_ENABLED_VALUE : FREE_LOOK_DISABLED_VALUE);
-        return result;
-    }
-
-    @Override
-    protected void getMessageValue(ByteBuffer valueCarrier){
+    protected void getMessageValue(ByteBuffer valueCarrier) {
         super.getMessageValue(valueCarrier);
-        valueCarrier.putInt(freeLook ? FREE_LOOK_ENABLED_VALUE : FREE_LOOK_DISABLED_VALUE);
+        valueCarrier.putInt(followPreference);
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         super.writeToParcel(dest, flags);
-        dest.writeByte(freeLook ? (byte) FREE_LOOK_ENABLED_VALUE : (byte) FREE_LOOK_DISABLED_VALUE);
+        dest.writeInt(followPreference);
     }
 
     protected SoloFollowOptionsV2(Parcel in) {
         super(in);
-        this.freeLook = in.readByte() != FREE_LOOK_DISABLED_VALUE;
+        @FollowPreference int followPreference = in.readInt();
+        this.followPreference = followPreference;
     }
 
     public static final Creator<SoloFollowOptionsV2> CREATOR = new Creator<SoloFollowOptionsV2>() {
@@ -84,4 +79,36 @@ public class SoloFollowOptionsV2 extends SoloFollowOptions {
             return new SoloFollowOptionsV2[size];
         }
     };
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
+
+        SoloFollowOptionsV2 that = (SoloFollowOptionsV2) o;
+
+        return followPreference == that.followPreference;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + followPreference;
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "SoloFollowOptionsV2{" +
+            "followPreference=" + followPreference +
+            '}';
+    }
 }

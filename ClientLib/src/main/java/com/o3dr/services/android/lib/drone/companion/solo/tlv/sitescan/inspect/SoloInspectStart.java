@@ -8,9 +8,15 @@ import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
 import java.nio.ByteBuffer;
 
 /**
- * Created by chavi on 12/8/15.
+ * Sent by the app to ShotManager to notify that the inspect shot is ready to
+ * commence and the vehicle should climb to the provided takeoffAlt.
+ * Shotmanager will either takeoff or place the vehicle into GUIDED
+ * depending on whether the vehicle is already in the air or not.
  */
 public class SoloInspectStart extends TLVPacket {
+    /**
+     * Relative altitude from takeoff (in meters) that the vehicle should navigate to.
+     */
     private float alt;
 
     public SoloInspectStart(float alt) {

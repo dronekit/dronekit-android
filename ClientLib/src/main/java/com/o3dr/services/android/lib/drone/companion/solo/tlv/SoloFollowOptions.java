@@ -88,4 +88,11 @@ public class SoloFollowOptions extends SoloShotOptions {
             return new SoloFollowOptions[size];
         }
     };
+
+    @Override
+    public String toString() {
+        return "SoloFollowOptions{" +
+            "lookAt=" + lookAt +
+            '}';
+    }
 }

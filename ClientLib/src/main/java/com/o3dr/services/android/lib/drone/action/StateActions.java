@@ -7,6 +7,8 @@ import com.o3dr.services.android.lib.util.Utils;
  */
 public class StateActions {
 
+    private static final String PACKAGE_NAME = "com.o3dr.services.android.lib.drone.action.state";
+
     public static final String ACTION_ARM = Utils.PACKAGE_NAME + ".action.ARM";
     public static final String EXTRA_ARM = "extra_arm";
     public static final String EXTRA_EMERGENCY_DISARM = "extra_emergency_disarm";
@@ -19,6 +21,9 @@ public class StateActions {
 
     public static final String ACTION_ENABLE_RETURN_TO_ME = Utils.PACKAGE_NAME + ".action.ENABLE_RETURN_TO_ME";
     public static final String EXTRA_IS_RETURN_TO_ME_ENABLED = "extra_is_return_to_me_enabled";
+
+    public static final String ACTION_UPDATE_VEHICLE_DATA_STREAM_RATE = PACKAGE_NAME + ".action.UPDATE_VEHICLE_DATA_STREAM_RATE";
+    public static final String EXTRA_VEHICLE_DATA_STREAM_RATE = "extra_vehicle_data_stream_rate";
 
     //Private to prevent instantiation
     private StateActions(){}

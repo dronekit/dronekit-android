@@ -4,9 +4,8 @@ import android.os.Bundle;
 
 import com.o3dr.android.client.Drone;
 import com.o3dr.services.android.lib.coordinate.LatLong;
-import com.o3dr.services.android.lib.drone.attribute.AttributeType;
+import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
-import com.o3dr.services.android.lib.drone.property.Gps;
 import com.o3dr.services.android.lib.model.AbstractCommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
 
@@ -14,15 +13,17 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_DO_GUIDED_TAKEOFF;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_ENABLE_MANUAL_CONTROL;
+import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_LOOK_AT_TARGET;
+import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_SEND_BRAKE_VEHICLE;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_SEND_GUIDED_POINT;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_SET_CONDITION_YAW;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_SET_GUIDED_ALTITUDE;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_SET_VELOCITY;
-import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_SEND_BRAKE_VEHICLE;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_ALTITUDE;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_DO_ENABLE;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_FORCE_GUIDED_POINT;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_GUIDED_POINT;
+import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_LOOK_AT_TARGET;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_VELOCITY_X;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_VELOCITY_Y;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_VELOCITY_Z;
@@ -97,6 +98,21 @@ public class ControlApi extends Api {
         params.putBoolean(EXTRA_FORCE_GUIDED_POINT, force);
         params.putParcelable(EXTRA_GUIDED_POINT, point);
         drone.performAsyncActionOnDroneThread(new Action(ACTION_SEND_GUIDED_POINT, params), listener);
+    }
+
+    /**
+     * Instructs the vehicle to orient toward the specified location
+     *
+     * @param point
+     * @param force
+     * @param listener
+     * @since 2.9.0
+     */
+    public void lookAt(LatLongAlt point, boolean force, AbstractCommandListener listener){
+        Bundle params = new Bundle();
+        params.putBoolean(EXTRA_FORCE_GUIDED_POINT, force);
+        params.putParcelable(EXTRA_LOOK_AT_TARGET, point);
+        drone.performAsyncActionOnDroneThread(new Action(ACTION_LOOK_AT_TARGET, params), listener);
     }
 
     /**
