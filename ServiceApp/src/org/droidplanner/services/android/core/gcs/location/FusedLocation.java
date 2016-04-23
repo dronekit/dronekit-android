@@ -41,6 +41,7 @@ public class FusedLocation extends LocationCallback implements LocationFinder, G
 
     private final GoogleApiClientManager gApiMgr;
     private final GoogleApiClientTask requestLocationUpdate;
+    private boolean mLocationUpdatesEnabled = false;
 
     private final GoogleApiClientTask removeLocationUpdate = new GoogleApiClientTask() {
         @Override
@@ -90,12 +91,16 @@ public class FusedLocation extends LocationCallback implements LocationFinder, G
         mSpeedReadings = 0;
         mTotalSpeed = 0f;
         mLastLocation = null;
+        mLocationUpdatesEnabled = true;
     }
 
     @Override
     public void disableLocationUpdates() {
-        gApiMgr.addTask(removeLocationUpdate);
-        gApiMgr.stopSafely();
+        if(mLocationUpdatesEnabled) {
+            gApiMgr.addTask(removeLocationUpdate);
+            gApiMgr.stopSafely();
+            mLocationUpdatesEnabled = false;
+        }
     }
 
     @Override
@@ -145,8 +150,10 @@ public class FusedLocation extends LocationCallback implements LocationFinder, G
     }
 
     private void notifyLocationUpdate(org.droidplanner.services.android.core.gcs.location.Location location) {
-        if (receivers.isEmpty())
+        if (receivers.isEmpty()) {
+            Timber.d(TAG, "notifyLocationUpdate(): No receivers");
             return;
+        }
 
         for (LocationReceiver receiver : receivers.values()) {
             receiver.onLocationUpdate(location);

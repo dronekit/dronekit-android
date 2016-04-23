@@ -2,6 +2,9 @@ package org.droidplanner.services.android.core.gcs.follow;
 
 import android.os.Handler;
 
+import com.o3dr.services.android.lib.drone.action.ControlActions;
+import com.o3dr.services.android.lib.model.action.Action;
+
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.core.drone.manager.MavLinkDroneManager;
 import org.droidplanner.services.android.core.gcs.location.Location;
@@ -10,6 +13,8 @@ import org.droidplanner.services.android.core.gcs.roi.ROIEstimator;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import timber.log.Timber;
 
 public abstract class FollowAlgorithm {
 
@@ -29,12 +34,16 @@ public abstract class FollowAlgorithm {
     }
 
     public void enableFollow() {
+        Timber.i("enableFollow()");
+
         isFollowEnabled.set(true);
         if(roiEstimator != null)
             roiEstimator.enableFollow();
     }
 
     public void disableFollow() {
+        Timber.i("disableFollow()");
+
         if (isFollowEnabled.compareAndSet(true, false)) {
             if (roiEstimator != null)
                 roiEstimator.disableFollow();
@@ -124,5 +133,5 @@ public abstract class FollowAlgorithm {
             }
         }
     }
-
 }
+

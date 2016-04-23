@@ -13,6 +13,8 @@ import org.droidplanner.services.android.core.drone.manager.MavLinkDroneManager;
 import org.droidplanner.services.android.core.gcs.location.Location;
 import org.droidplanner.services.android.core.gcs.roi.ROIEstimator;
 
+import timber.log.Timber;
+
 /**
  * Created by Fredia Huya-Kouadio on 8/3/15.
  */
@@ -43,6 +45,8 @@ public class FollowSoloShot extends FollowAlgorithm {
 
     @Override
     protected void processNewLocation(Location location) {
+        Timber.d("processNewLocation(): location=%s", location);
+
         if (location != null) {
             LatLongAlt receivedCoord = location.getCoord();
 
@@ -94,6 +98,8 @@ public class FollowSoloShot extends FollowAlgorithm {
 
         @Override
         protected void sendUpdateROI(LatLong goCoord){
+            Timber.i("sendUpdateROI(): coord=%s", goCoord);
+
             locationCoord.set(goCoord);
             locationSetter.setCoordinate(locationCoord);
             soloComp.updateFollowCenter(locationSetter);
