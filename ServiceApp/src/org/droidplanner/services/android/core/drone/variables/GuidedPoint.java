@@ -3,13 +3,13 @@ package org.droidplanner.services.android.core.drone.variables;
 import android.os.Handler;
 import android.os.RemoteException;
 
-import com.o3dr.services.android.lib.coordinate.LatLong;
-import com.o3dr.services.android.lib.drone.attribute.AttributeType;
-import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
-import com.o3dr.services.android.lib.drone.property.Altitude;
-import com.o3dr.services.android.lib.drone.property.Gps;
-import com.o3dr.services.android.lib.model.ICommandListener;
-import com.o3dr.services.android.lib.model.SimpleCommandListener;
+import org.droidplanner.services.android.lib.coordinate.LatLong;
+import org.droidplanner.services.android.lib.drone.attribute.AttributeType;
+import org.droidplanner.services.android.lib.drone.attribute.error.CommandExecutionError;
+import org.droidplanner.services.android.lib.drone.property.Altitude;
+import org.droidplanner.services.android.lib.drone.property.Gps;
+import org.droidplanner.services.android.lib.model.ICommandListener;
+import org.droidplanner.services.android.lib.model.SimpleCommandListener;
 
 import org.droidplanner.services.android.core.MAVLink.MavLinkCommands;
 import org.droidplanner.services.android.core.drone.DroneInterfaces.DroneEventsType;

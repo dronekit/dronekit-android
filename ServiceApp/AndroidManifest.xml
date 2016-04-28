@@ -88,7 +88,7 @@
 
         <provider
             android:name=".data.provider.FileProvider"
-            android:authorities="com.o3dr.services.android.provider.fileprovider"
+            android:authorities="org.droidplanner.services.android.provider.fileprovider"
             android:grantUriPermissions="true"
             android:exported="false">
             <meta-data
@@ -98,7 +98,7 @@
 
         <provider
             android:name=".data.provider.ServiceDataProvider"
-            android:authorities="com.o3dr.services.android.provider.dataprovider"
+            android:authorities="org.droidplanner.services.android.provider.dataprovider"
             android:enabled="false"
             android:exported="false"/>
 
@@ -112,7 +112,7 @@
             </intent-filter>
 
             <meta-data
-                android:name="com.o3dr.dronekit.android.core.version"
+                android:name="org.droidplanner.dronekit.android.core.version"
                 android:value="@integer/core_lib_version"/>
         </service>
 

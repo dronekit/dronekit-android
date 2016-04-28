@@ -9,19 +9,19 @@ import org.droidplanner.services.android.core.drone.autopilot.apm.solo.AbstractL
 import org.droidplanner.services.android.core.drone.autopilot.apm.solo.SoloComp;
 import org.droidplanner.services.android.core.drone.autopilot.apm.solo.controller.ControllerLinkManager;
 
-import com.o3dr.android.client.utils.connection.TcpConnection;
-import com.o3dr.android.client.utils.connection.UdpConnection;
-import com.o3dr.services.android.lib.drone.companion.solo.button.ButtonTypes;
-import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSetting;
-import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSettingGetter;
-import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSettingSetter;
-import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloGoproRequestState;
-import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloMessageShotManagerError;
-import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageParser;
-import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes;
-import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
-import com.o3dr.services.android.lib.model.ICommandListener;
-import com.o3dr.services.android.lib.model.SimpleCommandListener;
+import org.droidplanner.android.client.utils.connection.TcpConnection;
+import org.droidplanner.android.client.utils.connection.UdpConnection;
+import org.droidplanner.services.android.lib.drone.companion.solo.button.ButtonTypes;
+import org.droidplanner.services.android.lib.drone.companion.solo.tlv.SoloButtonSetting;
+import org.droidplanner.services.android.lib.drone.companion.solo.tlv.SoloButtonSettingGetter;
+import org.droidplanner.services.android.lib.drone.companion.solo.tlv.SoloButtonSettingSetter;
+import org.droidplanner.services.android.lib.drone.companion.solo.tlv.SoloGoproRequestState;
+import org.droidplanner.services.android.lib.drone.companion.solo.tlv.SoloMessageShotManagerError;
+import org.droidplanner.services.android.lib.drone.companion.solo.tlv.TLVMessageParser;
+import org.droidplanner.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes;
+import org.droidplanner.services.android.lib.drone.companion.solo.tlv.TLVPacket;
+import org.droidplanner.services.android.lib.model.ICommandListener;
+import org.droidplanner.services.android.lib.model.SimpleCommandListener;
 
 import org.droidplanner.services.android.utils.connection.SshConnection;
 

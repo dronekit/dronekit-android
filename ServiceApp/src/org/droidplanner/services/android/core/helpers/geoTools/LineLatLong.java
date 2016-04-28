@@ -1,6 +1,6 @@
 package org.droidplanner.services.android.core.helpers.geoTools;
 
-import com.o3dr.services.android.lib.coordinate.LatLong;
+import org.droidplanner.services.android.lib.coordinate.LatLong;
 
 public class LineLatLong {
 	private final LatLong start;

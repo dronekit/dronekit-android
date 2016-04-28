@@ -11,8 +11,8 @@ import com.googlecode.mp4parser.FileDataSourceImpl;
 import com.googlecode.mp4parser.authoring.Movie;
 import com.googlecode.mp4parser.authoring.builder.DefaultMp4Builder;
 import com.googlecode.mp4parser.authoring.tracks.h264.H264TrackImpl;
-import com.o3dr.android.client.utils.video.MediaCodecManager;
-import com.o3dr.android.client.utils.video.NaluChunk;
+import org.droidplanner.android.client.utils.video.MediaCodecManager;
+import org.droidplanner.android.client.utils.video.NaluChunk;
 
 import java.io.BufferedOutputStream;
 import java.io.File;

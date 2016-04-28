@@ -1,6 +1,6 @@
 package org.droidplanner.services.android.core.survey.grid;
 
-import com.o3dr.services.android.lib.coordinate.LatLong;
+import org.droidplanner.services.android.lib.coordinate.LatLong;
 
 import java.util.List;
 

@@ -1,6 +1,6 @@
 package org.droidplanner.services.android.core.polygon;
 
-import com.o3dr.services.android.lib.coordinate.LatLong;
+import org.droidplanner.services.android.lib.coordinate.LatLong;
 
 import java.util.ArrayList;
 import java.util.Collections;

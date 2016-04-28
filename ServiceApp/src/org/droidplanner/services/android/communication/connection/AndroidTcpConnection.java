@@ -2,7 +2,7 @@ package org.droidplanner.services.android.communication.connection;
 
 import android.content.Context;
 
-import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
+import org.droidplanner.services.android.lib.gcs.link.LinkConnectionStatus;
 
 import org.droidplanner.services.android.core.MAVLink.connection.TcpConnection;
 import org.droidplanner.services.android.core.model.Logger;

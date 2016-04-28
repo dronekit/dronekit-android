@@ -2,8 +2,8 @@ package org.droidplanner.services.android.core.gcs.roi;
 
 import android.os.Handler;
 
-import com.o3dr.services.android.lib.coordinate.LatLong;
-import com.o3dr.services.android.lib.coordinate.LatLongAlt;
+import org.droidplanner.services.android.lib.coordinate.LatLong;
+import org.droidplanner.services.android.lib.coordinate.LatLongAlt;
 
 import org.droidplanner.services.android.core.MAVLink.command.doCmd.MavLinkDoCmds;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;

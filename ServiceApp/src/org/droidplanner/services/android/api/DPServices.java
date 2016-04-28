@@ -4,12 +4,12 @@ import android.os.Bundle;
 import android.os.RemoteException;
 import android.util.Log;
 
-import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
-import com.o3dr.services.android.lib.gcs.event.GCSEvent;
-import com.o3dr.services.android.lib.model.IApiListener;
-import com.o3dr.services.android.lib.model.IDroidPlannerServices;
-import com.o3dr.services.android.lib.model.IDroneApi;
-import com.o3dr.services.android.lib.util.version.VersionUtils;
+import org.droidplanner.services.android.lib.drone.connection.ConnectionParameter;
+import org.droidplanner.services.android.lib.gcs.event.GCSEvent;
+import org.droidplanner.services.android.lib.model.IApiListener;
+import org.droidplanner.services.android.lib.model.IDroidPlannerServices;
+import org.droidplanner.services.android.lib.model.IDroneApi;
+import org.droidplanner.services.android.lib.util.version.VersionUtils;
 
 import org.droidplanner.services.android.BuildConfig;
 import org.droidplanner.services.android.core.drone.DroneManager;

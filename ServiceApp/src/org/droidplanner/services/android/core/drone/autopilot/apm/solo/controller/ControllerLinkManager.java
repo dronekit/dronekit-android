@@ -6,16 +6,16 @@ import android.text.TextUtils;
 import android.util.Pair;
 
 import com.github.zafarkhaja.semver.Version;
-import com.o3dr.android.client.utils.TxPowerComplianceCountries;
-import com.o3dr.android.client.utils.connection.IpConnectionListener;
-import com.o3dr.android.client.utils.connection.TcpConnection;
-import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
-import com.o3dr.services.android.lib.drone.companion.solo.button.ButtonPacket;
-import com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerMode;
-import com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerUnits;
-import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageParser;
-import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
-import com.o3dr.services.android.lib.model.ICommandListener;
+import org.droidplanner.android.client.utils.TxPowerComplianceCountries;
+import org.droidplanner.android.client.utils.connection.IpConnectionListener;
+import org.droidplanner.android.client.utils.connection.TcpConnection;
+import org.droidplanner.services.android.lib.drone.attribute.error.CommandExecutionError;
+import org.droidplanner.services.android.lib.drone.companion.solo.button.ButtonPacket;
+import org.droidplanner.services.android.lib.drone.companion.solo.controller.SoloControllerMode;
+import org.droidplanner.services.android.lib.drone.companion.solo.controller.SoloControllerUnits;
+import org.droidplanner.services.android.lib.drone.companion.solo.tlv.TLVMessageParser;
+import org.droidplanner.services.android.lib.drone.companion.solo.tlv.TLVPacket;
+import org.droidplanner.services.android.lib.model.ICommandListener;
 
 import org.droidplanner.services.android.core.drone.autopilot.apm.solo.AbstractLinkManager;
 import org.droidplanner.services.android.core.drone.autopilot.apm.solo.SoloComp;
@@ -321,7 +321,7 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
     /**
      * Return the current controller unit
      *
-     * @return @see {@link com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerUnits.ControllerUnit}
+     * @return @see {@link org.droidplanner.services.android.lib.drone.companion.solo.controller.SoloControllerUnits.ControllerUnit}
      */
     public
     @SoloControllerUnits.ControllerUnit

@@ -1,6 +1,6 @@
 package org.droidplanner.services.android.core.gcs.location;
 
-import com.o3dr.services.android.lib.coordinate.LatLongAlt;
+import org.droidplanner.services.android.lib.coordinate.LatLongAlt;
 
 public class Location {
 

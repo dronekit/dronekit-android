@@ -21,7 +21,7 @@ import android.os.Build;
 import android.text.TextUtils;
 import android.widget.Toast;
 
-import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
+import org.droidplanner.services.android.lib.gcs.link.LinkConnectionStatus;
 
 import org.droidplanner.services.android.utils.NetworkUtils;
 

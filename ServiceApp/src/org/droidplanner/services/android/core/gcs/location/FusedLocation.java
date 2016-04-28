@@ -13,9 +13,9 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.o3dr.services.android.lib.coordinate.LatLongAlt;
-import com.o3dr.services.android.lib.util.googleApi.GoogleApiClientManager;
-import com.o3dr.services.android.lib.util.googleApi.GoogleApiClientManager.GoogleApiClientTask;
+import org.droidplanner.services.android.lib.coordinate.LatLongAlt;
+import org.droidplanner.services.android.lib.util.googleApi.GoogleApiClientManager;
+import org.droidplanner.services.android.lib.util.googleApi.GoogleApiClientManager.GoogleApiClientTask;
 
 import org.droidplanner.services.android.core.gcs.location.Location.LocationFinder;
 import org.droidplanner.services.android.core.gcs.location.Location.LocationReceiver;

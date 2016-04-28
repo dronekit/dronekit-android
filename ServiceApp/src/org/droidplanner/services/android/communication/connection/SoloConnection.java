@@ -6,9 +6,9 @@ import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.text.TextUtils;
 
-import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
-import com.o3dr.services.android.lib.drone.connection.ConnectionType;
-import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
+import org.droidplanner.services.android.lib.drone.connection.ConnectionParameter;
+import org.droidplanner.services.android.lib.drone.connection.ConnectionType;
+import org.droidplanner.services.android.lib.gcs.link.LinkConnectionStatus;
 
 import org.droidplanner.services.android.utils.connection.WifiConnectionHandler;
 

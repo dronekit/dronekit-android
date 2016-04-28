@@ -4,8 +4,8 @@ import android.content.Context;
 
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
-import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
-import com.o3dr.services.android.lib.model.ICommandListener;
+import org.droidplanner.services.android.lib.drone.connection.ConnectionParameter;
+import org.droidplanner.services.android.lib.model.ICommandListener;
 
 import org.droidplanner.services.android.communication.model.DataLink;
 import org.droidplanner.services.android.communication.service.MAVLinkClient;

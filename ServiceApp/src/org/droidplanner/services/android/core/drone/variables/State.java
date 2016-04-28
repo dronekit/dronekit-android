@@ -6,9 +6,9 @@ import android.os.SystemClock;
 
 import com.MAVLink.ardupilotmega.msg_ekf_status_report;
 import com.MAVLink.enums.EKF_STATUS_FLAGS;
-import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
-import com.o3dr.services.android.lib.model.ICommandListener;
-import com.o3dr.services.android.lib.model.action.Action;
+import org.droidplanner.services.android.lib.drone.attribute.error.CommandExecutionError;
+import org.droidplanner.services.android.lib.model.ICommandListener;
+import org.droidplanner.services.android.lib.model.action.Action;
 
 import org.droidplanner.services.android.core.MAVLink.MavLinkCommands;
 import org.droidplanner.services.android.core.MAVLink.WaypointManager;

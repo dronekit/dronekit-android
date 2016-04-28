@@ -1,16 +1,16 @@
 apply plugin: 'com.android.library'
 
 ext {
-    VERSION_MAJOR = 2
-    VERSION_MINOR = 9
+    VERSION_MAJOR = 0
+    VERSION_MINOR = 0
     VERSION_PATCH = 0
-    VERSION_SUFFIX = "release"
+    VERSION_SUFFIX = "alpha1"
 
-    PUBLISH_ARTIFACT_ID = 'dronekit-android'
+    PUBLISH_ARTIFACT_ID = 'tower-lib'
     PUBLISH_VERSION = generateVersionName("", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH, VERSION_SUFFIX)
     PUBLISH_VERSION_CODE = computeVersionCode(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH)
-    PROJECT_DESCRIPTION = "Android DroneKit client library."
-    PROJECT_LABELS = ['3DR', '3DR Services', 'DroneAPI', 'Android', 'DroneKit']
+    PROJECT_DESCRIPTION = "Tower Library."
+    PROJECT_LABELS = ['DroneCode', '3DR', 'Tower', 'DroneAPI', 'Android', 'DroneKit']
     PROJECT_LICENSES = ['Apache-2.0']
 }
 

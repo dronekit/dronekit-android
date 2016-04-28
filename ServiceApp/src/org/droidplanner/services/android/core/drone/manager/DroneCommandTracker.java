@@ -7,7 +7,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.common.msg_command_ack;
 import com.MAVLink.common.msg_command_long;
 import com.MAVLink.common.msg_set_mode;
-import com.o3dr.services.android.lib.model.ICommandListener;
+import org.droidplanner.services.android.lib.model.ICommandListener;
 
 import java.util.concurrent.ConcurrentHashMap;
 

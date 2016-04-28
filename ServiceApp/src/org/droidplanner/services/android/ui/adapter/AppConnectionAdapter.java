@@ -14,11 +14,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
-
 import org.droidplanner.services.android.R;
 import org.droidplanner.services.android.api.DroneApi;
-import com.o3dr.services.android.lib.util.SpannableUtils;
+import org.droidplanner.services.android.lib.util.SpannableUtils;
 
 import java.util.ArrayList;
 import java.util.List;

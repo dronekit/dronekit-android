@@ -6,8 +6,8 @@ import com.MAVLink.common.msg_command_long;
 import com.MAVLink.common.msg_mission_set_current;
 import com.MAVLink.enums.GRIPPER_ACTIONS;
 import com.MAVLink.enums.MAV_CMD;
-import com.o3dr.services.android.lib.coordinate.LatLongAlt;
-import com.o3dr.services.android.lib.model.ICommandListener;
+import org.droidplanner.services.android.lib.coordinate.LatLongAlt;
+import org.droidplanner.services.android.lib.model.ICommandListener;
 
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
 

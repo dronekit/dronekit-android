@@ -6,11 +6,11 @@ import android.os.Handler;
 
 import com.github.zafarkhaja.semver.Version;
 import com.MAVLink.Messages.MAVLinkMessage;
-import com.o3dr.android.client.apis.CapabilityApi;
-import com.o3dr.services.android.lib.drone.action.ControlActions;
-import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
-import com.o3dr.services.android.lib.drone.property.Parameter;
-import com.o3dr.services.android.lib.model.ICommandListener;
+import org.droidplanner.android.client.apis.CapabilityApi;
+import org.droidplanner.services.android.lib.drone.action.ControlActions;
+import org.droidplanner.services.android.lib.drone.attribute.error.CommandExecutionError;
+import org.droidplanner.services.android.lib.drone.property.Parameter;
+import org.droidplanner.services.android.lib.model.ICommandListener;
 
 import org.droidplanner.services.android.communication.model.DataLink;
 import org.droidplanner.services.android.core.MAVLink.MavLinkCommands;
@@ -25,8 +25,6 @@ import org.droidplanner.services.android.core.model.AutopilotWarningParser;
 import org.droidplanner.services.android.utils.CommonApiUtils;
 
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Created by Fredia Huya-Kouadio on 7/27/15.

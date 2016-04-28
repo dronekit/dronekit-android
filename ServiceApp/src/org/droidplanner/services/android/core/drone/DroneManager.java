@@ -6,16 +6,16 @@ import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.o3dr.services.android.lib.drone.action.ControlActions;
-import com.o3dr.services.android.lib.drone.action.GimbalActions;
-import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
-import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
-import com.o3dr.services.android.lib.drone.connection.ConnectionType;
-import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
-import com.o3dr.services.android.lib.drone.property.DroneAttribute;
-import com.o3dr.services.android.lib.drone.property.Parameter;
-import com.o3dr.services.android.lib.model.ICommandListener;
-import com.o3dr.services.android.lib.model.action.Action;
+import org.droidplanner.services.android.lib.drone.action.ControlActions;
+import org.droidplanner.services.android.lib.drone.action.GimbalActions;
+import org.droidplanner.services.android.lib.drone.attribute.error.CommandExecutionError;
+import org.droidplanner.services.android.lib.drone.connection.ConnectionParameter;
+import org.droidplanner.services.android.lib.drone.connection.ConnectionType;
+import org.droidplanner.services.android.lib.gcs.link.LinkConnectionStatus;
+import org.droidplanner.services.android.lib.drone.property.DroneAttribute;
+import org.droidplanner.services.android.lib.drone.property.Parameter;
+import org.droidplanner.services.android.lib.model.ICommandListener;
+import org.droidplanner.services.android.lib.model.action.Action;
 
 import org.droidplanner.services.android.api.DroneApi;
 import org.droidplanner.services.android.communication.model.DataLink;

@@ -1,11 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.o3dr.android.client">
+          package="org.droidplanner.android.client">
 
     <uses-permission android:name="android.permission.INTERNET"/>
 
     <application>
         <activity
-            android:name=".utils.InstallServiceDialog"
+            android:name="org.droidplanner.android.client.utils.InstallServiceDialog"
             android:theme="@android:style/Theme.Holo.Light.Dialog.NoActionBar.MinWidth"
             android:noHistory="true"
             android:excludeFromRecents="true"

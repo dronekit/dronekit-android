@@ -7,7 +7,7 @@ import android.util.SparseBooleanArray;
 
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.common.msg_param_value;
-import com.o3dr.services.android.lib.drone.property.Parameter;
+import org.droidplanner.services.android.lib.drone.property.Parameter;
 
 import org.droidplanner.services.android.core.MAVLink.MavLinkParameters;
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
