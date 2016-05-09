@@ -7,7 +7,7 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 
 import org.droidplanner.services.android.BuildConfig;
-import org.droidplanner.services.android.core.drone.autopilot.apm.solo.SoloComp;
+import org.droidplanner.services.android.impl.core.drone.autopilot.apm.solo.SoloComp;
 
 /**
  * Created by Fredia Huya-Kouadio on 5/11/15.

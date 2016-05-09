@@ -22,7 +22,7 @@ import android.text.TextUtils;
 import android.widget.Toast;
 
 import org.droidplanner.services.android.lib.gcs.link.LinkConnectionStatus;
-import org.droidplanner.services.android.utils.NetworkUtils;
+import org.droidplanner.services.android.impl.utils.NetworkUtils;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;

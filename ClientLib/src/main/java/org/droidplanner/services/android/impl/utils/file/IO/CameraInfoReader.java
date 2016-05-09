@@ -2,7 +2,7 @@ package org.droidplanner.services.android.impl.utils.file.IO;
 
 import android.util.Xml;
 
-import org.droidplanner.services.android.core.survey.CameraInfo;
+import org.droidplanner.services.android.impl.core.survey.CameraInfo;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 

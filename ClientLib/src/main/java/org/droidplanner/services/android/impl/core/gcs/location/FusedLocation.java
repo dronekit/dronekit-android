@@ -14,8 +14,8 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 
-import org.droidplanner.services.android.core.gcs.location.Location.LocationFinder;
-import org.droidplanner.services.android.core.gcs.location.Location.LocationReceiver;
+import org.droidplanner.services.android.impl.core.gcs.location.Location.LocationFinder;
+import org.droidplanner.services.android.impl.core.gcs.location.Location.LocationReceiver;
 import org.droidplanner.services.android.lib.coordinate.LatLongAlt;
 import org.droidplanner.services.android.lib.util.googleApi.GoogleApiClientManager;
 import org.droidplanner.services.android.lib.util.googleApi.GoogleApiClientManager.GoogleApiClientTask;
@@ -126,8 +126,8 @@ public class FusedLocation extends LocationCallback implements LocationFinder, G
         final boolean isLocationAccurate = isLocationAccurate(androidLocation.getAccuracy(),
                 currentSpeed);
 
-        org.droidplanner.services.android.core.gcs.location.Location location =
-                new org.droidplanner.services.android.core.gcs.location.Location(
+        org.droidplanner.services.android.impl.core.gcs.location.Location location =
+                new org.droidplanner.services.android.impl.core.gcs.location.Location(
                 new LatLongAlt(
                         androidLocation.getLatitude(),
                         androidLocation.getLongitude(),
@@ -144,7 +144,7 @@ public class FusedLocation extends LocationCallback implements LocationFinder, G
         notifyLocationUpdate(location);
     }
 
-    private void notifyLocationUpdate(org.droidplanner.services.android.core.gcs.location.Location location) {
+    private void notifyLocationUpdate(org.droidplanner.services.android.impl.core.gcs.location.Location location) {
         if (receivers.isEmpty())
             return;
 

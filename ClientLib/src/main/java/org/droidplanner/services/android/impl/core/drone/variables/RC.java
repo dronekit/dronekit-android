@@ -3,9 +3,9 @@ package org.droidplanner.services.android.impl.core.drone.variables;
 import com.MAVLink.common.msg_rc_channels_raw;
 import com.MAVLink.common.msg_servo_output_raw;
 
-import org.droidplanner.services.android.core.drone.DroneInterfaces.DroneEventsType;
-import org.droidplanner.services.android.core.drone.DroneVariable;
-import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
+import org.droidplanner.services.android.impl.core.drone.DroneInterfaces.DroneEventsType;
+import org.droidplanner.services.android.impl.core.drone.DroneVariable;
+import org.droidplanner.services.android.impl.core.drone.autopilot.MavLinkDrone;
 
 public class RC extends DroneVariable {
 	public int in[] = new int[8];

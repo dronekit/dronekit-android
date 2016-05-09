@@ -2,8 +2,8 @@ package org.droidplanner.services.android.impl.core.drone;
 
 import android.os.Bundle;
 
-import org.droidplanner.services.android.core.MAVLink.WaypointManager;
-import org.droidplanner.services.android.core.drone.autopilot.Drone;
+import org.droidplanner.services.android.impl.core.MAVLink.WaypointManager;
+import org.droidplanner.services.android.impl.core.drone.autopilot.Drone;
 import org.droidplanner.services.android.lib.drone.property.Parameter;
 
 public class DroneInterfaces {

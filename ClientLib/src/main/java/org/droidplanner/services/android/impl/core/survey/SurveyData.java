@@ -1,6 +1,6 @@
 package org.droidplanner.services.android.impl.core.survey;
 
-import org.droidplanner.services.android.core.helpers.units.Area;
+import org.droidplanner.services.android.impl.core.helpers.units.Area;
 
 import java.util.Locale;
 

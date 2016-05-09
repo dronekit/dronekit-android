@@ -2,7 +2,7 @@ package org.droidplanner.services.android.impl.utils;
 
 import android.util.Log;
 
-import org.droidplanner.services.android.core.model.Logger;
+import org.droidplanner.services.android.impl.core.model.Logger;
 
 /**
  * Android specific implementation for the {org.droidplanner.services.android.core.model.Logger}

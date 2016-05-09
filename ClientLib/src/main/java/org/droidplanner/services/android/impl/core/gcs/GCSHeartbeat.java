@@ -5,7 +5,7 @@ import com.MAVLink.common.msg_heartbeat;
 import com.MAVLink.enums.MAV_AUTOPILOT;
 import com.MAVLink.enums.MAV_TYPE;
 
-import org.droidplanner.services.android.communication.model.DataLink;
+import org.droidplanner.services.android.impl.communication.model.DataLink;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;

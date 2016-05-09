@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.os.RemoteException;
 import android.util.Log;
 
+import org.droidplanner.android.client.BuildConfig;
 import org.droidplanner.services.android.impl.core.drone.DroneManager;
 import org.droidplanner.services.android.lib.drone.connection.ConnectionParameter;
 import org.droidplanner.services.android.lib.gcs.event.GCSEvent;

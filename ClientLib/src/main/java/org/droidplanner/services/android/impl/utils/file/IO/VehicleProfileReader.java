@@ -4,10 +4,10 @@ import android.content.Context;
 import android.content.res.AssetManager;
 import android.util.Xml;
 
-import org.droidplanner.services.android.core.drone.profiles.VehicleProfile;
-import org.droidplanner.services.android.core.firmware.FirmwareType;
-import org.droidplanner.services.android.utils.file.AssetUtil;
-import org.droidplanner.services.android.utils.file.DirectoryPath;
+import org.droidplanner.services.android.impl.core.drone.profiles.VehicleProfile;
+import org.droidplanner.services.android.impl.core.firmware.FirmwareType;
+import org.droidplanner.services.android.impl.utils.file.AssetUtil;
+import org.droidplanner.services.android.impl.utils.file.DirectoryPath;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 

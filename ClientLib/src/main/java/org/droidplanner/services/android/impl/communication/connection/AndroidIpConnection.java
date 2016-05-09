@@ -2,7 +2,7 @@ package org.droidplanner.services.android.impl.communication.connection;
 
 import android.content.Context;
 
-import org.droidplanner.services.android.utils.connection.WifiConnectionHandler;
+import org.droidplanner.services.android.impl.utils.connection.WifiConnectionHandler;
 
 import java.io.IOException;
 

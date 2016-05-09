@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import org.droidplanner.services.android.data.SessionContract.SessionData;
+import org.droidplanner.services.android.impl.data.SessionContract.SessionData;
 
 import java.util.Date;
 

@@ -1,7 +1,7 @@
 package org.droidplanner.services.android.impl.core.survey.grid;
 
-import org.droidplanner.services.android.core.helpers.geoTools.LineLatLong;
-import org.droidplanner.services.android.core.helpers.geoTools.LineTools;
+import org.droidplanner.services.android.impl.core.helpers.geoTools.LineLatLong;
+import org.droidplanner.services.android.impl.core.helpers.geoTools.LineTools;
 import org.droidplanner.services.android.lib.coordinate.LatLong;
 
 import java.util.ArrayList;

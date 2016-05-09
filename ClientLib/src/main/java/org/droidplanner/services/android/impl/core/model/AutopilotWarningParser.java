@@ -1,6 +1,6 @@
 package org.droidplanner.services.android.impl.core.model;
 
-import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
+import org.droidplanner.services.android.impl.core.drone.autopilot.MavLinkDrone;
 
 /**
  * Parse received autopilot warning messages.

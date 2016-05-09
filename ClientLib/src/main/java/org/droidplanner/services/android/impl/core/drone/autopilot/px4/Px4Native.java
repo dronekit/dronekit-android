@@ -5,11 +5,11 @@ import android.os.Handler;
 
 import com.MAVLink.Messages.MAVLinkMessage;
 
-import org.droidplanner.services.android.communication.model.DataLink;
-import org.droidplanner.services.android.core.drone.LogMessageListener;
-import org.droidplanner.services.android.core.drone.autopilot.generic.GenericMavLinkDrone;
-import org.droidplanner.services.android.core.firmware.FirmwareType;
-import org.droidplanner.services.android.core.model.AutopilotWarningParser;
+import org.droidplanner.services.android.impl.communication.model.DataLink;
+import org.droidplanner.services.android.impl.core.drone.LogMessageListener;
+import org.droidplanner.services.android.impl.core.drone.autopilot.generic.GenericMavLinkDrone;
+import org.droidplanner.services.android.impl.core.firmware.FirmwareType;
+import org.droidplanner.services.android.impl.core.model.AutopilotWarningParser;
 
 /**
  * Created by Fredia Huya-Kouadio on 9/10/15.

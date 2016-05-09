@@ -7,9 +7,9 @@ import android.text.TextUtils;
 import org.droidplanner.android.client.utils.connection.TcpConnection;
 import org.droidplanner.android.client.utils.connection.UdpConnection;
 import org.droidplanner.services.android.BuildConfig;
-import org.droidplanner.services.android.core.drone.autopilot.apm.solo.AbstractLinkManager;
-import org.droidplanner.services.android.core.drone.autopilot.apm.solo.SoloComp;
-import org.droidplanner.services.android.core.drone.autopilot.apm.solo.controller.ControllerLinkManager;
+import org.droidplanner.services.android.impl.core.drone.autopilot.apm.solo.AbstractLinkManager;
+import org.droidplanner.services.android.impl.core.drone.autopilot.apm.solo.SoloComp;
+import org.droidplanner.services.android.impl.core.drone.autopilot.apm.solo.controller.ControllerLinkManager;
 import org.droidplanner.services.android.lib.drone.companion.solo.button.ButtonTypes;
 import org.droidplanner.services.android.lib.drone.companion.solo.tlv.SoloButtonSetting;
 import org.droidplanner.services.android.lib.drone.companion.solo.tlv.SoloButtonSettingGetter;
@@ -21,7 +21,7 @@ import org.droidplanner.services.android.lib.drone.companion.solo.tlv.TLVMessage
 import org.droidplanner.services.android.lib.drone.companion.solo.tlv.TLVPacket;
 import org.droidplanner.services.android.lib.model.ICommandListener;
 import org.droidplanner.services.android.lib.model.SimpleCommandListener;
-import org.droidplanner.services.android.utils.connection.SshConnection;
+import org.droidplanner.services.android.impl.utils.connection.SshConnection;
 
 import java.io.IOException;
 import java.net.UnknownHostException;

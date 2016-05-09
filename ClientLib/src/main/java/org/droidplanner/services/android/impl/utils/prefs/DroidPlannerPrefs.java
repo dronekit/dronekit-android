@@ -4,10 +4,10 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-import org.droidplanner.services.android.core.drone.profiles.VehicleProfile;
-import org.droidplanner.services.android.core.drone.variables.StreamRates.Rates;
-import org.droidplanner.services.android.core.firmware.FirmwareType;
-import org.droidplanner.services.android.utils.file.IO.VehicleProfileReader;
+import org.droidplanner.services.android.impl.core.drone.profiles.VehicleProfile;
+import org.droidplanner.services.android.impl.core.drone.variables.StreamRates.Rates;
+import org.droidplanner.services.android.impl.core.firmware.FirmwareType;
+import org.droidplanner.services.android.impl.utils.file.IO.VehicleProfileReader;
 
 /**
  * Provides structured access to 3DR Services preferences
@@ -18,7 +18,7 @@ import org.droidplanner.services.android.utils.file.IO.VehicleProfileReader;
  * This is called the DRY (don't repeat yourself) principle of software
  * development.
  */
-public class DroidPlannerPrefs implements org.droidplanner.services.android.core.drone.Preferences {
+public class DroidPlannerPrefs implements org.droidplanner.services.android.impl.core.drone.Preferences {
 
     public static final int DEFAULT_STREAM_RATE = 2; //Hz
 

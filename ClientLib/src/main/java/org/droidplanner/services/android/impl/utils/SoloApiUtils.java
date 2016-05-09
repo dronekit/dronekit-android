@@ -3,9 +3,9 @@ package org.droidplanner.services.android.impl.utils;
 import android.os.RemoteException;
 import android.util.Pair;
 
-import org.droidplanner.services.android.core.drone.autopilot.Drone;
-import org.droidplanner.services.android.core.drone.autopilot.apm.solo.ArduSolo;
-import org.droidplanner.services.android.core.drone.autopilot.apm.solo.SoloComp;
+import org.droidplanner.services.android.impl.core.drone.autopilot.Drone;
+import org.droidplanner.services.android.impl.core.drone.autopilot.apm.solo.ArduSolo;
+import org.droidplanner.services.android.impl.core.drone.autopilot.apm.solo.SoloComp;
 import org.droidplanner.services.android.lib.drone.attribute.error.CommandExecutionError;
 import org.droidplanner.services.android.lib.drone.companion.solo.SoloState;
 import org.droidplanner.services.android.lib.drone.companion.solo.controller.SoloControllerMode;

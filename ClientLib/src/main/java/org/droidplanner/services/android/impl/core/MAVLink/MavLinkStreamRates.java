@@ -3,7 +3,7 @@ package org.droidplanner.services.android.impl.core.MAVLink;
 import com.MAVLink.common.msg_request_data_stream;
 import com.MAVLink.enums.MAV_DATA_STREAM;
 
-import org.droidplanner.services.android.communication.model.DataLink.DataLinkProvider;
+import org.droidplanner.services.android.impl.communication.model.DataLink.DataLinkProvider;
 
 public class MavLinkStreamRates {
 

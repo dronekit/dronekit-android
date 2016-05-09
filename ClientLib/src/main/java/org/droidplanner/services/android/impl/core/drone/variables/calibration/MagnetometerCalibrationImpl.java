@@ -4,10 +4,10 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.ardupilotmega.msg_mag_cal_progress;
 import com.MAVLink.ardupilotmega.msg_mag_cal_report;
 
-import org.droidplanner.services.android.core.MAVLink.MavLinkCalibration;
-import org.droidplanner.services.android.core.drone.DroneInterfaces;
-import org.droidplanner.services.android.core.drone.DroneVariable;
-import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
+import org.droidplanner.services.android.impl.core.MAVLink.MavLinkCalibration;
+import org.droidplanner.services.android.impl.core.drone.DroneInterfaces;
+import org.droidplanner.services.android.impl.core.drone.DroneVariable;
+import org.droidplanner.services.android.impl.core.drone.autopilot.MavLinkDrone;
 
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicBoolean;

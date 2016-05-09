@@ -1,6 +1,6 @@
 package org.droidplanner.services.android.impl.core.srtm;
 
-import org.droidplanner.services.android.core.srtm.Srtm.OnProgressListner;
+import org.droidplanner.services.android.impl.core.srtm.Srtm.OnProgressListner;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;

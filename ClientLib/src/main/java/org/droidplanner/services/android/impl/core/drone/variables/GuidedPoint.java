@@ -3,12 +3,12 @@ package org.droidplanner.services.android.impl.core.drone.variables;
 import android.os.Handler;
 import android.os.RemoteException;
 
-import org.droidplanner.services.android.core.MAVLink.MavLinkCommands;
-import org.droidplanner.services.android.core.drone.DroneInterfaces.DroneEventsType;
-import org.droidplanner.services.android.core.drone.DroneInterfaces.OnDroneListener;
-import org.droidplanner.services.android.core.drone.DroneVariable;
-import org.droidplanner.services.android.core.drone.autopilot.Drone;
-import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
+import org.droidplanner.services.android.impl.core.MAVLink.MavLinkCommands;
+import org.droidplanner.services.android.impl.core.drone.DroneInterfaces.DroneEventsType;
+import org.droidplanner.services.android.impl.core.drone.DroneInterfaces.OnDroneListener;
+import org.droidplanner.services.android.impl.core.drone.DroneVariable;
+import org.droidplanner.services.android.impl.core.drone.autopilot.Drone;
+import org.droidplanner.services.android.impl.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.lib.coordinate.LatLong;
 import org.droidplanner.services.android.lib.drone.attribute.AttributeType;
 import org.droidplanner.services.android.lib.drone.attribute.error.CommandExecutionError;

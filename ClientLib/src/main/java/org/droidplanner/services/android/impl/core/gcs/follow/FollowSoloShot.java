@@ -2,12 +2,12 @@ package org.droidplanner.services.android.impl.core.gcs.follow;
 
 import android.os.Handler;
 
-import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
-import org.droidplanner.services.android.core.drone.autopilot.apm.solo.ArduSolo;
-import org.droidplanner.services.android.core.drone.autopilot.apm.solo.SoloComp;
-import org.droidplanner.services.android.core.drone.manager.MavLinkDroneManager;
-import org.droidplanner.services.android.core.gcs.location.Location;
-import org.droidplanner.services.android.core.gcs.roi.ROIEstimator;
+import org.droidplanner.services.android.impl.core.drone.autopilot.MavLinkDrone;
+import org.droidplanner.services.android.impl.core.drone.autopilot.apm.solo.ArduSolo;
+import org.droidplanner.services.android.impl.core.drone.autopilot.apm.solo.SoloComp;
+import org.droidplanner.services.android.impl.core.drone.manager.MavLinkDroneManager;
+import org.droidplanner.services.android.impl.core.gcs.location.Location;
+import org.droidplanner.services.android.impl.core.gcs.roi.ROIEstimator;
 import org.droidplanner.services.android.lib.coordinate.LatLong;
 import org.droidplanner.services.android.lib.coordinate.LatLongAlt;
 import org.droidplanner.services.android.lib.drone.companion.solo.tlv.SoloMessageLocation;

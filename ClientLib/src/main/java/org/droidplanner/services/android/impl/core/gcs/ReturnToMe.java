@@ -2,12 +2,12 @@ package org.droidplanner.services.android.impl.core.gcs;
 
 import android.os.Bundle;
 
-import org.droidplanner.services.android.core.MAVLink.command.doCmd.MavLinkDoCmds;
-import org.droidplanner.services.android.core.drone.DroneInterfaces;
-import org.droidplanner.services.android.core.drone.DroneInterfaces.AttributeEventListener;
-import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
-import org.droidplanner.services.android.core.drone.manager.MavLinkDroneManager;
-import org.droidplanner.services.android.core.gcs.location.Location;
+import org.droidplanner.services.android.impl.core.MAVLink.command.doCmd.MavLinkDoCmds;
+import org.droidplanner.services.android.impl.core.drone.DroneInterfaces;
+import org.droidplanner.services.android.impl.core.drone.DroneInterfaces.AttributeEventListener;
+import org.droidplanner.services.android.impl.core.drone.autopilot.MavLinkDrone;
+import org.droidplanner.services.android.impl.core.drone.manager.MavLinkDroneManager;
+import org.droidplanner.services.android.impl.core.gcs.location.Location;
 import org.droidplanner.services.android.lib.coordinate.LatLongAlt;
 import org.droidplanner.services.android.lib.drone.attribute.AttributeEvent;
 import org.droidplanner.services.android.lib.drone.attribute.AttributeEventExtra;
@@ -18,7 +18,7 @@ import org.droidplanner.services.android.lib.gcs.returnToMe.ReturnToMeState;
 import org.droidplanner.services.android.lib.model.AbstractCommandListener;
 import org.droidplanner.services.android.lib.model.ICommandListener;
 import org.droidplanner.services.android.lib.model.action.Action;
-import org.droidplanner.services.android.utils.CommonApiUtils;
+import org.droidplanner.services.android.impl.utils.CommonApiUtils;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 

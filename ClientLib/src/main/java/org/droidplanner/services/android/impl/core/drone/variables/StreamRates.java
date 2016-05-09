@@ -1,10 +1,10 @@
 package org.droidplanner.services.android.impl.core.drone.variables;
 
-import org.droidplanner.services.android.core.MAVLink.MavLinkStreamRates;
-import org.droidplanner.services.android.core.drone.DroneInterfaces.DroneEventsType;
-import org.droidplanner.services.android.core.drone.DroneInterfaces.OnDroneListener;
-import org.droidplanner.services.android.core.drone.DroneVariable;
-import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
+import org.droidplanner.services.android.impl.core.MAVLink.MavLinkStreamRates;
+import org.droidplanner.services.android.impl.core.drone.DroneInterfaces.DroneEventsType;
+import org.droidplanner.services.android.impl.core.drone.DroneInterfaces.OnDroneListener;
+import org.droidplanner.services.android.impl.core.drone.DroneVariable;
+import org.droidplanner.services.android.impl.core.drone.autopilot.MavLinkDrone;
 
 public class StreamRates extends DroneVariable<MavLinkDrone> implements OnDroneListener<MavLinkDrone> {
 

@@ -1,7 +1,7 @@
 package org.droidplanner.services.android.impl.utils;
 
-import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
-import org.droidplanner.services.android.core.model.AutopilotWarningParser;
+import org.droidplanner.services.android.impl.core.drone.autopilot.MavLinkDrone;
+import org.droidplanner.services.android.impl.core.model.AutopilotWarningParser;
 import org.droidplanner.services.android.lib.drone.attribute.error.ErrorType;
 
 import java.util.Locale;

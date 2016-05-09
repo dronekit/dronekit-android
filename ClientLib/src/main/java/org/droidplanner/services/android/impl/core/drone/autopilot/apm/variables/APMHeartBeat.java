@@ -2,10 +2,10 @@ package org.droidplanner.services.android.impl.core.drone.autopilot.apm.variable
 
 import android.os.Handler;
 
-import org.droidplanner.services.android.core.drone.DroneInterfaces;
-import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
-import org.droidplanner.services.android.core.drone.autopilot.apm.ArduPilot;
-import org.droidplanner.services.android.core.drone.variables.HeartBeat;
+import org.droidplanner.services.android.impl.core.drone.DroneInterfaces;
+import org.droidplanner.services.android.impl.core.drone.autopilot.MavLinkDrone;
+import org.droidplanner.services.android.impl.core.drone.autopilot.apm.ArduPilot;
+import org.droidplanner.services.android.impl.core.drone.variables.HeartBeat;
 
 /**
  * Created by Fredia Huya-Kouadio on 10/24/15.

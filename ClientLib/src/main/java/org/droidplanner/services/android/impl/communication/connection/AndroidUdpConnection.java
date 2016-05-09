@@ -3,10 +3,10 @@ package org.droidplanner.services.android.impl.communication.connection;
 import android.content.Context;
 import android.util.Log;
 
-import org.droidplanner.services.android.core.MAVLink.connection.UdpConnection;
-import org.droidplanner.services.android.core.model.Logger;
+import org.droidplanner.services.android.impl.core.MAVLink.connection.UdpConnection;
+import org.droidplanner.services.android.impl.core.model.Logger;
 import org.droidplanner.services.android.lib.gcs.link.LinkConnectionStatus;
-import org.droidplanner.services.android.utils.connection.WifiConnectionHandler;
+import org.droidplanner.services.android.impl.utils.connection.WifiConnectionHandler;
 
 import java.io.IOException;
 import java.net.InetAddress;

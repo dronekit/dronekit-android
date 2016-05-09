@@ -2,7 +2,7 @@ package org.droidplanner.services.android.impl.core.gcs.follow;
 
 import android.os.Handler;
 
-import org.droidplanner.services.android.core.drone.manager.MavLinkDroneManager;
+import org.droidplanner.services.android.impl.core.drone.manager.MavLinkDroneManager;
 
 public class FollowLead extends FollowHeadingAngle {
 

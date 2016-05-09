@@ -6,11 +6,11 @@ import android.os.RemoteException;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.common.msg_statustext;
 
-import org.droidplanner.services.android.core.MAVLink.MavLinkCalibration;
-import org.droidplanner.services.android.core.drone.DroneInterfaces;
-import org.droidplanner.services.android.core.drone.DroneInterfaces.DroneEventsType;
-import org.droidplanner.services.android.core.drone.DroneVariable;
-import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
+import org.droidplanner.services.android.impl.core.MAVLink.MavLinkCalibration;
+import org.droidplanner.services.android.impl.core.drone.DroneInterfaces;
+import org.droidplanner.services.android.impl.core.drone.DroneInterfaces.DroneEventsType;
+import org.droidplanner.services.android.impl.core.drone.DroneVariable;
+import org.droidplanner.services.android.impl.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.lib.model.ICommandListener;
 import org.droidplanner.services.android.lib.model.SimpleCommandListener;
 

@@ -7,7 +7,7 @@ import com.MAVLink.common.msg_mission_request_list;
 import com.MAVLink.common.msg_mission_set_current;
 import com.MAVLink.enums.MAV_MISSION_RESULT;
 
-import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
+import org.droidplanner.services.android.impl.core.drone.autopilot.MavLinkDrone;
 
 public class MavLinkWaypoint {
 

@@ -5,11 +5,11 @@ import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 import android.util.Log;
 
-import org.droidplanner.services.android.communication.connection.AndroidMavLinkConnection;
-import org.droidplanner.services.android.core.MAVLink.connection.MavLinkConnectionTypes;
-import org.droidplanner.services.android.core.model.Logger;
+import org.droidplanner.services.android.impl.communication.connection.AndroidMavLinkConnection;
+import org.droidplanner.services.android.impl.core.MAVLink.connection.MavLinkConnectionTypes;
+import org.droidplanner.services.android.impl.core.model.Logger;
 import org.droidplanner.services.android.lib.gcs.link.LinkConnectionStatus;
-import org.droidplanner.services.android.utils.AndroidLogger;
+import org.droidplanner.services.android.impl.utils.AndroidLogger;
 
 import java.io.IOException;
 import java.util.HashMap;

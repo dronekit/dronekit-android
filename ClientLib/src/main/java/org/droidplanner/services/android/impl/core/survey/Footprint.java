@@ -2,7 +2,7 @@ package org.droidplanner.services.android.impl.core.survey;
 
 import com.MAVLink.ardupilotmega.msg_camera_feedback;
 
-import org.droidplanner.services.android.core.helpers.geoTools.GeoTools;
+import org.droidplanner.services.android.impl.core.helpers.geoTools.GeoTools;
 import org.droidplanner.services.android.lib.coordinate.LatLong;
 import org.droidplanner.services.android.lib.util.MathUtils;
 

@@ -3,9 +3,9 @@ package org.droidplanner.services.android.impl.core.mission.waypoints;
 import com.MAVLink.common.msg_mission_item;
 import com.MAVLink.enums.MAV_CMD;
 
-import org.droidplanner.services.android.core.mission.Mission;
-import org.droidplanner.services.android.core.mission.MissionItemImpl;
-import org.droidplanner.services.android.core.mission.MissionItemType;
+import org.droidplanner.services.android.impl.core.mission.Mission;
+import org.droidplanner.services.android.impl.core.mission.MissionItemImpl;
+import org.droidplanner.services.android.impl.core.mission.MissionItemType;
 import org.droidplanner.services.android.lib.coordinate.LatLongAlt;
 
 import java.util.List;

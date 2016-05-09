@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
 
-import org.droidplanner.services.android.ui.fragment.RecommendedAppsFragment;
+import org.droidplanner.services.android.impl.ui.fragment.RecommendedAppsFragment;
 
 /**
  * Created by Fredia Huya-Kouadio on 2/5/15.

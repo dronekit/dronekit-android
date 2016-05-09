@@ -2,9 +2,9 @@ package org.droidplanner.services.android.impl.core.gcs.follow;
 
 import android.os.Handler;
 
-import org.droidplanner.services.android.core.drone.manager.MavLinkDroneManager;
-import org.droidplanner.services.android.core.gcs.location.Location;
-import org.droidplanner.services.android.core.helpers.geoTools.GeoTools;
+import org.droidplanner.services.android.impl.core.drone.manager.MavLinkDroneManager;
+import org.droidplanner.services.android.impl.core.gcs.location.Location;
+import org.droidplanner.services.android.impl.core.helpers.geoTools.GeoTools;
 import org.droidplanner.services.android.lib.coordinate.LatLong;
 import org.droidplanner.services.android.lib.util.MathUtils;
 

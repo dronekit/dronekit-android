@@ -9,7 +9,7 @@ import android.text.TextUtils;
 import org.droidplanner.services.android.lib.drone.connection.ConnectionParameter;
 import org.droidplanner.services.android.lib.drone.connection.ConnectionType;
 import org.droidplanner.services.android.lib.gcs.link.LinkConnectionStatus;
-import org.droidplanner.services.android.utils.connection.WifiConnectionHandler;
+import org.droidplanner.services.android.impl.utils.connection.WifiConnectionHandler;
 
 import java.io.IOException;
 import java.util.List;

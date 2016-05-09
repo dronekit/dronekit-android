@@ -5,7 +5,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.util.Log;
 
-import org.droidplanner.services.android.BuildConfig;
+import org.droidplanner.android.client.BuildConfig;
 
 import java.io.File;
 import java.io.FileOutputStream;

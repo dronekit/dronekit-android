@@ -13,9 +13,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import org.droidplanner.services.android.R;
+import org.droidplanner.android.client.R;
+import org.droidplanner.services.android.impl.utils.file.FileUtils;
 import org.droidplanner.services.android.lib.data.ServiceDataContract;
-import org.droidplanner.services.android.utils.file.FileUtils;
 
 import java.io.File;
 import java.util.ArrayList;

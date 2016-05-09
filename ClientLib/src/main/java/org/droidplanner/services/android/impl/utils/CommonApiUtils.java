@@ -12,26 +12,26 @@ import com.MAVLink.ardupilotmega.msg_mag_cal_report;
 import com.MAVLink.enums.MAG_CAL_STATUS;
 import com.MAVLink.enums.MAV_TYPE;
 
-import org.droidplanner.services.android.core.MAVLink.MavLinkCommands;
-import org.droidplanner.services.android.core.MAVLink.command.doCmd.MavLinkDoCmds;
-import org.droidplanner.services.android.core.drone.autopilot.Drone;
-import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
-import org.droidplanner.services.android.core.drone.autopilot.apm.ArduPilot;
-import org.droidplanner.services.android.core.drone.autopilot.generic.GenericMavLinkDrone;
-import org.droidplanner.services.android.core.drone.profiles.ParameterManager;
-import org.droidplanner.services.android.core.drone.variables.ApmModes;
-import org.droidplanner.services.android.core.drone.variables.Camera;
-import org.droidplanner.services.android.core.drone.variables.GuidedPoint;
-import org.droidplanner.services.android.core.drone.variables.calibration.AccelCalibration;
-import org.droidplanner.services.android.core.drone.variables.calibration.MagnetometerCalibrationImpl;
-import org.droidplanner.services.android.core.firmware.FirmwareType;
-import org.droidplanner.services.android.core.gcs.follow.Follow;
-import org.droidplanner.services.android.core.gcs.follow.FollowAlgorithm;
-import org.droidplanner.services.android.core.mission.MissionItemImpl;
-import org.droidplanner.services.android.core.mission.survey.SplineSurveyImpl;
-import org.droidplanner.services.android.core.mission.survey.SurveyImpl;
-import org.droidplanner.services.android.core.mission.waypoints.StructureScannerImpl;
-import org.droidplanner.services.android.core.survey.Footprint;
+import org.droidplanner.services.android.impl.core.MAVLink.MavLinkCommands;
+import org.droidplanner.services.android.impl.core.MAVLink.command.doCmd.MavLinkDoCmds;
+import org.droidplanner.services.android.impl.core.drone.autopilot.Drone;
+import org.droidplanner.services.android.impl.core.drone.autopilot.MavLinkDrone;
+import org.droidplanner.services.android.impl.core.drone.autopilot.apm.ArduPilot;
+import org.droidplanner.services.android.impl.core.drone.autopilot.generic.GenericMavLinkDrone;
+import org.droidplanner.services.android.impl.core.drone.profiles.ParameterManager;
+import org.droidplanner.services.android.impl.core.drone.variables.ApmModes;
+import org.droidplanner.services.android.impl.core.drone.variables.Camera;
+import org.droidplanner.services.android.impl.core.drone.variables.GuidedPoint;
+import org.droidplanner.services.android.impl.core.drone.variables.calibration.AccelCalibration;
+import org.droidplanner.services.android.impl.core.drone.variables.calibration.MagnetometerCalibrationImpl;
+import org.droidplanner.services.android.impl.core.firmware.FirmwareType;
+import org.droidplanner.services.android.impl.core.gcs.follow.Follow;
+import org.droidplanner.services.android.impl.core.gcs.follow.FollowAlgorithm;
+import org.droidplanner.services.android.impl.core.mission.MissionItemImpl;
+import org.droidplanner.services.android.impl.core.mission.survey.SplineSurveyImpl;
+import org.droidplanner.services.android.impl.core.mission.survey.SurveyImpl;
+import org.droidplanner.services.android.impl.core.mission.waypoints.StructureScannerImpl;
+import org.droidplanner.services.android.impl.core.survey.Footprint;
 import org.droidplanner.services.android.lib.coordinate.LatLong;
 import org.droidplanner.services.android.lib.coordinate.LatLongAlt;
 import org.droidplanner.services.android.lib.drone.attribute.AttributeType;
@@ -377,7 +377,7 @@ public class CommonApiUtils {
         if (drone == null)
             return new State();
 
-        org.droidplanner.services.android.core.drone.variables.State droneState = drone.getState();
+        org.droidplanner.services.android.impl.core.drone.variables.State droneState = drone.getState();
         ApmModes droneMode = droneState.getMode();
         AccelCalibration accelCalibration = drone.getCalibrationSetup();
         String calibrationMessage = accelCalibration != null && accelCalibration.isCalibrating()
@@ -407,7 +407,7 @@ public class CommonApiUtils {
         if (drone == null)
             return proxyMission;
 
-        org.droidplanner.services.android.core.mission.Mission droneMission = drone.getMission();
+        org.droidplanner.services.android.impl.core.mission.Mission droneMission = drone.getMission();
         List<MissionItemImpl> droneMissionItemImpls = droneMission.getComponentItems();
 
 
@@ -586,7 +586,7 @@ public class CommonApiUtils {
         if (drone == null)
             return;
 
-        org.droidplanner.services.android.core.mission.Mission droneMission = drone.getMission();
+        org.droidplanner.services.android.impl.core.mission.Mission droneMission = drone.getMission();
         droneMission.clearMissionItems();
 
         List<MissionItem> itemsList = mission.getMissionItems();
@@ -684,7 +684,7 @@ public class CommonApiUtils {
             return;
 
         if (!arm && emergencyDisarm) {
-            if (org.droidplanner.services.android.core.drone.variables.Type.isCopter(drone.getType()) && !isKillSwitchSupported(drone)) {
+            if (org.droidplanner.services.android.impl.core.drone.variables.Type.isCopter(drone.getType()) && !isKillSwitchSupported(drone)) {
 
                 changeVehicleMode(drone, VehicleMode.COPTER_STABILIZE, new AbstractCommandListener() {
                     @Override
@@ -732,7 +732,7 @@ public class CommonApiUtils {
         if (drone == null)
             return false;
 
-        if (!org.droidplanner.services.android.core.drone.variables.Type.isCopter(drone.getType()))
+        if (!org.droidplanner.services.android.impl.core.drone.variables.Type.isCopter(drone.getType()))
             return false;
 
         String firmwareVersion = drone.getFirmwareVersion();
@@ -906,7 +906,7 @@ public class CommonApiUtils {
     }
 
     public static Survey buildSurvey(MavLinkDrone drone, Survey survey) {
-        org.droidplanner.services.android.core.mission.Mission droneMission = drone == null ? null : drone.getMission();
+        org.droidplanner.services.android.impl.core.mission.Mission droneMission = drone == null ? null : drone.getMission();
         SurveyImpl updatedSurveyImpl = (SurveyImpl) ProxyUtils.getMissionItemImpl
                 (droneMission, survey);
 
@@ -914,7 +914,7 @@ public class CommonApiUtils {
     }
 
     public static Survey buildSplineSurvey(MavLinkDrone drone, Survey survey) {
-        org.droidplanner.services.android.core.mission.Mission droneMission = drone == null ? null : drone.getMission();
+        org.droidplanner.services.android.impl.core.mission.Mission droneMission = drone == null ? null : drone.getMission();
         SplineSurveyImpl updatedSplineSurvey = (SplineSurveyImpl)
                 ProxyUtils.getMissionItemImpl(droneMission, survey);
 
@@ -922,7 +922,7 @@ public class CommonApiUtils {
     }
 
     public static StructureScanner buildStructureScanner(MavLinkDrone drone, StructureScanner item) {
-        org.droidplanner.services.android.core.mission.Mission droneMission = drone == null ? null : drone.getMission();
+        org.droidplanner.services.android.impl.core.mission.Mission droneMission = drone == null ? null : drone.getMission();
         StructureScannerImpl updatedScan = (StructureScannerImpl) ProxyUtils
                 .getMissionItemImpl(droneMission, item);
 

@@ -1,7 +1,7 @@
 package org.droidplanner.services.android.impl.core.helpers.geoTools;
 
-import org.droidplanner.services.android.core.helpers.units.Area;
-import org.droidplanner.services.android.core.polygon.Polygon;
+import org.droidplanner.services.android.impl.core.helpers.units.Area;
+import org.droidplanner.services.android.impl.core.polygon.Polygon;
 import org.droidplanner.services.android.lib.coordinate.LatLong;
 import org.droidplanner.services.android.lib.coordinate.LatLongAlt;
 import org.droidplanner.services.android.lib.util.MathUtils;

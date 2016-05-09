@@ -10,9 +10,9 @@ import com.MAVLink.common.msg_mission_item;
 import com.MAVLink.common.msg_mission_item_reached;
 import com.MAVLink.common.msg_mission_request;
 
-import org.droidplanner.services.android.core.drone.DroneInterfaces.OnWaypointManagerListener;
-import org.droidplanner.services.android.core.drone.DroneVariable;
-import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
+import org.droidplanner.services.android.impl.core.drone.DroneInterfaces.OnWaypointManagerListener;
+import org.droidplanner.services.android.impl.core.drone.DroneVariable;
+import org.droidplanner.services.android.impl.core.drone.autopilot.MavLinkDrone;
 
 import java.util.ArrayList;
 import java.util.List;

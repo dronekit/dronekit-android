@@ -10,8 +10,8 @@ import com.github.zafarkhaja.semver.Version;
 import org.droidplanner.android.client.utils.TxPowerComplianceCountries;
 import org.droidplanner.android.client.utils.connection.IpConnectionListener;
 import org.droidplanner.android.client.utils.connection.TcpConnection;
-import org.droidplanner.services.android.core.drone.autopilot.apm.solo.AbstractLinkManager;
-import org.droidplanner.services.android.core.drone.autopilot.apm.solo.SoloComp;
+import org.droidplanner.services.android.impl.core.drone.autopilot.apm.solo.AbstractLinkManager;
+import org.droidplanner.services.android.impl.core.drone.autopilot.apm.solo.SoloComp;
 import org.droidplanner.services.android.lib.drone.attribute.error.CommandExecutionError;
 import org.droidplanner.services.android.lib.drone.companion.solo.button.ButtonPacket;
 import org.droidplanner.services.android.lib.drone.companion.solo.controller.SoloControllerMode;
@@ -19,8 +19,8 @@ import org.droidplanner.services.android.lib.drone.companion.solo.controller.Sol
 import org.droidplanner.services.android.lib.drone.companion.solo.tlv.TLVMessageParser;
 import org.droidplanner.services.android.lib.drone.companion.solo.tlv.TLVPacket;
 import org.droidplanner.services.android.lib.model.ICommandListener;
-import org.droidplanner.services.android.utils.NetworkUtils;
-import org.droidplanner.services.android.utils.connection.SshConnection;
+import org.droidplanner.services.android.impl.utils.NetworkUtils;
+import org.droidplanner.services.android.impl.utils.connection.SshConnection;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

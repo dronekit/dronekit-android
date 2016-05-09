@@ -1,6 +1,6 @@
 package org.droidplanner.services.android.impl.core.helpers.geoTools;
 
-import org.droidplanner.services.android.core.helpers.coordinates.CoordBounds;
+import org.droidplanner.services.android.impl.core.helpers.coordinates.CoordBounds;
 import org.droidplanner.services.android.lib.coordinate.LatLong;
 
 import java.util.ArrayList;

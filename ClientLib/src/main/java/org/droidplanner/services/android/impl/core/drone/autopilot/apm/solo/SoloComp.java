@@ -9,10 +9,10 @@ import android.util.Pair;
 import android.util.SparseArray;
 
 import org.droidplanner.services.android.BuildConfig;
-import org.droidplanner.services.android.core.drone.autopilot.apm.solo.controller.ControllerLinkListener;
-import org.droidplanner.services.android.core.drone.autopilot.apm.solo.controller.ControllerLinkManager;
-import org.droidplanner.services.android.core.drone.autopilot.apm.solo.sololink.SoloLinkListener;
-import org.droidplanner.services.android.core.drone.autopilot.apm.solo.sololink.SoloLinkManager;
+import org.droidplanner.services.android.impl.core.drone.autopilot.apm.solo.controller.ControllerLinkListener;
+import org.droidplanner.services.android.impl.core.drone.autopilot.apm.solo.controller.ControllerLinkManager;
+import org.droidplanner.services.android.impl.core.drone.autopilot.apm.solo.sololink.SoloLinkListener;
+import org.droidplanner.services.android.impl.core.drone.autopilot.apm.solo.sololink.SoloLinkManager;
 import org.droidplanner.services.android.lib.drone.attribute.AttributeEvent;
 import org.droidplanner.services.android.lib.drone.attribute.error.CommandExecutionError;
 import org.droidplanner.services.android.lib.drone.companion.solo.SoloEventExtras;
@@ -29,7 +29,7 @@ import org.droidplanner.services.android.lib.drone.companion.solo.tlv.SoloMessag
 import org.droidplanner.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes;
 import org.droidplanner.services.android.lib.drone.companion.solo.tlv.TLVPacket;
 import org.droidplanner.services.android.lib.model.ICommandListener;
-import org.droidplanner.services.android.utils.NetworkUtils;
+import org.droidplanner.services.android.impl.utils.NetworkUtils;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

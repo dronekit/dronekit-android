@@ -8,7 +8,7 @@ import android.text.TextUtils;
 import org.droidplanner.android.client.utils.connection.AbstractIpConnection;
 import org.droidplanner.android.client.utils.connection.IpConnectionListener;
 import org.droidplanner.services.android.lib.model.ICommandListener;
-import org.droidplanner.services.android.utils.connection.SshConnection;
+import org.droidplanner.services.android.impl.utils.connection.SshConnection;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;

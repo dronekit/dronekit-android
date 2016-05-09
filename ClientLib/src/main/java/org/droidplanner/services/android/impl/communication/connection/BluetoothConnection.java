@@ -8,7 +8,7 @@ import android.content.Context;
 import android.os.ParcelUuid;
 import android.util.Log;
 
-import org.droidplanner.services.android.core.MAVLink.connection.MavLinkConnectionTypes;
+import org.droidplanner.services.android.impl.core.MAVLink.connection.MavLinkConnectionTypes;
 
 import java.io.IOException;
 import java.io.InputStream;

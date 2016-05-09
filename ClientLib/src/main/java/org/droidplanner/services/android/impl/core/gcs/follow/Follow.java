@@ -2,15 +2,15 @@ package org.droidplanner.services.android.impl.core.gcs.follow;
 
 import android.os.Handler;
 
-import org.droidplanner.services.android.core.drone.DroneInterfaces.DroneEventsType;
-import org.droidplanner.services.android.core.drone.DroneInterfaces.OnDroneListener;
-import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
-import org.droidplanner.services.android.core.drone.manager.MavLinkDroneManager;
-import org.droidplanner.services.android.core.drone.variables.GuidedPoint;
-import org.droidplanner.services.android.core.drone.variables.State;
-import org.droidplanner.services.android.core.gcs.location.Location;
-import org.droidplanner.services.android.core.gcs.location.Location.LocationFinder;
-import org.droidplanner.services.android.core.gcs.location.Location.LocationReceiver;
+import org.droidplanner.services.android.impl.core.drone.DroneInterfaces.DroneEventsType;
+import org.droidplanner.services.android.impl.core.drone.DroneInterfaces.OnDroneListener;
+import org.droidplanner.services.android.impl.core.drone.autopilot.MavLinkDrone;
+import org.droidplanner.services.android.impl.core.drone.manager.MavLinkDroneManager;
+import org.droidplanner.services.android.impl.core.drone.variables.GuidedPoint;
+import org.droidplanner.services.android.impl.core.drone.variables.State;
+import org.droidplanner.services.android.impl.core.gcs.location.Location;
+import org.droidplanner.services.android.impl.core.gcs.location.Location.LocationFinder;
+import org.droidplanner.services.android.impl.core.gcs.location.Location.LocationReceiver;
 import org.droidplanner.services.android.lib.drone.action.ControlActions;
 import org.droidplanner.services.android.lib.drone.attribute.AttributeEvent;
 import org.droidplanner.services.android.lib.model.action.Action;

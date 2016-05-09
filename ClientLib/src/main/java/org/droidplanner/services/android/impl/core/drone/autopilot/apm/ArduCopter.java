@@ -8,21 +8,21 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.github.zafarkhaja.semver.Version;
 
 import org.droidplanner.android.client.apis.CapabilityApi;
-import org.droidplanner.services.android.communication.model.DataLink;
-import org.droidplanner.services.android.core.MAVLink.MavLinkCommands;
-import org.droidplanner.services.android.core.drone.DroneInterfaces;
-import org.droidplanner.services.android.core.drone.DroneManager;
-import org.droidplanner.services.android.core.drone.LogMessageListener;
-import org.droidplanner.services.android.core.drone.profiles.ParameterManager;
-import org.droidplanner.services.android.core.drone.variables.ApmModes;
-import org.droidplanner.services.android.core.drone.variables.State;
-import org.droidplanner.services.android.core.firmware.FirmwareType;
-import org.droidplanner.services.android.core.model.AutopilotWarningParser;
+import org.droidplanner.services.android.impl.communication.model.DataLink;
+import org.droidplanner.services.android.impl.core.MAVLink.MavLinkCommands;
+import org.droidplanner.services.android.impl.core.drone.DroneInterfaces;
+import org.droidplanner.services.android.impl.core.drone.DroneManager;
+import org.droidplanner.services.android.impl.core.drone.LogMessageListener;
+import org.droidplanner.services.android.impl.core.drone.profiles.ParameterManager;
+import org.droidplanner.services.android.impl.core.drone.variables.ApmModes;
+import org.droidplanner.services.android.impl.core.drone.variables.State;
+import org.droidplanner.services.android.impl.core.firmware.FirmwareType;
+import org.droidplanner.services.android.impl.core.model.AutopilotWarningParser;
 import org.droidplanner.services.android.lib.drone.action.ControlActions;
 import org.droidplanner.services.android.lib.drone.attribute.error.CommandExecutionError;
 import org.droidplanner.services.android.lib.drone.property.Parameter;
 import org.droidplanner.services.android.lib.model.ICommandListener;
-import org.droidplanner.services.android.utils.CommonApiUtils;
+import org.droidplanner.services.android.impl.utils.CommonApiUtils;
 
 import java.util.concurrent.ConcurrentHashMap;
 

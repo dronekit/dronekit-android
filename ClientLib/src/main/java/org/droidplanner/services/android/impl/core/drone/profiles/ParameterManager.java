@@ -8,14 +8,14 @@ import android.util.SparseBooleanArray;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.common.msg_param_value;
 
-import org.droidplanner.services.android.core.MAVLink.MavLinkParameters;
-import org.droidplanner.services.android.core.drone.DroneInterfaces;
-import org.droidplanner.services.android.core.drone.DroneInterfaces.DroneEventsType;
-import org.droidplanner.services.android.core.drone.DroneInterfaces.OnDroneListener;
-import org.droidplanner.services.android.core.drone.DroneVariable;
-import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
+import org.droidplanner.services.android.impl.core.MAVLink.MavLinkParameters;
+import org.droidplanner.services.android.impl.core.drone.DroneInterfaces;
+import org.droidplanner.services.android.impl.core.drone.DroneInterfaces.DroneEventsType;
+import org.droidplanner.services.android.impl.core.drone.DroneInterfaces.OnDroneListener;
+import org.droidplanner.services.android.impl.core.drone.DroneVariable;
+import org.droidplanner.services.android.impl.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.lib.drone.property.Parameter;
-import org.droidplanner.services.android.utils.file.IO.ParameterMetadataLoader;
+import org.droidplanner.services.android.impl.utils.file.IO.ParameterMetadataLoader;
 
 import java.util.Locale;
 import java.util.Map;
