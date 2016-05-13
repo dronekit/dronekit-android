@@ -34,13 +34,80 @@
         android:name="android.hardware.location"
         android:required="false"/>
 
-    <application>
+    <application
+        android:theme="@style/AppTheme"
+        android:largeHeap="true">
+
+        <meta-data
+            android:name="com.crashlytics.ApiKey"
+            android:value="5ee4471ba6e8cd8858006c8166469bba33d64b2f" />
+
         <activity
             android:name="org.droidplanner.android.client.utils.InstallServiceDialog"
             android:theme="@android:style/Theme.Holo.Light.Dialog.NoActionBar.MinWidth"
             android:noHistory="true"
             android:excludeFromRecents="true"
             android:launchMode="singleTask"/>
+
+        <activity
+            android:name="org.droidplanner.services.android.impl.ui.activity.UsbIntentReceiver"
+            android:launchMode="singleInstance"
+            android:noHistory="true"
+            android:excludeFromRecents="true">
+            <!-- USB connection  intent -->
+            <intent-filter>
+                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"/>
+            </intent-filter>
+
+            <meta-data
+                android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
+                android:resource="@xml/device_filter"/>
+        </activity>
+
+        <activity
+            android:name="org.droidplanner.services.android.impl.ui.activity.TLogFileSelector"
+            android:label="@string/tlog_selector_label"
+            android:theme="@style/AppDialogTheme"
+            >
+            <intent-filter>
+                <action android:name="com.o3dr.services.android.provider.action.REQUEST_TLOG_FILE"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.OPENABLE"/>
+
+                <data android:mimeType="application/octet-stream"/>
+            </intent-filter>
+        </activity>
+
+        <provider
+            android:name="org.droidplanner.services.android.impl.data.provider.FileProvider"
+            android:authorities="org.droidplanner.services.android.provider.fileprovider"
+            android:grantUriPermissions="true"
+            android:exported="false">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/filepaths"/>
+        </provider>
+
+        <provider
+            android:name="org.droidplanner.services.android.impl.data.provider.ServiceDataProvider"
+            android:authorities="org.droidplanner.services.android.provider.dataprovider"
+            android:enabled="false"
+            android:exported="false"/>
+
+        <service
+            android:name="org.droidplanner.services.android.impl.api.DroidPlannerService"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action
+                    android:name="com.o3dr.services.android.lib.model.IDroidPlannerServices"/>
+            </intent-filter>
+
+            <meta-data
+                android:name="org.droidplanner.dronekit.android.core.version"
+                android:value="@integer/core_lib_version"/>
+        </service>
 
     </application>
 

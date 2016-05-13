@@ -70,4 +70,5 @@
     <string name="copter_auto_label">Mission</string>
 
     <string name="label_tlog_title">Telemetry Log Files</string>
+    <string name="tlog_selector_label">Telemetry Logs File Selector</string>
 </resources>
