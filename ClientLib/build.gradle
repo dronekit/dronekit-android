@@ -29,6 +29,7 @@ android {
     defaultConfig {
         minSdkVersion android_build_min_sdk_version
         targetSdkVersion android_build_target_sdk_version
+
         versionCode PUBLISH_VERSION_CODE
         versionName PUBLISH_VERSION
 
