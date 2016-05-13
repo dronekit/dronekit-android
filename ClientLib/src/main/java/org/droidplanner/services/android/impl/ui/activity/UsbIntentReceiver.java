@@ -2,6 +2,7 @@ package org.droidplanner.services.android.impl.ui.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 
 import org.droidplanner.android.client.R;
 

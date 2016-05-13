@@ -12,10 +12,7 @@ dependencies {
     compile "com.android.support:cardview-v7:${support_lib_version}"
     compile "com.android.support:recyclerview-v7:${support_lib_version}"
 
-    compile files('libs/d2xx.jar')
-
     compile project(':ClientLib')
-    compile project(':UsbSerialLibrary')
 
     compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
         transitive = true;

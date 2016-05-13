@@ -1,5 +1,6 @@
 package org.droidplanner.services.android.impl.utils.analytics;
 
+import android.app.Application;
 import android.content.Context;
 import android.util.Log;
 
@@ -72,7 +73,7 @@ public class GAUtils {
 	 */
 	private static Tracker sAppTracker;
 
-	public static void initGATracker(DroidPlannerServicesApp app) {
+	public static void initGATracker(Application app) {
 		if (sAppTracker == null) {
 			final Context context = app.getApplicationContext();
 

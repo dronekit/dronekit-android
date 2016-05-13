@@ -2,7 +2,6 @@ package org.droidplanner.services.android.impl.api;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -15,8 +14,10 @@ import android.text.TextUtils;
 
 import org.droidplanner.android.client.R;
 import org.droidplanner.services.android.impl.core.drone.DroneManager;
-import org.droidplanner.services.android.impl.utils.Utils;
 import org.droidplanner.services.android.impl.core.survey.CameraInfo;
+import org.droidplanner.services.android.impl.utils.LogToFileTree;
+import org.droidplanner.services.android.impl.utils.Utils;
+import org.droidplanner.services.android.impl.utils.analytics.GAUtils;
 import org.droidplanner.services.android.impl.utils.file.IO.CameraInfoLoader;
 import org.droidplanner.services.android.lib.drone.connection.ConnectionParameter;
 import org.droidplanner.services.android.lib.drone.mission.item.complex.CameraDetail;
@@ -53,6 +54,11 @@ public class DroidPlannerService extends Service {
      * Used to broadcast service events.
      */
     private LocalBroadcastManager lbm;
+
+    /**
+     * Used to channel logging
+     */
+    private LogToFileTree logToFileTree;
 
     /**
      * Stores drone api instances per connected client. The client are denoted by their app id.
@@ -206,8 +212,22 @@ public class DroidPlannerService extends Service {
     public void onCreate() {
         super.onCreate();
 
-        final DroidPlannerServicesApp dpApp = (DroidPlannerServicesApp) getApplication();
-        dpApp.createFileStartLogging();
+        //TODO: Figure out how to reenable crashlytics and timber logging from the library
+//        if(BuildConfig.ENABLE_CRASHLYTICS) {
+//            Fabric.with(this, new Crashlytics());
+//        }
+//
+//        if (BuildConfig.WRITE_LOG_FILE) {
+//            logToFileTree = new LogToFileTree();
+//            Timber.plant(logToFileTree);
+//        } else if (BuildConfig.DEBUG) {
+//            Timber.plant(new Timber.DebugTree());
+//        }
+//
+        GAUtils.initGATracker(getApplication());
+        GAUtils.startNewSession(null);
+
+        createFileStartLogging();
 
         Timber.d("Creating 3DR Services.");
 
@@ -221,6 +241,18 @@ public class DroidPlannerService extends Service {
         updateForegroundNotification();
     }
 
+    private void createFileStartLogging() {
+        if (logToFileTree != null) {
+            logToFileTree.createFileStartLogging(getApplicationContext());
+        }
+    }
+
+    private void closeLogFile() {
+        if(logToFileTree != null) {
+            logToFileTree.stopLoggingThread();
+        }
+    }
+
     @SuppressLint("NewApi")
     private void updateForegroundNotification() {
         final Context context = getApplicationContext();
@@ -229,9 +261,9 @@ public class DroidPlannerService extends Service {
         final NotificationCompat.Builder notifBuilder = new NotificationCompat.Builder(context)
                 .setContentTitle("3DR Services")
                 .setPriority(NotificationCompat.PRIORITY_MIN)
-                .setSmallIcon(R.drawable.ic_stat_notify)
-                .setContentIntent(PendingIntent.getActivity(context, 0, new Intent(context,
-                        MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK), 0));
+                .setSmallIcon(R.drawable.ic_stat_notify);
+//                .setContentIntent(PendingIntent.getActivity(context, 0, new Intent(context,
+//                        MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK), 0));
 
         final int connectedCount = droneApiStore.size();
         if (connectedCount > 0) {
@@ -265,8 +297,7 @@ public class DroidPlannerService extends Service {
 
         stopForeground(true);
 
-        final DroidPlannerServicesApp dpApp = (DroidPlannerServicesApp) getApplication();
-        dpApp.closeLogFile();
+        closeLogFile();
     }
 
     @Override
