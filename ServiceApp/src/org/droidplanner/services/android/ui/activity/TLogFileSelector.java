@@ -13,7 +13,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import org.droidplanner.services.android.lib.data.ServiceDataContract;
+import com.o3dr.services.android.lib.data.ServiceDataContract;
 
 import org.droidplanner.services.android.R;
 import org.droidplanner.services.android.utils.file.FileUtils;

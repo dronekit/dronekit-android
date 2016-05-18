@@ -1,8 +1,8 @@
 package org.droidplanner.services.android.core.drone.autopilot.apm.solo.controller;
 
-import org.droidplanner.services.android.lib.drone.companion.solo.button.ButtonPacket;
-import org.droidplanner.services.android.lib.drone.companion.solo.controller.SoloControllerUnits;
-import org.droidplanner.services.android.lib.drone.companion.solo.tlv.TLVPacket;
+import com.o3dr.services.android.lib.drone.companion.solo.button.ButtonPacket;
+import com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerUnits;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
 
 import org.droidplanner.services.android.core.drone.autopilot.apm.solo.AbstractLinkManager;
 

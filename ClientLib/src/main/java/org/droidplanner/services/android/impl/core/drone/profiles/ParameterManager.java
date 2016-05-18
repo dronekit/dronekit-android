@@ -14,7 +14,7 @@ import org.droidplanner.services.android.impl.core.drone.DroneInterfaces.DroneEv
 import org.droidplanner.services.android.impl.core.drone.DroneInterfaces.OnDroneListener;
 import org.droidplanner.services.android.impl.core.drone.DroneVariable;
 import org.droidplanner.services.android.impl.core.drone.autopilot.MavLinkDrone;
-import org.droidplanner.services.android.lib.drone.property.Parameter;
+import com.o3dr.services.android.lib.drone.property.Parameter;
 import org.droidplanner.services.android.impl.utils.file.IO.ParameterMetadataLoader;
 
 import java.util.Locale;

@@ -5,7 +5,7 @@ import com.MAVLink.common.msg_raw_imu;
 import org.droidplanner.services.android.impl.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.services.android.impl.core.drone.DroneVariable;
 import org.droidplanner.services.android.impl.core.drone.autopilot.MavLinkDrone;
-import org.droidplanner.services.android.lib.drone.property.Parameter;
+import com.o3dr.services.android.lib.drone.property.Parameter;
 
 public class Magnetometer extends DroneVariable {
 

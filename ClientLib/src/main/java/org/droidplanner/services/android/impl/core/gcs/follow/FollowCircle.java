@@ -5,8 +5,8 @@ import android.os.Handler;
 import org.droidplanner.services.android.impl.core.drone.manager.MavLinkDroneManager;
 import org.droidplanner.services.android.impl.core.gcs.location.Location;
 import org.droidplanner.services.android.impl.core.helpers.geoTools.GeoTools;
-import org.droidplanner.services.android.lib.coordinate.LatLong;
-import org.droidplanner.services.android.lib.util.MathUtils;
+import com.o3dr.services.android.lib.coordinate.LatLong;
+import com.o3dr.services.android.lib.util.MathUtils;
 
 public class FollowCircle extends FollowWithRadiusAlgorithm {
     /**

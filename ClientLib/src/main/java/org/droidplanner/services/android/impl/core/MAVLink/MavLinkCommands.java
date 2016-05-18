@@ -12,7 +12,7 @@ import com.MAVLink.enums.MAV_GOTO;
 
 import org.droidplanner.services.android.impl.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.impl.core.drone.variables.ApmModes;
-import org.droidplanner.services.android.lib.model.ICommandListener;
+import com.o3dr.services.android.lib.model.ICommandListener;
 
 public class MavLinkCommands {
 

@@ -9,10 +9,10 @@ import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Logger;
 import com.google.android.gms.analytics.Tracker;
 
-import org.droidplanner.android.client.BuildConfig;
-import org.droidplanner.android.client.R;
+import com.o3dr.android.client.BuildConfig;
+import com.o3dr.android.client.R;
 import org.droidplanner.services.android.impl.utils.prefs.DroidPlannerPrefs;
-import org.droidplanner.services.android.lib.drone.connection.DroneSharePrefs;
+import com.o3dr.services.android.lib.drone.connection.DroneSharePrefs;
 
 import java.util.Map;
 

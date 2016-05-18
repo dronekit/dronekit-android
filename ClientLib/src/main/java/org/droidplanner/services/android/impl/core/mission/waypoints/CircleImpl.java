@@ -7,7 +7,7 @@ import com.MAVLink.enums.MAV_FRAME;
 import org.droidplanner.services.android.impl.core.mission.Mission;
 import org.droidplanner.services.android.impl.core.mission.MissionItemImpl;
 import org.droidplanner.services.android.impl.core.mission.MissionItemType;
-import org.droidplanner.services.android.lib.coordinate.LatLongAlt;
+import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -14,9 +14,9 @@ import org.droidplanner.services.android.impl.core.drone.DroneVariable;
 import org.droidplanner.services.android.impl.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.impl.core.drone.autopilot.generic.GenericMavLinkDrone;
 import org.droidplanner.services.android.impl.core.model.AutopilotWarningParser;
-import org.droidplanner.services.android.lib.drone.attribute.error.CommandExecutionError;
-import org.droidplanner.services.android.lib.model.ICommandListener;
-import org.droidplanner.services.android.lib.model.action.Action;
+import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
+import com.o3dr.services.android.lib.model.ICommandListener;
+import com.o3dr.services.android.lib.model.action.Action;
 
 import timber.log.Timber;
 

@@ -11,11 +11,11 @@ import org.droidplanner.services.android.core.survey.Footprint;
 
 import com.MAVLink.ardupilotmega.msg_camera_feedback;
 import com.MAVLink.ardupilotmega.msg_mount_status;
-import org.droidplanner.services.android.lib.coordinate.LatLong;
-import org.droidplanner.services.android.lib.drone.attribute.AttributeType;
-import org.droidplanner.services.android.lib.drone.property.Altitude;
-import org.droidplanner.services.android.lib.drone.property.Attitude;
-import org.droidplanner.services.android.lib.drone.property.Gps;
+import com.o3dr.services.android.lib.coordinate.LatLong;
+import com.o3dr.services.android.lib.drone.attribute.AttributeType;
+import com.o3dr.services.android.lib.drone.property.Altitude;
+import com.o3dr.services.android.lib.drone.property.Attitude;
+import com.o3dr.services.android.lib.drone.property.Gps;
 
 public class Camera extends DroneVariable {
 	private CameraInfo camera = new CameraInfo();

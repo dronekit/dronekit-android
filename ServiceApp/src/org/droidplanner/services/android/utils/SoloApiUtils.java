@@ -3,13 +3,13 @@ package org.droidplanner.services.android.utils;
 import android.os.RemoteException;
 import android.util.Pair;
 
-import org.droidplanner.services.android.lib.drone.attribute.error.CommandExecutionError;
-import org.droidplanner.services.android.lib.drone.companion.solo.controller.SoloControllerMode;
-import org.droidplanner.services.android.lib.drone.companion.solo.SoloState;
-import org.droidplanner.services.android.lib.drone.companion.solo.controller.SoloControllerUnits;
-import org.droidplanner.services.android.lib.drone.companion.solo.tlv.SoloButtonSettingSetter;
-import org.droidplanner.services.android.lib.drone.companion.solo.tlv.TLVPacket;
-import org.droidplanner.services.android.lib.model.ICommandListener;
+import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
+import com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerMode;
+import com.o3dr.services.android.lib.drone.companion.solo.SoloState;
+import com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerUnits;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSettingSetter;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
+import com.o3dr.services.android.lib.model.ICommandListener;
 
 import org.droidplanner.services.android.core.drone.autopilot.Drone;
 import org.droidplanner.services.android.core.drone.autopilot.apm.solo.ArduSolo;

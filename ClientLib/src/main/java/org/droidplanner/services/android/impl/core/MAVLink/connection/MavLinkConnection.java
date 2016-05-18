@@ -7,7 +7,7 @@ import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Parser;
 
 import org.droidplanner.services.android.impl.core.model.Logger;
-import org.droidplanner.services.android.lib.gcs.link.LinkConnectionStatus;
+import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
 
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;

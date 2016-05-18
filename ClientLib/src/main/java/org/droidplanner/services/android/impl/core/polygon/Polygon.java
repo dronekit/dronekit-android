@@ -3,7 +3,7 @@ package org.droidplanner.services.android.impl.core.polygon;
 import org.droidplanner.services.android.impl.core.helpers.geoTools.GeoTools;
 import org.droidplanner.services.android.impl.core.helpers.geoTools.LineLatLong;
 import org.droidplanner.services.android.impl.core.helpers.units.Area;
-import org.droidplanner.services.android.lib.coordinate.LatLong;
+import com.o3dr.services.android.lib.coordinate.LatLong;
 
 import java.util.ArrayList;
 import java.util.Collections;

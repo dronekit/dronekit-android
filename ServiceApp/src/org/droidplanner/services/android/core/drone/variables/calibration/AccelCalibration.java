@@ -5,8 +5,8 @@ import android.os.RemoteException;
 
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.common.msg_statustext;
-import org.droidplanner.services.android.lib.model.ICommandListener;
-import org.droidplanner.services.android.lib.model.SimpleCommandListener;
+import com.o3dr.services.android.lib.model.ICommandListener;
+import com.o3dr.services.android.lib.model.SimpleCommandListener;
 
 import org.droidplanner.services.android.core.MAVLink.MavLinkCalibration;
 import org.droidplanner.services.android.core.drone.DroneInterfaces;

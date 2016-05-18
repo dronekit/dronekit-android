@@ -12,8 +12,8 @@ import org.droidplanner.services.android.impl.core.polygon.Polygon;
 import org.droidplanner.services.android.impl.core.survey.CameraInfo;
 import org.droidplanner.services.android.impl.core.survey.SurveyData;
 import org.droidplanner.services.android.impl.core.survey.grid.GridBuilder;
-import org.droidplanner.services.android.lib.coordinate.LatLong;
-import org.droidplanner.services.android.lib.coordinate.LatLongAlt;
+import com.o3dr.services.android.lib.coordinate.LatLong;
+import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 
 import java.util.ArrayList;
 import java.util.List;

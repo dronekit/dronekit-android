@@ -1,9 +1,9 @@
 package org.droidplanner.services.android.impl.core.drone.autopilot;
 
 import org.droidplanner.services.android.impl.core.drone.DroneInterfaces;
-import org.droidplanner.services.android.lib.drone.property.DroneAttribute;
-import org.droidplanner.services.android.lib.model.ICommandListener;
-import org.droidplanner.services.android.lib.model.action.Action;
+import com.o3dr.services.android.lib.drone.property.DroneAttribute;
+import com.o3dr.services.android.lib.model.ICommandListener;
+import com.o3dr.services.android.lib.model.action.Action;
 
 /**
  * Created by Fredia Huya-Kouadio on 7/27/15.

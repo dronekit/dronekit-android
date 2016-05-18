@@ -42,25 +42,25 @@ import org.droidplanner.services.android.impl.core.drone.variables.calibration.A
 import org.droidplanner.services.android.impl.core.drone.variables.calibration.MagnetometerCalibrationImpl;
 import org.droidplanner.services.android.impl.core.mission.Mission;
 import org.droidplanner.services.android.impl.core.model.AutopilotWarningParser;
-import org.droidplanner.services.android.lib.coordinate.LatLong;
-import org.droidplanner.services.android.lib.coordinate.LatLongAlt;
-import org.droidplanner.services.android.lib.drone.action.ControlActions;
-import org.droidplanner.services.android.lib.drone.action.ExperimentalActions;
-import org.droidplanner.services.android.lib.drone.action.GimbalActions;
-import org.droidplanner.services.android.lib.drone.action.ParameterActions;
-import org.droidplanner.services.android.lib.drone.action.StateActions;
-import org.droidplanner.services.android.lib.drone.attribute.AttributeEvent;
-import org.droidplanner.services.android.lib.drone.attribute.AttributeEventExtra;
-import org.droidplanner.services.android.lib.drone.attribute.AttributeType;
-import org.droidplanner.services.android.lib.drone.attribute.error.CommandExecutionError;
-import org.droidplanner.services.android.lib.drone.mission.action.MissionActions;
-import org.droidplanner.services.android.lib.drone.property.DroneAttribute;
-import org.droidplanner.services.android.lib.drone.property.Parameter;
-import org.droidplanner.services.android.lib.drone.property.VehicleMode;
-import org.droidplanner.services.android.lib.gcs.action.CalibrationActions;
-import org.droidplanner.services.android.lib.model.AbstractCommandListener;
-import org.droidplanner.services.android.lib.model.ICommandListener;
-import org.droidplanner.services.android.lib.model.action.Action;
+import com.o3dr.services.android.lib.coordinate.LatLong;
+import com.o3dr.services.android.lib.coordinate.LatLongAlt;
+import com.o3dr.services.android.lib.drone.action.ControlActions;
+import com.o3dr.services.android.lib.drone.action.ExperimentalActions;
+import com.o3dr.services.android.lib.drone.action.GimbalActions;
+import com.o3dr.services.android.lib.drone.action.ParameterActions;
+import com.o3dr.services.android.lib.drone.action.StateActions;
+import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
+import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
+import com.o3dr.services.android.lib.drone.attribute.AttributeType;
+import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
+import com.o3dr.services.android.lib.drone.mission.action.MissionActions;
+import com.o3dr.services.android.lib.drone.property.DroneAttribute;
+import com.o3dr.services.android.lib.drone.property.Parameter;
+import com.o3dr.services.android.lib.drone.property.VehicleMode;
+import com.o3dr.services.android.lib.gcs.action.CalibrationActions;
+import com.o3dr.services.android.lib.model.AbstractCommandListener;
+import com.o3dr.services.android.lib.model.ICommandListener;
+import com.o3dr.services.android.lib.model.action.Action;
 import org.droidplanner.services.android.impl.utils.CommonApiUtils;
 
 import java.util.regex.Matcher;
@@ -190,8 +190,8 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
                 return true;
 
             case MissionActions.ACTION_SET_MISSION:
-                data.setClassLoader(org.droidplanner.services.android.lib.drone.mission.Mission.class.getClassLoader());
-                org.droidplanner.services.android.lib.drone.mission.Mission mission = data.getParcelable(MissionActions.EXTRA_MISSION);
+                data.setClassLoader(com.o3dr.services.android.lib.drone.mission.Mission.class.getClassLoader());
+                com.o3dr.services.android.lib.drone.mission.Mission mission = data.getParcelable(MissionActions.EXTRA_MISSION);
                 boolean pushToDrone = data.getBoolean(MissionActions.EXTRA_PUSH_TO_DRONE);
                 CommonApiUtils.setMission(this, mission, pushToDrone);
                 return true;
@@ -257,8 +257,8 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
                 return true;
 
             case ParameterActions.ACTION_WRITE_PARAMETERS:
-                data.setClassLoader(org.droidplanner.services.android.lib.drone.property.Parameters.class.getClassLoader());
-                org.droidplanner.services.android.lib.drone.property.Parameters parameters = data.getParcelable(ParameterActions.EXTRA_PARAMETERS);
+                data.setClassLoader(com.o3dr.services.android.lib.drone.property.Parameters.class.getClassLoader());
+                com.o3dr.services.android.lib.drone.property.Parameters parameters = data.getParcelable(ParameterActions.EXTRA_PARAMETERS);
                 CommonApiUtils.writeParameters(this, parameters);
                 return true;
 

@@ -13,10 +13,10 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
-import org.droidplanner.services.android.lib.drone.connection.ConnectionParameter;
-import org.droidplanner.services.android.lib.drone.mission.item.complex.CameraDetail;
-import org.droidplanner.services.android.lib.model.IApiListener;
-import org.droidplanner.services.android.lib.model.IDroidPlannerServices;
+import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
+import com.o3dr.services.android.lib.drone.mission.item.complex.CameraDetail;
+import com.o3dr.services.android.lib.model.IApiListener;
+import com.o3dr.services.android.lib.model.IDroidPlannerServices;
 
 import org.droidplanner.services.android.DroidPlannerServicesApp;
 import org.droidplanner.services.android.R;

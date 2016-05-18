@@ -28,13 +28,13 @@ import org.droidplanner.services.android.impl.core.mission.waypoints.RegionOfInt
 import org.droidplanner.services.android.impl.core.mission.waypoints.SpatialCoordItem;
 import org.droidplanner.services.android.impl.core.mission.waypoints.SplineWaypointImpl;
 import org.droidplanner.services.android.impl.core.mission.waypoints.WaypointImpl;
-import org.droidplanner.services.android.lib.coordinate.LatLong;
-import org.droidplanner.services.android.lib.coordinate.LatLongAlt;
-import org.droidplanner.services.android.lib.drone.attribute.AttributeType;
-import org.droidplanner.services.android.lib.drone.property.Attitude;
-import org.droidplanner.services.android.lib.drone.property.Gps;
-import org.droidplanner.services.android.lib.drone.property.Home;
-import org.droidplanner.services.android.lib.drone.property.Parameter;
+import com.o3dr.services.android.lib.coordinate.LatLong;
+import com.o3dr.services.android.lib.coordinate.LatLongAlt;
+import com.o3dr.services.android.lib.drone.attribute.AttributeType;
+import com.o3dr.services.android.lib.drone.property.Attitude;
+import com.o3dr.services.android.lib.drone.property.Gps;
+import com.o3dr.services.android.lib.drone.property.Home;
+import com.o3dr.services.android.lib.drone.property.Parameter;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="org.droidplanner.android.client">
+          package="com.o3dr.android.client">
 
     <uses-permission android:name="android.permission.INTERNET"/>
 
@@ -43,7 +43,7 @@
             android:value="5ee4471ba6e8cd8858006c8166469bba33d64b2f" />
 
         <activity
-            android:name="org.droidplanner.android.client.utils.InstallServiceDialog"
+            android:name="com.o3dr.android.client.utils.InstallServiceDialog"
             android:theme="@android:style/Theme.Holo.Light.Dialog.NoActionBar.MinWidth"
             android:noHistory="true"
             android:excludeFromRecents="true"
@@ -101,19 +101,12 @@
 
             <!-- Filter and meta data for the Tower lib runtime -->
             <intent-filter>
-                <action android:name="org.droidplanner.services.android.lib.model.IDroidPlannerServices" />
-            </intent-filter>
-            <meta-data
-                android:name="org.droidplanner.services.android.lib.version"
-                android:value="@integer/tower_lib_version"/>
-
-            <!-- Filter and meta data for the deprecated 3DR Services runtime for compatibility -->
-            <intent-filter>
                 <action android:name="com.o3dr.services.android.lib.model.IDroidPlannerServices" />
             </intent-filter>
+
             <meta-data
                 android:name="com.o3dr.dronekit.android.core.version"
-                android:value="@integer/deprecated_lib_version" />
+                android:value="@integer/core_lib_version" />
         </service>
 
     </application>

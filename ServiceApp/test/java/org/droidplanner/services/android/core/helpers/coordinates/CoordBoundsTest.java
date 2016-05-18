@@ -1,6 +1,6 @@
 package org.droidplanner.services.android.core.helpers.coordinates;
 
-import org.droidplanner.services.android.lib.coordinate.LatLong;
+import com.o3dr.services.android.lib.coordinate.LatLong;
 
 import junit.framework.TestCase;
 

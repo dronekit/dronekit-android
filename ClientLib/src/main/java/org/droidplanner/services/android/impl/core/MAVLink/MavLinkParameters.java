@@ -5,7 +5,7 @@ import com.MAVLink.common.msg_param_request_read;
 import com.MAVLink.common.msg_param_set;
 
 import org.droidplanner.services.android.impl.core.drone.autopilot.MavLinkDrone;
-import org.droidplanner.services.android.lib.drone.property.Parameter;
+import com.o3dr.services.android.lib.drone.property.Parameter;
 
 public class MavLinkParameters {
 	public static void requestParametersList(MavLinkDrone drone) {

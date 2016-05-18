@@ -11,9 +11,9 @@ import org.droidplanner.services.android.impl.core.drone.variables.State;
 import org.droidplanner.services.android.impl.core.gcs.location.Location;
 import org.droidplanner.services.android.impl.core.gcs.location.Location.LocationFinder;
 import org.droidplanner.services.android.impl.core.gcs.location.Location.LocationReceiver;
-import org.droidplanner.services.android.lib.drone.action.ControlActions;
-import org.droidplanner.services.android.lib.drone.attribute.AttributeEvent;
-import org.droidplanner.services.android.lib.model.action.Action;
+import com.o3dr.services.android.lib.drone.action.ControlActions;
+import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
+import com.o3dr.services.android.lib.model.action.Action;
 
 public class Follow implements OnDroneListener<MavLinkDrone>, LocationReceiver {
 

@@ -2,7 +2,7 @@ package org.droidplanner.services.android.core.mission.waypoints;
 
 import com.MAVLink.common.msg_mission_item;
 import com.MAVLink.enums.MAV_FRAME;
-import org.droidplanner.services.android.lib.coordinate.LatLongAlt;
+import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 
 import junit.framework.TestCase;
 

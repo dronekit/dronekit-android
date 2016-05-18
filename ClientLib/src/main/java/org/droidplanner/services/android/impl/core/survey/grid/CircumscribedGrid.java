@@ -3,7 +3,7 @@ package org.droidplanner.services.android.impl.core.survey.grid;
 import org.droidplanner.services.android.impl.core.helpers.coordinates.CoordBounds;
 import org.droidplanner.services.android.impl.core.helpers.geoTools.GeoTools;
 import org.droidplanner.services.android.impl.core.helpers.geoTools.LineLatLong;
-import org.droidplanner.services.android.lib.coordinate.LatLong;
+import com.o3dr.services.android.lib.coordinate.LatLong;
 
 import java.util.ArrayList;
 import java.util.List;

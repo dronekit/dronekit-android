@@ -1,7 +1,7 @@
 package org.droidplanner.services.android.core.survey;
 
 import com.MAVLink.ardupilotmega.msg_camera_feedback;
-import org.droidplanner.services.android.lib.coordinate.LatLong;
+import com.o3dr.services.android.lib.coordinate.LatLong;
 
 import junit.framework.TestCase;
 

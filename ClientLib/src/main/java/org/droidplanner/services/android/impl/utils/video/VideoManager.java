@@ -8,14 +8,14 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.Surface;
 
-import org.droidplanner.android.client.utils.connection.AbstractIpConnection;
-import org.droidplanner.android.client.utils.connection.IpConnectionListener;
-import org.droidplanner.android.client.utils.connection.UdpConnection;
-import org.droidplanner.android.client.utils.video.DecoderListener;
-import org.droidplanner.android.client.utils.video.MediaCodecManager;
-import org.droidplanner.services.android.lib.drone.action.CameraActions;
-import org.droidplanner.services.android.lib.drone.attribute.error.CommandExecutionError;
-import org.droidplanner.services.android.lib.model.ICommandListener;
+import com.o3dr.android.client.utils.connection.AbstractIpConnection;
+import com.o3dr.android.client.utils.connection.IpConnectionListener;
+import com.o3dr.android.client.utils.connection.UdpConnection;
+import com.o3dr.android.client.utils.video.DecoderListener;
+import com.o3dr.android.client.utils.video.MediaCodecManager;
+import com.o3dr.services.android.lib.drone.action.CameraActions;
+import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
+import com.o3dr.services.android.lib.model.ICommandListener;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

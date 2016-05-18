@@ -20,10 +20,10 @@ import org.droidplanner.services.android.impl.core.MAVLink.connection.MavLinkCon
 import org.droidplanner.services.android.impl.core.MAVLink.connection.MavLinkConnectionTypes;
 import org.droidplanner.services.android.impl.core.drone.manager.DroneCommandTracker;
 import org.droidplanner.services.android.impl.data.SessionDB;
-import org.droidplanner.services.android.lib.drone.connection.ConnectionParameter;
-import org.droidplanner.services.android.lib.drone.connection.ConnectionType;
-import org.droidplanner.services.android.lib.gcs.link.LinkConnectionStatus;
-import org.droidplanner.services.android.lib.model.ICommandListener;
+import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
+import com.o3dr.services.android.lib.drone.connection.ConnectionType;
+import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
+import com.o3dr.services.android.lib.model.ICommandListener;
 import org.droidplanner.services.android.impl.utils.analytics.GAUtils;
 import org.droidplanner.services.android.impl.utils.connection.WifiConnectionHandler;
 import org.droidplanner.services.android.impl.utils.file.DirectoryPath;

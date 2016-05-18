@@ -4,14 +4,14 @@ import android.os.Bundle;
 import android.os.RemoteException;
 import android.util.Log;
 
-import org.droidplanner.android.client.BuildConfig;
+import com.o3dr.android.client.BuildConfig;
 import org.droidplanner.services.android.impl.core.drone.DroneManager;
-import org.droidplanner.services.android.lib.drone.connection.ConnectionParameter;
-import org.droidplanner.services.android.lib.gcs.event.GCSEvent;
-import org.droidplanner.services.android.lib.model.IApiListener;
-import org.droidplanner.services.android.lib.model.IDroidPlannerServices;
-import org.droidplanner.services.android.lib.model.IDroneApi;
-import org.droidplanner.services.android.lib.util.version.VersionUtils;
+import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
+import com.o3dr.services.android.lib.gcs.event.GCSEvent;
+import com.o3dr.services.android.lib.model.IApiListener;
+import com.o3dr.services.android.lib.model.IDroidPlannerServices;
+import com.o3dr.services.android.lib.model.IDroneApi;
+import com.o3dr.services.android.lib.util.version.VersionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +40,7 @@ final class DPServices extends IDroidPlannerServices.Stub {
 
     @Override
     public int getApiVersionCode() throws RemoteException {
-        return VersionUtils.getDeprecatedLibVersion(serviceRef.getApplicationContext());
+        return VersionUtils.getCoreLibVersion(serviceRef.getApplicationContext());
     }
 
     @Override

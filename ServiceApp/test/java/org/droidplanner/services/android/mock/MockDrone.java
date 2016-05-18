@@ -3,9 +3,9 @@ package org.droidplanner.services.android.mock;
 import android.content.Context;
 import android.os.Parcelable;
 
-import org.droidplanner.android.client.Drone;
-import org.droidplanner.services.android.lib.drone.property.DroneAttribute;
-import org.droidplanner.services.android.lib.model.action.Action;
+import com.o3dr.android.client.Drone;
+import com.o3dr.services.android.lib.drone.property.DroneAttribute;
+import com.o3dr.services.android.lib.model.action.Action;
 
 import java.util.HashMap;
 

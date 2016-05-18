@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
-import org.droidplanner.android.client.R;
+import com.o3dr.android.client.R;
 
 
 /**

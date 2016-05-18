@@ -4,7 +4,7 @@ import android.content.Context;
 
 import org.droidplanner.services.android.impl.core.MAVLink.connection.TcpConnection;
 import org.droidplanner.services.android.impl.core.model.Logger;
-import org.droidplanner.services.android.lib.gcs.link.LinkConnectionStatus;
+import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
 import org.droidplanner.services.android.impl.utils.connection.WifiConnectionHandler;
 
 import java.io.IOException;

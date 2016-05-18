@@ -8,7 +8,7 @@ import android.util.Log;
 import org.droidplanner.services.android.impl.communication.connection.AndroidMavLinkConnection;
 import org.droidplanner.services.android.impl.core.MAVLink.connection.MavLinkConnectionTypes;
 import org.droidplanner.services.android.impl.core.model.Logger;
-import org.droidplanner.services.android.lib.gcs.link.LinkConnectionStatus;
+import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
 import org.droidplanner.services.android.impl.utils.AndroidLogger;
 
 import java.io.IOException;

@@ -6,8 +6,8 @@ import org.droidplanner.services.android.impl.core.MAVLink.command.doCmd.MavLink
 import org.droidplanner.services.android.impl.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.impl.core.drone.manager.MavLinkDroneManager;
 import org.droidplanner.services.android.impl.core.gcs.roi.ROIEstimator;
-import org.droidplanner.services.android.lib.coordinate.LatLong;
-import org.droidplanner.services.android.lib.coordinate.LatLongAlt;
+import com.o3dr.services.android.lib.coordinate.LatLong;
+import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -18,7 +18,7 @@ import org.droidplanner.services.android.impl.core.mission.waypoints.RegionOfInt
 import org.droidplanner.services.android.impl.core.mission.waypoints.SplineWaypointImpl;
 import org.droidplanner.services.android.impl.core.mission.waypoints.StructureScannerImpl;
 import org.droidplanner.services.android.impl.core.mission.waypoints.WaypointImpl;
-import org.droidplanner.services.android.lib.coordinate.LatLong;
+import com.o3dr.services.android.lib.coordinate.LatLong;
 
 import java.util.Collections;
 

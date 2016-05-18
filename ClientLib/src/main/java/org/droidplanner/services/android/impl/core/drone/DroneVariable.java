@@ -4,7 +4,7 @@ import android.os.Handler;
 import android.os.RemoteException;
 
 import org.droidplanner.services.android.impl.core.drone.autopilot.MavLinkDrone;
-import org.droidplanner.services.android.lib.model.ICommandListener;
+import com.o3dr.services.android.lib.model.ICommandListener;
 
 import timber.log.Timber;
 

@@ -2,9 +2,9 @@ package org.droidplanner.services.android.core.gcs.follow;
 
 import android.os.Handler;
 
-import org.droidplanner.services.android.lib.drone.action.ControlActions;
-import org.droidplanner.services.android.lib.drone.attribute.AttributeEvent;
-import org.droidplanner.services.android.lib.model.action.Action;
+import com.o3dr.services.android.lib.drone.action.ControlActions;
+import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
+import com.o3dr.services.android.lib.model.action.Action;
 
 import org.droidplanner.services.android.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.services.android.core.drone.DroneInterfaces.OnDroneListener;

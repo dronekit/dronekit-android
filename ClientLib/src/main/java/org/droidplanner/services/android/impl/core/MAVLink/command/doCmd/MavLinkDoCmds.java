@@ -8,8 +8,8 @@ import com.MAVLink.enums.GRIPPER_ACTIONS;
 import com.MAVLink.enums.MAV_CMD;
 
 import org.droidplanner.services.android.impl.core.drone.autopilot.MavLinkDrone;
-import org.droidplanner.services.android.lib.coordinate.LatLongAlt;
-import org.droidplanner.services.android.lib.model.ICommandListener;
+import com.o3dr.services.android.lib.coordinate.LatLongAlt;
+import com.o3dr.services.android.lib.model.ICommandListener;
 
 public class MavLinkDoCmds {
 
