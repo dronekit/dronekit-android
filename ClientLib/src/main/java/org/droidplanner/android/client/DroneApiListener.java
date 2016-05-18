@@ -29,6 +29,6 @@ public class DroneApiListener extends IApiListener.Stub {
 
     @Override
     public int getApiVersionCode(){
-        return VersionUtils.getCoreLibVersion(drone.getContext());
+        return VersionUtils.getDeprecatedLibVersion(drone.getContext());
     }
 }

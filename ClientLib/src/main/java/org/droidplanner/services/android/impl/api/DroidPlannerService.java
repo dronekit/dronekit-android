@@ -3,8 +3,10 @@ package org.droidplanner.services.android.impl.api;
 import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.Service;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
@@ -298,6 +300,9 @@ public class DroidPlannerService extends Service {
         stopForeground(true);
 
         closeLogFile();
+
+        //Disable this service. It'll be reenabled the next time its local client needs it.
+        enableDroidPlannerService(getApplicationContext(), false);
     }
 
     @Override
@@ -315,6 +320,19 @@ public class DroidPlannerService extends Service {
 
         stopSelf();
         return START_NOT_STICKY;
+    }
+
+    /**
+     * Toggles the DroidPlannerService component
+     * @param context
+     * @param enable
+     */
+    public static void enableDroidPlannerService(Context context, boolean enable){
+        final ComponentName serviceComp = new ComponentName(context, DroidPlannerService.class);
+        final int newState = enable ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED
+                : PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
+
+        context.getPackageManager().setComponentEnabledSetting(serviceComp, newState, PackageManager.DONT_KILL_APP);
     }
 
 }

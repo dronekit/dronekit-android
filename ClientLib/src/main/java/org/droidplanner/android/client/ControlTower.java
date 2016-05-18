@@ -4,14 +4,12 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
 
-import org.droidplanner.android.client.apis.ApiAvailability;
 import org.droidplanner.android.client.interfaces.TowerListener;
 import org.droidplanner.services.android.lib.drone.connection.ConnectionParameter;
 import org.droidplanner.services.android.lib.model.IDroidPlannerServices;
@@ -24,8 +22,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class ControlTower {
 
     private static final String TAG = ControlTower.class.getSimpleName();
-
-    private final Intent serviceIntent = new Intent(IDroidPlannerServices.class.getName());
 
     private final IBinder.DeathRecipient binderDeathRecipient = new IBinder.DeathRecipient() {
         @Override
@@ -134,22 +130,9 @@ public class ControlTower {
         towerListener = listener;
 
         if (!isTowerConnected() && !isServiceConnecting.get()) {
-            final int apiAvailableResult = ApiAvailability.getInstance().checkApiAvailability(context);
-
-            switch(apiAvailableResult){
-                case ApiAvailability.API_AVAILABLE:
-                    final ResolveInfo info = context.getPackageManager().resolveService(serviceIntent, 0);
-                    if (info != null) {
-                        serviceIntent.setClassName(info.serviceInfo.packageName, info.serviceInfo.name);
-                        isServiceConnecting.set(context.bindService(serviceIntent, o3drServicesConnection,
-                                Context.BIND_AUTO_CREATE));
-                    }
-                    break;
-
-                default:
-                    ApiAvailability.getInstance().showErrorDialog(context, apiAvailableResult);
-                    break;
-            }
+            final Intent serviceIntent = ApiAvailability.getInstance().getAvailableServicesInstance(context);
+            isServiceConnecting.set(context.bindService(serviceIntent, o3drServicesConnection,
+                    Context.BIND_AUTO_CREATE));
         }
     }
 

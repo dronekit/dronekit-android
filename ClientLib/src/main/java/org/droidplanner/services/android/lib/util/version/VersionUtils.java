@@ -9,8 +9,17 @@ import org.droidplanner.android.client.R;
  */
 public class VersionUtils {
 
-    public static int getCoreLibVersion(Context context){
-        return context.getResources().getInteger(R.integer.core_lib_version);
+    /**
+     * @deprecated
+     * @param context
+     * @return
+     */
+    public static int getDeprecatedLibVersion(Context context){
+        return context.getResources().getInteger(R.integer.deprecated_lib_version);
+    }
+
+    public static int getTowerLibVersion(Context context){
+        return context.getResources().getInteger(R.integer.tower_lib_version);
     }
 
     //Prevent instantiation.

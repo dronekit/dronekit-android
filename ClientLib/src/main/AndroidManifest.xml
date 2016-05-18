@@ -97,16 +97,23 @@
 
         <service
             android:name="org.droidplanner.services.android.impl.api.DroidPlannerService"
-            android:enabled="true"
-            android:exported="true">
-            <intent-filter>
-                <action
-                    android:name="com.o3dr.services.android.lib.model.IDroidPlannerServices"/>
-            </intent-filter>
+            android:enabled="false">
 
+            <!-- Filter and meta data for the Tower lib runtime -->
+            <intent-filter>
+                <action android:name="org.droidplanner.services.android.lib.model.IDroidPlannerServices" />
+            </intent-filter>
             <meta-data
-                android:name="org.droidplanner.dronekit.android.core.version"
-                android:value="@integer/core_lib_version"/>
+                android:name="org.droidplanner.services.android.lib.version"
+                android:value="@integer/tower_lib_version"/>
+
+            <!-- Filter and meta data for the deprecated 3DR Services runtime for compatibility -->
+            <intent-filter>
+                <action android:name="com.o3dr.services.android.lib.model.IDroidPlannerServices" />
+            </intent-filter>
+            <meta-data
+                android:name="com.o3dr.dronekit.android.core.version"
+                android:value="@integer/deprecated_lib_version" />
         </service>
 
     </application>

@@ -104,7 +104,7 @@
 
         <service
             android:name=".api.DroidPlannerService"
-            android:enabled="true"
+            android:enabled="false"
             android:exported="true">
             <intent-filter>
                 <action
@@ -113,7 +113,7 @@
 
             <meta-data
                 android:name="org.droidplanner.dronekit.android.core.version"
-                android:value="@integer/core_lib_version"/>
+                android:value="@integer/deprecated_lib_version"/>
         </service>
 
         <receiver
