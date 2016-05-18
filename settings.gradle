@@ -6,7 +6,6 @@ include ':UsbSerialLibrary'
 include ':ClientLib'
 
 //Android projects
-include ':ServiceApp'
 include ':StarterApp'
 
 project(':UsbSerialLibrary').projectDir = new File('dependencyLibs/usb-serial-for-android/UsbSerialLibrary')

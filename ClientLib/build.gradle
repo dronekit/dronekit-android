@@ -1,4 +1,6 @@
 apply plugin: 'com.android.library'
+apply plugin: 'io.fabric'
+apply plugin: 'com.getkeepsafe.dexcount'
 
 ext {
     VERSION_MAJOR = 0
@@ -75,9 +77,19 @@ android {
             buildConfigField "boolean", "WRITE_LOG_FILE", "true"
         }
 
+        sitl {
+            debuggable true
+            buildConfigField "String", "SOLO_LINK_IP", getLocalIp()
+            buildConfigField "boolean", "SITL_DEBUG", "true"
+        }
+
         release {
             buildConfigField "boolean", "ENABLE_CRASHLYTICS", "true"
         }
+    }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
     }
 }
 
@@ -103,12 +115,17 @@ dependencies {
     }
 
     debugCompile project(':Mavlink')
+    sitlCompile project(':Mavlink')
     releaseCompile files('libs/Mavlink.jar')
 
     compile files('libs/d2xx.jar')
 
     debugCompile project(':UsbSerialLibrary')
+    sitlCompile project(':UsbSerialLibrary')
     releaseCompile project(':UsbSerialLibrary')
+
+    androidTestCompile 'junit:junit:4.12'
+    androidTestCompile "org.robolectric:robolectric:3.0"
 }
 
 def getSoloLinkIp() {
