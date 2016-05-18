@@ -27,7 +27,7 @@ task androidJavadocs(type: Javadoc) {
 
     source = files
     title = projectDescription
-    exclude '**/*.aidl'
+    exclude '**/*.aidl', 'org/droidplanner/services/android/impl/**'
     classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
     options.links("http://docs.oracle.com/javase/7/docs/api/")
     options.links("https://developer.android.com/reference/packages.html")
@@ -41,6 +41,7 @@ task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs){
 task androidSourcesJar(type: Jar){
     classifier = 'sources'
     from android.sourceSets.main.java.srcDirs
+    exclude 'org/droidplanner/services/android/impl/**'
 }
 
 artifacts {

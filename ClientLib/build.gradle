@@ -123,6 +123,7 @@ def getLocalIp() {
     }
 }
 
+evaluationDependsOn ':Mavlink'
 assemble.dependsOn ':Mavlink:jar'
 
-apply from: "../release_android_library.gradle"
+apply from: "$rootDir/release_android_library.gradle"

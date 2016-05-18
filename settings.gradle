@@ -1,10 +1,13 @@
-//Android projects
-include ':ServiceApp', ':StarterApp'
-include ':ClientLib'
-
 //Library projects
 include ':Mavlink'
 include ':UsbSerialLibrary'
+
+//Android library projects
+include ':ClientLib'
+
+//Android projects
+include ':ServiceApp'
+include ':StarterApp'
 
 project(':UsbSerialLibrary').projectDir = new File('dependencyLibs/usb-serial-for-android/UsbSerialLibrary')
 project(':Mavlink').projectDir = new File('dependencyLibs/Mavlink')
