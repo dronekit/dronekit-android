@@ -2,7 +2,7 @@ apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
 
 def publishFlag = false
-def projectGroupId = 'com.o3dr.android'
+def projectGroupId = 'org.droidplanner.android'
 def projectArtifactId = project.PUBLISH_ARTIFACT_ID
 def projectVersion = project.PUBLISH_VERSION
 def projectDescription = project.PROJECT_DESCRIPTION
@@ -78,12 +78,12 @@ bintray {
     publish = publishFlag //If version should be auto published after an upload
 
     pkg {
-        userOrg = getMavenOrg()
         repo = getMavenRepo()
         name = projectArtifactId
         desc = projectDescription
-        websiteUrl = 'http://android.dronekit.io/'
-        issueTrackerUrl = 'https://github.com/DroidPlanner/DroneKit-Android/issues'
+        //TODO: replace the values below
+//        websiteUrl = 'http://android.dronekit.io/'
+//        issueTrackerUrl = 'https://github.com/DroidPlanner/DroneKit-Android/issues'
         vcsUrl = 'https://github.com/DroidPlanner/DroneKit-Android.git'
         licenses = projectLicenses
         labels = projectLabels
@@ -97,19 +97,3 @@ bintray {
 }
 
 bintrayUpload.dependsOn(publishToMavenLocal)
-
-def getMavenOrg(){
-    return hasProperty('COM_O3DR_MAVEN_ORG') ? COM_O3DR_MAVEN_ORG : ''
-}
-
-def getMavenUsername(){
-    return hasProperty('COM_O3DR_MAVEN_USERNAME') ? COM_O3DR_MAVEN_USERNAME : ''
-}
-
-def getMavenApiKey(){
-    return hasProperty('COM_O3DR_MAVEN_APIKEY') ? COM_O3DR_MAVEN_APIKEY : ''
-}
-
-def getMavenRepo(){
-    return hasProperty('COM_O3DR_MAVEN_REPO') ? COM_O3DR_MAVEN_REPO : ''
-}

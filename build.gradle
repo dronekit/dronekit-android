@@ -73,6 +73,22 @@ def getGitShortHash(){
     }
 }
 
+def getMavenUsername(){
+    return hasProperty('DROIDPLANNER_MAVEN_USERNAME') ? DROIDPLANNER_MAVEN_USERNAME : ''
+}
+
+def getMavenApiKey(){
+    return hasProperty('DROIDPLANNER_MAVEN_APIKEY') ? DROIDPLANNER_MAVEN_APIKEY : ''
+}
+
+def getMavenRepo(){
+    return hasProperty('DROIDPLANNER_MAVEN_REPO') ? DROIDPLANNER_MAVEN_REPO : ''
+}
+
+def getMavenRepoUrl(){
+    return hasProperty('DROIDPLANNER_MAVEN_REPO_URL') ? DROIDPLANNER_MAVEN_REPO_URL : ''
+}
+
 /**
  * Improve build server performance by allowing disabling of pre-dexing
  * (see http://tools.android.com/tech-docs/new-build-system/tips#TOC-Improving-Build-Server-performance.)
@@ -94,5 +110,13 @@ allprojects {
     repositories {
         jcenter()
         maven { url 'https://maven.fabric.io/public' }
+
+        maven {
+            url getMavenRepoUrl()
+            credentials {
+                username getMavenUsername()
+                password getMavenApiKey()
+            }
+        }
     }
 }

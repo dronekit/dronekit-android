@@ -28,6 +28,10 @@ android {
     compileSdkVersion android_build_sdk_version
     buildToolsVersion android_build_tools_version
 
+    dexOptions {
+        javaMaxHeapSize "2g"
+    }
+
     defaultConfig {
         minSdkVersion android_build_min_sdk_version
         targetSdkVersion android_build_target_sdk_version
@@ -143,4 +147,4 @@ def getLocalIp() {
 evaluationDependsOn ':Mavlink'
 assemble.dependsOn ':Mavlink:jar'
 
-apply from: "$rootDir/release_android_library.gradle"
+apply from: "$projectDir/release_android_library.gradle"
