@@ -6,14 +6,16 @@ ext {
     VERSION_MAJOR = 0
     VERSION_MINOR = 0
     VERSION_PATCH = 0
-    VERSION_SUFFIX = "alpha1"
+    VERSION_SUFFIX = "alpha4"
 
     PUBLISH_ARTIFACT_ID = 'tower-lib'
     PUBLISH_VERSION = generateVersionName("", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH, VERSION_SUFFIX)
     PUBLISH_VERSION_CODE = computeVersionCode(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH)
-    PROJECT_DESCRIPTION = "Tower Library."
+    PROJECT_DESCRIPTION = "Tower Library"
     PROJECT_LABELS = ['DroneCode', '3DR', 'Tower', 'DroneAPI', 'Android', 'DroneKit']
-    PROJECT_LICENSES = ['Apache-2.0']
+    PROJECT_LICENSE = 'The Apache Software License, Version 2.0'
+    PROJECT_LICENSE_URL = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    PROJECT_LICENSE_DISTRIBUTION = 'repo'
 }
 
 //Log levels values
@@ -147,4 +149,4 @@ def getLocalIp() {
 evaluationDependsOn ':Mavlink'
 assemble.dependsOn ':Mavlink:jar'
 
-apply from: "$projectDir/release_android_library.gradle"
+apply from: "$projectDir/maven-push.gradle"
