@@ -17,8 +17,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.5.0'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.2'
+        classpath 'com.android.tools.build:gradle:2.1.0'
         classpath 'io.fabric.tools:gradle:1.21.2'
 
         //Dexcount gradle plugin
@@ -89,8 +88,12 @@ def getMavenRepoUrl(){
     return hasProperty('DROIDPLANNER_MAVEN_REPO_URL') ? DROIDPLANNER_MAVEN_REPO_URL : ''
 }
 
-def getMavenPublishUrl(){
-    return hasProperty('DROIDPLANNER_MAVEN_PUBLISH_URL') ? DROIDPLANNER_MAVEN_PUBLISH_URL : ''
+def getMavenPublishUrl(String artifactId){
+    def prefix = hasProperty('DROIDPLANNER_MAVEN_PUBLISH_URL_PREFIX') ? DROIDPLANNER_MAVEN_PUBLISH_URL_PREFIX : null
+    if(prefix == null)
+        return null
+
+    return "$prefix/$artifactId/;publish=1"
 }
 
 def getMavenPomPackaging(){

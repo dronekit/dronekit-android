@@ -6,7 +6,7 @@ ext {
     VERSION_MAJOR = 0
     VERSION_MINOR = 0
     VERSION_PATCH = 0
-    VERSION_SUFFIX = "alpha4"
+    VERSION_SUFFIX = "alpha5"
 
     PUBLISH_ARTIFACT_ID = 'tower-lib'
     PUBLISH_VERSION = generateVersionName("", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH, VERSION_SUFFIX)
@@ -120,15 +120,13 @@ dependencies {
         transitive = true;
     }
 
+    compile 'org.droidplanner.android:usb-serial-android:0.1.0'
+
     debugCompile project(':Mavlink')
     sitlCompile project(':Mavlink')
     releaseCompile files('libs/Mavlink.jar')
 
     compile files('libs/d2xx.jar')
-
-    debugCompile project(':UsbSerialLibrary')
-    sitlCompile project(':UsbSerialLibrary')
-    releaseCompile project(':UsbSerialLibrary')
 
     androidTestCompile 'junit:junit:4.12'
     androidTestCompile "org.robolectric:robolectric:3.0"

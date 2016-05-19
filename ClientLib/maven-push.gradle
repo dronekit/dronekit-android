@@ -20,7 +20,7 @@ afterEvaluate { project ->
                 pom.artifactId = projectArtifactId
                 pom.version = projectVersion
 
-                repository(url: getMavenPublishUrl()) {
+                repository(url: getMavenPublishUrl(projectArtifactId)) {
                     authentication(userName: getMavenUsername(), password: getMavenApiKey())
                 }
 
@@ -62,6 +62,8 @@ afterEvaluate { project ->
     }
 
     task androidJavadocs(type: Javadoc) {
+        failOnError false
+
         //Add the project java source directory.
         def files = [android.sourceSets.main.java.srcDirs]
 
