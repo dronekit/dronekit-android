@@ -13,12 +13,10 @@ buildscript {
 
     repositories {
         jcenter()
-        maven { url 'https://maven.fabric.io/public' }
     }
 
     dependencies {
         classpath 'com.android.tools.build:gradle:2.1.0'
-        classpath 'io.fabric.tools:gradle:1.21.2'
 
         //Dexcount gradle plugin
         classpath 'com.getkeepsafe.dexcount:dexcount-gradle-plugin:0.4.4'
@@ -128,7 +126,6 @@ subprojects {
 allprojects {
     repositories {
         jcenter()
-        maven { url 'https://maven.fabric.io/public' }
 
         maven {
             url getMavenRepoUrl()

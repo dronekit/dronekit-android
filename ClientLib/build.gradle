@@ -1,12 +1,11 @@
 apply plugin: 'com.android.library'
-apply plugin: 'io.fabric'
 apply plugin: 'com.getkeepsafe.dexcount'
 
 ext {
     VERSION_MAJOR = 0
     VERSION_MINOR = 0
     VERSION_PATCH = 0
-    VERSION_SUFFIX = "alpha8"
+    VERSION_SUFFIX = "alpha9"
 
     PUBLISH_ARTIFACT_ID = 'tower-lib'
     PUBLISH_VERSION = generateVersionName("", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH, VERSION_SUFFIX)
