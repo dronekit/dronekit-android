@@ -6,7 +6,7 @@ ext {
     VERSION_MAJOR = 0
     VERSION_MINOR = 0
     VERSION_PATCH = 0
-    VERSION_SUFFIX = "alpha7"
+    VERSION_SUFFIX = "alpha8"
 
     PUBLISH_ARTIFACT_ID = 'tower-lib'
     PUBLISH_VERSION = generateVersionName("", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH, VERSION_SUFFIX)
@@ -46,7 +46,6 @@ android {
         buildConfigField "String", "SOLO_LINK_IP", getSoloLinkIp()
         buildConfigField "boolean", "WRITE_LOG_FILE", "false"
         buildConfigField "int", "LOG_FILE_LEVEL", "$logLevelDebug"
-        buildConfigField "boolean", "ENABLE_CRASHLYTICS", "false"
     }
 
     sourceSets {
@@ -90,7 +89,6 @@ android {
         }
 
         release {
-            buildConfigField "boolean", "ENABLE_CRASHLYTICS", "true"
         }
     }
 
@@ -104,7 +102,6 @@ dependencies {
     compile "com.android.support:support-v4:${support_lib_version}"
     compile "com.android.support:appcompat-v7:${support_lib_version}"
 
-    compile "com.google.android.gms:play-services-analytics:${play_services_version}"
     compile "com.google.android.gms:play-services-base:${play_services_version}"
     compile "com.google.android.gms:play-services-location:${play_services_version}"
 
@@ -115,10 +112,6 @@ dependencies {
 
     //MP4 generation library
     compile 'com.googlecode.mp4parser:isoparser:1.1.7'
-
-    compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
-        transitive = true;
-    }
 
     compile 'org.droidplanner.android:usb-serial-android:0.1.0'
 

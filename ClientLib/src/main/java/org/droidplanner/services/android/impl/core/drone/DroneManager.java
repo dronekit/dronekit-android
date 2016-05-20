@@ -6,14 +6,6 @@ import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 
-import org.droidplanner.services.android.impl.api.DroneApi;
-import org.droidplanner.services.android.impl.communication.model.DataLink;
-import org.droidplanner.services.android.impl.core.drone.autopilot.Drone;
-import org.droidplanner.services.android.impl.core.drone.autopilot.apm.solo.ArduSolo;
-import org.droidplanner.services.android.impl.core.drone.autopilot.apm.solo.SoloComp;
-import org.droidplanner.services.android.impl.core.drone.manager.MavLinkDroneManager;
-import org.droidplanner.services.android.impl.utils.CommonApiUtils;
-import org.droidplanner.services.android.impl.utils.analytics.GAUtils;
 import com.o3dr.services.android.lib.drone.action.ControlActions;
 import com.o3dr.services.android.lib.drone.action.GimbalActions;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
@@ -24,6 +16,14 @@ import com.o3dr.services.android.lib.drone.property.Parameter;
 import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
 import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
+
+import org.droidplanner.services.android.impl.api.DroneApi;
+import org.droidplanner.services.android.impl.communication.model.DataLink;
+import org.droidplanner.services.android.impl.core.drone.autopilot.Drone;
+import org.droidplanner.services.android.impl.core.drone.autopilot.apm.solo.ArduSolo;
+import org.droidplanner.services.android.impl.core.drone.autopilot.apm.solo.SoloComp;
+import org.droidplanner.services.android.impl.core.drone.manager.MavLinkDroneManager;
+import org.droidplanner.services.android.impl.utils.CommonApiUtils;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -158,11 +158,7 @@ public class DroneManager<T extends Drone, D> implements DataLink.DataLinkListen
             case LinkConnectionStatus.DISCONNECTED:
                 notifyDroneEvent(DroneInterfaces.DroneEventsType.DISCONNECTED);
                 break;
-            case LinkConnectionStatus.CONNECTED:
-                // Start a new ga analytics session. The new session will be tagged
-                // with the mavlink connection mechanism, as well as whether the user has an active droneshare account.
-                GAUtils.startNewSession(null);
-                break;
+
             case LinkConnectionStatus.CONNECTING:
                 notifyDroneEvent(DroneInterfaces.DroneEventsType.CONNECTING);
                 break;

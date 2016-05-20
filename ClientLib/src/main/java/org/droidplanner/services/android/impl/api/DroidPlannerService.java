@@ -15,16 +15,16 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
 import com.o3dr.android.client.R;
-import org.droidplanner.services.android.impl.core.drone.DroneManager;
-import org.droidplanner.services.android.impl.core.survey.CameraInfo;
-import org.droidplanner.services.android.impl.utils.LogToFileTree;
-import org.droidplanner.services.android.impl.utils.Utils;
-import org.droidplanner.services.android.impl.utils.analytics.GAUtils;
-import org.droidplanner.services.android.impl.utils.file.IO.CameraInfoLoader;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.mission.item.complex.CameraDetail;
 import com.o3dr.services.android.lib.model.IApiListener;
 import com.o3dr.services.android.lib.model.IDroidPlannerServices;
+
+import org.droidplanner.services.android.impl.core.drone.DroneManager;
+import org.droidplanner.services.android.impl.core.survey.CameraInfo;
+import org.droidplanner.services.android.impl.utils.LogToFileTree;
+import org.droidplanner.services.android.impl.utils.Utils;
+import org.droidplanner.services.android.impl.utils.file.IO.CameraInfoLoader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -214,20 +214,13 @@ public class DroidPlannerService extends Service {
     public void onCreate() {
         super.onCreate();
 
-        //TODO: Figure out how to reenable crashlytics and timber logging from the library
-//        if(BuildConfig.ENABLE_CRASHLYTICS) {
-//            Fabric.with(this, new Crashlytics());
-//        }
-//
+        //TODO: Figure out how to enable timber logging from the library
 //        if (BuildConfig.WRITE_LOG_FILE) {
 //            logToFileTree = new LogToFileTree();
 //            Timber.plant(logToFileTree);
 //        } else if (BuildConfig.DEBUG) {
 //            Timber.plant(new Timber.DebugTree());
 //        }
-//
-        GAUtils.initGATracker(getApplication());
-        GAUtils.startNewSession(null);
 
         createFileStartLogging();
 

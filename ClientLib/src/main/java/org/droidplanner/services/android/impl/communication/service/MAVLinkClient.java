@@ -6,7 +6,10 @@ import android.text.TextUtils;
 
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
-import com.google.android.gms.analytics.HitBuilders;
+import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
+import com.o3dr.services.android.lib.drone.connection.ConnectionType;
+import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
+import com.o3dr.services.android.lib.model.ICommandListener;
 
 import org.droidplanner.services.android.impl.communication.connection.AndroidMavLinkConnection;
 import org.droidplanner.services.android.impl.communication.connection.AndroidTcpConnection;
@@ -20,11 +23,6 @@ import org.droidplanner.services.android.impl.core.MAVLink.connection.MavLinkCon
 import org.droidplanner.services.android.impl.core.MAVLink.connection.MavLinkConnectionTypes;
 import org.droidplanner.services.android.impl.core.drone.manager.DroneCommandTracker;
 import org.droidplanner.services.android.impl.data.SessionDB;
-import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
-import com.o3dr.services.android.lib.drone.connection.ConnectionType;
-import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
-import com.o3dr.services.android.lib.model.ICommandListener;
-import org.droidplanner.services.android.impl.utils.analytics.GAUtils;
 import org.droidplanner.services.android.impl.utils.connection.WifiConnectionHandler;
 import org.droidplanner.services.android.impl.utils.file.DirectoryPath;
 import org.droidplanner.services.android.impl.utils.file.FileUtils;
@@ -196,12 +194,6 @@ public class MAVLinkClient implements DataLink.DataLinkProvider<MAVLinkMessage> 
 
         if (mavlinkConn.getConnectionStatus() == MavLinkConnection.MAVLINK_DISCONNECTED) {
             mavlinkConn.connect();
-
-            // Record which connection type is used.
-            GAUtils.sendEvent(new HitBuilders.EventBuilder()
-                    .setCategory(GAUtils.Category.MAVLINK_CONNECTION)
-                    .setAction("MavLink connect")
-                    .setLabel(connParams.toString()));
         }
     }
 
@@ -217,10 +209,6 @@ public class MAVLinkClient implements DataLink.DataLinkProvider<MAVLinkMessage> 
         if(mavlinkConn.getMavLinkConnectionListenersCount() == 0){
             Timber.i("Disconnecting...");
             mavlinkConn.disconnect();
-            GAUtils.sendEvent(new HitBuilders.EventBuilder()
-                    .setCategory(GAUtils.Category.MAVLINK_CONNECTION)
-                    .setAction("MavLink disconnect")
-                    .setLabel(connParams.toString()));
         }
 
         stopLoggingThread(System.currentTimeMillis());
