@@ -22,7 +22,6 @@ import com.o3dr.services.android.lib.model.IDroidPlannerServices;
 
 import org.droidplanner.services.android.impl.core.drone.DroneManager;
 import org.droidplanner.services.android.impl.core.survey.CameraInfo;
-import org.droidplanner.services.android.impl.utils.LogToFileTree;
 import org.droidplanner.services.android.impl.utils.Utils;
 import org.droidplanner.services.android.impl.utils.file.IO.CameraInfoLoader;
 
@@ -37,9 +36,7 @@ import timber.log.Timber;
  */
 public class DroidPlannerService extends Service {
 
-    private static final String TAG = DroidPlannerService.class.getName();
-
-    /**
+        /**
      * Status bar notification id
      */
     private static final int FOREGROUND_ID = 101;
@@ -56,11 +53,6 @@ public class DroidPlannerService extends Service {
      * Used to broadcast service events.
      */
     private LocalBroadcastManager lbm;
-
-    /**
-     * Used to channel logging
-     */
-    private LogToFileTree logToFileTree;
 
     /**
      * Stores drone api instances per connected client. The client are denoted by their app id.
@@ -214,16 +206,6 @@ public class DroidPlannerService extends Service {
     public void onCreate() {
         super.onCreate();
 
-        //TODO: Figure out how to enable timber logging from the library
-//        if (BuildConfig.WRITE_LOG_FILE) {
-//            logToFileTree = new LogToFileTree();
-//            Timber.plant(logToFileTree);
-//        } else if (BuildConfig.DEBUG) {
-//            Timber.plant(new Timber.DebugTree());
-//        }
-
-        createFileStartLogging();
-
         Timber.d("Creating 3DR Services.");
 
         final Context context = getApplicationContext();
@@ -234,18 +216,6 @@ public class DroidPlannerService extends Service {
         this.cameraInfoLoader = new CameraInfoLoader(context);
 
         updateForegroundNotification();
-    }
-
-    private void createFileStartLogging() {
-        if (logToFileTree != null) {
-            logToFileTree.createFileStartLogging(getApplicationContext());
-        }
-    }
-
-    private void closeLogFile() {
-        if(logToFileTree != null) {
-            logToFileTree.stopLoggingThread();
-        }
     }
 
     @SuppressLint("NewApi")
@@ -291,8 +261,6 @@ public class DroidPlannerService extends Service {
         dpServices.destroy();
 
         stopForeground(true);
-
-        closeLogFile();
 
         //Disable this service. It'll be reenabled the next time its local client needs it.
         enableDroidPlannerService(getApplicationContext(), false);

@@ -1,4 +1,4 @@
-package org.droidplanner.services.android.impl.utils;
+package com.o3dr.android.client.utils;
 
 import android.content.Context;
 import android.content.pm.PackageInfo;
