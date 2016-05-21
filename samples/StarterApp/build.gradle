@@ -17,11 +17,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
-    //FIXME: Remove when lint errors are taken care of.
-    lintOptions {
-        abortOnError false
-    }
 }
 
 dependencies {

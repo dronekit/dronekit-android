@@ -10,18 +10,7 @@ import android.view.Surface;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.common.msg_statustext;
 import com.MAVLink.enums.MAV_TYPE;
-
 import com.o3dr.android.client.apis.CapabilityApi;
-import com.o3dr.android.client.utils.TxPowerComplianceCountries;
-import org.droidplanner.services.android.impl.communication.model.DataLink;
-import org.droidplanner.services.android.impl.core.drone.DroneInterfaces;
-import org.droidplanner.services.android.impl.core.drone.LogMessageListener;
-import org.droidplanner.services.android.impl.core.drone.autopilot.apm.ArduCopter;
-import org.droidplanner.services.android.impl.core.drone.variables.ApmModes;
-import org.droidplanner.services.android.impl.core.drone.variables.HeartBeat;
-import org.droidplanner.services.android.impl.core.drone.variables.StreamRates;
-import org.droidplanner.services.android.impl.core.firmware.FirmwareType;
-import org.droidplanner.services.android.impl.core.model.AutopilotWarningParser;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
@@ -41,6 +30,16 @@ import com.o3dr.services.android.lib.drone.property.DroneAttribute;
 import com.o3dr.services.android.lib.drone.property.State;
 import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
+
+import org.droidplanner.services.android.impl.communication.model.DataLink;
+import org.droidplanner.services.android.impl.core.drone.DroneInterfaces;
+import org.droidplanner.services.android.impl.core.drone.LogMessageListener;
+import org.droidplanner.services.android.impl.core.drone.autopilot.apm.ArduCopter;
+import org.droidplanner.services.android.impl.core.drone.variables.ApmModes;
+import org.droidplanner.services.android.impl.core.drone.variables.HeartBeat;
+import org.droidplanner.services.android.impl.core.drone.variables.StreamRates;
+import org.droidplanner.services.android.impl.core.firmware.FirmwareType;
+import org.droidplanner.services.android.impl.core.model.AutopilotWarningParser;
 import org.droidplanner.services.android.impl.utils.SoloApiUtils;
 
 import java.util.regex.Matcher;
@@ -92,7 +91,6 @@ public class ArduSolo extends ArduCopter {
 
             @Override
             public void onTlvPacketReceived(TLVPacket packet) {
-                //TODO: filter the message that are broadcast.
                 switch (packet.getMessageType()) {
                     case TLVMessageTypes.TYPE_ARTOO_INPUT_REPORT_MESSAGE:
                         //Drop this message as only the battery info is enabled, and that info is already
@@ -116,33 +114,33 @@ public class ArduSolo extends ArduCopter {
                         final Bundle messageInfo = new Bundle();
                         messageInfo.putParcelable(SoloEventExtras.EXTRA_SOLO_MESSAGE_DATA, packet);
 
-                        notifyAttributeListener(SoloEvents.SOLO_MESSAGE_RECEIVED, messageInfo, true);
+                        notifyAttributeListener(SoloEvents.SOLO_MESSAGE_RECEIVED, messageInfo);
                         break;
                 }
             }
 
             @Override
             public void onPresetButtonLoaded(int buttonType, SoloButtonSetting buttonSettings) {
-                notifyAttributeListener(SoloEvents.SOLO_BUTTON_SETTINGS_UPDATED, null, true);
+                notifyAttributeListener(SoloEvents.SOLO_BUTTON_SETTINGS_UPDATED, null);
             }
 
             @Override
             public void onWifiInfoUpdated(String wifiName, String wifiPassword) {
-                notifyAttributeListener(SoloEvents.SOLO_WIFI_SETTINGS_UPDATED, null, true);
+                notifyAttributeListener(SoloEvents.SOLO_WIFI_SETTINGS_UPDATED, null);
             }
 
             @Override
             public void onButtonPacketReceived(ButtonPacket packet) {
                 final Bundle eventInfo = new Bundle();
                 eventInfo.putParcelable(SoloEventExtras.EXTRA_SOLO_BUTTON_EVENT, packet);
-                notifyAttributeListener(SoloEvents.SOLO_BUTTON_EVENT_RECEIVED, eventInfo, true);
+                notifyAttributeListener(SoloEvents.SOLO_BUTTON_EVENT_RECEIVED, eventInfo);
             }
 
             @Override
             public void onTxPowerComplianceCountryUpdated(String compliantCountry) {
                 final Bundle eventInfo = new Bundle(1);
                 eventInfo.putString(SoloEventExtras.EXTRA_SOLO_TX_POWER_COMPLIANT_COUNTRY, compliantCountry);
-                notifyAttributeListener(SoloEvents.SOLO_TX_POWER_COMPLIANCE_COUNTRY_UPDATED, eventInfo, true);
+                notifyAttributeListener(SoloEvents.SOLO_TX_POWER_COMPLIANCE_COUNTRY_UPDATED, eventInfo);
             }
 
             @Override
@@ -154,12 +152,12 @@ public class ArduSolo extends ArduCopter {
                 eventInfo.putString(SoloEventExtras.EXTRA_SOLO_CONTROLLER_VERSION, soloComp.getControllerVersion());
                 eventInfo.putString(SoloEventExtras.EXTRA_SOLO_CONTROLLER_FIRMWARE_VERSION, soloComp.getControllerFirmwareVersion());
 
-                notifyAttributeListener(SoloEvents.SOLO_VERSIONS_UPDATED, eventInfo, true);
+                notifyAttributeListener(SoloEvents.SOLO_VERSIONS_UPDATED, eventInfo);
             }
 
             @Override
             public void onControllerEvent(String event, Bundle eventInfo) {
-                notifyAttributeListener(event, eventInfo, true);
+                notifyAttributeListener(event, eventInfo);
             }
         });
     }
@@ -332,14 +330,6 @@ public class ArduSolo extends ArduCopter {
             case SoloConfigActions.ACTION_UPDATE_CONTROLLER_MODE:
                 final @SoloControllerMode.ControllerMode int mode = data.getInt(SoloConfigActions.EXTRA_CONTROLLER_MODE);
                 SoloApiUtils.updateSoloLinkControllerMode(this, mode, listener);
-                return true;
-
-            //TODO remove this when deprecated methods are deleted in 3.0
-            case SoloConfigActions.ACTION_UPDATE_EU_TX_POWER_COMPLIANCE:
-                final boolean isCompliant = data.getBoolean(SoloConfigActions.EXTRA_EU_TX_POWER_COMPLIANT);
-                String compliantCountryCode = isCompliant ? TxPowerComplianceCountries.getDefaultEUCountry().name() :
-                    TxPowerComplianceCountries.getDefaultCountry().name();
-                SoloApiUtils.updateSoloLinkTxPowerComplianceCountry(this, compliantCountryCode, listener);
                 return true;
 
             case SoloConfigActions.ACTION_UPDATE_TX_POWER_COMPLIANCE_COUNTRY:

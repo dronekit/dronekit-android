@@ -2,9 +2,10 @@ package org.droidplanner.services.android.impl.core.drone;
 
 import android.os.Bundle;
 
+import com.o3dr.services.android.lib.drone.property.Parameter;
+
 import org.droidplanner.services.android.impl.core.MAVLink.WaypointManager;
 import org.droidplanner.services.android.impl.core.drone.autopilot.Drone;
-import com.o3dr.services.android.lib.drone.property.Parameter;
 
 public class DroneInterfaces {
 
@@ -202,7 +203,7 @@ public class DroneInterfaces {
     }
 
     public interface AttributeEventListener {
-        void onAttributeEvent(String attributeEvent, Bundle eventInfo, boolean checkForSololinkApi);
+        void onAttributeEvent(String attributeEvent, Bundle eventInfo);
     }
 
     public interface OnParameterManagerListener {

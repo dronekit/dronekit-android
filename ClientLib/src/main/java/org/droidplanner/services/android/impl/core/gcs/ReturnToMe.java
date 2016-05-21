@@ -2,12 +2,6 @@ package org.droidplanner.services.android.impl.core.gcs;
 
 import android.os.Bundle;
 
-import org.droidplanner.services.android.impl.core.MAVLink.command.doCmd.MavLinkDoCmds;
-import org.droidplanner.services.android.impl.core.drone.DroneInterfaces;
-import org.droidplanner.services.android.impl.core.drone.DroneInterfaces.AttributeEventListener;
-import org.droidplanner.services.android.impl.core.drone.autopilot.MavLinkDrone;
-import org.droidplanner.services.android.impl.core.drone.manager.MavLinkDroneManager;
-import org.droidplanner.services.android.impl.core.gcs.location.Location;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
@@ -18,6 +12,13 @@ import com.o3dr.services.android.lib.gcs.returnToMe.ReturnToMeState;
 import com.o3dr.services.android.lib.model.AbstractCommandListener;
 import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
+
+import org.droidplanner.services.android.impl.core.MAVLink.command.doCmd.MavLinkDoCmds;
+import org.droidplanner.services.android.impl.core.drone.DroneInterfaces;
+import org.droidplanner.services.android.impl.core.drone.DroneInterfaces.AttributeEventListener;
+import org.droidplanner.services.android.impl.core.drone.autopilot.MavLinkDrone;
+import org.droidplanner.services.android.impl.core.drone.manager.MavLinkDroneManager;
+import org.droidplanner.services.android.impl.core.gcs.location.Location;
 import org.droidplanner.services.android.impl.utils.CommonApiUtils;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -200,7 +201,7 @@ public class ReturnToMe implements DroneInterfaces.OnDroneListener<MavLinkDrone>
         if (attributeListener != null) {
             final Bundle eventInfo = new Bundle();
             eventInfo.putInt(AttributeEventExtra.EXTRA_RETURN_TO_ME_STATE, state);
-            attributeListener.onAttributeEvent(AttributeEvent.RETURN_TO_ME_STATE_UPDATE, eventInfo, false);
+            attributeListener.onAttributeEvent(AttributeEvent.RETURN_TO_ME_STATE_UPDATE, eventInfo);
         }
     }
 

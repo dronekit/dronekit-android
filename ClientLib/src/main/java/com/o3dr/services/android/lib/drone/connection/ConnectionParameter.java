@@ -13,7 +13,6 @@ public class ConnectionParameter implements Parcelable {
 
     private final int connectionType;
     private final Bundle paramsBundle;
-    private final DroneSharePrefs droneSharePrefs;
 
     /**
      * @return Returns a new {@link ConnectionParameter} with type {@link ConnectionType#TYPE_USB}
@@ -155,23 +154,10 @@ public class ConnectionParameter implements Parcelable {
     }
 
     /**
-     * @deprecated Use one of specified static methods
      */
-    //TODO: make this private version 3.0
-    public ConnectionParameter(int connectionType, Bundle paramsBundle){
+    private ConnectionParameter(int connectionType, Bundle paramsBundle){
         this.connectionType = connectionType;
         this.paramsBundle = paramsBundle;
-        this.droneSharePrefs = null;
-    }
-
-    /**
-     * @deprecated Use {@link ConnectionParameter#ConnectionParameter(int, Bundle)} instead.
-     * @since 2.8.0
-     */
-    public ConnectionParameter(int connectionType, Bundle paramsBundle, DroneSharePrefs droneSharePrefs){
-        this.connectionType = connectionType;
-        this.paramsBundle = paramsBundle;
-        this.droneSharePrefs = droneSharePrefs;
     }
 
     public int getConnectionType() {
@@ -180,10 +166,6 @@ public class ConnectionParameter implements Parcelable {
 
     public Bundle getParamsBundle() {
         return paramsBundle;
-    }
-
-    public DroneSharePrefs getDroneSharePrefs() {
-        return droneSharePrefs;
     }
 
     public String getUniqueId(){
@@ -275,6 +257,11 @@ public class ConnectionParameter implements Parcelable {
     }
 
     @Override
+    public ConnectionParameter clone(){
+        return new ConnectionParameter(this.connectionType, this.paramsBundle);
+    }
+
+    @Override
     public int describeContents() {
         return 0;
     }
@@ -283,13 +270,11 @@ public class ConnectionParameter implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(this.connectionType);
         dest.writeBundle(paramsBundle);
-        dest.writeParcelable(this.droneSharePrefs, 0);
     }
 
     private ConnectionParameter(Parcel in) {
         this.connectionType = in.readInt();
-        paramsBundle = in.readBundle();
-        this.droneSharePrefs = in.readParcelable(DroneSharePrefs.class.getClassLoader());
+        paramsBundle = in.readBundle(getClass().getClassLoader());
     }
 
     public static final Creator<ConnectionParameter> CREATOR = new Creator<ConnectionParameter>() {

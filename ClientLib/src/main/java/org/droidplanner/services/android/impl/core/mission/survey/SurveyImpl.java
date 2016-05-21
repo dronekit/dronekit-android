@@ -3,6 +3,7 @@ package org.droidplanner.services.android.impl.core.mission.survey;
 import com.MAVLink.common.msg_mission_item;
 import com.MAVLink.enums.MAV_CMD;
 import com.MAVLink.enums.MAV_FRAME;
+import com.o3dr.services.android.lib.coordinate.LatLong;
 
 import org.droidplanner.services.android.impl.core.mission.Mission;
 import org.droidplanner.services.android.impl.core.mission.MissionItemImpl;
@@ -13,7 +14,6 @@ import org.droidplanner.services.android.impl.core.survey.CameraInfo;
 import org.droidplanner.services.android.impl.core.survey.SurveyData;
 import org.droidplanner.services.android.impl.core.survey.grid.Grid;
 import org.droidplanner.services.android.impl.core.survey.grid.GridBuilder;
-import com.o3dr.services.android.lib.coordinate.LatLong;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -117,8 +117,6 @@ public class SurveyImpl extends MissionItemImpl {
 
     @Override
     public void unpackMAVMessage(msg_mission_item mavMsg) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override

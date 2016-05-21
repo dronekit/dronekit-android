@@ -12,17 +12,6 @@ import android.view.Surface;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.ardupilotmega.msg_mag_cal_progress;
 import com.MAVLink.ardupilotmega.msg_mag_cal_report;
-
-import org.droidplanner.services.android.impl.communication.connection.SoloConnection;
-import org.droidplanner.services.android.impl.core.drone.DroneInterfaces;
-import org.droidplanner.services.android.impl.core.drone.DroneManager;
-import org.droidplanner.services.android.impl.core.drone.autopilot.Drone;
-import org.droidplanner.services.android.impl.core.drone.autopilot.MavLinkDrone;
-import org.droidplanner.services.android.impl.core.drone.variables.calibration.AccelCalibration;
-import org.droidplanner.services.android.impl.core.drone.variables.calibration.MagnetometerCalibrationImpl;
-import org.droidplanner.services.android.impl.exception.ConnectionException;
-import org.droidplanner.services.android.impl.utils.CommonApiUtils;
-import org.droidplanner.services.android.impl.utils.video.VideoManager;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.action.CameraActions;
 import com.o3dr.services.android.lib.drone.action.ConnectionActions;
@@ -32,7 +21,6 @@ import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
-import com.o3dr.services.android.lib.drone.connection.ConnectionResult;
 import com.o3dr.services.android.lib.drone.mission.Mission;
 import com.o3dr.services.android.lib.drone.mission.action.MissionActions;
 import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
@@ -52,6 +40,17 @@ import com.o3dr.services.android.lib.model.IDroneApi;
 import com.o3dr.services.android.lib.model.IMavlinkObserver;
 import com.o3dr.services.android.lib.model.IObserver;
 import com.o3dr.services.android.lib.model.action.Action;
+
+import org.droidplanner.services.android.impl.communication.connection.SoloConnection;
+import org.droidplanner.services.android.impl.core.drone.DroneInterfaces;
+import org.droidplanner.services.android.impl.core.drone.DroneManager;
+import org.droidplanner.services.android.impl.core.drone.autopilot.Drone;
+import org.droidplanner.services.android.impl.core.drone.autopilot.MavLinkDrone;
+import org.droidplanner.services.android.impl.core.drone.variables.calibration.AccelCalibration;
+import org.droidplanner.services.android.impl.core.drone.variables.calibration.MagnetometerCalibrationImpl;
+import org.droidplanner.services.android.impl.exception.ConnectionException;
+import org.droidplanner.services.android.impl.utils.CommonApiUtils;
+import org.droidplanner.services.android.impl.utils.video.VideoManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -440,7 +439,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
     }
 
     @Override
-    public void onAttributeEvent(String attributeEvent, Bundle eventInfo, boolean checkForSololinkApi) {
+    public void onAttributeEvent(String attributeEvent, Bundle eventInfo) {
         if (TextUtils.isEmpty(attributeEvent)) {
             return;
         }
@@ -581,8 +580,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
 
             case CONNECTED:
                 //Broadcast the vehicle connection.
-                ConnectionParameter sanitizedParameter = new ConnectionParameter(connectionParams
-                    .getConnectionType(), connectionParams.getParamsBundle());
+                ConnectionParameter sanitizedParameter = connectionParams.clone();
 
                 context.sendBroadcast(new Intent(GCSEvent.ACTION_VEHICLE_CONNECTION)
                     .putExtra(GCSEvent.EXTRA_APP_ID, ownerId)
@@ -683,11 +681,8 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
             case LinkConnectionStatus.FAILED:
                 disconnect();
                 checkForSelfRelease();
-
-                //This is to ensure backwards compatibility
-                // TODO: remove this in version 3.0
-                notifyConnectionFailed(connectionStatus);
                 break;
+
             case LinkConnectionStatus.DISCONNECTED:
                 disconnect();
                 checkForSelfRelease();
@@ -697,22 +692,6 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
         Bundle extras = new Bundle();
         extras.putParcelable(LinkEventExtra.EXTRA_CONNECTION_STATUS, connectionStatus);
         notifyAttributeUpdate(LinkEvent.LINK_STATE_UPDATED, extras);
-
-    }
-
-    private void notifyConnectionFailed(LinkConnectionStatus connectionStatus) {
-        Bundle extras = connectionStatus.getExtras();
-        String msg = null;
-        if (extras != null) {
-            msg = extras.getString(LinkConnectionStatus.EXTRA_ERROR_MSG);
-        }
-
-        ConnectionResult connectionResult = new ConnectionResult(0, msg);
-        try {
-            apiListener.onConnectionFailed(connectionResult);
-        } catch (RemoteException e) {
-            Timber.w(e, "Unable to forward connection fail to client.");
-        }
 
     }
 

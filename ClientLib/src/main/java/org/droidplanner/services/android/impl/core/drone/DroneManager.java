@@ -37,8 +37,6 @@ public class DroneManager<T extends Drone, D> implements DataLink.DataLinkListen
 
     public static final String EXTRA_CLIENT_APP_ID = "extra_client_app_id";
 
-    private static final int SOLOLINK_API_MIN_VERSION = 20412;
-
     protected final ConcurrentHashMap<String, DroneApi> connectedApps = new ConcurrentHashMap<>();
 
     protected final Context context;
@@ -107,10 +105,8 @@ public class DroneManager<T extends Drone, D> implements DataLink.DataLinkListen
         final int connectionType = connectionParameter.getConnectionType();
 
         return drone instanceof ArduSolo
-            ||
-            (connectionType == ConnectionType.TYPE_UDP && SoloComp.isAvailable(context) && doAnyListenersSupportSoloLinkApi())
-            ||
-            connectionType == ConnectionType.TYPE_SOLO;
+            || (connectionType == ConnectionType.TYPE_UDP && SoloComp.isAvailable(context))
+            || connectionType == ConnectionType.TYPE_SOLO;
 
     }
 
@@ -225,51 +221,13 @@ public class DroneManager<T extends Drone, D> implements DataLink.DataLinkListen
     }
 
     protected void notifyDroneAttributeEvent(String attributeEvent, Bundle eventInfo) {
-        notifyDroneAttributeEvent(attributeEvent, eventInfo, false);
-    }
-
-    /**
-     * Temporary delegate to prevent sending of newly defined payload to older version of the api
-     * #FIXME: remove when old version of the api is phased out.
-     *
-     * @param attributeEvent
-     * @param eventInfo
-     * @param checkForSoloLinkApi
-     */
-    private void notifyDroneAttributeEvent(String attributeEvent, Bundle eventInfo, boolean checkForSoloLinkApi) {
         if (TextUtils.isEmpty(attributeEvent) || connectedApps.isEmpty()) {
             return;
         }
 
         for (DroneApi listener : connectedApps.values()) {
-            if (checkForSoloLinkApi && !supportSoloLinkApi(listener)) {
-                continue;
-            }
-            listener.onAttributeEvent(attributeEvent, eventInfo, checkForSoloLinkApi);
+            listener.onAttributeEvent(attributeEvent, eventInfo);
         }
-    }
-
-    private boolean supportSoloLinkApi(DroneApi listener) {
-        return listener != null && listener.getClientInfo().apiVersionCode >= SOLOLINK_API_MIN_VERSION;
-    }
-
-    /**
-     * FIXME: remove when android solo v2 is released.
-     *
-     * @return
-     */
-    private boolean doAnyListenersSupportSoloLinkApi() {
-        if (connectedApps.isEmpty()) {
-            return false;
-        }
-
-        for (DroneApi listener : connectedApps.values()) {
-            if (supportSoloLinkApi(listener)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     @Override
@@ -339,7 +297,7 @@ public class DroneManager<T extends Drone, D> implements DataLink.DataLinkListen
     }
 
     @Override
-    public void onAttributeEvent(String attributeEvent, Bundle eventInfo, boolean checkForSololinkApi) {
-        notifyDroneAttributeEvent(attributeEvent, eventInfo, checkForSololinkApi);
+    public void onAttributeEvent(String attributeEvent, Bundle eventInfo) {
+        notifyDroneAttributeEvent(attributeEvent, eventInfo);
     }
 }

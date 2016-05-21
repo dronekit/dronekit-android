@@ -21,30 +21,6 @@ import com.MAVLink.common.msg_sys_status;
 import com.MAVLink.common.msg_vibration;
 import com.MAVLink.enums.MAV_MODE_FLAG;
 import com.MAVLink.enums.MAV_STATE;
-
-import org.droidplanner.services.android.impl.communication.model.DataLink;
-import org.droidplanner.services.android.impl.core.MAVLink.MavLinkCommands;
-import org.droidplanner.services.android.impl.core.MAVLink.MavLinkWaypoint;
-import org.droidplanner.services.android.impl.core.MAVLink.WaypointManager;
-import org.droidplanner.services.android.impl.core.drone.DroneEvents;
-import org.droidplanner.services.android.impl.core.drone.DroneInterfaces;
-import org.droidplanner.services.android.impl.core.drone.LogMessageListener;
-import org.droidplanner.services.android.impl.core.drone.autopilot.MavLinkDrone;
-import org.droidplanner.services.android.impl.core.drone.autopilot.apm.APMConstants;
-import org.droidplanner.services.android.impl.core.drone.profiles.ParameterManager;
-import org.droidplanner.services.android.impl.core.drone.variables.ApmModes;
-import org.droidplanner.services.android.impl.core.drone.variables.Camera;
-import org.droidplanner.services.android.impl.core.drone.variables.GuidedPoint;
-import org.droidplanner.services.android.impl.core.drone.variables.HeartBeat;
-import org.droidplanner.services.android.impl.core.drone.variables.MissionStats;
-import org.droidplanner.services.android.impl.core.drone.variables.State;
-import org.droidplanner.services.android.impl.core.drone.variables.StreamRates;
-import org.droidplanner.services.android.impl.core.drone.variables.Type;
-import org.droidplanner.services.android.impl.core.drone.variables.calibration.AccelCalibration;
-import org.droidplanner.services.android.impl.core.drone.variables.calibration.MagnetometerCalibrationImpl;
-import org.droidplanner.services.android.impl.core.firmware.FirmwareType;
-import org.droidplanner.services.android.impl.core.mission.Mission;
-import org.droidplanner.services.android.impl.core.model.AutopilotWarningParser;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.action.CapabilityActions;
@@ -72,6 +48,30 @@ import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
 import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
 import com.o3dr.services.android.lib.util.MathUtils;
+
+import org.droidplanner.services.android.impl.communication.model.DataLink;
+import org.droidplanner.services.android.impl.core.MAVLink.MavLinkCommands;
+import org.droidplanner.services.android.impl.core.MAVLink.MavLinkWaypoint;
+import org.droidplanner.services.android.impl.core.MAVLink.WaypointManager;
+import org.droidplanner.services.android.impl.core.drone.DroneEvents;
+import org.droidplanner.services.android.impl.core.drone.DroneInterfaces;
+import org.droidplanner.services.android.impl.core.drone.LogMessageListener;
+import org.droidplanner.services.android.impl.core.drone.autopilot.MavLinkDrone;
+import org.droidplanner.services.android.impl.core.drone.autopilot.apm.APMConstants;
+import org.droidplanner.services.android.impl.core.drone.profiles.ParameterManager;
+import org.droidplanner.services.android.impl.core.drone.variables.ApmModes;
+import org.droidplanner.services.android.impl.core.drone.variables.Camera;
+import org.droidplanner.services.android.impl.core.drone.variables.GuidedPoint;
+import org.droidplanner.services.android.impl.core.drone.variables.HeartBeat;
+import org.droidplanner.services.android.impl.core.drone.variables.MissionStats;
+import org.droidplanner.services.android.impl.core.drone.variables.State;
+import org.droidplanner.services.android.impl.core.drone.variables.StreamRates;
+import org.droidplanner.services.android.impl.core.drone.variables.Type;
+import org.droidplanner.services.android.impl.core.drone.variables.calibration.AccelCalibration;
+import org.droidplanner.services.android.impl.core.drone.variables.calibration.MagnetometerCalibrationImpl;
+import org.droidplanner.services.android.impl.core.firmware.FirmwareType;
+import org.droidplanner.services.android.impl.core.mission.Mission;
+import org.droidplanner.services.android.impl.core.model.AutopilotWarningParser;
 import org.droidplanner.services.android.impl.utils.CommonApiUtils;
 import org.droidplanner.services.android.impl.utils.prefs.DroidPlannerPrefs;
 import org.droidplanner.services.android.impl.utils.video.VideoManager;
@@ -298,17 +298,13 @@ public class GenericMavLinkDrone implements MavLinkDrone {
     }
 
     protected void notifyAttributeListener(String attributeEvent, Bundle eventInfo) {
-        notifyAttributeListener(attributeEvent, eventInfo, false);
-    }
-
-    protected void notifyAttributeListener(String attributeEvent, Bundle eventInfo, boolean checkForSololinkApi) {
         if (attributeListener != null) {
             if(eventInfo == null){
                 eventInfo = new Bundle();
             }
             eventInfo.putString(AttributeEventExtra.EXTRA_VEHICLE_ID, getId());
 
-            attributeListener.onAttributeEvent(attributeEvent, eventInfo, checkForSololinkApi);
+            attributeListener.onAttributeEvent(attributeEvent, eventInfo);
         }
     }
 

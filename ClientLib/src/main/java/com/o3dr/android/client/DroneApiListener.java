@@ -18,9 +18,7 @@ public class DroneApiListener extends IApiListener.Stub {
     }
 
     @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) throws RemoteException {
-        drone.notifyDroneConnectionFailed(connectionResult);
-    }
+    public void onConnectionFailed(ConnectionResult connectionResult) throws RemoteException {}
 
     @Override
     public int getClientVersionCode() throws RemoteException {

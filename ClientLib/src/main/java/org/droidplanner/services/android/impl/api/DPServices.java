@@ -5,13 +5,14 @@ import android.os.RemoteException;
 import android.util.Log;
 
 import com.o3dr.android.client.BuildConfig;
-import org.droidplanner.services.android.impl.core.drone.DroneManager;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.gcs.event.GCSEvent;
 import com.o3dr.services.android.lib.model.IApiListener;
 import com.o3dr.services.android.lib.model.IDroidPlannerServices;
 import com.o3dr.services.android.lib.model.IDroneApi;
 import com.o3dr.services.android.lib.util.version.VersionUtils;
+
+import org.droidplanner.services.android.impl.core.drone.DroneManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,8 +59,7 @@ final class DPServices extends IDroidPlannerServices.Stub {
                 DroneManager droneManager = droneApi.getDroneManager();
                 if(droneManager != null) {
                     final ConnectionParameter droneParams = droneApi.getDroneManager().getConnectionParameter();
-                    final ConnectionParameter sanitizedParams = new ConnectionParameter(droneParams.getConnectionType(),
-                            droneParams.getParamsBundle(), null);
+                    final ConnectionParameter sanitizedParams = droneParams.clone();
 
                     Bundle info = new Bundle();
                     info.putString(GCSEvent.EXTRA_APP_ID, droneApi.getOwnerId());

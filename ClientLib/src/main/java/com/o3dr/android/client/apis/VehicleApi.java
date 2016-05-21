@@ -3,7 +3,6 @@ package com.o3dr.android.client.apis;
 import android.os.Bundle;
 
 import com.o3dr.android.client.Drone;
-import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.property.Parameters;
@@ -153,76 +152,6 @@ public class VehicleApi extends Api {
         Bundle params = new Bundle();
         params.putParcelable(EXTRA_PARAMETERS, parameters);
         drone.performAsyncAction(new Action(ACTION_WRITE_PARAMETERS, params));
-    }
-
-    /*
-    Deprecated apis
-     */
-
-    /**
-     * @param altitude altitude in meters
-     * @deprecated Use {@link ControlApi#takeoff(double, AbstractCommandListener)} instead.
-     * Perform a guided take off.
-     */
-    public void takeoff(double altitude) {
-        controlApi.takeoff(altitude, null);
-    }
-
-    /**
-     * @param altitude altitude in meters
-     * @param listener Register a callback to receive update of the command execution state.
-     * @deprecated Use {@link ControlApi#takeoff(double, AbstractCommandListener)} instead.
-     * Perform a guided take off.
-     */
-    public void takeoff(double altitude, AbstractCommandListener listener) {
-        controlApi.takeoff(altitude, listener);
-    }
-
-    /**
-     * @param point guided point location
-     * @param force true to enable guided mode is required.
-     * @deprecated Use {@link ControlApi#goTo(LatLong, boolean, AbstractCommandListener)} instead.
-     * Send a guided point to the connected drone.
-     */
-    public void sendGuidedPoint(LatLong point, boolean force) {
-        controlApi.goTo(point, force, null);
-    }
-
-    /**
-     * @param point    guided point location
-     * @param force    true to enable guided mode is required.
-     * @param listener Register a callback to receive update of the command execution state.
-     * @deprecated Use {@link ControlApi#goTo(LatLong, boolean, AbstractCommandListener)} instead.
-     * Send a guided point to the connected drone.
-     */
-    public void sendGuidedPoint(LatLong point, boolean force, AbstractCommandListener listener) {
-        controlApi.goTo(point, force, listener);
-    }
-
-    /**
-     * @param altitude altitude in meters
-     * @deprecated Use {@link ControlApi#climbTo(double)} instead.
-     * Set the altitude for the guided point.
-     */
-    public void setGuidedAltitude(double altitude) {
-        controlApi.climbTo(altitude);
-    }
-
-    /**
-     * @deprecated Use {@link ControlApi#pauseAtCurrentLocation(AbstractCommandListener)} instead.
-     * Pause the vehicle at its current location.
-     */
-    public void pauseAtCurrentLocation() {
-        controlApi.pauseAtCurrentLocation(null);
-    }
-
-    /**
-     * @param listener Register a callback to receive update of the command execution state.
-     * @deprecated Use {@link ControlApi#pauseAtCurrentLocation(AbstractCommandListener)} instead.
-     * Pause the vehicle at its current location.
-     */
-    public void pauseAtCurrentLocation(final AbstractCommandListener listener) {
-        controlApi.pauseAtCurrentLocation(listener);
     }
 
     /**

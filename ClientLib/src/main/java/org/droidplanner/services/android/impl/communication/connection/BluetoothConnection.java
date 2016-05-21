@@ -90,7 +90,6 @@ public class BluetoothConnection extends AndroidMavLinkConnection {
                 final ParcelUuid[] deviceUuids = device.getUuids();
                 if (deviceUuids != null && deviceUuids.length > 0) {
                     for (ParcelUuid id : device.getUuids()) {
-                        // TODO maybe this will not work on newer devices
                         Log.d(BLUE, "id:" + id.toString());
                         if (id.toString().equalsIgnoreCase(UUID_SPP_DEVICE)) {
                             Log.d(BLUE,
@@ -149,6 +148,5 @@ public class BluetoothConnection extends AndroidMavLinkConnection {
 
     @Override
     protected void loadPreferences() {
-        // TODO Auto-generated method stub
     }
 }

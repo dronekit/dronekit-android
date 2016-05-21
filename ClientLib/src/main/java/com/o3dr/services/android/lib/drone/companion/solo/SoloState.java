@@ -88,10 +88,7 @@ public class SoloState implements DroneAttribute {
         return wifiSsid;
     }
 
-    /**
-     * @deprecated Use {@link #getTxPowerCompliantCountry()} instead.
-     */
-    public boolean isEUTxPowerCompliant() {
+    private boolean isEUTxPowerCompliant() {
         return !TxPowerComplianceCountries.getDefaultCountry().name().equals(txPowerCompliantCountry);
     }
 

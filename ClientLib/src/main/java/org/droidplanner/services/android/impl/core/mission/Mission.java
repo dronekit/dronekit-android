@@ -6,6 +6,13 @@ import com.MAVLink.common.msg_mission_ack;
 import com.MAVLink.common.msg_mission_item;
 import com.MAVLink.enums.MAV_CMD;
 import com.MAVLink.enums.MAV_FRAME;
+import com.o3dr.services.android.lib.coordinate.LatLong;
+import com.o3dr.services.android.lib.coordinate.LatLongAlt;
+import com.o3dr.services.android.lib.drone.attribute.AttributeType;
+import com.o3dr.services.android.lib.drone.property.Attitude;
+import com.o3dr.services.android.lib.drone.property.Gps;
+import com.o3dr.services.android.lib.drone.property.Home;
+import com.o3dr.services.android.lib.drone.property.Parameter;
 
 import org.droidplanner.services.android.impl.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.services.android.impl.core.drone.DroneVariable;
@@ -28,13 +35,6 @@ import org.droidplanner.services.android.impl.core.mission.waypoints.RegionOfInt
 import org.droidplanner.services.android.impl.core.mission.waypoints.SpatialCoordItem;
 import org.droidplanner.services.android.impl.core.mission.waypoints.SplineWaypointImpl;
 import org.droidplanner.services.android.impl.core.mission.waypoints.WaypointImpl;
-import com.o3dr.services.android.lib.coordinate.LatLong;
-import com.o3dr.services.android.lib.coordinate.LatLongAlt;
-import com.o3dr.services.android.lib.drone.attribute.AttributeType;
-import com.o3dr.services.android.lib.drone.property.Attitude;
-import com.o3dr.services.android.lib.drone.property.Gps;
-import com.o3dr.services.android.lib.drone.property.Home;
-import com.o3dr.services.android.lib.drone.property.Parameter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -107,8 +107,7 @@ public class Mission extends DroneVariable<GenericMavLinkDrone> {
     }
 
     /**
-     * Signals that this mission object was updated. //TODO: maybe move outside
-     * of this class
+     * Signals that this mission object was updated.
      */
     public void notifyMissionUpdate() {
         updateComponentItems();

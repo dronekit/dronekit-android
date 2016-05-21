@@ -2,6 +2,10 @@ package org.droidplanner.services.android.impl.core.gcs.follow;
 
 import android.os.Handler;
 
+import com.o3dr.services.android.lib.drone.action.ControlActions;
+import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
+import com.o3dr.services.android.lib.model.action.Action;
+
 import org.droidplanner.services.android.impl.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.services.android.impl.core.drone.DroneInterfaces.OnDroneListener;
 import org.droidplanner.services.android.impl.core.drone.autopilot.MavLinkDrone;
@@ -11,9 +15,6 @@ import org.droidplanner.services.android.impl.core.drone.variables.State;
 import org.droidplanner.services.android.impl.core.gcs.location.Location;
 import org.droidplanner.services.android.impl.core.gcs.location.Location.LocationFinder;
 import org.droidplanner.services.android.impl.core.gcs.location.Location.LocationReceiver;
-import com.o3dr.services.android.lib.drone.action.ControlActions;
-import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
-import com.o3dr.services.android.lib.model.action.Action;
 
 public class Follow implements OnDroneListener<MavLinkDrone>, LocationReceiver {
 
@@ -76,7 +77,7 @@ public class Follow implements OnDroneListener<MavLinkDrone>, LocationReceiver {
         locationFinder.enableLocationUpdates();
         followAlgorithm.enableFollow();
 
-        droneMgr.onAttributeEvent(AttributeEvent.FOLLOW_START, null, false);
+        droneMgr.onAttributeEvent(AttributeEvent.FOLLOW_START, null);
     }
 
     private void disableFollowMe() {
@@ -87,7 +88,7 @@ public class Follow implements OnDroneListener<MavLinkDrone>, LocationReceiver {
 
         if (isEnabled()) {
             state = FollowStates.FOLLOW_END;
-            droneMgr.onAttributeEvent(AttributeEvent.FOLLOW_STOP, null, false);
+            droneMgr.onAttributeEvent(AttributeEvent.FOLLOW_STOP, null);
         }
 
         final MavLinkDrone drone = droneMgr.getDrone();
@@ -130,7 +131,7 @@ public class Follow implements OnDroneListener<MavLinkDrone>, LocationReceiver {
             state = FollowStates.FOLLOW_START;
         }
 
-        droneMgr.onAttributeEvent(AttributeEvent.FOLLOW_UPDATE, null, false);
+        droneMgr.onAttributeEvent(AttributeEvent.FOLLOW_UPDATE, null);
     }
 
     @Override
@@ -151,7 +152,7 @@ public class Follow implements OnDroneListener<MavLinkDrone>, LocationReceiver {
                 followAlgorithm.onLocationReceived(lastLocation);
         }
 
-        droneMgr.onAttributeEvent(AttributeEvent.FOLLOW_UPDATE, null, false);
+        droneMgr.onAttributeEvent(AttributeEvent.FOLLOW_UPDATE, null);
     }
 
     public FollowAlgorithm getFollowAlgorithm() {

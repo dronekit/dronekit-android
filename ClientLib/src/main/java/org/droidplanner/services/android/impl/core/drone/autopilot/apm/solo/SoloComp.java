@@ -9,11 +9,6 @@ import android.util.Pair;
 import android.util.SparseArray;
 
 import com.o3dr.android.client.BuildConfig;
-import org.droidplanner.services.android.impl.core.drone.autopilot.apm.solo.controller.ControllerLinkListener;
-import org.droidplanner.services.android.impl.core.drone.autopilot.apm.solo.controller.ControllerLinkManager;
-import org.droidplanner.services.android.impl.core.drone.autopilot.apm.solo.sololink.SoloLinkListener;
-import org.droidplanner.services.android.impl.core.drone.autopilot.apm.solo.sololink.SoloLinkManager;
-import org.droidplanner.services.android.impl.utils.NetworkUtils;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.drone.companion.solo.SoloEventExtras;
@@ -30,6 +25,12 @@ import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloMessageLocatio
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
 import com.o3dr.services.android.lib.model.ICommandListener;
+
+import org.droidplanner.services.android.impl.core.drone.autopilot.apm.solo.controller.ControllerLinkListener;
+import org.droidplanner.services.android.impl.core.drone.autopilot.apm.solo.controller.ControllerLinkManager;
+import org.droidplanner.services.android.impl.core.drone.autopilot.apm.solo.sololink.SoloLinkListener;
+import org.droidplanner.services.android.impl.core.drone.autopilot.apm.solo.sololink.SoloLinkManager;
+import org.droidplanner.services.android.impl.utils.NetworkUtils;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -114,7 +115,6 @@ public class SoloComp implements SoloLinkListener, ControllerLinkListener {
     }
 
     public static boolean isAvailable(Context context) {
-        //TODO: complement the logic.
         return NetworkUtils.isOnSololinkNetwork(context);
     }
 
