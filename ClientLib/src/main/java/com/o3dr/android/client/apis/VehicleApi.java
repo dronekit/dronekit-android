@@ -54,11 +54,9 @@ public class VehicleApi extends Api {
     }
 
     private final Drone drone;
-    private final ControlApi controlApi;
 
     private VehicleApi(Drone drone) {
         this.drone = drone;
-        this.controlApi = ControlApi.getApi(drone);
     }
 
     /**
