@@ -86,26 +86,6 @@ def getMavenRepoUrl(){
     return hasProperty('DROIDPLANNER_MAVEN_REPO_URL') ? DROIDPLANNER_MAVEN_REPO_URL : ''
 }
 
-def getMavenPublishUrl(String artifactId){
-    def prefix = hasProperty('DROIDPLANNER_MAVEN_PUBLISH_URL_PREFIX') ? DROIDPLANNER_MAVEN_PUBLISH_URL_PREFIX : null
-    if(prefix == null)
-        return null
-
-    return "$prefix/$artifactId/;publish=1"
-}
-
-def getMavenPomPackaging(){
-    return hasProperty('DROIDPLANNER_MAVEN_POM_PACKAGING') ? DROIDPLANNER_MAVEN_POM_PACKAGING : 'aar'
-}
-
-def getDeveloperId(){
-    return hasProperty('DEVELOPER_ID') ? DEVELOPER_ID : ''
-}
-
-def getDeveloperName(){
-    return hasProperty('DEVELOPER_NAME') ? DEVELOPER_NAME : ''
-}
-
 /**
  * Improve build server performance by allowing disabling of pre-dexing
  * (see http://tools.android.com/tech-docs/new-build-system/tips#TOC-Improving-Build-Server-performance.)

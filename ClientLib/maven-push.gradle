@@ -10,6 +10,26 @@ def projectLicense = project.PROJECT_LICENSE
 def projectLicenseUrl = project.PROJECT_LICENSE_URL
 def projectLicenseDistribution = project.PROJECT_LICENSE_DISTRIBUTION
 
+def getMavenPublishUrl(String artifactId){
+    def prefix = hasProperty('DROIDPLANNER_MAVEN_PUBLISH_URL_PREFIX') ? DROIDPLANNER_MAVEN_PUBLISH_URL_PREFIX : null
+    if(prefix == null)
+        return null
+
+    return "$prefix/$artifactId/;publish=1"
+}
+
+def getMavenPomPackaging(){
+    return hasProperty('DROIDPLANNER_MAVEN_POM_PACKAGING') ? DROIDPLANNER_MAVEN_POM_PACKAGING : 'aar'
+}
+
+def getDeveloperId(){
+    return hasProperty('DEVELOPER_ID') ? DEVELOPER_ID : ''
+}
+
+def getDeveloperName(){
+    return hasProperty('DEVELOPER_NAME') ? DEVELOPER_NAME : ''
+}
+
 afterEvaluate { project ->
     uploadArchives {
         repositories {
