@@ -37,13 +37,6 @@
     <application>
 
         <activity
-            android:name="com.o3dr.android.client.utils.InstallServiceDialog"
-            android:theme="@android:style/Theme.Holo.Light.Dialog.NoActionBar.MinWidth"
-            android:noHistory="true"
-            android:excludeFromRecents="true"
-            android:launchMode="singleTask"/>
-
-        <activity
             android:name="org.droidplanner.services.android.impl.ui.activity.UsbIntentReceiver"
             android:launchMode="singleInstance"
             android:noHistory="true"

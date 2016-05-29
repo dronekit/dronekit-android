@@ -7,7 +7,6 @@ import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 
-import com.o3dr.android.client.utils.InstallServiceDialog;
 import com.o3dr.services.android.lib.model.IDroidPlannerServices;
 import com.o3dr.services.android.lib.util.version.VersionUtils;
 
@@ -27,10 +26,6 @@ class ApiAvailability {
 
     private static final String SERVICES_CLAZZ_NAME = IDroidPlannerServices.class.getName();
     private static final String METADATA_KEY = "com.o3dr.dronekit.android.core.version";
-
-    public static final int API_AVAILABLE = 0;
-    public static final int API_MISSING = 1;
-    public static final int API_UPDATE_REQUIRED = 2;
 
     private static final int INVALID_LIB_VERSION = -1;
 
@@ -72,29 +67,6 @@ class ApiAvailability {
         DroidPlannerService.enableDroidPlannerService(context, true);
         serviceIntent.setClass(context, DroidPlannerService.class);
         return serviceIntent;
-    }
-
-    /**
-     * Display a dialog for an error code returned from callback to {@link ApiAvailability#getAvailableServicesInstance(Context)}
-     *
-     * @param context   Application context
-     * @param errorCode Error code returned from callback to
-     *                  {@link ApiAvailability#getAvailableServicesInstance(Context)}. If errorCode is API_AVAILABLE, then this does nothing.
-     */
-    void showErrorDialog(Context context, int errorCode) {
-        switch (errorCode) {
-            case API_MISSING:
-                context.startActivity(new Intent(context, InstallServiceDialog.class)
-                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                        .putExtra(InstallServiceDialog.EXTRA_REQUIREMENT, InstallServiceDialog.REQUIRE_INSTALL));
-                break;
-
-            case API_UPDATE_REQUIRED:
-                context.startActivity(new Intent(context, InstallServiceDialog.class)
-                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                        .putExtra(InstallServiceDialog.EXTRA_REQUIREMENT, InstallServiceDialog.REQUIRE_UPDATE));
-                break;
-        }
     }
 
 }
