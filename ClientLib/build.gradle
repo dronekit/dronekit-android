@@ -30,7 +30,7 @@ android {
     buildToolsVersion android_build_tools_version
 
     dexOptions {
-        javaMaxHeapSize "2g"
+        javaMaxHeapSize "4g"
     }
 
     defaultConfig {
