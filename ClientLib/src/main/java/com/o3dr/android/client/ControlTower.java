@@ -13,6 +13,7 @@ import android.util.Log;
 import com.o3dr.android.client.interfaces.TowerListener;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.model.IDroidPlannerServices;
+import com.o3dr.services.android.lib.model.IDroneApi;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -55,15 +56,13 @@ public class ControlTower {
     private final AtomicBoolean isServiceConnecting = new AtomicBoolean(false);
 
     private final Context context;
+    private final DroneApiListener apiListener;
     private TowerListener towerListener;
     private IDroidPlannerServices o3drServices;
 
     public ControlTower(Context context) {
         this.context = context;
-    }
-
-    IDroidPlannerServices get3drServices() {
-        return o3drServices;
+        this.apiListener = new DroneApiListener(this.context);
     }
 
     public boolean isTowerConnected() {
@@ -153,7 +152,15 @@ public class ControlTower {
         }
     }
 
-    String getApplicationId() {
+    IDroneApi registerDroneApi() throws RemoteException {
+        return o3drServices.registerDroneApi(this.apiListener, getApplicationId());
+    }
+
+    void releaseDroneApi(IDroneApi droneApi) throws RemoteException {
+        o3drServices.releaseDroneApi(droneApi);
+    }
+
+    private String getApplicationId() {
         return context.getPackageName();
     }
 }

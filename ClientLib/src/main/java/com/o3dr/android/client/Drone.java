@@ -95,7 +95,6 @@ public class Drone {
     private Handler handler;
     private ControlTower serviceMgr;
     private DroneObserver droneObserver;
-    private DroneApiListener apiListener;
 
     private final AtomicReference<IDroneApi> droneApiRef = new AtomicReference<>(null);
     private ConnectionParameter connectionParameter;
@@ -123,7 +122,6 @@ public class Drone {
     void init(ControlTower controlTower, Handler handler) {
         this.handler = handler;
         this.serviceMgr = controlTower;
-        this.apiListener = new DroneApiListener(this);
         this.droneObserver = new DroneObserver(this);
     }
 
@@ -142,7 +140,7 @@ public class Drone {
         }
 
         try {
-            droneApi = serviceMgr.get3drServices().registerDroneApi(this.apiListener, serviceMgr.getApplicationId());
+            droneApi = serviceMgr.registerDroneApi();
             droneApi.asBinder().linkToDeath(binderDeathRecipient, 0);
         } catch (RemoteException e) {
             throw new IllegalStateException("Unable to retrieve a valid drone handle.");
@@ -166,7 +164,7 @@ public class Drone {
         try {
             if (isStarted(droneApi)) {
                 droneApi.asBinder().unlinkToDeath(binderDeathRecipient, 0);
-                serviceMgr.get3drServices().releaseDroneApi(droneApi);
+                serviceMgr.releaseDroneApi(droneApi);
             }
         } catch (RemoteException | NoSuchElementException e) {
             Log.e(TAG, e.getMessage(), e);
