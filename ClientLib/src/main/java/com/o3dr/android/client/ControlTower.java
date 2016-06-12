@@ -11,10 +11,12 @@ import android.os.RemoteException;
 import android.util.Log;
 
 import com.o3dr.android.client.interfaces.TowerListener;
+import com.o3dr.android.client.utils.data.tlog.TLogUtils;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.model.IDroidPlannerServices;
 import com.o3dr.services.android.lib.model.IDroneApi;
 
+import java.io.File;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -158,6 +160,14 @@ public class ControlTower {
 
     void releaseDroneApi(IDroneApi droneApi) throws RemoteException {
         o3drServices.releaseDroneApi(droneApi);
+    }
+
+    /**
+     * Return the directory where the generated tlogs are stored.
+     * @return File to the tlogs directory, or null if the root directory is not available.
+     */
+    public File getTLogsDirectory(){
+        return TLogUtils.getTLogsDirectory(getApplicationId());
     }
 
     private String getApplicationId() {

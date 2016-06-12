@@ -6,6 +6,7 @@ import android.text.TextUtils;
 
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
+import com.o3dr.android.client.utils.data.tlog.TLogUtils;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionType;
 import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
@@ -24,7 +25,6 @@ import org.droidplanner.services.android.impl.core.MAVLink.connection.MavLinkCon
 import org.droidplanner.services.android.impl.core.drone.manager.DroneCommandTracker;
 import org.droidplanner.services.android.impl.data.SessionDB;
 import org.droidplanner.services.android.impl.utils.connection.WifiConnectionHandler;
-import org.droidplanner.services.android.impl.utils.file.DirectoryPath;
 import org.droidplanner.services.android.impl.utils.file.FileUtils;
 
 import java.io.File;
@@ -254,11 +254,23 @@ public class MAVLinkClient implements DataLink.DataLinkProvider<MAVLinkMessage> 
     }
 
     private File getTLogDir(String appId) {
-        return DirectoryPath.getTLogPath(this.context, appId);
+        File tlogsDir = TLogUtils.getTLogsDirectory(appId);
+        if(tlogsDir == null)
+            return null;
+
+        if(!tlogsDir.exists() && !tlogsDir.mkdirs()){
+            return null;
+        }
+
+        return tlogsDir;
     }
 
     private File getTempTLogFile(String appId, long connectionTimestamp) {
-        return new File(getTLogDir(appId), getTLogFilename(connectionTimestamp));
+        File tlogsDir = getTLogDir(appId);
+        if(tlogsDir == null)
+            return null;
+
+        return new File(tlogsDir, getTLogFilename(connectionTimestamp));
     }
 
     private String getTLogFilename(long connectionTimestamp) {
@@ -274,7 +286,9 @@ public class MAVLinkClient implements DataLink.DataLinkProvider<MAVLinkMessage> 
     public synchronized void addLoggingFile(String appId){
         if(isConnecting() || isConnected()) {
             final File logFile = getTempTLogFile(appId, System.currentTimeMillis());
-            mavlinkConn.addLoggingPath(appId, logFile.getAbsolutePath());
+            if(logFile != null) {
+                mavlinkConn.addLoggingPath(appId, logFile.getAbsolutePath());
+            }
         }
     }
 

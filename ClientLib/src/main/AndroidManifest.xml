@@ -51,21 +51,6 @@
                 android:resource="@xml/device_filter"/>
         </activity>
 
-        <activity
-            android:name="org.droidplanner.services.android.impl.ui.activity.TLogFileSelector"
-            android:label="@string/tlog_selector_label"
-            android:theme="@style/AppDialogTheme"
-            >
-            <intent-filter>
-                <action android:name="com.o3dr.services.android.provider.action.REQUEST_TLOG_FILE"/>
-
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.OPENABLE"/>
-
-                <data android:mimeType="application/octet-stream"/>
-            </intent-filter>
-        </activity>
-
         <service
             android:name="org.droidplanner.services.android.impl.api.DroidPlannerService"
             android:enabled="false">

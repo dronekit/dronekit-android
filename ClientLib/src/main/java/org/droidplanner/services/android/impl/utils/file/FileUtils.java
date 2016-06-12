@@ -26,28 +26,7 @@ public class FileUtils {
 		return getFileList(DirectoryPath.getCameraInfoPath(context), filter);
 	}
 
-    public static File[] getTLogFileList(Context context, String appId) {
-        final FilenameFilter tlogFilter = new FilenameFilter() {
-            public boolean accept(File dir, String filename) {
-                return filename.endsWith(TLOG_FILENAME_EXT);
-            }
-        };
-
-        File[] unsentFiles = getFileList(DirectoryPath.getTLogPath(context, appId).getPath(), tlogFilter);
-        File[] sentFiles = getFileList(DirectoryPath.getTLogSentPath(context, appId).getPath(), tlogFilter);
-        File[] tlogFiles = new File[unsentFiles.length + sentFiles.length];
-
-        int i = 0;
-        for(File file : unsentFiles)
-            tlogFiles[i++] = file;
-
-        for(File file : sentFiles)
-            tlogFiles[i++] = file;
-
-        return tlogFiles;
-    }
-
-	static public File[] getFileList(String path, FilenameFilter filter) {
+	private static File[] getFileList(String path, FilenameFilter filter) {
 		File mPath = new File(path);
         if(!mPath.exists())
             return new File[0];
@@ -74,7 +53,7 @@ public class FileUtils {
         return sdf.format(new Date(timestamp));
     }
 
-    static public String getTimeStamp() {
+    private static String getTimeStamp() {
         return getTimeStamp(System.currentTimeMillis());
     }
 }
