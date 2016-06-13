@@ -25,7 +25,6 @@ import org.droidplanner.services.android.impl.core.MAVLink.connection.MavLinkCon
 import org.droidplanner.services.android.impl.core.drone.manager.DroneCommandTracker;
 import org.droidplanner.services.android.impl.data.SessionDB;
 import org.droidplanner.services.android.impl.utils.connection.WifiConnectionHandler;
-import org.droidplanner.services.android.impl.utils.file.FileUtils;
 
 import java.io.File;
 import java.net.InetAddress;
@@ -41,8 +40,6 @@ public class MAVLinkClient implements DataLink.DataLinkProvider<MAVLinkMessage> 
 
     private static final int DEFAULT_SYS_ID = 255;
     private static final int DEFAULT_COMP_ID = 190;
-
-    private static final String TLOG_PREFIX = "log";
 
     /**
      * Maximum possible sequence number for a packet.
@@ -274,8 +271,9 @@ public class MAVLinkClient implements DataLink.DataLinkProvider<MAVLinkMessage> 
     }
 
     private String getTLogFilename(long connectionTimestamp) {
-        return TLOG_PREFIX + "_" + MavLinkConnectionTypes.getConnectionTypeLabel(this.connParams.getConnectionType()) +
-                "_" + FileUtils.getTimeStamp(connectionTimestamp) + FileUtils.TLOG_FILENAME_EXT;
+        return TLogUtils.getTLogFilename(
+                MavLinkConnectionTypes.getConnectionTypeLabel(this.connParams.getConnectionType()),
+                connectionTimestamp);
     }
 
     /**

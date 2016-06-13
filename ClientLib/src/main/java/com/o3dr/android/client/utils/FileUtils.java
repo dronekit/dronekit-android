@@ -1,6 +1,8 @@
-package org.droidplanner.services.android.impl.utils.file;
+package com.o3dr.android.client.utils;
 
 import android.content.Context;
+
+import org.droidplanner.services.android.impl.utils.file.DirectoryPath;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -13,8 +15,7 @@ import java.util.Locale;
 public class FileUtils {
 
     public static final String CAMERA_FILENAME_EXT = ".xml";
-
-    public static final String TLOG_FILENAME_EXT = ".tlog";
+    public static final SimpleDateFormat timestampFormatter = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss", Locale.US);
 
 	public static File[] getCameraInfoFileList(Context context) {
 		FilenameFilter filter = new FilenameFilter() {
@@ -49,8 +50,7 @@ public class FileUtils {
      * Timestamp for logs in the Mission Planner Format
      */
     static public String getTimeStamp(long timestamp) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss", Locale.US);
-        return sdf.format(new Date(timestamp));
+        return timestampFormatter.format(new Date(timestamp));
     }
 
     private static String getTimeStamp() {
