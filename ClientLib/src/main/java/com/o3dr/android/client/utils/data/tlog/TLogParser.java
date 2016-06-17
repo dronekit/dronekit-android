@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -290,7 +291,9 @@ public class TLogParser {
     /**
      * Mavlink message event.
      */
-    public static class Event {
+    public static class Event implements Serializable {
+        private static final long serialVersionUID = -3035618718582382608L;
+
         private long timestamp;
         private MAVLinkMessage mavLinkMessage;
 
