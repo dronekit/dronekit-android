@@ -4,6 +4,11 @@ import android.content.Context;
 import android.os.Handler;
 import android.text.TextUtils;
 
+import org.droidplanner.services.android.BuildConfig;
+import org.droidplanner.services.android.core.drone.autopilot.apm.solo.AbstractLinkManager;
+import org.droidplanner.services.android.core.drone.autopilot.apm.solo.SoloComp;
+import org.droidplanner.services.android.core.drone.autopilot.apm.solo.controller.ControllerLinkManager;
+
 import com.o3dr.android.client.utils.connection.TcpConnection;
 import com.o3dr.android.client.utils.connection.UdpConnection;
 import com.o3dr.services.android.lib.drone.companion.solo.button.ButtonTypes;
@@ -18,10 +23,6 @@ import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
 import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.model.SimpleCommandListener;
 
-import org.droidplanner.services.android.BuildConfig;
-import org.droidplanner.services.android.core.drone.autopilot.apm.solo.AbstractLinkManager;
-import org.droidplanner.services.android.core.drone.autopilot.apm.solo.SoloComp;
-import org.droidplanner.services.android.core.drone.autopilot.apm.solo.controller.ControllerLinkManager;
 import org.droidplanner.services.android.utils.connection.SshConnection;
 
 import java.io.IOException;
@@ -234,8 +235,6 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
     }
 
     public void sendTLVPacket(TLVPacket packet, boolean useFollowLink, ICommandListener listener) {
-        Timber.i("sendTLVPacket(): packet=%s useFollowLink=%s", packet, useFollowLink);
-
         if (packet == null) {
             return;
         }
@@ -316,16 +315,12 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
     }
 
     public void disableFollowDataConnection() {
-        Timber.i("disableFollowDataConnection(): followDataConn=%s", followDataConn);
-
         if (followDataConn != null) {
             followDataConn.disconnect();
         }
     }
 
     public void enableFollowDataConnection() {
-        Timber.i("enableFollowDataConnection(): followDataConn=%s", followDataConn);
-
         if (followDataConn != null) {
             followDataConn.connect();
         }

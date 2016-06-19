@@ -4,7 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 /**
- * Created by kellys on 3/18/16.
+ * A location supplied by the client app when using external locations in Follow.
  */
 public class FollowLocation implements Parcelable {
 
