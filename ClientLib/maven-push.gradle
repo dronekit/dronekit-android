@@ -19,7 +19,7 @@ def getMavenPublishUrl(String artifactId){
     if(prefix == null)
         return null
 
-    return "$prefix/$artifactId/;publish=1"
+    return "$prefix/$artifactId/;publish=0;override=1"
 }
 
 def getMavenPomPackaging(){
