@@ -1,7 +1,7 @@
 apply plugin: 'maven'
 apply plugin: 'signing'
 
-def projectGroupId = 'org.droidplanner.android'
+def projectGroupId = 'com.o3dr.android'
 def projectArtifactId = project.PUBLISH_ARTIFACT_ID
 def projectVersion = project.PUBLISH_VERSION
 def projectDescription = project.PROJECT_DESCRIPTION
@@ -10,8 +10,12 @@ def projectLicense = project.PROJECT_LICENSE
 def projectLicenseUrl = project.PROJECT_LICENSE_URL
 def projectLicenseDistribution = project.PROJECT_LICENSE_DISTRIBUTION
 
+def getMavenOrg(){
+    return hasProperty('COM_O3DR_MAVEN_ORG') ? COM_O3DR_MAVEN_ORG : ''
+}
+
 def getMavenPublishUrl(String artifactId){
-    def prefix = hasProperty('DROIDPLANNER_MAVEN_PUBLISH_URL_PREFIX') ? DROIDPLANNER_MAVEN_PUBLISH_URL_PREFIX : null
+    def prefix = hasProperty('COM_O3DR_MAVEN_PUBLISH_URL_PREFIX') ? COM_O3DR_MAVEN_PUBLISH_URL_PREFIX : null
     if(prefix == null)
         return null
 
@@ -19,7 +23,7 @@ def getMavenPublishUrl(String artifactId){
 }
 
 def getMavenPomPackaging(){
-    return hasProperty('DROIDPLANNER_MAVEN_POM_PACKAGING') ? DROIDPLANNER_MAVEN_POM_PACKAGING : 'aar'
+    return hasProperty('COM_O3DR_MAVEN_POM_PACKAGING') ? COM_O3DR_MAVEN_POM_PACKAGING : 'aar'
 }
 
 def getDeveloperId(){
@@ -49,7 +53,6 @@ afterEvaluate { project ->
                     packaging getMavenPomPackaging()
                     description projectDescription
 
-                    //TODO: replace the values below
                     url 'https://github.com/dronekit/dronekit-android'
                     scm {
                         url 'https://github.com/dronekit/dronekit-android'
