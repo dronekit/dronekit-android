@@ -5,7 +5,6 @@ import android.os.Handler;
 
 import com.o3dr.services.android.lib.drone.action.ControlActions;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
-import com.o3dr.services.android.lib.gcs.follow.FollowLocation;
 import com.o3dr.services.android.lib.gcs.follow.FollowLocationSource;
 import com.o3dr.services.android.lib.model.action.Action;
 
@@ -171,9 +170,9 @@ public class Follow implements OnDroneListener<MavLinkDrone>, LocationReceiver {
         }
     }
 
-    public void onFollowNewLocation(FollowLocation fl) {
-        Timber.d("onFollowNewLocation(%s)", fl);
-        Location loc = mLocationRelay.toLocation(fl);
+    public void onFollowNewLocation(android.location.Location location) {
+        Timber.d("onFollowNewLocation(%s)", location);
+        Location loc = mLocationRelay.toLocation(location);
         if(loc != null) {
             onLocationUpdate(loc);
         }

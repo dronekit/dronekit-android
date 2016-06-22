@@ -20,7 +20,6 @@ import com.o3dr.services.android.lib.gcs.follow.FollowLocationSource;
 import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
 import com.o3dr.services.android.lib.drone.property.DroneAttribute;
 import com.o3dr.services.android.lib.gcs.action.FollowMeActions;
-import com.o3dr.services.android.lib.gcs.follow.FollowLocation;
 import com.o3dr.services.android.lib.gcs.follow.FollowType;
 import com.o3dr.services.android.lib.gcs.returnToMe.ReturnToMeState;
 import com.o3dr.services.android.lib.model.ICommandListener;
@@ -312,9 +311,9 @@ public class MavLinkDroneManager extends DroneManager<MavLinkDrone, MAVLinkPacke
                 return true;
 
             case FollowMeActions.ACTION_NEW_EXTERNAL_LOCATION:
-                data.setClassLoader(FollowLocation.class.getClassLoader());
+                data.setClassLoader(android.location.Location.class.getClassLoader());
                 if(followMe != null && data != null) {
-                    FollowLocation loc = data.getParcelable(FollowMeActions.EXTRA_LOCATION);
+                    android.location.Location loc = data.getParcelable(FollowMeActions.EXTRA_LOCATION);
                     if(loc != null) {
                         Timber.i("onNewLocation(%s)", loc);
                         followMe.onFollowNewLocation(loc);

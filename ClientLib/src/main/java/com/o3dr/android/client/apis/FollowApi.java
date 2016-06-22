@@ -3,7 +3,6 @@ package com.o3dr.android.client.apis;
 import android.os.Bundle;
 
 import com.o3dr.android.client.Drone;
-import com.o3dr.services.android.lib.gcs.follow.FollowLocation;
 import com.o3dr.services.android.lib.gcs.follow.FollowLocationSource;
 import com.o3dr.services.android.lib.gcs.follow.FollowType;
 import com.o3dr.services.android.lib.model.action.Action;
@@ -84,7 +83,7 @@ public class FollowApi extends Api {
     /**
      * A new FollowLocation for the drone to follow.
      */
-    public void updateLocation(FollowLocation loc) {
+    public void updateLocation(android.location.Location loc) {
         Bundle params = new Bundle();
         params.putParcelable(EXTRA_LOCATION, loc);
         drone.performAsyncAction(new Action(ACTION_NEW_EXTERNAL_LOCATION, params));

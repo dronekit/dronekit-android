@@ -3,7 +3,6 @@ package org.droidplanner.services.android.core.gcs.follow;
 import android.content.Context;
 
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
-import com.o3dr.services.android.lib.gcs.follow.FollowLocation;
 
 import org.droidplanner.services.android.core.gcs.location.Location;
 
@@ -18,20 +17,6 @@ public class LocationRelay {
     private static final float LOCATION_ACCURACY_THRESHOLD = 10.0f;
     private static final float JUMP_FACTOR = 4.0f;
     private static boolean VERBOSE = true;
-
-    public static android.location.Location toAndroidLocation(FollowLocation fl) {
-        android.location.Location loc = new android.location.Location("follow");
-
-        loc.setLatitude(fl.getLat());
-        loc.setLongitude(fl.getLng());
-        loc.setAltitude(fl.getAltitude());
-        loc.setAccuracy(fl.getAccuracy());
-        loc.setBearing(fl.getHeading());
-        loc.setSpeed(fl.getSpeed());
-        loc.setTime(fl.getTime());
-
-        return loc;
-    }
 
     static String getLatLongFromLocation(final android.location.Location location) {
         return android.location.Location.convert(location.getLatitude(), android.location.Location.FORMAT_DEGREES) + " " +
@@ -55,25 +40,23 @@ public class LocationRelay {
         mSpeedReadings = 0;
     }
 
-    public Location toLocation(FollowLocation fl) {
+    public Location toLocation(android.location.Location location) {
         Location loc = null;
-        if(VERBOSE) Timber.d("toLocation(): followLoc=" + fl);
+        if(VERBOSE) Timber.d("toLocation(): followLoc=" + location);
 
-        boolean ok = (fl.hasAccuracy() && fl.hasHeading() && fl.hasTime());
+        boolean ok = (location.hasAccuracy() && location.hasBearing() && location.getTime() > 0);
 
         if(!ok) {
             Timber.w("toLocation(): Location needs accuracy, heading, and time");
         }
 
         if(ok) {
-            android.location.Location androidLocation = toAndroidLocation(fl);
-
             float distanceToLast = -1.0f;
             long timeSinceLast = -1L;
 
-            final long androidLocationTime = androidLocation.getTime();
+            final long androidLocationTime = location.getTime();
             if (mLastLocation != null) {
-                distanceToLast = androidLocation.distanceTo(mLastLocation);
+                distanceToLast = location.distanceTo(mLastLocation);
                 timeSinceLast = (androidLocationTime - mLastLocation.getTime()) / 1000;
             }
 
@@ -81,7 +64,7 @@ public class LocationRelay {
                     ? (distanceToLast / timeSinceLast)
                     : 0f;
 
-            final boolean isAccurate = isLocationAccurate(androidLocation.getAccuracy(), currentSpeed);
+            final boolean isAccurate = isLocationAccurate(location.getAccuracy(), currentSpeed);
 
             if(VERBOSE) {
                 Timber.d(
@@ -91,21 +74,21 @@ public class LocationRelay {
 
             // Make a new location
             LatLongAlt lla = new LatLongAlt(
-                    androidLocation.getLatitude(),
-                    androidLocation.getLongitude(),
-                    androidLocation.getAltitude()
+                    location.getLatitude(),
+                    location.getLongitude(),
+                    location.getAltitude()
             );
 
             loc = new Location(
                     lla,
-                    androidLocation.getBearing(),
-                    androidLocation.getSpeed(),
+                    location.getBearing(),
+                    location.getSpeed(),
                     isAccurate,
-                    androidLocation.getTime());
+                    location.getTime());
 
-            mLastLocation = androidLocation;
+            mLastLocation = location;
 
-            if(VERBOSE) Timber.d("External location lat/lng=" + getLatLongFromLocation(androidLocation));
+            if(VERBOSE) Timber.d("External location lat/lng=" + getLatLongFromLocation(location));
         }
 
         return loc;
