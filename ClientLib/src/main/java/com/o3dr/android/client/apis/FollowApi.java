@@ -57,7 +57,7 @@ public class FollowApi extends Api {
     public void enableFollowMe(FollowType type, FollowLocationSource source) {
         Bundle params = new Bundle();
         params.putParcelable(EXTRA_FOLLOW_TYPE, type);
-        params.putInt(EXTRA_LOCATION_SOURCE, source.ordinal());
+        params.putParcelable(EXTRA_LOCATION_SOURCE, source);
         drone.performAsyncAction(new Action(ACTION_ENABLE_FOLLOW_ME, params));
     }
 

@@ -27,7 +27,7 @@ public class Follow implements OnDroneListener<MavLinkDrone>, LocationReceiver {
     private static final String TAG = Follow.class.getSimpleName();
     private Location lastLocation;
     private FollowLocationSource mLocationSource = FollowLocationSource.Internal;
-    
+
     /**
      * Set of return value for the 'toggleFollowMeState' method.
      */

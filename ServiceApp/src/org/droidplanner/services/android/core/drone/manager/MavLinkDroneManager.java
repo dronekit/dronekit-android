@@ -268,9 +268,14 @@ public class MavLinkDroneManager extends DroneManager<MavLinkDrone, MAVLinkPacke
         switch (type) {
             //FOLLOW-ME ACTIONS
             case FollowMeActions.ACTION_ENABLE_FOLLOW_ME:
-                FollowLocationSource locationSource = FollowLocationSource.fromOrdinal(
-                        data.getInt(FollowMeActions.EXTRA_LOCATION_SOURCE, FollowLocationSource.Internal.ordinal()));
                 data.setClassLoader(FollowType.class.getClassLoader());
+
+                FollowLocationSource locationSource = data.getParcelable(FollowMeActions.EXTRA_LOCATION_SOURCE);
+
+                if(locationSource == null) {
+                    locationSource = FollowLocationSource.Internal;
+                }
+
                 FollowType followType = data.getParcelable(FollowMeActions.EXTRA_FOLLOW_TYPE);
                 enableFollowMe(followType, locationSource, listener);
                 return true;
@@ -278,6 +283,15 @@ public class MavLinkDroneManager extends DroneManager<MavLinkDrone, MAVLinkPacke
             case FollowMeActions.ACTION_UPDATE_FOLLOW_PARAMS:
                 if (followMe != null) {
                     data.setClassLoader(LatLong.class.getClassLoader());
+
+                    if(data.containsKey(FollowMeActions.EXTRA_LOCATION_SOURCE)) {
+                        FollowLocationSource source = data.getParcelable(FollowMeActions.EXTRA_LOCATION_SOURCE);
+                        if(source == null) {
+                            source = FollowLocationSource.Internal;
+                        }
+
+                        followMe.setLocationSource(source);
+                    }
 
                     FollowAlgorithm followAlgorithm = followMe.getFollowAlgorithm();
                     if (followAlgorithm != null) {
