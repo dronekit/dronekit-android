@@ -3,6 +3,7 @@ package com.o3dr.android.client.apis;
 import android.os.Bundle;
 
 import com.o3dr.android.client.Drone;
+import com.o3dr.services.android.lib.gcs.follow.FollowLocation;
 import com.o3dr.services.android.lib.gcs.follow.FollowType;
 import com.o3dr.services.android.lib.model.action.Action;
 
@@ -10,8 +11,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static com.o3dr.services.android.lib.gcs.action.FollowMeActions.ACTION_DISABLE_FOLLOW_ME;
 import static com.o3dr.services.android.lib.gcs.action.FollowMeActions.ACTION_ENABLE_FOLLOW_ME;
+import static com.o3dr.services.android.lib.gcs.action.FollowMeActions.ACTION_NEW_EXTERNAL_LOCATION;
 import static com.o3dr.services.android.lib.gcs.action.FollowMeActions.ACTION_UPDATE_FOLLOW_PARAMS;
 import static com.o3dr.services.android.lib.gcs.action.FollowMeActions.EXTRA_FOLLOW_TYPE;
+import static com.o3dr.services.android.lib.gcs.action.FollowMeActions.EXTRA_LOCATION;
+import static com.o3dr.services.android.lib.gcs.action.FollowMeActions.EXTRA_USE_EXTERNAL_PROVIDER;
 
 /**
  * Provides access to the Follow me api.
@@ -46,12 +50,18 @@ public class FollowApi extends Api {
     /**
      * Enables follow-me if disabled.
      *
-     * @param followType follow-me mode to use.
+     * @param type follow-me mode to use.
+     * @param useExternal true if the API will expect locations from the client app.
      */
-    public void enableFollowMe(FollowType followType) {
+    public void enableFollowMe(FollowType type, boolean useExternal) {
         Bundle params = new Bundle();
-        params.putParcelable(EXTRA_FOLLOW_TYPE, followType);
+        params.putParcelable(EXTRA_FOLLOW_TYPE, type);
+        params.putBoolean(EXTRA_USE_EXTERNAL_PROVIDER, useExternal);
         drone.performAsyncAction(new Action(ACTION_ENABLE_FOLLOW_ME, params));
+    }
+
+    public void enableFollowMe(FollowType type) {
+        enableFollowMe(type, false);
     }
 
     /**
@@ -68,5 +78,14 @@ public class FollowApi extends Api {
      */
     public void disableFollowMe() {
         drone.performAsyncAction(new Action(ACTION_DISABLE_FOLLOW_ME));
+    }
+
+    /**
+     * A new FollowLocation for the drone to follow.
+     */
+    public void updateLocation(FollowLocation loc) {
+        Bundle params = new Bundle();
+        params.putParcelable(EXTRA_LOCATION, loc);
+        drone.performAsyncAction(new Action(ACTION_NEW_EXTERNAL_LOCATION, params));
     }
 }
