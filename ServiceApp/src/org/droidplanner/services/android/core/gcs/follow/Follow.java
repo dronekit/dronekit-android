@@ -5,8 +5,9 @@ import android.os.Handler;
 
 import com.o3dr.services.android.lib.drone.action.ControlActions;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
-import com.o3dr.services.android.lib.model.action.Action;
 import com.o3dr.services.android.lib.gcs.follow.FollowLocation;
+import com.o3dr.services.android.lib.gcs.follow.FollowLocationSource;
+import com.o3dr.services.android.lib.model.action.Action;
 
 import org.droidplanner.services.android.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.services.android.core.drone.DroneInterfaces.OnDroneListener;
@@ -25,8 +26,8 @@ public class Follow implements OnDroneListener<MavLinkDrone>, LocationReceiver {
 
     private static final String TAG = Follow.class.getSimpleName();
     private Location lastLocation;
-    private boolean mUseExternalLocations = false;
-
+    private FollowLocationSource mLocationSource = FollowLocationSource.Internal;
+    
     /**
      * Set of return value for the 'toggleFollowMeState' method.
      */
@@ -57,9 +58,10 @@ public class Follow implements OnDroneListener<MavLinkDrone>, LocationReceiver {
         mLocationRelay = new LocationRelay(context, this);
     }
 
-    public void toggleFollowMeState(boolean useExternal) {
+    public void toggleFollowMeState(FollowLocationSource source) {
         final MavLinkDrone drone = droneMgr.getDrone();
-        final State droneState = drone == null ? null : drone.getState();
+        final State droneState = (drone == null) ? null : drone.getState();
+
         if (droneState == null) {
             state = FollowStates.FOLLOW_INVALID_STATE;
             return;
@@ -87,7 +89,7 @@ public class Follow implements OnDroneListener<MavLinkDrone>, LocationReceiver {
 
         mLocationRelay.onFollowStart();
 
-        if(!mUseExternalLocations) {
+        if(mLocationSource != FollowLocationSource.External) {
             locationFinder.enableLocationUpdates();
         }
 
@@ -122,27 +124,31 @@ public class Follow implements OnDroneListener<MavLinkDrone>, LocationReceiver {
         return state == FollowStates.FOLLOW_RUNNING || state == FollowStates.FOLLOW_START;
     }
 
-    public boolean isUsingExternalLocations() {
-        return mUseExternalLocations;
+    public FollowLocationSource getLocationSource() {
+        return mLocationSource;
     }
 
-    public void useExternalLocations(boolean use) {
-        Timber.d("useExternalLocations(): use=%s", use);
+    public void setLocationSource(FollowLocationSource source) {
+        if(mLocationSource != source) {
+            switch(mLocationSource) {
+                case External: {
+                    Timber.d("Turn external OFF");
+                    locationFinder.addLocationListener(TAG, this);
+                    locationFinder.enableLocationUpdates();
+                    break;
+                }
 
-        if(mUseExternalLocations != use) {
-            // We're turning external locations off, going back to normal
-            if(mUseExternalLocations) {
-                Timber.d("Turn external OFF");
-                locationFinder.addLocationListener(TAG, this);
-                locationFinder.enableLocationUpdates();
-            } else {
-                Timber.d("Turn external ON");
-                // We're turning them on, ignoring on-device GPS
-                locationFinder.removeLocationListener(TAG);
-                locationFinder.disableLocationUpdates();
+                default: {
+                    Timber.d("Turn external ON");
+                    // We're turning them on, ignoring on-device GPS
+                    locationFinder.removeLocationListener(TAG);
+                    locationFinder.disableLocationUpdates();
+
+                    break;
+                }
             }
 
-            mUseExternalLocations = use;
+            mLocationSource = source;
         }
     }
 
