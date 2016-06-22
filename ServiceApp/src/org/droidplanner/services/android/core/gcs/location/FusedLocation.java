@@ -87,11 +87,13 @@ public class FusedLocation extends LocationCallback implements LocationFinder, G
 
     @Override
     public void enableLocationUpdates() {
-        gApiMgr.start();
-        mSpeedReadings = 0;
-        mTotalSpeed = 0f;
-        mLastLocation = null;
-        mLocationUpdatesEnabled = true;
+        if(!mLocationUpdatesEnabled) {
+            gApiMgr.start();
+            mSpeedReadings = 0;
+            mTotalSpeed = 0f;
+            mLastLocation = null;
+            mLocationUpdatesEnabled = true;
+        }
     }
 
     @Override
