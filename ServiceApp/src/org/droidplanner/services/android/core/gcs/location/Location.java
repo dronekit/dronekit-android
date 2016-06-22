@@ -59,4 +59,14 @@ public class Location {
         return fixTime;
     }
 
+    @Override
+    public String toString() {
+        return "Location{" +
+                "coordinate=" + coordinate +
+                ", heading=" + heading +
+                ", speed=" + speed +
+                ", isAccurate=" + isAccurate +
+                ", fixTime=" + fixTime +
+                '}';
+    }
 }
