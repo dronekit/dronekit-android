@@ -61,7 +61,7 @@ public class FollowApi extends Api {
     }
 
     public void enableFollowMe(FollowType type) {
-        enableFollowMe(type, FollowLocationSource.Internal);
+        enableFollowMe(type, FollowLocationSource.INTERNAL);
     }
 
     /**

@@ -709,7 +709,7 @@ public class Drone {
      * @deprecated Use {@link FollowApi#enableFollowMe(FollowType, com.o3dr.services.android.lib.gcs.follow.FollowLocationSource)} instead.
      */
     public void enableFollowMe(FollowType followType) {
-        FollowApi.getApi(this).enableFollowMe(followType, FollowLocationSource.Internal);
+        FollowApi.getApi(this).enableFollowMe(followType, FollowLocationSource.INTERNAL);
     }
 
     /**

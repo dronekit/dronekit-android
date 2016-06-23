@@ -7,11 +7,12 @@ import android.os.Parcelable;
  * Location source for Follow
  */
 public enum FollowLocationSource implements Parcelable {
-    Internal("Device GPS"),
-    External("Client Specified")
+    NONE("None"),
+    INTERNAL("Device GPS"),
+    CLIENT_SPECIFIED("Client Specified")
     ;
 
-    final String mLabel;
+    private final String mLabel;
 
     FollowLocationSource(String label) {
         mLabel = label;
@@ -22,16 +23,6 @@ public enum FollowLocationSource implements Parcelable {
     @Override
     public String toString() {
         return getLabel();
-    }
-
-    public static FollowLocationSource fromOrdinal(int ordinal) {
-        for(FollowLocationSource source: values()) {
-            if(source.ordinal() == ordinal) {
-                return source;
-            }
-        }
-
-        return Internal;
     }
 
     @Override

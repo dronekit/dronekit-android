@@ -25,7 +25,7 @@ public class Follow implements OnDroneListener<MavLinkDrone>, LocationReceiver {
 
     private static final String TAG = Follow.class.getSimpleName();
     private Location lastLocation;
-    private FollowLocationSource mLocationSource = FollowLocationSource.Internal;
+    private FollowLocationSource mLocationSource = FollowLocationSource.NONE;
 
     /**
      * Set of return value for the 'toggleFollowMeState' method.
@@ -88,7 +88,7 @@ public class Follow implements OnDroneListener<MavLinkDrone>, LocationReceiver {
 
         mLocationRelay.onFollowStart();
 
-        if(mLocationSource != FollowLocationSource.External) {
+        if(mLocationSource == FollowLocationSource.INTERNAL) {
             locationFinder.enableLocationUpdates();
         }
 
@@ -129,20 +129,18 @@ public class Follow implements OnDroneListener<MavLinkDrone>, LocationReceiver {
 
     public void setLocationSource(FollowLocationSource source) {
         if(mLocationSource != source) {
-            switch(mLocationSource) {
-                case External: {
-                    Timber.d("Turn external OFF");
-                    locationFinder.addLocationListener(TAG, this);
-                    locationFinder.enableLocationUpdates();
+            switch(source) {
+                case CLIENT_SPECIFIED: {
+                    Timber.d("Switch to client-specified locations");
+                    locationFinder.removeLocationListener(TAG);
+                    locationFinder.disableLocationUpdates();
                     break;
                 }
 
                 default: {
-                    Timber.d("Turn external ON");
-                    // We're turning them on, ignoring on-device GPS
-                    locationFinder.removeLocationListener(TAG);
-                    locationFinder.disableLocationUpdates();
-
+                    Timber.d("Switch to internal locations");
+                    locationFinder.addLocationListener(TAG, this);
+                    locationFinder.enableLocationUpdates();
                     break;
                 }
             }
@@ -173,7 +171,8 @@ public class Follow implements OnDroneListener<MavLinkDrone>, LocationReceiver {
     public void onFollowNewLocation(android.location.Location location) {
         Timber.d("onFollowNewLocation(%s)", location);
         Location loc = mLocationRelay.toLocation(location);
-        if(loc != null) {
+
+        if((loc != null) && (mLocationSource == FollowLocationSource.CLIENT_SPECIFIED)) {
             onLocationUpdate(loc);
         }
     }

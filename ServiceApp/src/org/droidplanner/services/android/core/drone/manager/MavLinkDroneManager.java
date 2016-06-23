@@ -272,7 +272,7 @@ public class MavLinkDroneManager extends DroneManager<MavLinkDrone, MAVLinkPacke
                 FollowLocationSource locationSource = data.getParcelable(FollowMeActions.EXTRA_LOCATION_SOURCE);
 
                 if(locationSource == null) {
-                    locationSource = FollowLocationSource.Internal;
+                    locationSource = FollowLocationSource.INTERNAL;
                 }
 
                 FollowType followType = data.getParcelable(FollowMeActions.EXTRA_FOLLOW_TYPE);
@@ -283,12 +283,8 @@ public class MavLinkDroneManager extends DroneManager<MavLinkDrone, MAVLinkPacke
                 if (followMe != null) {
                     data.setClassLoader(LatLong.class.getClassLoader());
 
-                    if(data.containsKey(FollowMeActions.EXTRA_LOCATION_SOURCE)) {
-                        FollowLocationSource source = data.getParcelable(FollowMeActions.EXTRA_LOCATION_SOURCE);
-                        if(source == null) {
-                            source = FollowLocationSource.Internal;
-                        }
-
+                    FollowLocationSource source = data.getParcelable(FollowMeActions.EXTRA_LOCATION_SOURCE);
+                    if(source != null) {
                         followMe.setLocationSource(source);
                     }
 
@@ -352,13 +348,14 @@ public class MavLinkDroneManager extends DroneManager<MavLinkDrone, MAVLinkPacke
                 return;
             }
 
-            Timber.d("CURRENT: followMe.enabled=%s followMe.state=%s", followMe.isEnabled(), followMe.getState());
+            Timber.d("CURRENT: followMe.enabled=%s followMe.state=%s source=%s",
+                    followMe.isEnabled(), followMe.getState(), source);
 
             if (!followMe.isEnabled()) {
                 followMe.toggleFollowMeState(source);
-            } else {
-                followMe.setLocationSource(source);
             }
+
+            followMe.setLocationSource(source);
 
             FollowAlgorithm currentAlg = followMe.getFollowAlgorithm();
             if (currentAlg.getType() != selectedMode) {
@@ -371,7 +368,6 @@ public class MavLinkDroneManager extends DroneManager<MavLinkDrone, MAVLinkPacke
                 FollowAlgorithm algo = selectedMode.getAlgorithmType(this, handler);
                 Timber.d("Setting followAlgorithm to %s", algo);
                 followMe.setAlgorithm(algo);
-                followMe.setLocationSource(source);
                 CommonApiUtils.postSuccessEvent(listener);
             }
 
