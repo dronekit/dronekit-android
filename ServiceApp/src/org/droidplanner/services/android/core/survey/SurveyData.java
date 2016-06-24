@@ -10,17 +10,19 @@ public class SurveyData {
     private Double angle;
     private Double overlap;
     private Double sidelap;
+    private boolean lockOrientation;
     private Footprint footprint;
 
     public SurveyData() {
-        update(0, (50.0), 50, 60);
+        update(0, (50.0), 50, 60, false);
     }
 
-    public void update(double angle, double altitude, double overlap, double sidelap) {
+    public void update(double angle, double altitude, double overlap, double sidelap, boolean lockOrientation) {
         this.angle = angle;
         this.overlap = overlap;
         this.sidelap = sidelap;
         setAltitude(altitude);
+        this.lockOrientation = lockOrientation;
     }
 
     public void setAltitude(double altitude) {
@@ -36,6 +38,10 @@ public class SurveyData {
 
     public CameraInfo getCameraInfo() {
         return this.camera;
+    }
+
+    public void setLockOrientation(boolean lockOrientation) {
+        this.lockOrientation = lockOrientation;
     }
 
     private void tryToLoadOverlapFromCamera() {
@@ -87,10 +93,14 @@ public class SurveyData {
         return camera.name;
     }
 
+    public boolean getLockOrientation(){
+        return lockOrientation;
+    }
+
     @Override
     public String toString() {
-        return String.format(Locale.US, "Altitude: %f Angle %f Overlap: %f Sidelap: %f", altitude,
-                angle, overlap, sidelap);
+        return String.format(Locale.US, "Altitude: %f Angle %f Overlap: %f Sidelap: %f Locked Orientation: %b", altitude,
+                angle, overlap, sidelap, lockOrientation);
     }
 
 }

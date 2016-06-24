@@ -14,6 +14,7 @@ public class SurveyDetail implements Parcelable {
     private double angle;
     private double overlap;
     private double sidelap;
+    private boolean lockOrientation;
     private CameraDetail cameraDetail;
 
     public double getAltitude() {
@@ -56,6 +57,14 @@ public class SurveyDetail implements Parcelable {
         this.cameraDetail = cameraDetail;
     }
 
+    public boolean getLockOrientation(){
+        return lockOrientation;
+    }
+
+    public void setLockOrientation(boolean lockOrientation){
+        this.lockOrientation = lockOrientation;
+    }
+
     public double getLateralFootPrint() {
         return altitude * cameraDetail.getSensorLateralSize()
                 / cameraDetail.getFocalLength();
@@ -93,6 +102,7 @@ public class SurveyDetail implements Parcelable {
         dest.writeDouble(this.angle);
         dest.writeDouble(this.overlap);
         dest.writeDouble(this.sidelap);
+        dest.writeByte((byte)(this.lockOrientation?1:0));
         dest.writeParcelable(this.cameraDetail, 0);
     }
 
@@ -104,6 +114,7 @@ public class SurveyDetail implements Parcelable {
         this.angle = copy.angle;
         this.overlap = copy.overlap;
         this.sidelap = copy.sidelap;
+        this.lockOrientation = copy.lockOrientation;
         this.cameraDetail = copy.cameraDetail == null ? null : new CameraDetail(copy.cameraDetail);
     }
 
@@ -112,6 +123,7 @@ public class SurveyDetail implements Parcelable {
         this.angle = in.readDouble();
         this.overlap = in.readDouble();
         this.sidelap = in.readDouble();
+        this.lockOrientation = in.readByte() != 0;
         this.cameraDetail = in.readParcelable(CameraDetail.class.getClassLoader());
     }
 
