@@ -1,7 +1,5 @@
 package org.droidplanner.services.android.core.gcs.follow;
 
-import android.content.Context;
-
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 
 import org.droidplanner.services.android.core.gcs.location.Location;
@@ -16,23 +14,19 @@ public class LocationRelay {
 
     private static final float LOCATION_ACCURACY_THRESHOLD = 10.0f;
     private static final float JUMP_FACTOR = 4.0f;
-    private static boolean VERBOSE = true;
+    private static boolean VERBOSE = false;
 
-    static String getLatLongFromLocation(final android.location.Location location) {
+    public static String getLatLongFromLocation(final android.location.Location location) {
         return android.location.Location.convert(location.getLatitude(), android.location.Location.FORMAT_DEGREES) + " " +
                 android.location.Location.convert(location.getLongitude(), android.location.Location.FORMAT_DEGREES);
     }
-
-    private final Context mContext;
-    private final Follow mFollow;
 
     private android.location.Location mLastLocation;
     private float mTotalSpeed = 0;
     private int mSpeedReadings = 0;
 
-    public LocationRelay(Context context, Follow follow) {
-        mContext = context;
-        mFollow = follow;
+    public LocationRelay() {
+        super();
     }
 
     public void onFollowStart() {
@@ -40,11 +34,14 @@ public class LocationRelay {
         mSpeedReadings = 0;
     }
 
-    public Location toLocation(android.location.Location location) {
-        Location loc = null;
-        if(VERBOSE) Timber.d("toLocation(): followLoc=" + location);
+    /**
+     * Convert the specified Android location to a local Location, and track speed/accuracy
+     */
+    public Location toGcsLocation(android.location.Location androidLocation) {
+        Location gcsLocation = null;
+        if(VERBOSE) Timber.d("toLocation(): followLoc=" + androidLocation);
 
-        boolean ok = (location.hasAccuracy() && location.hasBearing() && location.getTime() > 0);
+        boolean ok = (androidLocation.hasAccuracy() && androidLocation.hasBearing() && androidLocation.getTime() > 0);
 
         if(!ok) {
             Timber.w("toLocation(): Location needs accuracy, heading, and time");
@@ -54,17 +51,16 @@ public class LocationRelay {
             float distanceToLast = -1.0f;
             long timeSinceLast = -1L;
 
-            final long androidLocationTime = location.getTime();
+            final long androidLocationTime = androidLocation.getTime();
             if (mLastLocation != null) {
-                distanceToLast = location.distanceTo(mLastLocation);
+                distanceToLast = androidLocation.distanceTo(mLastLocation);
                 timeSinceLast = (androidLocationTime - mLastLocation.getTime()) / 1000;
             }
 
-            final float currentSpeed = (distanceToLast > 0f && timeSinceLast > 0)
-                    ? (distanceToLast / timeSinceLast)
-                    : 0f;
+            final float currentSpeed = (distanceToLast > 0f && timeSinceLast > 0) ?
+                    (distanceToLast / timeSinceLast) : 0f;
 
-            final boolean isAccurate = isLocationAccurate(location.getAccuracy(), currentSpeed);
+            final boolean isAccurate = isLocationAccurate(androidLocation.getAccuracy(), currentSpeed);
 
             if(VERBOSE) {
                 Timber.d(
@@ -73,26 +69,24 @@ public class LocationRelay {
             }
 
             // Make a new location
-            LatLongAlt lla = new LatLongAlt(
-                    location.getLatitude(),
-                    location.getLongitude(),
-                    location.getAltitude()
-            );
-
-            loc = new Location(
-                    lla,
-                    location.getBearing(),
-                    location.getSpeed(),
+            gcsLocation = new Location(
+                    new LatLongAlt(
+                        androidLocation.getLatitude(),
+                        androidLocation.getLongitude(),
+                        androidLocation.getAltitude()
+                    ),
+                    androidLocation.getBearing(),
+                    androidLocation.getSpeed(),
                     isAccurate,
-                    location.getTime());
+                    androidLocation.getTime()
+                );
 
-            mLastLocation = location;
+            mLastLocation = androidLocation;
 
-            if(VERBOSE) Timber.d("External location lat/lng=" + getLatLongFromLocation(location));
+            if(VERBOSE) Timber.d("External location lat/lng=" + getLatLongFromLocation(androidLocation));
         }
 
-        return loc;
-
+        return gcsLocation;
     }
 
     private boolean isLocationAccurate(float accuracy, float currentSpeed) {
@@ -104,11 +98,11 @@ public class LocationRelay {
         mTotalSpeed += currentSpeed;
         float avg = (mTotalSpeed / ++mSpeedReadings);
 
-        //If moving:
+        // If moving:
         if (currentSpeed > 0) {
-            //if average indicates some movement
+            // if average indicates some movement
             if (avg >= 1.0) {
-                //Reject unreasonable updates.
+                // Reject unreasonable updates.
                 if (currentSpeed >= (avg * JUMP_FACTOR)) {
                     Timber.w("isLocationAccurate() -- High current speed: " + currentSpeed);
                     return false;

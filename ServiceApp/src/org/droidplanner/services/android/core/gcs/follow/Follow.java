@@ -54,7 +54,7 @@ public class Follow implements OnDroneListener<MavLinkDrone>, LocationReceiver {
         this.locationFinder = locationFinder;
         locationFinder.addLocationListener(TAG, this);
 
-        mLocationRelay = new LocationRelay(context, this);
+        mLocationRelay = new LocationRelay();
     }
 
     public void toggleFollowMeState(FollowLocationSource source) {
@@ -170,7 +170,7 @@ public class Follow implements OnDroneListener<MavLinkDrone>, LocationReceiver {
 
     public void onFollowNewLocation(android.location.Location location) {
         Timber.d("onFollowNewLocation(%s)", location);
-        Location loc = mLocationRelay.toLocation(location);
+        Location loc = mLocationRelay.toGcsLocation(location);
 
         if((loc != null) && (mLocationSource == FollowLocationSource.CLIENT_SPECIFIED)) {
             onLocationUpdate(loc);
