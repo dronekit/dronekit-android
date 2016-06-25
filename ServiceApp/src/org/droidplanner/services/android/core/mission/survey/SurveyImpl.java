@@ -87,8 +87,8 @@ public class SurveyImpl extends MissionItemImpl {
             msg_mission_item mavMsg = getSurveyPoint(point, altitude);
             list.add(mavMsg);
             if(surveyData.getLockOrientation()) {
-                mavMsg = getYawCondition(surveyData.getAngle());
-                list.add(mavMsg);
+                msg_mission_item yawMsg = getYawCondition(surveyData.getAngle());
+                list.add(yawMsg);
             }
 
             if(addToFirst){
@@ -119,7 +119,7 @@ public class SurveyImpl extends MissionItemImpl {
         return mavMsg;
     }
 
-    protected msg_mission_item getYawCondition(double angle){
+    private msg_mission_item getYawCondition(double angle){
         return packYawCondition(angle);
     }
 
@@ -132,7 +132,7 @@ public class SurveyImpl extends MissionItemImpl {
         mavMsg.y = 0f;
         mavMsg.z = 0f;
         mavMsg.param1 = (float)angle;
-        //@// TODO: 6/24/2016 define angular velocity better
+        //yaw craft a 30 degrees per second (value is relatively insignificant since it only applies when approaching first waypoint of mission)
         mavMsg.param2 = 30;
         mavMsg.param3 = 0;
         mavMsg.param4 = 0;

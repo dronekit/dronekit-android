@@ -57,10 +57,17 @@ public class SurveyDetail implements Parcelable {
         this.cameraDetail = cameraDetail;
     }
 
+    /**
+     * True if aircraft's yaw is locked to the angle of the survey (added: client-lib:v3.0)
+     */
     public boolean getLockOrientation(){
         return lockOrientation;
     }
 
+    /**
+     * Lock aircraft's yaw to the angle of the survey (added: client-lib:v3.0)
+     * @param lockOrientation
+     */
     public void setLockOrientation(boolean lockOrientation){
         this.lockOrientation = lockOrientation;
     }
@@ -102,8 +109,8 @@ public class SurveyDetail implements Parcelable {
         dest.writeDouble(this.angle);
         dest.writeDouble(this.overlap);
         dest.writeDouble(this.sidelap);
-        dest.writeByte((byte)(this.lockOrientation?1:0));
         dest.writeParcelable(this.cameraDetail, 0);
+        dest.writeByte((byte)(this.lockOrientation?1:0));
     }
 
     public SurveyDetail() {
@@ -123,8 +130,8 @@ public class SurveyDetail implements Parcelable {
         this.angle = in.readDouble();
         this.overlap = in.readDouble();
         this.sidelap = in.readDouble();
-        this.lockOrientation = in.readByte() != 0;
         this.cameraDetail = in.readParcelable(CameraDetail.class.getClassLoader());
+        this.lockOrientation = in.readByte() != 0;
     }
 
     public static final Parcelable.Creator<SurveyDetail> CREATOR = new Parcelable.Creator<SurveyDetail>() {
