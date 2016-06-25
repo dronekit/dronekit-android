@@ -58,15 +58,17 @@ public class SurveyDetail implements Parcelable {
     }
 
     /**
-     * True if aircraft's yaw is locked to the angle of the survey (added: client-lib:v3.0)
+     * True if aircraft's yaw is locked to the angle of the survey
+     * @since 3.0.0
      */
     public boolean getLockOrientation(){
         return lockOrientation;
     }
 
     /**
-     * Lock aircraft's yaw to the angle of the survey (added: client-lib:v3.0)
+     * Lock aircraft's yaw to the angle of the survey
      * @param lockOrientation
+     * @since 3.0.0
      */
     public void setLockOrientation(boolean lockOrientation){
         this.lockOrientation = lockOrientation;

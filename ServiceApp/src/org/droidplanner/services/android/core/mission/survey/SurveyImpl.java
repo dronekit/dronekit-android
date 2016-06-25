@@ -120,10 +120,6 @@ public class SurveyImpl extends MissionItemImpl {
     }
 
     private msg_mission_item getYawCondition(double angle){
-        return packYawCondition(angle);
-    }
-
-    public static msg_mission_item packYawCondition(double angle){
         msg_mission_item mavMsg = new msg_mission_item();
         mavMsg.autocontinue = 1;
         mavMsg.frame = MAV_FRAME.MAV_FRAME_LOCAL_ENU;
