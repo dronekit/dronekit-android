@@ -80,16 +80,19 @@ public class FusedLocation extends LocationCallback implements LocationFinder, G
     }
 
     @Override
-    public void enableLocationUpdates() {
+    public void enableLocationUpdates(String tag, LocationReceiver receiver) {
         if(!mLocationUpdatesEnabled) {
+            receivers.put(tag, receiver);
             gApiMgr.start();
+            locationRelay.onFollowStart();
             mLocationUpdatesEnabled = true;
         }
     }
 
     @Override
-    public void disableLocationUpdates() {
+    public void disableLocationUpdates(String tag) {
         if(mLocationUpdatesEnabled) {
+            receivers.remove(tag);
             gApiMgr.addTask(removeLocationUpdate);
             gApiMgr.stopSafely();
             mLocationUpdatesEnabled = false;

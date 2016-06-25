@@ -32,6 +32,7 @@ public class LocationRelay {
     public void onFollowStart() {
         mTotalSpeed = 0;
         mSpeedReadings = 0;
+        mLastLocation = null;
     }
 
     /**

@@ -25,7 +25,7 @@ public class Follow implements OnDroneListener<MavLinkDrone>, LocationReceiver {
 
     private static final String TAG = Follow.class.getSimpleName();
     private Location lastLocation;
-    private FollowLocationSource mLocationSource = FollowLocationSource.NONE;
+    private FollowLocationSource mLocationSource = null;
 
     /**
      * Set of return value for the 'toggleFollowMeState' method.
@@ -57,44 +57,31 @@ public class Follow implements OnDroneListener<MavLinkDrone>, LocationReceiver {
         mLocationRelay = new LocationRelay();
     }
 
-    public void toggleFollowMeState(FollowLocationSource source) {
+    public void enableFollowMe(FollowLocationSource source) {
         final MavLinkDrone drone = droneMgr.getDrone();
-        final State droneState = (drone == null) ? null : drone.getState();
+        final State droneState = (drone != null)? drone.getState(): null;
 
-        if (droneState == null) {
+        if(droneState == null) {
+            Timber.w("No drone for enableFollowMe(%s)", source);
             state = FollowStates.FOLLOW_INVALID_STATE;
             return;
         }
 
-        if (isEnabled()) {
-            disableFollowMe();
-        } else {
-            if (droneMgr.isConnected()) {
-                if (droneState.isArmed()) {
-                    enableFollowMe();
-                } else {
-                    state = FollowStates.FOLLOW_DRONE_NOT_ARMED;
-                }
+        if(droneMgr.isConnected()) {
+            if(droneState.isArmed()) {
+                GuidedPoint.changeToGuidedMode(drone, null);
+                setLocationSource(source);
+                state = FollowStates.FOLLOW_START;
+                mLocationRelay.onFollowStart();
+                followAlgorithm.enableFollow();
+
+                droneMgr.onAttributeEvent(AttributeEvent.FOLLOW_START, null, false);
             } else {
-                state = FollowStates.FOLLOW_DRONE_DISCONNECTED;
+                state = FollowStates.FOLLOW_DRONE_NOT_ARMED;
             }
+        } else {
+            state = FollowStates.FOLLOW_DRONE_DISCONNECTED;
         }
-    }
-
-    private void enableFollowMe() {
-        GuidedPoint.changeToGuidedMode(droneMgr.getDrone(), null);
-
-        state = FollowStates.FOLLOW_START;
-
-        mLocationRelay.onFollowStart();
-
-        if(mLocationSource == FollowLocationSource.INTERNAL) {
-            locationFinder.enableLocationUpdates();
-        }
-
-        followAlgorithm.enableFollow();
-
-        droneMgr.onAttributeEvent(AttributeEvent.FOLLOW_START, null, false);
     }
 
     public void disableFollowMe() {
@@ -102,7 +89,9 @@ public class Follow implements OnDroneListener<MavLinkDrone>, LocationReceiver {
 
         followAlgorithm.disableFollow();
 
-        locationFinder.disableLocationUpdates();
+        if(mLocationSource == FollowLocationSource.INTERNAL) {
+            locationFinder.disableLocationUpdates(TAG);
+        }
 
         lastLocation = null;
 
@@ -121,32 +110,6 @@ public class Follow implements OnDroneListener<MavLinkDrone>, LocationReceiver {
 
     public boolean isEnabled() {
         return state == FollowStates.FOLLOW_RUNNING || state == FollowStates.FOLLOW_START;
-    }
-
-    public FollowLocationSource getLocationSource() {
-        return mLocationSource;
-    }
-
-    public void setLocationSource(FollowLocationSource source) {
-        if(mLocationSource != source) {
-            switch(source) {
-                case CLIENT_SPECIFIED: {
-                    Timber.d("Switch to client-specified locations");
-                    locationFinder.removeLocationListener(TAG);
-                    locationFinder.disableLocationUpdates();
-                    break;
-                }
-
-                default: {
-                    Timber.d("Switch to internal locations");
-                    locationFinder.addLocationListener(TAG, this);
-                    locationFinder.enableLocationUpdates();
-                    break;
-                }
-            }
-
-            mLocationSource = source;
-        }
     }
 
     @Override
@@ -229,5 +192,25 @@ public class Follow implements OnDroneListener<MavLinkDrone>, LocationReceiver {
 
     public FollowStates getState() {
         return state;
+    }
+
+    private void setLocationSource(FollowLocationSource source) {
+        if(mLocationSource != source) {
+            switch(source) {
+                case CLIENT_SPECIFIED: {
+                    Timber.d("Switch to client-specified locations");
+                    locationFinder.disableLocationUpdates(TAG);
+                    break;
+                }
+
+                case INTERNAL: {
+                    Timber.d("Switch to internal locations");
+                    locationFinder.enableLocationUpdates(TAG, this);
+                    break;
+                }
+            }
+
+            mLocationSource = source;
+        }
     }
 }

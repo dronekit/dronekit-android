@@ -271,6 +271,7 @@ public class MavLinkDroneManager extends DroneManager<MavLinkDrone, MAVLinkPacke
 
                 FollowLocationSource locationSource = data.getParcelable(FollowMeActions.EXTRA_LOCATION_SOURCE);
 
+                // Default to internal GPS locations
                 if(locationSource == null) {
                     locationSource = FollowLocationSource.INTERNAL;
                 }
@@ -282,11 +283,6 @@ public class MavLinkDroneManager extends DroneManager<MavLinkDrone, MAVLinkPacke
             case FollowMeActions.ACTION_UPDATE_FOLLOW_PARAMS:
                 if (followMe != null) {
                     data.setClassLoader(LatLong.class.getClassLoader());
-
-                    FollowLocationSource source = data.getParcelable(FollowMeActions.EXTRA_LOCATION_SOURCE);
-                    if(source != null) {
-                        followMe.setLocationSource(source);
-                    }
 
                     FollowAlgorithm followAlgorithm = followMe.getFollowAlgorithm();
                     if (followAlgorithm != null) {
@@ -352,10 +348,8 @@ public class MavLinkDroneManager extends DroneManager<MavLinkDrone, MAVLinkPacke
                     followMe.isEnabled(), followMe.getState(), source);
 
             if (!followMe.isEnabled()) {
-                followMe.toggleFollowMeState(source);
+                followMe.enableFollowMe(source);
             }
-
-            followMe.setLocationSource(source);
 
             FollowAlgorithm currentAlg = followMe.getFollowAlgorithm();
             if (currentAlg.getType() != selectedMode) {
