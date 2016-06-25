@@ -68,13 +68,13 @@ public class StructureScannerImpl extends SpatialCoordItem {
         survey.setAltitude(getTopHeight());
 
         try {
-            survey.update(0.0, survey.getAltitude(), survey.getOverlap(), survey.getSidelap());
+            survey.update(0.0, survey.getAltitude(), survey.getOverlap(), survey.getSidelap(), survey.getLockOrientation());
             GridBuilder grid = new GridBuilder(polygon, survey, corner);
             for (LatLong point : grid.generate(false).gridPoints) {
                 list.add(SurveyImpl.packSurveyPoint(point, getTopHeight()));
             }
 
-            survey.update(90.0, survey.getAltitude(), survey.getOverlap(), survey.getSidelap());
+            survey.update(90.0, survey.getAltitude(), survey.getOverlap(), survey.getSidelap(), survey.getLockOrientation());
             GridBuilder grid2 = new GridBuilder(polygon, survey, corner);
             for (LatLong point : grid2.generate(false).gridPoints) {
                 list.add(SurveyImpl.packSurveyPoint(point, getTopHeight()));
