@@ -31,8 +31,8 @@ public class SurveyImpl extends MissionItemImpl {
         polygon.addPoints(points);
     }
 
-    public void update(double angle, double altitude, double overlap, double sidelap) {
-        surveyData.update(angle, altitude, overlap, sidelap);
+    public void update(double angle, double altitude, double overlap, double sidelap, boolean lockOrientation) {
+        surveyData.update(angle, altitude, overlap, sidelap, lockOrientation);
     }
 
     public boolean isStartCameraBeforeFirstWaypoint() {
@@ -86,6 +86,10 @@ public class SurveyImpl extends MissionItemImpl {
         for (LatLong point : grid.gridPoints) {
             msg_mission_item mavMsg = getSurveyPoint(point, altitude);
             list.add(mavMsg);
+            if(surveyData.getLockOrientation()) {
+                msg_mission_item yawMsg = getYawCondition(surveyData.getAngle());
+                list.add(yawMsg);
+            }
 
             if(addToFirst){
                 list.addAll(camTrigger.packMissionItem());
@@ -112,6 +116,22 @@ public class SurveyImpl extends MissionItemImpl {
         mavMsg.param2 = 0f;
         mavMsg.param3 = 0f;
         mavMsg.param4 = 0f;
+        return mavMsg;
+    }
+
+    private msg_mission_item getYawCondition(double angle){
+        msg_mission_item mavMsg = new msg_mission_item();
+        mavMsg.autocontinue = 1;
+        mavMsg.frame = MAV_FRAME.MAV_FRAME_LOCAL_ENU;
+        mavMsg.command = MAV_CMD.MAV_CMD_CONDITION_YAW;
+        mavMsg.x = 0f;
+        mavMsg.y = 0f;
+        mavMsg.z = 0f;
+        mavMsg.param1 = (float)angle;
+        //yaw craft a 30 degrees per second (value is relatively insignificant since it only applies when approaching first waypoint of mission)
+        mavMsg.param2 = 30;
+        mavMsg.param3 = 0;
+        mavMsg.param4 = 0;
         return mavMsg;
     }
 

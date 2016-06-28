@@ -85,6 +85,7 @@ public class ProxyUtils {
         surveyDetail.setOverlap(surveyData.getOverlap());
         surveyDetail.setAngle(surveyData.getAngle());
         surveyDetail.setAltitude(surveyData.getAltitude());
+        surveyDetail.setLockOrientation(surveyData.getLockOrientation());
         return surveyDetail;
     }
 
@@ -239,7 +240,7 @@ public class ProxyUtils {
                         temp.setCameraInfo(getCameraInfo(cameraDetail));
 
                     temp.update(surveyDetail.getAngle(), (surveyDetail.getAltitude()),
-                            surveyDetail.getOverlap(), surveyDetail.getSidelap());
+                            surveyDetail.getOverlap(), surveyDetail.getSidelap(), surveyDetail.getLockOrientation());
                 }
 
                 try {
@@ -264,7 +265,7 @@ public class ProxyUtils {
                         temp.setCameraInfo(getCameraInfo(cameraDetail));
 
                     temp.update(surveyDetail.getAngle(), (surveyDetail.getAltitude()),
-                            surveyDetail.getOverlap(), surveyDetail.getSidelap());
+                            surveyDetail.getOverlap(), surveyDetail.getSidelap(), surveyDetail.getLockOrientation());
                 }
 
                 try {
