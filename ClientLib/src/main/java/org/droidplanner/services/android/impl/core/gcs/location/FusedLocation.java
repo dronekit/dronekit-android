@@ -15,7 +15,7 @@ import com.google.android.gms.location.LocationServices;
 import com.o3dr.services.android.lib.util.googleApi.GoogleApiClientManager;
 import com.o3dr.services.android.lib.util.googleApi.GoogleApiClientManager.GoogleApiClientTask;
 
-import org.droidplanner.services.android.core.gcs.follow.LocationRelay;
+import org.droidplanner.services.android.impl.core.gcs.follow.LocationRelay;
 import org.droidplanner.services.android.impl.core.gcs.location.Location.LocationFinder;
 import org.droidplanner.services.android.impl.core.gcs.location.Location.LocationReceiver;
 
@@ -112,7 +112,7 @@ public class FusedLocation extends LocationCallback implements LocationFinder, G
         if (androidLocation == null)
             return;
 
-        org.droidplanner.services.android.core.gcs.location.Location gcsLocation =
+        org.droidplanner.services.android.impl.core.gcs.location.Location gcsLocation =
                 locationRelay.toGcsLocation(androidLocation);
 
         Timber.d("Location Lat/Long: " + LocationRelay.getLatLongFromLocation(androidLocation));
@@ -120,7 +120,7 @@ public class FusedLocation extends LocationCallback implements LocationFinder, G
         notifyLocationUpdate(gcsLocation);
     }
 
-    private void notifyLocationUpdate(org.droidplanner.services.android.core.gcs.location.Location location) {
+    private void notifyLocationUpdate(org.droidplanner.services.android.impl.core.gcs.location.Location location) {
         if (receivers.isEmpty()) {
             Timber.d(TAG, "notifyLocationUpdate(): No receivers");
             return;

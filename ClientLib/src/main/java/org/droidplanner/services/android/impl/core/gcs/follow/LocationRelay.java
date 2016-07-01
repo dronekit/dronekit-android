@@ -2,7 +2,7 @@ package org.droidplanner.services.android.impl.core.gcs.follow;
 
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 
-import org.droidplanner.services.android.core.gcs.location.Location;
+import org.droidplanner.services.android.impl.core.gcs.location.Location;
 
 import timber.log.Timber;
 

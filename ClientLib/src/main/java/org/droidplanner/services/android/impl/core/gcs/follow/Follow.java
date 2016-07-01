@@ -11,6 +11,7 @@ import com.o3dr.services.android.lib.model.action.Action;
 import org.droidplanner.services.android.impl.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.services.android.impl.core.drone.DroneInterfaces.OnDroneListener;
 import org.droidplanner.services.android.impl.core.drone.autopilot.MavLinkDrone;
+import org.droidplanner.services.android.impl.core.drone.autopilot.apm.solo.ArduSolo;
 import org.droidplanner.services.android.impl.core.drone.manager.MavLinkDroneManager;
 import org.droidplanner.services.android.impl.core.drone.variables.GuidedPoint;
 import org.droidplanner.services.android.impl.core.drone.variables.State;
@@ -74,7 +75,7 @@ public class Follow implements OnDroneListener<MavLinkDrone>, LocationReceiver {
                 mLocationRelay.onFollowStart();
                 followAlgorithm.enableFollow();
 
-                droneMgr.onAttributeEvent(AttributeEvent.FOLLOW_START, null, false);
+                droneMgr.onAttributeEvent(AttributeEvent.FOLLOW_START, null);
             } else {
                 state = FollowStates.FOLLOW_DRONE_NOT_ARMED;
             }
