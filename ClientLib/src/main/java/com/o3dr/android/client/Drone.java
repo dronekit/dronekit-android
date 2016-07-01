@@ -27,6 +27,7 @@ import com.o3dr.services.android.lib.drone.companion.solo.SoloEventExtras;
 import com.o3dr.services.android.lib.drone.companion.solo.SoloEvents;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionResult;
+import com.o3dr.services.android.lib.gcs.follow.FollowLocationSource;
 import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
 import com.o3dr.services.android.lib.drone.mission.Mission;
 import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
@@ -705,10 +706,10 @@ public class Drone {
     }
 
     /**
-     * @deprecated Use {@link FollowApi#enableFollowMe(FollowType)} instead.
+     * @deprecated Use {@link FollowApi#enableFollowMe(FollowType, com.o3dr.services.android.lib.gcs.follow.FollowLocationSource)} instead.
      */
     public void enableFollowMe(FollowType followType) {
-        FollowApi.getApi(this).enableFollowMe(followType);
+        FollowApi.getApi(this).enableFollowMe(followType, FollowLocationSource.INTERNAL);
     }
 
     /**

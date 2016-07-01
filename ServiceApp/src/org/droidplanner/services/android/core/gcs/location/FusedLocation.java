@@ -3,7 +3,6 @@ package org.droidplanner.services.android.core.gcs.location;
 import android.content.Context;
 import android.location.Location;
 import android.os.Handler;
-import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -13,10 +12,10 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.util.googleApi.GoogleApiClientManager;
 import com.o3dr.services.android.lib.util.googleApi.GoogleApiClientManager.GoogleApiClientTask;
 
+import org.droidplanner.services.android.core.gcs.follow.LocationRelay;
 import org.droidplanner.services.android.core.gcs.location.Location.LocationFinder;
 import org.droidplanner.services.android.core.gcs.location.Location.LocationReceiver;
 
@@ -34,13 +33,12 @@ public class FusedLocation extends LocationCallback implements LocationFinder, G
 
     private static final long MIN_TIME_MS = 16;
     private static final float MIN_DISTANCE_M = 0.0f;
-    private static final float LOCATION_ACCURACY_THRESHOLD = 20.0f;
-    private static final float JUMP_FACTOR = 4.0f;
 
     private final static Api<? extends Api.ApiOptions.NotRequiredOptions>[] apisList = new Api[]{LocationServices.API};
 
     private final GoogleApiClientManager gApiMgr;
     private final GoogleApiClientTask requestLocationUpdate;
+    private boolean mLocationUpdatesEnabled = false;
 
     private final GoogleApiClientTask removeLocationUpdate = new GoogleApiClientTask() {
         @Override
@@ -52,11 +50,7 @@ public class FusedLocation extends LocationCallback implements LocationFinder, G
 
     private final Map<String, LocationReceiver> receivers = new ConcurrentHashMap<>();
 
-    private Location mLastLocation;
-
-    private float mTotalSpeed;
-    private long mSpeedReadings;
-
+    private final LocationRelay locationRelay;
     private final Context context;
 
     public FusedLocation(Context context, final Handler handler) {
@@ -66,6 +60,7 @@ public class FusedLocation extends LocationCallback implements LocationFinder, G
     public FusedLocation(Context context, final Handler handler, final int locationRequestPriority,
                          final long interval, final long fastestInterval, final float smallestDisplacement) {
         this.context = context;
+        this.locationRelay = new LocationRelay();
 
         requestLocationUpdate = new GoogleApiClientTask() {
             @Override
@@ -85,17 +80,23 @@ public class FusedLocation extends LocationCallback implements LocationFinder, G
     }
 
     @Override
-    public void enableLocationUpdates() {
-        gApiMgr.start();
-        mSpeedReadings = 0;
-        mTotalSpeed = 0f;
-        mLastLocation = null;
+    public void enableLocationUpdates(String tag, LocationReceiver receiver) {
+        if(!mLocationUpdatesEnabled) {
+            receivers.put(tag, receiver);
+            gApiMgr.start();
+            locationRelay.onFollowStart();
+            mLocationUpdatesEnabled = true;
+        }
     }
 
     @Override
-    public void disableLocationUpdates() {
-        gApiMgr.addTask(removeLocationUpdate);
-        gApiMgr.stopSafely();
+    public void disableLocationUpdates(String tag) {
+        if(mLocationUpdatesEnabled) {
+            receivers.remove(tag);
+            gApiMgr.addTask(removeLocationUpdate);
+            gApiMgr.stopSafely();
+            mLocationUpdatesEnabled = false;
+        }
     }
 
     @Override
@@ -111,75 +112,23 @@ public class FusedLocation extends LocationCallback implements LocationFinder, G
         if (androidLocation == null)
             return;
 
-        float distanceToLast = -1.0f;
-        long timeSinceLast = -1L;
+        org.droidplanner.services.android.core.gcs.location.Location gcsLocation =
+                locationRelay.toGcsLocation(androidLocation);
 
-        final long androidLocationTime = androidLocation.getTime();
-        if (mLastLocation != null) {
-            distanceToLast = androidLocation.distanceTo(mLastLocation);
-            timeSinceLast = (androidLocationTime - mLastLocation.getTime()) / 1000;
-        }
+        Timber.d("Location Lat/Long: " + LocationRelay.getLatLongFromLocation(androidLocation));
 
-        final float currentSpeed = distanceToLast > 0f && timeSinceLast > 0
-                ? (distanceToLast / timeSinceLast)
-                : 0f;
-        final boolean isLocationAccurate = isLocationAccurate(androidLocation.getAccuracy(),
-                currentSpeed);
-
-        org.droidplanner.services.android.core.gcs.location.Location location =
-                new org.droidplanner.services.android.core.gcs.location.Location(
-                new LatLongAlt(
-                        androidLocation.getLatitude(),
-                        androidLocation.getLongitude(),
-                        androidLocation.getAltitude()),
-                androidLocation.getBearing(),
-                androidLocation.hasSpeed() ? androidLocation.getSpeed() : currentSpeed,
-                isLocationAccurate,
-                androidLocationTime);
-
-        mLastLocation = androidLocation;
-
-        Timber.d("Location Lat/Long: " + getLatLongFromLocation(androidLocation));
-
-        notifyLocationUpdate(location);
+        notifyLocationUpdate(gcsLocation);
     }
 
     private void notifyLocationUpdate(org.droidplanner.services.android.core.gcs.location.Location location) {
-        if (receivers.isEmpty())
+        if (receivers.isEmpty()) {
+            Timber.d(TAG, "notifyLocationUpdate(): No receivers");
             return;
+        }
 
         for (LocationReceiver receiver : receivers.values()) {
             receiver.onLocationUpdate(location);
         }
-    }
-
-    private boolean isLocationAccurate(float accuracy, float currentSpeed) {
-        if (accuracy >= LOCATION_ACCURACY_THRESHOLD) {
-            Log.d(TAG, "High accuracy: " + accuracy);
-            return false;
-        }
-
-        mTotalSpeed += currentSpeed;
-        float avg = (mTotalSpeed / ++mSpeedReadings);
-
-        //If moving:
-        if (currentSpeed > 0) {
-            //if average indicates some movement
-            if (avg >= 1.0) {
-                //Reject unreasonable updates.
-                if (currentSpeed >= (avg * JUMP_FACTOR)) {
-                    Log.d(TAG, "High current speed: " + currentSpeed);
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
-
-    public String getLatLongFromLocation(final Location location) {
-        return Location.convert(location.getLatitude(), Location.FORMAT_DEGREES) + " " +
-                Location.convert(location.getLongitude(), Location.FORMAT_DEGREES);
     }
 
     @Override
