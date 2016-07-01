@@ -50,7 +50,6 @@ public class ReturnToMe implements DroneInterfaces.OnDroneListener<MavLinkDrone>
     public ReturnToMe(MavLinkDroneManager droneMgr, Location.LocationFinder locationFinder, AttributeEventListener listener) {
         this.droneMgr = droneMgr;
         this.locationFinder = locationFinder;
-        locationFinder.addLocationListener(TAG, this);
 
         this.attributeListener = listener;
         this.currentState = new ReturnToMeState();

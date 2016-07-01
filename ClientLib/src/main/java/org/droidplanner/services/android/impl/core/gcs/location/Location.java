@@ -13,9 +13,6 @@ public class Location {
     public interface LocationFinder {
         void enableLocationUpdates(String tag, LocationReceiver receiver);
         void disableLocationUpdates(String tag);
-
-        void addLocationListener(String tag, LocationReceiver receiver);
-        void removeLocationListener(String tag);
     }
 
     private LatLongAlt coordinate;

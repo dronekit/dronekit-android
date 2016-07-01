@@ -10,6 +10,20 @@ import com.MAVLink.ardupilotmega.msg_mag_cal_progress;
 import com.MAVLink.ardupilotmega.msg_mag_cal_report;
 import com.MAVLink.common.msg_command_ack;
 import com.google.android.gms.location.LocationRequest;
+import com.o3dr.services.android.lib.coordinate.LatLong;
+import com.o3dr.services.android.lib.drone.action.GimbalActions;
+import com.o3dr.services.android.lib.drone.action.StateActions;
+import com.o3dr.services.android.lib.drone.attribute.AttributeType;
+import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
+import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
+import com.o3dr.services.android.lib.drone.property.DroneAttribute;
+import com.o3dr.services.android.lib.gcs.action.FollowMeActions;
+import com.o3dr.services.android.lib.gcs.follow.FollowLocationSource;
+import com.o3dr.services.android.lib.gcs.follow.FollowType;
+import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
+import com.o3dr.services.android.lib.gcs.returnToMe.ReturnToMeState;
+import com.o3dr.services.android.lib.model.ICommandListener;
+import com.o3dr.services.android.lib.model.action.Action;
 
 import org.droidplanner.services.android.impl.api.DroneApi;
 import org.droidplanner.services.android.impl.communication.service.MAVLinkClient;
@@ -36,20 +50,6 @@ import org.droidplanner.services.android.impl.utils.AndroidApWarningParser;
 import org.droidplanner.services.android.impl.utils.CommonApiUtils;
 import org.droidplanner.services.android.impl.utils.SoloApiUtils;
 import org.droidplanner.services.android.impl.utils.prefs.DroidPlannerPrefs;
-import com.o3dr.services.android.lib.coordinate.LatLong;
-import com.o3dr.services.android.lib.drone.action.GimbalActions;
-import com.o3dr.services.android.lib.drone.action.StateActions;
-import com.o3dr.services.android.lib.drone.attribute.AttributeType;
-import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
-import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
-import com.o3dr.services.android.lib.gcs.follow.FollowLocationSource;
-import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
-import com.o3dr.services.android.lib.drone.property.DroneAttribute;
-import com.o3dr.services.android.lib.gcs.action.FollowMeActions;
-import com.o3dr.services.android.lib.gcs.follow.FollowType;
-import com.o3dr.services.android.lib.gcs.returnToMe.ReturnToMeState;
-import com.o3dr.services.android.lib.model.ICommandListener;
-import com.o3dr.services.android.lib.model.action.Action;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -127,7 +127,7 @@ public class MavLinkDroneManager extends DroneManager<MavLinkDrone, MAVLinkPacke
                 break;
         }
 
-        this.followMe = new Follow(context, this, handler, new FusedLocation(context, handler));
+        this.followMe = new Follow(this, handler, new FusedLocation(context, handler));
         this.returnToMe = new ReturnToMe(this, new FusedLocation(context, handler,
                 LocationRequest.PRIORITY_HIGH_ACCURACY, 1000L, 1000L, ReturnToMe.UPDATE_MINIMAL_DISPLACEMENT), this);
 
@@ -347,9 +347,7 @@ public class MavLinkDroneManager extends DroneManager<MavLinkDrone, MAVLinkPacke
             Timber.d("CURRENT: followMe.enabled=%s followMe.state=%s source=%s",
                     followMe.isEnabled(), followMe.getState(), source);
 
-            if (!followMe.isEnabled()) {
-                followMe.enableFollowMe(source);
-            }
+            followMe.enableFollowMe(source);
 
             FollowAlgorithm currentAlg = followMe.getFollowAlgorithm();
             if (currentAlg.getType() != selectedMode) {

@@ -25,10 +25,6 @@ public class LocationRelay {
     private float mTotalSpeed = 0;
     private int mSpeedReadings = 0;
 
-    public LocationRelay() {
-        super();
-    }
-
     public void onFollowStart() {
         mTotalSpeed = 0;
         mSpeedReadings = 0;
@@ -39,16 +35,18 @@ public class LocationRelay {
      * Convert the specified Android location to a local Location, and track speed/accuracy
      */
     public Location toGcsLocation(android.location.Location androidLocation) {
+        if(androidLocation == null)
+            return null;
+
         Location gcsLocation = null;
+
         if(VERBOSE) Timber.d("toLocation(): followLoc=" + androidLocation);
 
         boolean ok = (androidLocation.hasAccuracy() && androidLocation.hasBearing() && androidLocation.getTime() > 0);
 
         if(!ok) {
             Timber.w("toLocation(): Location needs accuracy, heading, and time");
-        }
-
-        if(ok) {
+        }else {
             float distanceToLast = -1.0f;
             long timeSinceLast = -1L;
 

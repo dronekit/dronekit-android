@@ -81,8 +81,8 @@ public class FusedLocation extends LocationCallback implements LocationFinder, G
 
     @Override
     public void enableLocationUpdates(String tag, LocationReceiver receiver) {
+        receivers.put(tag, receiver);
         if(!mLocationUpdatesEnabled) {
-            receivers.put(tag, receiver);
             gApiMgr.start();
             locationRelay.onFollowStart();
             mLocationUpdatesEnabled = true;
@@ -92,11 +92,11 @@ public class FusedLocation extends LocationCallback implements LocationFinder, G
     @Override
     public void disableLocationUpdates(String tag) {
         if(mLocationUpdatesEnabled) {
-            receivers.remove(tag);
             gApiMgr.addTask(removeLocationUpdate);
             gApiMgr.stopSafely();
             mLocationUpdatesEnabled = false;
         }
+        receivers.remove(tag);
     }
 
     @Override
@@ -129,16 +129,6 @@ public class FusedLocation extends LocationCallback implements LocationFinder, G
         for (LocationReceiver receiver : receivers.values()) {
             receiver.onLocationUpdate(location);
         }
-    }
-
-    @Override
-    public void addLocationListener(String tag, LocationReceiver receiver) {
-        receivers.put(tag, receiver);
-    }
-
-    @Override
-    public void removeLocationListener(String tag) {
-        receivers.remove(tag);
     }
 
     @Override

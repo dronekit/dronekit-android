@@ -1,6 +1,5 @@
 package org.droidplanner.services.android.impl.core.gcs.follow;
 
-import android.content.Context;
 import android.os.Handler;
 
 import com.o3dr.services.android.lib.drone.action.ControlActions;
@@ -25,7 +24,7 @@ public class Follow implements OnDroneListener<MavLinkDrone>, LocationReceiver {
 
     private static final String TAG = Follow.class.getSimpleName();
     private Location lastLocation;
-    private FollowLocationSource mLocationSource = null;
+    private FollowLocationSource mLocationSource;
 
     /**
      * Set of return value for the 'toggleFollowMeState' method.
@@ -41,7 +40,7 @@ public class Follow implements OnDroneListener<MavLinkDrone>, LocationReceiver {
     private FollowAlgorithm followAlgorithm;
     private final LocationRelay mLocationRelay;
 
-    public Follow(Context context, MavLinkDroneManager droneMgr, Handler handler, LocationFinder locationFinder) {
+    public Follow(MavLinkDroneManager droneMgr, Handler handler, LocationFinder locationFinder) {
         this.droneMgr = droneMgr;
         final MavLinkDrone drone = droneMgr.getDrone();
         if(drone != null)
@@ -52,36 +51,36 @@ public class Follow implements OnDroneListener<MavLinkDrone>, LocationReceiver {
                 FollowAlgorithm.FollowModes.LEASH.getAlgorithmType(droneMgr, handler);
 
         this.locationFinder = locationFinder;
-        locationFinder.addLocationListener(TAG, this);
-
         mLocationRelay = new LocationRelay();
     }
 
     public void enableFollowMe(FollowLocationSource source) {
-        final MavLinkDrone drone = droneMgr.getDrone();
-        final State droneState = (drone != null)? drone.getState(): null;
+        if (!isEnabled()) {
+            final MavLinkDrone drone = droneMgr.getDrone();
+            final State droneState = (drone != null) ? drone.getState() : null;
 
-        if(droneState == null) {
-            Timber.w("No drone for enableFollowMe(%s)", source);
-            state = FollowStates.FOLLOW_INVALID_STATE;
-            return;
-        }
-
-        if(droneMgr.isConnected()) {
-            if(droneState.isArmed()) {
-                GuidedPoint.changeToGuidedMode(drone, null);
-                setLocationSource(source);
-                state = FollowStates.FOLLOW_START;
-                mLocationRelay.onFollowStart();
-                followAlgorithm.enableFollow();
-
-                droneMgr.onAttributeEvent(AttributeEvent.FOLLOW_START, null);
-            } else {
-                state = FollowStates.FOLLOW_DRONE_NOT_ARMED;
+            if (droneState == null) {
+                Timber.w("No drone for enableFollowMe(%s)", source);
+                state = FollowStates.FOLLOW_INVALID_STATE;
+                return;
             }
-        } else {
-            state = FollowStates.FOLLOW_DRONE_DISCONNECTED;
+
+            if (droneMgr.isConnected()) {
+                if (droneState.isArmed()) {
+                    GuidedPoint.changeToGuidedMode(drone, null);
+                    state = FollowStates.FOLLOW_START;
+                    followAlgorithm.enableFollow();
+
+                    droneMgr.onAttributeEvent(AttributeEvent.FOLLOW_START, null);
+                } else {
+                    state = FollowStates.FOLLOW_DRONE_NOT_ARMED;
+                }
+            } else {
+                state = FollowStates.FOLLOW_DRONE_DISCONNECTED;
+            }
         }
+
+        setLocationSource(source);
     }
 
     public void disableFollowMe() {
@@ -89,9 +88,7 @@ public class Follow implements OnDroneListener<MavLinkDrone>, LocationReceiver {
 
         followAlgorithm.disableFollow();
 
-        if(mLocationSource == FollowLocationSource.INTERNAL) {
-            locationFinder.disableLocationUpdates(TAG);
-        }
+        setLocationSource(FollowLocationSource.NONE);
 
         lastLocation = null;
 
@@ -195,17 +192,27 @@ public class Follow implements OnDroneListener<MavLinkDrone>, LocationReceiver {
     }
 
     private void setLocationSource(FollowLocationSource source) {
+        if(!isEnabled())
+            return;
+
         if(mLocationSource != source) {
             switch(source) {
                 case CLIENT_SPECIFIED: {
                     Timber.d("Switch to client-specified locations");
                     locationFinder.disableLocationUpdates(TAG);
+                    mLocationRelay.onFollowStart();
                     break;
                 }
 
                 case INTERNAL: {
                     Timber.d("Switch to internal locations");
                     locationFinder.enableLocationUpdates(TAG, this);
+                    break;
+                }
+
+                case NONE:
+                default:{
+                    locationFinder.disableLocationUpdates(TAG);
                     break;
                 }
             }
