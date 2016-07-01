@@ -17,4 +17,7 @@ public class FollowMeActions {
 
     public static final String ACTION_DISABLE_FOLLOW_ME = Utils.PACKAGE_NAME + ".action.DISABLE_FOLLOW_ME";
 
+    public static final String ACTION_NEW_EXTERNAL_LOCATION = Utils.PACKAGE_NAME + ".action.NEW_EXTERNAL_LOCATION";
+    public static final String EXTRA_LOCATION = "extra_location";
+    public static final String EXTRA_LOCATION_SOURCE = "extra_location_source";
 }

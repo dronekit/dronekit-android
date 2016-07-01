@@ -70,7 +70,7 @@ public class ReturnToMe implements DroneInterfaces.OnDroneListener<MavLinkDrone>
 
             //Enable return to me
             Timber.i("Enabling return to me.");
-            locationFinder.enableLocationUpdates();
+            locationFinder.enableLocationUpdates(TAG, this);
             updateCurrentState(ReturnToMeState.STATE_WAITING_FOR_VEHICLE_GPS);
         }
     }
@@ -79,7 +79,7 @@ public class ReturnToMe implements DroneInterfaces.OnDroneListener<MavLinkDrone>
         if (isEnabled.compareAndSet(true, false)) {
             //Disable return to me
             Timber.i("Disabling return to me.");
-            locationFinder.disableLocationUpdates();
+            locationFinder.disableLocationUpdates(TAG);
 
             currentState.setCurrentHomeLocation(null);
 
