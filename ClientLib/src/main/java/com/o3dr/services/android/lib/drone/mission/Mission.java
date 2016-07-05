@@ -56,6 +56,31 @@ public class Mission implements DroneAttribute {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Mission)) {
+            return false;
+        }
+
+        Mission mission = (Mission) o;
+
+        if (currentMissionItem != mission.currentMissionItem) {
+            return false;
+        }
+        return missionItemsList.equals(mission.missionItemsList);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = currentMissionItem;
+        result = 31 * result + missionItemsList.hashCode();
+        return result;
+    }
+
+    @Override
     public int describeContents() {
         return 0;
     }
