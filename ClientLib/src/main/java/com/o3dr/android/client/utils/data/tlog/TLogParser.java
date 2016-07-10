@@ -319,5 +319,30 @@ public class TLogParser {
         public MAVLinkMessage getMavLinkMessage() {
             return mavLinkMessage;
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (!(o instanceof Event)) {
+                return false;
+            }
+
+            Event event = (Event) o;
+
+            if (timestamp != event.timestamp) {
+                return false;
+            }
+            return mavLinkMessage != null ? mavLinkMessage.equals(event.mavLinkMessage) : event.mavLinkMessage == null;
+
+        }
+
+        @Override
+        public int hashCode() {
+            int result = (int) (timestamp ^ (timestamp >>> 32));
+            result = 31 * result + (mavLinkMessage != null ? mavLinkMessage.hashCode() : 0);
+            return result;
+        }
     }
 }
