@@ -23,13 +23,11 @@ import org.droidplanner.services.android.impl.core.MAVLink.connection.MavLinkCon
 import org.droidplanner.services.android.impl.core.MAVLink.connection.MavLinkConnectionListener;
 import org.droidplanner.services.android.impl.core.MAVLink.connection.MavLinkConnectionTypes;
 import org.droidplanner.services.android.impl.core.drone.manager.DroneCommandTracker;
-import org.droidplanner.services.android.impl.data.SessionDB;
 import org.droidplanner.services.android.impl.utils.connection.WifiConnectionHandler;
 
 import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Date;
 
 import timber.log.Timber;
 
@@ -61,16 +59,6 @@ public class MAVLinkClient implements DataLink.DataLinkProvider<MAVLinkMessage> 
                 case LinkConnectionStatus.DISCONNECTED:
                     closeConnection();
                     break;
-
-                case LinkConnectionStatus.CONNECTED:
-                    Bundle extras = connectionStatus.getExtras();
-                    if (extras != null) {
-                        long connectionTime = extras.getLong(LinkConnectionStatus.EXTRA_CONNECTION_TIME);
-                        if (connectionTime != 0) {
-                            startLoggingThread(connectionTime);
-                        }
-                    }
-                    break;
             }
         }
     };
@@ -78,7 +66,6 @@ public class MAVLinkClient implements DataLink.DataLinkProvider<MAVLinkMessage> 
     private AndroidMavLinkConnection mavlinkConn;
 
     private final DataLink.DataLinkListener<MAVLinkPacket> listener;
-    private final SessionDB sessionDB;
     private final Context context;
 
     private int packetSeqNumber = 0;
@@ -96,8 +83,6 @@ public class MAVLinkClient implements DataLink.DataLinkProvider<MAVLinkMessage> 
         }
 
         this.connParams = connParams;
-        this.sessionDB = new SessionDB(context);
-
         this.commandTracker = commandTracker;
     }
 
@@ -208,8 +193,6 @@ public class MAVLinkClient implements DataLink.DataLinkProvider<MAVLinkMessage> 
             mavlinkConn.disconnect();
         }
 
-        stopLoggingThread(System.currentTimeMillis());
-
         listener.onConnectionStatus(new LinkConnectionStatus(LinkConnectionStatus.DISCONNECTED, null));
     }
 
@@ -301,15 +284,4 @@ public class MAVLinkClient implements DataLink.DataLinkProvider<MAVLinkMessage> 
         }
     }
 
-    private void startLoggingThread(long startTime) {
-        //log into the database the connection time.
-        final String connectionType = MavLinkConnectionTypes.getConnectionTypeLabel(connParams.getConnectionType());
-        this.sessionDB.startSession(new Date(startTime), connectionType);
-    }
-
-    private void stopLoggingThread(long stopTime) {
-        //log into the database the disconnection time.
-        final String connectionType = MavLinkConnectionTypes.getConnectionTypeLabel(connParams.getConnectionType());
-        this.sessionDB.endSession(new Date(stopTime), connectionType, new Date());
-    }
 }
