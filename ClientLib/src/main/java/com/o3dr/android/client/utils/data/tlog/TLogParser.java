@@ -65,7 +65,7 @@ public class TLogParser {
          */
         public TLogIterator(Uri uri, Handler handler) {
             this.handler = handler;
-            file = new File(uri.toString());
+            file = new File(uri.getPath());
         }
 
         /**
@@ -108,21 +108,46 @@ public class TLogParser {
                 @Override
                 public void run() {
                     try {
-                        Event event = next(in);
-                        while (event != null) {
-                            if (filter.acceptEvent(event)) {
-                                sendResult(callback, event);
-                                return;
-                            }
-                            event = next(in);
+                        Event event = blockingNext(filter);
+                        if (event != null) {
+                            sendResult(callback, event);
+                        } else {
+                            sendFailed(callback, new NoSuchElementException());
                         }
-
-                        sendFailed(callback, new NoSuchElementException());
                     } catch (IOException e) {
                         sendFailed(callback, e);
                     }
                 }
             });
+        }
+
+        /**
+         * Retrieves next tlog data event.
+         * Note: This method blocks and should not be used on the main thread.
+         * @return
+         * @throws IOException
+         */
+        public Event blockingNext() throws IOException {
+            return blockingNext(DEFAULT_FILTER);
+        }
+
+        /**
+         * Retrieves next tlog data event matching the given filter parameter.
+         * Note: This method blocks and should not be used on the main thread.
+         * @param filter
+         * @return
+         * @throws IOException
+         */
+        public Event blockingNext(final TLogIteratorFilter filter) throws IOException {
+            Event event = next(in);
+            while (event != null) {
+                if (filter.acceptEvent(event)) {
+                    return event;
+                }
+                event = next(in);
+            }
+
+            return null;
         }
 
         private void sendResult(final TLogIteratorCallback callback, final Event event) {
