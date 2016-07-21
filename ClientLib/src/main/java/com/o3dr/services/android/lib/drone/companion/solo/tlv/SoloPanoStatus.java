@@ -8,12 +8,21 @@ import java.nio.ByteBuffer;
  * Created by phu on 7/17/16.
  */
 public class SoloPanoStatus extends TLVPacket {
-    public static final int MESSAGE_LENGTH = 2;
+
     private int currentStep;
+    public static final int MESSAGE_LENGTH = 2;
+
+    public int getCurrentStep() {
+        return currentStep;
+    }
+
     private int totalSteps;
+    public int getTotalSteps() {
+        return totalSteps;
+    }
 
     public SoloPanoStatus(int currentStep, int totalSteps) {
-        super(TLVMessageTypes.TYPE_SOLO_PANO_OPTIONS, MESSAGE_LENGTH);
+        super(TLVMessageTypes.TYPE_SOLO_PANO_STATUS, MESSAGE_LENGTH);
         this.currentStep = currentStep;
         this.totalSteps = totalSteps;
     }

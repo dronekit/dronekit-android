@@ -45,6 +45,7 @@ import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageT
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_MESSAGE_SET_CURRENT_SHOT;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_MESSAGE_SHOT_MANAGER_ERROR;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_PANO_OPTIONS;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_PANO_STATUS;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_PAUSE_BUTTON;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SCAN_START;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SET_BUTTON_SETTING;
@@ -279,6 +280,11 @@ public class TLVMessageParser {
 
                     case TYPE_SOLO_PANO_OPTIONS: {
                         packet = new SoloPanoOptions(packetBuffer);
+                        break;
+                    }
+
+                    case TYPE_SOLO_PANO_STATUS: {
+                        packet = new SoloPanoStatus(packetBuffer);
                         break;
                     }
 

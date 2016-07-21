@@ -92,7 +92,7 @@ public class SoloPanoOptions extends SoloShotOptions {
         this.cameraFOV = cameraFOV;
     }
 
-    public SoloPanoOptions(boolean isRunning, int panoPreference, short panAngle, float degreesPerSecondYawSpeed, float cameraFOV) {
+    public SoloPanoOptions(int panoPreference, boolean isRunning, short panAngle, float degreesPerSecondYawSpeed, float cameraFOV) {
         super(TLVMessageTypes.TYPE_SOLO_PANO_OPTIONS, MESSAGE_LENGTH, PAUSED_CRUISE_SPEED);
         this.panoPreference = panoPreference;
         this.isRunning = isRunning;
@@ -102,7 +102,7 @@ public class SoloPanoOptions extends SoloShotOptions {
     }
 
     SoloPanoOptions(ByteBuffer buffer) {
-        this(buffer.get() ==  PANO_ON_VALUE, buffer.get(), (short) buffer.getShort(), buffer.getFloat(), buffer.getFloat());
+        this(buffer.get(), buffer.get() ==  PANO_ON_VALUE, (short) buffer.getShort(), buffer.getFloat(), buffer.getFloat());
     }
 
     @Override
@@ -126,7 +126,7 @@ public class SoloPanoOptions extends SoloShotOptions {
 
     protected SoloPanoOptions(Parcel in) {
         super(in);
-        @PanoPreference int panoPreference = (int) in.readByte();
+        @PanoPreference int panoPreference = (int)in.readByte();
         this.panoPreference = panoPreference;
         this.isRunning = in.readByte() != 0;
         this.panAngle = (short) in.readInt();
