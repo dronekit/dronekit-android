@@ -63,6 +63,7 @@ import timber.log.Timber;
  * Created by Fredia Huya-Kouadio on 12/17/15.
  */
 public class MavLinkDroneManager extends DroneManager<MavLinkDrone, MAVLinkPacket> implements MagnetometerCalibrationImpl.OnMagnetometerCalibrationListener {
+    static final String TAG = MavLinkDroneManager.class.getSimpleName();
 
     private Follow followMe;
     private ReturnToMe returnToMe;

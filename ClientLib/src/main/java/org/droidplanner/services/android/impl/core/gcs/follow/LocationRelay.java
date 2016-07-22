@@ -14,11 +14,16 @@ public class LocationRelay {
 
     private static final float LOCATION_ACCURACY_THRESHOLD = 10.0f;
     private static final float JUMP_FACTOR = 4.0f;
-    private static boolean VERBOSE = false;
+    private static boolean VERBOSE = true;
 
     public static String getLatLongFromLocation(final android.location.Location location) {
         return android.location.Location.convert(location.getLatitude(), android.location.Location.FORMAT_DEGREES) + " " +
                 android.location.Location.convert(location.getLongitude(), android.location.Location.FORMAT_DEGREES);
+    }
+
+    public static String toLatLongString(final android.location.Location location) {
+        return (location != null)?
+                String.format("%.6f, %.6f", location.getLatitude(), location.getLongitude()): null;
     }
 
     private android.location.Location mLastLocation;
@@ -42,22 +47,27 @@ public class LocationRelay {
 
         if(VERBOSE) Timber.d("toLocation(): followLoc=" + androidLocation);
 
-        boolean ok = (androidLocation.hasAccuracy() && androidLocation.hasBearing() && androidLocation.getTime() > 0);
+        if(androidLocation.getTime() <= 0) {
+            androidLocation.setTime(System.currentTimeMillis());
+        }
+
+        boolean ok = (androidLocation.hasAccuracy() && androidLocation.getTime() > 0);
 
         if(!ok) {
-            Timber.w("toLocation(): Location needs accuracy, heading, and time");
-        }else {
+            Timber.w("toLocation(): Location needs accuracy and time");
+        } else {
             float distanceToLast = -1.0f;
             long timeSinceLast = -1L;
 
             final long androidLocationTime = androidLocation.getTime();
             if (mLastLocation != null) {
                 distanceToLast = androidLocation.distanceTo(mLastLocation);
-                timeSinceLast = (androidLocationTime - mLastLocation.getTime()) / 1000;
+                timeSinceLast = (androidLocationTime - mLastLocation.getTime());
             }
 
+            // mm/ms
             final float currentSpeed = (distanceToLast > 0f && timeSinceLast > 0) ?
-                    (distanceToLast / timeSinceLast) : 0f;
+                    ((distanceToLast * 1000) / timeSinceLast) : 0f;
 
             final boolean isAccurate = isLocationAccurate(androidLocation.getAccuracy(), currentSpeed);
 
@@ -82,7 +92,7 @@ public class LocationRelay {
 
             mLastLocation = androidLocation;
 
-            if(VERBOSE) Timber.d("External location lat/lng=" + getLatLongFromLocation(androidLocation));
+            if(VERBOSE) Timber.d("External location lat/lng=" + toLatLongString(androidLocation));
         }
 
         return gcsLocation;

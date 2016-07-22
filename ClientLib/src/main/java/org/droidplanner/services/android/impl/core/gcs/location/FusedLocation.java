@@ -118,7 +118,7 @@ public class FusedLocation extends LocationCallback implements LocationFinder, G
         if(gcsLocation == null)
             return;
 
-        Timber.d("Location Lat/Long: " + LocationRelay.getLatLongFromLocation(androidLocation));
+        Timber.d("Location lat/long: " + LocationRelay.toLatLongString(androidLocation));
 
         notifyLocationUpdate(gcsLocation);
     }
