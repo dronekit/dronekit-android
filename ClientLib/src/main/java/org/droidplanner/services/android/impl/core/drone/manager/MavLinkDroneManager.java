@@ -1,8 +1,10 @@
 package org.droidplanner.services.android.impl.core.drone.manager;
 
 import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.Nullable;
 
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
@@ -162,7 +164,7 @@ public class MavLinkDroneManager extends DroneManager<MavLinkDrone, MAVLinkPacke
     }
 
     @Override
-    protected void doConnect(String appId, DroneApi listener) {
+    protected void doConnect(String appId, DroneApi listener, @Nullable Uri tlogLoggingUri) {
         if (mavClient.isDisconnected()) {
             Timber.i("Opening connection for %s", appId);
             mavClient.openConnection();
@@ -174,7 +176,7 @@ public class MavLinkDroneManager extends DroneManager<MavLinkDrone, MAVLinkPacke
             }
         }
 
-        mavClient.addLoggingFile(appId);
+        mavClient.registerForTLogLogging(appId, tlogLoggingUri);
     }
 
     @Override
@@ -184,7 +186,7 @@ public class MavLinkDroneManager extends DroneManager<MavLinkDrone, MAVLinkPacke
         }
 
         if (listener != null) {
-            mavClient.removeLoggingFile(appId);
+            mavClient.unregisterForTLogLogging(appId);
             if (isConnected()) {
                 listener.onDroneEvent(DroneInterfaces.DroneEventsType.DISCONNECTED, drone);
             }

@@ -198,7 +198,7 @@ public class SoloConnection extends AndroidMavLinkConnection implements WifiConn
 
         final String wifiSsid = WifiConnectionHandler.getCurrentWifiLink((WifiManager) context.getSystemService(Context.WIFI_SERVICE));
         if(WifiConnectionHandler.isSoloWifi(wifiSsid)){
-            return ConnectionParameter.newSoloConnection(wifiSsid, null);
+            return ConnectionParameter.newSoloConnection(wifiSsid, null, null);
         }
 
         return null;

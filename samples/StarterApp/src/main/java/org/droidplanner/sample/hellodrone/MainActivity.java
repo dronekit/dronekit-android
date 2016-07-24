@@ -308,8 +308,8 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
             int selectedConnectionType = connectionSelector.getSelectedItemPosition();
 
             ConnectionParameter connectionParams = selectedConnectionType == ConnectionType.TYPE_USB
-                ? ConnectionParameter.newUsbConnection()
-                : ConnectionParameter.newUdpConnection();
+                ? ConnectionParameter.newUsbConnection(null)
+                : ConnectionParameter.newUdpConnection(null);
 
             this.drone.connect(connectionParams);
         }

@@ -133,7 +133,7 @@ public class DroidPlannerService extends Service {
         }
 
         Timber.d("Drone manager connection for " + appId);
-        droneMgr.connect(appId, listener);
+        droneMgr.connect(appId, listener, connParams.getTLogLoggingUri());
         return droneMgr;
     }
 
