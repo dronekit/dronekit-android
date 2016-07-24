@@ -1,5 +1,6 @@
 package com.o3dr.services.android.lib.drone.connection;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -11,8 +12,9 @@ import android.text.TextUtils;
  */
 public class ConnectionParameter implements Parcelable {
 
-    private final int connectionType;
+    private final @ConnectionType.Type int connectionType;
     private final Bundle paramsBundle;
+    private final Uri tlogLoggingUri;
 
     /**
      * @return Returns a new {@link ConnectionParameter} with type {@link ConnectionType#TYPE_USB}
@@ -153,19 +155,28 @@ public class ConnectionParameter implements Parcelable {
         return new ConnectionParameter(ConnectionType.TYPE_SOLO, paramsBundle);
     }
 
-    /**
-     */
     private ConnectionParameter(int connectionType, Bundle paramsBundle){
-        this.connectionType = connectionType;
-        this.paramsBundle = paramsBundle;
+        this(connectionType, paramsBundle, null);
     }
 
-    public int getConnectionType() {
+    /**
+     */
+    private ConnectionParameter(int connectionType, Bundle paramsBundle, Uri tlogLoggingUri){
+        this.connectionType = connectionType;
+        this.paramsBundle = paramsBundle;
+        this.tlogLoggingUri = tlogLoggingUri;
+    }
+
+    public @ConnectionType.Type int getConnectionType() {
         return connectionType;
     }
 
     public Bundle getParamsBundle() {
         return paramsBundle;
+    }
+
+    public Uri getTLogLoggingUri(){
+        return tlogLoggingUri;
     }
 
     public String getUniqueId(){
@@ -270,11 +281,14 @@ public class ConnectionParameter implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(this.connectionType);
         dest.writeBundle(paramsBundle);
+        dest.writeParcelable(tlogLoggingUri, 0);
     }
 
     private ConnectionParameter(Parcel in) {
-        this.connectionType = in.readInt();
+        @ConnectionType.Type int type = in.readInt();
+        this.connectionType = type;
         paramsBundle = in.readBundle(getClass().getClassLoader());
+        tlogLoggingUri = in.readParcelable(Uri.class.getClassLoader());
     }
 
     public static final Creator<ConnectionParameter> CREATOR = new Creator<ConnectionParameter>() {
