@@ -7,6 +7,9 @@ import android.support.annotation.IntDef;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringDef;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
 /**
  * Conveys information about the link connection state.
  * <p/>
@@ -33,22 +36,30 @@ public final class LinkConnectionStatus implements Parcelable {
      */
     public static final String EXTRA_CONNECTION_TIME = "extra_connection_time";
 
+    /**
+     * The possible status codes that notifies what state the link connection is in.
+     */
     @StringDef({
         CONNECTED,
         CONNECTING,
         DISCONNECTED,
         FAILED
     })
-    /**
-     * The possible status codes that notifies what state the link connection is in.
-     */
+    @Retention(RetentionPolicy.SOURCE)
     public @interface StatusCode {
     }
+
     public static final String CONNECTED = "CONNECTED";
     public static final String CONNECTING = "CONNECTING";
     public static final String DISCONNECTED = "DISCONNECTED";
     public static final String FAILED = "FAILED";
 
+    /**
+     * The possible failure codes that can be retrieved from the {@link #getExtras()} using key
+     * {@link #EXTRA_ERROR_CODE}. A {@link LinkConnectionStatus.FailureCode}
+     * is guaranteed when {@link #FAILED} occurs.
+     *
+     */
     @IntDef({
         SYSTEM_UNAVAILABLE,
         LINK_UNAVAILABLE,
@@ -58,12 +69,7 @@ public final class LinkConnectionStatus implements Parcelable {
         ADDRESS_IN_USE,
         UNKNOWN
     })
-    /**
-     * The possible failure codes that can be retrieved from the {@link #getExtras()} using key
-     * {@link #EXTRA_ERROR_CODE}. A {@link LinkConnectionStatus.FailureCode}
-     * is guaranteed when {@link #FAILED} occurs.
-     *
-     */
+    @Retention(RetentionPolicy.SOURCE)
     public @interface FailureCode {
     }
 
