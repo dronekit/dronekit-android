@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_ARTOO_INPUT_REPORT_MESSAGE;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_RTL_HOME_POINT;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_CABLE_CAM_OPTIONS;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_CABLE_CAM_WAYPOINT;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_FOLLOW_OPTIONS;
@@ -47,6 +48,7 @@ import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageT
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_PANO_OPTIONS;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_PANO_STATUS;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_PAUSE_BUTTON;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_REWIND_OPTIONS;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SCAN_START;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SET_BUTTON_SETTING;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SHOT_ERROR;
@@ -295,6 +297,19 @@ public class TLVMessageParser {
 
                     case TYPE_SOLO_ZIPLINE_LOCK: {
                         packet = new SoloZiplineLock();
+                        break;
+                    }
+
+                    case TYPE_RTL_HOME_POINT: {
+                        final double latitude = packetBuffer.getDouble();
+                        final double longitude = packetBuffer.getDouble();
+                        final float altitude = packetBuffer.getFloat();
+                        packet = new SoloReturnHomeLocationMessage(latitude, longitude, altitude);
+                        break;
+                    }
+
+                    case TYPE_SOLO_REWIND_OPTIONS: {
+                        packet = new SoloRewindOptions(packetBuffer);
                         break;
                     }
 
