@@ -109,11 +109,25 @@ public class ConnectionType {
      */
     public static final String EXTRA_SOLO_LINK_PASSWORD = "extra_solo_link_password";
 
-    public static final @Type int[] values = {
-        TYPE_USB,
-        TYPE_UDP,
-        TYPE_TCP,
-        TYPE_BLUETOOTH,
-        TYPE_SOLO
-    };
+    public static String getConnectionTypeLabel(@Type int connectionType){
+        switch (connectionType) {
+            case TYPE_BLUETOOTH:
+                return "bluetooth";
+
+            case TYPE_TCP:
+                return "tcp";
+
+            case TYPE_UDP:
+                return "udp";
+
+            case TYPE_USB:
+                return "usb";
+
+            case TYPE_SOLO:
+                return "solo";
+
+            default:
+                return null;
+        }
+    }
 }
