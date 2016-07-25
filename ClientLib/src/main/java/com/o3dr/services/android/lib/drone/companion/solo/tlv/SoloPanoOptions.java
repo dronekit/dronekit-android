@@ -64,7 +64,7 @@ public class SoloPanoOptions extends SoloShotOptions {
         return panoPreference;
     }
 
-    public void setPanoPreference(int panoPreference) {
+    public void setPanoPreference(@PanoPreference int panoPreference) {
         this.panoPreference = panoPreference;
     }
 

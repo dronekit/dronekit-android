@@ -16,11 +16,6 @@ public class SoloZiplineLock extends TLVPacket {
     protected void getMessageValue(ByteBuffer valueCarrier) {
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        super.writeToParcel(dest, flags);
-    }
-
     protected SoloZiplineLock(Parcel in) {
         super(in);
     }

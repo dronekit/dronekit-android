@@ -33,11 +33,12 @@ public class SoloRewindOptions extends TLVPacket {
         this.rewindDistance = rewindDistance;
     }
 
+    @ReturnPreference
     public int getReturnPreference() {
         return returnPreference;
     }
 
-    public void setReturnPreference(int returnPreference) {
+    public void setReturnPreference(@ReturnPreference int returnPreference) {
         this.returnPreference = returnPreference;
     }
 

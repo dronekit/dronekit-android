@@ -41,7 +41,7 @@ public class SoloReturnHomeLocationMessage extends TLVPacket {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         super.writeToParcel(dest, flags);
-        dest.writeParcelable(this.coordinate, 0);
+        dest.writeParcelable(this.coordinate, flags);
     }
 
     protected SoloReturnHomeLocationMessage(Parcel in) {
