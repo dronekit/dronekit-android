@@ -115,6 +115,9 @@ public class FusedLocation extends LocationCallback implements LocationFinder, G
         org.droidplanner.services.android.impl.core.gcs.location.Location gcsLocation =
                 locationRelay.toGcsLocation(androidLocation);
 
+        if(gcsLocation == null)
+            return;
+
         Timber.d("Location Lat/Long: " + LocationRelay.getLatLongFromLocation(androidLocation));
 
         notifyLocationUpdate(gcsLocation);
