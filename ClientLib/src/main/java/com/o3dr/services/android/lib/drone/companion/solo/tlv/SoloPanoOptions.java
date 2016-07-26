@@ -8,7 +8,7 @@ import java.nio.ByteBuffer;
 /**
  * Created by phu on 6/24/16.
  */
-public class SoloPanoOptions extends SoloShotOptions {
+public class SoloPanoOptions extends TLVPacket {
 
     public static final int MESSAGE_LENGTH = 12;
 
@@ -93,7 +93,7 @@ public class SoloPanoOptions extends SoloShotOptions {
     }
 
     public SoloPanoOptions(int panoPreference, boolean isRunning, short panAngle, float degreesPerSecondYawSpeed, float cameraFOV) {
-        super(TLVMessageTypes.TYPE_SOLO_PANO_OPTIONS, MESSAGE_LENGTH, PAUSED_CRUISE_SPEED);
+        super(TLVMessageTypes.TYPE_SOLO_PANO_OPTIONS, MESSAGE_LENGTH);
         this.panoPreference = panoPreference;
         this.isRunning = isRunning;
         this.panAngle = panAngle;

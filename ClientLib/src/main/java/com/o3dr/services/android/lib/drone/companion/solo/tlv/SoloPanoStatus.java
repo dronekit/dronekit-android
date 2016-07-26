@@ -9,45 +9,38 @@ import java.nio.ByteBuffer;
  */
 public class SoloPanoStatus extends TLVPacket {
 
-    private int currentStep;
     public static final int MESSAGE_LENGTH = 2;
 
-    public int getCurrentStep() {
-        return currentStep;
-    }
+    private byte currentStep;
+    private byte totalSteps;
 
-    private int totalSteps;
-    public int getTotalSteps() {
-        return totalSteps;
-    }
-
-    public SoloPanoStatus(int currentStep, int totalSteps) {
+    public SoloPanoStatus(byte currentStep, byte totalSteps) {
         super(TLVMessageTypes.TYPE_SOLO_PANO_STATUS, MESSAGE_LENGTH);
         this.currentStep = currentStep;
         this.totalSteps = totalSteps;
     }
 
     SoloPanoStatus(ByteBuffer buffer) {
-        this((int) buffer.get(), (int) buffer.get());
+        this(buffer.get(), buffer.get());
     }
 
     @Override
     protected void getMessageValue(ByteBuffer valueCarrier) {
-        valueCarrier.put((byte) currentStep);
-        valueCarrier.put((byte) totalSteps);
+        valueCarrier.put(currentStep);
+        valueCarrier.put(totalSteps);
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         super.writeToParcel(dest, flags);
-        dest.writeByte((byte) currentStep);
-        dest.writeByte((byte) totalSteps);
+        dest.writeByte(currentStep);
+        dest.writeByte(totalSteps);
     }
 
     protected SoloPanoStatus(Parcel in) {
         super(in);
-        this.currentStep = (int) in.readByte();
-        this.totalSteps = (int) in.readByte();
+        this.currentStep = in.readByte();
+        this.totalSteps = in.readByte();
     }
 
     public static final Creator<SoloPanoStatus> CREATOR = new Creator<SoloPanoStatus>() {
@@ -65,6 +58,14 @@ public class SoloPanoStatus extends TLVPacket {
                 "currentStep=" + currentStep +
                 "totalSteps=" + totalSteps +
                 '}';
+    }
+
+    public int getCurrentStep() {
+        return currentStep;
+    }
+
+    public int getTotalSteps() {
+        return totalSteps;
     }
 
 }
