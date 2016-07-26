@@ -121,7 +121,7 @@ public class GenericMavLinkDrone implements MavLinkDrone {
 
         this.logListener = logListener;
 
-        events = new DroneEvents(this, handler);
+        events = new DroneEvents(this);
         heartbeat = initHeartBeat(handler);
         this.type = new Type(this);
         this.missionStats = new MissionStats(this);
