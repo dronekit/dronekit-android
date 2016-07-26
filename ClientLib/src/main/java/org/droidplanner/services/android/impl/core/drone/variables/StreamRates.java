@@ -16,7 +16,12 @@ public class StreamRates extends DroneVariable<MavLinkDrone> implements OnDroneL
 	}
 
     public void setRates(Rates rates) {
-        this.rates = rates;
+		if(this.rates == null || !this.rates.equals(rates)) {
+			this.rates = rates;
+			if (myDrone.isConnected() && myDrone.isConnectionAlive()) {
+				setupStreamRatesFromPref();
+			}
+		}
     }
 
     @Override
@@ -32,7 +37,7 @@ public class StreamRates extends DroneVariable<MavLinkDrone> implements OnDroneL
 		}
 	}
 
-	public void setupStreamRatesFromPref() {
+	private void setupStreamRatesFromPref() {
         if(rates == null)
             return;
 
@@ -52,8 +57,6 @@ public class StreamRates extends DroneVariable<MavLinkDrone> implements OnDroneL
         public int rawSensors;
         public int rawController;
 		
-		public Rates(){}
-		
 		public Rates(int rate){
 			this.extendedStatus = rate;
 			this.extra1 = rate;
@@ -64,6 +67,55 @@ public class StreamRates extends DroneVariable<MavLinkDrone> implements OnDroneL
 			this.rawSensors = rate;
 			this.rawController = rate;
 		}
-    }
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) {
+				return true;
+			}
+			if (!(o instanceof Rates)) {
+				return false;
+			}
+
+			Rates rates = (Rates) o;
+
+			if (extendedStatus != rates.extendedStatus) {
+				return false;
+			}
+			if (extra1 != rates.extra1) {
+				return false;
+			}
+			if (extra2 != rates.extra2) {
+				return false;
+			}
+			if (extra3 != rates.extra3) {
+				return false;
+			}
+			if (position != rates.position) {
+				return false;
+			}
+			if (rcChannels != rates.rcChannels) {
+				return false;
+			}
+			if (rawSensors != rates.rawSensors) {
+				return false;
+			}
+			return rawController == rates.rawController;
+
+		}
+
+		@Override
+		public int hashCode() {
+			int result = extendedStatus;
+			result = 31 * result + extra1;
+			result = 31 * result + extra2;
+			result = 31 * result + extra3;
+			result = 31 * result + position;
+			result = 31 * result + rcChannels;
+			result = 31 * result + rawSensors;
+			result = 31 * result + rawController;
+			return result;
+		}
+	}
 
 }

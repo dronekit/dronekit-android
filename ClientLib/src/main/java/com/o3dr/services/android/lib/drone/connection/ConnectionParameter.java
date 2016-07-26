@@ -12,7 +12,7 @@ import android.text.TextUtils;
  */
 public class ConnectionParameter implements Parcelable {
 
-    private static final long DEFAULT_EVENTS_DISPATCHING_PERIOD = 100L; //milliseconds
+    private static final long DEFAULT_EVENTS_DISPATCHING_PERIOD = 200L; //milliseconds
 
     private final @ConnectionType.Type int connectionType;
     private final Bundle paramsBundle;
@@ -174,7 +174,7 @@ public class ConnectionParameter implements Parcelable {
     }
 
     /**
-     * Dictates how long to wait before dispatching buffered drone events.
+     * Dictates how long (in milliseconds) to wait before dispatching buffered drone events.
      * A value of OL means events should be dispatched as soon as they are received.
      * @return
      */

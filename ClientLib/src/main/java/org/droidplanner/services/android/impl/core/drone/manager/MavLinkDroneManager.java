@@ -1,10 +1,8 @@
 package org.droidplanner.services.android.impl.core.drone.manager;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.Nullable;
 
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
@@ -51,11 +49,11 @@ import org.droidplanner.services.android.impl.core.gcs.location.FusedLocation;
 import org.droidplanner.services.android.impl.utils.AndroidApWarningParser;
 import org.droidplanner.services.android.impl.utils.CommonApiUtils;
 import org.droidplanner.services.android.impl.utils.SoloApiUtils;
-import org.droidplanner.services.android.impl.utils.prefs.DroidPlannerPrefs;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import timber.log.Timber;
 
@@ -63,6 +61,8 @@ import timber.log.Timber;
  * Created by Fredia Huya-Kouadio on 12/17/15.
  */
 public class MavLinkDroneManager extends DroneManager<MavLinkDrone, MAVLinkPacket> implements MagnetometerCalibrationImpl.OnMagnetometerCalibrationListener {
+
+    private static final int DEFAULT_STREAM_RATE = 2; //Hz
 
     private Follow followMe;
     private ReturnToMe returnToMe;
@@ -72,6 +72,8 @@ public class MavLinkDroneManager extends DroneManager<MavLinkDrone, MAVLinkPacke
     private final DroneCommandTracker commandTracker;
 
     private final GCSHeartbeat gcsHeartbeat;
+
+    private AtomicInteger droneStreamRate = new AtomicInteger(DEFAULT_STREAM_RATE); //Hz
 
     public MavLinkDroneManager(Context context, ConnectionParameter connParams, Handler handler) {
         super(context, connParams, handler);
@@ -83,6 +85,7 @@ public class MavLinkDroneManager extends DroneManager<MavLinkDrone, MAVLinkPacke
         this.gcsHeartbeat = new GCSHeartbeat(mavClient, 1);
 
         this.mavLinkMsgHandler = new MavLinkMsgHandler(this);
+        updateDroneStreamRate(connParams);
     }
 
     public void onVehicleTypeReceived(FirmwareType type) {
@@ -135,8 +138,7 @@ public class MavLinkDroneManager extends DroneManager<MavLinkDrone, MAVLinkPacke
 
         StreamRates streamRates = drone.getStreamRates();
         if (streamRates != null) {
-            DroidPlannerPrefs dpPrefs = new DroidPlannerPrefs(context);
-            streamRates.setRates(dpPrefs.getRates());
+            streamRates.setRates(new StreamRates.Rates(droneStreamRate.get()));
         }
 
         drone.addDroneListener(this);
@@ -164,7 +166,7 @@ public class MavLinkDroneManager extends DroneManager<MavLinkDrone, MAVLinkPacke
     }
 
     @Override
-    protected void doConnect(String appId, DroneApi listener, @Nullable Uri tlogLoggingUri) {
+    protected void doConnect(String appId, DroneApi listener, ConnectionParameter connParams) {
         if (mavClient.isDisconnected()) {
             Timber.i("Opening connection for %s", appId);
             mavClient.openConnection();
@@ -176,7 +178,29 @@ public class MavLinkDroneManager extends DroneManager<MavLinkDrone, MAVLinkPacke
             }
         }
 
-        mavClient.registerForTLogLogging(appId, tlogLoggingUri);
+        mavClient.registerForTLogLogging(appId, connParams.getTLogLoggingUri());
+
+        updateDroneStreamRate(connParams);
+    }
+
+    private void updateDroneStreamRate(ConnectionParameter connParams) {
+        int eventsDispatchingRate = Math.round(1000L / connParams.getEventsDispatchingPeriod());
+
+        boolean updateComplete;
+        do {
+            updateComplete = true;
+
+            int currentRate = droneStreamRate.get();
+            if (eventsDispatchingRate > currentRate) {
+                updateComplete = droneStreamRate.compareAndSet(currentRate, eventsDispatchingRate);
+                if (updateComplete && drone != null) {
+                    StreamRates rates = drone.getStreamRates();
+                    if (rates != null) {
+                        rates.setRates(new StreamRates.Rates(droneStreamRate.get()));
+                    }
+                }
+            }
+        }while(!updateComplete);
     }
 
     @Override
