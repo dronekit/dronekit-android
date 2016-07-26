@@ -1,12 +1,12 @@
 package org.droidplanner.services.android.impl.communication.service;
 
 import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
-import com.o3dr.android.client.utils.data.tlog.TLogUtils;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionType;
 import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
@@ -21,7 +21,6 @@ import org.droidplanner.services.android.impl.communication.connection.usb.UsbCo
 import org.droidplanner.services.android.impl.communication.model.DataLink;
 import org.droidplanner.services.android.impl.core.MAVLink.connection.MavLinkConnection;
 import org.droidplanner.services.android.impl.core.MAVLink.connection.MavLinkConnectionListener;
-import org.droidplanner.services.android.impl.core.MAVLink.connection.MavLinkConnectionTypes;
 import org.droidplanner.services.android.impl.core.drone.manager.DroneCommandTracker;
 import org.droidplanner.services.android.impl.utils.connection.WifiConnectionHandler;
 
@@ -233,43 +232,18 @@ public class MAVLinkClient implements DataLink.DataLinkProvider<MAVLinkMessage> 
         return getConnectionStatus() == MavLinkConnection.MAVLINK_CONNECTING;
     }
 
-    private File getTLogDir(String appId) {
-        File tlogsDir = TLogUtils.getTLogsDirectory(appId);
-        if(tlogsDir == null)
-            return null;
-
-        if(!tlogsDir.exists() && !tlogsDir.mkdirs()){
-            return null;
-        }
-
-        return tlogsDir;
-    }
-
-    private File getTempTLogFile(String appId, long connectionTimestamp) {
-        File tlogsDir = getTLogDir(appId);
-        if(tlogsDir == null)
-            return null;
-
-        return new File(tlogsDir, getTLogFilename(connectionTimestamp));
-    }
-
-    private String getTLogFilename(long connectionTimestamp) {
-        return TLogUtils.getTLogFilename(
-                MavLinkConnectionTypes.getConnectionTypeLabel(this.connParams.getConnectionType()),
-                connectionTimestamp);
-    }
-
     /**
      * Register a log listener.
      *
      * @param appId             Tag for the listener.
      */
-    public synchronized void addLoggingFile(String appId){
+    public synchronized void registerForTLogLogging(String appId, Uri tlogLoggingUri){
+        if(tlogLoggingUri == null)
+            return;
+
         if(isConnecting() || isConnected()) {
-            final File logFile = getTempTLogFile(appId, System.currentTimeMillis());
-            if(logFile != null) {
+            File logFile = new File(tlogLoggingUri.getPath());
                 mavlinkConn.addLoggingPath(appId, logFile.getAbsolutePath());
-            }
         }
     }
 
@@ -278,7 +252,7 @@ public class MAVLinkClient implements DataLink.DataLinkProvider<MAVLinkMessage> 
      *
      * @param appId        Tag for the listener.
      */
-    public synchronized void removeLoggingFile(String appId){
+    public synchronized void unregisterForTLogLogging(String appId){
         if(isConnecting() || isConnected()){
             mavlinkConn.removeLoggingPath(appId);
         }

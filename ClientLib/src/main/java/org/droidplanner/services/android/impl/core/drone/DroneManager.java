@@ -1,8 +1,10 @@
 package org.droidplanner.services.android.impl.core.drone;
 
 import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -77,16 +79,16 @@ public class DroneManager<T extends Drone, D> implements DataLink.DataLinkListen
 
     }
 
-    public synchronized void connect(String appId, DroneApi listener) {
+    public synchronized void connect(String appId, DroneApi listener, Uri tlogLoggingUri) {
         if (listener == null || TextUtils.isEmpty(appId)) {
             return;
         }
 
         connectedApps.put(appId, listener);
-        doConnect(appId, listener);
+        doConnect(appId, listener, tlogLoggingUri);
     }
 
-    protected void doConnect(String appId, DroneApi listener) {
+    protected void doConnect(String appId, DroneApi listener, @Nullable Uri tlogLoggingUri) {
 
     }
 

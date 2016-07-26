@@ -1,5 +1,6 @@
 package com.o3dr.services.android.lib.drone.connection;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -11,47 +12,48 @@ import android.text.TextUtils;
  */
 public class ConnectionParameter implements Parcelable {
 
-    private final int connectionType;
+    private final @ConnectionType.Type int connectionType;
     private final Bundle paramsBundle;
+    private final Uri tlogLoggingUri;
 
     /**
+     * @param tlogLoggingUri Uri where the tlog data should be logged. Pass null if the tlog data shouldn't be logged
      * @return Returns a new {@link ConnectionParameter} with type {@link ConnectionType#TYPE_USB}
      * and baud rate {@link ConnectionType#DEFAULT_USB_BAUD_RATE}.
      */
-    public static ConnectionParameter newUsbConnection() {
-        return newUsbConnection(ConnectionType.DEFAULT_USB_BAUD_RATE);
+    public static ConnectionParameter newUsbConnection(@Nullable Uri tlogLoggingUri) {
+        return newUsbConnection(ConnectionType.DEFAULT_USB_BAUD_RATE, tlogLoggingUri);
     }
-
     /**
      *
      * @param usbBaudRate Baud rate for USB connection.
-     *
+     * @param tlogLoggingUri Uri where the tlog data should be logged. Pass null if the tlog data shouldn't be logged
      * @return Returns a new {@link ConnectionParameter} with type {@link ConnectionType#TYPE_USB}.
      */
-    public static ConnectionParameter newUsbConnection(int usbBaudRate) {
+    public static ConnectionParameter newUsbConnection(int usbBaudRate, @Nullable Uri tlogLoggingUri) {
         Bundle paramsBundle = new Bundle(1);
         paramsBundle.putInt(ConnectionType.EXTRA_USB_BAUD_RATE, usbBaudRate);
 
-        return new ConnectionParameter(ConnectionType.TYPE_USB, paramsBundle);
+        return new ConnectionParameter(ConnectionType.TYPE_USB, paramsBundle, tlogLoggingUri);
     }
 
     /**
-     *
+     * @param tlogLoggingUri Uri where the tlog data should be logged. Pass null if the tlog data shouldn't be logged
      * @return Returns {@link ConnectionParameter} with type {@link ConnectionType#TYPE_UDP}, using
      * {@link ConnectionType#DEFAULT_UDP_SERVER_PORT} port.
      */
-    public static ConnectionParameter newUdpConnection() {
-        return newUdpConnection(ConnectionType.DEFAULT_UDP_SERVER_PORT);
+    public static ConnectionParameter newUdpConnection(@Nullable Uri tlogLoggingUri) {
+        return newUdpConnection(ConnectionType.DEFAULT_UDP_SERVER_PORT, tlogLoggingUri);
     }
 
     /**
      *
      * @param udpPort Port for the UDP connection.
-     *
+     * @param tlogLoggingUri Uri where the tlog data should be logged. Pass null if the tlog data shouldn't be logged
      * @return Returns {@link ConnectionParameter} with type {@link ConnectionType#TYPE_UDP}.
      */
-    public static ConnectionParameter newUdpConnection(int udpPort) {
-        return newUdpConnection(udpPort, null, 0, null);
+    public static ConnectionParameter newUdpConnection(int udpPort, @Nullable Uri tlogLoggingUri) {
+        return newUdpConnection(udpPort, null, 0, null, tlogLoggingUri);
     }
 
     /**
@@ -61,13 +63,14 @@ public class ConnectionParameter implements Parcelable {
      *                          along with udpPingReceiverPort and udpPingPayload.
      * @param udpPingReceiverPort Port of the UDP server to ping.
      * @param udpPingPayload Ping payload.
+     * @param tlogLoggingUri Uri where the tlog data should be logged. Pass null if the tlog data shouldn't be logged
      *
      * @return Returns {@link ConnectionParameter} with type {@link ConnectionType#TYPE_UDP}. The ping
      * period is set to {@link ConnectionType#DEFAULT_UDP_PING_PERIOD}
      */
     public static ConnectionParameter newUdpConnection(int udpPort, @Nullable String udpPingReceiverIp, int udpPingReceiverPort,
-                                                       byte[] udpPingPayload) {
-        return newUdpConnection(udpPort, udpPingReceiverIp, udpPingReceiverPort, udpPingPayload, ConnectionType.DEFAULT_UDP_PING_PERIOD);
+                                                       byte[] udpPingPayload, @Nullable Uri tlogLoggingUri) {
+        return newUdpConnection(udpPort, udpPingReceiverIp, udpPingReceiverPort, udpPingPayload, ConnectionType.DEFAULT_UDP_PING_PERIOD, tlogLoggingUri);
     }
 
     /**
@@ -78,11 +81,12 @@ public class ConnectionParameter implements Parcelable {
      * @param udpPingReceiverPort Port of the UDP server to ping.
      * @param udpPingPayload Ping payload.
      * @param pingPeriod How often should the udp ping be performed.
+     * @param tlogLoggingUri Uri where the tlog data should be logged. Pass null if the tlog data shouldn't be logged
      *
      * @return Returns {@link ConnectionParameter} with type {@link ConnectionType#TYPE_UDP}.
      */
     public static ConnectionParameter newUdpConnection(int udpPort, @Nullable String udpPingReceiverIp, int udpPingReceiverPort,
-                                                       byte[] udpPingPayload, long pingPeriod) {
+                                                       byte[] udpPingPayload, long pingPeriod, @Nullable Uri tlogLoggingUri) {
         Bundle paramsBundle = new Bundle();
         paramsBundle.putInt(ConnectionType.EXTRA_UDP_SERVER_PORT, udpPort);
 
@@ -93,46 +97,46 @@ public class ConnectionParameter implements Parcelable {
             paramsBundle.putLong(ConnectionType.EXTRA_UDP_PING_PERIOD, pingPeriod);
         }
 
-        return new ConnectionParameter(ConnectionType.TYPE_UDP, paramsBundle);
+        return new ConnectionParameter(ConnectionType.TYPE_UDP, paramsBundle, tlogLoggingUri);
     }
 
     /**
      *
      * @param tcpServerIp TCP server IP address.
-     *
+     * @param tlogLoggingUri Uri where the tlog data should be logged. Pass null if the tlog data shouldn't be logged
      * @return Returns {@link ConnectionParameter} with type {@link ConnectionType#TYPE_TCP}, using
      * {@link ConnectionType#DEFAULT_TCP_SERVER_PORT}.
      */
-    public static ConnectionParameter newTcpConnection(String tcpServerIp) {
-        return newTcpConnection(tcpServerIp, ConnectionType.DEFAULT_TCP_SERVER_PORT);
+    public static ConnectionParameter newTcpConnection(String tcpServerIp, @Nullable Uri tlogLoggingUri) {
+        return newTcpConnection(tcpServerIp, ConnectionType.DEFAULT_TCP_SERVER_PORT, tlogLoggingUri);
     }
 
     /**
      *
      * @param tcpServerIp TCP server IP address.
      * @param tcpServerPort TCP server port.
-     *
+     * @param tlogLoggingUri Uri where the tlog data should be logged. Pass null if the tlog data shouldn't be logged
      * @return Returns {@link ConnectionParameter} with type {@link ConnectionType#TYPE_TCP}.
      */
-    public static ConnectionParameter newTcpConnection(String tcpServerIp, int tcpServerPort) {
+    public static ConnectionParameter newTcpConnection(String tcpServerIp, int tcpServerPort, @Nullable Uri tlogLoggingUri) {
         Bundle paramsBundle = new Bundle(2);
         paramsBundle.putString(ConnectionType.EXTRA_TCP_SERVER_IP, tcpServerIp);
         paramsBundle.putInt(ConnectionType.EXTRA_TCP_SERVER_PORT, tcpServerPort);
 
-        return new ConnectionParameter(ConnectionType.TYPE_TCP, paramsBundle);
+        return new ConnectionParameter(ConnectionType.TYPE_TCP, paramsBundle, tlogLoggingUri);
     }
 
     /**
      *
      * @param bluetoothAddress Bluetooth address.
-     *
+     * @param tlogLoggingUri Uri where the tlog data should be logged. Pass null if the tlog data shouldn't be logged
      * @return Returns {@link ConnectionParameter} with type {@link ConnectionType#TYPE_BLUETOOTH}.
      */
-    public static ConnectionParameter newBluetoothConnection(String bluetoothAddress) {
+    public static ConnectionParameter newBluetoothConnection(String bluetoothAddress, @Nullable Uri tlogLoggingUri){
         Bundle paramsBundle = new Bundle(1);
         paramsBundle.putString(ConnectionType.EXTRA_BLUETOOTH_ADDRESS, bluetoothAddress);
 
-        return new ConnectionParameter(ConnectionType.TYPE_BLUETOOTH, paramsBundle);
+        return new ConnectionParameter(ConnectionType.TYPE_BLUETOOTH, paramsBundle, tlogLoggingUri);
     }
 
     /**
@@ -140,32 +144,45 @@ public class ConnectionParameter implements Parcelable {
      * @param ssid Wifi SSID of the solo vehicle link. This will remove a leading and/or trailing quotation.
      * @param password Password to access the solo wifi network. This value can be null as long as the wifi
      *                 configuration has been set up and stored in the mobile device's system.
-     *
+     * @param tlogLoggingUri Uri where the tlog data should be logged. Pass null if the tlog data shouldn't be logged.
      * @return Returns {@link ConnectionParameter} with type {@link ConnectionType#TYPE_SOLO}.
      */
-    public static ConnectionParameter newSoloConnection(String ssid, @Nullable String password) {
+    public static ConnectionParameter newSoloConnection(String ssid, @Nullable String password, @Nullable Uri tlogLoggingUri){
         String ssidWithoutQuotes = ssid.replaceAll("^\"|\"$", "");
 
         Bundle paramsBundle = new Bundle(2);
         paramsBundle.putString(ConnectionType.EXTRA_SOLO_LINK_ID, ssidWithoutQuotes);
         paramsBundle.putString(ConnectionType.EXTRA_SOLO_LINK_PASSWORD, password);
 
-        return new ConnectionParameter(ConnectionType.TYPE_SOLO, paramsBundle);
+        return new ConnectionParameter(ConnectionType.TYPE_SOLO, paramsBundle, tlogLoggingUri);
+    }
+
+    private ConnectionParameter(@ConnectionType.Type int connectionType, Bundle paramsBundle){
+        this(connectionType, paramsBundle, null);
     }
 
     /**
      */
-    private ConnectionParameter(int connectionType, Bundle paramsBundle){
+    private ConnectionParameter(@ConnectionType.Type int connectionType, Bundle paramsBundle, Uri tlogLoggingUri){
         this.connectionType = connectionType;
         this.paramsBundle = paramsBundle;
+        this.tlogLoggingUri = tlogLoggingUri;
     }
 
-    public int getConnectionType() {
+    public @ConnectionType.Type int getConnectionType() {
         return connectionType;
     }
 
     public Bundle getParamsBundle() {
         return paramsBundle;
+    }
+
+    /**
+     * Return the uri where the tlog data should be logged.
+     * @return Uri where to log the tlog data, or null if it shouldn't be logged.
+     */
+    public Uri getTLogLoggingUri(){
+        return tlogLoggingUri;
     }
 
     public String getUniqueId(){
@@ -270,11 +287,14 @@ public class ConnectionParameter implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(this.connectionType);
         dest.writeBundle(paramsBundle);
+        dest.writeParcelable(tlogLoggingUri, flags);
     }
 
     private ConnectionParameter(Parcel in) {
-        this.connectionType = in.readInt();
+        @ConnectionType.Type int type = in.readInt();
+        this.connectionType = type;
         paramsBundle = in.readBundle(getClass().getClassLoader());
+        tlogLoggingUri = in.readParcelable(Uri.class.getClassLoader());
     }
 
     public static final Creator<ConnectionParameter> CREATOR = new Creator<ConnectionParameter>() {

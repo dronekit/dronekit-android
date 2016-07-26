@@ -1,6 +1,7 @@
 package org.droidplanner.services.android.impl.communication.connection;
 
 import android.content.Context;
+import android.net.Uri;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
@@ -192,13 +193,13 @@ public class SoloConnection extends AndroidMavLinkConnection implements WifiConn
         }
     }
 
-    public static ConnectionParameter getSoloConnectionParameterFromUdp(Context context){
+    public static ConnectionParameter getSoloConnectionParameterFromUdp(Context context, Uri tLogLoggingUri){
         if(context == null)
             return null;
 
         final String wifiSsid = WifiConnectionHandler.getCurrentWifiLink((WifiManager) context.getSystemService(Context.WIFI_SERVICE));
         if(WifiConnectionHandler.isSoloWifi(wifiSsid)){
-            return ConnectionParameter.newSoloConnection(wifiSsid, null);
+            return ConnectionParameter.newSoloConnection(wifiSsid, null, tLogLoggingUri);
         }
 
         return null;
