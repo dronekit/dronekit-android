@@ -1,7 +1,8 @@
 package org.droidplanner.services.android.core.gcs.follow;
 
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
-
+import com.o3dr.services.android.lib.coordinate.LatLong;
+import org.droidplanner.services.android.core.helpers.geoTools.GeoTools;
 import org.droidplanner.services.android.core.gcs.location.Location;
 
 import timber.log.Timber;
@@ -42,10 +43,22 @@ public class LocationRelay {
         Location gcsLocation = null;
         if(VERBOSE) Timber.d("toGcsLocation(): followLoc=" + androidLocation);
 
-        boolean ok = (androidLocation.hasAccuracy() && androidLocation.getTime() > 0);
+        // If location has no bearing, set one based on its heading from the
+        // previous location (or 0 if no previous location).
+        if(!androidLocation.hasBearing()) {
+            if(mLastLocation != null) {
+                LatLong last = new LatLong(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+                LatLong newLoc = new LatLong(androidLocation.getLatitude(), androidLocation.getLongitude());
+                androidLocation.setBearing((float)GeoTools.getHeadingFromCoordinates(last, newLoc));
+            } else {
+                androidLocation.setBearing(0);
+            }
+        }
+
+        boolean ok = (androidLocation.hasAccuracy() && androidLocation.hasBearing() && androidLocation.getTime() > 0);
 
         if(!ok) {
-            Timber.w("toGcsLocation(): Location needs accuracy and time.");
+            Timber.w("toGcsLocation(): Location needs accuracy, bearing, and time.");
         } else {
             float distanceToLast = -1.0f;
             long timeSinceLast = -1L;
