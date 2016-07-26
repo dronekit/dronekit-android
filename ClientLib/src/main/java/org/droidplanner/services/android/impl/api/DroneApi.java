@@ -3,7 +3,9 @@ package org.droidplanner.services.android.impl.api;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.RemoteException;
 import android.text.TextUtils;
 import android.util.Pair;
@@ -54,8 +56,11 @@ import org.droidplanner.services.android.impl.utils.video.VideoManager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 import timber.log.Timber;
 
@@ -68,7 +73,28 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
     //The Reset ROI mission item was introduced in version 2.6.8. Any client library older than this do not support it.
     private final static int RESET_ROI_LIB_VERSION = 206080;
 
+    private final Runnable eventsDispatcher = new Runnable() {
+        @Override
+        public void run() {
+            handler.removeCallbacks(this);
+
+            //Go through the events buffer and empty it
+            Set<Map.Entry<EventInfo, Bundle>> eventsToDispatch = eventsBuffer.entrySet();
+            for(Map.Entry<EventInfo, Bundle> entry: eventsToDispatch){
+                String event = entry.getKey().event;
+                Bundle extras = entry.getValue();
+                eventsToDispatch.remove(entry);
+                dispatchAttributeEvent(event, extras);
+            }
+
+            if(isEventsBufferingEnabled()) {
+                handler.postDelayed(this, connectionParams.getEventsDispatchingPeriod());
+            }
+        }
+    };
+
     private final Context context;
+    private final Handler handler;
 
     private final ConcurrentLinkedQueue<IObserver> observersList;
     private final ConcurrentLinkedQueue<IMavlinkObserver> mavlinkObserversList;
@@ -80,12 +106,15 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
 
     private final DroidPlannerService service;
 
+    private final Map<EventInfo, Bundle> eventsBuffer = new ConcurrentSkipListMap<>();
+
     private ConnectionParameter connectionParams;
 
     DroneApi(DroidPlannerService dpService, IApiListener listener, String ownerId) {
 
         this.service = dpService;
         this.context = dpService.getApplicationContext();
+        handler = new Handler(Looper.getMainLooper());
 
         this.ownerId = ownerId;
 
@@ -137,6 +166,10 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
         }
 
         return this.droneMgr.getDrone();
+    }
+
+    private boolean isEventsBufferingEnabled(){
+        return connectionParams != null && connectionParams.getEventsDispatchingPeriod() > 0L;
     }
 
     @Override
@@ -218,6 +251,10 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
 
                 this.connectionParams = connParams;
                 this.droneMgr = service.connectDroneManager(this.connectionParams, ownerId, this);
+
+                if(isEventsBufferingEnabled()) {
+                    handler.postDelayed(eventsDispatcher, this.connectionParams.getEventsDispatchingPeriod());
+                }
             }
         } catch (ConnectionException e) {
             LinkConnectionStatus connectionStatus = LinkConnectionStatus
@@ -231,6 +268,8 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
         service.disconnectDroneManager(this.droneMgr, clientInfo);
         this.connectionParams = null;
         this.droneMgr = null;
+
+        handler.removeCallbacks(eventsDispatcher);
 
     }
 
@@ -385,21 +424,29 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
     }
 
     private void notifyAttributeUpdate(String attributeEvent, Bundle extrasBundle) {
-        if (observersList.isEmpty()) {
+        if (observersList.isEmpty() || attributeEvent == null) {
             return;
         }
 
-        if (attributeEvent != null) {
-            for (IObserver observer : observersList) {
+        if(isEventsBufferingEnabled()){
+            eventsBuffer.put(new EventInfo(attributeEvent), extrasBundle);
+        }
+        else {
+            //Dispatch the event immediately
+            dispatchAttributeEvent(attributeEvent, extrasBundle);
+        }
+    }
+
+    private void dispatchAttributeEvent(String attributeEvent, Bundle extrasBundle){
+        for (IObserver observer : observersList) {
+            try {
+                observer.onAttributeUpdated(attributeEvent, extrasBundle);
+            } catch (RemoteException e) {
+                Timber.e(e, e.getMessage());
                 try {
-                    observer.onAttributeUpdated(attributeEvent, extrasBundle);
-                } catch (RemoteException e) {
-                    Timber.e(e, e.getMessage());
-                    try {
-                        removeAttributesObserver(observer);
-                    } catch (RemoteException e1) {
-                        Timber.e(e, e1.getMessage());
-                    }
+                    removeAttributesObserver(observer);
+                } catch (RemoteException e1) {
+                    Timber.e(e, e1.getMessage());
                 }
             }
         }
@@ -733,6 +780,44 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
             this.apiVersionCode = apiVersionCode;
             this.appId = appId;
             this.clientVersionCode = clientVersionCode;
+        }
+    }
+
+    private static class EventInfo implements Comparable<EventInfo>{
+        final String event;
+        final long eventTimestamp;
+
+        EventInfo(String event){
+            this.event = event;
+            eventTimestamp = System.currentTimeMillis();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (!(o instanceof EventInfo)) {
+                return false;
+            }
+
+            EventInfo eventInfo = (EventInfo) o;
+
+            return event != null ? event.equals(eventInfo.event) : eventInfo.event == null;
+
+        }
+
+        @Override
+        public int hashCode() {
+            return event != null ? event.hashCode() : 0;
+        }
+
+        @Override
+        public int compareTo(EventInfo another) {
+            if(this.event.equals(another.event))
+                return 0;
+
+            return this.eventTimestamp > another.eventTimestamp ? 1 : -1;
         }
     }
 }

@@ -12,9 +12,12 @@ import android.text.TextUtils;
  */
 public class ConnectionParameter implements Parcelable {
 
+    private static final long DEFAULT_EVENTS_DISPATCHING_PERIOD = 100L; //milliseconds
+
     private final @ConnectionType.Type int connectionType;
     private final Bundle paramsBundle;
     private final Uri tlogLoggingUri;
+    private final long eventsDispatchingPeriod;
 
     /**
      * @param tlogLoggingUri Uri where the tlog data should be logged. Pass null if the tlog data shouldn't be logged
@@ -167,6 +170,16 @@ public class ConnectionParameter implements Parcelable {
         this.connectionType = connectionType;
         this.paramsBundle = paramsBundle;
         this.tlogLoggingUri = tlogLoggingUri;
+        this.eventsDispatchingPeriod = DEFAULT_EVENTS_DISPATCHING_PERIOD;
+    }
+
+    /**
+     * Dictates how long to wait before dispatching buffered drone events.
+     * A value of OL means events should be dispatched as soon as they are received.
+     * @return
+     */
+    public long getEventsDispatchingPeriod() {
+        return eventsDispatchingPeriod;
     }
 
     public @ConnectionType.Type int getConnectionType() {
@@ -288,6 +301,7 @@ public class ConnectionParameter implements Parcelable {
         dest.writeInt(this.connectionType);
         dest.writeBundle(paramsBundle);
         dest.writeParcelable(tlogLoggingUri, flags);
+        dest.writeLong(eventsDispatchingPeriod);
     }
 
     private ConnectionParameter(Parcel in) {
@@ -295,6 +309,7 @@ public class ConnectionParameter implements Parcelable {
         this.connectionType = type;
         paramsBundle = in.readBundle(getClass().getClassLoader());
         tlogLoggingUri = in.readParcelable(Uri.class.getClassLoader());
+        eventsDispatchingPeriod = in.readLong();
     }
 
     public static final Creator<ConnectionParameter> CREATOR = new Creator<ConnectionParameter>() {
