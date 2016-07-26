@@ -40,26 +40,25 @@ public class LocationRelay {
      */
     public Location toGcsLocation(android.location.Location androidLocation) {
         Location gcsLocation = null;
-        if(VERBOSE) Timber.d("toLocation(): followLoc=" + androidLocation);
+        if(VERBOSE) Timber.d("toGcsLocation(): followLoc=" + androidLocation);
 
-        boolean ok = (androidLocation.hasAccuracy() && androidLocation.hasBearing() && androidLocation.getTime() > 0);
+        boolean ok = (androidLocation.hasAccuracy() && androidLocation.getTime() > 0);
 
         if(!ok) {
-            Timber.w("toLocation(): Location needs accuracy, heading, and time");
-        }
-
-        if(ok) {
+            Timber.w("toGcsLocation(): Location needs accuracy and time.");
+        } else {
             float distanceToLast = -1.0f;
             long timeSinceLast = -1L;
 
             final long androidLocationTime = androidLocation.getTime();
             if (mLastLocation != null) {
                 distanceToLast = androidLocation.distanceTo(mLastLocation);
-                timeSinceLast = (androidLocationTime - mLastLocation.getTime()) / 1000;
+                timeSinceLast = (androidLocationTime - mLastLocation.getTime());
             }
 
+            // mm/ms (does a better job calculating for locations that arrive at < 1-second intervals)
             final float currentSpeed = (distanceToLast > 0f && timeSinceLast > 0) ?
-                    (distanceToLast / timeSinceLast) : 0f;
+                    ((distanceToLast * 1000) / timeSinceLast) : 0f;
 
             final boolean isAccurate = isLocationAccurate(androidLocation.getAccuracy(), currentSpeed);
 
