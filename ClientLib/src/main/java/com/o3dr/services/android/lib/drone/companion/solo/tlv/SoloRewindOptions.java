@@ -6,7 +6,12 @@ import android.support.annotation.IntDef;
 import java.nio.ByteBuffer;
 
 /**
- * Created by phu on 7/21/16.
+ * Path: Bidirectional
+ * Purpose: Configures the options for failsafe behavior of shotmanager
+ * This can be sent at anytime to shotmanager, even outside of a shot
+ * Requires: shotmanager 2.4.0
+ * Created by phu 7/2016
+ * @since 2.9.1
  */
 public class SoloRewindOptions extends TLVPacket {
 
@@ -19,10 +24,20 @@ public class SoloRewindOptions extends TLVPacket {
             RETURN_AND_LAND,
     })
     public @interface ReturnPreference{}
+
     private boolean isRewindEnabled;
+
+    /**
+     * Tells shotmanager what to do when the copter reaches the home point
+     * Options: Land or Hover
+     */
     @ReturnPreference
     private int returnPreference;
 
+    /**
+     * Tells shotmanager how far to backtrack along the path travelled before
+     * engaging in the normal up and over RTL
+     */
     private float rewindDistance;
 
     public float getRewindDistance() {

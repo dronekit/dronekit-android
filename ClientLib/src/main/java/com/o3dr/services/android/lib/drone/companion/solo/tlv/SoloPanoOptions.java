@@ -6,23 +6,26 @@ import android.support.annotation.IntDef;
 import java.nio.ByteBuffer;
 
 /**
- * Created by phu on 6/24/16.
+ * Path: Bidirectional
+ * Purpose: App updates shotmanager of pano settings
+ * Shotmanager tells app to update UI based on pano settings changed through the controller
+ * Requires: Shotmanager 2.4.0
+ * Created by phu 7/2016
+ * @since 2.9.1
  */
 public class SoloPanoOptions extends TLVPacket {
 
     public static final int MESSAGE_LENGTH = 12;
 
     /**
-     * Pano can automatically run, is it running?
+     * Used to toggle whether the photo panos (cylindrical or spherical are running)
      */
     private static final int PANO_ON_VALUE = 1;
     private static final int PANO_OFF_VALUE = 0;
 
     private boolean isRunning;
 
-    /**
-     * Pano has multiple sub modes
-     */
+
     @IntDef({
             PANO_PREFERENCE_CYLINDRICAL,
             PANO_PREFERENCE_SPHERICAL,
@@ -33,21 +36,28 @@ public class SoloPanoOptions extends TLVPacket {
     public static final int PANO_PREFERENCE_CYLINDRICAL = 0;
     public static final int PANO_PREFERENCE_SPHERICAL = 1;
     public static final int PANO_PREFERENCE_VIDEO = 2;
+
+    /**
+     * Pano sub modes:
+     * 0. Cylindrrical - captures still photos for a wide rectangular pano
+     * 1. Spherical - captures still photos for a "little world" pano
+     * 2. Video - smoothly pan a video
+     */
     @PanoPreference
     private int panoPreference;
 
     /**
-     * Pan angle (used in cylindrical)
+     * Pan angle used in cylindrical pano to determine how wide the pano should be
      */
     private short panAngle;
 
     /**
-     * Yaw speed (used in video)
+     * Yaw speed used in video pano to determine how fast to pan
      */
     private float degreesPerSecondYawSpeed;
 
     /**
-     * Camera FOV
+     * Camera FOV used in all modes to calculate the overlap of the photos
      */
     private float cameraFOV;
 

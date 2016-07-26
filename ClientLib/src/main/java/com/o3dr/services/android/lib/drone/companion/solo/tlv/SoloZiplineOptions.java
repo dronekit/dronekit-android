@@ -5,18 +5,27 @@ import android.os.Parcel;
 import java.nio.ByteBuffer;
 
 /**
- * Created by phu on 7/6/16.
+ * Path: Bidirectional
+ * Purpose: App updates shotmanager on changes in zipline settings
+ * App can also controls automatic cruise movements by setting the cruise speed
+ * to positive or negative or zero
+ * Shotmanager tells app to update UI based on zipline settings changed through the controller
+ * Requires: Shotmanager 2.4.0
+ * Created by phu 7/2016
+ * @since 2.9.1
  */
 public class SoloZiplineOptions extends SoloShotOptions {
     public static final int MESSAGE_LENGTH = 6;
 
     /**
-     * Zipline can do a 3D path (with altitude) or 2d
+     * Zipline can do a 3D path (with altitude change) or 2d
      */
     private boolean is3D;
 
     /**
-     * Zipline can lock the camera on a GPS spot while the copter is moving
+     * Zipline can lock the camera on the GPS point is
+     * extrapolated from the gimbal's current heading
+     * and after that the camera will orient towards that point
      */
     private boolean cameraLock;
 
