@@ -5,7 +5,12 @@ import android.os.Parcel;
 import java.nio.ByteBuffer;
 
 /**
- * Created by phu on 7/6/16.
+ * Path: Bidirectional
+ * Purpose: App tells shotmanager to lock onto the path of the current copter heading for zipline
+ * Or shotmanager tells app that a path has been locked and transition the UI
+ * Requires: Shotmanager 2.4.0
+ * Created by phu 7/2016
+ * @since 2.9.1
  */
 public class SoloZiplineLock extends TLVPacket {
     public SoloZiplineLock() {

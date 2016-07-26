@@ -5,7 +5,14 @@ import android.os.Parcel;
 import java.nio.ByteBuffer;
 
 /**
- * Created by phu on 7/17/16.
+ * Path: Bidirectional
+ * Purpose: App updates shotmanager on changes in zipline settings
+ * App can also controls automatic cruise movements by setting the cruise speed
+ * to positive or negative or zero
+ * Shotmanager tells app to update UI based on zipline settings changed through the controller
+ * Requires: Shotmanager 2.4.0
+ * Created by phu 7/2016
+ * @since 2.9.1
  */
 public class SoloPanoStatus extends TLVPacket {
 

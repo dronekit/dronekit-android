@@ -7,7 +7,11 @@ import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import java.nio.ByteBuffer;
 
 /**
- * Created by phu on 7/21/16.
+ * Path: App to shotmanager
+ * Purpose: Sends an update of the user location as the home location for Return to Me
+ * Requires: Shotmanager 2.4.0
+ * Created by phu 7/2016
+ * @since 2.9.1
  */
 public class SoloReturnHomeLocationMessage extends TLVPacket {
 
