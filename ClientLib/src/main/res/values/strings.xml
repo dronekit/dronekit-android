@@ -59,6 +59,11 @@
     <string name="label_inspect">Inspect</string>
     <string name="label_survey">Survey</string>
     <string name="label_scan">Scan</string>
+    <string name="label_pano">Pano</string>
+    <string name="label_zipline">Zipline</string>
+    <string name="label_rewind">Rewind</string>
+    <string name="label_return_home">Return Home</string>
+    <string name="label_transect">Transect</string>
 
     <!-- Shot type indicator -->
     <string name="copter_alt_hold_label">FLY: Manual</string>
