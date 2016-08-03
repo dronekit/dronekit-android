@@ -95,6 +95,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
 
     private final Context context;
     private final Handler handler;
+    private final Bundle emptyBundle = Bundle.EMPTY;
 
     private final ConcurrentLinkedQueue<IObserver> observersList;
     private final ConcurrentLinkedQueue<IMavlinkObserver> mavlinkObserversList;
@@ -428,16 +429,23 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
             return;
         }
 
-        if(isEventsBufferingEnabled()){
-            eventsBuffer.put(new EventInfo(attributeEvent), extrasBundle);
-        }
-        else {
+        if(AttributeEvent.STATE_CONNECTED.equals(attributeEvent) ||
+            AttributeEvent.STATE_DISCONNECTED.equals(attributeEvent) ||
+            !isEventsBufferingEnabled()){
             //Dispatch the event immediately
             dispatchAttributeEvent(attributeEvent, extrasBundle);
+        }
+        else{
+            if(extrasBundle == null)
+                extrasBundle = emptyBundle;
+            eventsBuffer.put(new EventInfo(attributeEvent), extrasBundle);
         }
     }
 
     private void dispatchAttributeEvent(String attributeEvent, Bundle extrasBundle){
+        if(extrasBundle == emptyBundle)
+            extrasBundle = null;
+
         for (IObserver observer : observersList) {
             try {
                 observer.onAttributeUpdated(attributeEvent, extrasBundle);
