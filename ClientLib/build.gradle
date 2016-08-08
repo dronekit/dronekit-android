@@ -114,7 +114,7 @@ dependencies {
 
     compile 'org.droidplanner.android:usb-serial-android:0.1.0'
 
-//    debugCompile project(':Mavlink')
+    debugCompile project(':Mavlink')
 //    sitlCompile project(':Mavlink')
 
     compile files('libs/Mavlink.jar')
