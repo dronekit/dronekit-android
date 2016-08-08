@@ -2,13 +2,14 @@ package org.droidplanner.services.android.impl.core.gcs.follow;
 
 import android.os.Handler;
 
-import org.droidplanner.services.android.impl.core.drone.manager.MavLinkDroneManager;
-import org.droidplanner.services.android.impl.core.gcs.location.Location;
-import org.droidplanner.services.android.impl.core.helpers.geoTools.GeoTools;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.property.Gps;
+
+import org.droidplanner.services.android.impl.core.drone.manager.MavLinkDroneManager;
+import org.droidplanner.services.android.impl.core.gcs.location.Location;
+import org.droidplanner.services.android.impl.core.helpers.geoTools.GeoTools;
 
 /**
  * Created by fhuya on 1/5/15.
@@ -28,7 +29,6 @@ public class FollowSplineLeash extends FollowWithRadiusAlgorithm {
             double headingGCSToDrone = GeoTools.getHeadingFromCoordinates(userLoc, droneLoc);
             LatLong goCoord = GeoTools.newCoordFromBearingAndDistance(userLoc, headingGCSToDrone, radius);
 
-            //TODO: some device (nexus 6) do not report the speed (always 0).. figure out workaround.
             double speed = location.getSpeed();
             double bearing = location.getBearing();
             double bearingInRad = Math.toRadians(bearing);

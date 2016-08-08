@@ -12,9 +12,12 @@ import android.text.TextUtils;
  */
 public class ConnectionParameter implements Parcelable {
 
+    private static final long DEFAULT_EVENTS_DISPATCHING_PERIOD = 200L; //milliseconds
+
     private final @ConnectionType.Type int connectionType;
     private final Bundle paramsBundle;
     private final Uri tlogLoggingUri;
+    private final long eventsDispatchingPeriod;
 
     /**
      * @param tlogLoggingUri Uri where the tlog data should be logged. Pass null if the tlog data shouldn't be logged
@@ -24,6 +27,7 @@ public class ConnectionParameter implements Parcelable {
     public static ConnectionParameter newUsbConnection(@Nullable Uri tlogLoggingUri) {
         return newUsbConnection(ConnectionType.DEFAULT_USB_BAUD_RATE, tlogLoggingUri);
     }
+
     /**
      *
      * @param usbBaudRate Baud rate for USB connection.
@@ -31,10 +35,24 @@ public class ConnectionParameter implements Parcelable {
      * @return Returns a new {@link ConnectionParameter} with type {@link ConnectionType#TYPE_USB}.
      */
     public static ConnectionParameter newUsbConnection(int usbBaudRate, @Nullable Uri tlogLoggingUri) {
+        return newUsbConnection(usbBaudRate, tlogLoggingUri, DEFAULT_EVENTS_DISPATCHING_PERIOD);
+    }
+
+    /**
+     *
+     * @param usbBaudRate Baud rate for USB connection.
+     * @param tlogLoggingUri Uri where the tlog data should be logged. Pass null if the tlog data shouldn't be logged
+     * @param eventsDispatchingPeriod Dictates how long (in milliseconds) to wait before dispatching
+     *                                buffered drone events. A value of OL means events should be
+     *                                dispatched as soon as they are received.
+     * @return Returns a new {@link ConnectionParameter} with type {@link ConnectionType#TYPE_USB}.
+     */
+    public static ConnectionParameter newUsbConnection(int usbBaudRate, @Nullable Uri tlogLoggingUri,
+                                                       long eventsDispatchingPeriod){
         Bundle paramsBundle = new Bundle(1);
         paramsBundle.putInt(ConnectionType.EXTRA_USB_BAUD_RATE, usbBaudRate);
 
-        return new ConnectionParameter(ConnectionType.TYPE_USB, paramsBundle, tlogLoggingUri);
+        return new ConnectionParameter(ConnectionType.TYPE_USB, paramsBundle, tlogLoggingUri, eventsDispatchingPeriod);
     }
 
     /**
@@ -53,14 +71,31 @@ public class ConnectionParameter implements Parcelable {
      * @return Returns {@link ConnectionParameter} with type {@link ConnectionType#TYPE_UDP}.
      */
     public static ConnectionParameter newUdpConnection(int udpPort, @Nullable Uri tlogLoggingUri) {
-        return newUdpConnection(udpPort, null, 0, null, tlogLoggingUri);
+        return newUdpConnection(udpPort, tlogLoggingUri, DEFAULT_EVENTS_DISPATCHING_PERIOD);
     }
 
     /**
      *
      * @param udpPort Port for the UDP connection.
-     * @param udpPingReceiverIp IP address of the UDP server to ping. If this value is null, it is ignored
-     *                          along with udpPingReceiverPort and udpPingPayload.
+     * @param tlogLoggingUri Uri where the tlog data should be logged. Pass null if the tlog data shouldn't be logged
+     * @param eventsDispatchingPeriod Dictates how long (in milliseconds) to wait before dispatching
+     *                                buffered drone events. A value of OL means events should be
+     *                                dispatched as soon as they are received.
+     * @return Returns {@link ConnectionParameter} with type {@link ConnectionType#TYPE_UDP}.
+     */
+    public static ConnectionParameter newUdpConnection(int udpPort, @Nullable Uri tlogLoggingUri,
+                                                       long eventsDispatchingPeriod) {
+        Bundle paramsBundle = new Bundle();
+        paramsBundle.putInt(ConnectionType.EXTRA_UDP_SERVER_PORT, udpPort);
+
+        return new ConnectionParameter(ConnectionType.TYPE_UDP, paramsBundle, tlogLoggingUri,
+            eventsDispatchingPeriod);
+    }
+
+    /**
+     *
+     * @param udpPort Port for the UDP connection.
+     * @param udpPingReceiverIp IP address of the UDP server to ping.
      * @param udpPingReceiverPort Port of the UDP server to ping.
      * @param udpPingPayload Ping payload.
      * @param tlogLoggingUri Uri where the tlog data should be logged. Pass null if the tlog data shouldn't be logged
@@ -68,9 +103,12 @@ public class ConnectionParameter implements Parcelable {
      * @return Returns {@link ConnectionParameter} with type {@link ConnectionType#TYPE_UDP}. The ping
      * period is set to {@link ConnectionType#DEFAULT_UDP_PING_PERIOD}
      */
-    public static ConnectionParameter newUdpConnection(int udpPort, @Nullable String udpPingReceiverIp, int udpPingReceiverPort,
-                                                       byte[] udpPingPayload, @Nullable Uri tlogLoggingUri) {
-        return newUdpConnection(udpPort, udpPingReceiverIp, udpPingReceiverPort, udpPingPayload, ConnectionType.DEFAULT_UDP_PING_PERIOD, tlogLoggingUri);
+    public static ConnectionParameter newUdpWithPingConnection(int udpPort, String udpPingReceiverIp,
+                                                               int udpPingReceiverPort,
+                                                               byte[] udpPingPayload,
+                                                               @Nullable Uri tlogLoggingUri) {
+        return newUdpWithPingConnection(udpPort, udpPingReceiverIp, udpPingReceiverPort,
+            udpPingPayload, ConnectionType.DEFAULT_UDP_PING_PERIOD, tlogLoggingUri);
     }
 
     /**
@@ -85,8 +123,37 @@ public class ConnectionParameter implements Parcelable {
      *
      * @return Returns {@link ConnectionParameter} with type {@link ConnectionType#TYPE_UDP}.
      */
-    public static ConnectionParameter newUdpConnection(int udpPort, @Nullable String udpPingReceiverIp, int udpPingReceiverPort,
-                                                       byte[] udpPingPayload, long pingPeriod, @Nullable Uri tlogLoggingUri) {
+    public static ConnectionParameter newUdpWithPingConnection(int udpPort,
+                                                               String udpPingReceiverIp,
+                                                               int udpPingReceiverPort,
+                                                               byte[] udpPingPayload,
+                                                               long pingPeriod,
+                                                               @Nullable Uri tlogLoggingUri) {
+        return newUdpWithPingConnection(udpPort, udpPingReceiverIp, udpPingReceiverPort,
+            udpPingPayload, pingPeriod, tlogLoggingUri, DEFAULT_EVENTS_DISPATCHING_PERIOD);
+    }
+
+    /**
+     *
+     * @param udpPort Port for the UDP connection.
+     * @param udpPingReceiverIp IP address of the UDP server to ping. If this value is null, it is ignored
+     *                          along with udpPingReceiverPort, udpPingPayload, and pingPeriod.
+     * @param udpPingReceiverPort Port of the UDP server to ping.
+     * @param udpPingPayload Ping payload.
+     * @param pingPeriod How often should the udp ping be performed.
+     * @param tlogLoggingUri Uri where the tlog data should be logged. Pass null if the tlog data shouldn't be logged
+     * @param eventsDispatchingPeriod Dictates how long (in milliseconds) to wait before dispatching
+     *                                buffered drone events. A value of OL means events should be
+     *                                dispatched as soon as they are received.
+     * @return Returns {@link ConnectionParameter} with type {@link ConnectionType#TYPE_UDP}.
+     */
+    public static ConnectionParameter newUdpWithPingConnection(int udpPort,
+                                                               String udpPingReceiverIp,
+                                                               int udpPingReceiverPort,
+                                                               byte[] udpPingPayload,
+                                                               long pingPeriod,
+                                                               @Nullable Uri tlogLoggingUri,
+                                                               long eventsDispatchingPeriod) {
         Bundle paramsBundle = new Bundle();
         paramsBundle.putInt(ConnectionType.EXTRA_UDP_SERVER_PORT, udpPort);
 
@@ -97,7 +164,7 @@ public class ConnectionParameter implements Parcelable {
             paramsBundle.putLong(ConnectionType.EXTRA_UDP_PING_PERIOD, pingPeriod);
         }
 
-        return new ConnectionParameter(ConnectionType.TYPE_UDP, paramsBundle, tlogLoggingUri);
+        return new ConnectionParameter(ConnectionType.TYPE_UDP, paramsBundle, tlogLoggingUri, eventsDispatchingPeriod);
     }
 
     /**
@@ -118,12 +185,31 @@ public class ConnectionParameter implements Parcelable {
      * @param tlogLoggingUri Uri where the tlog data should be logged. Pass null if the tlog data shouldn't be logged
      * @return Returns {@link ConnectionParameter} with type {@link ConnectionType#TYPE_TCP}.
      */
-    public static ConnectionParameter newTcpConnection(String tcpServerIp, int tcpServerPort, @Nullable Uri tlogLoggingUri) {
+    public static ConnectionParameter newTcpConnection(String tcpServerIp, int tcpServerPort,
+                                                       @Nullable Uri tlogLoggingUri) {
+        return newTcpConnection(tcpServerIp, tcpServerPort, tlogLoggingUri,
+            DEFAULT_EVENTS_DISPATCHING_PERIOD);
+    }
+
+    /**
+     *
+     * @param tcpServerIp TCP server IP address.
+     * @param tcpServerPort TCP server port.
+     * @param tlogLoggingUri Uri where the tlog data should be logged. Pass null if the tlog data shouldn't be logged
+     * @param eventsDispatchingPeriod Dictates how long (in milliseconds) to wait before dispatching
+     *                                buffered drone events. A value of OL means events should be
+     *                                dispatched as soon as they are received.
+     * @return Returns {@link ConnectionParameter} with type {@link ConnectionType#TYPE_TCP}.
+     */
+    public static ConnectionParameter newTcpConnection(String tcpServerIp, int tcpServerPort,
+                                                       @Nullable Uri tlogLoggingUri,
+                                                       long eventsDispatchingPeriod) {
         Bundle paramsBundle = new Bundle(2);
         paramsBundle.putString(ConnectionType.EXTRA_TCP_SERVER_IP, tcpServerIp);
         paramsBundle.putInt(ConnectionType.EXTRA_TCP_SERVER_PORT, tcpServerPort);
 
-        return new ConnectionParameter(ConnectionType.TYPE_TCP, paramsBundle, tlogLoggingUri);
+        return new ConnectionParameter(ConnectionType.TYPE_TCP, paramsBundle, tlogLoggingUri,
+            eventsDispatchingPeriod);
     }
 
     /**
@@ -133,10 +219,26 @@ public class ConnectionParameter implements Parcelable {
      * @return Returns {@link ConnectionParameter} with type {@link ConnectionType#TYPE_BLUETOOTH}.
      */
     public static ConnectionParameter newBluetoothConnection(String bluetoothAddress, @Nullable Uri tlogLoggingUri){
+        return newBluetoothConnection(bluetoothAddress, tlogLoggingUri, DEFAULT_EVENTS_DISPATCHING_PERIOD);
+    }
+
+    /**
+     *
+     * @param bluetoothAddress Bluetooth address.
+     * @param tlogLoggingUri Uri where the tlog data should be logged. Pass null if the tlog data shouldn't be logged
+     * @param eventsDispatchingPeriod Dictates how long (in milliseconds) to wait before dispatching
+     *                                buffered drone events. A value of OL means events should be
+     *                                dispatched as soon as they are received.
+     * @return Returns {@link ConnectionParameter} with type {@link ConnectionType#TYPE_BLUETOOTH}.
+     */
+    public static ConnectionParameter newBluetoothConnection(String bluetoothAddress,
+                                                             @Nullable Uri tlogLoggingUri,
+                                                             long eventsDispatchingPeriod){
         Bundle paramsBundle = new Bundle(1);
         paramsBundle.putString(ConnectionType.EXTRA_BLUETOOTH_ADDRESS, bluetoothAddress);
 
-        return new ConnectionParameter(ConnectionType.TYPE_BLUETOOTH, paramsBundle, tlogLoggingUri);
+        return new ConnectionParameter(ConnectionType.TYPE_BLUETOOTH, paramsBundle, tlogLoggingUri,
+            eventsDispatchingPeriod);
     }
 
     /**
@@ -148,13 +250,31 @@ public class ConnectionParameter implements Parcelable {
      * @return Returns {@link ConnectionParameter} with type {@link ConnectionType#TYPE_SOLO}.
      */
     public static ConnectionParameter newSoloConnection(String ssid, @Nullable String password, @Nullable Uri tlogLoggingUri){
+        return newSoloConnection(ssid, password, tlogLoggingUri, DEFAULT_EVENTS_DISPATCHING_PERIOD);
+    }
+
+    /**
+     *
+     * @param ssid Wifi SSID of the solo vehicle link. This will remove a leading and/or trailing quotation.
+     * @param password Password to access the solo wifi network. This value can be null as long as the wifi
+     *                 configuration has been set up and stored in the mobile device's system.
+     * @param tlogLoggingUri Uri where the tlog data should be logged. Pass null if the tlog data shouldn't be logged.
+     * @param eventsDispatchingPeriod Dictates how long (in milliseconds) to wait before dispatching
+     *                                buffered drone events. A value of OL means events should be
+     *                                dispatched as soon as they are received.
+     * @return Returns {@link ConnectionParameter} with type {@link ConnectionType#TYPE_SOLO}.
+     */
+    public static ConnectionParameter newSoloConnection(String ssid, @Nullable String password,
+                                                        @Nullable Uri tlogLoggingUri,
+                                                        long eventsDispatchingPeriod){
         String ssidWithoutQuotes = ssid.replaceAll("^\"|\"$", "");
 
         Bundle paramsBundle = new Bundle(2);
         paramsBundle.putString(ConnectionType.EXTRA_SOLO_LINK_ID, ssidWithoutQuotes);
         paramsBundle.putString(ConnectionType.EXTRA_SOLO_LINK_PASSWORD, password);
 
-        return new ConnectionParameter(ConnectionType.TYPE_SOLO, paramsBundle, tlogLoggingUri);
+        return new ConnectionParameter(ConnectionType.TYPE_SOLO, paramsBundle, tlogLoggingUri,
+            eventsDispatchingPeriod);
     }
 
     private ConnectionParameter(@ConnectionType.Type int connectionType, Bundle paramsBundle){
@@ -164,9 +284,23 @@ public class ConnectionParameter implements Parcelable {
     /**
      */
     private ConnectionParameter(@ConnectionType.Type int connectionType, Bundle paramsBundle, Uri tlogLoggingUri){
+        this(connectionType, paramsBundle, tlogLoggingUri, DEFAULT_EVENTS_DISPATCHING_PERIOD);
+    }
+
+    private ConnectionParameter(@ConnectionType.Type int connectionType, Bundle paramsBundle,
+                                Uri tlogLoggingUri, long eventsDispatchingPeriod){
         this.connectionType = connectionType;
         this.paramsBundle = paramsBundle;
         this.tlogLoggingUri = tlogLoggingUri;
+        this.eventsDispatchingPeriod = eventsDispatchingPeriod;
+    }
+
+    /**
+     * Dictates how long (in milliseconds) to wait before dispatching buffered drone events.
+     * A value of OL means events should be dispatched as soon as they are received.
+     */
+    public long getEventsDispatchingPeriod() {
+        return eventsDispatchingPeriod;
     }
 
     public @ConnectionType.Type int getConnectionType() {
@@ -288,6 +422,7 @@ public class ConnectionParameter implements Parcelable {
         dest.writeInt(this.connectionType);
         dest.writeBundle(paramsBundle);
         dest.writeParcelable(tlogLoggingUri, flags);
+        dest.writeLong(eventsDispatchingPeriod);
     }
 
     private ConnectionParameter(Parcel in) {
@@ -295,6 +430,7 @@ public class ConnectionParameter implements Parcelable {
         this.connectionType = type;
         paramsBundle = in.readBundle(getClass().getClassLoader());
         tlogLoggingUri = in.readParcelable(Uri.class.getClassLoader());
+        eventsDispatchingPeriod = in.readLong();
     }
 
     public static final Creator<ConnectionParameter> CREATOR = new Creator<ConnectionParameter>() {

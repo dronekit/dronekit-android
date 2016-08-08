@@ -28,6 +28,7 @@ import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
 import com.o3dr.services.android.lib.drone.property.DroneAttribute;
 import com.o3dr.services.android.lib.drone.property.State;
+import com.o3dr.services.android.lib.drone.property.Type;
 import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
 
@@ -71,10 +72,12 @@ public class ArduSolo extends ArduCopter {
     private String pixhawkSerialNumber;
 
     private final SoloComp soloComp;
+    private final Type propertyType;
 
     public ArduSolo(String droneId, Context context, DataLink.DataLinkProvider<MAVLinkMessage> mavClient, Handler handler,
                     AutopilotWarningParser warningParser, LogMessageListener logListener) {
         super(droneId, context, mavClient, handler, warningParser, logListener);
+        this.propertyType = new Type(Type.TYPE_SOLO, getFirmwareVersion());
         this.soloComp = new SoloComp(context, handler);
         this.soloComp.setListener(new SoloComp.SoloCompListener() {
             @Override
@@ -203,6 +206,11 @@ public class ArduSolo extends ArduCopter {
     @Override
     public DroneAttribute getAttribute(String attributeType) {
         switch (attributeType) {
+            case AttributeType.TYPE:
+                // Update the firmware version
+                propertyType.setFirmwareVersion(getFirmwareVersion());
+                return propertyType;
+
             case SoloAttributes.SOLO_STATE:
                 return SoloApiUtils.getSoloLinkState(this);
 

@@ -73,7 +73,6 @@ import org.droidplanner.services.android.impl.core.firmware.FirmwareType;
 import org.droidplanner.services.android.impl.core.mission.Mission;
 import org.droidplanner.services.android.impl.core.model.AutopilotWarningParser;
 import org.droidplanner.services.android.impl.utils.CommonApiUtils;
-import org.droidplanner.services.android.impl.utils.prefs.DroidPlannerPrefs;
 import org.droidplanner.services.android.impl.utils.video.VideoManager;
 
 /**
@@ -121,7 +120,7 @@ public class GenericMavLinkDrone implements MavLinkDrone {
 
         this.logListener = logListener;
 
-        events = new DroneEvents(this, handler);
+        events = new DroneEvents(this);
         heartbeat = initHeartBeat(handler);
         this.type = new Type(this);
         this.missionStats = new MissionStats(this);
@@ -418,11 +417,11 @@ public class GenericMavLinkDrone implements MavLinkDrone {
     private boolean updateVehicleDataStreamRate(Bundle data, ICommandListener listener) {
         StreamRates streamRates = getStreamRates();
         if(streamRates != null){
-            int rate = data.getInt(StateActions.EXTRA_VEHICLE_DATA_STREAM_RATE, DroidPlannerPrefs.DEFAULT_STREAM_RATE);
-            StreamRates.Rates rates = new StreamRates.Rates(rate);
-            streamRates.setRates(rates);
-
-            streamRates.setupStreamRatesFromPref();
+            int rate = data.getInt(StateActions.EXTRA_VEHICLE_DATA_STREAM_RATE, -1);
+            if(rate != -1) {
+                StreamRates.Rates rates = new StreamRates.Rates(rate);
+                streamRates.setRates(rates);
+            }
             CommonApiUtils.postSuccessEvent(listener);
             return true;
         }

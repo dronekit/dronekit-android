@@ -1,52 +1,18 @@
 package org.droidplanner.services.android.impl.core.drone;
 
-import android.os.Handler;
-
 import org.droidplanner.services.android.impl.core.drone.DroneInterfaces.DroneEventsType;
 import org.droidplanner.services.android.impl.core.drone.DroneInterfaces.OnDroneListener;
 import org.droidplanner.services.android.impl.core.drone.autopilot.MavLinkDrone;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class DroneEvents extends DroneVariable<MavLinkDrone> {
 
-    private static final long EVENT_DISPATCHING_DELAY = 33l; //milliseconds
-
-    private final AtomicBoolean isDispatcherRunning = new AtomicBoolean(false);
-
-    private final Runnable eventDispatcher = new Runnable() {
-
-        @Override
-        public void run() {
-            handler.removeCallbacks(this);
-
-            final DroneEventsType event = eventQueue.poll();
-            if (event == null) {
-                isDispatcherRunning.set(false);
-                return;
-            }
-
-            for (OnDroneListener listener : droneListeners) {
-                listener.onDroneEvent(event, myDrone);
-            }
-
-            handler.removeCallbacks(this);
-            handler.postDelayed(this, EVENT_DISPATCHING_DELAY);
-
-            isDispatcherRunning.set(true);
-        }
-    };
-
-    private final Handler handler;
-
-    public DroneEvents(MavLinkDrone myDrone, Handler handler) {
-        super(myDrone);
-        this.handler = handler;
-    }
-
     private final ConcurrentLinkedQueue<OnDroneListener> droneListeners = new ConcurrentLinkedQueue<OnDroneListener>();
-    private final ConcurrentLinkedQueue<DroneEventsType> eventQueue = new ConcurrentLinkedQueue<>();
+
+    public DroneEvents(MavLinkDrone myDrone) {
+        super(myDrone);
+    }
 
     public void addDroneListener(OnDroneListener listener) {
         if (listener != null & !droneListeners.contains(listener))
@@ -63,11 +29,11 @@ public class DroneEvents extends DroneVariable<MavLinkDrone> {
     }
 
     public void notifyDroneEvent(DroneEventsType event) {
-        if (event == null || droneListeners.isEmpty() || eventQueue.contains(event))
+        if (event == null || droneListeners.isEmpty())
             return;
 
-        eventQueue.add(event);
-        if (isDispatcherRunning.compareAndSet(false, true))
-            handler.postDelayed(eventDispatcher, EVENT_DISPATCHING_DELAY);
+        for (OnDroneListener listener : droneListeners) {
+            listener.onDroneEvent(event, myDrone);
+        }
     }
 }

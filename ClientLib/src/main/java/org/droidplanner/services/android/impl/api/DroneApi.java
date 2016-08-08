@@ -3,7 +3,9 @@ package org.droidplanner.services.android.impl.api;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.RemoteException;
 import android.text.TextUtils;
 import android.util.Pair;
@@ -53,7 +55,9 @@ import org.droidplanner.services.android.impl.utils.CommonApiUtils;
 import org.droidplanner.services.android.impl.utils.video.VideoManager;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -68,7 +72,36 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
     //The Reset ROI mission item was introduced in version 2.6.8. Any client library older than this do not support it.
     private final static int RESET_ROI_LIB_VERSION = 206080;
 
+    private final Runnable eventsDispatcher = new Runnable() {
+        private final LinkedHashMap<String, Bundle> eventsFilter = new LinkedHashMap<>();
+
+        @Override
+        public void run() {
+            eventsFilter.clear();
+            //Go through the events buffer and empty it
+            EventInfo eventInfo = eventsBuffer.poll();
+            while(eventInfo != null) {
+                eventsFilter.put(eventInfo.event, eventInfo.extras);
+                EventInfo.recycle(eventInfo);
+
+                eventInfo = eventsBuffer.poll();
+            }
+
+            for(Map.Entry<String, Bundle> entry : eventsFilter.entrySet()){
+                dispatchAttributeEvent(entry.getKey(), entry.getValue());
+            }
+
+            eventsFilter.clear();
+
+            handler.removeCallbacks(this);
+            if(isEventsBufferingEnabled()) {
+                handler.postDelayed(this, connectionParams.getEventsDispatchingPeriod());
+            }
+        }
+    };
+
     private final Context context;
+    private final Handler handler;
 
     private final ConcurrentLinkedQueue<IObserver> observersList;
     private final ConcurrentLinkedQueue<IMavlinkObserver> mavlinkObserversList;
@@ -80,12 +113,15 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
 
     private final DroidPlannerService service;
 
+    private final ConcurrentLinkedQueue<EventInfo> eventsBuffer = new ConcurrentLinkedQueue<>();
+
     private ConnectionParameter connectionParams;
 
     DroneApi(DroidPlannerService dpService, IApiListener listener, String ownerId) {
 
         this.service = dpService;
         this.context = dpService.getApplicationContext();
+        handler = new Handler(Looper.getMainLooper());
 
         this.ownerId = ownerId;
 
@@ -137,6 +173,10 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
         }
 
         return this.droneMgr.getDrone();
+    }
+
+    private boolean isEventsBufferingEnabled(){
+        return connectionParams != null && connectionParams.getEventsDispatchingPeriod() > 0L;
     }
 
     @Override
@@ -218,6 +258,11 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
 
                 this.connectionParams = connParams;
                 this.droneMgr = service.connectDroneManager(this.connectionParams, ownerId, this);
+
+                if(isEventsBufferingEnabled()) {
+                    eventsBuffer.clear();
+                    handler.postDelayed(eventsDispatcher, this.connectionParams.getEventsDispatchingPeriod());
+                }
             }
         } catch (ConnectionException e) {
             LinkConnectionStatus connectionStatus = LinkConnectionStatus
@@ -231,6 +276,8 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
         service.disconnectDroneManager(this.droneMgr, clientInfo);
         this.connectionParams = null;
         this.droneMgr = null;
+
+        handler.removeCallbacks(eventsDispatcher);
 
     }
 
@@ -385,21 +432,31 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
     }
 
     private void notifyAttributeUpdate(String attributeEvent, Bundle extrasBundle) {
-        if (observersList.isEmpty()) {
+        if (observersList.isEmpty() || attributeEvent == null) {
             return;
         }
 
-        if (attributeEvent != null) {
-            for (IObserver observer : observersList) {
+        if(AttributeEvent.STATE_CONNECTED.equals(attributeEvent) ||
+            AttributeEvent.STATE_DISCONNECTED.equals(attributeEvent) ||
+            !isEventsBufferingEnabled()){
+            //Dispatch the event immediately
+            dispatchAttributeEvent(attributeEvent, extrasBundle);
+        }
+        else{
+            eventsBuffer.add(EventInfo.obtain(attributeEvent, extrasBundle));
+        }
+    }
+
+    private void dispatchAttributeEvent(String attributeEvent, Bundle extrasBundle){
+        for (IObserver observer : observersList) {
+            try {
+                observer.onAttributeUpdated(attributeEvent, extrasBundle);
+            } catch (RemoteException e) {
+                Timber.e(e, e.getMessage());
                 try {
-                    observer.onAttributeUpdated(attributeEvent, extrasBundle);
-                } catch (RemoteException e) {
-                    Timber.e(e, e.getMessage());
-                    try {
-                        removeAttributesObserver(observer);
-                    } catch (RemoteException e1) {
-                        Timber.e(e, e1.getMessage());
-                    }
+                    removeAttributesObserver(observer);
+                } catch (RemoteException e1) {
+                    Timber.e(e, e1.getMessage());
                 }
             }
         }
@@ -467,6 +524,9 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
                     .putExtra(GCSEvent.EXTRA_APP_ID, ownerId));
 
                 droneEvent = AttributeEvent.STATE_DISCONNECTED;
+
+                //Empty the event buffer queue
+                eventsBuffer.clear();
                 break;
 
             case GUIDEDPOINT:
@@ -733,6 +793,33 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
             this.apiVersionCode = apiVersionCode;
             this.appId = appId;
             this.clientVersionCode = clientVersionCode;
+        }
+    }
+
+    private static class EventInfo {
+
+        private static final ConcurrentLinkedQueue<EventInfo> sPool = new ConcurrentLinkedQueue<>();
+
+        String event;
+        Bundle extras;
+
+        static EventInfo obtain(String event, Bundle extras){
+            EventInfo eventInfo = sPool.poll();
+            if(eventInfo == null){
+                eventInfo = new EventInfo();
+            }
+
+            eventInfo.event = event;
+            eventInfo.extras = extras;
+            return eventInfo;
+        }
+
+        static void recycle(EventInfo eventInfo){
+            if(eventInfo != null) {
+                eventInfo.event = null;
+                eventInfo.extras = null;
+                sPool.offer(eventInfo);
+            }
         }
     }
 }
