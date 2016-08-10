@@ -55,12 +55,11 @@ import org.droidplanner.services.android.impl.utils.CommonApiUtils;
 import org.droidplanner.services.android.impl.utils.video.VideoManager;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ConcurrentSkipListMap;
 
 import timber.log.Timber;
 
@@ -74,19 +73,27 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
     private final static int RESET_ROI_LIB_VERSION = 206080;
 
     private final Runnable eventsDispatcher = new Runnable() {
+        private final LinkedHashMap<String, Bundle> eventsFilter = new LinkedHashMap<>();
+
         @Override
         public void run() {
-            handler.removeCallbacks(this);
-
+            eventsFilter.clear();
             //Go through the events buffer and empty it
-            Set<Map.Entry<EventInfo, Bundle>> eventsToDispatch = eventsBuffer.entrySet();
-            for(Map.Entry<EventInfo, Bundle> entry: eventsToDispatch){
-                String event = entry.getKey().event;
-                Bundle extras = entry.getValue();
-                eventsToDispatch.remove(entry);
-                dispatchAttributeEvent(event, extras);
+            EventInfo eventInfo = eventsBuffer.poll();
+            while(eventInfo != null) {
+                eventsFilter.put(eventInfo.event, eventInfo.extras);
+                EventInfo.recycle(eventInfo);
+
+                eventInfo = eventsBuffer.poll();
             }
 
+            for(Map.Entry<String, Bundle> entry : eventsFilter.entrySet()){
+                dispatchAttributeEvent(entry.getKey(), entry.getValue());
+            }
+
+            eventsFilter.clear();
+
+            handler.removeCallbacks(this);
             if(isEventsBufferingEnabled()) {
                 handler.postDelayed(this, connectionParams.getEventsDispatchingPeriod());
             }
@@ -106,7 +113,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
 
     private final DroidPlannerService service;
 
-    private final Map<EventInfo, Bundle> eventsBuffer = new ConcurrentSkipListMap<>();
+    private final ConcurrentLinkedQueue<EventInfo> eventsBuffer = new ConcurrentLinkedQueue<>();
 
     private ConnectionParameter connectionParams;
 
@@ -253,6 +260,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
                 this.droneMgr = service.connectDroneManager(this.connectionParams, ownerId, this);
 
                 if(isEventsBufferingEnabled()) {
+                    eventsBuffer.clear();
                     handler.postDelayed(eventsDispatcher, this.connectionParams.getEventsDispatchingPeriod());
                 }
             }
@@ -428,12 +436,14 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
             return;
         }
 
-        if(isEventsBufferingEnabled()){
-            eventsBuffer.put(new EventInfo(attributeEvent), extrasBundle);
-        }
-        else {
+        if(AttributeEvent.STATE_CONNECTED.equals(attributeEvent) ||
+            AttributeEvent.STATE_DISCONNECTED.equals(attributeEvent) ||
+            !isEventsBufferingEnabled()){
             //Dispatch the event immediately
             dispatchAttributeEvent(attributeEvent, extrasBundle);
+        }
+        else{
+            eventsBuffer.add(EventInfo.obtain(attributeEvent, extrasBundle));
         }
     }
 
@@ -514,6 +524,9 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
                     .putExtra(GCSEvent.EXTRA_APP_ID, ownerId));
 
                 droneEvent = AttributeEvent.STATE_DISCONNECTED;
+
+                //Empty the event buffer queue
+                eventsBuffer.clear();
                 break;
 
             case GUIDEDPOINT:
@@ -783,41 +796,30 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
         }
     }
 
-    private static class EventInfo implements Comparable<EventInfo>{
-        final String event;
-        final long eventTimestamp;
+    private static class EventInfo {
 
-        EventInfo(String event){
-            this.event = event;
-            eventTimestamp = System.currentTimeMillis();
-        }
+        private static final ConcurrentLinkedQueue<EventInfo> sPool = new ConcurrentLinkedQueue<>();
 
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (!(o instanceof EventInfo)) {
-                return false;
+        String event;
+        Bundle extras;
+
+        static EventInfo obtain(String event, Bundle extras){
+            EventInfo eventInfo = sPool.poll();
+            if(eventInfo == null){
+                eventInfo = new EventInfo();
             }
 
-            EventInfo eventInfo = (EventInfo) o;
-
-            return event != null ? event.equals(eventInfo.event) : eventInfo.event == null;
-
+            eventInfo.event = event;
+            eventInfo.extras = extras;
+            return eventInfo;
         }
 
-        @Override
-        public int hashCode() {
-            return event != null ? event.hashCode() : 0;
-        }
-
-        @Override
-        public int compareTo(EventInfo another) {
-            if(this.event.equals(another.event))
-                return 0;
-
-            return this.eventTimestamp > another.eventTimestamp ? 1 : -1;
+        static void recycle(EventInfo eventInfo){
+            if(eventInfo != null) {
+                eventInfo.event = null;
+                eventInfo.extras = null;
+                sPool.offer(eventInfo);
+            }
         }
     }
 }
