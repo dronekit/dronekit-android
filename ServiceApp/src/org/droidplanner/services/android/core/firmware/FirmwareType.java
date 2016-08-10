@@ -12,7 +12,7 @@ public enum FirmwareType {
     /**
      * PX4 firmware type
      */
-    PX4_NATIVE(MAV_AUTOPILOT.MAV_AUTOPILOT_PX4, "", "PX4 Native"),
+    PX4_NATIVE(MAV_AUTOPILOT.MAV_AUTOPILOT_PX4, "PX4", "PX4 Native"),
 
     /**
      * Generic firmware type

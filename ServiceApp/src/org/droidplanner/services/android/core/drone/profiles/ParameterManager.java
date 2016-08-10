@@ -3,11 +3,13 @@ package org.droidplanner.services.android.core.drone.profiles;
 import android.content.Context;
 import android.os.Handler;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.SparseBooleanArray;
 
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.common.msg_param_value;
 import com.o3dr.services.android.lib.drone.property.Parameter;
+import com.o3dr.services.android.lib.drone.property.Type;
 
 import org.droidplanner.services.android.core.MAVLink.MavLinkParameters;
 import org.droidplanner.services.android.core.drone.DroneInterfaces;
@@ -15,7 +17,9 @@ import org.droidplanner.services.android.core.drone.DroneInterfaces.DroneEventsT
 import org.droidplanner.services.android.core.drone.DroneInterfaces.OnDroneListener;
 import org.droidplanner.services.android.core.drone.DroneVariable;
 import org.droidplanner.services.android.core.drone.autopilot.MavLinkDrone;
+import org.droidplanner.services.android.core.firmware.FirmwareType;
 import org.droidplanner.services.android.utils.file.IO.ParameterMetadataLoader;
+import org.droidplanner.services.android.utils.file.IO.ParameterMetadataLoaderPX4;
 
 import java.util.Locale;
 import java.util.Map;
@@ -64,11 +68,14 @@ public class ParameterManager extends DroneVariable<MavLinkDrone> implements OnD
     private final SparseBooleanArray paramsRollCall = new SparseBooleanArray();
     private final ConcurrentHashMap<String, Parameter> parameters = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, ParameterMetadata> parametersMetadata = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, ParameterMetadataPX4> parametersMetadataPX4 = new ConcurrentHashMap<>();
 
     private DroneInterfaces.OnParameterManagerListener parameterListener;
 
     private final Handler watchdog;
     private final Context context;
+
+    private String metadataType;
 
     public ParameterManager(MavLinkDrone myDrone, Context context, Handler handler) {
         super(myDrone);
@@ -84,7 +91,7 @@ public class ParameterManager extends DroneVariable<MavLinkDrone> implements OnD
             parameters.clear();
             paramsRollCall.clear();
 
-            notifyParametersReceiptStart();
+            notifyParametersReceiptStart(); // Tower --> LocalBroadcast --> PARAMETERS_REFRESH_STARTED
 
             MavLinkParameters.requestParametersList(myDrone);
             resetWatchdog();
@@ -108,8 +115,11 @@ public class ParameterManager extends DroneVariable<MavLinkDrone> implements OnD
      */
     public boolean processMessage(MAVLinkMessage msg) {
         if (msg.msgid == msg_param_value.MAVLINK_MSG_ID_PARAM_VALUE) {
+            Log.d("kiba", "processMessage: msg.msgid == msg_param_value.MAVLINK_MSG_ID_PARAM_VALUE? " + true);
             processReceivedParam((msg_param_value) msg);
             return true;
+        }else{
+            Log.d("kiba", "processMessage: msg.msgid == msg_param_value.MAVLINK_MSG_ID_PARAM_VALUE? " + false);
         }
         return false;
     }
@@ -120,12 +130,13 @@ public class ParameterManager extends DroneVariable<MavLinkDrone> implements OnD
         loadParameterMetadata(param);
 
         parameters.put(param.getName().toLowerCase(Locale.US), param);
+        Log.d("kiba", "processReceivedParam: parameters size = " + parameters.size());
         int paramIndex = m_value.param_index;
         if (paramIndex == -1) {
             // update listener
             notifyParameterReceipt(param, 0, 1);
 
-            notifyParametersReceiptEnd();
+            notifyParametersReceiptEnd(); // Tower --> PARAMETERS_REFRESH_COMPLETED
             return;
         }
 
@@ -140,7 +151,7 @@ public class ParameterManager extends DroneVariable<MavLinkDrone> implements OnD
             killWatchdog();
             isRefreshing.set(false);
 
-            notifyParametersReceiptEnd();
+            notifyParametersReceiptEnd(); //Tower --> PARAMETERS_REFRESH_COMPLETED
         } else {
             resetWatchdog();
         }
@@ -213,14 +224,20 @@ public class ParameterManager extends DroneVariable<MavLinkDrone> implements OnD
     private void refreshParametersMetadata() {
         //Reload the vehicle parameters metadata
         String metadataType = myDrone.getFirmwareType().getParameterMetadataGroup();
+        this.metadataType = metadataType;
         if (!TextUtils.isEmpty(metadataType)) {
             try {
-                ParameterMetadataLoader.load(context, metadataType, this.parametersMetadata);
+                if(metadataType.equals(FirmwareType.PX4_NATIVE.getParameterMetadataGroup())){
+                    ParameterMetadataLoaderPX4.load(context, metadataType, this.parametersMetadataPX4);
+                    Log.d("kiba", "parseMetadataPX4: size = " + parametersMetadataPX4.size());
+                }else{
+                    ParameterMetadataLoader.load(context, metadataType, this.parametersMetadata);
+                    Log.d("kiba", "parseMetadata: size = " + parametersMetadata.size());
+                }
             } catch (Exception e) {
                 Timber.e(e, e.getMessage());
             }
         }
-
         if (parametersMetadata.isEmpty() || parameters.isEmpty())
             return;
 
@@ -230,14 +247,26 @@ public class ParameterManager extends DroneVariable<MavLinkDrone> implements OnD
     }
 
     private void loadParameterMetadata(Parameter parameter){
-        ParameterMetadata metadata = parametersMetadata.get(parameter.getName());
-        if (metadata != null) {
-            parameter.setDisplayName(metadata.getDisplayName());
-            parameter.setDescription(metadata.getDescription());
-            parameter.setUnits(metadata.getUnits());
-            parameter.setRange(metadata.getRange());
-            parameter.setValues(metadata.getValues());
+        if(metadataType.equals(FirmwareType.PX4_NATIVE.getParameterMetadataGroup())){ // PX4
+            ParameterMetadataPX4 metadata = parametersMetadataPX4.get(parameter.getName());
+            if (metadata != null) {
+                parameter.setDisplayName(metadata.getDisplayName());
+                parameter.setDescription(metadata.getDescription());
+                parameter.setUnits(metadata.getUnits());
+                parameter.setRange(metadata.getRange());
+                parameter.setValues(metadata.getValues());
+            }
+        }else{ // ArduPilot
+            ParameterMetadata metadata = parametersMetadata.get(parameter.getName());
+            if (metadata != null) {
+                parameter.setDisplayName(metadata.getDisplayName());
+                parameter.setDescription(metadata.getDescription());
+                parameter.setUnits(metadata.getUnits());
+                parameter.setRange(metadata.getRange());
+                parameter.setValues(metadata.getValues());
+            }
         }
+
     }
 
     public void setParameterListener(DroneInterfaces.OnParameterManagerListener parameterListener) {
