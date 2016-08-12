@@ -2,10 +2,6 @@ package com.o3dr.services.android.lib.drone.companion.solo.tlv;
 
 import android.util.Log;
 
-import com.o3dr.services.android.lib.drone.companion.solo.tlv.sitescan.inspect.SoloInspectStart;
-import com.o3dr.services.android.lib.drone.companion.solo.tlv.sitescan.inspect.SoloInspectSetWaypoint;
-import com.o3dr.services.android.lib.drone.companion.solo.tlv.sitescan.inspect.SoloInspectMoveGimbal;
-import com.o3dr.services.android.lib.drone.companion.solo.tlv.sitescan.inspect.SoloInspectMoveVehicle;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.mpcc.SoloSplineAttach;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.mpcc.SoloSplineDurations;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.mpcc.SoloSplinePathSettings;
@@ -14,6 +10,10 @@ import com.o3dr.services.android.lib.drone.companion.solo.tlv.mpcc.SoloSplinePla
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.mpcc.SoloSplinePoint;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.mpcc.SoloSplineRecord;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.mpcc.SoloSplineSeek;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.sitescan.inspect.SoloInspectMoveGimbal;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.sitescan.inspect.SoloInspectMoveVehicle;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.sitescan.inspect.SoloInspectSetWaypoint;
+import com.o3dr.services.android.lib.drone.companion.solo.tlv.sitescan.inspect.SoloInspectStart;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.sitescan.scan.SoloScanStart;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.sitescan.survey.SoloSurveyStart;
 
@@ -29,6 +29,9 @@ import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageT
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_CABLE_CAM_WAYPOINT;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_FOLLOW_OPTIONS;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_FOLLOW_OPTIONS_V2;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_GEOFENCE_ACTIVATED;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_GEOFENCE_CLEAR;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_GEOFENCE_SET_ACK;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_GET_BUTTON_SETTING;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_GOPRO_RECORD;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_GOPRO_REQUEST_STATE;
@@ -54,8 +57,8 @@ import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageT
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SHOT_ERROR;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SHOT_OPTIONS;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SPLINE_ATTACH;
-import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SPLINE_PATH_SETTINGS;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SPLINE_DURATIONS;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SPLINE_PATH_SETTINGS;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SPLINE_PLAY;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SPLINE_PLAYBACK_STATUS;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_SPLINE_POINT;
@@ -297,6 +300,21 @@ public class TLVMessageParser {
 
                     case TYPE_SOLO_ZIPLINE_LOCK: {
                         packet = new SoloZiplineLock();
+                        break;
+                    }
+
+                    case TYPE_SOLO_GEOFENCE_ACTIVATED: {
+                        packet = new SoloGeofenceActivatedMessage();
+                        break;
+                    }
+
+                    case TYPE_SOLO_GEOFENCE_CLEAR: {
+                        packet = new SoloGeofenceClearMessage();
+                        break;
+                    }
+
+                    case TYPE_SOLO_GEOFENCE_SET_ACK: {
+                        packet = new SoloGeofenceAckMessage(packetBuffer.getShort(), packetBuffer.get());
                         break;
                     }
 

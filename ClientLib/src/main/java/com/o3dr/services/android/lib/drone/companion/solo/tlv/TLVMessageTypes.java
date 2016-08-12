@@ -69,6 +69,15 @@ public class TLVMessageTypes {
      */
     public static final int TYPE_SOLO_SURVEY_START = 10201;
 
+    /*
+    Solo Geofence message types
+     */
+    public static final int TYPE_SOLO_GEOFENCE_SET_DATA = 3000;
+    public static final int TYPE_SOLO_GEOFENCE_SET_ACK = 3001;
+    public static final int TYPE_SOLO_GEOFENCE_UPDATE_POLY = 3002;
+    public static final int TYPE_SOLO_GEOFENCE_CLEAR = 3003;
+    public static final int TYPE_SOLO_GEOFENCE_ACTIVATED = 3004;
+
     //Private constructor to prevent instantiation
     private TLVMessageTypes(){}
 }
