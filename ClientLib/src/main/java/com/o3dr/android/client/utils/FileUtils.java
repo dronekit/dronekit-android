@@ -56,4 +56,29 @@ public class FileUtils {
     private static String getTimeStamp() {
         return getTimeStamp(System.currentTimeMillis());
     }
+
+    public static String getFilenameWithoutExtension(File file){
+        return getFilenameWithoutExtension(file.getName());
+    }
+
+    public static String getFilenameWithoutExtension(String filename){
+        int pos = filename.lastIndexOf(".");
+        if (pos >= 0) {
+            filename = filename.substring(0, pos);
+        }
+        return filename;
+    }
+
+    public static String getFileExtension(File file){
+        return getFileExtension(file.getName());
+    }
+
+    public static String getFileExtension(String filename){
+        String extension = "";
+        int pos = filename.lastIndexOf(".");
+        if(pos >= 0){
+            extension = filename.substring(pos);
+        }
+        return extension;
+    }
 }
