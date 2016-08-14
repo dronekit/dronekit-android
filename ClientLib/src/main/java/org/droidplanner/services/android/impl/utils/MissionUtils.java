@@ -50,6 +50,15 @@ import timber.log.Timber;
  */
 public class MissionUtils {
 
+    /**
+     * Waypoint file format:
+     *
+     * * QGC WPL <VERSION> <INDEX> <CURRENT WP> <COORD FRAME> <COMMAND> <PARAM1>
+     * <PARAM2> <PARAM3> <PARAM4> <PARAM5/X/LONGITUDE> <PARAM6/Y/LATITUDE>
+     * <PARAM7/Z/ALTITUDE> <AUTOCONTINUE>
+     *
+     * See http://qgroundcontrol.org/mavlink/waypoint_protocol for details
+     */
     private static final String WAYPOINT_PROTOCOL_HEADER = "QGC WPL 110";
 
     private MissionUtils(){}

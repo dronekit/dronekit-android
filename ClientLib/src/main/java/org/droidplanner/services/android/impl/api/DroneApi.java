@@ -65,6 +65,10 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import timber.log.Timber;
 
+import static com.o3dr.services.android.lib.drone.mission.action.MissionActions.ACTION_SET_MISSION;
+import static com.o3dr.services.android.lib.drone.mission.action.MissionActions.EXTRA_MISSION;
+import static com.o3dr.services.android.lib.drone.mission.action.MissionActions.EXTRA_PUSH_TO_DRONE;
+
 /**
  * Implementation for the IDroneApi interface.
  */
@@ -412,12 +416,20 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
 
             case MissionActions.ACTION_LOAD_MISSION: {
                 String encodedLoadUri = data.getString(MissionActions.EXTRA_LOAD_MISSION_URI, null);
+                boolean setMission = data.getBoolean(MissionActions.EXTRA_SET_LOADED_MISSION, false);
                 if (encodedLoadUri != null) {
                     Uri loadUri = Uri.parse(encodedLoadUri);
                     Mission mission = MissionUtils.loadMission(loadUri);
                     if(mission != null){
                         // Going back to the caller.
                         data.putParcelable(MissionActions.EXTRA_MISSION, mission);
+
+                        if(setMission){
+                            Bundle params = new Bundle();
+                            params.putParcelable(EXTRA_MISSION, mission);
+                            params.putBoolean(EXTRA_PUSH_TO_DRONE, false);
+                            executeAction(new Action(ACTION_SET_MISSION, params), listener);
+                        }
                     }
                 }
                 break;

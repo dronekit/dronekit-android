@@ -30,6 +30,7 @@ import static com.o3dr.services.android.lib.drone.mission.action.MissionActions.
 import static com.o3dr.services.android.lib.drone.mission.action.MissionActions.EXTRA_MISSION_SPEED;
 import static com.o3dr.services.android.lib.drone.mission.action.MissionActions.EXTRA_PUSH_TO_DRONE;
 import static com.o3dr.services.android.lib.drone.mission.action.MissionActions.EXTRA_SAVE_MISSION_URI;
+import static com.o3dr.services.android.lib.drone.mission.action.MissionActions.EXTRA_SET_LOADED_MISSION;
 
 /**
  * Provides access to missions specific functionality.
@@ -114,18 +115,34 @@ public class MissionApi extends Api {
     }
 
     /**
-     * Loads and return the mission from the given source uri
+     * Loads the mission from the given source uri
      * @param sourceUri
      * @return Mission object if the load process is successful, null otherwise.
      * @since 3.0.0
      */
     @Nullable
     public Mission loadMission(Uri sourceUri) {
+        return loadAndSetMission(sourceUri, false);
+    }
+
+    /**
+     * Loads and sets the mission retrieved from the source uri.
+     * @param sourceUri
+     * @return Mission object if the load process is successful, null otherwise.
+     * @since 3.0.0
+     */
+    public Mission loadAndSetMission(Uri sourceUri){
+        return loadAndSetMission(sourceUri, true);
+    }
+
+    private Mission loadAndSetMission(Uri sourceUri, boolean setMission){
         if(sourceUri == null){
             throw new NullPointerException("Mission source uri must be non null.");
         }
         Bundle params = new Bundle();
         params.putString(EXTRA_LOAD_MISSION_URI, sourceUri.toString());
+        params.putBoolean(EXTRA_SET_LOADED_MISSION, setMission);
+
         Action loadAction = new Action(ACTION_LOAD_MISSION, params);
         boolean result = drone.performAction(loadAction);
         if(result){
