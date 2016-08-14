@@ -117,40 +117,92 @@ public class MissionApi extends Api {
     /**
      * Loads the mission from the given source uri
      * @param sourceUri
-     * @return Mission object if the load process is successful, null otherwise.
+     * @param loadingCallback Invoked when the loading operation completes.
      * @since 3.0.0
      */
     @Nullable
-    public Mission loadMission(Uri sourceUri) {
-        return loadAndSetMission(sourceUri, false);
+    public void loadMission(Uri sourceUri, LoadingCallback<Mission> loadingCallback) {
+        loadAndSetMission(sourceUri, false, loadingCallback);
     }
 
     /**
      * Loads and sets the mission retrieved from the source uri.
      * @param sourceUri
-     * @return Mission object if the load process is successful, null otherwise.
+     * @param loadingCallback Invoked when the loading operation completes.
      * @since 3.0.0
      */
-    public Mission loadAndSetMission(Uri sourceUri){
-        return loadAndSetMission(sourceUri, true);
+    public void loadAndSetMission(Uri sourceUri, LoadingCallback<Mission> loadingCallback){
+        loadAndSetMission(sourceUri, true, loadingCallback);
     }
 
-    private Mission loadAndSetMission(Uri sourceUri, boolean setMission){
+    private void loadAndSetMission(final Uri sourceUri, final boolean setMission, final LoadingCallback<Mission> loadingCallback){
         if(sourceUri == null){
             throw new NullPointerException("Mission source uri must be non null.");
         }
-        Bundle params = new Bundle();
-        params.putString(EXTRA_LOAD_MISSION_URI, sourceUri.toString());
-        params.putBoolean(EXTRA_SET_LOADED_MISSION, setMission);
-
-        Action loadAction = new Action(ACTION_LOAD_MISSION, params);
-        boolean result = drone.performAction(loadAction);
-        if(result){
-            Mission loadedMission = loadAction.getData().getParcelable(EXTRA_MISSION);
-            return loadedMission;
+        if(!setMission && loadingCallback == null){
+            // No point to load the mission if no one is listening for it.
+            return;
         }
 
-        return null;
+        drone.getAsyncScheduler().execute(new Runnable() {
+            @Override
+            public void run() {
+                postLoadingStart(loadingCallback);
+
+                Bundle params = new Bundle();
+                params.putString(EXTRA_LOAD_MISSION_URI, sourceUri.toString());
+                params.putBoolean(EXTRA_SET_LOADED_MISSION, setMission);
+
+                Action loadAction = new Action(ACTION_LOAD_MISSION, params);
+                boolean result = drone.performAction(loadAction);
+                if (loadingCallback != null) {
+                    if (result) {
+                        final Mission loadedMission = loadAction.getData().getParcelable(EXTRA_MISSION);
+                        if (loadedMission == null) {
+                            postLoadingFailed(loadingCallback);
+                        }
+                        else {
+                            postLoadingComplete(loadedMission, loadingCallback);
+                        }
+                    } else {
+                        postLoadingFailed(loadingCallback);
+                    }
+                }
+            }
+        });
+    }
+
+    private void postLoadingStart(final LoadingCallback<?> callback) {
+        if(callback != null){
+            drone.getHandler().post(new Runnable() {
+                @Override
+                public void run() {
+                    callback.onLoadingStart();
+                }
+            });
+        }
+    }
+
+    private void postLoadingFailed(final LoadingCallback<?> callback){
+        if(callback != null){
+            drone.getHandler().post(new Runnable() {
+                @Override
+                public void run() {
+                    callback.onLoadingFailed();
+                }
+            });
+        }
+    }
+
+    private <T> void postLoadingComplete(final T loaded, final LoadingCallback<T> callback) {
+        if(callback != null){
+            drone.getHandler().post(new Runnable() {
+                @Override
+                public void run() {
+                    callback.onLoadingComplete(loaded);
+                }
+            });
+        }
     }
 
     /**
@@ -231,5 +283,11 @@ public class MissionApi extends Api {
         Bundle params = new Bundle();
         params.putFloat(EXTRA_MISSION_SPEED, speed);
         drone.performAsyncActionOnDroneThread(new Action(ACTION_CHANGE_MISSION_SPEED, params), listener);
+    }
+
+    public interface LoadingCallback<T> {
+        void onLoadingStart();
+        void onLoadingComplete(T loaded);
+        void onLoadingFailed();
     }
 }

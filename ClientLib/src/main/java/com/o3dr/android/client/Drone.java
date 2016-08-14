@@ -603,6 +603,10 @@ public class Drone {
         return handler;
     }
 
+    public ExecutorService getAsyncScheduler(){
+        return asyncScheduler;
+    }
+
     void notifyAttributeUpdated(final String attributeEvent, final Bundle extras) {
         //Update the bundle classloader
         if (extras != null) {
