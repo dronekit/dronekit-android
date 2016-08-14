@@ -150,7 +150,7 @@ public class MissionApi extends Api {
                 postLoadingStart(loadingCallback);
 
                 Bundle params = new Bundle();
-                params.putString(EXTRA_LOAD_MISSION_URI, sourceUri.toString());
+                params.putParcelable(EXTRA_LOAD_MISSION_URI, sourceUri);
                 params.putBoolean(EXTRA_SET_LOADED_MISSION, setMission);
 
                 Action loadAction = new Action(ACTION_LOAD_MISSION, params);
@@ -222,7 +222,7 @@ public class MissionApi extends Api {
         }
         Bundle params = new Bundle();
         params.putParcelable(EXTRA_MISSION, mission);
-        params.putString(EXTRA_SAVE_MISSION_URI, saveUri.toString());
+        params.putParcelable(EXTRA_SAVE_MISSION_URI, saveUri);
         drone.performAsyncActionOnDroneThread(new Action(ACTION_SAVE_MISSION, params), listener);
     }
 
