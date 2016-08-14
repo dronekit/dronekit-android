@@ -13,7 +13,7 @@ import org.droidplanner.services.android.impl.core.drone.variables.StreamRates;
 import org.droidplanner.services.android.impl.core.drone.variables.calibration.AccelCalibration;
 import org.droidplanner.services.android.impl.core.drone.variables.calibration.MagnetometerCalibrationImpl;
 import org.droidplanner.services.android.impl.core.firmware.FirmwareType;
-import org.droidplanner.services.android.impl.core.mission.Mission;
+import org.droidplanner.services.android.impl.core.mission.MissionImpl;
 
 public interface MavLinkDrone extends Drone {
 
@@ -43,7 +43,7 @@ public interface MavLinkDrone extends Drone {
 
     public WaypointManager getWaypointManager();
 
-    public Mission getMission();
+    public MissionImpl getMission();
 
     public StreamRates getStreamRates();
 

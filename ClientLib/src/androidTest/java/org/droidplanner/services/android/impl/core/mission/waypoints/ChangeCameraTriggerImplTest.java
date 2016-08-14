@@ -5,7 +5,7 @@ import com.MAVLink.enums.MAV_CMD;
 
 import junit.framework.TestCase;
 
-import org.droidplanner.services.android.impl.core.mission.Mission;
+import org.droidplanner.services.android.impl.core.mission.MissionImpl;
 import org.droidplanner.services.android.impl.core.mission.commands.CameraTriggerImpl;
 
 import java.util.List;
@@ -13,8 +13,8 @@ import java.util.List;
 public class ChangeCameraTriggerImplTest extends TestCase {
 
     public void testPackMissionItem() {
-        Mission mission = new Mission(null);
-        CameraTriggerImpl item = new CameraTriggerImpl(mission, (12.0));
+        MissionImpl missionImpl = new MissionImpl(null);
+        CameraTriggerImpl item = new CameraTriggerImpl(missionImpl, (12.0));
 
         List<msg_mission_item> listOfMsg = item.packMissionItem();
         assertEquals(1, listOfMsg.size());

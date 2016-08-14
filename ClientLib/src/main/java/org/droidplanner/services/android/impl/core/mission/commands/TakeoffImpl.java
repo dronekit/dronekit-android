@@ -4,7 +4,7 @@ import com.MAVLink.common.msg_mission_item;
 import com.MAVLink.enums.MAV_CMD;
 import com.MAVLink.enums.MAV_FRAME;
 
-import org.droidplanner.services.android.impl.core.mission.Mission;
+import org.droidplanner.services.android.impl.core.mission.MissionImpl;
 import org.droidplanner.services.android.impl.core.mission.MissionItemImpl;
 import org.droidplanner.services.android.impl.core.mission.MissionItemType;
 
@@ -21,19 +21,19 @@ public class TakeoffImpl extends MissionCMD {
         super(item);
     }
 
-    public TakeoffImpl(msg_mission_item msg, Mission mission) {
-        super(mission);
+    public TakeoffImpl(msg_mission_item msg, MissionImpl missionImpl) {
+        super(missionImpl);
         unpackMAVMessage(msg);
     }
 
-    public TakeoffImpl(Mission mission, double altitude) {
-        super(mission);
+    public TakeoffImpl(MissionImpl missionImpl, double altitude) {
+        super(missionImpl);
         this.finishedAlt = altitude;
         this.pitch = 0;
     }
 
-    public TakeoffImpl(Mission mission, double altitude, double pitch) {
-        super(mission);
+    public TakeoffImpl(MissionImpl missionImpl, double altitude, double pitch) {
+        super(missionImpl);
         this.finishedAlt = altitude;
         this.pitch = pitch;
     }

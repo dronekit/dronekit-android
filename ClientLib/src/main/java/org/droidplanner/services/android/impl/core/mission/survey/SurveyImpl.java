@@ -5,7 +5,7 @@ import com.MAVLink.enums.MAV_CMD;
 import com.MAVLink.enums.MAV_FRAME;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 
-import org.droidplanner.services.android.impl.core.mission.Mission;
+import org.droidplanner.services.android.impl.core.mission.MissionImpl;
 import org.droidplanner.services.android.impl.core.mission.MissionItemImpl;
 import org.droidplanner.services.android.impl.core.mission.MissionItemType;
 import org.droidplanner.services.android.impl.core.mission.commands.CameraTriggerImpl;
@@ -26,8 +26,8 @@ public class SurveyImpl extends MissionItemImpl {
 
     private boolean startCameraBeforeFirstWaypoint;
 
-    public SurveyImpl(Mission mission, List<LatLong> points) {
-        super(mission);
+    public SurveyImpl(MissionImpl missionImpl, List<LatLong> points) {
+        super(missionImpl);
         polygon.addPoints(points);
     }
 
@@ -71,7 +71,7 @@ public class SurveyImpl extends MissionItemImpl {
 
     private void packSurveyPoints(List<msg_mission_item> list) {
         //Generate the camera trigger
-        CameraTriggerImpl camTrigger = new CameraTriggerImpl(mission, surveyData.getLongitudinalPictureDistance());
+        CameraTriggerImpl camTrigger = new CameraTriggerImpl(missionImpl, surveyData.getLongitudinalPictureDistance());
 
         //Add it if the user wants it to start before the first waypoint.
         if(startCameraBeforeFirstWaypoint){
@@ -97,7 +97,7 @@ public class SurveyImpl extends MissionItemImpl {
             }
         }
 
-        list.addAll((new CameraTriggerImpl(mission, (0.0)).packMissionItem()));
+        list.addAll((new CameraTriggerImpl(missionImpl, (0.0)).packMissionItem()));
     }
 
     protected msg_mission_item getSurveyPoint(LatLong point, double altitude){

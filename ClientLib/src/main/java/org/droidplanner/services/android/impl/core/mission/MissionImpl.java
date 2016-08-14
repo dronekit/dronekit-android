@@ -44,7 +44,7 @@ import java.util.List;
  * This implements a mavlink mission. A mavlink mission is a set of
  * commands/mission items to be carried out by the drone.
  */
-public class Mission extends DroneVariable<GenericMavLinkDrone> {
+public class MissionImpl extends DroneVariable<GenericMavLinkDrone> {
 
     /**
      * Stores the set of mission items belonging to this mission.
@@ -52,7 +52,7 @@ public class Mission extends DroneVariable<GenericMavLinkDrone> {
     private List<MissionItemImpl> items = new ArrayList<MissionItemImpl>();
     private final List<MissionItemImpl> componentItems = new ArrayList<>();
 
-    public Mission(GenericMavLinkDrone myDrone) {
+    public MissionImpl(GenericMavLinkDrone myDrone) {
         super(myDrone);
     }
 

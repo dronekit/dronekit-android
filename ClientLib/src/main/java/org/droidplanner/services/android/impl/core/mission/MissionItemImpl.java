@@ -8,14 +8,14 @@ import java.util.List;
 
 public abstract class MissionItemImpl implements Comparable<MissionItemImpl> {
 
-	protected Mission mission;
+	protected MissionImpl missionImpl;
 
-	public MissionItemImpl(Mission mission) {
-		this.mission = mission;
+	public MissionItemImpl(MissionImpl missionImpl) {
+		this.missionImpl = missionImpl;
 	}
 
 	public MissionItemImpl(MissionItemImpl item) {
-		this(item.mission);
+		this(item.missionImpl);
 	}
 
 	/**
@@ -42,13 +42,13 @@ public abstract class MissionItemImpl implements Comparable<MissionItemImpl> {
 
 	public abstract MissionItemType getType();
 
-	public Mission getMission() {
-		return mission;
+	public MissionImpl getMission() {
+		return missionImpl;
 	}
 
 	@Override
 	public int compareTo(MissionItemImpl another) {
-		return mission.getOrder(this) - mission.getOrder(another);
+		return missionImpl.getOrder(this) - missionImpl.getOrder(another);
 	}
 
 }

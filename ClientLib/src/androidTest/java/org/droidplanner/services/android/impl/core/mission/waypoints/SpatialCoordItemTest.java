@@ -6,13 +6,13 @@ import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 
 import junit.framework.TestCase;
 
-import org.droidplanner.services.android.impl.core.mission.Mission;
+import org.droidplanner.services.android.impl.core.mission.MissionImpl;
 
 public class SpatialCoordItemTest extends TestCase {
 
     public void testPackMissionItem() {
-        Mission mission = new Mission(null);
-        WaypointImpl item = new WaypointImpl(mission, new LatLongAlt(0.1, 1, (2)));
+        MissionImpl missionImpl = new MissionImpl(null);
+        WaypointImpl item = new WaypointImpl(missionImpl, new LatLongAlt(0.1, 1, (2)));
 
         msg_mission_item mavMsg = item.packMissionItem().get(0);
 

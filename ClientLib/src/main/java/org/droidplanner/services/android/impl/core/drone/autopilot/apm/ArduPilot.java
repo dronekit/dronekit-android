@@ -40,7 +40,7 @@ import org.droidplanner.services.android.impl.core.drone.variables.Magnetometer;
 import org.droidplanner.services.android.impl.core.drone.variables.RC;
 import org.droidplanner.services.android.impl.core.drone.variables.calibration.AccelCalibration;
 import org.droidplanner.services.android.impl.core.drone.variables.calibration.MagnetometerCalibrationImpl;
-import org.droidplanner.services.android.impl.core.mission.Mission;
+import org.droidplanner.services.android.impl.core.mission.MissionImpl;
 import org.droidplanner.services.android.impl.core.model.AutopilotWarningParser;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
@@ -79,7 +79,7 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
     public static final String FIRMWARE_VERSION_NUMBER_REGEX = "\\d+(\\.\\d{1,2})?";
 
     private final org.droidplanner.services.android.impl.core.drone.variables.RC rc;
-    private final Mission mission;
+    private final MissionImpl missionImpl;
     private final GuidedPoint guidedPoint;
     private final AccelCalibration accelCalibrationSetup;
     private final WaypointManager waypointManager;
@@ -99,7 +99,7 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
         this.waypointManager = new WaypointManager(this, handler);
 
         rc = new RC(this);
-        this.mission = new Mission(this);
+        this.missionImpl = new MissionImpl(this);
         this.guidedPoint = new GuidedPoint(this, handler);
         this.accelCalibrationSetup = new AccelCalibration(this, handler);
         this.magCalibration = new MagnetometerCalibrationImpl(this);
@@ -133,8 +133,8 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
     }
 
     @Override
-    public Mission getMission() {
-        return mission;
+    public MissionImpl getMission() {
+        return missionImpl;
     }
 
     @Override

@@ -3,7 +3,7 @@ package org.droidplanner.services.android.impl.core.mission.waypoints;
 import com.MAVLink.common.msg_mission_item;
 import com.MAVLink.enums.MAV_CMD;
 
-import org.droidplanner.services.android.impl.core.mission.Mission;
+import org.droidplanner.services.android.impl.core.mission.MissionImpl;
 import org.droidplanner.services.android.impl.core.mission.MissionItemImpl;
 import org.droidplanner.services.android.impl.core.mission.MissionItemType;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
@@ -25,12 +25,12 @@ public class SplineWaypointImpl extends SpatialCoordItem {
         super(item);
     }
 
-    public SplineWaypointImpl(Mission mission, LatLongAlt coord) {
-        super(mission, coord);
+    public SplineWaypointImpl(MissionImpl missionImpl, LatLongAlt coord) {
+        super(missionImpl, coord);
     }
 
-    public SplineWaypointImpl(msg_mission_item msg, Mission mission) {
-        super(mission, null);
+    public SplineWaypointImpl(msg_mission_item msg, MissionImpl missionImpl) {
+        super(missionImpl, null);
         unpackMAVMessage(msg);
     }
 

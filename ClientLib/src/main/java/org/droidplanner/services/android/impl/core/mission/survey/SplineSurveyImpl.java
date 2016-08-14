@@ -4,7 +4,7 @@ import com.MAVLink.common.msg_mission_item;
 import com.MAVLink.enums.MAV_CMD;
 import com.MAVLink.enums.MAV_FRAME;
 
-import org.droidplanner.services.android.impl.core.mission.Mission;
+import org.droidplanner.services.android.impl.core.mission.MissionImpl;
 import org.droidplanner.services.android.impl.core.mission.MissionItemType;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 
@@ -12,8 +12,8 @@ import java.util.List;
 
 public class SplineSurveyImpl extends SurveyImpl {
 
-    public SplineSurveyImpl(Mission mission, List<LatLong> points) {
-        super(mission, points);
+    public SplineSurveyImpl(MissionImpl missionImpl, List<LatLong> points) {
+        super(missionImpl, points);
     }
 
     @Override

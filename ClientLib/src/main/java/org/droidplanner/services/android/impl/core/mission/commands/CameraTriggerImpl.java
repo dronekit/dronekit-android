@@ -3,7 +3,7 @@ package org.droidplanner.services.android.impl.core.mission.commands;
 import com.MAVLink.common.msg_mission_item;
 import com.MAVLink.enums.MAV_CMD;
 
-import org.droidplanner.services.android.impl.core.mission.Mission;
+import org.droidplanner.services.android.impl.core.mission.MissionImpl;
 import org.droidplanner.services.android.impl.core.mission.MissionItemImpl;
 import org.droidplanner.services.android.impl.core.mission.MissionItemType;
 
@@ -16,13 +16,13 @@ public class CameraTriggerImpl extends MissionCMD {
         super(item);
     }
 
-    public CameraTriggerImpl(msg_mission_item msg, Mission mission) {
-        super(mission);
+    public CameraTriggerImpl(msg_mission_item msg, MissionImpl missionImpl) {
+        super(missionImpl);
         unpackMAVMessage(msg);
     }
 
-    public CameraTriggerImpl(Mission mission, double triggerDistance) {
-        super(mission);
+    public CameraTriggerImpl(MissionImpl missionImpl, double triggerDistance) {
+        super(missionImpl);
         this.distance = triggerDistance;
     }
 
