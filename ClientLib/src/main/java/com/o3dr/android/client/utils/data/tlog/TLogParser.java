@@ -7,14 +7,14 @@ import android.util.Log;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Parser;
+import com.o3dr.services.android.lib.util.UriUtils;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.EOFException;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +37,7 @@ public class TLogParser {
      * Iterator class to iterate and parse the Tlog file.
      */
     public static class TLogIterator {
-        private File file;
+        private Uri uri;
         private DataInputStream in = null;
         private final Handler handler;
 
@@ -65,7 +65,7 @@ public class TLogParser {
          */
         public TLogIterator(Uri uri, Handler handler) {
             this.handler = handler;
-            file = new File(uri.getPath());
+            this.uri = uri;
         }
 
         /**
@@ -73,8 +73,8 @@ public class TLogParser {
          *
          * @throws FileNotFoundException
          */
-        public void start() throws FileNotFoundException {
-            in = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
+        public void start() throws IOException {
+            in = new DataInputStream(new BufferedInputStream(UriUtils.getInputStream(this.uri)));
         }
 
         /**
@@ -203,10 +203,10 @@ public class TLogParser {
      * @throws Exception
      */
     public static List<TLogParser.Event> getAllEvents(final Uri uri, final TLogParserFilter filter) throws Exception {
-        File file = new File(uri.getPath());
+        InputStream inputStream = UriUtils.getInputStream(uri);
         DataInputStream in = null;
         try {
-            in = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
+            in = new DataInputStream(new BufferedInputStream(inputStream));
             ArrayList<Event> eventList = new ArrayList<>();
             Event event = next(in);
             while (event != null && filter.shouldIterate()) {

@@ -398,21 +398,30 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
                 }
                 break;
 
-            case MissionActions.ACTION_SAVE_MISSION:
+            case MissionActions.ACTION_SAVE_MISSION: {
                 Mission mission = data.getParcelable(MissionActions.EXTRA_MISSION);
                 String encodedSaveUri = data.getString(MissionActions.EXTRA_SAVE_MISSION_URI, null);
-                if(encodedSaveUri == null){
+                if (encodedSaveUri == null) {
                     CommonApiUtils.postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
-                }
-                else{
+                } else {
                     Uri saveUri = Uri.parse(encodedSaveUri);
                     MissionUtils.saveMission(mission, saveUri, listener);
                 }
                 break;
+            }
 
-            case MissionActions.ACTION_LOAD_MISSION:
-                //TODO: complete
+            case MissionActions.ACTION_LOAD_MISSION: {
+                String encodedLoadUri = data.getString(MissionActions.EXTRA_LOAD_MISSION_URI, null);
+                if (encodedLoadUri != null) {
+                    Uri loadUri = Uri.parse(encodedLoadUri);
+                    Mission mission = MissionUtils.loadMission(loadUri);
+                    if(mission != null){
+                        // Going back to the caller.
+                        data.putParcelable(MissionActions.EXTRA_MISSION, mission);
+                    }
+                }
                 break;
+            }
 
             default:
                 if (droneMgr != null) {

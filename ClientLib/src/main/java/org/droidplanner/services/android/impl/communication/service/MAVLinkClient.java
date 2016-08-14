@@ -24,7 +24,6 @@ import org.droidplanner.services.android.impl.core.MAVLink.connection.MavLinkCon
 import org.droidplanner.services.android.impl.core.drone.manager.DroneCommandTracker;
 import org.droidplanner.services.android.impl.utils.connection.WifiConnectionHandler;
 
-import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -241,9 +240,8 @@ public class MAVLinkClient implements DataLink.DataLinkProvider<MAVLinkMessage> 
         if(tlogLoggingUri == null)
             return;
 
-        if(isConnecting() || isConnected()) {
-            File logFile = new File(tlogLoggingUri.getPath());
-                mavlinkConn.addLoggingPath(appId, logFile.getAbsolutePath());
+        if (isConnecting() || isConnected()) {
+            mavlinkConn.addLoggingPath(appId, tlogLoggingUri);
         }
     }
 
