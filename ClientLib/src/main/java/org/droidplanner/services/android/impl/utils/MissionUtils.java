@@ -47,7 +47,6 @@ import timber.log.Timber;
 
 /**
  * Created by fhuya on 8/13/2016.
- * TODO: Add saveMissionToDpwp and loadMissionFromDpwp
  */
 public class MissionUtils {
 
@@ -56,11 +55,11 @@ public class MissionUtils {
     private MissionUtils(){}
 
     public static void saveMission(Mission mission, Uri saveUri, ICommandListener listener){
-        saveMissionToWPL(mission, saveUri, listener);
+        saveMissionToDpwp(mission, saveUri, listener);
     }
 
     public static Mission loadMission(Uri loadUri){
-        return loadMissionFromWPL(loadUri);
+        return loadMissionFromDpwp(loadUri);
     }
 
     private static void saveMissionToWPL(Mission mission, Uri saveUri, ICommandListener listener){
