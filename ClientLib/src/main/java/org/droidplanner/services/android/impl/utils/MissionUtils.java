@@ -64,11 +64,17 @@ public class MissionUtils {
     private MissionUtils(){}
 
     public static void saveMission(Mission mission, Uri saveUri, ICommandListener listener){
-        saveMissionToDpwp(mission, saveUri, listener);
+        saveMissionToWPL(mission, saveUri, listener);
     }
 
     public static Mission loadMission(Uri loadUri){
-        return loadMissionFromDpwp(loadUri);
+        // Attempt to load the mission using the waypoint file format.
+        Mission mission = loadMissionFromWPL(loadUri);
+        if(mission == null){
+            // Attempt to load using the deprecated dpwp formt
+            mission = loadMissionFromDpwp(loadUri);
+        }
+        return mission;
     }
 
     private static void saveMissionToWPL(Mission mission, Uri saveUri, ICommandListener listener){
@@ -157,6 +163,7 @@ public class MissionUtils {
 
                 if (!reader.readLine().contains(WAYPOINT_PROTOCOL_HEADER)) {
                     // Invalid file header.
+                    Timber.w("Invalid waypoint file format for %s", loadUri);
                     return null;
                 }
 
