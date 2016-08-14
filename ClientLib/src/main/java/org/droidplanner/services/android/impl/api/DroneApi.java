@@ -2,6 +2,7 @@ package org.droidplanner.services.android.impl.api;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -52,6 +53,7 @@ import org.droidplanner.services.android.impl.core.drone.variables.calibration.A
 import org.droidplanner.services.android.impl.core.drone.variables.calibration.MagnetometerCalibrationImpl;
 import org.droidplanner.services.android.impl.exception.ConnectionException;
 import org.droidplanner.services.android.impl.utils.CommonApiUtils;
+import org.droidplanner.services.android.impl.utils.MissionUtils;
 import org.droidplanner.services.android.impl.utils.video.VideoManager;
 
 import java.util.ArrayList;
@@ -394,6 +396,22 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
                 } else {
                     CommonApiUtils.postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
                 }
+                break;
+
+            case MissionActions.ACTION_SAVE_MISSION:
+                Mission mission = data.getParcelable(MissionActions.EXTRA_MISSION);
+                String encodedSaveUri = data.getString(MissionActions.EXTRA_SAVE_MISSION_URI, null);
+                if(encodedSaveUri == null){
+                    CommonApiUtils.postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
+                }
+                else{
+                    Uri saveUri = Uri.parse(encodedSaveUri);
+                    MissionUtils.saveMission(mission, saveUri, listener);
+                }
+                break;
+
+            case MissionActions.ACTION_LOAD_MISSION:
+                //TODO: complete
                 break;
 
             default:
