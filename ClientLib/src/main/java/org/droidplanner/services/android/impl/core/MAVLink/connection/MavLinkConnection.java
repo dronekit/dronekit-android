@@ -1,5 +1,6 @@
 package org.droidplanner.services.android.impl.core.MAVLink.connection;
 
+import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.util.Pair;
@@ -224,7 +225,7 @@ public abstract class MavLinkConnection {
                         try {
                             BufferedOutputStream logWriter = logInfo.second;
                             if (logWriter == null) {
-                                logWriter = new BufferedOutputStream(UriUtils.getOutputStream(loggingFileUri));
+                                logWriter = new BufferedOutputStream(UriUtils.getOutputStream(context, loggingFileUri));
                                 loggingOutStreams.put(entry.getKey(), Pair.create(loggingFileUri, logWriter));
                             }
 
@@ -258,9 +259,14 @@ public abstract class MavLinkConnection {
     };
 
     protected final Logger mLogger = initLogger();
+    protected final Context context;
 
     private Thread mConnectThread;
     private Thread mTaskThread;
+
+    protected MavLinkConnection(Context context){
+        this.context = context;
+    }
 
     /**
      * Establish a mavlink connection. If the connection is successful, it will

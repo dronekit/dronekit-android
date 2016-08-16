@@ -1,5 +1,6 @@
 package com.o3dr.android.client.utils.data.tlog;
 
+import android.content.Context;
 import android.net.Uri;
 import android.os.Handler;
 import android.util.Log;
@@ -37,7 +38,8 @@ public class TLogParser {
      * Iterator class to iterate and parse the Tlog file.
      */
     public static class TLogIterator {
-        private Uri uri;
+        private final Context context;
+        private final Uri uri;
         private DataInputStream in = null;
         private final Handler handler;
 
@@ -53,8 +55,8 @@ public class TLogParser {
          *
          * @param uri Location of the TLog files
          */
-        public TLogIterator(Uri uri) {
-            this(uri, new Handler());
+        public TLogIterator(Context context, Uri uri) {
+            this(context, uri, new Handler());
         }
 
         /**
@@ -63,7 +65,8 @@ public class TLogParser {
          * @param uri     Location of the TLog files
          * @param handler Handler to post results to
          */
-        public TLogIterator(Uri uri, Handler handler) {
+        public TLogIterator(Context context, Uri uri, Handler handler) {
+            this.context = context;
             this.handler = handler;
             this.uri = uri;
         }
@@ -74,7 +77,7 @@ public class TLogParser {
          * @throws FileNotFoundException
          */
         public void start() throws IOException {
-            in = new DataInputStream(new BufferedInputStream(UriUtils.getInputStream(this.uri)));
+            in = new DataInputStream(new BufferedInputStream(UriUtils.getInputStream(context, this.uri)));
         }
 
         /**
@@ -191,8 +194,8 @@ public class TLogParser {
      * @return
      * @throws Exception
      */
-    public static List<TLogParser.Event> getAllEvents(final Uri uri) throws Exception {
-        return getAllEvents(uri, DEFAULT_FILTER);
+    public static List<TLogParser.Event> getAllEvents(Context context, final Uri uri) throws Exception {
+        return getAllEvents(context, uri, DEFAULT_FILTER);
     }
 
     /**
@@ -202,8 +205,8 @@ public class TLogParser {
      * @return
      * @throws Exception
      */
-    public static List<TLogParser.Event> getAllEvents(final Uri uri, final TLogParserFilter filter) throws Exception {
-        InputStream inputStream = UriUtils.getInputStream(uri);
+    public static List<TLogParser.Event> getAllEvents(Context context, final Uri uri, final TLogParserFilter filter) throws Exception {
+        InputStream inputStream = UriUtils.getInputStream(context, uri);
         DataInputStream in = null;
         try {
             in = new DataInputStream(new BufferedInputStream(inputStream));
@@ -236,8 +239,8 @@ public class TLogParser {
      * @param uri {@link Uri}
      * @param callback {@link TLogParserCallback}
      */
-    public static void getAllEventsAsync(final Handler handler, final Uri uri, final TLogParserCallback callback) {
-        getAllEventsAsync(handler, uri, DEFAULT_FILTER, callback);
+    public static void getAllEventsAsync(Context context, final Handler handler, final Uri uri, final TLogParserCallback callback) {
+        getAllEventsAsync(context, handler, uri, DEFAULT_FILTER, callback);
     }
 
     /**
@@ -248,12 +251,12 @@ public class TLogParser {
      * @param filter {@link TLogParserFilter}
      * @param callback {@link TLogParserCallback}
      */
-    public static void getAllEventsAsync(final Handler handler, final Uri uri, final TLogParserFilter filter, final TLogParserCallback callback) {
+    public static void getAllEventsAsync(final Context context, final Handler handler, final Uri uri, final TLogParserFilter filter, final TLogParserCallback callback) {
         getInstance().execute(new Runnable() {
             @Override
             public void run() {
                 try {
-                    List<Event> eventList = getAllEvents(uri, filter);
+                    List<Event> eventList = getAllEvents(context, uri, filter);
 
                     if (eventList.isEmpty()) {
                         sendFailed(handler, callback, new NoSuchElementException());

@@ -408,7 +408,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
                 if (saveUri == null) {
                     CommonApiUtils.postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
                 } else {
-                    MissionUtils.saveMission(mission, saveUri, listener);
+                    MissionUtils.saveMission(context, mission, saveUri, listener);
                 }
                 break;
             }
@@ -417,7 +417,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
                 Uri loadUri = data.getParcelable(MissionActions.EXTRA_LOAD_MISSION_URI);
                 boolean setMission = data.getBoolean(MissionActions.EXTRA_SET_LOADED_MISSION, false);
                 if (loadUri != null) {
-                    Mission mission = MissionUtils.loadMission(loadUri);
+                    Mission mission = MissionUtils.loadMission(context, loadUri);
                     if(mission != null){
                         // Going back to the caller.
                         data.putParcelable(MissionActions.EXTRA_MISSION, mission);

@@ -1,5 +1,6 @@
 package org.droidplanner.services.android.impl.utils;
 
+import android.content.Context;
 import android.net.Uri;
 
 import com.MAVLink.common.msg_mission_item;
@@ -63,23 +64,23 @@ public class MissionUtils {
 
     private MissionUtils(){}
 
-    public static void saveMission(Mission mission, Uri saveUri, ICommandListener listener){
-        saveMissionToWPL(mission, saveUri, listener);
+    public static void saveMission(Context context, Mission mission, Uri saveUri, ICommandListener listener){
+        saveMissionToWPL(context, mission, saveUri, listener);
     }
 
-    public static Mission loadMission(Uri loadUri){
+    public static Mission loadMission(Context context, Uri loadUri){
         // Attempt to load the mission using the waypoint file format.
-        Mission mission = loadMissionFromWPL(loadUri);
+        Mission mission = loadMissionFromWPL(context, loadUri);
         if(mission == null){
             // Attempt to load using the deprecated dpwp formt
-            mission = loadMissionFromDpwp(loadUri);
+            mission = loadMissionFromDpwp(context, loadUri);
         }
         return mission;
     }
 
-    private static void saveMissionToWPL(Mission mission, Uri saveUri, ICommandListener listener){
+    private static void saveMissionToWPL(Context context, Mission mission, Uri saveUri, ICommandListener listener){
         try {
-            OutputStream saveOut = UriUtils.getOutputStream(saveUri);
+            OutputStream saveOut = UriUtils.getOutputStream(context, saveUri);
             try {
                 String header = WAYPOINT_PROTOCOL_HEADER + "\n";
                 saveOut.write(header.getBytes());
@@ -109,9 +110,9 @@ public class MissionUtils {
         }
     }
 
-    private static void saveMissionToDpwp(Mission mission, Uri saveUri, ICommandListener listener){
+    private static void saveMissionToDpwp(Context context, Mission mission, Uri saveUri, ICommandListener listener){
         try{
-            OutputStream saveOut = UriUtils.getOutputStream(saveUri);
+            OutputStream saveOut = UriUtils.getOutputStream(context, saveUri);
             try{
                 byte[] missionBytes = ParcelableUtils.marshall(mission);
                 saveOut.write(missionBytes);
@@ -126,9 +127,9 @@ public class MissionUtils {
         }
     }
 
-    private static Mission loadMissionFromDpwp(Uri loadUri){
+    private static Mission loadMissionFromDpwp(Context context, Uri loadUri){
         try{
-            InputStream loadIn = UriUtils.getInputStream(loadUri);
+            InputStream loadIn = UriUtils.getInputStream(context, loadUri);
             try{
                 Map<byte[], Integer> bytesList = new LinkedHashMap<>();
                 int length = 0;
@@ -155,9 +156,9 @@ public class MissionUtils {
         }
     }
     
-    private static Mission loadMissionFromWPL(Uri loadUri) {
+    private static Mission loadMissionFromWPL(Context context, Uri loadUri) {
         try {
-            InputStream loadIn = UriUtils.getInputStream(loadUri);
+            InputStream loadIn = UriUtils.getInputStream(context, loadUri);
             try {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(loadIn));
 

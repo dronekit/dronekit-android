@@ -2,9 +2,10 @@ package org.droidplanner.services.android.impl.communication.connection;
 
 import android.content.Context;
 
+import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
+
 import org.droidplanner.services.android.impl.core.MAVLink.connection.TcpConnection;
 import org.droidplanner.services.android.impl.core.model.Logger;
-import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
 import org.droidplanner.services.android.impl.utils.connection.WifiConnectionHandler;
 
 import java.io.IOException;
@@ -22,7 +23,7 @@ public class AndroidTcpConnection extends AndroidIpConnection {
         this.serverIp = tcpServerIp;
         this.serverPort = tcpServerPort;
 
-        mConnectionImpl = new TcpConnection() {
+        mConnectionImpl = new TcpConnection(context) {
             @Override
             protected int loadServerPort() {
                 return serverPort;
