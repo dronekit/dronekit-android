@@ -19,22 +19,14 @@ import org.droidplanner.services.android.impl.core.drone.DroneVariable;
 import org.droidplanner.services.android.impl.core.drone.autopilot.apm.APMConstants;
 import org.droidplanner.services.android.impl.core.drone.autopilot.generic.GenericMavLinkDrone;
 import org.droidplanner.services.android.impl.core.helpers.geoTools.GeoTools;
-import org.droidplanner.services.android.impl.core.mission.commands.CameraTriggerImpl;
 import org.droidplanner.services.android.impl.core.mission.commands.ChangeSpeedImpl;
-import org.droidplanner.services.android.impl.core.mission.commands.ConditionYawImpl;
-import org.droidplanner.services.android.impl.core.mission.commands.DoJumpImpl;
-import org.droidplanner.services.android.impl.core.mission.commands.EpmGripperImpl;
 import org.droidplanner.services.android.impl.core.mission.commands.ReturnToHomeImpl;
-import org.droidplanner.services.android.impl.core.mission.commands.SetRelayImpl;
-import org.droidplanner.services.android.impl.core.mission.commands.SetServoImpl;
 import org.droidplanner.services.android.impl.core.mission.commands.TakeoffImpl;
-import org.droidplanner.services.android.impl.core.mission.waypoints.CircleImpl;
-import org.droidplanner.services.android.impl.core.mission.waypoints.DoLandStartImpl;
 import org.droidplanner.services.android.impl.core.mission.waypoints.LandImpl;
 import org.droidplanner.services.android.impl.core.mission.waypoints.RegionOfInterestImpl;
 import org.droidplanner.services.android.impl.core.mission.waypoints.SpatialCoordItem;
-import org.droidplanner.services.android.impl.core.mission.waypoints.SplineWaypointImpl;
 import org.droidplanner.services.android.impl.core.mission.waypoints.WaypointImpl;
+import org.droidplanner.services.android.impl.utils.MissionUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -44,7 +36,7 @@ import java.util.List;
  * This implements a mavlink mission. A mavlink mission is a set of
  * commands/mission items to be carried out by the drone.
  */
-public class Mission extends DroneVariable<GenericMavLinkDrone> {
+public class MissionImpl extends DroneVariable<GenericMavLinkDrone> {
 
     /**
      * Stores the set of mission items belonging to this mission.
@@ -52,7 +44,7 @@ public class Mission extends DroneVariable<GenericMavLinkDrone> {
     private List<MissionItemImpl> items = new ArrayList<MissionItemImpl>();
     private final List<MissionItemImpl> componentItems = new ArrayList<>();
 
-    public Mission(GenericMavLinkDrone myDrone) {
+    public MissionImpl(GenericMavLinkDrone myDrone) {
         super(myDrone);
     }
 
@@ -214,7 +206,7 @@ public class Mission extends DroneVariable<GenericMavLinkDrone> {
             myDrone.processHomeUpdate(msgs.get(0));
             msgs.remove(0); // Remove Home waypoint
             items.clear();
-            items.addAll(processMavLinkMessages(msgs));
+            items.addAll(MissionUtils.processMavLinkMessages(this, msgs));
             myDrone.notifyDroneEvent(DroneEventsType.MISSION_RECEIVED);
             notifyMissionUpdate();
         }
@@ -225,67 +217,10 @@ public class Mission extends DroneVariable<GenericMavLinkDrone> {
             myDrone.processHomeUpdate(msgs.get(0));
             msgs.remove(0); // Remove Home waypoint
             items.clear();
-            items.addAll(processMavLinkMessages(msgs));
+            items.addAll(MissionUtils.processMavLinkMessages(this, msgs));
             myDrone.notifyDroneEvent(DroneEventsType.MISSION_RECEIVED);
             notifyMissionUpdate();
         }
-    }
-
-    private List<MissionItemImpl> processMavLinkMessages(List<msg_mission_item> msgs) {
-        List<MissionItemImpl> received = new ArrayList<MissionItemImpl>();
-        for (msg_mission_item msg : msgs) {
-            switch (msg.command) {
-                case MAV_CMD.MAV_CMD_DO_SET_SERVO:
-                    received.add(new SetServoImpl(msg, this));
-                    break;
-                case MAV_CMD.MAV_CMD_NAV_WAYPOINT:
-                    received.add(new WaypointImpl(msg, this));
-                    break;
-                case MAV_CMD.MAV_CMD_NAV_SPLINE_WAYPOINT:
-                    received.add(new SplineWaypointImpl(msg, this));
-                    break;
-                case MAV_CMD.MAV_CMD_NAV_LAND:
-                    received.add(new LandImpl(msg, this));
-                    break;
-                case MAV_CMD.MAV_CMD_DO_LAND_START:
-                    received.add(new DoLandStartImpl(msg, this));
-                    break;
-                case MAV_CMD.MAV_CMD_NAV_TAKEOFF:
-                    received.add(new TakeoffImpl(msg, this));
-                    break;
-                case MAV_CMD.MAV_CMD_DO_CHANGE_SPEED:
-                    received.add(new ChangeSpeedImpl(msg, this));
-                    break;
-                case MAV_CMD.MAV_CMD_DO_SET_CAM_TRIGG_DIST:
-                    received.add(new CameraTriggerImpl(msg, this));
-                    break;
-                case MAV_CMD.MAV_CMD_DO_GRIPPER:
-                    received.add(new EpmGripperImpl(msg, this));
-                    break;
-                case MAV_CMD.MAV_CMD_DO_SET_ROI:
-                    received.add(new RegionOfInterestImpl(msg, this));
-                    break;
-                case MAV_CMD.MAV_CMD_NAV_LOITER_TURNS:
-                    received.add(new CircleImpl(msg, this));
-                    break;
-                case MAV_CMD.MAV_CMD_NAV_RETURN_TO_LAUNCH:
-                    received.add(new ReturnToHomeImpl(msg, this));
-                    break;
-                case MAV_CMD.MAV_CMD_CONDITION_YAW:
-                    received.add(new ConditionYawImpl(msg, this));
-                    break;
-                case MAV_CMD.MAV_CMD_DO_SET_RELAY:
-                    received.add(new SetRelayImpl(msg, this));
-                    break;
-                case MAV_CMD.MAV_CMD_DO_JUMP:
-                    received.add(new DoJumpImpl(msg, this));
-                    break;
-
-                default:
-                    break;
-            }
-        }
-        return received;
     }
 
     /**
@@ -311,7 +246,7 @@ public class Mission extends DroneVariable<GenericMavLinkDrone> {
         if(firstItem.seq == APMConstants.HOME_WAYPOINT_INDEX) {
             msgMissionItems.remove(0); // Remove Home waypoint
         }
-        componentItems.addAll(processMavLinkMessages(msgMissionItems));
+        componentItems.addAll(MissionUtils.processMavLinkMessages(this, msgMissionItems));
     }
 
     public msg_mission_item packHomeMavlink() {

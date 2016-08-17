@@ -3,9 +3,10 @@ package org.droidplanner.services.android.impl.communication.connection;
 import android.content.Context;
 import android.util.Log;
 
+import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
+
 import org.droidplanner.services.android.impl.core.MAVLink.connection.UdpConnection;
 import org.droidplanner.services.android.impl.core.model.Logger;
-import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
 import org.droidplanner.services.android.impl.utils.connection.WifiConnectionHandler;
 
 import java.io.IOException;
@@ -30,7 +31,7 @@ public class AndroidUdpConnection extends AndroidIpConnection {
         super(context, wifiHandler);
         this.serverPort = udpServerPort;
 
-        mConnectionImpl = new UdpConnection() {
+        mConnectionImpl = new UdpConnection(context) {
             @Override
             protected int loadServerPort() {
                 return serverPort;

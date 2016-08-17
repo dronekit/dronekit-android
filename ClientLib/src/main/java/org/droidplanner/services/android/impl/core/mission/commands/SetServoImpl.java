@@ -3,7 +3,7 @@ package org.droidplanner.services.android.impl.core.mission.commands;
 import com.MAVLink.common.msg_mission_item;
 import com.MAVLink.enums.MAV_CMD;
 
-import org.droidplanner.services.android.impl.core.mission.Mission;
+import org.droidplanner.services.android.impl.core.mission.MissionImpl;
 import org.droidplanner.services.android.impl.core.mission.MissionItemImpl;
 import org.droidplanner.services.android.impl.core.mission.MissionItemType;
 
@@ -18,13 +18,13 @@ public class SetServoImpl extends MissionCMD {
 		super(item);
 	}
 
-	public SetServoImpl(msg_mission_item msg, Mission mission) {
-		super(mission);
+	public SetServoImpl(msg_mission_item msg, MissionImpl missionImpl) {
+		super(missionImpl);
 		unpackMAVMessage(msg);
 	}
 
-	public SetServoImpl(Mission mission, int channel, int pwm) {
-		super(mission);
+	public SetServoImpl(MissionImpl missionImpl, int channel, int pwm) {
+		super(missionImpl);
 		this.channel = channel;
 		this.pwm = pwm;
 	}

@@ -24,6 +24,13 @@ public class MissionActions {
     public static final String EXTRA_FORCE_ARM = "extra_force_arm";
     public static final String EXTRA_MISSION_SPEED = "extra_mission_speed";
 
+    public static final String ACTION_SAVE_MISSION = Utils.PACKAGE_NAME + ".action.SAVE_MISSION";
+    public static final String EXTRA_SAVE_MISSION_URI = "extra_save_mission_uri";
+
+    public static final String ACTION_LOAD_MISSION = Utils.PACKAGE_NAME + ".action.LOAD_MISSION";
+    public static final String EXTRA_LOAD_MISSION_URI = "extra_load_mission_uri";
+    public static final String EXTRA_SET_LOADED_MISSION = "extra_set_loaded_mission";
+
     public static final String ACTION_LOAD_WAYPOINTS = Utils.PACKAGE_NAME + ".action.LOAD_WAYPOINTS";
 
     public static final String ACTION_BUILD_COMPLEX_MISSION_ITEM = Utils.PACKAGE_NAME + ".action" +

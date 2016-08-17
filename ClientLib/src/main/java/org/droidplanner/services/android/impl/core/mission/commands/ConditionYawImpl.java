@@ -4,7 +4,7 @@ import com.MAVLink.common.msg_mission_item;
 import com.MAVLink.enums.MAV_CMD;
 
 import org.droidplanner.services.android.impl.core.helpers.geoTools.GeoTools;
-import org.droidplanner.services.android.impl.core.mission.Mission;
+import org.droidplanner.services.android.impl.core.mission.MissionImpl;
 import org.droidplanner.services.android.impl.core.mission.MissionItemImpl;
 import org.droidplanner.services.android.impl.core.mission.MissionItemType;
 
@@ -19,13 +19,13 @@ public class ConditionYawImpl extends MissionCMD {
 		super(item);
 	}
 
-	public ConditionYawImpl(msg_mission_item msg, Mission mission) {
-		super(mission);
+	public ConditionYawImpl(msg_mission_item msg, MissionImpl missionImpl) {
+		super(missionImpl);
 		unpackMAVMessage(msg);
 	}
 
-	public ConditionYawImpl(Mission mission, double angle, boolean isRelative) {
-		super(mission);
+	public ConditionYawImpl(MissionImpl missionImpl, double angle, boolean isRelative) {
+		super(missionImpl);
 		setAngle(angle);
 		setRelative(isRelative);
 	}

@@ -3,7 +3,7 @@ package org.droidplanner.services.android.impl.core.mission.waypoints;
 import com.MAVLink.common.msg_mission_item;
 import com.MAVLink.enums.MAV_CMD;
 
-import org.droidplanner.services.android.impl.core.mission.Mission;
+import org.droidplanner.services.android.impl.core.mission.MissionImpl;
 import org.droidplanner.services.android.impl.core.mission.MissionItemImpl;
 import org.droidplanner.services.android.impl.core.mission.MissionItemType;
 import com.o3dr.services.android.lib.coordinate.LatLong;
@@ -18,16 +18,16 @@ public class DoLandStartImpl extends SpatialCoordItem {
         setAltitude((0.0));
     }
 
-    public DoLandStartImpl(Mission mission) {
-        this(mission, new LatLong(0, 0));
+    public DoLandStartImpl(MissionImpl missionImpl) {
+        this(missionImpl, new LatLong(0, 0));
     }
 
-    public DoLandStartImpl(Mission mMission, LatLong coord) {
-        super(mMission, new LatLongAlt(coord, (0)));
+    public DoLandStartImpl(MissionImpl mMissionImpl, LatLong coord) {
+        super(mMissionImpl, new LatLongAlt(coord, (0)));
     }
 
-    public DoLandStartImpl(msg_mission_item msg, Mission mission) {
-        super(mission, null);
+    public DoLandStartImpl(msg_mission_item msg, MissionImpl missionImpl) {
+        super(missionImpl, null);
         unpackMAVMessage(msg);
     }
 

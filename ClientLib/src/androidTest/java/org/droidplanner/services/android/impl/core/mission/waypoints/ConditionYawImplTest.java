@@ -5,7 +5,7 @@ import com.MAVLink.enums.MAV_CMD;
 
 import junit.framework.TestCase;
 
-import org.droidplanner.services.android.impl.core.mission.Mission;
+import org.droidplanner.services.android.impl.core.mission.MissionImpl;
 import org.droidplanner.services.android.impl.core.mission.commands.ConditionYawImpl;
 
 import java.util.List;
@@ -13,8 +13,8 @@ import java.util.List;
 public class ConditionYawImplTest extends TestCase {
 
     public void testPackMissionItem() {
-        Mission mission = new Mission(null);
-        ConditionYawImpl item = new ConditionYawImpl(mission, 12, false);
+        MissionImpl missionImpl = new MissionImpl(null);
+        ConditionYawImpl item = new ConditionYawImpl(missionImpl, 12, false);
 
         List<msg_mission_item> listOfMsg = item.packMissionItem();
         assertEquals(1, listOfMsg.size());

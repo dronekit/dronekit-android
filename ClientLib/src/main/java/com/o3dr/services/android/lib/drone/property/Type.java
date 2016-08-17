@@ -10,14 +10,12 @@ public class Type implements DroneAttribute {
     public static final int TYPE_UNKNOWN = -1;
     public static final int TYPE_PLANE = 1;
     public static final int TYPE_COPTER = 2;
-    public static final int TYPE_SOLO = 3;
     public static final int TYPE_ROVER = 10;
 
     public static enum Firmware {
         ARDU_PLANE("ArduPlane"),
         ARDU_COPTER("ArduCopter"),
-        APM_ROVER("APMRover"),
-        SOLO("Solo");
+        APM_ROVER("APMRover");
 
         private final String label;
 
@@ -52,9 +50,6 @@ public class Type implements DroneAttribute {
 
             case TYPE_ROVER:
                 return Firmware.APM_ROVER;
-
-            case TYPE_SOLO:
-                return Firmware.SOLO;
 
             case TYPE_UNKNOWN:
             default:

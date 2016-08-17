@@ -8,10 +8,9 @@ import org.droidplanner.services.android.impl.utils.AndroidLogger;
 
 public abstract class AndroidMavLinkConnection extends MavLinkConnection {
 
-    protected final Context mContext;
 
     public AndroidMavLinkConnection(Context applicationContext) {
-        this.mContext = applicationContext;
+        super(applicationContext);
     }
 
     @Override

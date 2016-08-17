@@ -26,7 +26,7 @@ import com.o3dr.services.android.lib.drone.mission.item.spatial.RegionOfInterest
 import com.o3dr.services.android.lib.drone.mission.item.spatial.SplineWaypoint;
 import com.o3dr.services.android.lib.drone.mission.item.spatial.Waypoint;
 
-import org.droidplanner.services.android.impl.core.mission.Mission;
+import org.droidplanner.services.android.impl.core.mission.MissionImpl;
 import org.droidplanner.services.android.impl.core.mission.MissionItemImpl;
 import org.droidplanner.services.android.impl.core.mission.commands.CameraTriggerImpl;
 import org.droidplanner.services.android.impl.core.mission.commands.ChangeSpeedImpl;
@@ -90,7 +90,7 @@ public class ProxyUtils {
         return surveyDetail;
     }
 
-    public static MissionItemImpl getMissionItemImpl(Mission mission, MissionItem proxyItem) {
+    public static MissionItemImpl getMissionItemImpl(MissionImpl missionImpl, MissionItem proxyItem) {
         if (proxyItem == null)
             return null;
 
@@ -100,7 +100,7 @@ public class ProxyUtils {
             case CAMERA_TRIGGER: {
                 CameraTrigger proxy = (CameraTrigger) proxyItem;
 
-                CameraTriggerImpl temp = new CameraTriggerImpl(mission, (proxy.getTriggerDistance()));
+                CameraTriggerImpl temp = new CameraTriggerImpl(missionImpl, (proxy.getTriggerDistance()));
 
                 missionItemImpl = temp;
                 break;
@@ -108,7 +108,7 @@ public class ProxyUtils {
             case CHANGE_SPEED: {
                 ChangeSpeed proxy = (ChangeSpeed) proxyItem;
 
-                ChangeSpeedImpl temp = new ChangeSpeedImpl(mission, proxy.getSpeed());
+                ChangeSpeedImpl temp = new ChangeSpeedImpl(missionImpl, proxy.getSpeed());
 
                 missionItemImpl = temp;
                 break;
@@ -116,7 +116,7 @@ public class ProxyUtils {
             case EPM_GRIPPER: {
                 EpmGripper proxy = (EpmGripper) proxyItem;
 
-                EpmGripperImpl temp = new EpmGripperImpl(mission, proxy.isRelease());
+                EpmGripperImpl temp = new EpmGripperImpl(missionImpl, proxy.isRelease());
 
                 missionItemImpl = temp;
                 break;
@@ -124,7 +124,7 @@ public class ProxyUtils {
             case RETURN_TO_LAUNCH: {
                 ReturnToLaunch proxy = (ReturnToLaunch) proxyItem;
 
-                ReturnToHomeImpl temp = new ReturnToHomeImpl(mission);
+                ReturnToHomeImpl temp = new ReturnToHomeImpl(missionImpl);
                 temp.setHeight((proxy.getReturnAltitude()));
 
                 missionItemImpl = temp;
@@ -133,7 +133,7 @@ public class ProxyUtils {
             case SET_SERVO: {
                 SetServo proxy = (SetServo) proxyItem;
 
-                SetServoImpl temp = new SetServoImpl(mission, proxy.getChannel(), proxy.getPwm());
+                SetServoImpl temp = new SetServoImpl(missionImpl, proxy.getChannel(), proxy.getPwm());
 
                 missionItemImpl = temp;
                 break;
@@ -141,7 +141,7 @@ public class ProxyUtils {
             case TAKEOFF: {
                 Takeoff proxy = (Takeoff) proxyItem;
 
-                TakeoffImpl temp = new TakeoffImpl(mission, proxy.getTakeoffAltitude(),
+                TakeoffImpl temp = new TakeoffImpl(missionImpl, proxy.getTakeoffAltitude(),
                     proxy.getTakeoffPitch());
 
                 missionItemImpl = temp;
@@ -150,7 +150,7 @@ public class ProxyUtils {
             case CIRCLE: {
                 Circle proxy = (Circle) proxyItem;
 
-                CircleImpl temp = new CircleImpl(mission, (proxy.getCoordinate()));
+                CircleImpl temp = new CircleImpl(missionImpl, (proxy.getCoordinate()));
                 temp.setRadius(proxy.getRadius());
                 temp.setTurns(proxy.getTurns());
 
@@ -160,7 +160,7 @@ public class ProxyUtils {
             case LAND: {
                 Land proxy = (Land) proxyItem;
 
-                LandImpl temp = new LandImpl(mission, (proxy.getCoordinate()));
+                LandImpl temp = new LandImpl(missionImpl, (proxy.getCoordinate()));
 
                 missionItemImpl = temp;
                 break;
@@ -168,7 +168,7 @@ public class ProxyUtils {
             case DO_LAND_START: {
                 DoLandStart proxy = (DoLandStart) proxyItem;
 
-                DoLandStartImpl temp = new DoLandStartImpl(mission, (proxy.getCoordinate()));
+                DoLandStartImpl temp = new DoLandStartImpl(missionImpl, (proxy.getCoordinate()));
 
                 missionItemImpl = temp;
                 break;
@@ -177,7 +177,7 @@ public class ProxyUtils {
             case REGION_OF_INTEREST: {
                 RegionOfInterest proxy = (RegionOfInterest) proxyItem;
 
-                RegionOfInterestImpl temp = new RegionOfInterestImpl(mission, (proxy.getCoordinate()));
+                RegionOfInterestImpl temp = new RegionOfInterestImpl(missionImpl, (proxy.getCoordinate()));
 
                 missionItemImpl = temp;
                 break;
@@ -185,7 +185,7 @@ public class ProxyUtils {
 
             case RESET_ROI: {
                 //Sending a roi with all coordinates set to 0 will reset the current roi.
-                RegionOfInterestImpl temp = new RegionOfInterestImpl(mission, new LatLongAlt(0, 0, 0));
+                RegionOfInterestImpl temp = new RegionOfInterestImpl(missionImpl, new LatLongAlt(0, 0, 0));
                 missionItemImpl = temp;
                 break;
             }
@@ -193,7 +193,7 @@ public class ProxyUtils {
             case SPLINE_WAYPOINT: {
                 SplineWaypoint proxy = (SplineWaypoint) proxyItem;
 
-                SplineWaypointImpl temp = new SplineWaypointImpl(mission, (proxy.getCoordinate()));
+                SplineWaypointImpl temp = new SplineWaypointImpl(missionImpl, (proxy.getCoordinate()));
                 temp.setDelay(proxy.getDelay());
 
                 missionItemImpl = temp;
@@ -202,7 +202,7 @@ public class ProxyUtils {
             case STRUCTURE_SCANNER: {
                 StructureScanner proxy = (StructureScanner) proxyItem;
 
-                StructureScannerImpl temp = new StructureScannerImpl(mission, (proxy.getCoordinate()));
+                StructureScannerImpl temp = new StructureScannerImpl(missionImpl, (proxy.getCoordinate()));
                 temp.setRadius((int) proxy.getRadius());
                 temp.setNumberOfSteps(proxy.getStepsCount());
                 temp.setAltitudeStep((int) proxy.getHeightStep());
@@ -218,7 +218,7 @@ public class ProxyUtils {
             case WAYPOINT: {
                 Waypoint proxy = (Waypoint) proxyItem;
 
-                WaypointImpl temp = new WaypointImpl(mission, (proxy
+                WaypointImpl temp = new WaypointImpl(missionImpl, (proxy
                         .getCoordinate()));
                 temp.setAcceptanceRadius(proxy.getAcceptanceRadius());
                 temp.setDelay(proxy.getDelay());
@@ -233,7 +233,7 @@ public class ProxyUtils {
                 Survey proxy = (Survey) proxyItem;
                 SurveyDetail surveyDetail = proxy.getSurveyDetail();
 
-                SurveyImpl temp = new SurveyImpl(mission, proxy.getPolygonPoints());
+                SurveyImpl temp = new SurveyImpl(missionImpl, proxy.getPolygonPoints());
                 temp.setStartCameraBeforeFirstWaypoint(proxy.isStartCameraBeforeFirstWaypoint());
 
                 if (surveyDetail != null) {
@@ -258,7 +258,7 @@ public class ProxyUtils {
                 SplineSurvey proxy = (SplineSurvey) proxyItem;
                 SurveyDetail surveyDetail = proxy.getSurveyDetail();
 
-                SplineSurveyImpl temp = new SplineSurveyImpl(mission, proxy.getPolygonPoints());
+                SplineSurveyImpl temp = new SplineSurveyImpl(missionImpl, proxy.getPolygonPoints());
                 temp.setStartCameraBeforeFirstWaypoint(proxy.isStartCameraBeforeFirstWaypoint());
 
                 if (surveyDetail != null) {
@@ -282,7 +282,7 @@ public class ProxyUtils {
             case YAW_CONDITION: {
                 YawCondition proxy = (YawCondition) proxyItem;
 
-                ConditionYawImpl temp = new ConditionYawImpl(mission, proxy.getAngle(), proxy.isRelative());
+                ConditionYawImpl temp = new ConditionYawImpl(missionImpl, proxy.getAngle(), proxy.isRelative());
                 temp.setAngularSpeed(proxy.getAngularSpeed());
 
                 missionItemImpl = temp;
@@ -291,13 +291,13 @@ public class ProxyUtils {
 
             case SET_RELAY: {
                 SetRelay proxy = (SetRelay) proxyItem;
-                missionItemImpl = new SetRelayImpl(mission, proxy.getRelayNumber(), proxy.isEnabled());
+                missionItemImpl = new SetRelayImpl(missionImpl, proxy.getRelayNumber(), proxy.isEnabled());
                 break;
             }
 
             case DO_JUMP: {
                 DoJump proxy = (DoJump) proxyItem;
-                missionItemImpl = new DoJumpImpl(mission, proxy.getWaypoint(), proxy.getRepeatCount());
+                missionItemImpl = new DoJumpImpl(missionImpl, proxy.getWaypoint(), proxy.getRepeatCount());
                 break;
             }
 

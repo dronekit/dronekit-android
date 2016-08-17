@@ -70,7 +70,7 @@ import org.droidplanner.services.android.impl.core.drone.variables.Type;
 import org.droidplanner.services.android.impl.core.drone.variables.calibration.AccelCalibration;
 import org.droidplanner.services.android.impl.core.drone.variables.calibration.MagnetometerCalibrationImpl;
 import org.droidplanner.services.android.impl.core.firmware.FirmwareType;
-import org.droidplanner.services.android.impl.core.mission.Mission;
+import org.droidplanner.services.android.impl.core.mission.MissionImpl;
 import org.droidplanner.services.android.impl.core.model.AutopilotWarningParser;
 import org.droidplanner.services.android.impl.utils.CommonApiUtils;
 import org.droidplanner.services.android.impl.utils.video.VideoManager;
@@ -147,7 +147,7 @@ public class GenericMavLinkDrone implements MavLinkDrone {
     }
 
     @Override
-    public Mission getMission() {
+    public MissionImpl getMission() {
         //TODO: complete implementation
         return null;
     }

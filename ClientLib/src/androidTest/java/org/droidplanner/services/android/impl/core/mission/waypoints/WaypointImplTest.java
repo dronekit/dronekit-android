@@ -6,15 +6,15 @@ import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 
 import junit.framework.TestCase;
 
-import org.droidplanner.services.android.impl.core.mission.Mission;
+import org.droidplanner.services.android.impl.core.mission.MissionImpl;
 
 import java.util.List;
 
 public class WaypointImplTest extends TestCase {
 
     public void testPackMissionItem() {
-        Mission mission = new Mission(null);
-        WaypointImpl item = new WaypointImpl(mission, new LatLongAlt(0, 1, (2)));
+        MissionImpl missionImpl = new MissionImpl(null);
+        WaypointImpl item = new WaypointImpl(missionImpl, new LatLongAlt(0, 1, (2)));
 
         List<msg_mission_item> listOfMsg = item.packMissionItem();
         assertEquals(1, listOfMsg.size());

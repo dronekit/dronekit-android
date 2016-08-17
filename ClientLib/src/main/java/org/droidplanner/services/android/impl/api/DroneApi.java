@@ -2,6 +2,7 @@ package org.droidplanner.services.android.impl.api;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -52,6 +53,7 @@ import org.droidplanner.services.android.impl.core.drone.variables.calibration.A
 import org.droidplanner.services.android.impl.core.drone.variables.calibration.MagnetometerCalibrationImpl;
 import org.droidplanner.services.android.impl.exception.ConnectionException;
 import org.droidplanner.services.android.impl.utils.CommonApiUtils;
+import org.droidplanner.services.android.impl.utils.MissionUtils;
 import org.droidplanner.services.android.impl.utils.video.VideoManager;
 
 import java.util.ArrayList;
@@ -62,6 +64,10 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import timber.log.Timber;
+
+import static com.o3dr.services.android.lib.drone.mission.action.MissionActions.ACTION_SET_MISSION;
+import static com.o3dr.services.android.lib.drone.mission.action.MissionActions.EXTRA_MISSION;
+import static com.o3dr.services.android.lib.drone.mission.action.MissionActions.EXTRA_PUSH_TO_DRONE;
 
 /**
  * Implementation for the IDroneApi interface.
@@ -395,6 +401,37 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
                     CommonApiUtils.postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
                 }
                 break;
+
+            case MissionActions.ACTION_SAVE_MISSION: {
+                Mission mission = data.getParcelable(MissionActions.EXTRA_MISSION);
+                Uri saveUri = data.getParcelable(MissionActions.EXTRA_SAVE_MISSION_URI);
+                if (saveUri == null) {
+                    CommonApiUtils.postErrorEvent(CommandExecutionError.COMMAND_FAILED, listener);
+                } else {
+                    MissionUtils.saveMission(context, mission, saveUri, listener);
+                }
+                break;
+            }
+
+            case MissionActions.ACTION_LOAD_MISSION: {
+                Uri loadUri = data.getParcelable(MissionActions.EXTRA_LOAD_MISSION_URI);
+                boolean setMission = data.getBoolean(MissionActions.EXTRA_SET_LOADED_MISSION, false);
+                if (loadUri != null) {
+                    Mission mission = MissionUtils.loadMission(context, loadUri);
+                    if(mission != null){
+                        // Going back to the caller.
+                        data.putParcelable(MissionActions.EXTRA_MISSION, mission);
+
+                        if(setMission){
+                            Bundle params = new Bundle();
+                            params.putParcelable(EXTRA_MISSION, mission);
+                            params.putBoolean(EXTRA_PUSH_TO_DRONE, false);
+                            executeAction(new Action(ACTION_SET_MISSION, params), listener);
+                        }
+                    }
+                }
+                break;
+            }
 
             default:
                 if (droneMgr != null) {

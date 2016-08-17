@@ -5,7 +5,7 @@ import com.MAVLink.enums.MAV_CMD;
 
 import junit.framework.TestCase;
 
-import org.droidplanner.services.android.impl.core.mission.Mission;
+import org.droidplanner.services.android.impl.core.mission.MissionImpl;
 import org.droidplanner.services.android.impl.core.mission.commands.ChangeSpeedImpl;
 
 import java.util.List;
@@ -13,8 +13,8 @@ import java.util.List;
 public class ChangeSpeedImplTest extends TestCase {
 
     public void testPackMissionItem() {
-        Mission mission = new Mission(null);
-        ChangeSpeedImpl item = new ChangeSpeedImpl(mission, 12.0);
+        MissionImpl missionImpl = new MissionImpl(null);
+        ChangeSpeedImpl item = new ChangeSpeedImpl(missionImpl, 12.0);
 
         List<msg_mission_item> listOfMsg = item.packMissionItem();
         assertEquals(1, listOfMsg.size());

@@ -4,7 +4,7 @@ import com.MAVLink.common.msg_mission_item;
 import com.MAVLink.enums.MAV_CMD;
 
 import org.droidplanner.services.android.impl.core.helpers.geoTools.GeoTools;
-import org.droidplanner.services.android.impl.core.mission.Mission;
+import org.droidplanner.services.android.impl.core.mission.MissionImpl;
 import org.droidplanner.services.android.impl.core.mission.MissionItemImpl;
 import org.droidplanner.services.android.impl.core.mission.MissionItemType;
 import org.droidplanner.services.android.impl.core.mission.survey.SurveyImpl;
@@ -25,8 +25,8 @@ public class StructureScannerImpl extends SpatialCoordItem {
     private boolean crossHatch = false;
     SurveyData survey = new SurveyData();
 
-    public StructureScannerImpl(Mission mission, LatLongAlt coord) {
-        super(mission, coord);
+    public StructureScannerImpl(MissionImpl missionImpl, LatLongAlt coord) {
+        super(missionImpl, coord);
     }
 
     public StructureScannerImpl(MissionItemImpl item) {
@@ -45,13 +45,13 @@ public class StructureScannerImpl extends SpatialCoordItem {
     }
 
     private void packROI(List<msg_mission_item> list) {
-        RegionOfInterestImpl roi = new RegionOfInterestImpl(mission, new LatLongAlt(coordinate, (0.0)));
+        RegionOfInterestImpl roi = new RegionOfInterestImpl(missionImpl, new LatLongAlt(coordinate, (0.0)));
         list.addAll(roi.packMissionItem());
     }
 
     private void packCircles(List<msg_mission_item> list) {
         for (double altitude = coordinate.getAltitude(); altitude <= getTopHeight(); altitude += heightStep) {
-            CircleImpl circleImpl = new CircleImpl(mission, new LatLongAlt(coordinate, (altitude)));
+            CircleImpl circleImpl = new CircleImpl(missionImpl, new LatLongAlt(coordinate, (altitude)));
             circleImpl.setRadius(radius);
             list.addAll(circleImpl.packMissionItem());
         }

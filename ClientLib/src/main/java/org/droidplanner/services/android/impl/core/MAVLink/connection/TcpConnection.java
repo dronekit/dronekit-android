@@ -1,5 +1,7 @@
 package org.droidplanner.services.android.impl.core.MAVLink.connection;
 
+import android.content.Context;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -20,6 +22,10 @@ public abstract class TcpConnection extends MavLinkConnection {
 
     private String serverIP;
     private int serverPort;
+
+    protected TcpConnection(Context context) {
+        super(context);
+    }
 
     @Override
     public final void openConnection() throws IOException {

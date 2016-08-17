@@ -5,7 +5,7 @@ import com.MAVLink.enums.MAV_CMD;
 
 import junit.framework.TestCase;
 
-import org.droidplanner.services.android.impl.core.mission.Mission;
+import org.droidplanner.services.android.impl.core.mission.MissionImpl;
 import org.droidplanner.services.android.impl.core.mission.commands.TakeoffImpl;
 
 import java.util.List;
@@ -13,8 +13,8 @@ import java.util.List;
 public class TakeoffImplTest extends TestCase {
 
     public void testPackMissionItem() {
-        Mission mission = new Mission(null);
-        TakeoffImpl item = new TakeoffImpl(mission, (50.0));
+        MissionImpl missionImpl = new MissionImpl(null);
+        TakeoffImpl item = new TakeoffImpl(missionImpl, (50.0));
 
         List<msg_mission_item> listOfMsg = item.packMissionItem();
         assertEquals(1, listOfMsg.size());

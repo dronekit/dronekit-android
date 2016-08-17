@@ -3,7 +3,7 @@ package org.droidplanner.services.android.impl.core.mission.commands;
 import com.MAVLink.common.msg_mission_item;
 import com.MAVLink.enums.MAV_CMD;
 
-import org.droidplanner.services.android.impl.core.mission.Mission;
+import org.droidplanner.services.android.impl.core.mission.MissionImpl;
 import org.droidplanner.services.android.impl.core.mission.MissionItemImpl;
 import org.droidplanner.services.android.impl.core.mission.MissionItemType;
 
@@ -20,17 +20,17 @@ public class DoJumpImpl extends MissionCMD{
         super(item);
     }
 
-    public DoJumpImpl(Mission mission) {
-        super(mission);
+    public DoJumpImpl(MissionImpl missionImpl) {
+        super(missionImpl);
     }
 
-    public DoJumpImpl(msg_mission_item mavMsg, Mission mission){
-        super(mission);
+    public DoJumpImpl(msg_mission_item mavMsg, MissionImpl missionImpl){
+        super(missionImpl);
         unpackMAVMessage(mavMsg);
     }
 
-    public DoJumpImpl(Mission mission, int waypoint, int repeatCount){
-        super(mission);
+    public DoJumpImpl(MissionImpl missionImpl, int waypoint, int repeatCount){
+        super(missionImpl);
         this.waypoint = waypoint;
         this.repeatCount  = repeatCount;
     }

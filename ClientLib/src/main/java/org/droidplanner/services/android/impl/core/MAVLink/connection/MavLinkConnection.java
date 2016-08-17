@@ -1,16 +1,18 @@
 package org.droidplanner.services.android.impl.core.MAVLink.connection;
 
+import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.util.Pair;
 
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Parser;
+import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
+import com.o3dr.services.android.lib.util.UriUtils;
 
 import org.droidplanner.services.android.impl.core.model.Logger;
-import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
 
 import java.io.BufferedOutputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.BindException;
 import java.nio.ByteBuffer;
@@ -50,7 +52,7 @@ public abstract class MavLinkConnection {
     /**
      * Stores the list of log files to be written to.
      */
-    private final ConcurrentHashMap<String, Pair<String, BufferedOutputStream>> loggingOutStreams = new
+    private final ConcurrentHashMap<String, Pair<Uri, BufferedOutputStream>> loggingOutStreams = new
         ConcurrentHashMap<>();
 
     /**
@@ -216,21 +218,21 @@ public abstract class MavLinkConnection {
                     logBuffer.clear();
                     logBuffer.putLong(System.currentTimeMillis() * 1000);
 
-                    for (Map.Entry<String, Pair<String, BufferedOutputStream>> entry : loggingOutStreams
+                    for (Map.Entry<String, Pair<Uri, BufferedOutputStream>> entry : loggingOutStreams
                         .entrySet()) {
-                        final Pair<String, BufferedOutputStream> logInfo = entry.getValue();
-                        final String loggingFilePath = logInfo.first;
+                        final Pair<Uri, BufferedOutputStream> logInfo = entry.getValue();
+                        final Uri loggingFileUri = logInfo.first;
                         try {
                             BufferedOutputStream logWriter = logInfo.second;
                             if (logWriter == null) {
-                                logWriter = new BufferedOutputStream(new FileOutputStream(loggingFilePath));
-                                loggingOutStreams.put(entry.getKey(), Pair.create(loggingFilePath, logWriter));
+                                logWriter = new BufferedOutputStream(UriUtils.getOutputStream(context, loggingFileUri));
+                                loggingOutStreams.put(entry.getKey(), Pair.create(loggingFileUri, logWriter));
                             }
 
                             logWriter.write(logBuffer.array());
                             logWriter.write(packetData);
                         } catch (IOException e) {
-                            mLogger.logErr(TAG, "IO Exception while writing to " + loggingFilePath, e);
+                            mLogger.logErr(TAG, "IO Exception while writing to " + loggingFileUri, e);
                         }
                     }
                 }
@@ -240,14 +242,14 @@ public abstract class MavLinkConnection {
                     mLogger.logVerbose(TAG, errorMessage);
                 }
             } finally {
-                for (Pair<String, BufferedOutputStream> entry : loggingOutStreams.values()) {
-                    final String loggingFilePath = entry.first;
+                for (Pair<Uri, BufferedOutputStream> entry : loggingOutStreams.values()) {
+                    final Uri loggingFileUri = entry.first;
                     try {
                         if (entry.second != null) {
                             entry.second.close();
                         }
                     } catch (IOException e) {
-                        mLogger.logErr(TAG, "IO Exception while closing " + loggingFilePath, e);
+                        mLogger.logErr(TAG, "IO Exception while closing " + loggingFileUri, e);
                     }
                 }
 
@@ -257,9 +259,14 @@ public abstract class MavLinkConnection {
     };
 
     protected final Logger mLogger = initLogger();
+    protected final Context context;
 
     private Thread mConnectThread;
     private Thread mTaskThread;
+
+    protected MavLinkConnection(Context context){
+        this.context = context;
+    }
 
     /**
      * Establish a mavlink connection. If the connection is successful, it will
@@ -349,13 +356,13 @@ public abstract class MavLinkConnection {
         }
     }
 
-    public void addLoggingPath(String tag, String loggingPath) {
-        if (tag == null || tag.length() == 0 || loggingPath == null || loggingPath.length() == 0) {
+    public void addLoggingPath(String tag, Uri loggingUri) {
+        if (tag == null || tag.length() == 0 || loggingUri == null) {
             return;
         }
 
         if (!loggingOutStreams.contains(tag)) {
-            loggingOutStreams.put(tag, Pair.<String, BufferedOutputStream>create(loggingPath, null));
+            loggingOutStreams.put(tag, Pair.<Uri, BufferedOutputStream>create(loggingUri, null));
         }
     }
 
@@ -364,7 +371,7 @@ public abstract class MavLinkConnection {
             return;
         }
 
-        Pair<String, BufferedOutputStream> logInfo = loggingOutStreams.remove(tag);
+        Pair<Uri, BufferedOutputStream> logInfo = loggingOutStreams.remove(tag);
         if (logInfo != null) {
             BufferedOutputStream outStream = logInfo.second;
             if (outStream != null) {
