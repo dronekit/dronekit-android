@@ -204,7 +204,7 @@ public class MathUtils {
      * @param epsilon   Tolerance for determining list of points for approximation of curve.
      * @return          List of lat/long points in the approximated curve.
      */
-    public static List<LatLong> simplify(List<LatLong> list, double epsilon) {
+    public static List<LatLong> simplify(List<? extends LatLong> list, double epsilon) {
         int index = 0;
         double dmax = 0;
         int lastIndex = list.size() - 1;
