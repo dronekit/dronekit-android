@@ -7,6 +7,7 @@ import android.util.SparseBooleanArray;
 
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.common.msg_param_value;
+import com.o3dr.services.android.lib.drone.property.Parameter;
 
 import org.droidplanner.services.android.impl.core.MAVLink.MavLinkParameters;
 import org.droidplanner.services.android.impl.core.drone.DroneInterfaces;
@@ -14,7 +15,6 @@ import org.droidplanner.services.android.impl.core.drone.DroneInterfaces.DroneEv
 import org.droidplanner.services.android.impl.core.drone.DroneInterfaces.OnDroneListener;
 import org.droidplanner.services.android.impl.core.drone.DroneVariable;
 import org.droidplanner.services.android.impl.core.drone.autopilot.MavLinkDrone;
-import com.o3dr.services.android.lib.drone.property.Parameter;
 import org.droidplanner.services.android.impl.utils.file.IO.ParameterMetadataLoader;
 
 import java.util.Locale;
@@ -115,6 +115,8 @@ public class ParameterManager extends DroneVariable<MavLinkDrone> implements OnD
     }
 
     protected void processReceivedParam(msg_param_value m_value) {
+        if(!isRefreshing.get())
+            return;
         // collect params in parameter list
         Parameter param = new Parameter(m_value.getParam_Id(), m_value.param_value, m_value.param_type);
         loadParameterMetadata(param);
@@ -137,10 +139,11 @@ public class ParameterManager extends DroneVariable<MavLinkDrone> implements OnD
 
         // Are all parameters here? Notify the listener with the parameters
         if (parameters.size() >= m_value.param_count) {
-            killWatchdog();
-            isRefreshing.set(false);
+            if(isRefreshing.compareAndSet(true, false)) {
+                killWatchdog();
 
-            notifyParametersReceiptEnd();
+                notifyParametersReceiptEnd();
+            }
         } else {
             resetWatchdog();
         }
