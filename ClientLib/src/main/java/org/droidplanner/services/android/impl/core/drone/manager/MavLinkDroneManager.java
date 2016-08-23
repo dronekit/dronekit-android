@@ -184,7 +184,10 @@ public class MavLinkDroneManager extends DroneManager<MavLinkDrone, MAVLinkPacke
     }
 
     private void updateDroneStreamRate(ConnectionParameter connParams) {
-        int eventsDispatchingRate = Math.round(1000L / connParams.getEventsDispatchingPeriod());
+        // Prevent divide by zero
+        long eventDispatchPeriod = connParams.getEventsDispatchingPeriod() == 0L ? 1L : connParams.getEventsDispatchingPeriod();
+
+        int eventsDispatchingRate = Math.round(1000L / eventDispatchPeriod);
 
         boolean updateComplete;
         do {
