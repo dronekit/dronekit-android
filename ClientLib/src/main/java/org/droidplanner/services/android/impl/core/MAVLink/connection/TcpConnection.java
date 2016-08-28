@@ -1,6 +1,7 @@
 package org.droidplanner.services.android.impl.core.MAVLink.connection;
 
 import android.content.Context;
+import android.os.Bundle;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -28,7 +29,7 @@ public abstract class TcpConnection extends MavLinkConnection {
     }
 
     @Override
-    public final void openConnection() throws IOException {
+    public final void openConnection(Bundle connectionExtras) throws IOException {
         getTCPStream();
         onConnectionOpened();
     }

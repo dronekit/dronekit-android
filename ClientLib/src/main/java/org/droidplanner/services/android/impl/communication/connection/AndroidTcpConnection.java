@@ -1,6 +1,7 @@
 package org.droidplanner.services.android.impl.communication.connection;
 
 import android.content.Context;
+import android.os.Bundle;
 
 import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
 
@@ -66,8 +67,8 @@ public class AndroidTcpConnection extends AndroidIpConnection {
     }
 
     @Override
-    protected void onOpenConnection() throws IOException {
-        mConnectionImpl.openConnection();
+    protected void onOpenConnection(Bundle extras) throws IOException {
+        mConnectionImpl.openConnection(extras);
     }
 
     @Override

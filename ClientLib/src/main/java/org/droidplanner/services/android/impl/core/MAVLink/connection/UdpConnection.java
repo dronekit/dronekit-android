@@ -1,6 +1,7 @@
 package org.droidplanner.services.android.impl.core.MAVLink.connection;
 
 import android.content.Context;
+import android.os.Bundle;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -41,7 +42,7 @@ public abstract class UdpConnection extends MavLinkConnection {
     }
 
     @Override
-    public final void openConnection() throws IOException {
+    public final void openConnection(Bundle connectionExtras) throws IOException {
         getUdpStream();
         onConnectionOpened();
     }

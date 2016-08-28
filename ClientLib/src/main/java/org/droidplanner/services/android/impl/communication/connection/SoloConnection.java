@@ -10,6 +10,7 @@ import android.text.TextUtils;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionType;
 import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
+
 import org.droidplanner.services.android.impl.utils.connection.WifiConnectionHandler;
 
 import java.io.IOException;
@@ -51,7 +52,7 @@ public class SoloConnection extends AndroidMavLinkConnection implements WifiConn
     }
 
     @Override
-    protected void openConnection() throws IOException {
+    protected void openConnection(Bundle connectionExtras) throws IOException {
         if (TextUtils.isEmpty(soloLinkId)) {
             LinkConnectionStatus connectionStatus = LinkConnectionStatus
                 .newFailedConnectionStatus(LinkConnectionStatus.INVALID_CREDENTIALS, "Invalid connection credentials!");
@@ -60,6 +61,11 @@ public class SoloConnection extends AndroidMavLinkConnection implements WifiConn
             wifiHandler.start();
             checkScanResults(wifiHandler.getScanResults());
         }
+    }
+
+    @Override
+    public Bundle getConnectionExtras(){
+        return dataLink.getConnectionExtras();
     }
 
     private void refreshWifiAps() {
@@ -97,13 +103,13 @@ public class SoloConnection extends AndroidMavLinkConnection implements WifiConn
     }
 
     @Override
-    public void onWifiConnected(String wifiSsid) {
+    public void onWifiConnected(String wifiSsid, Bundle extras) {
         if (isConnecting()) {
             //Let's see if we're connected to our target wifi
             if (wifiSsid.equalsIgnoreCase(soloLinkId)) {
                 //We're good to go
                 try {
-                    dataLink.openConnection();
+                    dataLink.openConnection(extras);
                 } catch (IOException e) {
                     reportIOException(e);
                     Timber.e(e, e.getMessage());
@@ -151,7 +157,14 @@ public class SoloConnection extends AndroidMavLinkConnection implements WifiConn
         if (targetResult != null) {
             //We're good to go
             try {
-                int connectionResult = wifiHandler.connectToWifi(targetResult, soloLinkPassword);
+                Bundle connectInfo = new Bundle();
+                Bundle extras = super.getConnectionExtras();
+                if (extras != null && !extras.isEmpty()) {
+                    connectInfo.putAll(extras);
+                }
+                connectInfo.putParcelable(WifiConnectionHandler.EXTRA_SCAN_RESULT, targetResult);
+                connectInfo.putString(WifiConnectionHandler.EXTRA_SSID_PASSWORD, soloLinkPassword);
+                int connectionResult = wifiHandler.connectToWifi(connectInfo);
                 if (connectionResult != 0) {
                     @LinkConnectionStatus.FailureCode int failureCode = connectionResult;
                     LinkConnectionStatus connectionStatus = LinkConnectionStatus

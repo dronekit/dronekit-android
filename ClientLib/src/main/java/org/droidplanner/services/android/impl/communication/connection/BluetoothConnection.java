@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
+import android.os.Bundle;
 import android.os.ParcelUuid;
 import android.util.Log;
 
@@ -38,7 +39,7 @@ public class BluetoothConnection extends AndroidMavLinkConnection {
     }
 
     @Override
-    protected void openConnection() throws IOException {
+    protected void openConnection(Bundle connectionExtras) throws IOException {
         Log.d(BLUE, "Connect");
 
         // Reset the bluetooth connection

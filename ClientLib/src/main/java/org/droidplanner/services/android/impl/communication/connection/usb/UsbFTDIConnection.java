@@ -1,6 +1,7 @@
 package org.droidplanner.services.android.impl.communication.connection.usb;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.util.Log;
 
 import com.ftdi.j2xx.D2xxManager;
@@ -22,7 +23,7 @@ class UsbFTDIConnection extends UsbConnection.UsbConnectionImpl {
 	}
 
 	@Override
-	protected void openUsbConnection() throws IOException {
+	protected void openUsbConnection(Bundle extras) throws IOException {
 		D2xxManager ftD2xx = null;
 		try {
 			ftD2xx = D2xxManager.getInstance(mContext);

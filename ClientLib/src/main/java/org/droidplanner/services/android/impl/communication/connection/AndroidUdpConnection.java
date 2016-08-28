@@ -1,6 +1,7 @@
 package org.droidplanner.services.android.impl.communication.connection;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.util.Log;
 
 import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
@@ -88,9 +89,9 @@ public class AndroidUdpConnection extends AndroidIpConnection {
     }
 
     @Override
-    protected void onOpenConnection() throws IOException {
+    protected void onOpenConnection(Bundle extras) throws IOException {
         Log.d(TAG, "Opening udp connection");
-        mConnectionImpl.openConnection();
+        mConnectionImpl.openConnection(extras);
 
         if (pingRunner == null || pingRunner.isShutdown())
             pingRunner = Executors.newSingleThreadScheduledExecutor();

@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
+import android.os.Bundle;
 import android.util.Log;
 
 import com.hoho.android.usbserial.driver.UsbSerialDriver;
@@ -103,7 +104,7 @@ class UsbCDCConnection extends UsbConnection.UsbConnectionImpl {
     }
 
     @Override
-    protected void openUsbConnection() throws IOException {
+    protected void openUsbConnection(Bundle extras) throws IOException {
         registerUsbPermissionBroadcastReceiver();
 
         // Get UsbManager from Android.

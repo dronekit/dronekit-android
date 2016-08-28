@@ -173,7 +173,7 @@ public class MAVLinkClient implements DataLink.DataLinkProvider<MAVLinkMessage> 
         }
 
         if (mavlinkConn.getConnectionStatus() == MavLinkConnection.MAVLINK_DISCONNECTED) {
-            mavlinkConn.connect();
+            mavlinkConn.connect(null);
         }
     }
 

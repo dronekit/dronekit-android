@@ -3,12 +3,14 @@ package org.droidplanner.services.android.impl.communication.connection.usb;
 import android.content.Context;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
+import android.os.Bundle;
 import android.util.Log;
+
+import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
 
 import org.droidplanner.services.android.impl.communication.connection.AndroidMavLinkConnection;
 import org.droidplanner.services.android.impl.core.MAVLink.connection.MavLinkConnectionTypes;
 import org.droidplanner.services.android.impl.core.model.Logger;
-import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
 import org.droidplanner.services.android.impl.utils.AndroidLogger;
 
 import java.io.IOException;
@@ -42,10 +44,10 @@ public class UsbConnection extends AndroidMavLinkConnection {
     }
 
     @Override
-    protected void openConnection() throws IOException {
+    protected void openConnection(Bundle connectionExtras) throws IOException {
         if (mUsbConnection != null) {
             try {
-                mUsbConnection.openUsbConnection();
+                mUsbConnection.openUsbConnection(connectionExtras);
                 Log.d(TAG, "Reusing previous usb connection.");
                 return;
             } catch (IOException e) {
@@ -57,7 +59,7 @@ public class UsbConnection extends AndroidMavLinkConnection {
         if (isFTDIdevice(context)) {
             final UsbConnectionImpl tmp = new UsbFTDIConnection(context, this, mBaudRate);
             try {
-                tmp.openUsbConnection();
+                tmp.openUsbConnection(connectionExtras);
 
                 // If the call above is successful, 'mUsbConnection' will be set.
                 mUsbConnection = tmp;
@@ -73,7 +75,7 @@ public class UsbConnection extends AndroidMavLinkConnection {
             final UsbConnectionImpl tmp = new UsbCDCConnection(context, this, mBaudRate);
 
             // If an error happens here, let it propagate up the call chain since this is the fallback.
-            tmp.openUsbConnection();
+            tmp.openUsbConnection(connectionExtras);
             mUsbConnection = tmp;
             Log.d(TAG, "Using open-source usb connection.");
         }
@@ -148,7 +150,7 @@ public class UsbConnection extends AndroidMavLinkConnection {
 
         protected abstract void closeUsbConnection() throws IOException;
 
-        protected abstract void openUsbConnection() throws IOException;
+        protected abstract void openUsbConnection(Bundle extras) throws IOException;
 
         protected abstract int readDataBlock(byte[] readData) throws IOException;
 
