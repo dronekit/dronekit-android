@@ -17,6 +17,8 @@ import com.o3dr.services.android.lib.drone.action.CameraActions;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.model.ICommandListener;
 
+import org.droidplanner.services.android.impl.communication.model.DataLink;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
@@ -44,6 +46,7 @@ public class VideoManager implements IpConnectionListener {
     private static final int UDP_BUFFER_SIZE = 1500;
 
     private final AtomicBoolean videoStreamObserverUsed = new AtomicBoolean(false);
+    private final DataLink.DataLinkProvider linkProvider;
 
     public interface LinkListener {
         void onLinkConnected();
@@ -56,7 +59,7 @@ public class VideoManager implements IpConnectionListener {
         public void run() {
             handler.removeCallbacks(reconnectTask);
             if(linkConn != null)
-                linkConn.connect();
+                linkConn.connect(linkProvider.getConnectionExtras());
         }
     };
 
@@ -76,12 +79,13 @@ public class VideoManager implements IpConnectionListener {
 
     private int linkPort = -1;
 
-    public VideoManager(Context context, Handler handler) {
+    public VideoManager(Context context, Handler handler, DataLink.DataLinkProvider linkProvider) {
         this.streamRecorder = new StreamRecorder(context);
 
         this.handler = handler;
         this.mediaCodecManager = new MediaCodecManager(handler);
         this.mediaCodecManager.setNaluChunkListener(streamRecorder);
+        this.linkProvider = linkProvider;
     }
 
     private void enableLocalRecording(String filename) {
@@ -164,7 +168,7 @@ public class VideoManager implements IpConnectionListener {
 
         isStarted.set(true);
         this.streamRecorder.startConverterThread();
-        this.linkConn.connect();
+        this.linkConn.connect(linkProvider.getConnectionExtras());
         this.linkListener = listener;
     }
 

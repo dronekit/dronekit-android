@@ -7,10 +7,6 @@ import android.text.TextUtils;
 import com.o3dr.android.client.BuildConfig;
 import com.o3dr.android.client.utils.connection.TcpConnection;
 import com.o3dr.android.client.utils.connection.UdpConnection;
-import org.droidplanner.services.android.impl.core.drone.autopilot.apm.solo.AbstractLinkManager;
-import org.droidplanner.services.android.impl.core.drone.autopilot.apm.solo.SoloComp;
-import org.droidplanner.services.android.impl.core.drone.autopilot.apm.solo.controller.ControllerLinkManager;
-import org.droidplanner.services.android.impl.utils.connection.SshConnection;
 import com.o3dr.services.android.lib.drone.companion.solo.button.ButtonTypes;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSetting;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSettingGetter;
@@ -22,6 +18,12 @@ import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
 import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.model.SimpleCommandListener;
+
+import org.droidplanner.services.android.impl.communication.model.DataLink;
+import org.droidplanner.services.android.impl.core.drone.autopilot.apm.solo.AbstractLinkManager;
+import org.droidplanner.services.android.impl.core.drone.autopilot.apm.solo.SoloComp;
+import org.droidplanner.services.android.impl.core.drone.autopilot.apm.solo.controller.ControllerLinkManager;
+import org.droidplanner.services.android.impl.utils.connection.SshConnection;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
@@ -49,7 +51,7 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
 
     private final UdpConnection followDataConn;
 
-    private static final SshConnection sshLink = new SshConnection(getSoloLinkIp(), SoloComp.SSH_USERNAME, SoloComp.SSH_PASSWORD);
+    private final SshConnection sshLink;
 
     private final SoloButtonSettingGetter presetButtonAGetter = new SoloButtonSettingGetter(ButtonTypes.BUTTON_A,
         ButtonTypes.BUTTON_EVENT_PRESS);
@@ -106,9 +108,13 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
 
     private SoloLinkListener linkListener;
 
-    public SoloLinkManager(Context context, Handler handler, ExecutorService asyncExecutor) {
-        super(context, new TcpConnection(handler, getSoloLinkIp(), SOLO_LINK_TCP_PORT), handler, asyncExecutor);
+    public SoloLinkManager(Context context, Handler handler, ExecutorService asyncExecutor,
+                           DataLink.DataLinkProvider mavClient) {
+        super(context, new TcpConnection(handler, getSoloLinkIp(), SOLO_LINK_TCP_PORT), handler,
+            asyncExecutor,
+            mavClient);
 
+        sshLink  = new SshConnection(getSoloLinkIp(), SoloComp.SSH_USERNAME, SoloComp.SSH_PASSWORD, mavClient);
         UdpConnection dataConn = null;
         try {
             dataConn = new UdpConnection(handler, getSoloLinkIp(), SHOT_FOLLOW_UDP_PORT, 14557);
@@ -320,7 +326,7 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
 
     public void enableFollowDataConnection() {
         if (followDataConn != null) {
-            followDataConn.connect();
+            followDataConn.connect(linkProvider.getConnectionExtras());
         }
     }
 

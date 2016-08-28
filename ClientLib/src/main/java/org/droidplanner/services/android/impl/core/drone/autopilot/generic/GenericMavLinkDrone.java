@@ -128,7 +128,7 @@ public class GenericMavLinkDrone implements MavLinkDrone {
         this.state = new State(this, handler, warningParser);
         parameterManager = new ParameterManager(this, context, handler);
 
-        this.videoMgr = new VideoManager(context, handler);
+        this.videoMgr = new VideoManager(context, handler, mavClient);
     }
 
     @Override

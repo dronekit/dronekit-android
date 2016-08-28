@@ -60,7 +60,7 @@ public class ArduSolo extends ArduCopter {
     private final Runnable disconnectSoloCompTask = new Runnable() {
         @Override
         public void run() {
-            if (soloComp != null && soloComp.isConnected()) {
+            if (soloComp.isConnected()) {
                 soloComp.stop();
             }
 
@@ -75,7 +75,7 @@ public class ArduSolo extends ArduCopter {
     public ArduSolo(String droneId, Context context, DataLink.DataLinkProvider<MAVLinkMessage> mavClient, Handler handler,
                     AutopilotWarningParser warningParser, LogMessageListener logListener) {
         super(droneId, context, mavClient, handler, warningParser, logListener);
-        this.soloComp = new SoloComp(context, handler);
+        this.soloComp = new SoloComp(context, handler, mavClient);
         this.soloComp.setListener(new SoloComp.SoloCompListener() {
             @Override
             public void onConnected() {

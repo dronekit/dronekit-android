@@ -1,5 +1,7 @@
 package org.droidplanner.services.android.impl.communication.model;
 
+import android.os.Bundle;
+
 import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
 import com.o3dr.services.android.lib.model.ICommandListener;
 
@@ -14,6 +16,8 @@ public class DataLink {
         void openConnection();
 
         void closeConnection();
+
+        Bundle getConnectionExtras();
 
     }
 

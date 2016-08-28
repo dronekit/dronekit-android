@@ -1,9 +1,9 @@
 package org.droidplanner.services.android.impl.core.MAVLink.connection;
 
 import android.content.Context;
-import android.net.Network;
-import android.os.Build;
 import android.os.Bundle;
+
+import org.droidplanner.services.android.impl.utils.NetworkUtils;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -32,16 +32,7 @@ public abstract class UdpConnection extends MavLinkConnection {
         final DatagramSocket socket = new DatagramSocket(serverPort);
         socket.setBroadcast(true);
         socket.setReuseAddress(true);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            Network network = extras == null
-                ? null
-                : (Network) extras.getParcelable(MavLinkConnection.EXTRA_NETWORK);
-            if (network != null) {
-                network.bindSocket(socket);
-            }
-        }
-
+        NetworkUtils.bindSocketToNetwork(extras, socket);
         socketRef.set(socket);
     }
 
