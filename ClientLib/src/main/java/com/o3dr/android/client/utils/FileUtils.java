@@ -15,7 +15,7 @@ import java.util.Locale;
 public class FileUtils {
 
     public static final String CAMERA_FILENAME_EXT = ".xml";
-    public static final SimpleDateFormat timestampFormatter = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss", Locale.US);
+    public static final SimpleDateFormat timestampFormatter = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss_SSS", Locale.US);
 
 	public static File[] getCameraInfoFileList(Context context) {
 		FilenameFilter filter = new FilenameFilter() {
