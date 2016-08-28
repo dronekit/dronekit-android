@@ -194,6 +194,14 @@ public class MAVLinkClient implements DataLink.DataLinkProvider<MAVLinkMessage> 
         listener.onConnectionStatus(new LinkConnectionStatus(LinkConnectionStatus.DISCONNECTED, null));
     }
 
+    public Bundle getConnectionExtras() {
+        if (mavlinkConn == null) {
+            return null;
+        }
+
+        return mavlinkConn.getConnectionExtras();
+    }
+
     @Override
     public synchronized void sendMessage(MAVLinkMessage message, ICommandListener listener) {
         sendMavMessage(message, DEFAULT_SYS_ID, DEFAULT_COMP_ID, listener);

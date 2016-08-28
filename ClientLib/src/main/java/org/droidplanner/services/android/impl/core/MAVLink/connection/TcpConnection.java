@@ -1,6 +1,8 @@
 package org.droidplanner.services.android.impl.core.MAVLink.connection;
 
 import android.content.Context;
+import android.net.Network;
+import android.os.Build;
 import android.os.Bundle;
 
 import java.io.BufferedInputStream;
@@ -30,7 +32,7 @@ public abstract class TcpConnection extends MavLinkConnection {
 
     @Override
     public final void openConnection(Bundle connectionExtras) throws IOException {
-        getTCPStream();
+        getTCPStream(connectionExtras);
         onConnectionOpened();
     }
 
@@ -64,9 +66,19 @@ public abstract class TcpConnection extends MavLinkConnection {
         }
     }
 
-    private void getTCPStream() throws IOException {
+    private void getTCPStream(Bundle extras) throws IOException {
         InetAddress serverAddr = InetAddress.getByName(serverIP);
         socket = new Socket();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Network network = extras == null
+                ? null
+                : (Network) extras.getParcelable(MavLinkConnection.EXTRA_NETWORK);
+            if (network != null) {
+                network.bindSocket(socket);
+            }
+        }
+
         socket.connect(new InetSocketAddress(serverAddr, serverPort), CONNECTION_TIMEOUT);
         mavOut = new BufferedOutputStream((socket.getOutputStream()));
         mavIn = new BufferedInputStream(socket.getInputStream());
