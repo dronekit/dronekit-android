@@ -97,7 +97,7 @@ public class NetworkUtils {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 network.bindSocket(socket);
             } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                // Can be access through reflection.
+                // Can be accessed through reflection.
                 try {
                     Method bindSocketMethod = Network.class.getMethod("bindSocket", DatagramSocket.class);
                     bindSocketMethod.invoke(network, socket);
