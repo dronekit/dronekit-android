@@ -15,15 +15,12 @@ import com.jcraft.jsch.SocketFactory;
 import org.droidplanner.services.android.impl.communication.model.DataLink;
 import org.droidplanner.services.android.impl.core.MAVLink.connection.MavLinkConnection;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
@@ -70,7 +67,6 @@ public class SshConnection {
     private Session getSession() throws JSchException {
         Session session = jsch.getSession(username, host);
 
-        //Try to connect with the password set.
         Bundle extras = linkProvider.getConnectionExtras();
         if (extras != null && !extras.isEmpty()) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -401,19 +397,17 @@ public class SshConnection {
 
         @Override
         public Socket createSocket(String host, int port) throws IOException, UnknownHostException {
-            Socket socket = socketFactory.createSocket(host, port);
-            socket.connect(new InetSocketAddress(host, port));
-            return socket;
+            return socketFactory.createSocket(host, port);
         }
 
         @Override
         public InputStream getInputStream(Socket socket) throws IOException {
-            return new BufferedInputStream(socket.getInputStream());
+            return socket.getInputStream();
         }
 
         @Override
         public OutputStream getOutputStream(Socket socket) throws IOException {
-            return new BufferedOutputStream(socket.getOutputStream());
+            return socket.getOutputStream();
         }
     }
 }
