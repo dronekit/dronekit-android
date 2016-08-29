@@ -14,6 +14,7 @@ import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
 import org.droidplanner.services.android.impl.utils.connection.WifiConnectionHandler;
 
 import java.io.IOException;
+import java.sql.Connection;
 import java.util.List;
 
 import timber.log.Timber;
@@ -201,13 +202,13 @@ public class SoloConnection extends AndroidMavLinkConnection implements WifiConn
         }
     }
 
-    public static ConnectionParameter getSoloConnectionParameterFromUdp(Context context, Uri tLogLoggingUri){
+    public static ConnectionParameter getSoloConnectionParameterFromUdp(Context context, ConnectionParameter udpConnectionParameters){
         if(context == null)
             return null;
 
         final String wifiSsid = WifiConnectionHandler.getCurrentWifiLink((WifiManager) context.getSystemService(Context.WIFI_SERVICE));
         if(WifiConnectionHandler.isSoloWifi(wifiSsid)){
-            return ConnectionParameter.newSoloConnection(wifiSsid, null, tLogLoggingUri);
+            return ConnectionParameter.newSoloConnection(wifiSsid, null, udpConnectionParameters.getTLogLoggingUri(), udpConnectionParameters.getEventsDispatchingPeriod());
         }
 
         return null;
