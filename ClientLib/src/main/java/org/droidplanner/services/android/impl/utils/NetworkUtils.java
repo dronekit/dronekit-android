@@ -16,8 +16,12 @@ import org.droidplanner.services.android.impl.core.MAVLink.connection.MavLinkCon
 import org.droidplanner.services.android.impl.core.drone.autopilot.apm.solo.SoloComp;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.DatagramSocket;
 import java.net.Socket;
+
+import timber.log.Timber;
 
 /**
  * Created by Fredia Huya-Kouadio on 5/11/15.
@@ -71,13 +75,14 @@ public class NetworkUtils {
     public static void bindSocketToNetwork(Network network, Socket socket) throws IOException {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             if (network != null && socket != null) {
+                Timber.d("Binding socket to network %s", network);
                 network.bindSocket(socket);
             }
         }
     }
 
     public static void bindSocketToNetwork(Bundle extras, DatagramSocket socket) throws IOException {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Network network = extras == null
                 ? null
                 : (Network) extras.getParcelable(MavLinkConnection.EXTRA_NETWORK);
@@ -85,11 +90,22 @@ public class NetworkUtils {
         }
     }
 
-    @TargetApi(23)
+    @TargetApi(21)
     public static void bindSocketToNetwork(Network network, DatagramSocket socket) throws IOException {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (network != null && socket != null) {
+        if (network != null && socket != null) {
+            Timber.d("Binding datagram socket to network %s", network);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 network.bindSocket(socket);
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                // Can be access through reflection.
+                try {
+                    Method bindSocketMethod = Network.class.getMethod("bindSocket", DatagramSocket.class);
+                    bindSocketMethod.invoke(network, socket);
+                } catch (NoSuchMethodException | IllegalAccessException e) {
+                    Timber.e(e, "Unable to access Network#bindSocket(DatagramSocket).");
+                } catch (InvocationTargetException e) {
+                    Timber.e(e, "Unable to invoke Network#bindSocket(DatagramSocket).");
+                }
             }
         }
     }
