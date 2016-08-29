@@ -18,10 +18,13 @@ import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
+import android.os.Bundle;
 import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
+
+import org.droidplanner.services.android.impl.core.MAVLink.connection.MavLinkConnection;
 import org.droidplanner.services.android.impl.utils.NetworkUtils;
 
 import java.util.List;
@@ -34,8 +37,12 @@ import timber.log.Timber;
  */
 public class WifiConnectionHandler {
 
+    public static final String EXTRA_SSID = "extra_ssid";
+    public static final String EXTRA_SSID_PASSWORD = "extra_ssid_password";
+    public static final String EXTRA_SCAN_RESULT = "extra_scan_result";
+
     public interface WifiConnectionListener {
-        void onWifiConnected(String wifiSsid);
+        void onWifiConnected(String wifiSsid, Bundle extras);
 
         void onWifiConnecting();
 
@@ -104,7 +111,7 @@ public class WifiConnectionHandler {
                             }
 
                             if (wifiSSID != null) {
-                                setDefaultNetworkIfNecessary(wifiSSID);
+                                updateNetworkIfNecessary(wifiSSID, null);
                             }
                             break;
 
@@ -118,7 +125,7 @@ public class WifiConnectionHandler {
                                 NetworkInfo.DetailedState detailedState = netInfo.getDetailedState();
                                 if (detailedState != null && detailedState == NetworkInfo.DetailedState.VERIFYING_POOR_LINK) {
                                     String connectingSsid = NetworkUtils.getCurrentWifiLink(context);
-                                    setDefaultNetworkIfNecessary(connectingSsid);
+                                    updateNetworkIfNecessary(connectingSsid, null);
                                 }
                             }
                             Timber.d("Connecting to wifi network.");
@@ -179,26 +186,20 @@ public class WifiConnectionHandler {
                     //Check if we're still connected to solo. If not, unregister the callbacks
                     final String currentWifi = getCurrentWifiLink();
                     if (!isSoloWifi(currentWifi)) {
-                        resetNetworkBindings(this);
+                        try {
+                            connMgr.unregisterNetworkCallback(this);
+                        } catch (IllegalArgumentException e) {
+                            Timber.w(e, "Network callback was not registered.");
+                        }
                         return;
                     }
 
                     Timber.i("Network %s is available", network);
                     getNetworkInfo(network);
 
-                    final boolean wasBound;
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        wasBound = connMgr.bindProcessToNetwork(network);
-                    } else {
-                        wasBound = ConnectivityManager.setProcessDefaultNetwork(network);
-                    }
-
-                    if (wasBound) {
-                        Timber.i("Bound process to network %s", network);
-                        notifyWifiConnected(currentWifi);
-                    } else {
-                        Timber.w("Unable to bind process to network %s", network);
-                    }
+                    Bundle extras = new Bundle(1);
+                    extras.putParcelable(MavLinkConnection.EXTRA_NETWORK, network);
+                    notifyWifiConnected(currentWifi, extras);
                 }
 
                 @Override
@@ -241,25 +242,11 @@ public class WifiConnectionHandler {
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            resetNetworkBindings((ConnectivityManager.NetworkCallback) netReqCb);
-        }
-    }
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private void resetNetworkBindings(ConnectivityManager.NetworkCallback netCb) {
-        Timber.i("Unregistering network callbacks.");
-
-        connectedWifi.set(NetworkUtils.getCurrentWifiLink(context));
-        try {
-            connMgr.unregisterNetworkCallback(netCb);
-        } catch (IllegalArgumentException e) {
-            Timber.w(e, "Network callback was not registered.");
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            connMgr.bindProcessToNetwork(null);
-        } else {
-            ConnectivityManager.setProcessDefaultNetwork(null);
+            try {
+                connMgr.unregisterNetworkCallback((ConnectivityManager.NetworkCallback) netReqCb);
+            } catch (IllegalArgumentException e) {
+                Timber.w(e, "Network callback was not registered.");
+            }
         }
     }
 
@@ -288,19 +275,15 @@ public class WifiConnectionHandler {
         return wifiSsid.equalsIgnoreCase(getCurrentWifiLink());
     }
 
-    public boolean isConnected(String wifiSSID) {
+    public boolean isConnected(String wifiSSID, Bundle info) {
         if (!isOnNetwork(wifiSSID)) {
             return false;
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Network network;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                network = connMgr.getBoundNetworkForProcess();
-            } else {
-                network = ConnectivityManager.getProcessDefaultNetwork();
-            }
-
+            Network network = info == null
+                ? null
+                : (Network) info.getParcelable(MavLinkConnection.EXTRA_NETWORK);
             if (network == null) {
                 return false;
             }
@@ -316,52 +299,58 @@ public class WifiConnectionHandler {
         return wifiMgr.getScanResults();
     }
 
-    public int connectToWifi(String soloLinkId, String password) {
-        if (TextUtils.isEmpty(soloLinkId)) {
+    private ScanResult getScanResult(String ssid) {
+        if (TextUtils.isEmpty(ssid)) {
+            return null;
+        }
+        final List<ScanResult> scanResults = wifiMgr.getScanResults();
+        for (ScanResult result : scanResults) {
+            if (result.SSID.equalsIgnoreCase(ssid)) {
+                return result;
+            }
+        }
+        return null;
+    }
+
+    public int connectToWifi(Bundle info) {
+        if (info == null || info.isEmpty()) {
             return LinkConnectionStatus.INVALID_CREDENTIALS;
         }
 
-        ScanResult targetScanResult = null;
-        final List<ScanResult> scanResults = wifiMgr.getScanResults();
-        for (ScanResult result : scanResults) {
-            if (result.SSID.equalsIgnoreCase(soloLinkId)) {
-                targetScanResult = result;
-                break;
-            }
-        }
-
-        if (targetScanResult == null) {
-            Timber.i("No matching scan result was found for id %s", soloLinkId);
-            return LinkConnectionStatus.LINK_UNAVAILABLE;
-        }
-
-        return connectToWifi(targetScanResult, password);
-    }
-
-    public int connectToWifi(ScanResult scanResult, String password) {
+        ScanResult scanResult = info.getParcelable(EXTRA_SCAN_RESULT);
         if (scanResult == null) {
-            return LinkConnectionStatus.LINK_UNAVAILABLE;
+            // Check if the ssid was given.
+            String ssid = info.getString(EXTRA_SSID);
+            if (TextUtils.isEmpty(ssid)) {
+                return LinkConnectionStatus.INVALID_CREDENTIALS;
+            }
+
+            // Get the scan result that match the given ssid.
+            scanResult = getScanResult(ssid);
+            if (scanResult == null) {
+                Timber.i("No matching scan result was found for id %s", ssid);
+                return LinkConnectionStatus.LINK_UNAVAILABLE;
+            }
         }
 
         Timber.d("Connecting to wifi " + scanResult.SSID);
 
-
         //Check if we're already connected to the given network.
-        if (isConnected(scanResult.SSID)) {
+        if (isConnected(scanResult.SSID, info)) {
             Timber.d("Already connected to " + scanResult.SSID);
 
-            notifyWifiConnected(scanResult.SSID);
+            notifyWifiConnected(scanResult.SSID, info);
             return 0;
         } else if (isOnNetwork(scanResult.SSID)) {
-            setDefaultNetworkIfNecessary(scanResult.SSID);
+            updateNetworkIfNecessary(scanResult.SSID, info);
             return 0;
-
         }
 
         WifiConfiguration wifiConfig = getWifiConfigs(scanResult.SSID);
 
         //Network is not configured and needs a password to connect
         if (wifiConfig == null) {
+            String password = info.getString(EXTRA_SSID_PASSWORD);
             Timber.d("Connecting to closed wifi network.");
             if (TextUtils.isEmpty(password)) {
                 return LinkConnectionStatus.INVALID_CREDENTIALS;
@@ -433,35 +422,30 @@ public class WifiConnectionHandler {
         return !TextUtils.isEmpty(wifiSsid) && wifiSsid.startsWith(SOLO_LINK_WIFI_PREFIX);
     }
 
-    private void setDefaultNetworkIfNecessary(String wifiSsid) {
+    private void updateNetworkIfNecessary(String wifiSsid, Bundle info) {
         final String trimmedSsid = trimWifiSsid(wifiSsid);
 
-        if (!trimmedSsid.equals(connectedWifi.get())) {
-            connectedWifi.set(trimmedSsid);
+        if (isConnected(wifiSsid, info)) {
+            notifyWifiConnected(wifiSsid, info);
+            return;
+        }
 
-            if (isConnected(wifiSsid)) {
-                notifyWifiConnected(wifiSsid);
-                return;
-            }
-
-            if (isSoloWifi(trimmedSsid)) {
-                //Attempt to connect to the vehicle.
-                Timber.i("Requesting route to sololink network");
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    connMgr.requestNetwork((NetworkRequest) netReq, (ConnectivityManager.NetworkCallback) netReqCb);
-                } else {
-                    notifyWifiConnected(trimmedSsid);
-
-                }
+        if (isSoloWifi(trimmedSsid)) {
+            //Attempt to connect to the vehicle.
+            Timber.i("Requesting route to sololink network");
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                connMgr.requestNetwork((NetworkRequest) netReq, (ConnectivityManager.NetworkCallback) netReqCb);
             } else {
-                notifyWifiConnected(trimmedSsid);
+                notifyWifiConnected(trimmedSsid, info);
             }
+        } else {
+            notifyWifiConnected(trimmedSsid, info);
         }
     }
 
-    private void notifyWifiConnected(String wifiSsid) {
+    private void notifyWifiConnected(String wifiSsid, Bundle extras) {
         if (listener != null) {
-            listener.onWifiConnected(wifiSsid);
+            listener.onWifiConnected(wifiSsid, extras);
         }
     }
 

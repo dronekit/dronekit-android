@@ -1,6 +1,9 @@
 package org.droidplanner.services.android.impl.core.MAVLink.connection;
 
 import android.content.Context;
+import android.os.Bundle;
+
+import org.droidplanner.services.android.impl.utils.NetworkUtils;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -25,10 +28,11 @@ public abstract class UdpConnection extends MavLinkConnection {
         super(context);
     }
 
-    private void getUdpStream() throws IOException {
+    private void getUdpStream(Bundle extras) throws IOException {
         final DatagramSocket socket = new DatagramSocket(serverPort);
         socket.setBroadcast(true);
         socket.setReuseAddress(true);
+        NetworkUtils.bindSocketToNetwork(extras, socket);
         socketRef.set(socket);
     }
 
@@ -41,9 +45,9 @@ public abstract class UdpConnection extends MavLinkConnection {
     }
 
     @Override
-    public final void openConnection() throws IOException {
-        getUdpStream();
-        onConnectionOpened();
+    public final void openConnection(Bundle connectionExtras) throws IOException {
+        getUdpStream(connectionExtras);
+        onConnectionOpened(connectionExtras);
     }
 
     @Override

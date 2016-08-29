@@ -360,7 +360,7 @@ public class ExperimentalApi extends Api {
             public void run() {
                 handler.removeCallbacks(reconnectTask);
                 if (linkConn != null)
-                    linkConn.connect();
+                    linkConn.connect(null);
             }
         };
 
@@ -374,7 +374,7 @@ public class ExperimentalApi extends Api {
             handler.removeCallbacks(reconnectTask);
 
             Log.d(TAG, "Connecting to video stream...");
-            this.linkConn.connect();
+            this.linkConn.connect(null);
         }
 
         public void stop() {

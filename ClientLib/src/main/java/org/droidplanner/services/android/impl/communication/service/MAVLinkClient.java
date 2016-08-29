@@ -173,7 +173,7 @@ public class MAVLinkClient implements DataLink.DataLinkProvider<MAVLinkMessage> 
         }
 
         if (mavlinkConn.getConnectionStatus() == MavLinkConnection.MAVLINK_DISCONNECTED) {
-            mavlinkConn.connect();
+            mavlinkConn.connect(null);
         }
     }
 
@@ -192,6 +192,15 @@ public class MAVLinkClient implements DataLink.DataLinkProvider<MAVLinkMessage> 
         }
 
         listener.onConnectionStatus(new LinkConnectionStatus(LinkConnectionStatus.DISCONNECTED, null));
+    }
+
+    @Override
+    public Bundle getConnectionExtras() {
+        if (mavlinkConn == null) {
+            return null;
+        }
+
+        return mavlinkConn.getConnectionExtras();
     }
 
     @Override

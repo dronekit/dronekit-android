@@ -1,6 +1,7 @@
 package org.droidplanner.services.android.impl.communication.connection;
 
 import android.content.Context;
+import android.os.Bundle;
 
 import org.droidplanner.services.android.impl.utils.connection.WifiConnectionHandler;
 
@@ -13,24 +14,20 @@ public abstract class AndroidIpConnection extends AndroidMavLinkConnection {
 
     private final WifiConnectionHandler wifiHandler;
 
-    public AndroidIpConnection(Context applicationContext) {
-        this(applicationContext, null);
-    }
-
     protected AndroidIpConnection(Context context, WifiConnectionHandler wifiHandler){
         super(context);
         this.wifiHandler = wifiHandler;
     }
 
     @Override
-    protected final void openConnection() throws IOException {
+    protected final void openConnection(Bundle connectionExtras) throws IOException {
         if(this.wifiHandler != null) {
             this.wifiHandler.start();
         }
-        onOpenConnection();
+        onOpenConnection(connectionExtras);
     }
 
-    protected abstract void onOpenConnection() throws IOException;
+    protected abstract void onOpenConnection(Bundle extras) throws IOException;
 
     @Override
     protected final void closeConnection() throws IOException {

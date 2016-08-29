@@ -6,12 +6,9 @@ import android.text.TextUtils;
 import android.util.Pair;
 
 import com.github.zafarkhaja.semver.Version;
-
 import com.o3dr.android.client.utils.TxPowerComplianceCountries;
 import com.o3dr.android.client.utils.connection.IpConnectionListener;
 import com.o3dr.android.client.utils.connection.TcpConnection;
-import org.droidplanner.services.android.impl.core.drone.autopilot.apm.solo.AbstractLinkManager;
-import org.droidplanner.services.android.impl.core.drone.autopilot.apm.solo.SoloComp;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.drone.companion.solo.button.ButtonPacket;
 import com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerMode;
@@ -19,6 +16,10 @@ import com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControl
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageParser;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
 import com.o3dr.services.android.lib.model.ICommandListener;
+
+import org.droidplanner.services.android.impl.communication.model.DataLink;
+import org.droidplanner.services.android.impl.core.drone.autopilot.apm.solo.AbstractLinkManager;
+import org.droidplanner.services.android.impl.core.drone.autopilot.apm.solo.SoloComp;
 import org.droidplanner.services.android.impl.utils.NetworkUtils;
 import org.droidplanner.services.android.impl.utils.connection.SshConnection;
 
@@ -74,7 +75,7 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
         @Override
         public void run() {
             handler.removeCallbacks(this);
-            batteryConnection.connect();
+            batteryConnection.connect(linkProvider.getConnectionExtras());
         }
     };
 
@@ -82,7 +83,7 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
         @Override
         public void run() {
             handler.removeCallbacks(this);
-            videoHandshake.connect();
+            videoHandshake.connect(linkProvider.getConnectionExtras());
         }
     };
 
@@ -93,8 +94,7 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
     private final TcpConnection videoHandshake;
     private final TcpConnection batteryConnection;
 
-    protected static final SshConnection sshLink = new SshConnection(ARTOO_IP, SoloComp.SSH_USERNAME,
-            SoloComp.SSH_PASSWORD);
+    protected final SshConnection sshLink;
 
     private final Runnable artooVersionRetriever = new Runnable() {
         @Override
@@ -214,9 +214,14 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
     private ControllerLinkListener linkListener;
     private final AtomicBoolean streamingPermission = new AtomicBoolean(false);
 
-    public ControllerLinkManager(Context context, final Handler handler, ExecutorService asyncExecutor) {
-        super(context, new TcpConnection(handler, ARTOO_IP, ARTOO_BUTTON_PORT), handler, asyncExecutor);
+    public ControllerLinkManager(Context context, final Handler handler, ExecutorService asyncExecutor,
+                                 DataLink.DataLinkProvider linkProvider) {
+        super(context, new TcpConnection(handler, ARTOO_IP, ARTOO_BUTTON_PORT), handler,
+            asyncExecutor,
+            linkProvider);
 
+        this.sshLink = new SshConnection(ARTOO_IP, SoloComp.SSH_USERNAME,
+            SoloComp.SSH_PASSWORD, linkProvider);
         videoHandshake = new TcpConnection(handler, ARTOO_IP, ARTOO_VIDEO_HANDSHAKE_PORT);
         videoHandshake.setIpConnectionListener(new IpConnectionListener() {
 
@@ -333,7 +338,7 @@ public class ControllerLinkManager extends AbstractLinkManager<ControllerLinkLis
     private void startVideoManager() {
         handler.removeCallbacks(reconnectVideoHandshake);
         isVideoHandshakeStarted.set(true);
-        videoHandshake.connect();
+        videoHandshake.connect(linkProvider.getConnectionExtras());
     }
 
     private void stopVideoManager() {

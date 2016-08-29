@@ -1,7 +1,10 @@
 package com.o3dr.android.client.utils.connection;
 
+import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+
+import org.droidplanner.services.android.impl.utils.NetworkUtils;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -51,13 +54,14 @@ public class UdpConnection extends AbstractIpConnection {
     }
 
     @Override
-    protected void open() throws IOException {
+    protected void open(Bundle extras) throws IOException {
         Log.d(TAG, "Opening udp connection.");
 
         socket = (serverPort == -1) ?new DatagramSocket() : new DatagramSocket(serverPort);
         socket.setBroadcast(true);
         socket.setReuseAddress(true);
         socket.setSoTimeout(readTimeout);
+        NetworkUtils.bindSocketToNetwork(extras, socket);
     }
 
     @Override

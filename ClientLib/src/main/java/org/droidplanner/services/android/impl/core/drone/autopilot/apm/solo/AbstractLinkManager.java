@@ -8,6 +8,8 @@ import android.text.TextUtils;
 import com.o3dr.android.client.utils.connection.AbstractIpConnection;
 import com.o3dr.android.client.utils.connection.IpConnectionListener;
 import com.o3dr.services.android.lib.model.ICommandListener;
+
+import org.droidplanner.services.android.impl.communication.model.DataLink;
 import org.droidplanner.services.android.impl.utils.connection.SshConnection;
 
 import java.io.IOException;
@@ -42,7 +44,7 @@ public abstract class AbstractLinkManager<T extends AbstractLinkManager.LinkList
         @Override
         public void run() {
             handler.removeCallbacks(reconnectTask);
-            linkConn.connect();
+            linkConn.connect(linkProvider.getConnectionExtras());
         }
     };
 
@@ -69,16 +71,22 @@ public abstract class AbstractLinkManager<T extends AbstractLinkManager.LinkList
 
     protected final Context context;
     protected final AbstractIpConnection linkConn;
+    protected final DataLink.DataLinkProvider linkProvider;
 
     private T linkListener;
 
-    public AbstractLinkManager(Context context, AbstractIpConnection ipConn, Handler handler, ExecutorService asyncExecutor) {
+    public AbstractLinkManager(Context context,
+                               AbstractIpConnection ipConn,
+                               Handler handler,
+                               ExecutorService asyncExecutor,
+                               DataLink.DataLinkProvider linkProvider) {
         this.context = context;
         this.linkConn = ipConn;
         this.linkConn.setIpConnectionListener(this);
 
         this.handler = handler;
         this.asyncExecutor = asyncExecutor;
+        this.linkProvider = linkProvider;
     }
 
     protected void postAsyncTask(Runnable task){
@@ -142,7 +150,7 @@ public abstract class AbstractLinkManager<T extends AbstractLinkManager.LinkList
         handler.removeCallbacks(reconnectTask);
 
         isStarted.set(true);
-        this.linkConn.connect();
+        this.linkConn.connect(linkProvider.getConnectionExtras());
 
         this.linkListener = listener;
     }

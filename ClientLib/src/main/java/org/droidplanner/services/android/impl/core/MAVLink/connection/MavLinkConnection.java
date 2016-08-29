@@ -22,6 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Base for mavlink connection implementations.
@@ -41,6 +42,11 @@ public abstract class MavLinkConnection {
      * Size of the buffer used to read messages from the mavlink connection.
      */
     private static final int READ_BUFFER_SIZE = 4096;
+
+    /**
+     * @see {@link android.net.Network}
+     */
+    public static final String EXTRA_NETWORK = "extra_network";
 
     /**
      * Set of listeners subscribed to this mavlink connection. We're using a
@@ -69,6 +75,7 @@ public abstract class MavLinkConnection {
 
     private final AtomicInteger mConnectionStatus = new AtomicInteger(MAVLINK_DISCONNECTED);
     private final AtomicLong mConnectionTime = new AtomicLong(-1);
+    private final AtomicReference<Bundle> extrasHolder = new AtomicReference<>();
 
     /**
      * Start the connection process.
@@ -80,7 +87,7 @@ public abstract class MavLinkConnection {
             loadPreferences();
             // Open the connection
             try {
-                openConnection();
+                openConnection(extrasHolder.get());
             } catch (IOException e) {
                 // Ignore errors while shutting down
                 if (mConnectionStatus.get() != MAVLINK_DISCONNECTED) {
@@ -268,12 +275,9 @@ public abstract class MavLinkConnection {
         this.context = context;
     }
 
-    /**
-     * Establish a mavlink connection. If the connection is successful, it will
-     * be reported through the MavLinkConnectionListener interface.
-     */
-    public void connect() {
+    public void connect(Bundle extras) {
         if (mConnectionStatus.compareAndSet(MAVLINK_DISCONNECTED, MAVLINK_CONNECTING)) {
+            extrasHolder.set(extras);
             mLogger.logInfo(TAG, "Starting connection thread.");
             mConnectThread = new Thread(mConnectingTask, "MavLinkConnection-Connecting Thread");
             mConnectThread.start();
@@ -281,8 +285,9 @@ public abstract class MavLinkConnection {
         }
     }
 
-    protected void onConnectionOpened() {
+    protected void onConnectionOpened(Bundle extras) {
         if (mConnectionStatus.compareAndSet(MAVLINK_CONNECTING, MAVLINK_CONNECTED)) {
+            extrasHolder.set(extras);
             mLogger.logInfo(TAG, "Starting manager thread.");
             mTaskThread = new Thread(mManagerTask, "MavLinkConnection-Manager Thread");
             mTaskThread.start();
@@ -310,10 +315,9 @@ public abstract class MavLinkConnection {
         }
 
         try {
-            final long disconnectTime = System.currentTimeMillis();
-
             mConnectionStatus.set(MAVLINK_DISCONNECTED);
             mConnectionTime.set(-1);
+            extrasHolder.set(null);
 
             if (mConnectThread != null && mConnectThread.isAlive() && !mConnectThread.isInterrupted()) {
                 mConnectThread.interrupt();
@@ -407,6 +411,10 @@ public abstract class MavLinkConnection {
         return mListeners.size();
     }
 
+    public Bundle getConnectionExtras() {
+        return extrasHolder.get();
+    }
+
     /**
      * Used to query the presence of a connection listener.
      *
@@ -435,7 +443,7 @@ public abstract class MavLinkConnection {
 
     protected abstract Logger initLogger();
 
-    protected abstract void openConnection() throws IOException;
+    protected abstract void openConnection(Bundle connectionExtras) throws IOException;
 
     protected abstract int readDataBlock(byte[] buffer) throws IOException;
 

@@ -1,5 +1,8 @@
 package org.droidplanner.services.android.impl.utils.connection;
 
+import android.net.Network;
+import android.os.Build;
+import android.os.Bundle;
 import android.text.TextUtils;
 
 import com.jcraft.jsch.Channel;
@@ -7,6 +10,10 @@ import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
+import com.jcraft.jsch.SocketFactory;
+
+import org.droidplanner.services.android.impl.communication.model.DataLink;
+import org.droidplanner.services.android.impl.core.MAVLink.connection.MavLinkConnection;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,6 +21,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.Socket;
+import java.net.UnknownHostException;
 
 import timber.log.Timber;
 
@@ -45,18 +54,28 @@ public class SshConnection {
     private final String host;
     private final String username;
     private final String password;
+    private final DataLink.DataLinkProvider linkProvider;
 
-    public SshConnection(String host, String username, String password) {
+    public SshConnection(String host, String username, String password, DataLink.DataLinkProvider linkProvider) {
         this.jsch = new JSch();
         this.host = host;
         this.username = username;
         this.password = password;
+        this.linkProvider = linkProvider;
     }
 
     private Session getSession() throws JSchException {
         Session session = jsch.getSession(username, host);
 
-        //Try to connect with the password set.
+        Bundle extras = linkProvider.getConnectionExtras();
+        if (extras != null && !extras.isEmpty()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                Network network = extras.getParcelable(MavLinkConnection.EXTRA_NETWORK);
+                if (network != null) {
+                    session.setSocketFactory(new SshSocketFactory(network.getSocketFactory()));
+                }
+            }
+        }
         session.setConfig("StrictHostKeyChecking", "no");
         session.setPassword(this.password);
         session.connect(CONNECTION_TIMEOUT);
@@ -366,5 +385,29 @@ public class SshConnection {
         }
 
         return result;
+    }
+
+    private static class SshSocketFactory implements SocketFactory {
+
+        private final javax.net.SocketFactory socketFactory;
+
+        private SshSocketFactory(javax.net.SocketFactory socketFactory) {
+            this.socketFactory = socketFactory;
+        }
+
+        @Override
+        public Socket createSocket(String host, int port) throws IOException, UnknownHostException {
+            return socketFactory.createSocket(host, port);
+        }
+
+        @Override
+        public InputStream getInputStream(Socket socket) throws IOException {
+            return socket.getInputStream();
+        }
+
+        @Override
+        public OutputStream getOutputStream(Socket socket) throws IOException {
+            return socket.getOutputStream();
+        }
     }
 }

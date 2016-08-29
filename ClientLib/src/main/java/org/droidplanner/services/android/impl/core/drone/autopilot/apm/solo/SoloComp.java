@@ -26,6 +26,7 @@ import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
 import com.o3dr.services.android.lib.model.ICommandListener;
 
+import org.droidplanner.services.android.impl.communication.model.DataLink;
 import org.droidplanner.services.android.impl.core.drone.autopilot.apm.solo.controller.ControllerLinkListener;
 import org.droidplanner.services.android.impl.core.drone.autopilot.apm.solo.controller.ControllerLinkManager;
 import org.droidplanner.services.android.impl.core.drone.autopilot.apm.solo.sololink.SoloLinkListener;
@@ -85,14 +86,14 @@ public class SoloComp implements SoloLinkListener, ControllerLinkListener {
      *
      * @param context Application context
      */
-    public SoloComp(Context context, Handler handler) {
+    public SoloComp(Context context, Handler handler, DataLink.DataLinkProvider mavClient) {
         this.context = context;
 
         this.handler = handler;
         asyncExecutor = Executors.newCachedThreadPool();
 
-        this.controllerLinkManager = new ControllerLinkManager(context, handler, asyncExecutor);
-        this.soloLinkMgr = new SoloLinkManager(context, handler, asyncExecutor);
+        this.controllerLinkManager = new ControllerLinkManager(context, handler, asyncExecutor, mavClient);
+        this.soloLinkMgr = new SoloLinkManager(context, handler, asyncExecutor, mavClient);
     }
 
     public SoloGoproState getGoproState() {

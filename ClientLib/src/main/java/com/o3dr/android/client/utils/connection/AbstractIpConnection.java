@@ -1,5 +1,6 @@
 package com.o3dr.android.client.utils.connection;
 
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Process;
 import android.os.RemoteException;
@@ -12,6 +13,7 @@ import java.io.InterruptedIOException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Base class for ip connection (tcp, udp).
@@ -43,6 +45,7 @@ public abstract class AbstractIpConnection {
     private final LinkedBlockingQueue<PacketData> packetsToSend = new LinkedBlockingQueue<>();
 
     private final AtomicInteger connectionStatus = new AtomicInteger(STATE_DISCONNECTED);
+    private final AtomicReference<Bundle> extrasHolder = new AtomicReference<>();
 
     private final boolean isSendingDisabled;
     private final boolean isReadingDisabled;
@@ -58,7 +61,7 @@ public abstract class AbstractIpConnection {
 
             try {
                 try {
-                    open();
+                    open(extrasHolder.get());
                     connectionStatus.set(STATE_CONNECTED);
                     if(ipConnectionListener != null)
                         ipConnectionListener.onIpConnected();
@@ -200,7 +203,7 @@ public abstract class AbstractIpConnection {
         this.isPolling = isPolling;
     }
 
-    protected abstract void open() throws IOException;
+    protected abstract void open(Bundle extras) throws IOException;
 
     protected abstract int read(ByteBuffer buffer) throws IOException;
 
@@ -210,14 +213,20 @@ public abstract class AbstractIpConnection {
 
     /**
      * Establish an ip connection. If successful, ConnectionListener#onIpConnected() is called.
+     * @param extras
      */
-    public void connect(){
+    public void connect(Bundle extras){
         if(connectionStatus.compareAndSet(STATE_DISCONNECTED, STATE_CONNECTING)){
             Log.i(TAG, "Starting manager thread.");
+            extrasHolder.set(extras);
             managerThread = new Thread(managerTask, "IP Connection-Manager Thread");
             managerThread.setPriority(Thread.MAX_PRIORITY);
             managerThread.start();
         }
+    }
+
+    public Bundle getConnectionExtras(){
+        return extrasHolder.get();
     }
 
     /**
