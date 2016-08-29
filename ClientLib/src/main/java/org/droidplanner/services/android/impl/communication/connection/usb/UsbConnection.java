@@ -140,8 +140,8 @@ public class UsbConnection extends AndroidMavLinkConnection {
             mBaudRate = baudRate;
         }
 
-        protected void onUsbConnectionOpened() {
-            parentConnection.onConnectionOpened();
+        protected void onUsbConnectionOpened(Bundle extras) {
+            parentConnection.onConnectionOpened(extras);
         }
 
         protected void onUsbConnectionStatus(LinkConnectionStatus connectionStatus) {

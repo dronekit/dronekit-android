@@ -71,7 +71,7 @@ class UsbFTDIConnection extends UsbConnection.UsbConnectionImpl {
 
         ftDevRef.set(ftDev);
 
-        onUsbConnectionOpened();
+        onUsbConnectionOpened(extras);
 	}
 
 	@Override

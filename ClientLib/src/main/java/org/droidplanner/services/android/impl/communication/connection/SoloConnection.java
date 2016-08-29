@@ -40,8 +40,8 @@ public class SoloConnection extends AndroidMavLinkConnection implements WifiConn
         this.soloLinkPassword = password;
         this.dataLink = new AndroidUdpConnection(applicationContext, SOLO_UDP_PORT) {
             @Override
-            protected void onConnectionOpened() {
-                SoloConnection.this.onConnectionOpened();
+            protected void onConnectionOpened(Bundle extras) {
+                SoloConnection.this.onConnectionOpened(extras);
             }
 
             @Override
@@ -61,11 +61,6 @@ public class SoloConnection extends AndroidMavLinkConnection implements WifiConn
             wifiHandler.start();
             checkScanResults(wifiHandler.getScanResults());
         }
-    }
-
-    @Override
-    public Bundle getConnectionExtras(){
-        return dataLink.getConnectionExtras();
     }
 
     private void refreshWifiAps() {
@@ -158,7 +153,7 @@ public class SoloConnection extends AndroidMavLinkConnection implements WifiConn
             //We're good to go
             try {
                 Bundle connectInfo = new Bundle();
-                Bundle extras = super.getConnectionExtras();
+                Bundle extras = getConnectionExtras();
                 if (extras != null && !extras.isEmpty()) {
                     connectInfo.putAll(extras);
                 }

@@ -47,7 +47,7 @@ public abstract class UdpConnection extends MavLinkConnection {
     @Override
     public final void openConnection(Bundle connectionExtras) throws IOException {
         getUdpStream(connectionExtras);
-        onConnectionOpened();
+        onConnectionOpened(connectionExtras);
     }
 
     @Override

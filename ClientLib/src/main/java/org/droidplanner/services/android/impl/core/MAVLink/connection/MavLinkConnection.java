@@ -285,8 +285,9 @@ public abstract class MavLinkConnection {
         }
     }
 
-    protected void onConnectionOpened() {
+    protected void onConnectionOpened(Bundle extras) {
         if (mConnectionStatus.compareAndSet(MAVLINK_CONNECTING, MAVLINK_CONNECTED)) {
+            extrasHolder.set(extras);
             mLogger.logInfo(TAG, "Starting manager thread.");
             mTaskThread = new Thread(mManagerTask, "MavLinkConnection-Manager Thread");
             mTaskThread.start();

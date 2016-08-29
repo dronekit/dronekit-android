@@ -41,8 +41,8 @@ public class AndroidTcpConnection extends AndroidIpConnection {
             }
 
             @Override
-            protected void onConnectionOpened() {
-                AndroidTcpConnection.this.onConnectionOpened();
+            protected void onConnectionOpened(Bundle extras) {
+                AndroidTcpConnection.this.onConnectionOpened(extras);
             }
 
             @Override

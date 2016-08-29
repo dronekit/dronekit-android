@@ -33,7 +33,7 @@ public abstract class TcpConnection extends MavLinkConnection {
     @Override
     public final void openConnection(Bundle connectionExtras) throws IOException {
         getTCPStream(connectionExtras);
-        onConnectionOpened();
+        onConnectionOpened(connectionExtras);
     }
 
     @Override

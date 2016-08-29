@@ -44,8 +44,8 @@ public class AndroidUdpConnection extends AndroidIpConnection {
             }
 
             @Override
-            protected void onConnectionOpened() {
-                AndroidUdpConnection.this.onConnectionOpened();
+            protected void onConnectionOpened(Bundle extras) {
+                AndroidUdpConnection.this.onConnectionOpened(extras);
             }
 
             @Override

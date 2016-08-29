@@ -46,7 +46,7 @@ class UsbCDCConnection extends UsbConnection.UsbConnectionImpl {
                     if (device != null) {
                         //call method to set up device communication
                         try {
-                            openUsbDevice(device);
+                            openUsbDevice(device, extrasHolder.get());
                         } catch (IOException e) {
                             Log.e(TAG, e.getMessage(), e);
                         }
@@ -77,6 +77,7 @@ class UsbCDCConnection extends UsbConnection.UsbConnectionImpl {
         }
     };
 
+    private final AtomicReference<Bundle> extrasHolder = new AtomicReference<>();
     private ScheduledExecutorService scheduler;
 
     protected UsbCDCConnection(Context context, UsbConnection parentConn, int baudRate) {
@@ -105,6 +106,7 @@ class UsbCDCConnection extends UsbConnection.UsbConnectionImpl {
 
     @Override
     protected void openUsbConnection(Bundle extras) throws IOException {
+        extrasHolder.set(extras);
         registerUsbPermissionBroadcastReceiver();
 
         // Get UsbManager from Android.
@@ -120,7 +122,7 @@ class UsbCDCConnection extends UsbConnection.UsbConnectionImpl {
         //Pick the first device
         UsbDevice device = availableDevices.get(0);
         if (manager.hasPermission(device)) {
-            openUsbDevice(device);
+            openUsbDevice(device, extras);
         } else {
             removeWatchdog();
 
@@ -131,7 +133,7 @@ class UsbCDCConnection extends UsbConnection.UsbConnectionImpl {
         }
     }
 
-    private void openUsbDevice(UsbDevice device) throws IOException {
+    private void openUsbDevice(UsbDevice device, Bundle extras) throws IOException {
         // Get UsbManager from Android.
         UsbManager manager = (UsbManager) mContext.getSystemService(Context.USB_SERVICE);
 
@@ -149,7 +151,7 @@ class UsbCDCConnection extends UsbConnection.UsbConnectionImpl {
 
                 serialDriverRef.set(serialDriver);
 
-                onUsbConnectionOpened();
+                onUsbConnectionOpened(extras);
             } catch (IOException e) {
                 Log.e(TAG, "Error setting up device: " + e.getMessage(), e);
                 try {
