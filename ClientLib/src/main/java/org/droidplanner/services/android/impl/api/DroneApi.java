@@ -235,7 +235,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
         }
 
         if (SoloConnection.isUdpSoloConnection(context, connParams)) {
-            ConnectionParameter update = SoloConnection.getSoloConnectionParameterFromUdp(context, connParams.getTLogLoggingUri());
+            ConnectionParameter update = SoloConnection.getSoloConnectionParameterFromUdp(context, connParams);
             if (update != null) {
                 return update;
             }
