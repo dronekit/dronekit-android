@@ -3,7 +3,6 @@ package com.o3dr.android.client.utils.connection;
 import android.os.Handler;
 import android.os.Process;
 import android.os.RemoteException;
-import android.util.Log;
 
 import com.o3dr.services.android.lib.model.ICommandListener;
 
@@ -12,6 +11,8 @@ import java.io.InterruptedIOException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import timber.log.Timber;
 
 /**
  * Base class for ip connection (tcp, udp).
@@ -63,7 +64,7 @@ public abstract class AbstractIpConnection {
                     if(ipConnectionListener != null)
                         ipConnectionListener.onIpConnected();
                 } catch (IOException e) {
-                    Log.e(TAG, "Unable to open ip connection.", e);
+                    Timber.e("Unable to open ip connection.", e);
                     return;
                 }
 
@@ -93,14 +94,14 @@ public abstract class AbstractIpConnection {
                             }
                         }
                     } catch (IOException e) {
-                        Log.e(TAG, "Error occurred while reading from the connection.", e);
+                        Timber.e("Error occurred while reading from the connection.", e);
                     }
                 }
                 else if(sendingThread != null){
                     try {
                         sendingThread.join();
                     } catch (InterruptedException e) {
-                        Log.e(TAG, "Error while waiting for sending thread to complete.", e);
+                        Timber.e("Error while waiting for sending thread to complete.", e);
                     }
                 }
             }
@@ -109,7 +110,7 @@ public abstract class AbstractIpConnection {
                     sendingThread.interrupt();
 
                 disconnect();
-                Log.i(TAG, "Exiting connection manager thread.");
+                Timber.d("Exiting connection manager thread.");
             }
         }
     };
@@ -129,16 +130,16 @@ public abstract class AbstractIpConnection {
                         send(packetData);
                         postSendSuccess(listener);
                     } catch (IOException e) {
-                        Log.e(TAG, "Error occurred while sending packet.", e);
+                        Timber.e("Error occurred while sending packet.", e);
                         postSendTimeout(listener);
                     }
                 }
             } catch (InterruptedException e) {
-                Log.e(TAG, "Dispatching thread was interrupted.", e);
+                Timber.e("Dispatching thread was interrupted.", e);
             }
             finally{
                 disconnect();
-                Log.i(TAG, "Exiting packet dispatcher thread.");
+                Timber.d("Exiting packet dispatcher thread.");
             }
         }
 
@@ -152,7 +153,7 @@ public abstract class AbstractIpConnection {
                     try {
                         listener.onSuccess();
                     } catch (RemoteException e) {
-                        Log.e(TAG, e.getMessage(), e);
+                        Timber.e(e.getMessage(), e);
                     }
                 }
             });
@@ -168,7 +169,7 @@ public abstract class AbstractIpConnection {
                     try {
                         listener.onTimeout();
                     } catch (RemoteException e) {
-                        Log.e(TAG, e.getMessage(), e);
+                        Timber.e(e.getMessage(), e);
                     }
                 }
             });
@@ -213,7 +214,7 @@ public abstract class AbstractIpConnection {
      */
     public void connect(){
         if(connectionStatus.compareAndSet(STATE_DISCONNECTED, STATE_CONNECTING)){
-            Log.i(TAG, "Starting manager thread.");
+            Timber.d(TAG, "connect(): Starting manager thread.");
             managerThread = new Thread(managerTask, "IP Connection-Manager Thread");
             managerThread.setPriority(Thread.MAX_PRIORITY);
             managerThread.start();
@@ -224,8 +225,10 @@ public abstract class AbstractIpConnection {
      * Disconnect an existing ip connection. If successful, ConnectionListener#onIpDisconnected() is called.
      */
     public void disconnect(){
-        if(connectionStatus.get() == STATE_DISCONNECTED || managerThread == null)
+        if(connectionStatus.get() == STATE_DISCONNECTED || managerThread == null) {
+            Timber.d("already disconnected");
             return;
+        }
 
         connectionStatus.set(STATE_DISCONNECTED);
         if(managerThread != null && managerThread.isAlive() && !managerThread.isInterrupted()){
@@ -235,7 +238,7 @@ public abstract class AbstractIpConnection {
         try {
             close();
         } catch (IOException e) {
-            Log.e(TAG, "Error occurred while closing ip connection.", e);
+            Timber.e("Error occurred while closing ip connection.", e);
         }
 
         if(ipConnectionListener != null)

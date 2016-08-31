@@ -1,7 +1,6 @@
 package com.o3dr.android.client.utils.connection;
 
 import android.os.Handler;
-import android.util.Log;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -9,6 +8,8 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
+
+import timber.log.Timber;
 
 /**
  * Created by Fredia Huya-Kouadio on 2/18/15.
@@ -52,7 +53,7 @@ public class UdpConnection extends AbstractIpConnection {
 
     @Override
     protected void open() throws IOException {
-        Log.d(TAG, "Opening udp connection.");
+        Timber.d("Opening udp connection.");
 
         socket = (serverPort == -1) ?new DatagramSocket() : new DatagramSocket(serverPort);
         socket.setBroadcast(true);
@@ -84,13 +85,13 @@ public class UdpConnection extends AbstractIpConnection {
 
             socket.send(sendPacket);
         } else {
-            Log.w(TAG, "Still awaiting connection from remote host.");
+            Timber.w("Still awaiting connection from remote host.");
         }
     }
 
     @Override
     protected void close() throws IOException {
-        Log.d(TAG, "Closing udp connection.");
+        Timber.d("Closing udp connection.");
         if (socket != null)
             socket.close();
     }
