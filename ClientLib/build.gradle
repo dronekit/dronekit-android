@@ -5,7 +5,7 @@ ext {
     VERSION_MAJOR = 3
     VERSION_MINOR = 0
     VERSION_PATCH = 0
-    VERSION_SUFFIX = "rc2"
+    VERSION_SUFFIX = "rc3"
 
     PUBLISH_ARTIFACT_ID = 'dronekit-android'
     PUBLISH_VERSION = generateVersionName("", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH, VERSION_SUFFIX)
@@ -98,8 +98,6 @@ android {
 
 dependencies {
     compile 'com.jakewharton.timber:timber:3.1.0'
-    compile "com.android.support:support-v4:${support_lib_version}"
-    compile "com.android.support:appcompat-v7:${support_lib_version}"
 
     compile "com.google.android.gms:play-services-base:${play_services_version}"
     compile "com.google.android.gms:play-services-location:${play_services_version}"
