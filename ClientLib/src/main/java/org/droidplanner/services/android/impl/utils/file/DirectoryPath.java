@@ -10,7 +10,7 @@ public class DirectoryPath {
 	/**
 	 * Main path used to store private data files related to the program
 	 * 
-	 * @return Path to 3DR Services private data folder in external storage
+	 * @return Path to DroneKit-Android private data folder in external storage
 	 */
 	static public String getPrivateDataPath(Context context) {
         File dataDir = context.getExternalFilesDir(null);
@@ -20,7 +20,7 @@ public class DirectoryPath {
     /**
      * Main path used to store public data files related to the app.
      * @param context application context
-     * @return Path to 3DR Services public data directory.
+     * @return Path to DroneKit-Android public data directory.
      */
     public static String getPublicDataPath(Context context){
         final String root = Environment.getExternalStorageDirectory().getPath();

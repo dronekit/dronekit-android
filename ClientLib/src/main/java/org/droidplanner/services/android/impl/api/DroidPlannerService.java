@@ -32,7 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import timber.log.Timber;
 
 /**
- * 3DR Services background service implementation.
+ * DroneKit-Android background service implementation.
  */
 public class DroidPlannerService extends Service {
 
@@ -65,7 +65,6 @@ public class DroidPlannerService extends Service {
     final ConcurrentHashMap<ConnectionParameter, DroneManager> droneManagers = new ConcurrentHashMap<>();
 
     private DPServices dpServices;
-    private DroneAccess droneAccess;
 
     private CameraInfoLoader cameraInfoLoader;
     private List<CameraDetail> cachedCameraDetails;
@@ -196,8 +195,7 @@ public class DroidPlannerService extends Service {
             // Return binder to ipc client-server interaction.
             return dpServices;
         } else {
-            // Return binder to the service.
-            return droneAccess;
+            return null;
         }
     }
 
@@ -206,11 +204,10 @@ public class DroidPlannerService extends Service {
     public void onCreate() {
         super.onCreate();
 
-        Timber.d("Creating 3DR Services.");
+        Timber.d("Creating DroneKit-Android.");
 
         final Context context = getApplicationContext();
 
-        droneAccess = new DroneAccess(this);
         dpServices = new DPServices(this);
         lbm = LocalBroadcastManager.getInstance(context);
         this.cameraInfoLoader = new CameraInfoLoader(context);
@@ -224,19 +221,13 @@ public class DroidPlannerService extends Service {
 
         //Put the service in the foreground
         final NotificationCompat.Builder notifBuilder = new NotificationCompat.Builder(context)
-                .setContentTitle("3DR Services")
+                .setContentTitle("DroneKit-Android")
                 .setPriority(NotificationCompat.PRIORITY_MIN)
                 .setSmallIcon(R.drawable.ic_stat_notify);
-//                .setContentIntent(PendingIntent.getActivity(context, 0, new Intent(context,
-//                        MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK), 0));
 
         final int connectedCount = droneApiStore.size();
-        if (connectedCount > 0) {
-            if (connectedCount == 1) {
-                notifBuilder.setContentText("1 connected app");
-            } else {
-                notifBuilder.setContentText(connectedCount + " connected apps");
-            }
+        if (connectedCount > 1) {
+            notifBuilder.setContentText(connectedCount + " connected apps");
         }
 
         final Notification notification = notifBuilder.build();
@@ -246,7 +237,7 @@ public class DroidPlannerService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Timber.d("Destroying 3DR Services.");
+        Timber.d("Destroying DroneKit-Android.");
 
         for (DroneApi droneApi : droneApiStore.values()) {
             droneApi.destroy();

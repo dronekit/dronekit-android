@@ -213,19 +213,19 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
         this.controlTower.disconnect();
     }
 
-    // 3DR Services Listener
+    // DroneKit-Android Listener
     // ==========================================================
 
     @Override
     public void onTowerConnected() {
-        alertUser("3DR Services Connected");
+        alertUser("DroneKit-Android Connected");
         this.controlTower.registerDrone(this.drone, this.handler);
         this.drone.registerDroneListener(this);
     }
 
     @Override
     public void onTowerDisconnected() {
-        alertUser("3DR Service Interrupted");
+        alertUser("DroneKit-Android Interrupted");
     }
 
     // Drone Listener

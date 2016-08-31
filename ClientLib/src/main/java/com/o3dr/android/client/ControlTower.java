@@ -148,7 +148,7 @@ public class ControlTower {
         try {
             context.unbindService(o3drServicesConnection);
         } catch (Exception e) {
-            Log.e(TAG, "Error occurred while unbinding from 3DR Services.");
+            Log.e(TAG, "Error occurred while unbinding from DroneKit-Android.");
         }
     }
 

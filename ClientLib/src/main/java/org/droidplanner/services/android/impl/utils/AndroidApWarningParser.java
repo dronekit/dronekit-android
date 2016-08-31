@@ -1,8 +1,9 @@
 package org.droidplanner.services.android.impl.utils;
 
+import com.o3dr.services.android.lib.drone.attribute.error.ErrorType;
+
 import org.droidplanner.services.android.impl.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.impl.core.model.AutopilotWarningParser;
-import com.o3dr.services.android.lib.drone.attribute.error.ErrorType;
 
 import java.util.Locale;
 
@@ -59,10 +60,10 @@ public class AndroidApWarningParser implements AutopilotWarningParser {
     }
 
     /**
-     * Maps the ArduPilot warnings set to the 3DR Services warnings set.
+     * Maps the ArduPilot warnings set to the DroneKit-Android warnings set.
      *
      * @param warning warning originating from the ArduPilot autopilot
-     * @return equivalent 3DR Services warning type
+     * @return equivalent DroneKit-Android warning type
      */
     @Override
     public String parseWarning(MavLinkDrone drone, String warning) {
