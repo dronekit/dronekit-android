@@ -12,7 +12,7 @@ import android.text.TextUtils;
  */
 public class ConnectionParameter implements Parcelable {
 
-    private static final long DEFAULT_EVENTS_DISPATCHING_PERIOD = 200L; //milliseconds
+    private static final long DEFAULT_EVENTS_DISPATCHING_PERIOD = 0L; //milliseconds - disabled by default.
 
     private final @ConnectionType.Type int connectionType;
     private final Bundle paramsBundle;
