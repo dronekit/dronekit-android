@@ -115,14 +115,14 @@ public class ParameterManager extends DroneVariable<MavLinkDrone> implements OnD
     }
 
     protected void processReceivedParam(msg_param_value m_value) {
-        if(!isRefreshing.get())
+        int paramIndex = m_value.param_index;
+        if(!isRefreshing.get() && paramIndex != -1)
             return;
         // collect params in parameter list
         Parameter param = new Parameter(m_value.getParam_Id(), m_value.param_value, m_value.param_type);
         loadParameterMetadata(param);
 
         parameters.put(param.getName().toLowerCase(Locale.US), param);
-        int paramIndex = m_value.param_index;
         if (paramIndex == -1) {
             // update listener
             notifyParameterReceipt(param, 0, 1);
