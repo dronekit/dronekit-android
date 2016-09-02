@@ -20,6 +20,7 @@ import org.droidplanner.services.android.impl.utils.file.IO.ParameterMetadataLoa
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import timber.log.Timber;
@@ -58,6 +59,7 @@ public class ParameterManager extends DroneVariable<MavLinkDrone> implements OnD
     };
 
     private final AtomicBoolean isRefreshing = new AtomicBoolean(false);
+    private final ConcurrentLinkedQueue<String> paramsToReadFromVehicle = new ConcurrentLinkedQueue<>();
 
     private int expectedParams;
 
@@ -80,6 +82,7 @@ public class ParameterManager extends DroneVariable<MavLinkDrone> implements OnD
 
     public void refreshParameters() {
         if (isRefreshing.compareAndSet(false, true)) {
+            paramsToReadFromVehicle.clear();
             expectedParams = 0;
             parameters.clear();
             paramsRollCall.clear();
@@ -115,13 +118,14 @@ public class ParameterManager extends DroneVariable<MavLinkDrone> implements OnD
     }
 
     protected void processReceivedParam(msg_param_value m_value) {
-        int paramIndex = m_value.param_index;
-        if(!isRefreshing.get() && paramIndex != -1)
+        String paramName = m_value.getParam_Id();
+        if(!paramsToReadFromVehicle.remove(paramName) && !isRefreshing.get())
             return;
         // collect params in parameter list
-        Parameter param = new Parameter(m_value.getParam_Id(), m_value.param_value, m_value.param_type);
+        Parameter param = new Parameter(paramName, m_value.param_value, m_value.param_type);
         loadParameterMetadata(param);
 
+        int paramIndex = m_value.param_index;
         parameters.put(param.getName().toLowerCase(Locale.US), param);
         if (paramIndex == -1) {
             // update listener
@@ -141,9 +145,8 @@ public class ParameterManager extends DroneVariable<MavLinkDrone> implements OnD
         if (parameters.size() >= m_value.param_count) {
             if(isRefreshing.compareAndSet(true, false)) {
                 killWatchdog();
-
-                notifyParametersReceiptEnd();
             }
+            notifyParametersReceiptEnd();
         } else {
             resetWatchdog();
         }
@@ -158,10 +161,12 @@ public class ParameterManager extends DroneVariable<MavLinkDrone> implements OnD
     }
 
     public void sendParameter(Parameter parameter) {
+        paramsToReadFromVehicle.add(parameter.getName());
         MavLinkParameters.sendParameter(myDrone, parameter);
     }
 
     public void readParameter(String name) {
+        paramsToReadFromVehicle.add(name);
         MavLinkParameters.readParameter(myDrone, name);
     }
 
