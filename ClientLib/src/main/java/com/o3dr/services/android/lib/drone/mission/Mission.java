@@ -2,12 +2,10 @@ package com.o3dr.services.android.lib.drone.mission;
 
 import android.os.Bundle;
 import android.os.Parcel;
-import android.os.Parcelable;
 
 import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
 import com.o3dr.services.android.lib.drone.property.DroneAttribute;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,6 +53,31 @@ public class Mission implements DroneAttribute {
 
     public void setCurrentMissionItem(int currentMissionItem) {
         this.currentMissionItem = currentMissionItem;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Mission)) {
+            return false;
+        }
+
+        Mission mission = (Mission) o;
+
+        if (currentMissionItem != mission.currentMissionItem) {
+            return false;
+        }
+        return missionItemsList.equals(mission.missionItemsList);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = currentMissionItem;
+        result = 31 * result + missionItemsList.hashCode();
+        return result;
     }
 
     @Override

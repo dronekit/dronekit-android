@@ -14,12 +14,16 @@ public abstract class BaseSpatialItem extends MissionItem implements MissionItem
     private LatLongAlt coordinate;
 
     protected BaseSpatialItem(MissionItemType type) {
+        this(type, null);
+    }
+
+    protected BaseSpatialItem(MissionItemType type, LatLongAlt coordinate){
         super(type);
+        this.coordinate = coordinate;
     }
 
     protected BaseSpatialItem(BaseSpatialItem copy){
-        this(copy.getType());
-        coordinate = copy.coordinate == null ? null : new LatLongAlt(copy.coordinate);
+        this(copy.getType(), copy.coordinate == null ? null : new LatLongAlt(copy.coordinate));
     }
 
     @Override

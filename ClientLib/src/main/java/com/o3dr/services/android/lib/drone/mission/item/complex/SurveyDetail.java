@@ -3,8 +3,6 @@ package com.o3dr.services.android.lib.drone.mission.item.complex;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.io.Serializable;
-
 /**
  * Created by fhuya on 11/7/14.
  */

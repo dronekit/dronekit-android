@@ -6,8 +6,6 @@ import android.os.Parcelable;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.mission.MissionItemType;
 
-import java.io.Serializable;
-
 /**
  * Created by fhuya on 11/5/14.
  */

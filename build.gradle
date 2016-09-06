@@ -3,8 +3,6 @@ buildscript {
 
     ext {
         play_services_version = '8.4.0'
-        support_lib_version = '23.1.1'
-        okhttp_version = '2.5.0'
 
         android_build_sdk_version = 23
         android_build_tools_version = '23.0.2'
@@ -14,13 +12,10 @@ buildscript {
 
     repositories {
         jcenter()
-        maven { url 'https://maven.fabric.io/public' }
     }
 
     dependencies {
         classpath 'com.android.tools.build:gradle:1.5.0'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.2'
-        classpath 'io.fabric.tools:gradle:1.21.2'
 
         //Dexcount gradle plugin
         classpath 'com.getkeepsafe.dexcount:dexcount-gradle-plugin:0.4.4'
@@ -74,6 +69,22 @@ def getGitShortHash(){
     }
 }
 
+def getMavenUsername(){
+    return hasProperty('COM_O3DR_MAVEN_USERNAME') ? COM_O3DR_MAVEN_USERNAME : ''
+}
+
+def getMavenApiKey(){
+    return hasProperty('COM_O3DR_MAVEN_APIKEY') ? COM_O3DR_MAVEN_APIKEY : ''
+}
+
+def getMavenRepo(){
+    return hasProperty('COM_O3DR_MAVEN_REPO') ? COM_O3DR_MAVEN_REPO : ''
+}
+
+def getMavenRepoUrl(){
+    return hasProperty('COM_O3DR_MAVEN_REPO_URL') ? COM_O3DR_MAVEN_REPO_URL : 'https://dl.bintray.com/3d-robotics/maven'
+}
+
 /**
  * Improve build server performance by allowing disabling of pre-dexing
  * (see http://tools.android.com/tech-docs/new-build-system/tips#TOC-Improving-Build-Server-performance.)
@@ -94,6 +105,13 @@ subprojects {
 allprojects {
     repositories {
         jcenter()
-        maven { url 'https://maven.fabric.io/public' }
+
+        maven {
+            url getMavenRepoUrl()
+            credentials {
+                username getMavenUsername()
+                password getMavenApiKey()
+            }
+        }
     }
 }

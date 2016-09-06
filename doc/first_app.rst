@@ -28,13 +28,13 @@ Project Setup
 Adding the Client Library
 =========================
 
-To add the 3DR Services library to your project:
+To add the DroneKit-Android Client library to your project:
 
 #. Open **build.gradle (Module:app)** and, under the dependencies section, add: 
 
    .. code-block:: bash
 
-       compile 'com.o3dr.android:dronekit-android:2.3.+'
+       compile 'com.o3dr.android:dronekit-android:3.0.+'
 
 #. Click **Sync** in the top-right corner to re-sync the gradle:
 
@@ -43,10 +43,10 @@ To add the 3DR Services library to your project:
 
 
 
-Connecting to 3DR Services
+Connecting to DroneKit-Android
 ==========================
 
-Implement a ``TowerListener`` on your ``MainActivity`` to listen for events sent from 3DR Services to your app.
+Implement a ``TowerListener`` on your ``MainActivity`` to listen for events sent from the library to your app.
 
 .. code-block:: java
    :linenos:
@@ -54,7 +54,7 @@ Implement a ``TowerListener`` on your ``MainActivity`` to listen for events sent
 
 	public class MainActivity extends ActionBarActivity implements TowerListener {
 
-		// 3DR Services Listener
+		// DroneKit-Android Listener
 		@Override
 		public void onTowerConnected() {
 			
@@ -75,8 +75,8 @@ Implement a ``TowerListener`` on your ``MainActivity`` to listen for events sent
 
 Now you'll need to:
 
-1. Add a ``ControlTower`` instance to manage the communication to 3DR Services.
-2. Connect to 3DR Services on start of the ``MainActivity`` and disconnect on its stop.
+1. Add a ``ControlTower`` instance to manage the communication to the Client library.
+2. Connect to the Client library on start of the ``MainActivity`` and disconnect on its stop.
 
    .. code-block:: java
        :linenos:

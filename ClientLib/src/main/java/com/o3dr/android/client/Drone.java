@@ -9,26 +9,15 @@ import android.os.RemoteException;
 import android.os.SystemClock;
 import android.util.Log;
 
-import com.o3dr.android.client.apis.CalibrationApi;
-import com.o3dr.android.client.apis.ControlApi;
-import com.o3dr.android.client.apis.ExperimentalApi;
-import com.o3dr.android.client.apis.FollowApi;
 import com.o3dr.android.client.apis.MissionApi;
 import com.o3dr.android.client.apis.VehicleApi;
 import com.o3dr.android.client.interfaces.DroneListener;
 import com.o3dr.android.client.interfaces.LinkListener;
-import com.o3dr.android.client.utils.TxPowerComplianceCountries;
-import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.calibration.magnetometer.MagnetometerCalibrationStatus;
 import com.o3dr.services.android.lib.drone.companion.solo.SoloAttributes;
-import com.o3dr.services.android.lib.drone.companion.solo.SoloEventExtras;
-import com.o3dr.services.android.lib.drone.companion.solo.SoloEvents;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
-import com.o3dr.services.android.lib.drone.connection.ConnectionResult;
-import com.o3dr.services.android.lib.gcs.follow.FollowLocationSource;
-import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
 import com.o3dr.services.android.lib.drone.mission.Mission;
 import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
 import com.o3dr.services.android.lib.drone.property.Altitude;
@@ -43,13 +32,11 @@ import com.o3dr.services.android.lib.drone.property.Signal;
 import com.o3dr.services.android.lib.drone.property.Speed;
 import com.o3dr.services.android.lib.drone.property.State;
 import com.o3dr.services.android.lib.drone.property.Type;
-import com.o3dr.services.android.lib.drone.property.VehicleMode;
 import com.o3dr.services.android.lib.gcs.follow.FollowState;
-import com.o3dr.services.android.lib.gcs.follow.FollowType;
-import com.o3dr.services.android.lib.gcs.returnToMe.ReturnToMeState;
+import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
 import com.o3dr.services.android.lib.gcs.link.LinkEvent;
 import com.o3dr.services.android.lib.gcs.link.LinkEventExtra;
-import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
+import com.o3dr.services.android.lib.gcs.returnToMe.ReturnToMeState;
 import com.o3dr.services.android.lib.model.AbstractCommandListener;
 import com.o3dr.services.android.lib.model.IDroneApi;
 import com.o3dr.services.android.lib.model.IObserver;
@@ -108,7 +95,6 @@ public class Drone {
     private Handler handler;
     private ControlTower serviceMgr;
     private DroneObserver droneObserver;
-    private DroneApiListener apiListener;
 
     private final AtomicReference<IDroneApi> droneApiRef = new AtomicReference<>(null);
     private ConnectionParameter connectionParameter;
@@ -136,7 +122,6 @@ public class Drone {
     void init(ControlTower controlTower, Handler handler) {
         this.handler = handler;
         this.serviceMgr = controlTower;
-        this.apiListener = new DroneApiListener(this);
         this.droneObserver = new DroneObserver(this);
     }
 
@@ -155,7 +140,7 @@ public class Drone {
         }
 
         try {
-            droneApi = serviceMgr.get3drServices().registerDroneApi(this.apiListener, serviceMgr.getApplicationId());
+            droneApi = serviceMgr.registerDroneApi();
             droneApi.asBinder().linkToDeath(binderDeathRecipient, 0);
         } catch (RemoteException e) {
             throw new IllegalStateException("Unable to retrieve a valid drone handle.");
@@ -179,7 +164,7 @@ public class Drone {
         try {
             if (isStarted(droneApi)) {
                 droneApi.asBinder().unlinkToDeath(binderDeathRecipient, 0);
-                serviceMgr.get3drServices().releaseDroneApi(droneApi);
+                serviceMgr.releaseDroneApi(droneApi);
             }
         } catch (RemoteException | NoSuchElementException e) {
             Log.e(TAG, e.getMessage(), e);
@@ -614,141 +599,12 @@ public class Drone {
         }
     }
 
-    /**
-     * @deprecated Use {@link VehicleApi#setVehicleMode(VehicleMode)} instead.
-     */
-    public void changeVehicleMode(VehicleMode newMode) {
-        VehicleApi.getApi(this).setVehicleMode(newMode);
-    }
-
-    /**
-     * @deprecated Use {@link VehicleApi#refreshParameters()} instead.
-     */
-    public void refreshParameters() {
-        VehicleApi.getApi(this).refreshParameters();
-    }
-
-    /**
-     * @deprecated Use {@link VehicleApi#writeParameters(Parameters)} instead.
-     */
-    public void writeParameters(Parameters parameters) {
-        VehicleApi.getApi(this).writeParameters(parameters);
-    }
-
-    /**
-     * @deprecated Use {@link MissionApi#setMission(Mission, boolean)} instead.
-     */
-    public void setMission(Mission mission, boolean pushToDrone) {
-        MissionApi.getApi(this).setMission(mission, pushToDrone);
-    }
-
-    /**
-     * @deprecated Use {@link MissionApi#generateDronie()} instead.
-     */
-    public void generateDronie() {
-        MissionApi.getApi(this).generateDronie();
-    }
-
-    /**
-     * @deprecated Use {@link VehicleApi#arm(boolean)} instead.
-     */
-    public void arm(boolean arm) {
-        VehicleApi.getApi(this).arm(arm);
-    }
-
-    /**
-     * @deprecated Use {@link CalibrationApi#startIMUCalibration()} instead.
-     */
-    public void startIMUCalibration() {
-        CalibrationApi.getApi(this).startIMUCalibration();
-    }
-
-    /**
-     * @deprecated Use {@link CalibrationApi#sendIMUAck(int)} instead.
-     */
-    public void sendIMUCalibrationAck(int step) {
-        CalibrationApi.getApi(this).sendIMUAck(step);
-    }
-
-    /**
-     * @deprecated Use {@link ControlApi#takeoff(double, AbstractCommandListener)} instead.
-     */
-    public void doGuidedTakeoff(double altitude) {
-        ControlApi.getApi(this).takeoff(altitude, null);
-    }
-
-    /**
-     * @deprecated Use {@link ControlApi#pauseAtCurrentLocation(AbstractCommandListener)} instead.
-     */
-    public void pauseAtCurrentLocation() {
-        ControlApi.getApi(this).pauseAtCurrentLocation(null);
-    }
-
-    /**
-     * @deprecated Use {@link ControlApi#goTo(LatLong, boolean, AbstractCommandListener)} instead.
-     */
-    public void sendGuidedPoint(LatLong point, boolean force) {
-        ControlApi.getApi(this).goTo(point, force, null);
-    }
-
-    /**
-     * @deprecated Use {@link ExperimentalApi#sendMavlinkMessage(MavlinkMessageWrapper)} instead.
-     */
-    public void sendMavlinkMessage(MavlinkMessageWrapper messageWrapper) {
-        ExperimentalApi.getApi(this).sendMavlinkMessage(messageWrapper);
-    }
-
-    /**
-     * @deprecated Use {@link ControlApi#climbTo(double)} instead.
-     */
-    public void setGuidedAltitude(double altitude) {
-        ControlApi.getApi(this).climbTo(altitude);
-    }
-
-    /**
-     * @deprecated Use {@link FollowApi#enableFollowMe(FollowType, com.o3dr.services.android.lib.gcs.follow.FollowLocationSource)} instead.
-     */
-    public void enableFollowMe(FollowType followType) {
-        FollowApi.getApi(this).enableFollowMe(followType, FollowLocationSource.INTERNAL);
-    }
-
-    /**
-     * @deprecated Use {@link FollowApi#disableFollowMe()} instead.
-     */
-    public void disableFollowMe() {
-        FollowApi.getApi(this).disableFollowMe();
-    }
-
-    /**
-     * @deprecated Use {@link ExperimentalApi#triggerCamera()} instead.
-     */
-    public void triggerCamera() {
-        ExperimentalApi.getApi(this).triggerCamera();
-    }
-
-    /**
-     * @deprecated Use {@link MissionApi#loadWaypoints()} instead.
-     */
-    public void loadWaypoints() {
-        MissionApi.getApi(this).loadWaypoints();
-    }
-
     public Handler getHandler() {
         return handler;
     }
 
-    void notifyDroneConnectionFailed(final ConnectionResult result) {
-        if (droneListeners.isEmpty()) {
-            return;
-        }
-
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                for (DroneListener listener : droneListeners)
-                    listener.onDroneConnectionFailed(result);
-            }
-        });
+    public ExecutorService getAsyncScheduler(){
+        return asyncScheduler;
     }
 
     void notifyAttributeUpdated(final String attributeEvent, final Bundle extras) {
@@ -778,16 +634,6 @@ public class Drone {
 
             case AttributeEvent.SPEED_UPDATED:
                 checkForGroundCollision();
-                break;
-
-            //TODO remove this when deprecated methods are deleted in 3.0
-            // This ensures that the api is backwards compatible
-            case SoloEvents.SOLO_TX_POWER_COMPLIANCE_COUNTRY_UPDATED:
-                String compliantCountry = extras.getString(SoloEventExtras.EXTRA_SOLO_TX_POWER_COMPLIANT_COUNTRY);
-                final Bundle eventInfo = new Bundle(1);
-                boolean isEUCompliant = !TxPowerComplianceCountries.getDefaultCountry().name().equals(compliantCountry);
-                eventInfo.putBoolean(SoloEventExtras.EXTRA_SOLO_EU_TX_POWER_COMPLIANT, isEUCompliant);
-                sendDroneEventToListeners(SoloEvents.SOLO_EU_TX_POWER_COMPLIANCE_UPDATED, eventInfo);
                 break;
 
             case LinkEvent.LINK_STATE_UPDATED:

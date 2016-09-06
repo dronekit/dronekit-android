@@ -32,7 +32,7 @@ public abstract class GeoTagAsyncTask extends AsyncTask<Void, Integer, GeoTagUti
      * Warning: this copies data to external storage
      *
      * @param rootDir  {@link File}
-     * @param events   {@link List<com.o3dr.android.client.utils.data.tlog.TLogParser.Event>} list of events to geotag photos.
+     * @param events   {@link List<  com.o3dr.android.client.utils.data.tlog.TLogParser.Event>} list of events to geotag photos.
      * @param photos   {@link List<File>} list of files of photos to geotag.
      */
     public GeoTagAsyncTask(File rootDir, List<TLogParser.Event> events, ArrayList<File> photos) {

@@ -1,7 +1,6 @@
 package com.o3dr.services.android.lib.drone.property;
 
 import android.os.Parcel;
-import android.os.Parcelable;
 
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.util.MathUtils;

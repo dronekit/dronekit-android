@@ -1,12 +1,4 @@
 <resources>
-    <string name="install_service_dialog_title">Install 3DR Services!</string>
-    <string name="install_service_dialog_message">3DR Services must be installed on the device to use this app.</string>
-    <string name="install_service_dialog_install_button">Install</string>
-
-    <string name="update_service_dialog_title">Update 3DR Services!</string>
-    <string name="update_service_dialog_message">Your version of 3DR Services must be updated to continue.</string>
-    <string name="update_service_dialog_update_button">Update</string>
-
     <string name="error_no_error">No error!</string>
     <string name="error_throttle_below_failsafe">Throttle below failsafe</string>
     <string name="error_gyro_calibration_failed">Gyro calibration failed</string>
@@ -73,4 +65,8 @@
     <string name="copter_auto_tune_label">Auto-tune</string>
     <string name="copter_pos_hold_label">Position Hold</string>
     <string name="copter_auto_label">Mission</string>
+
+    <string name="label_tlog_title">Telemetry Log Files</string>
+    <string name="tlog_selector_label">Telemetry Logs File Selector</string>
+    <string name="loading_data">Loading data...</string>
 </resources>
