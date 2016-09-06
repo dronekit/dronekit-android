@@ -33,15 +33,6 @@ public class SoloConfigActions {
      */
     public static final String EXTRA_CONTROLLER_MODE = "extra_controller_mode";
 
-    /**
-     * @deprecated Use {@link #ACTION_UPDATE_TX_POWER_COMPLIANCE_COUNTRY} instead.
-     */
-    public static final String ACTION_UPDATE_EU_TX_POWER_COMPLIANCE = PACKAGE_NAME + ".UPDATE_EU_TX_POWER_COMPLIANCE";
-    /**
-     * @deprecated Use {@link #EXTRA_TX_POWER_COMPLIANT_COUNTRY_CODE} instead.
-     */
-    public static final String EXTRA_EU_TX_POWER_COMPLIANT = "extra_eu_tx_power_compliant";
-
     public static final String ACTION_UPDATE_TX_POWER_COMPLIANCE_COUNTRY = PACKAGE_NAME + ".UPDATE_TX_POWER_COMPLIANCE_COUNTRY";
     /**
      * String value. The country the controller should be made compliant with.

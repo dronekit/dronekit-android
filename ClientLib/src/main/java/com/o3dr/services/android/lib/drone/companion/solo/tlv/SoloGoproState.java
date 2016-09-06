@@ -1,12 +1,9 @@
 package com.o3dr.services.android.lib.drone.companion.solo.tlv;
 
 import android.os.Parcel;
-import android.support.annotation.IntDef;
 
 import com.o3dr.services.android.lib.drone.property.DroneAttribute;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.nio.ByteBuffer;
 
 /**

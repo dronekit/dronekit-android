@@ -1,7 +1,6 @@
 package com.o3dr.services.android.lib.drone.property;
 
 import android.os.Parcel;
-import android.os.Parcelable;
 
 /**
  * Created by fhuya on 10/28/14.

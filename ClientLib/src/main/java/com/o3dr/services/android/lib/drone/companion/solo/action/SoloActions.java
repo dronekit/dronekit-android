@@ -1,7 +1,5 @@
 package com.o3dr.services.android.lib.drone.companion.solo.action;
 
-import com.o3dr.services.android.lib.util.Utils;
-
 /**
  * Created by Fredia Huya-Kouadio on 7/10/15.
  */

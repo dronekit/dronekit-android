@@ -32,6 +32,7 @@ public class StructureScanner extends BaseSpatialItem implements MissionItem.Com
         copy(copy);
     }
 
+    @Override
     public void copy(StructureScanner source){
         this.radius = source.radius;
         this.heightStep = source.heightStep;

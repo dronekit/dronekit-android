@@ -1,7 +1,6 @@
 package com.o3dr.services.android.lib.util.version;
 
 import android.content.Context;
-import android.content.pm.PackageManager;
 
 import com.o3dr.android.client.R;
 
@@ -10,6 +9,10 @@ import com.o3dr.android.client.R;
  */
 public class VersionUtils {
 
+    /**
+     * @param context
+     * @return
+     */
     public static int getCoreLibVersion(Context context){
         return context.getResources().getInteger(R.integer.core_lib_version);
     }

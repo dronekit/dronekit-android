@@ -12,7 +12,7 @@ import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
 public class Land extends BaseSpatialItem implements android.os.Parcelable {
 
     public Land(){
-        super(MissionItemType.LAND);
+        super(MissionItemType.LAND, new LatLongAlt(0.0, 0.0, 0.0));
     }
 
     public Land(Land copy){

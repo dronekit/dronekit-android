@@ -1,9 +1,24 @@
 package com.o3dr.services.android.lib.drone.connection;
 
+import android.support.annotation.IntDef;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
 /**
  * Contains constants used for the connection parameters.
  */
 public class ConnectionType {
+
+    @IntDef({
+        TYPE_USB,
+        TYPE_UDP,
+        TYPE_TCP,
+        TYPE_BLUETOOTH,
+        TYPE_SOLO
+    })
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface Type {}
 
     /**
      *  USB connection type
@@ -94,4 +109,25 @@ public class ConnectionType {
      */
     public static final String EXTRA_SOLO_LINK_PASSWORD = "extra_solo_link_password";
 
+    public static String getConnectionTypeLabel(@Type int connectionType){
+        switch (connectionType) {
+            case TYPE_BLUETOOTH:
+                return "bluetooth";
+
+            case TYPE_TCP:
+                return "tcp";
+
+            case TYPE_UDP:
+                return "udp";
+
+            case TYPE_USB:
+                return "usb";
+
+            case TYPE_SOLO:
+                return "solo";
+
+            default:
+                return null;
+        }
+    }
 }

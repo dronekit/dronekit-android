@@ -1,7 +1,6 @@
 package com.o3dr.services.android.lib.drone.property;
 
 import android.os.Parcel;
-import android.os.Parcelable;
 
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -114,14 +113,14 @@ public class Parameter implements DroneAttribute, Comparable<Parameter> {
     public double[] parseRange() throws ParseException {
         final DecimalFormat format = formatter;
 
-        final String[] parts = this.range.split(" ");
-        if (parts.length != 2) {
+        final String[] parts = this.range.split("( to |\\s+|-)");
+        if (parts.length < 2) {
             throw new IllegalArgumentException();
         }
 
         final double[] outRange = new double[2];
-        outRange[RANGE_LOW] = format.parse(parts[RANGE_LOW]).doubleValue();
-        outRange[RANGE_HIGH] = format.parse(parts[RANGE_HIGH]).doubleValue();
+        outRange[RANGE_LOW] = format.parse(parts[0]).doubleValue();
+        outRange[RANGE_HIGH] = format.parse(parts[outRange.length -1]).doubleValue();
 
         return outRange;
     }

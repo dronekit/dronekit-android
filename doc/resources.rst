@@ -38,7 +38,7 @@ Tower (Droidplanner 3)
 
 The most used Android ground control station for drones.
 
-`Source <https://github.com/DroidPlanner/Tower>`_ | `Play Store <https://play.google.com/store/apps/details?id=org.droidplanner.android>`_
+`Source <https://github.com/DroidPlanner/Tower>`_ | `Play Store <https://play.google.com/store/apps/details?id=com.o3dr.android>`_
 
 Tower Pebble
 ----------

@@ -92,20 +92,6 @@ public class SoloConfigApi extends SoloApi {
     }
 
     /**
-     * @deprecated Use {@link #updateTxPowerComplianceCountry(TxPowerComplianceCountries compliantCountry, AbstractCommandListener listener)} instead.
-     */
-    public void updateEUTxPowerCompliance(boolean isEUCompliant, AbstractCommandListener listener) {
-        TxPowerComplianceCountries compliantCountry;
-        if (isEUCompliant) {
-            compliantCountry = TxPowerComplianceCountries.getDefaultEUCountry();
-        } else {
-            compliantCountry = TxPowerComplianceCountries.getDefaultCountry();
-        }
-
-        updateTxPowerComplianceCountry(compliantCountry, listener);
-    }
-
-    /**
      * Updates the tx power compliance to the specified country.
      *
      * @param compliantCountry Country code which the controller will be compliant.

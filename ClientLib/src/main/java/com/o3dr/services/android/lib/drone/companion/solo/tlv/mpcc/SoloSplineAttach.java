@@ -21,7 +21,7 @@ import java.nio.ByteBuffer;
  * indicate that it has reached the Path and is prepared to receive SOLO_SPLINE_SEEK messages.
  *
  *
- * This message is only valid once after a Path is loaded.  There is no corresponding “detach”
+ * This message is only valid once after a Path is loaded.  There is no corresponding "detach"
  * message -- the vehicle stays attached until playback mode is exited.
  *
  * @since 2.8.0

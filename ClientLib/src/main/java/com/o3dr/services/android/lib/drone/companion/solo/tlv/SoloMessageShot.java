@@ -18,8 +18,13 @@ public abstract class SoloMessageShot extends TLVPacket {
     public static final int SHOT_SELFIE = 0;
     public static final int SHOT_ORBIT = 1;
     public static final int SHOT_CABLECAM = 2;
+    public static final int SHOT_ZIPLINE = 3;
     public static final int SHOT_FOLLOW = 5;
     public static final int SHOT_MPCC = 6;
+    public static final int SHOT_PANO = 7;
+    public static final int SHOT_REWIND = 8;
+    public static final int SHOT_TRANSECT = 9;
+    public static final int SHOT_RETURN_HOME = 10;
 
     /*
     Site Scan shots
@@ -77,6 +82,21 @@ public abstract class SoloMessageShot extends TLVPacket {
 
             case SHOT_SCAN:
                 return context.getString(R.string.label_scan);
+
+            case SHOT_ZIPLINE:
+                return context.getString(R.string.label_zipline);
+
+            case SHOT_PANO:
+                return context.getString(R.string.label_pano);
+
+            case SHOT_REWIND:
+                return context.getString(R.string.label_rewind);
+
+            case SHOT_RETURN_HOME:
+                return context.getString(R.string.label_return_home);
+
+            case SHOT_TRANSECT:
+                return context.getString(R.string.label_transect);
 
             default:
                 return null;

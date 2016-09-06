@@ -1,6 +1,9 @@
 package com.o3dr.android.client.utils.connection;
 
+import android.os.Bundle;
 import android.os.Handler;
+
+import org.droidplanner.services.android.impl.utils.NetworkUtils;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -29,10 +32,11 @@ public class TcpConnection extends AbstractIpConnection {
     }
 
     @Override
-    protected void open() throws IOException {
+    protected void open(Bundle extras) throws IOException {
         final InetAddress serverAddr = InetAddress.getByName(serverIp);
         socket = new Socket();
         socket.setReuseAddress(true);
+        NetworkUtils.bindSocketToNetwork(extras, socket);
         socket.connect(new InetSocketAddress(serverAddr, serverPort), CONNECTION_TIMEOUT);
         connOut = new BufferedOutputStream(socket.getOutputStream());
         connIn = new BufferedInputStream(socket.getInputStream());

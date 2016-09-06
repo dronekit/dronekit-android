@@ -1,7 +1,6 @@
 package com.o3dr.services.android.lib.drone.property;
 
 import android.os.Parcel;
-import android.os.Parcelable;
 
 /**
  * Stores information about the drone's type.
@@ -20,7 +19,7 @@ public class Type implements DroneAttribute {
 
         private final String label;
 
-        private Firmware(String label){
+        Firmware(String label){
             this.label = label;
         }
 
@@ -38,24 +37,23 @@ public class Type implements DroneAttribute {
     public Type(int droneType, String firmwareVersion){
         this.droneType = droneType;
         this.firmwareVersion = firmwareVersion;
+        this.firmware = getTypeFirmware(droneType);
+    }
 
+    private static Firmware getTypeFirmware(int droneType) {
         switch(droneType){
             case TYPE_COPTER:
-                firmware = Firmware.ARDU_COPTER;
-                break;
+                return Firmware.ARDU_COPTER;
 
             case TYPE_PLANE:
-                firmware = Firmware.ARDU_PLANE;
-                break;
+                return Firmware.ARDU_PLANE;
 
             case TYPE_ROVER:
-                firmware = Firmware.APM_ROVER;
-                break;
+                return Firmware.APM_ROVER;
 
             case TYPE_UNKNOWN:
             default:
-                firmware = null;
-                break;
+                return null;
         }
     }
 
@@ -92,14 +90,16 @@ public class Type implements DroneAttribute {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(this.droneType);
         dest.writeString(this.firmwareVersion);
-        dest.writeInt(this.firmware == null ? -1 : this.firmware.ordinal());
+
+        // We're no longer passing the firmware ordinal since it'll be inferred from the drone type.
+        dest.writeInt(-1);
     }
 
     private Type(Parcel in) {
-        this.droneType = in.readInt();
-        this.firmwareVersion = in.readString();
-        int tmpFirmware = in.readInt();
-        this.firmware = tmpFirmware == -1 ? null : Firmware.values()[tmpFirmware];
+        this(in.readInt(), in.readString());
+
+        // Last value is the drone firmware ordinal, which is no longer of use.
+        in.readInt();
     }
 
     public static final Creator<Type> CREATOR = new Creator<Type>() {

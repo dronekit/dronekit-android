@@ -4,17 +4,16 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
 
-import com.o3dr.android.client.apis.ApiAvailability;
 import com.o3dr.android.client.interfaces.TowerListener;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.model.IDroidPlannerServices;
+import com.o3dr.services.android.lib.model.IDroneApi;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -24,8 +23,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class ControlTower {
 
     private static final String TAG = ControlTower.class.getSimpleName();
-
-    private final Intent serviceIntent = new Intent(IDroidPlannerServices.class.getName());
 
     private final IBinder.DeathRecipient binderDeathRecipient = new IBinder.DeathRecipient() {
         @Override
@@ -59,15 +56,13 @@ public class ControlTower {
     private final AtomicBoolean isServiceConnecting = new AtomicBoolean(false);
 
     private final Context context;
+    private final DroneApiListener apiListener;
     private TowerListener towerListener;
     private IDroidPlannerServices o3drServices;
 
     public ControlTower(Context context) {
         this.context = context;
-    }
-
-    IDroidPlannerServices get3drServices() {
-        return o3drServices;
+        this.apiListener = new DroneApiListener(this.context);
     }
 
     public boolean isTowerConnected() {
@@ -134,22 +129,9 @@ public class ControlTower {
         towerListener = listener;
 
         if (!isTowerConnected() && !isServiceConnecting.get()) {
-            final int apiAvailableResult = ApiAvailability.getInstance().checkApiAvailability(context);
-
-            switch(apiAvailableResult){
-                case ApiAvailability.API_AVAILABLE:
-                    final ResolveInfo info = context.getPackageManager().resolveService(serviceIntent, 0);
-                    if (info != null) {
-                        serviceIntent.setClassName(info.serviceInfo.packageName, info.serviceInfo.name);
-                        isServiceConnecting.set(context.bindService(serviceIntent, o3drServicesConnection,
-                                Context.BIND_AUTO_CREATE));
-                    }
-                    break;
-
-                default:
-                    ApiAvailability.getInstance().showErrorDialog(context, apiAvailableResult);
-                    break;
-            }
+            final Intent serviceIntent = ApiAvailability.getInstance().getAvailableServicesInstance(context);
+            isServiceConnecting.set(context.bindService(serviceIntent, o3drServicesConnection,
+                    Context.BIND_AUTO_CREATE));
         }
     }
 
@@ -166,11 +148,19 @@ public class ControlTower {
         try {
             context.unbindService(o3drServicesConnection);
         } catch (Exception e) {
-            Log.e(TAG, "Error occurred while unbinding from 3DR Services.");
+            Log.e(TAG, "Error occurred while unbinding from DroneKit-Android.");
         }
     }
 
-    String getApplicationId() {
+    IDroneApi registerDroneApi() throws RemoteException {
+        return o3drServices.registerDroneApi(this.apiListener, getApplicationId());
+    }
+
+    void releaseDroneApi(IDroneApi droneApi) throws RemoteException {
+        o3drServices.releaseDroneApi(droneApi);
+    }
+
+    private String getApplicationId() {
         return context.getPackageName();
     }
 }

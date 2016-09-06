@@ -20,6 +20,7 @@ public class Survey extends MissionItem implements MissionItem.ComplexItem<Surve
         surveyDetail.setAngle(0);
         surveyDetail.setOverlap(50);
         surveyDetail.setSidelap(60);
+        surveyDetail.setLockOrientation(false);
     }
 
     private double polygonArea;

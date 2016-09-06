@@ -8,6 +8,7 @@ import java.nio.ByteBuffer;
 
 /**
  *  Send the app our cable cam waypoint when it’s recorded.
+ *  Deprecated since shotmanager 2.0
  */
 public class SoloCableCamWaypoint extends TLVPacket {
 

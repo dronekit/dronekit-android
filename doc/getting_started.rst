@@ -36,7 +36,7 @@ For an existing app:
 
 #. Open the **build.gradle** file inside your application module directory. Android Studio projects contain a top level **build.gradle** file and a **build.gradle** for each module. Make sure to edit the file for your application module.
 
-#. Add a new build rule under dependencies for the latest version of the 3DR Services Client library. For example: 
+#. Add a new build rule under dependencies for the latest version of the DroneKit-Android Client library. For example:
 
    .. code-block:: bash
 
@@ -48,13 +48,6 @@ For an existing app:
        }
 
        dependencies {
-           compile 'com.o3dr.android:dronekit-android:2.3.+'
+           compile 'com.o3dr.android:dronekit-android:3.0.+'
            ...
        }
-
-Installing 3DR Services on your Mobile Device
-=============================================
-
-For any DroneKit apps to work on Android, the *3DR Services* app must be installed. This app provides a communication layer to the drone and showcases apps built on DroneKit.
-
-You can `install 3DR Services from here <https://play.google.com/store/apps/details?id=org.droidplanner.services.android>`_.

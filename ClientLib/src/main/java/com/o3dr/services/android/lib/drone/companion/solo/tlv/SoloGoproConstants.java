@@ -2,8 +2,6 @@ package com.o3dr.services.android.lib.drone.companion.solo.tlv;
 
 import android.support.annotation.IntDef;
 
-import com.MAVLink.enums.GOPRO_CAPTURE_MODE;
-
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 

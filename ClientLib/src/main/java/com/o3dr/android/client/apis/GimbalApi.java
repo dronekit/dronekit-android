@@ -10,7 +10,6 @@ import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
-import com.o3dr.services.android.lib.drone.connection.ConnectionResult;
 import com.o3dr.services.android.lib.drone.property.Type;
 import com.o3dr.services.android.lib.model.SimpleCommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
@@ -18,7 +17,12 @@ import com.o3dr.services.android.lib.model.action.Action;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import static com.o3dr.services.android.lib.drone.action.GimbalActions.*;
+import static com.o3dr.services.android.lib.drone.action.GimbalActions.ACTION_SET_GIMBAL_MOUNT_MODE;
+import static com.o3dr.services.android.lib.drone.action.GimbalActions.ACTION_SET_GIMBAL_ORIENTATION;
+import static com.o3dr.services.android.lib.drone.action.GimbalActions.GIMBAL_MOUNT_MODE;
+import static com.o3dr.services.android.lib.drone.action.GimbalActions.GIMBAL_PITCH;
+import static com.o3dr.services.android.lib.drone.action.GimbalActions.GIMBAL_ROLL;
+import static com.o3dr.services.android.lib.drone.action.GimbalActions.GIMBAL_YAW;
 
 public final class GimbalApi extends Api implements DroneListener {
 
@@ -264,11 +268,6 @@ public final class GimbalApi extends Api implements DroneListener {
         for(GimbalOrientationListener listener: gimbalListeners){
             listener.onGimbalOrientationUpdate(orientation);
         }
-    }
-
-    @Override
-    public void onDroneConnectionFailed(ConnectionResult result) {
-
     }
 
     @Override
