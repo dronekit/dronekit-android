@@ -24,8 +24,8 @@ public class HeartBeat extends DroneVariable implements OnDroneListener<MavLinkD
     protected static final int NORMAL_HEARTBEAT = 2;
 
     protected int heartbeatState = FIRST_HEARTBEAT;
-    private byte sysid = 1;
-    private byte compid = 1;
+    private short sysid = 1;
+    private short compid = 1;
 
     /**
      * Stores the version of the mavlink protocol.
@@ -46,11 +46,11 @@ public class HeartBeat extends DroneVariable implements OnDroneListener<MavLinkD
         myDrone.addDroneListener(this);
     }
 
-    public byte getSysid() {
+    public short getSysid() {
         return sysid;
     }
 
-    public byte getCompid() {
+    public short getCompid() {
         return compid;
     }
 
@@ -64,8 +64,8 @@ public class HeartBeat extends DroneVariable implements OnDroneListener<MavLinkD
     public void onHeartbeat(MAVLinkMessage msg) {
         msg_heartbeat heartBeatMsg = msg instanceof msg_heartbeat ? (msg_heartbeat) msg : null;
         if(heartBeatMsg != null){
-            sysid = (byte) msg.sysid;
-            compid = (byte) msg.compid;
+            sysid  = validateToUnsignedByteRange(msg.sysid);
+            compid = validateToUnsignedByteRange(msg.compid);
             mMavlinkVersion = heartBeatMsg.mavlink_version;
         }
 

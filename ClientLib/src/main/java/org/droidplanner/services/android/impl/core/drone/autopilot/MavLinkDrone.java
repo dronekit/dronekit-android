@@ -27,9 +27,9 @@ public interface MavLinkDrone extends Drone {
 
     void onMavLinkMessageReceived(MAVLinkMessage message);
 
-    public byte getSysid();
+    public short getSysid();
 
-    public byte getCompid();
+    public short getCompid();
 
     public State getState();
 
