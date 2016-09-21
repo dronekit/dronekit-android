@@ -224,7 +224,7 @@ public class DroidPlannerService extends Service {
 
         //Put the service in the foreground
         final NotificationCompat.Builder notifBuilder = new NotificationCompat.Builder(context)
-                .setContentTitle("3DR Services")
+                .setContentTitle("Dronekit-Android")
                 .setPriority(NotificationCompat.PRIORITY_MIN)
                 .setSmallIcon(R.drawable.ic_stat_notify);
 //                .setContentIntent(PendingIntent.getActivity(context, 0, new Intent(context,
