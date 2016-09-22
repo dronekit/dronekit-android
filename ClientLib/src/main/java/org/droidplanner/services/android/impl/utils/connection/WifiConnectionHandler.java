@@ -1,10 +1,12 @@
 package org.droidplanner.services.android.impl.utils.connection;
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.DhcpInfo;
 import android.net.LinkProperties;
@@ -18,12 +20,15 @@ import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
+import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
+
 import org.droidplanner.services.android.impl.utils.NetworkUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -313,7 +318,11 @@ public class WifiConnectionHandler {
     }
 
     public List<ScanResult> getScanResults() {
-        return wifiMgr.getScanResults();
+        if(ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            return wifiMgr.getScanResults();
+        } else {
+            return new ArrayList<ScanResult>();
+        }
     }
 
     public int connectToWifi(String soloLinkId, String password) {
