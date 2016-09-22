@@ -2,17 +2,21 @@ package com.o3dr.android.client.apis.solo;
 
 import android.os.Bundle;
 
+import com.MAVLink.ardupilotmega.msg_led_control;
 import com.o3dr.android.client.Drone;
 import com.o3dr.android.client.utils.TxPowerComplianceCountries;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerMode;
 import com.o3dr.services.android.lib.drone.companion.solo.controller.SoloControllerUnits;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloButtonSettingSetter;
+import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
 import com.o3dr.services.android.lib.model.AbstractCommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
 
 import java.util.concurrent.ConcurrentHashMap;
 
+import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.ACTION_SEND_MAVLINK_MESSAGE;
+import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.EXTRA_MAVLINK_MESSAGE;
 import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.ACTION_REFRESH_SOLO_VERSIONS;
 import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.ACTION_UPDATE_BUTTON_SETTINGS;
 import static com.o3dr.services.android.lib.drone.companion.solo.action.SoloConfigActions.ACTION_UPDATE_CONTROLLER_MODE;
@@ -131,5 +135,15 @@ public class SoloConfigApi extends SoloApi {
         Bundle params = new Bundle();
         params.putString(EXTRA_CONTROLLER_UNIT, controllerUnit);
         drone.performAsyncActionOnDroneThread(new Action(ACTION_UPDATE_CONTROLLER_UNIT, params), listener);
+    }
+
+    public void setLedColor(int instance, int pattern) {
+        msg_led_control led = new msg_led_control();
+        led.instance = (short)instance;
+        led.pattern = (short)pattern; // actually, macro
+
+        Bundle params = new Bundle();
+        params.putParcelable(EXTRA_MAVLINK_MESSAGE, new MavlinkMessageWrapper(led));
+        drone.performAsyncAction(new Action(ACTION_SEND_MAVLINK_MESSAGE, params));
     }
 }
