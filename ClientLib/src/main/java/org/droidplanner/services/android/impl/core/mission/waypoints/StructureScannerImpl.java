@@ -2,6 +2,8 @@ package org.droidplanner.services.android.impl.core.mission.waypoints;
 
 import com.MAVLink.common.msg_mission_item;
 import com.MAVLink.enums.MAV_CMD;
+import com.o3dr.services.android.lib.coordinate.LatLong;
+import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 
 import org.droidplanner.services.android.impl.core.helpers.geoTools.GeoTools;
 import org.droidplanner.services.android.impl.core.mission.MissionImpl;
@@ -12,15 +14,13 @@ import org.droidplanner.services.android.impl.core.polygon.Polygon;
 import org.droidplanner.services.android.impl.core.survey.CameraInfo;
 import org.droidplanner.services.android.impl.core.survey.SurveyData;
 import org.droidplanner.services.android.impl.core.survey.grid.GridBuilder;
-import com.o3dr.services.android.lib.coordinate.LatLong;
-import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class StructureScannerImpl extends SpatialCoordItem {
-    private double radius = (10.0);
-    private double heightStep = (5);
+    private double radius = 10.0;
+    private double heightStep = 5;
     private int numberOfSteps = 2;
     private boolean crossHatch = false;
     SurveyData survey = new SurveyData();
@@ -50,10 +50,13 @@ public class StructureScannerImpl extends SpatialCoordItem {
     }
 
     private void packCircles(List<msg_mission_item> list) {
-        for (double altitude = coordinate.getAltitude(); altitude <= getTopHeight(); altitude += heightStep) {
-            CircleImpl circleImpl = new CircleImpl(missionImpl, new LatLongAlt(coordinate, (altitude)));
-            circleImpl.setRadius(radius);
-            list.addAll(circleImpl.packMissionItem());
+        if (heightStep > 0) {
+            double topHeight = getTopHeight();
+            for (double altitude = coordinate.getAltitude(); altitude <= topHeight; altitude += heightStep) {
+                CircleImpl circleImpl = new CircleImpl(missionImpl, new LatLongAlt(coordinate, (altitude)));
+                circleImpl.setRadius(radius);
+                list.addAll(circleImpl.packMissionItem());
+            }
         }
     }
 
