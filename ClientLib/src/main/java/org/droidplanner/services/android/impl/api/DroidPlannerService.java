@@ -35,6 +35,7 @@ import timber.log.Timber;
  * 3DR Services background service implementation.
  */
 public class DroidPlannerService extends Service {
+    static final String TAG = DroidPlannerService.class.getSimpleName();
 
         /**
      * Status bar notification id
@@ -206,7 +207,7 @@ public class DroidPlannerService extends Service {
     public void onCreate() {
         super.onCreate();
 
-        Timber.d("Creating 3DR Services.");
+        Timber.d("Creating %s", TAG);
 
         final Context context = getApplicationContext();
 
@@ -246,7 +247,7 @@ public class DroidPlannerService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Timber.d("Destroying 3DR Services.");
+        Timber.d("Destroying %s", TAG);
 
         for (DroneApi droneApi : droneApiStore.values()) {
             droneApi.destroy();
