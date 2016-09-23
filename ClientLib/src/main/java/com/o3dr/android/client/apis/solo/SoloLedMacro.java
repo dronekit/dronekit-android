@@ -2,6 +2,9 @@ package com.o3dr.android.client.apis.solo;
 
 public class SoloLedMacro {
     public static final int MACRO_RESET = 0;
+    public static final int MACRO_COLOR_CYCLE = 1;
+    public static final int MACRO_BREATHE = 2;
+    public static final int MACRO_STROBE = 3;
     public static final int MACRO_RED = 6;
     public static final int MACRO_GREEN = 7;
     public static final int MACRO_BLUE = 8;
