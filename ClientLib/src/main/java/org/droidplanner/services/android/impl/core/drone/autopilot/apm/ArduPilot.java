@@ -385,6 +385,12 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
 
     @Override
     public void onMavLinkMessageReceived(MAVLinkMessage message) {
+
+        if (message.sysid != this.getSysid()) {
+            // Reject Messages that are not for the system id
+            return;
+        }
+
         int compId = message.compid;
         if (compId != AUTOPILOT_COMPONENT_ID
                 && compId != ARTOO_COMPONENT_ID
