@@ -50,13 +50,12 @@ public class StructureScannerImpl extends SpatialCoordItem {
     }
 
     private void packCircles(List<msg_mission_item> list) {
-        if (heightStep > 0) {
-            double topHeight = getTopHeight();
-            for (double altitude = coordinate.getAltitude(); altitude <= topHeight; altitude += heightStep) {
-                CircleImpl circleImpl = new CircleImpl(missionImpl, new LatLongAlt(coordinate, (altitude)));
-                circleImpl.setRadius(radius);
-                list.addAll(circleImpl.packMissionItem());
-            }
+        double altitude = coordinate.getAltitude();
+        for (int iSteps = 0; iSteps < numberOfSteps; iSteps++) {
+            CircleImpl circleImpl = new CircleImpl(missionImpl, new LatLongAlt(coordinate, altitude));
+            circleImpl.setRadius(radius);
+            list.addAll(circleImpl.packMissionItem());
+            altitude+= heightStep;
         }
     }
 
