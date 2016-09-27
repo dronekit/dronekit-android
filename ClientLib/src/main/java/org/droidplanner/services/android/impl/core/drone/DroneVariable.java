@@ -9,6 +9,10 @@ import com.o3dr.services.android.lib.model.ICommandListener;
 import timber.log.Timber;
 
 public class DroneVariable<T extends MavLinkDrone> {
+
+	static int UNSIGNED_BYTE_MIN_VALUE = 0;
+	static int UNSIGNED_BYTE_MAX_VALUE = 255;
+
 	protected T myDrone;
 
 	public DroneVariable(T myDrone) {
@@ -75,4 +79,13 @@ public class DroneVariable<T extends MavLinkDrone> {
 			});
 		}
 	}
+
+	public static short validateToUnsignedByteRange(int id){
+		if(id < UNSIGNED_BYTE_MIN_VALUE || id > UNSIGNED_BYTE_MAX_VALUE){
+			throw new IllegalArgumentException("Value is outside of the range of an sysid/compid byte: " + id);
+		}
+		return (short)id;
+	}
+
+
 }
