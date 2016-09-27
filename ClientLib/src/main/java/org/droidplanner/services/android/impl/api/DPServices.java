@@ -8,7 +8,7 @@ import com.o3dr.android.client.BuildConfig;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.gcs.event.GCSEvent;
 import com.o3dr.services.android.lib.model.IApiListener;
-import com.o3dr.services.android.lib.model.IDroidPlannerServices;
+import com.o3dr.services.android.lib.model.IDroidPlannerService;
 import com.o3dr.services.android.lib.model.IDroneApi;
 import com.o3dr.services.android.lib.util.version.VersionUtils;
 
@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * Created by fhuya on 11/3/14.
  */
-final class DPServices extends IDroidPlannerServices.Stub {
+final class DPServices extends IDroidPlannerService.Stub {
 
     private final static String TAG = DPServices.class.getSimpleName();
 

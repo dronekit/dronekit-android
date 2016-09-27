@@ -12,7 +12,7 @@ import android.util.Log;
 
 import com.o3dr.android.client.interfaces.TowerListener;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
-import com.o3dr.services.android.lib.model.IDroidPlannerServices;
+import com.o3dr.services.android.lib.model.IDroidPlannerService;
 import com.o3dr.services.android.lib.model.IDroneApi;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -37,7 +37,7 @@ public class ControlTower {
         public void onServiceConnected(ComponentName name, IBinder service) {
             isServiceConnecting.set(false);
 
-            o3drServices = IDroidPlannerServices.Stub.asInterface(service);
+            o3drServices = IDroidPlannerService.Stub.asInterface(service);
             try {
                 o3drServices.asBinder().linkToDeath(binderDeathRecipient, 0);
                 notifyTowerConnected();
@@ -58,7 +58,7 @@ public class ControlTower {
     private final Context context;
     private final DroneApiListener apiListener;
     private TowerListener towerListener;
-    private IDroidPlannerServices o3drServices;
+    private IDroidPlannerService o3drServices;
 
     public ControlTower(Context context) {
         this.context = context;

@@ -58,7 +58,7 @@
 
             <!-- Filter and meta data for the Tower lib runtime -->
             <intent-filter>
-                <action android:name="com.o3dr.services.android.lib.model.IDroidPlannerServices" />
+                <action android:name="com.o3dr.services.android.lib.model.IDroidPlannerService" />
             </intent-filter>
 
             <meta-data

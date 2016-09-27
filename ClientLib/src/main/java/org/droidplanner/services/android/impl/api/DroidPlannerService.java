@@ -18,7 +18,7 @@ import com.o3dr.android.client.R;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.mission.item.complex.CameraDetail;
 import com.o3dr.services.android.lib.model.IApiListener;
-import com.o3dr.services.android.lib.model.IDroidPlannerServices;
+import com.o3dr.services.android.lib.model.IDroidPlannerService;
 
 import org.droidplanner.services.android.impl.core.drone.DroneManager;
 import org.droidplanner.services.android.impl.core.survey.CameraInfo;
@@ -193,7 +193,7 @@ public class DroidPlannerService extends Service {
     public IBinder onBind(Intent intent) {
         Timber.d("Binding intent: " + intent);
         final String action = intent.getAction();
-        if (IDroidPlannerServices.class.getName().equals(action)) {
+        if (IDroidPlannerService.class.getName().equals(action)) {
             // Return binder to ipc client-server interaction.
             return dpServices;
         } else {

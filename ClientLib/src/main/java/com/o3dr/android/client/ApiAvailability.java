@@ -7,7 +7,7 @@ import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 
-import com.o3dr.services.android.lib.model.IDroidPlannerServices;
+import com.o3dr.services.android.lib.model.IDroidPlannerService;
 import com.o3dr.services.android.lib.util.version.VersionUtils;
 
 import org.droidplanner.services.android.impl.api.DroidPlannerService;
@@ -24,7 +24,7 @@ class ApiAvailability {
         private static final ApiAvailability INSTANCE = new ApiAvailability();
     }
 
-    private static final String SERVICES_CLAZZ_NAME = IDroidPlannerServices.class.getName();
+    private static final String SERVICES_CLAZZ_NAME = IDroidPlannerService.class.getName();
     private static final String METADATA_KEY = "com.o3dr.dronekit.android.core.version";
 
     private static final int INVALID_LIB_VERSION = -1;

@@ -1,4 +1,4 @@
-// IDroidPlannerServices.aidl
+// IDroidPlannerService.aidl
 package com.o3dr.services.android.lib.model;
 
 import com.o3dr.services.android.lib.model.IDroneApi;
@@ -7,7 +7,7 @@ import com.o3dr.services.android.lib.model.IApiListener;
 /**
 * Used to establish connection with a drone.
 */
-interface IDroidPlannerServices {
+interface IDroidPlannerService {
 
     /**
     * Retrieve the version code for the 3DR Service implementation.
