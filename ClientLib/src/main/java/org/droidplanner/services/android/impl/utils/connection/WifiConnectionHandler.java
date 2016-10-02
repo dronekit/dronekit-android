@@ -20,6 +20,7 @@ import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
+import android.provider.Settings;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.widget.Toast;
@@ -69,7 +70,7 @@ public class WifiConnectionHandler {
             switch (action) {
 
                 case WifiManager.SCAN_RESULTS_AVAILABLE_ACTION:
-                    notifyWifiScanResultsAvailable(wifiMgr.getScanResults());
+                    notifyWifiScanResultsAvailable(getWifiScanResults());
                     break;
 
                 case WifiManager.SUPPLICANT_STATE_CHANGED_ACTION:
@@ -317,12 +318,49 @@ public class WifiConnectionHandler {
         }
     }
 
-    public List<ScanResult> getScanResults() {
-        if(ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+    public List<ScanResult> getWifiScanResults() {
+        if(hasLocationPermissions()) {
             return wifiMgr.getScanResults();
         } else {
             return new ArrayList<ScanResult>();
         }
+    }
+
+    private boolean hasNetworkChangeStatePermissions() {
+        boolean hasPerms = false;
+
+        for(String perm: new String[] {
+                Manifest.permission.CHANGE_NETWORK_STATE
+        }) {
+            if(ContextCompat.checkSelfPermission(context, perm) == PackageManager.PERMISSION_GRANTED) {
+                hasPerms = true;
+                break;
+            }
+        }
+
+        if(!hasPerms) {
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                hasPerms = Settings.System.canWrite(context);
+            }
+        }
+
+        return hasPerms;
+    }
+
+    private boolean hasLocationPermissions() {
+        boolean hasPerms = false;
+
+        for(String perm: new String[] {
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+        }) {
+            if(ContextCompat.checkSelfPermission(context, perm) == PackageManager.PERMISSION_GRANTED) {
+                hasPerms = true;
+                break;
+            }
+        }
+
+        return hasPerms;
     }
 
     public int connectToWifi(String soloLinkId, String password) {
@@ -331,7 +369,7 @@ public class WifiConnectionHandler {
         }
 
         ScanResult targetScanResult = null;
-        final List<ScanResult> scanResults = wifiMgr.getScanResults();
+        final List<ScanResult> scanResults = getWifiScanResults();
         for (ScanResult result : scanResults) {
             if (result.SSID.equalsIgnoreCase(soloLinkId)) {
                 targetScanResult = result;
@@ -457,7 +495,10 @@ public class WifiConnectionHandler {
                 //Attempt to connect to the vehicle.
                 Timber.i("Requesting route to sololink network");
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    connMgr.requestNetwork((NetworkRequest) netReq, (ConnectivityManager.NetworkCallback) netReqCb);
+                    if(hasNetworkChangeStatePermissions()) {
+                        connMgr.requestNetwork((NetworkRequest) netReq, (ConnectivityManager.NetworkCallback) netReqCb);
+                    }
+
                 } else {
                     notifyWifiConnected(trimmedSsid);
 

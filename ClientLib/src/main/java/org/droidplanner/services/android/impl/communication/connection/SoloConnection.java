@@ -58,7 +58,7 @@ public class SoloConnection extends AndroidMavLinkConnection implements WifiConn
             onConnectionStatus(connectionStatus);
         } else {
             wifiHandler.start();
-            checkScanResults(wifiHandler.getScanResults());
+            checkScanResults(wifiHandler.getWifiScanResults());
         }
     }
 
@@ -135,8 +135,13 @@ public class SoloConnection extends AndroidMavLinkConnection implements WifiConn
     }
 
     private void checkScanResults(List<ScanResult> results) {
-        if (!isConnecting())
+        if (!isConnecting()) {
             return;
+        }
+
+        if(results == null) {
+            return;
+        }
 
         //We're in the connection process, let's see if the wifi we want is available
         ScanResult targetResult = null;
