@@ -4,7 +4,7 @@ apply plugin: 'com.getkeepsafe.dexcount'
 ext {
     VERSION_MAJOR = 3
     VERSION_MINOR = 0
-    VERSION_PATCH = 1
+    VERSION_PATCH = 2
     VERSION_SUFFIX = "release"
 
     PUBLISH_ARTIFACT_ID = 'dronekit-android'
@@ -94,6 +94,7 @@ android {
     testOptions {
         unitTests.returnDefaultValues = true
     }
+    buildToolsVersion '24.0.1'
 }
 
 dependencies {

@@ -14,7 +14,7 @@ DroneKit-Android helps you create powerful Android apps for UAVs.
 
 [DroneKit-Android](http://android.dronekit.io/) is the implementation of [DroneKit](http://dronekit.io/) on Android.
 
-The API provides interfaces that apps can use to control copters, planes, and ground vehicles. It is compatible with vehicles that communicate using the MAVLink protocol (including most vehicles made by 3DR and other members of the DroneCode foundation), and is validated against the open-source [ArduPilot flight control platform](ardupilot.com).
+The API provides interfaces that apps can use to control copters, planes, and ground vehicles. It is compatible with vehicles that communicate using the MAVLink protocol (including most vehicles made by 3DR and other members of the DroneCode foundation), and is validated against the open-source [ArduPilot flight control platform](http://ardupilot.com).
 
 This project implements the [DroneKit-Android Client library](http://android.dronekit.io) which allows developers to leverage the DroneKit API.
 
