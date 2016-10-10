@@ -14,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_DO_GUIDED_TAKEOFF;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_ENABLE_MANUAL_CONTROL;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_LOOK_AT_TARGET;
+import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_RESET_ROI;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_SEND_BRAKE_VEHICLE;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_SEND_GUIDED_POINT;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_SET_CONDITION_YAW;
@@ -113,6 +114,11 @@ public class ControlApi extends Api {
         params.putBoolean(EXTRA_FORCE_GUIDED_POINT, force);
         params.putParcelable(EXTRA_LOOK_AT_TARGET, point);
         drone.performAsyncActionOnDroneThread(new Action(ACTION_LOOK_AT_TARGET, params), listener);
+    }
+
+    public void resetROI(AbstractCommandListener listener) {
+        Bundle params = new Bundle();
+        drone.performAsyncActionOnDroneThread(new Action(ACTION_RESET_ROI, params), listener);
     }
 
     /**

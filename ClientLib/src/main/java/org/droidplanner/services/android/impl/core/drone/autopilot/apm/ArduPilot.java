@@ -246,6 +246,10 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
                 CommonApiUtils.sendLookAtTarget(this, lookAtTarget, force, listener);
                 return true;
 
+            case ControlActions.ACTION_RESET_ROI:
+                CommonApiUtils.sendResetROI(this, listener);
+                return true;
+
             case ControlActions.ACTION_SET_GUIDED_ALTITUDE:
                 double guidedAltitude = data.getDouble(ControlActions.EXTRA_ALTITUDE);
                 CommonApiUtils.setGuidedAltitude(this, guidedAltitude);

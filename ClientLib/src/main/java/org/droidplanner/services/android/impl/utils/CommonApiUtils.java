@@ -827,6 +827,14 @@ public class CommonApiUtils {
         }
     }
 
+    public static void sendResetROI(final MavLinkDrone drone, final ICommandListener listener) {
+        if(drone == null) {
+            return;
+        }
+
+        MavLinkDoCmds.resetROI(drone, listener);
+    }
+
     public static void sendLookAtTarget(final MavLinkDrone drone, final LatLongAlt target, final boolean force, final ICommandListener listener){
         if(drone == null)
             return;

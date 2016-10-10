@@ -53,6 +53,11 @@ public class ControlActions {
      */
     public static final String EXTRA_LOOK_AT_TARGET = "extra_look_at_target";
 
+    /**
+     * Reset ROI: Stop staring at something
+     */
+    public static final String ACTION_RESET_ROI = PACKAGE_NAME + ".RESET_ROI";
+
     //Private to prevent instantiation
     private ControlActions(){}
 
