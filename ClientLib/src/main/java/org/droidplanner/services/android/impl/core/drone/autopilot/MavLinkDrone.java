@@ -15,6 +15,8 @@ import org.droidplanner.services.android.impl.core.drone.variables.calibration.M
 import org.droidplanner.services.android.impl.core.firmware.FirmwareType;
 import org.droidplanner.services.android.impl.core.mission.MissionImpl;
 
+import com.o3dr.services.android.lib.coordinate.*;
+
 public interface MavLinkDrone extends Drone {
 
     String PACKAGE_NAME = "org.droidplanner.services.android.core.drone.autopilot";
@@ -27,36 +29,40 @@ public interface MavLinkDrone extends Drone {
 
     void onMavLinkMessageReceived(MAVLinkMessage message);
 
-    public short getSysid();
+    short getSysid();
 
-    public short getCompid();
+    short getCompid();
 
-    public State getState();
+    State getState();
 
-    public ParameterManager getParameterManager();
+    Frame getFrame();
 
-    public int getType();
+    void setFrame(Frame frame);
 
-    public FirmwareType getFirmwareType();
+    ParameterManager getParameterManager();
 
-    public DataLink.DataLinkProvider<MAVLinkMessage> getMavClient();
+    int getType();
 
-    public WaypointManager getWaypointManager();
+    FirmwareType getFirmwareType();
 
-    public MissionImpl getMission();
+    DataLink.DataLinkProvider<MAVLinkMessage> getMavClient();
 
-    public StreamRates getStreamRates();
+    WaypointManager getWaypointManager();
 
-    public MissionStats getMissionStats();
+    MissionImpl getMission();
 
-    public GuidedPoint getGuidedPoint();
+    StreamRates getStreamRates();
 
-    public AccelCalibration getCalibrationSetup();
+    MissionStats getMissionStats();
 
-    public MagnetometerCalibrationImpl getMagnetometerCalibration();
+    GuidedPoint getGuidedPoint();
 
-    public String getFirmwareVersion();
+    AccelCalibration getCalibrationSetup();
 
-    public Camera getCamera();
+    MagnetometerCalibrationImpl getMagnetometerCalibration();
+
+    String getFirmwareVersion();
+
+    Camera getCamera();
 
 }

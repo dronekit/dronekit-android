@@ -23,6 +23,7 @@ import com.MAVLink.enums.MAV_MODE_FLAG;
 import com.MAVLink.enums.MAV_STATE;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
+import com.o3dr.services.android.lib.coordinate.Frame;
 import com.o3dr.services.android.lib.drone.action.CapabilityActions;
 import com.o3dr.services.android.lib.drone.action.ControlActions;
 import com.o3dr.services.android.lib.drone.action.ExperimentalActions;
@@ -102,6 +103,7 @@ public class GenericMavLinkDrone implements MavLinkDrone {
     private final Gps vehicleGps = new Gps();
     private final Parameters parameters = new Parameters();
     protected final Altitude altitude = new Altitude();
+    protected Frame frame = Frame.GLOBAL_RELATIVE;  // Frame in which the vehicle operates.
     protected final Speed speed = new Speed();
     protected final Battery battery = new Battery();
     protected final Signal signal = new Signal();
@@ -245,6 +247,16 @@ public class GenericMavLinkDrone implements MavLinkDrone {
     @Override
     public short getCompid() {
         return heartbeat.getCompid();
+    }
+
+    @Override
+    public Frame getFrame() {
+        return this.frame;
+    }
+
+    @Override
+    public void setFrame(Frame frame){
+        this.frame = frame;
     }
 
     @Override
