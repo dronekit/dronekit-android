@@ -2,6 +2,7 @@ package org.droidplanner.services.android.impl.core.mission.waypoints;
 
 import com.MAVLink.common.msg_mission_item;
 import com.MAVLink.enums.MAV_CMD;
+import com.o3dr.services.android.lib.coordinate.Frame;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 
@@ -45,14 +46,14 @@ public class StructureScannerImpl extends SpatialCoordItem {
     }
 
     private void packROI(List<msg_mission_item> list) {
-        RegionOfInterestImpl roi = new RegionOfInterestImpl(missionImpl, new LatLongAlt(coordinate, (0.0)));
+        RegionOfInterestImpl roi = new RegionOfInterestImpl(missionImpl, new LatLongAlt(coordinate, (0.0), Frame.GLOBAL_RELATIVE));
         list.addAll(roi.packMissionItem());
     }
 
     private void packCircles(List<msg_mission_item> list) {
         double altitude = coordinate.getAltitude();
         for (int iSteps = 0; iSteps < numberOfSteps; iSteps++) {
-            CircleImpl circleImpl = new CircleImpl(missionImpl, new LatLongAlt(coordinate, altitude));
+            CircleImpl circleImpl = new CircleImpl(missionImpl, new LatLongAlt(coordinate, altitude, Frame.GLOBAL_RELATIVE));
             circleImpl.setRadius(radius);
             list.addAll(circleImpl.packMissionItem());
             altitude+= heightStep;

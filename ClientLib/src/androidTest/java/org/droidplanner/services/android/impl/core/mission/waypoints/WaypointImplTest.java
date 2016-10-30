@@ -2,6 +2,7 @@ package org.droidplanner.services.android.impl.core.mission.waypoints;
 
 import com.MAVLink.common.msg_mission_item;
 import com.MAVLink.enums.MAV_CMD;
+import com.o3dr.services.android.lib.coordinate.Frame;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 
 import junit.framework.TestCase;
@@ -14,7 +15,7 @@ public class WaypointImplTest extends TestCase {
 
     public void testPackMissionItem() {
         MissionImpl missionImpl = new MissionImpl(null);
-        WaypointImpl item = new WaypointImpl(missionImpl, new LatLongAlt(0, 1, (2)));
+        WaypointImpl item = new WaypointImpl(missionImpl, new LatLongAlt(0, 1, (2), Frame.GLOBAL_RELATIVE));
 
         List<msg_mission_item> listOfMsg = item.packMissionItem();
         assertEquals(1, listOfMsg.size());

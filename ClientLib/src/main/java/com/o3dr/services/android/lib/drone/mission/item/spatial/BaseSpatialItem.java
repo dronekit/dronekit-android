@@ -54,7 +54,7 @@ public abstract class BaseSpatialItem extends MissionItem implements MissionItem
 
     @Override
     public LatLongAlt getCoordinate() {
-        return coordinate;
+        return coordinate != null ? coordinate : new LatLongAlt();
     }
 
     @Override

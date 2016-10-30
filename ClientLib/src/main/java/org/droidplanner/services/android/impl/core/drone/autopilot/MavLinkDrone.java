@@ -39,6 +39,10 @@ public interface MavLinkDrone extends Drone {
 
     void setFrame(Frame frame);
 
+    short getMavFrame();
+
+    short getMavFrameInt();
+
     ParameterManager getParameterManager();
 
     int getType();

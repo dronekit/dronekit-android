@@ -55,6 +55,7 @@ import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.drone.mission.action.MissionActions;
 import com.o3dr.services.android.lib.drone.property.DroneAttribute;
+import com.o3dr.services.android.lib.drone.property.GuidedState;
 import com.o3dr.services.android.lib.drone.property.Parameter;
 import com.o3dr.services.android.lib.drone.property.VehicleMode;
 import com.o3dr.services.android.lib.gcs.action.CalibrationActions;
@@ -165,7 +166,7 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
                     return CommonApiUtils.getMission(this);
 
                 case AttributeType.GUIDED_STATE:
-                    return CommonApiUtils.getGuidedState(this);
+                    return GuidedState.getGuidedStateFromPoint(guidedPoint);
 
                 case AttributeType.MAGNETOMETER_CALIBRATION_STATUS:
                     return CommonApiUtils.getMagnetometerCalibrationStatus(this);

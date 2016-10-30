@@ -2,6 +2,7 @@ package com.o3dr.services.android.lib.drone.companion.solo.tlv;
 
 import android.os.Parcel;
 
+import com.o3dr.services.android.lib.coordinate.Frame;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 
 import java.nio.ByteBuffer;
@@ -19,7 +20,7 @@ public class SoloReturnHomeLocationMessage extends TLVPacket {
 
     public SoloReturnHomeLocationMessage(double latitude, double longitude, float altitudeInMeters) {
         super(TLVMessageTypes.TYPE_RTL_HOME_POINT, 20);
-        this.coordinate = new LatLongAlt(latitude, longitude, altitudeInMeters);
+        this.coordinate = new LatLongAlt(latitude, longitude, altitudeInMeters, Frame.GLOBAL_RELATIVE);
     }
 
     public SoloReturnHomeLocationMessage(LatLongAlt coordinate){

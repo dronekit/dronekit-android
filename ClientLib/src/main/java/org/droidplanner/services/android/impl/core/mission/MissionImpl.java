@@ -6,6 +6,7 @@ import com.MAVLink.common.msg_mission_ack;
 import com.MAVLink.common.msg_mission_item;
 import com.MAVLink.enums.MAV_CMD;
 import com.MAVLink.enums.MAV_FRAME;
+import com.o3dr.services.android.lib.coordinate.Frame;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
@@ -334,12 +335,15 @@ public class MissionImpl extends DroneVariable<GenericMavLinkDrone> {
         List<MissionItemImpl> dronieItems = new ArrayList<MissionItemImpl>();
         dronieItems.add(new TakeoffImpl(this, startAltitude));
         dronieItems.add(new RegionOfInterestImpl(this,
-                new LatLongAlt(GeoTools.pointAlongTheLine(start, end, roiDistance), (1.0))));
-        dronieItems.add(new WaypointImpl(this, new LatLongAlt(end, (startAltitude + GeoTools.getDistance(start, end) / 2.0))));
+                new LatLongAlt(GeoTools.pointAlongTheLine(start, end, roiDistance), (1.0), Frame.GLOBAL_RELATIVE)));
+        dronieItems.add(new WaypointImpl(this, new LatLongAlt(end,
+                                                                (startAltitude + GeoTools.getDistance(start, end) / 2.0),
+                                                                Frame.GLOBAL_RELATIVE)));
         dronieItems.add(new WaypointImpl(this,
-                new LatLongAlt(slowDownPoint, (startAltitude + GeoTools.getDistance(start, slowDownPoint) / 2.0))));
+                new LatLongAlt(slowDownPoint, (startAltitude + GeoTools.getDistance(start, slowDownPoint) / 2.0),
+                                Frame.GLOBAL_RELATIVE)));
         dronieItems.add(new ChangeSpeedImpl(this, 1.0));
-        dronieItems.add(new WaypointImpl(this, new LatLongAlt(start, startAltitude)));
+        dronieItems.add(new WaypointImpl(this, new LatLongAlt(start, startAltitude, Frame.GLOBAL_RELATIVE)));
         dronieItems.add(new ChangeSpeedImpl(this, defaultSpeed));
         dronieItems.add(new LandImpl(this, start));
         return dronieItems;

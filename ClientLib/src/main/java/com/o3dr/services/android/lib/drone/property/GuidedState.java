@@ -5,6 +5,8 @@ import android.os.Parcelable;
 
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 
+import org.droidplanner.services.android.impl.core.drone.variables.GuidedPoint;
+
 /**
  * Created by fhuya on 11/5/14.
  */
@@ -46,6 +48,28 @@ public class GuidedState implements DroneAttribute {
 
     public void setCoordinate(LatLongAlt coordinate) {
         this.coordinate = coordinate;
+    }
+
+    public static GuidedState getGuidedStateFromPoint(GuidedPoint guidedPoint) {
+        if (guidedPoint == null)
+            return new GuidedState();
+
+        int guidedState;
+        switch (guidedPoint.getState()) {
+            default:
+            case UNINITIALIZED:
+                guidedState = GuidedState.STATE_UNINITIALIZED;
+                break;
+
+            case ACTIVE:
+                guidedState = GuidedState.STATE_ACTIVE;
+                break;
+
+            case IDLE:
+                guidedState = GuidedState.STATE_IDLE;
+                break;
+        }
+        return new GuidedState(guidedState, guidedPoint.getCoord());
     }
 
     @Override

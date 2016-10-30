@@ -17,15 +17,9 @@ public class LatLongAlt extends LatLong {
     private double mAltitude;
     private Frame mFrame;
 
-    public LatLongAlt(double latitude, double longitude, double altitude) {
-        super(latitude, longitude);
-        mAltitude = altitude;
-        mFrame = Frame.GLOBAL_RELATIVE;
-    }
-
-    public LatLongAlt(LatLong location, double altitude){
-        super(location);
-        mAltitude = altitude;
+    public LatLongAlt() {
+        super();
+        mAltitude = 0.0;
         mFrame = Frame.GLOBAL_RELATIVE;
     }
 

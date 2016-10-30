@@ -6,6 +6,8 @@ import org.droidplanner.services.android.impl.core.MAVLink.command.doCmd.MavLink
 import org.droidplanner.services.android.impl.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.impl.core.drone.manager.MavLinkDroneManager;
 import org.droidplanner.services.android.impl.core.gcs.roi.ROIEstimator;
+
+import com.o3dr.services.android.lib.coordinate.Frame;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 
@@ -45,7 +47,7 @@ public class FollowGuidedScan extends FollowAbove {
         if (tempCoord == null || tempCoord instanceof LatLongAlt) {
             target = (LatLongAlt) tempCoord;
         } else {
-            target = new LatLongAlt(tempCoord, sDefaultRoiAltitude);
+            target = new LatLongAlt(tempCoord, sDefaultRoiAltitude, Frame.GLOBAL_RELATIVE);
         }
 
         getROIEstimator().updateROITarget(target);

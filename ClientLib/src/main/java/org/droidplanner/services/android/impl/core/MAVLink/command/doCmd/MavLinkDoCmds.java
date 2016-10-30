@@ -8,6 +8,8 @@ import com.MAVLink.enums.GRIPPER_ACTIONS;
 import com.MAVLink.enums.MAV_CMD;
 
 import org.droidplanner.services.android.impl.core.drone.autopilot.MavLinkDrone;
+
+import com.o3dr.services.android.lib.coordinate.Frame;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.model.ICommandListener;
 
@@ -38,9 +40,16 @@ public class MavLinkDoCmds {
         msg.target_component = drone.getCompid();
         msg.command = MAV_CMD.MAV_CMD_DO_SET_ROI;
 
-        msg.param5 = (float) coord.getLatitude();
-        msg.param6 = (float) coord.getLongitude();
-        msg.param7 = (float) coord.getAltitude();
+        if (coord != null) {
+            msg.param5 = (float) coord.getLatitude();
+            msg.param6 = (float) coord.getLongitude();
+            msg.param7 = (float) coord.getAltitude();
+
+        } else {
+            msg.param5 = 0.0f;
+            msg.param6 = 0.0f;
+            msg.param7 = 0.0f;
+        }
 
         drone.getMavClient().sendMessage(msg, listener);
     }
@@ -49,7 +58,7 @@ public class MavLinkDoCmds {
         if (drone == null)
             return;
 
-        setROI(drone, new LatLongAlt(0, 0, 0), listener);
+        setROI(drone, null, listener);
     }
 
     public static void triggerCamera(MavLinkDrone drone) {

@@ -19,6 +19,7 @@ import com.MAVLink.common.msg_nav_controller_output;
 import com.MAVLink.common.msg_radio_status;
 import com.MAVLink.common.msg_sys_status;
 import com.MAVLink.common.msg_vibration;
+import com.MAVLink.enums.MAV_FRAME;
 import com.MAVLink.enums.MAV_MODE_FLAG;
 import com.MAVLink.enums.MAV_STATE;
 import com.o3dr.services.android.lib.coordinate.LatLong;
@@ -257,6 +258,32 @@ public class GenericMavLinkDrone implements MavLinkDrone {
     @Override
     public void setFrame(Frame frame){
         this.frame = frame;
+    }
+
+    @Override
+    public short getMavFrame() {
+        switch (frame) {
+            case GLOBAL_ABS:
+                return MAV_FRAME.MAV_FRAME_GLOBAL;
+            case GLOBAL_TERRAIN:
+                return MAV_FRAME.MAV_FRAME_GLOBAL_TERRAIN_ALT;
+            case GLOBAL_RELATIVE:
+            default:
+                return MAV_FRAME.MAV_FRAME_GLOBAL_RELATIVE_ALT;
+        }
+    }
+
+    @Override
+    public short getMavFrameInt() {
+        switch (frame) {
+            case GLOBAL_ABS:
+                return MAV_FRAME.MAV_FRAME_GLOBAL_INT;
+            case GLOBAL_TERRAIN:
+                return MAV_FRAME.MAV_FRAME_GLOBAL_TERRAIN_ALT_INT;
+            case GLOBAL_RELATIVE:
+            default:
+                return MAV_FRAME.MAV_FRAME_GLOBAL_RELATIVE_ALT_INT;
+        }
     }
 
     @Override
@@ -712,6 +739,7 @@ public class GenericMavLinkDrone implements MavLinkDrone {
             return;
         }
 
+        Frame frame = Frame.getFrame(missionItem.frame);
         float latitude = missionItem.x;
         float longitude = missionItem.y;
         float altitude = missionItem.z;
@@ -719,15 +747,17 @@ public class GenericMavLinkDrone implements MavLinkDrone {
 
         LatLongAlt homeCoord = vehicleHome.getCoordinate();
         if (homeCoord == null) {
-            vehicleHome.setCoordinate(new LatLongAlt(latitude, longitude, altitude));
+            vehicleHome.setCoordinate(new LatLongAlt(latitude, longitude, altitude, frame ));
             homeUpdated = true;
         } else {
             if (homeCoord.getLatitude() != latitude
                     || homeCoord.getLongitude() != longitude
-                    || homeCoord.getAltitude() != altitude) {
+                    || homeCoord.getAltitude() != altitude
+                    || homeCoord.getFrame() != frame) {
                 homeCoord.setLatitude(latitude);
                 homeCoord.setLongitude(longitude);
                 homeCoord.setAltitude(altitude);
+                homeCoord.setFrame(frame);
                 homeUpdated = true;
             }
         }

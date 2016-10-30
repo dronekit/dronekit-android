@@ -1,5 +1,6 @@
 package org.droidplanner.services.android.impl.core.gcs.follow;
 
+import com.o3dr.services.android.lib.coordinate.Frame;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import org.droidplanner.services.android.impl.core.helpers.geoTools.GeoTools;
@@ -85,7 +86,8 @@ public class LocationRelay {
                     new LatLongAlt(
                         androidLocation.getLatitude(),
                         androidLocation.getLongitude(),
-                        androidLocation.getAltitude()
+                        androidLocation.getAltitude(),
+                        Frame.GLOBAL_RELATIVE
                     ),
                     androidLocation.getBearing(),
                     androidLocation.getSpeed(),

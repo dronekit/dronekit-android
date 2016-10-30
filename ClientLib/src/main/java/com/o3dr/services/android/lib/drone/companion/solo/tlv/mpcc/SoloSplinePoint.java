@@ -2,6 +2,7 @@ package com.o3dr.services.android.lib.drone.companion.solo.tlv.mpcc;
 
 import android.os.Parcel;
 
+import com.o3dr.services.android.lib.coordinate.Frame;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVPacket;
@@ -100,7 +101,10 @@ public class SoloSplinePoint extends TLVPacket {
         this(dataBuffer.getShort(),
                 dataBuffer.getFloat(),
                 dataBuffer.getInt(),
-                new LatLongAlt(dataBuffer.getDouble(), dataBuffer.getDouble(), dataBuffer.getFloat()),
+                new LatLongAlt(dataBuffer.getDouble(),
+                                dataBuffer.getDouble(),
+                                dataBuffer.getFloat(),
+                                Frame.GLOBAL_RELATIVE),
                 dataBuffer.getFloat(),
                 dataBuffer.getFloat(),
                 dataBuffer.getFloat(),

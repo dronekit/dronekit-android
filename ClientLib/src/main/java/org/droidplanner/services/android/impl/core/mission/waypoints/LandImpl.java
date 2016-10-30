@@ -6,6 +6,8 @@ import com.MAVLink.enums.MAV_CMD;
 import org.droidplanner.services.android.impl.core.mission.MissionImpl;
 import org.droidplanner.services.android.impl.core.mission.MissionItemImpl;
 import org.droidplanner.services.android.impl.core.mission.MissionItemType;
+
+import com.o3dr.services.android.lib.coordinate.Frame;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 
@@ -23,7 +25,7 @@ public class LandImpl extends SpatialCoordItem {
     }
 
     public LandImpl(MissionImpl mMissionImpl, LatLong coord) {
-        super(mMissionImpl, new LatLongAlt(coord, 0));
+        super(mMissionImpl, new LatLongAlt(coord, 0, Frame.GLOBAL_RELATIVE));
     }
 
     public LandImpl(msg_mission_item msg, MissionImpl missionImpl) {

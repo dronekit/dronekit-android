@@ -4,6 +4,8 @@ import com.MAVLink.common.msg_mission_item;
 
 import org.droidplanner.services.android.impl.core.mission.MissionImpl;
 import org.droidplanner.services.android.impl.core.mission.MissionItemImpl;
+
+import com.o3dr.services.android.lib.coordinate.Frame;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 
@@ -23,7 +25,7 @@ public abstract class SpatialCoordItem extends MissionItemImpl {
         if (item instanceof SpatialCoordItem) {
             coordinate = ((SpatialCoordItem) item).getCoordinate();
         } else {
-            coordinate = new LatLongAlt(0, 0, 0);
+            coordinate = new LatLongAlt(0, 0, 0, Frame.GLOBAL_RELATIVE); // TODO lets use null to mean no location
         }
     }
 
@@ -39,6 +41,7 @@ public abstract class SpatialCoordItem extends MissionItemImpl {
     public List<msg_mission_item> packMissionItem() {
         List<msg_mission_item> list = super.packMissionItem();
         msg_mission_item mavMsg = list.get(0);
+        mavMsg.frame = (short) coordinate.getFrame().getFrameAsInt();
         mavMsg.x = (float) coordinate.getLatitude();
         mavMsg.y = (float) coordinate.getLongitude();
         mavMsg.z = (float) coordinate.getAltitude();
@@ -47,7 +50,7 @@ public abstract class SpatialCoordItem extends MissionItemImpl {
 
     @Override
     public void unpackMAVMessage(msg_mission_item mavMsg) {
-        setCoordinate(new LatLongAlt(mavMsg.x, mavMsg.y, mavMsg.z));
+        setCoordinate(new LatLongAlt(mavMsg.x, mavMsg.y, mavMsg.z, Frame.getFrame(mavMsg.frame)));
     }
 
     public void setAltitude(double altitude) {

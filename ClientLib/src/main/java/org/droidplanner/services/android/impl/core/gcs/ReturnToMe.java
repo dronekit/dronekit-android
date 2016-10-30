@@ -2,6 +2,7 @@ package org.droidplanner.services.android.impl.core.gcs;
 
 import android.os.Bundle;
 
+import com.o3dr.services.android.lib.coordinate.Frame;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
@@ -132,7 +133,8 @@ public class ReturnToMe implements DroneInterfaces.OnDroneListener<MavLinkDrone>
 
             if (displacement >= UPDATE_MINIMAL_DISPLACEMENT) {
                 MavLinkDoCmds.setVehicleHome(droneMgr.getDrone(),
-                        new LatLongAlt(locationCoord.getLatitude(), locationCoord.getLongitude(), homePosition.getAltitude()),
+                        new LatLongAlt(locationCoord.getLatitude(), locationCoord.getLongitude(),
+                                        homePosition.getAltitude(), Frame.GLOBAL_RELATIVE),
                         new AbstractCommandListener() {
                             @Override
                             public void onSuccess() {

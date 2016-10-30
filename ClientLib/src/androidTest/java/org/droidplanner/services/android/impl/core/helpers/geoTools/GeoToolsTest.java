@@ -1,5 +1,6 @@
 package org.droidplanner.services.android.impl.core.helpers.geoTools;
 
+import com.o3dr.services.android.lib.coordinate.Frame;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 
@@ -10,8 +11,8 @@ import org.droidplanner.services.android.impl.core.polygon.Polygon;
 
 public class GeoToolsTest extends TestCase {
 
-    LatLongAlt p1 = new LatLongAlt(37.85363485683941, -122.4204097390123, (250.0));
-    LatLongAlt p2 = new LatLongAlt(37.85130335221235, -122.4142645673542, (0.0));
+    LatLongAlt p1 = new LatLongAlt(37.85363485683941, -122.4204097390123, (250.0), Frame.GLOBAL_RELATIVE);
+    LatLongAlt p2 = new LatLongAlt(37.85130335221235, -122.4142645673542, (0.0), Frame.GLOBAL_RELATIVE);
     double polygonArea = 502915;
     double dist2DP1toP2 = 599.26;
     double dist3DP1toP2 = 649.32;
