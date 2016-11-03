@@ -277,7 +277,7 @@ public class ConnectionParameter implements Parcelable {
             eventsDispatchingPeriod);
     }
 
-    private ConnectionParameter(@ConnectionType.Type int connectionType, Bundle paramsBundle){
+    public ConnectionParameter(@ConnectionType.Type int connectionType, Bundle paramsBundle){
         this(connectionType, paramsBundle, null);
     }
 

@@ -32,7 +32,7 @@ public enum Frame {
         return abbreviation;
     }
 
-    public int getFrameAsInt() {
+    public int asInt() {
         return frame;
     }
 

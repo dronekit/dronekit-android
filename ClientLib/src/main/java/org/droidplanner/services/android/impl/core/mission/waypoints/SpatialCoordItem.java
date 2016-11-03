@@ -41,7 +41,7 @@ public abstract class SpatialCoordItem extends MissionItemImpl {
     public List<msg_mission_item> packMissionItem() {
         List<msg_mission_item> list = super.packMissionItem();
         msg_mission_item mavMsg = list.get(0);
-        mavMsg.frame = (short) coordinate.getFrame().getFrameAsInt();
+        mavMsg.frame = (short) coordinate.getFrame().asInt();
         mavMsg.x = (float) coordinate.getLatitude();
         mavMsg.y = (float) coordinate.getLongitude();
         mavMsg.z = (float) coordinate.getAltitude();

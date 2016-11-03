@@ -73,7 +73,7 @@ public class LatLongAlt extends LatLong {
         LatLongAlt that = (LatLongAlt) o;
 
         if ((Double.compare(that.mAltitude, mAltitude) != 0)
-            && (that.mFrame.getFrameAsInt() != mFrame.getFrameAsInt()) )
+            && (that.mFrame.asInt() != mFrame.asInt()) )
             return false;
 
         return true;
