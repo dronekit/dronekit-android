@@ -233,9 +233,14 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener<MavLin
 
     private void initialize() {
         if (state == GuidedStates.UNINITIALIZED) {
-            latLongAlt = new LatLongAlt( getGpsPosition(myDrone),
-                                getDroneAltConstrained(myDrone),
-                                myDrone.getFrame() );
+            latLongAlt = new LatLongAlt();
+            LatLong currentPos = getGpsPosition(myDrone);
+
+            if (currentPos != null && currentPos.isValid()) {
+                latLongAlt.set(currentPos);
+            }
+            latLongAlt.setAltitude(getDroneAltConstrained(myDrone));
+            latLongAlt.setFrame(myDrone.getFrame());
             state = GuidedStates.IDLE;
             myDrone.notifyDroneEvent(DroneEventsType.GUIDEDPOINT);
         }
