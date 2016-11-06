@@ -60,8 +60,12 @@ public class LatLongAlt extends LatLong {
         return mFrame;
     }
 
-    public void setFrame(Frame frame) {
-        mFrame = frame;
+    public boolean setFrame(Frame frame) {
+        if (mFrame !=  frame) {
+            mFrame = frame;
+            return true;
+        }
+        return false;
     }
 
     @Override
