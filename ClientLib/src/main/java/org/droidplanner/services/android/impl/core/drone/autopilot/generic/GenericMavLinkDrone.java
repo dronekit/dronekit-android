@@ -83,6 +83,9 @@ import org.droidplanner.services.android.impl.utils.video.VideoManager;
  */
 public class GenericMavLinkDrone implements MavLinkDrone {
 
+    public static final int SiK_RADIO_FIXED_SYSID = 0x33;  // '3' 0x33 51
+    public static final int SiK_RADIO_FIXED_COMPID = 0x44; // 'D' 0x44 68
+
     private final DataLink.DataLinkProvider<MAVLinkMessage> mavClient;
 
     protected final VideoManager videoMgr;
@@ -572,11 +575,21 @@ public class GenericMavLinkDrone implements MavLinkDrone {
         heartbeat.onHeartbeat(msg);
     }
 
+    // Check if message should be allowed to pass even if sysid/compid mismatch
+    protected boolean isMavLinkMessageException(MAVLinkMessage message){
+
+        // Allows SiK Radio Messages through. // TODO Make it a configurable setting
+        if (message.sysid == SiK_RADIO_FIXED_SYSID && message.compid == SiK_RADIO_FIXED_COMPID) {
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public void onMavLinkMessageReceived(MAVLinkMessage message) {
 
-        if (message.sysid != this.getSysid()) {
-            // Reject Messages that are not for the system id
+        if ( (message.sysid != this.getSysid()) && !isMavLinkMessageException(message) ) {
+            // Reject Messages that are not for this drones system id
             return;
         }
 
