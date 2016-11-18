@@ -390,10 +390,11 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
             return;
         }
 
+        // Filter Components IDs to be specifically the IDs that can be processed
         int compId = message.compid;
         if (compId != AUTOPILOT_COMPONENT_ID
                 && compId != ARTOO_COMPONENT_ID
-                && !(message.sysid == SiK_RADIO_FIXED_SYSID && compId == SiK_RADIO_FIXED_COMPID) ){
+                && compId != SiK_RADIO_FIXED_COMPID ){
             return;
         }
 
