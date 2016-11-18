@@ -214,6 +214,8 @@ class StreamRecorder implements MediaCodecManager.NaluChunkListener{
 
                 } catch (IOException | NullPointerException e) {
                     Timber.e(e, e.getMessage());
+                } catch(Throwable ex) {
+                    Timber.e(ex, ex.getMessage());
                 }
             }
         });
