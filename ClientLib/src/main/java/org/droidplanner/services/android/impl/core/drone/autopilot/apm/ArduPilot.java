@@ -74,7 +74,6 @@ import timber.log.Timber;
 public abstract class ArduPilot extends GenericMavLinkDrone {
     public static final int AUTOPILOT_COMPONENT_ID = 1;
     public static final int ARTOO_COMPONENT_ID = 0;
-    public static final int TELEMETRY_RADIO_COMPONENT_ID = 68;
 
     public static final String FIRMWARE_VERSION_NUMBER_REGEX = "\\d+(\\.\\d{1,2})?";
 
@@ -386,15 +385,16 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
     @Override
     public void onMavLinkMessageReceived(MAVLinkMessage message) {
 
-        if (message.sysid != this.getSysid()) {
+        if ((message.sysid != this.getSysid()) && !isMavLinkMessageException(message)) {
             // Reject Messages that are not for the system id
             return;
         }
 
+        // Filter Components IDs to be specifically the IDs that can be processed
         int compId = message.compid;
         if (compId != AUTOPILOT_COMPONENT_ID
                 && compId != ARTOO_COMPONENT_ID
-                && compId != TELEMETRY_RADIO_COMPONENT_ID) {
+                && compId != SiK_RADIO_FIXED_COMPID ){
             return;
         }
 
