@@ -9,8 +9,9 @@ env:
 
 android:
   components:
-    - platform-tools
     - tools
+    - tools
+    - platform-tools
 
     # The BuildTools version used by your project
     - build-tools-23.0.3
@@ -24,14 +25,7 @@ android:
     - extra-android-m2repository
     - extra-android-support
 
-  licenses:
-    - android-sdk-preview-license-52d11cd2
-    - android-sdk-license-c81a61d9
-    - android-sdk-license-.+
-    - google-gdk-license-.+
-
 before_script:
-    - android update sdk --no-ui --filter build-tools-23.0.3,android-23,extra-android-m2repository
     - export GRADLE_OPTS="-XX:MaxPermSize=2048m -Xmx1536m"
 
 script: ./gradlew cleanJar clean testDebug assembleDebug -PdisablePreDex
