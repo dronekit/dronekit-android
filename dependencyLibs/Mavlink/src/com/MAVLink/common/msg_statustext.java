@@ -124,7 +124,7 @@ public class msg_statustext extends MAVLinkMessage{
     * Returns a string with the MSG name and data
     */
     public String toString(){
-        return "MAVLINK_MSG_ID_STATUSTEXT -"+" severity:"+severity+" text:"+text+"";
+        return "MAVLINK_MSG_ID_STATUSTEXT -"+" severity:"+severity+" text:"+getText()+"";
     }
 }
         
