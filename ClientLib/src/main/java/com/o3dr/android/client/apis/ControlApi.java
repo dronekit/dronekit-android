@@ -6,8 +6,11 @@ import com.o3dr.android.client.Drone;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
+import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
 import com.o3dr.services.android.lib.model.AbstractCommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
+
+import org.droidplanner.services.android.impl.msg.msg_do_change_speed;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -31,6 +34,8 @@ import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_VE
 import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_YAW_CHANGE_RATE;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_YAW_IS_RELATIVE;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_YAW_TARGET_ANGLE;
+import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.ACTION_SEND_MAVLINK_MESSAGE;
+import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.EXTRA_MAVLINK_MESSAGE;
 
 /**
  * Provides access to the vehicle control functionality.
@@ -213,6 +218,15 @@ public class ControlApi extends Api {
         Bundle params = new Bundle();
         params.putBoolean(EXTRA_DO_ENABLE, enable);
         drone.performAsyncActionOnDroneThread(new Action(ACTION_ENABLE_MANUAL_CONTROL, params), listenerWrapper);
+    }
+
+    public void changeGuidedSpeed(int speedType, int targetMetersSecond, int throttlePercent) {
+        msg_do_change_speed msg = new msg_do_change_speed(
+                (short)speedType, (short)targetMetersSecond, (short)throttlePercent);
+
+        Bundle params = new Bundle();
+        params.putParcelable(EXTRA_MAVLINK_MESSAGE, new MavlinkMessageWrapper(msg));
+        drone.performAsyncAction(new Action(ACTION_SEND_MAVLINK_MESSAGE, params));
     }
 
     private static boolean isWithinBounds(float value, float lowerBound, float upperBound) {
