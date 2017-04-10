@@ -23,6 +23,24 @@ import com.MAVLink.common.msg_vfr_hud;
 import com.MAVLink.enums.MAV_MOUNT_MODE;
 import com.MAVLink.enums.MAV_SYS_STATUS_SENSOR;
 import com.github.zafarkhaja.semver.Version;
+import com.o3dr.services.android.lib.coordinate.LatLongAlt;
+import com.o3dr.services.android.lib.drone.action.ControlActions;
+import com.o3dr.services.android.lib.drone.action.ExperimentalActions;
+import com.o3dr.services.android.lib.drone.action.GimbalActions;
+import com.o3dr.services.android.lib.drone.action.ParameterActions;
+import com.o3dr.services.android.lib.drone.action.StateActions;
+import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
+import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
+import com.o3dr.services.android.lib.drone.attribute.AttributeType;
+import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
+import com.o3dr.services.android.lib.drone.mission.action.MissionActions;
+import com.o3dr.services.android.lib.drone.property.DroneAttribute;
+import com.o3dr.services.android.lib.drone.property.Parameter;
+import com.o3dr.services.android.lib.drone.property.VehicleMode;
+import com.o3dr.services.android.lib.gcs.action.CalibrationActions;
+import com.o3dr.services.android.lib.model.AbstractCommandListener;
+import com.o3dr.services.android.lib.model.ICommandListener;
+import com.o3dr.services.android.lib.model.action.Action;
 
 import org.droidplanner.services.android.impl.communication.model.DataLink;
 import org.droidplanner.services.android.impl.core.MAVLink.MavLinkParameters;
@@ -42,25 +60,6 @@ import org.droidplanner.services.android.impl.core.drone.variables.calibration.A
 import org.droidplanner.services.android.impl.core.drone.variables.calibration.MagnetometerCalibrationImpl;
 import org.droidplanner.services.android.impl.core.mission.Mission;
 import org.droidplanner.services.android.impl.core.model.AutopilotWarningParser;
-import com.o3dr.services.android.lib.coordinate.LatLong;
-import com.o3dr.services.android.lib.coordinate.LatLongAlt;
-import com.o3dr.services.android.lib.drone.action.ControlActions;
-import com.o3dr.services.android.lib.drone.action.ExperimentalActions;
-import com.o3dr.services.android.lib.drone.action.GimbalActions;
-import com.o3dr.services.android.lib.drone.action.ParameterActions;
-import com.o3dr.services.android.lib.drone.action.StateActions;
-import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
-import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
-import com.o3dr.services.android.lib.drone.attribute.AttributeType;
-import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
-import com.o3dr.services.android.lib.drone.mission.action.MissionActions;
-import com.o3dr.services.android.lib.drone.property.DroneAttribute;
-import com.o3dr.services.android.lib.drone.property.Parameter;
-import com.o3dr.services.android.lib.drone.property.VehicleMode;
-import com.o3dr.services.android.lib.gcs.action.CalibrationActions;
-import com.o3dr.services.android.lib.model.AbstractCommandListener;
-import com.o3dr.services.android.lib.model.ICommandListener;
-import com.o3dr.services.android.lib.model.action.Action;
 import org.droidplanner.services.android.impl.utils.CommonApiUtils;
 
 import java.util.regex.Matcher;
@@ -233,9 +232,11 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
 
             // CONTROL ACTIONS
             case ControlActions.ACTION_SEND_GUIDED_POINT: {
-                data.setClassLoader(LatLong.class.getClassLoader());
+                data.setClassLoader(LatLongAlt.class.getClassLoader());
                 boolean force = data.getBoolean(ControlActions.EXTRA_FORCE_GUIDED_POINT);
-                LatLong guidedPoint = data.getParcelable(ControlActions.EXTRA_GUIDED_POINT);
+                LatLongAlt guidedPoint = data.getParcelable(ControlActions.EXTRA_GUIDED_POINT);
+                Timber.d("ACTION_SEND_GUIDED_POINT: guidedPoint=%s force=%s", guidedPoint, force);
+
                 CommonApiUtils.sendGuidedPoint(this, guidedPoint, force, listener);
                 return true;
             }
@@ -252,6 +253,8 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
 
             case ControlActions.ACTION_SET_GUIDED_ALTITUDE:
                 double guidedAltitude = data.getDouble(ControlActions.EXTRA_ALTITUDE);
+                Timber.d("ACTION_SET_GUIDED_ALTITUDE: alt=%.1f", guidedAltitude);
+
                 CommonApiUtils.setGuidedAltitude(this, guidedAltitude);
                 return true;
 

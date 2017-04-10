@@ -3,7 +3,6 @@ package com.o3dr.android.client.apis;
 import android.os.Bundle;
 
 import com.o3dr.android.client.Drone;
-import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
@@ -13,6 +12,8 @@ import com.o3dr.services.android.lib.model.action.Action;
 import org.droidplanner.services.android.impl.msg.msg_do_change_speed;
 
 import java.util.concurrent.ConcurrentHashMap;
+
+import timber.log.Timber;
 
 import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_DO_GUIDED_TAKEOFF;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_ENABLE_MANUAL_CONTROL;
@@ -99,7 +100,9 @@ public class ControlApi extends Api {
      * @param force    true to enable guided mode is required.
      * @param listener Register a callback to receive update of the command execution state.
      */
-    public void goTo(LatLong point, boolean force, AbstractCommandListener listener) {
+    public void goTo(LatLongAlt point, boolean force, AbstractCommandListener listener) {
+        Timber.d("goTo(): point=%s force=%s", point, force);
+
         Bundle params = new Bundle();
         params.putBoolean(EXTRA_FORCE_GUIDED_POINT, force);
         params.putParcelable(EXTRA_GUIDED_POINT, point);
@@ -132,6 +135,8 @@ public class ControlApi extends Api {
      * @param altitude altitude in meters
      */
     public void climbTo(double altitude) {
+        Timber.d("climbTo(): altitude=%.1f", altitude);
+
         Bundle params = new Bundle();
         params.putDouble(EXTRA_ALTITUDE, altitude);
         drone.performAsyncAction(new Action(ACTION_SET_GUIDED_ALTITUDE, params));

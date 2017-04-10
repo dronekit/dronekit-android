@@ -9,10 +9,12 @@ import com.MAVLink.common.msg_set_position_target_local_ned;
 import com.MAVLink.enums.MAV_CMD;
 import com.MAVLink.enums.MAV_FRAME;
 import com.MAVLink.enums.MAV_GOTO;
+import com.o3dr.services.android.lib.model.ICommandListener;
 
 import org.droidplanner.services.android.impl.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.impl.core.drone.variables.ApmModes;
-import com.o3dr.services.android.lib.model.ICommandListener;
+
+import timber.log.Timber;
 
 public class MavLinkCommands {
 
@@ -35,6 +37,8 @@ public class MavLinkCommands {
     }
 
     public static void setGuidedMode(MavLinkDrone drone, double latitude, double longitude, double d) {
+        Timber.d("setGuidedMode(): lat=%.4f lng=%.4f alt=%.1f", latitude, longitude, d);
+
         msg_mission_item msg = new msg_mission_item();
         msg.seq = 0;
         msg.current = 2; // TODO use guided mode enum

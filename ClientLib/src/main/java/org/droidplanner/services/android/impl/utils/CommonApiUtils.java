@@ -11,27 +11,6 @@ import com.MAVLink.ardupilotmega.msg_mag_cal_progress;
 import com.MAVLink.ardupilotmega.msg_mag_cal_report;
 import com.MAVLink.enums.MAG_CAL_STATUS;
 import com.MAVLink.enums.MAV_TYPE;
-
-import org.droidplanner.services.android.impl.core.MAVLink.MavLinkCommands;
-import org.droidplanner.services.android.impl.core.MAVLink.command.doCmd.MavLinkDoCmds;
-import org.droidplanner.services.android.impl.core.drone.autopilot.Drone;
-import org.droidplanner.services.android.impl.core.drone.autopilot.MavLinkDrone;
-import org.droidplanner.services.android.impl.core.drone.autopilot.apm.ArduPilot;
-import org.droidplanner.services.android.impl.core.drone.autopilot.generic.GenericMavLinkDrone;
-import org.droidplanner.services.android.impl.core.drone.profiles.ParameterManager;
-import org.droidplanner.services.android.impl.core.drone.variables.ApmModes;
-import org.droidplanner.services.android.impl.core.drone.variables.Camera;
-import org.droidplanner.services.android.impl.core.drone.variables.GuidedPoint;
-import org.droidplanner.services.android.impl.core.drone.variables.calibration.AccelCalibration;
-import org.droidplanner.services.android.impl.core.drone.variables.calibration.MagnetometerCalibrationImpl;
-import org.droidplanner.services.android.impl.core.firmware.FirmwareType;
-import org.droidplanner.services.android.impl.core.gcs.follow.Follow;
-import org.droidplanner.services.android.impl.core.gcs.follow.FollowAlgorithm;
-import org.droidplanner.services.android.impl.core.mission.MissionItemImpl;
-import org.droidplanner.services.android.impl.core.mission.survey.SplineSurveyImpl;
-import org.droidplanner.services.android.impl.core.mission.survey.SurveyImpl;
-import org.droidplanner.services.android.impl.core.mission.waypoints.StructureScannerImpl;
-import org.droidplanner.services.android.impl.core.survey.Footprint;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
@@ -61,6 +40,27 @@ import com.o3dr.services.android.lib.gcs.follow.FollowType;
 import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
 import com.o3dr.services.android.lib.model.AbstractCommandListener;
 import com.o3dr.services.android.lib.model.ICommandListener;
+
+import org.droidplanner.services.android.impl.core.MAVLink.MavLinkCommands;
+import org.droidplanner.services.android.impl.core.MAVLink.command.doCmd.MavLinkDoCmds;
+import org.droidplanner.services.android.impl.core.drone.autopilot.Drone;
+import org.droidplanner.services.android.impl.core.drone.autopilot.MavLinkDrone;
+import org.droidplanner.services.android.impl.core.drone.autopilot.apm.ArduPilot;
+import org.droidplanner.services.android.impl.core.drone.autopilot.generic.GenericMavLinkDrone;
+import org.droidplanner.services.android.impl.core.drone.profiles.ParameterManager;
+import org.droidplanner.services.android.impl.core.drone.variables.ApmModes;
+import org.droidplanner.services.android.impl.core.drone.variables.Camera;
+import org.droidplanner.services.android.impl.core.drone.variables.GuidedPoint;
+import org.droidplanner.services.android.impl.core.drone.variables.calibration.AccelCalibration;
+import org.droidplanner.services.android.impl.core.drone.variables.calibration.MagnetometerCalibrationImpl;
+import org.droidplanner.services.android.impl.core.firmware.FirmwareType;
+import org.droidplanner.services.android.impl.core.gcs.follow.Follow;
+import org.droidplanner.services.android.impl.core.gcs.follow.FollowAlgorithm;
+import org.droidplanner.services.android.impl.core.mission.MissionItemImpl;
+import org.droidplanner.services.android.impl.core.mission.survey.SplineSurveyImpl;
+import org.droidplanner.services.android.impl.core.mission.survey.SurveyImpl;
+import org.droidplanner.services.android.impl.core.mission.waypoints.StructureScannerImpl;
+import org.droidplanner.services.android.impl.core.survey.Footprint;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -811,11 +811,13 @@ public class CommonApiUtils {
         drone.getMavClient().sendMessage(message, null);
     }
 
-    public static void sendGuidedPoint(MavLinkDrone drone, LatLong point, boolean force, ICommandListener listener) {
+    public static void sendGuidedPoint(MavLinkDrone drone, LatLongAlt point, boolean force, ICommandListener listener) {
         if (drone == null)
             return;
 
         GuidedPoint guidedPoint = drone.getGuidedPoint();
+        Timber.d("sendGuidedPoint(): point=%s guidedPoint=%s force=%s", point, guidedPoint, force);
+
         if (guidedPoint.isInitialized()) {
             guidedPoint.newGuidedCoord(point);
         } else if (force) {
