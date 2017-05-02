@@ -13,6 +13,7 @@ public class ControlActions {
     public static final String EXTRA_ALTITUDE = "extra_altitude";
 
     public static final String ACTION_SEND_GUIDED_POINT = Utils.PACKAGE_NAME + ".action.SEND_GUIDED_POINT";
+    public static final String ACTION_SEND_GUIDED_POINT_DIRECT = Utils.PACKAGE_NAME + ".action.SEND_GUIDED_POINT_DIRECT";
     public static final String EXTRA_GUIDED_POINT = "extra_guided_point";
 
     public static final String EXTRA_FORCE_GUIDED_POINT = "extra_force_guided_point";

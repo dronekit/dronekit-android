@@ -43,6 +43,7 @@ import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
 
 import org.droidplanner.services.android.impl.communication.model.DataLink;
+import org.droidplanner.services.android.impl.core.MAVLink.MavLinkCommands;
 import org.droidplanner.services.android.impl.core.MAVLink.MavLinkParameters;
 import org.droidplanner.services.android.impl.core.MAVLink.WaypointManager;
 import org.droidplanner.services.android.impl.core.MAVLink.command.doCmd.MavLinkDoCmds;
@@ -238,6 +239,18 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
                 Timber.d("ACTION_SEND_GUIDED_POINT: guidedPoint=%s force=%s", guidedPoint, force);
 
                 CommonApiUtils.sendGuidedPoint(this, guidedPoint, force, listener);
+                return true;
+            }
+
+            case ControlActions.ACTION_SEND_GUIDED_POINT_DIRECT: {
+                data.setClassLoader(LatLongAlt.class.getClassLoader());
+                LatLongAlt point = data.getParcelable(ControlActions.EXTRA_GUIDED_POINT);
+                Timber.d("ACTION_SEND_GUIDED_POINT_DIRECT: point=%s", point);
+
+                MavLinkCommands.sendGuidedPosition(this,
+                        point.getLatitude(),
+                        point.getLongitude(),
+                        point.getAltitude());
                 return true;
             }
 

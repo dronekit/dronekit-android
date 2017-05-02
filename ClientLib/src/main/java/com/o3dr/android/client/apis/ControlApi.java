@@ -21,6 +21,7 @@ import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_L
 import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_RESET_ROI;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_SEND_BRAKE_VEHICLE;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_SEND_GUIDED_POINT;
+import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_SEND_GUIDED_POINT_DIRECT;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_SET_CONDITION_YAW;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_SET_GUIDED_ALTITUDE;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_SET_VELOCITY;
@@ -107,6 +108,19 @@ public class ControlApi extends Api {
         params.putBoolean(EXTRA_FORCE_GUIDED_POINT, force);
         params.putParcelable(EXTRA_GUIDED_POINT, point);
         drone.performAsyncActionOnDroneThread(new Action(ACTION_SEND_GUIDED_POINT, params), listener);
+    }
+
+    /**
+     * Instructs the vehicle to go to the specified location. Hopefully.
+     *
+     * @param point    target location
+     */
+    public void sendGuidedPointDirect(LatLongAlt point) {
+        Timber.d("sendGuidedPointDirect(): point=%s", point);
+
+        Bundle params = new Bundle();
+        params.putParcelable(EXTRA_GUIDED_POINT, point);
+        drone.performAsyncActionOnDroneThread(new Action(ACTION_SEND_GUIDED_POINT_DIRECT, params), null);
     }
 
     /**
