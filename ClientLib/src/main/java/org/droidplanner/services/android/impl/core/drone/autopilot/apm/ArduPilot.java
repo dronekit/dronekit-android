@@ -500,6 +500,8 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
     }
 
     protected static Version extractVersionNumber(String firmwareVersion) {
+        Timber.d("extractVersionNumber(): firmwareVersion=%s", firmwareVersion);
+
         Version version = Version.forIntegers(0, 0, 0);
 
         Pattern pattern = Pattern.compile(FIRMWARE_VERSION_NUMBER_REGEX);
