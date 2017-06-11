@@ -50,7 +50,7 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
 
     private final UdpConnection followDataConn;
 
-    private static final SshConnection sshLink = new SshConnection(getSoloLinkIp(), SoloComp.SSH_USERNAME, SoloComp.SSH_PASSWORD);
+    private final SshConnection sshLink;
 
     private final SoloButtonSettingGetter presetButtonAGetter = new SoloButtonSettingGetter(ButtonTypes.BUTTON_A,
         ButtonTypes.BUTTON_EVENT_PRESS);
@@ -106,9 +106,12 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
     };
 
     private SoloLinkListener linkListener;
+    private final String serverIp;
 
-    public SoloLinkManager(Context context, Handler handler, ExecutorService asyncExecutor) {
-        super(context, new TcpConnection(handler, getSoloLinkIp(), SOLO_LINK_TCP_PORT), handler, asyncExecutor);
+    public SoloLinkManager(Context context, String ipAddress, Handler handler, ExecutorService asyncExecutor) {
+        super(context, new TcpConnection(handler, ipAddress, SOLO_LINK_TCP_PORT), handler, asyncExecutor);
+        serverIp = ipAddress;
+        sshLink = new SshConnection(serverIp, SoloComp.SSH_USERNAME, SoloComp.SSH_PASSWORD);
 
         UdpConnection dataConn = null;
         try {
@@ -122,12 +125,9 @@ public class SoloLinkManager extends AbstractLinkManager<SoloLinkListener> {
 
     }
 
-    public static String getSoloLinkIp() {
-        if (!BuildConfig.SITL_DEBUG) {
-            return SOLO_LINK_IP;
-        } else {
-            return BuildConfig.SOLO_LINK_IP;
-        }
+    public String getSoloLinkIp() {
+        return (BuildConfig.SITL_DEBUG)?
+                BuildConfig.SOLO_LINK_IP: this.serverIp;
     }
 
     public String getVehicleVersion() {

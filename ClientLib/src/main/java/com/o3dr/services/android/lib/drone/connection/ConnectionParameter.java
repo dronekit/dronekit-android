@@ -7,6 +7,8 @@ import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import timber.log.Timber;
+
 /**
  * Base type used to pass the drone connection parameters over ipc.
  */
@@ -53,11 +55,22 @@ public class ConnectionParameter implements Parcelable {
      * @return Returns {@link ConnectionParameter} with type {@link ConnectionType#TYPE_UDP}.
      */
     public static ConnectionParameter newUdpConnection(int udpPort, @Nullable Uri tlogLoggingUri) {
-        return newUdpConnection(udpPort, null, 0, null, tlogLoggingUri);
+        return newUdpConnection(null, udpPort, null, 0, null, tlogLoggingUri);
+    }
+
+    /**
+     * @param udpIP IP addresss for the UDP connection.
+     * @param udpPort Port for the UDP connection.
+     * @param tlogLoggingUri Uri where the tlog data should be logged. Pass null if the tlog data shouldn't be logged
+     * @return Returns {@link ConnectionParameter} with type {@link ConnectionType#TYPE_UDP}.
+     */
+    public static ConnectionParameter newUdpConnection(String udpIP, int udpPort, @Nullable Uri tlogLoggingUri) {
+        return newUdpConnection(udpIP, udpPort, null, 0, null, tlogLoggingUri);
     }
 
     /**
      *
+     * @param udpIP IP address for the UDP connection.
      * @param udpPort Port for the UDP connection.
      * @param udpPingReceiverIp IP address of the UDP server to ping. If this value is null, it is ignored
      *                          along with udpPingReceiverPort and udpPingPayload.
@@ -68,13 +81,14 @@ public class ConnectionParameter implements Parcelable {
      * @return Returns {@link ConnectionParameter} with type {@link ConnectionType#TYPE_UDP}. The ping
      * period is set to {@link ConnectionType#DEFAULT_UDP_PING_PERIOD}
      */
-    public static ConnectionParameter newUdpConnection(int udpPort, @Nullable String udpPingReceiverIp, int udpPingReceiverPort,
+    public static ConnectionParameter newUdpConnection(String udpIP, int udpPort, @Nullable String udpPingReceiverIp, int udpPingReceiverPort,
                                                        byte[] udpPingPayload, @Nullable Uri tlogLoggingUri) {
-        return newUdpConnection(udpPort, udpPingReceiverIp, udpPingReceiverPort, udpPingPayload, ConnectionType.DEFAULT_UDP_PING_PERIOD, tlogLoggingUri);
+        return newUdpConnection(udpIP, udpPort, udpPingReceiverIp, udpPingReceiverPort, udpPingPayload, ConnectionType.DEFAULT_UDP_PING_PERIOD, tlogLoggingUri);
     }
 
     /**
      *
+     * @param udpIP IP address for the UDP connection.
      * @param udpPort Port for the UDP connection.
      * @param udpPingReceiverIp IP address of the UDP server to ping. If this value is null, it is ignored
      *                          along with udpPingReceiverPort, udpPingPayload, and pingPeriod.
@@ -85,10 +99,17 @@ public class ConnectionParameter implements Parcelable {
      *
      * @return Returns {@link ConnectionParameter} with type {@link ConnectionType#TYPE_UDP}.
      */
-    public static ConnectionParameter newUdpConnection(int udpPort, @Nullable String udpPingReceiverIp, int udpPingReceiverPort,
+    public static ConnectionParameter newUdpConnection(String udpIP, int udpPort, @Nullable String udpPingReceiverIp, int udpPingReceiverPort,
                                                        byte[] udpPingPayload, long pingPeriod, @Nullable Uri tlogLoggingUri) {
         Bundle paramsBundle = new Bundle();
         paramsBundle.putInt(ConnectionType.EXTRA_UDP_SERVER_PORT, udpPort);
+
+        Timber.d("newUdpConnection(%s, %d, %s, %d, %s, %d, %s)",
+                udpIP, udpPort, udpPingReceiverIp, udpPingReceiverPort, udpPingPayload, pingPeriod, tlogLoggingUri);
+
+        if(!TextUtils.isEmpty(udpIP)) {
+            paramsBundle.putString(ConnectionType.EXTRA_UDP_SERVER_IP, udpIP);
+        }
 
         if (!TextUtils.isEmpty(udpPingReceiverIp)) {
             paramsBundle.putString(ConnectionType.EXTRA_UDP_PING_RECEIVER_IP, udpPingReceiverIp);
@@ -155,6 +176,16 @@ public class ConnectionParameter implements Parcelable {
         paramsBundle.putString(ConnectionType.EXTRA_SOLO_LINK_PASSWORD, password);
 
         return new ConnectionParameter(ConnectionType.TYPE_SOLO, paramsBundle, tlogLoggingUri);
+    }
+
+    public static ConnectionParameter newSoloConnection(String ssid, @Nullable String password, ConnectionParameter params) {
+        String ssidWithoutQuotes = ssid.replaceAll("^\"|\"$", "");
+
+        Bundle paramsBundle = new Bundle(params.getParamsBundle());
+        paramsBundle.putString(ConnectionType.EXTRA_SOLO_LINK_ID, ssidWithoutQuotes);
+        paramsBundle.putString(ConnectionType.EXTRA_SOLO_LINK_PASSWORD, password);
+
+        return new ConnectionParameter(ConnectionType.TYPE_SOLO, paramsBundle, params.getTLogLoggingUri());
     }
 
     private ConnectionParameter(@ConnectionType.Type int connectionType, Bundle paramsBundle){

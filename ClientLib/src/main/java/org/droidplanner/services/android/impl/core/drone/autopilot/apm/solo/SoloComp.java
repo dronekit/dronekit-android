@@ -72,6 +72,7 @@ public class SoloComp implements SoloLinkListener, ControllerLinkListener {
     private final SoloLinkManager soloLinkMgr;
 
     private final Context context;
+    private final String soloIp;
     private final Handler handler;
     private final ExecutorService asyncExecutor;
 
@@ -85,14 +86,14 @@ public class SoloComp implements SoloLinkListener, ControllerLinkListener {
      *
      * @param context Application context
      */
-    public SoloComp(Context context, Handler handler) {
+    public SoloComp(Context context, String ip, Handler handler) {
         this.context = context;
-
+        this.soloIp = ip;
         this.handler = handler;
         asyncExecutor = Executors.newCachedThreadPool();
 
         this.controllerLinkManager = new ControllerLinkManager(context, handler, asyncExecutor);
-        this.soloLinkMgr = new SoloLinkManager(context, handler, asyncExecutor);
+        this.soloLinkMgr = new SoloLinkManager(context, this.soloIp, handler, asyncExecutor);
     }
 
     public SoloGoproState getGoproState() {

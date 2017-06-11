@@ -41,10 +41,17 @@ public class ConnectionType {
      * Key used to retrieve the udp server port from the connection parameter bundle
      */
     public static final String EXTRA_UDP_SERVER_PORT = "extra_udp_server_port";
+
+    /** Key for UDP server IP */
+    public static final String EXTRA_UDP_SERVER_IP = "extra_udp_server_ip";
+
     /**
      * Default value for the upd server port.
      */
     public static final int DEFAULT_UDP_SERVER_PORT = 14550;
+
+    /** Default value for UDP server IP */
+    public static final String DEFAULT_UDP_SERVER_IP = "10.1.1.10";
 
     /**
      * Key used to retrieve the ip address of the udp server to ping.

@@ -1,6 +1,5 @@
 package org.droidplanner.services.android.impl;
 
-import android.content.Context;
 import android.os.Handler;
 
 import com.MAVLink.MAVLinkPacket;
@@ -8,23 +7,17 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.common.msg_command_long;
 import com.MAVLink.enums.MAV_CMD;
 import com.o3dr.android.client.BuildConfig;
-import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
 
 import org.droidplanner.services.android.impl.communication.model.DataLink;
 import org.droidplanner.services.android.impl.core.MAVLink.MavLinkCommands;
-import org.droidplanner.services.android.impl.core.drone.LogMessageListener;
 import org.droidplanner.services.android.impl.core.drone.autopilot.MavLinkDrone;
-import org.droidplanner.services.android.impl.core.drone.autopilot.apm.ArduCopter;
-import org.droidplanner.services.android.impl.core.firmware.FirmwareType;
 import org.droidplanner.services.android.impl.mock.MockMAVLinkClient;
-import org.droidplanner.services.android.impl.utils.AndroidApWarningParser;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricGradleTestRunner;
-import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
 
@@ -53,17 +46,17 @@ public class BasicTest {
 
     @Before
     public void setUp() throws Exception {
-        final Context context = RuntimeEnvironment.application.getApplicationContext();
-
-        ConnectionParameter connParams = ConnectionParameter.newUsbConnection();
-        mavClient = new MockMAVLinkClient(context, inputStreamListener, connParams);
-
-        drone = new ArduCopter("test:" + FirmwareType.ARDU_COPTER.getType(), context, mavClient, dpHandler, new AndroidApWarningParser(), new LogMessageListener() {
-            @Override
-            public void onMessageLogged(int logLevel, String message) {
-
-            }
-        });
+//        final Context context = RuntimeEnvironment.application.getApplicationContext();
+//
+//        ConnectionParameter connParams = ConnectionParameter.newUsbConnection();
+//        mavClient = new MockMAVLinkClient(context, inputStreamListener, connParams);
+//
+//        drone = new ArduCopter("test:" + FirmwareType.ARDU_COPTER.getType(), context, mavClient, dpHandler, new AndroidApWarningParser(), new LogMessageListener() {
+//            @Override
+//            public void onMessageLogged(int logLevel, String message) {
+//
+//            }
+//        });
     }
 
     /**

@@ -18,6 +18,7 @@ import com.o3dr.services.android.lib.drone.action.StateActions;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
+import com.o3dr.services.android.lib.drone.connection.ConnectionType;
 import com.o3dr.services.android.lib.drone.property.DroneAttribute;
 import com.o3dr.services.android.lib.gcs.action.FollowMeActions;
 import com.o3dr.services.android.lib.gcs.follow.FollowLocationSource;
@@ -37,6 +38,7 @@ import org.droidplanner.services.android.impl.core.drone.autopilot.apm.ArduCopte
 import org.droidplanner.services.android.impl.core.drone.autopilot.apm.ArduPlane;
 import org.droidplanner.services.android.impl.core.drone.autopilot.apm.ArduRover;
 import org.droidplanner.services.android.impl.core.drone.autopilot.apm.solo.ArduSolo;
+import org.droidplanner.services.android.impl.core.drone.autopilot.apm.solo.sololink.SoloLinkManager;
 import org.droidplanner.services.android.impl.core.drone.autopilot.generic.GenericMavLinkDrone;
 import org.droidplanner.services.android.impl.core.drone.autopilot.px4.Px4Native;
 import org.droidplanner.services.android.impl.core.drone.profiles.ParameterManager;
@@ -104,10 +106,14 @@ public class MavLinkDroneManager extends DroneManager<MavLinkDrone, MAVLinkPacke
                 this.drone = new ArduCopter(droneId, context, mavClient, handler, new AndroidApWarningParser(), this);
                 break;
 
-            case ARDU_SOLO:
+            case ARDU_SOLO: {
                 Timber.i("Instantiating ArduSolo autopilot.");
-                this.drone = new ArduSolo(droneId, context, mavClient, handler, new AndroidApWarningParser(), this);
+                final Bundle params = connectionParameter.getParamsBundle();
+                final String ip = params.getString(ConnectionType.EXTRA_UDP_SERVER_IP, SoloLinkManager.SOLO_LINK_IP);
+                Timber.d("solo IP=%s", ip);
+                this.drone = new ArduSolo(droneId, ip, context, mavClient, handler, new AndroidApWarningParser(), this);
                 break;
+            }
 
             case ARDU_PLANE:
                 Timber.i("Instantiating ArduPlane autopilot.");

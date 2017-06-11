@@ -72,10 +72,10 @@ public class ArduSolo extends ArduCopter {
 
     private final SoloComp soloComp;
 
-    public ArduSolo(String droneId, Context context, DataLink.DataLinkProvider<MAVLinkMessage> mavClient, Handler handler,
+    public ArduSolo(String droneId, String soloIp, Context context, DataLink.DataLinkProvider<MAVLinkMessage> mavClient, Handler handler,
                     AutopilotWarningParser warningParser, LogMessageListener logListener) {
         super(droneId, context, mavClient, handler, warningParser, logListener);
-        this.soloComp = new SoloComp(context, handler);
+        this.soloComp = new SoloComp(context, soloIp, handler);
         this.soloComp.setListener(new SoloComp.SoloCompListener() {
             @Override
             public void onConnected() {
