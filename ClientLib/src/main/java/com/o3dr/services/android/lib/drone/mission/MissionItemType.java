@@ -9,6 +9,7 @@ import com.o3dr.services.android.lib.drone.mission.item.command.CameraTrigger;
 import com.o3dr.services.android.lib.drone.mission.item.command.ChangeSpeed;
 import com.o3dr.services.android.lib.drone.mission.item.command.DoJump;
 import com.o3dr.services.android.lib.drone.mission.item.command.EpmGripper;
+import com.o3dr.services.android.lib.drone.mission.item.command.LoiterToAlt;
 import com.o3dr.services.android.lib.drone.mission.item.command.ResetROI;
 import com.o3dr.services.android.lib.drone.mission.item.command.ReturnToLaunch;
 import com.o3dr.services.android.lib.drone.mission.item.command.SetRelay;
@@ -28,7 +29,7 @@ import com.o3dr.services.android.lib.drone.property.Type;
 import com.o3dr.services.android.lib.util.ParcelableUtils;
 
 /**
- * /**
+ *
  * List of mission item types.
  */
 public enum MissionItemType {
@@ -265,7 +266,20 @@ public enum MissionItemType {
         protected Creator<ResetROI> getMissionItemCreator() {
             return ResetROI.CREATOR;
         }
-    };
+    },
+
+    LOITER_TO_ALT("Loiter to Alt") {
+        @Override
+        public MissionItem getNewItem() {
+            return new LoiterToAlt();
+        }
+
+        @Override
+        protected Creator<LoiterToAlt> getMissionItemCreator() {
+            return LoiterToAlt.CREATOR;
+        }
+    },
+    ;
 
     private final static String EXTRA_MISSION_ITEM_TYPE = "extra_mission_item_type";
     private final static String EXTRA_MISSION_ITEM = "extra_mission_item";

@@ -2,34 +2,13 @@ package org.droidplanner.services.android.impl.utils;
 
 import android.util.Log;
 
-import org.droidplanner.services.android.impl.core.mission.Mission;
-import org.droidplanner.services.android.impl.core.mission.MissionItemImpl;
-import org.droidplanner.services.android.impl.core.mission.commands.CameraTriggerImpl;
-import org.droidplanner.services.android.impl.core.mission.commands.ChangeSpeedImpl;
-import org.droidplanner.services.android.impl.core.mission.commands.ConditionYawImpl;
-import org.droidplanner.services.android.impl.core.mission.commands.DoJumpImpl;
-import org.droidplanner.services.android.impl.core.mission.commands.EpmGripperImpl;
-import org.droidplanner.services.android.impl.core.mission.commands.ReturnToHomeImpl;
-import org.droidplanner.services.android.impl.core.mission.commands.SetRelayImpl;
-import org.droidplanner.services.android.impl.core.mission.commands.SetServoImpl;
-import org.droidplanner.services.android.impl.core.mission.commands.TakeoffImpl;
-import org.droidplanner.services.android.impl.core.mission.survey.SplineSurveyImpl;
-import org.droidplanner.services.android.impl.core.mission.survey.SurveyImpl;
-import org.droidplanner.services.android.impl.core.mission.waypoints.CircleImpl;
-import org.droidplanner.services.android.impl.core.mission.waypoints.DoLandStartImpl;
-import org.droidplanner.services.android.impl.core.mission.waypoints.LandImpl;
-import org.droidplanner.services.android.impl.core.mission.waypoints.RegionOfInterestImpl;
-import org.droidplanner.services.android.impl.core.mission.waypoints.SplineWaypointImpl;
-import org.droidplanner.services.android.impl.core.mission.waypoints.StructureScannerImpl;
-import org.droidplanner.services.android.impl.core.mission.waypoints.WaypointImpl;
-import org.droidplanner.services.android.impl.core.survey.CameraInfo;
-import org.droidplanner.services.android.impl.core.survey.SurveyData;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
 import com.o3dr.services.android.lib.drone.mission.item.command.CameraTrigger;
 import com.o3dr.services.android.lib.drone.mission.item.command.ChangeSpeed;
 import com.o3dr.services.android.lib.drone.mission.item.command.DoJump;
 import com.o3dr.services.android.lib.drone.mission.item.command.EpmGripper;
+import com.o3dr.services.android.lib.drone.mission.item.command.LoiterToAlt;
 import com.o3dr.services.android.lib.drone.mission.item.command.ResetROI;
 import com.o3dr.services.android.lib.drone.mission.item.command.ReturnToLaunch;
 import com.o3dr.services.android.lib.drone.mission.item.command.SetRelay;
@@ -47,6 +26,30 @@ import com.o3dr.services.android.lib.drone.mission.item.spatial.Land;
 import com.o3dr.services.android.lib.drone.mission.item.spatial.RegionOfInterest;
 import com.o3dr.services.android.lib.drone.mission.item.spatial.SplineWaypoint;
 import com.o3dr.services.android.lib.drone.mission.item.spatial.Waypoint;
+
+import org.droidplanner.services.android.impl.core.mission.Mission;
+import org.droidplanner.services.android.impl.core.mission.MissionItemImpl;
+import org.droidplanner.services.android.impl.core.mission.commands.CameraTriggerImpl;
+import org.droidplanner.services.android.impl.core.mission.commands.ChangeSpeedImpl;
+import org.droidplanner.services.android.impl.core.mission.commands.ConditionYawImpl;
+import org.droidplanner.services.android.impl.core.mission.commands.DoJumpImpl;
+import org.droidplanner.services.android.impl.core.mission.commands.EpmGripperImpl;
+import org.droidplanner.services.android.impl.core.mission.commands.LoiterToAltImpl;
+import org.droidplanner.services.android.impl.core.mission.commands.ReturnToHomeImpl;
+import org.droidplanner.services.android.impl.core.mission.commands.SetRelayImpl;
+import org.droidplanner.services.android.impl.core.mission.commands.SetServoImpl;
+import org.droidplanner.services.android.impl.core.mission.commands.TakeoffImpl;
+import org.droidplanner.services.android.impl.core.mission.survey.SplineSurveyImpl;
+import org.droidplanner.services.android.impl.core.mission.survey.SurveyImpl;
+import org.droidplanner.services.android.impl.core.mission.waypoints.CircleImpl;
+import org.droidplanner.services.android.impl.core.mission.waypoints.DoLandStartImpl;
+import org.droidplanner.services.android.impl.core.mission.waypoints.LandImpl;
+import org.droidplanner.services.android.impl.core.mission.waypoints.RegionOfInterestImpl;
+import org.droidplanner.services.android.impl.core.mission.waypoints.SplineWaypointImpl;
+import org.droidplanner.services.android.impl.core.mission.waypoints.StructureScannerImpl;
+import org.droidplanner.services.android.impl.core.mission.waypoints.WaypointImpl;
+import org.droidplanner.services.android.impl.core.survey.CameraInfo;
+import org.droidplanner.services.android.impl.core.survey.SurveyData;
 
 /**
  * Created by fhuya on 11/10/14.
@@ -112,6 +115,19 @@ public class ProxyUtils {
                 missionItemImpl = temp;
                 break;
             }
+            case LOITER_TO_ALT: {
+                LoiterToAlt proxy = (LoiterToAlt)proxyItem;
+                final LatLongAlt coord = proxy.getCoordinate();
+
+                if(coord != null) {
+                    LoiterToAltImpl impl = new LoiterToAltImpl(mission, coord.getLatitude(), coord.getLongitude(), coord.getAltitude());
+                    missionItemImpl = impl;
+                } else {
+                    missionItemImpl = null;
+                }
+
+                break;
+            }
             case EPM_GRIPPER: {
                 EpmGripper proxy = (EpmGripper) proxyItem;
 
@@ -140,7 +156,7 @@ public class ProxyUtils {
             case TAKEOFF: {
                 Takeoff proxy = (Takeoff) proxyItem;
 
-                TakeoffImpl temp = new TakeoffImpl(mission, (proxy.getTakeoffAltitude()));
+                TakeoffImpl temp = new TakeoffImpl(mission, proxy.getTakeoffAltitude(), proxy.getTakeoffPitch());
 
                 missionItemImpl = temp;
                 break;
@@ -479,6 +495,15 @@ public class ProxyUtils {
 
                 ChangeSpeed temp = new ChangeSpeed();
                 temp.setSpeed(source.getSpeed());
+
+                proxyMissionItem = temp;
+                break;
+            }
+
+            case LOITER_TO_ALT: {
+                LoiterToAltImpl source = (LoiterToAltImpl) itemImpl;
+                LoiterToAlt temp = new LoiterToAlt();
+                temp.setCoordinate(new LatLongAlt(source.getLat(), source.getLng(), source.getAlt()));
 
                 proxyMissionItem = temp;
                 break;
