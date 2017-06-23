@@ -7,7 +7,7 @@ import org.droidplanner.services.android.impl.communication.model.DataLink.DataL
 
 public class MavLinkStreamRates {
 
-	public static void setupStreamRates(DataLinkProvider MAVClient, byte sysid, byte compid,
+	public static void setupStreamRates(DataLinkProvider MAVClient, short sysid, short compid,
 			int extendedStatus, int extra1, int extra2, int extra3, int position, int rcChannels,
 			int rawSensors, int rawControler) {
 		requestMavlinkDataStream(MAVClient, sysid, compid, MAV_DATA_STREAM.MAV_DATA_STREAM_EXTENDED_STATUS,
@@ -22,8 +22,8 @@ public class MavLinkStreamRates {
 		requestMavlinkDataStream(MAVClient, sysid, compid, MAV_DATA_STREAM.MAV_DATA_STREAM_RC_CHANNELS, rcChannels);
 	}
 
-	private static void requestMavlinkDataStream(DataLinkProvider mAVClient, byte sysid,
-			byte compid, int stream_id, int rate) {
+	private static void requestMavlinkDataStream(DataLinkProvider mAVClient, short sysid,
+			short compid, int stream_id, int rate) {
 		msg_request_data_stream msg = new msg_request_data_stream();
 		msg.target_system = sysid;
 		msg.target_component = compid;

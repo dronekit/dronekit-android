@@ -238,12 +238,12 @@ public class GenericMavLinkDrone implements MavLinkDrone {
     }
 
     @Override
-    public byte getSysid() {
+    public short getSysid() {
         return heartbeat.getSysid();
     }
 
     @Override
-    public byte getCompid() {
+    public short getCompid() {
         return heartbeat.getCompid();
     }
 
