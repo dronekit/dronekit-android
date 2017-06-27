@@ -51,6 +51,13 @@ public class LoiterToAlt extends MissionItem implements MissionItem.Command, and
         return new LoiterToAlt(this);
     }
 
+    @Override
+    public String toString() {
+        return "LoiterToAlt{" +
+                "coordinate=" + coordinate +
+                '}';
+    }
+
     public static final Creator<LoiterToAlt> CREATOR = new Creator<LoiterToAlt>() {
         public LoiterToAlt createFromParcel(Parcel source) {
             return new LoiterToAlt(source);
