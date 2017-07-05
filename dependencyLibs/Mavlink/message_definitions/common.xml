@@ -1811,11 +1811,12 @@
           
         <!-- SUI custom messages -->          
         <message id="8" name="SET_COMPANION_COMPUTER_WIFI">
-             <description>Setup the companion computers wifi as an access point or a client.  If the ssid or pass fields are empty strings, the previous values will be used.</description>
-            <field type="uint8_t" name="cmd">cmd, 1-access point mode, 2-client mode</field>
-            <field type="char[64]" name="ssid">ssid</field>
-            <field type="char[64]" name="pass">pass</field>
-          </message>
+          <description>Setup the companion computers wifi as an access point or a client.  If the ssid or pass fields are empty strings, the previous values will be used.</description>
+          <field type="uint8_t" name="cmd">cmd, 1-access point mode, 2-client mode</field>
+          <field type="char[64]" name="ssid">ssid</field>
+          <field type="char[64]" name="pass">pass</field>
+        </message>
+     <!-- end SUI custom messages -->
              
           <message id="11" name="SET_MODE">
                <description>Set the system mode, as defined by enum MAV_MODE. There is no target component id as the mode is by definition for the overall aircraft, not only for one component.</description>

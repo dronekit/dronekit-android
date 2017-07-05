@@ -5,9 +5,9 @@ import android.support.v4.util.Pair;
 
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Parser;
+import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
 
 import org.droidplanner.services.android.impl.core.model.Logger;
-import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
 
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
@@ -51,7 +51,7 @@ public abstract class MavLinkConnection {
      * Stores the list of log files to be written to.
      */
     private final ConcurrentHashMap<String, Pair<String, BufferedOutputStream>> loggingOutStreams = new
-        ConcurrentHashMap<>();
+            ConcurrentHashMap<>();
 
     /**
      * Queue the set of packets to send via the mavlink connection. A thread
@@ -217,7 +217,7 @@ public abstract class MavLinkConnection {
                     logBuffer.putLong(System.currentTimeMillis() * 1000);
 
                     for (Map.Entry<String, Pair<String, BufferedOutputStream>> entry : loggingOutStreams
-                        .entrySet()) {
+                            .entrySet()) {
                         final Pair<String, BufferedOutputStream> logInfo = entry.getValue();
                         final String loggingFilePath = logInfo.first;
                         try {

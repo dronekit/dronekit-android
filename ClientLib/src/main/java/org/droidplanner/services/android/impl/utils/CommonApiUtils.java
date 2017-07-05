@@ -785,15 +785,21 @@ public class CommonApiUtils {
     }
 
     public static void sendMavlinkMessage(MavLinkDrone drone, MavlinkMessageWrapper messageWrapper) {
-        if (drone == null || messageWrapper == null)
+        if (drone == null || messageWrapper == null) {
+            Timber.d("No drone or messageWrapper");
             return;
+        }
 
         MAVLinkMessage message = messageWrapper.getMavLinkMessage();
-        if (message == null)
+        if (message == null) {
+            Timber.d("No message to send");
             return;
+        }
 
         message.compid = drone.getCompid();
         message.sysid = drone.getSysid();
+
+        Timber.d("compid=" + message.compid + " sysid=" + message.sysid);
 
         //Set the target system and target component for MAVLink messages that support those
         //attributes.
