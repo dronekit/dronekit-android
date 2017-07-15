@@ -808,8 +808,8 @@ public class CommonApiUtils {
             Field target_system = tempMessage.getDeclaredField("target_system");
             Field target_component = tempMessage.getDeclaredField("target_component");
 
-            target_system.setByte(message, (byte) message.sysid);
-            target_component.setByte(message, (byte) message.compid);
+            target_system.setShort(message, (short)message.sysid);
+            target_component.setShort(message, (short)message.compid);
         } catch (NoSuchFieldException | SecurityException | IllegalAccessException | IllegalArgumentException | ExceptionInInitializerError e) {
             Timber.e(e, e.getMessage());
         }

@@ -13,7 +13,7 @@ import com.MAVLink.Messages.MAVLinkPayload;
 /**
 * Control on-board Camera Control System to take shots.
 */
-public class msg_digicam_control extends MAVLinkMessage{
+public class msg_digicam_control extends MAVLinkMessage {
 
     public static final int MAVLINK_MSG_ID_DIGICAM_CONTROL = 155;
     public static final int MAVLINK_MSG_LENGTH = 13;
