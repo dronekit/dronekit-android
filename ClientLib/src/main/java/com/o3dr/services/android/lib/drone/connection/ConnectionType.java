@@ -15,7 +15,8 @@ public class ConnectionType {
         TYPE_UDP,
         TYPE_TCP,
         TYPE_BLUETOOTH,
-        TYPE_SOLO
+        TYPE_SOLO,
+        TYPE_CUSTOM
     })
     @Retention(RetentionPolicy.SOURCE)
     public @interface Type {}
@@ -111,6 +112,13 @@ public class ConnectionType {
      */
     public static final String EXTRA_SOLO_LINK_ID = "extra_solo_link_id";
 
+    /** Custom connection type
+     * Uses a custom MavlinkConnectionManager provided by the client
+     */
+    public static final int TYPE_CUSTOM = 99;
+
+    public static final String EXTRA_CUSTOM_CONNECTION_ID = "extra_custom_connection_id";
+
     /**
      * Used to retrieve the password to access the solo wifi network.
      */
@@ -132,6 +140,9 @@ public class ConnectionType {
 
             case TYPE_SOLO:
                 return "solo";
+
+            case TYPE_CUSTOM:
+                return "custom";
 
             default:
                 return null;

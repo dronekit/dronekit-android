@@ -7,6 +7,8 @@ import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import org.droidplanner.services.android.impl.communication.connection.AndroidMavLinkConnection;
+
 import timber.log.Timber;
 
 /**
@@ -17,6 +19,7 @@ public class ConnectionParameter implements Parcelable {
     private final @ConnectionType.Type int connectionType;
     private final Bundle paramsBundle;
     private final Uri tlogLoggingUri;
+    private final AndroidMavLinkConnection customConnection;
 
     /**
      * @param tlogLoggingUri Uri where the tlog data should be logged. Pass null if the tlog data shouldn't be logged
@@ -36,7 +39,7 @@ public class ConnectionParameter implements Parcelable {
         Bundle paramsBundle = new Bundle(1);
         paramsBundle.putInt(ConnectionType.EXTRA_USB_BAUD_RATE, usbBaudRate);
 
-        return new ConnectionParameter(ConnectionType.TYPE_USB, paramsBundle, tlogLoggingUri);
+        return new ConnectionParameter(ConnectionType.TYPE_USB, paramsBundle, tlogLoggingUri, null);
     }
 
     /**
@@ -118,7 +121,7 @@ public class ConnectionParameter implements Parcelable {
             paramsBundle.putLong(ConnectionType.EXTRA_UDP_PING_PERIOD, pingPeriod);
         }
 
-        return new ConnectionParameter(ConnectionType.TYPE_UDP, paramsBundle, tlogLoggingUri);
+        return new ConnectionParameter(ConnectionType.TYPE_UDP, paramsBundle, tlogLoggingUri, null);
     }
 
     /**
@@ -144,7 +147,7 @@ public class ConnectionParameter implements Parcelable {
         paramsBundle.putString(ConnectionType.EXTRA_TCP_SERVER_IP, tcpServerIp);
         paramsBundle.putInt(ConnectionType.EXTRA_TCP_SERVER_PORT, tcpServerPort);
 
-        return new ConnectionParameter(ConnectionType.TYPE_TCP, paramsBundle, tlogLoggingUri);
+        return new ConnectionParameter(ConnectionType.TYPE_TCP, paramsBundle, tlogLoggingUri, null);
     }
 
     /**
@@ -157,7 +160,14 @@ public class ConnectionParameter implements Parcelable {
         Bundle paramsBundle = new Bundle(1);
         paramsBundle.putString(ConnectionType.EXTRA_BLUETOOTH_ADDRESS, bluetoothAddress);
 
-        return new ConnectionParameter(ConnectionType.TYPE_BLUETOOTH, paramsBundle, tlogLoggingUri);
+        return new ConnectionParameter(ConnectionType.TYPE_BLUETOOTH, paramsBundle, tlogLoggingUri, null);
+    }
+
+    public static ConnectionParameter newCustomConnection(AndroidMavLinkConnection connection, String connectionId) {
+        Bundle paramsBundle = new Bundle(1);
+        paramsBundle.putString(ConnectionType.EXTRA_CUSTOM_CONNECTION_ID, connectionId);
+
+        return new ConnectionParameter(ConnectionType.TYPE_CUSTOM, paramsBundle, null, connection);
     }
 
     /**
@@ -175,7 +185,7 @@ public class ConnectionParameter implements Parcelable {
         paramsBundle.putString(ConnectionType.EXTRA_SOLO_LINK_ID, ssidWithoutQuotes);
         paramsBundle.putString(ConnectionType.EXTRA_SOLO_LINK_PASSWORD, password);
 
-        return new ConnectionParameter(ConnectionType.TYPE_SOLO, paramsBundle, tlogLoggingUri);
+        return new ConnectionParameter(ConnectionType.TYPE_SOLO, paramsBundle, tlogLoggingUri, null);
     }
 
     public static ConnectionParameter newSoloConnection(String ssid, @Nullable String password, ConnectionParameter params) {
@@ -185,19 +195,20 @@ public class ConnectionParameter implements Parcelable {
         paramsBundle.putString(ConnectionType.EXTRA_SOLO_LINK_ID, ssidWithoutQuotes);
         paramsBundle.putString(ConnectionType.EXTRA_SOLO_LINK_PASSWORD, password);
 
-        return new ConnectionParameter(ConnectionType.TYPE_SOLO, paramsBundle, params.getTLogLoggingUri());
+        return new ConnectionParameter(ConnectionType.TYPE_SOLO, paramsBundle, params.getTLogLoggingUri(), null);
     }
 
     private ConnectionParameter(@ConnectionType.Type int connectionType, Bundle paramsBundle){
-        this(connectionType, paramsBundle, null);
+        this(connectionType, paramsBundle, null, null);
     }
 
     /**
      */
-    private ConnectionParameter(@ConnectionType.Type int connectionType, Bundle paramsBundle, Uri tlogLoggingUri){
+    private ConnectionParameter(@ConnectionType.Type int connectionType, Bundle paramsBundle, Uri tlogLoggingUri, AndroidMavLinkConnection customConnection) {
         this.connectionType = connectionType;
         this.paramsBundle = paramsBundle;
         this.tlogLoggingUri = tlogLoggingUri;
+        this.customConnection = customConnection;
     }
 
     public @ConnectionType.Type int getConnectionType() {
@@ -260,6 +271,10 @@ public class ConnectionParameter implements Parcelable {
                 uniqueId = "solo:" + soloLinkId;
                 break;
 
+            case ConnectionType.TYPE_CUSTOM:
+                uniqueId = "custom: " + paramsBundle.getString(ConnectionType.EXTRA_CUSTOM_CONNECTION_ID, "");
+                break;
+
             default:
                 uniqueId = "";
                 break;
@@ -267,6 +282,8 @@ public class ConnectionParameter implements Parcelable {
 
         return uniqueId;
     }
+
+    public AndroidMavLinkConnection getCustomConnection() { return customConnection; }
 
     @Override
     public boolean equals(Object o){
@@ -326,6 +343,7 @@ public class ConnectionParameter implements Parcelable {
         this.connectionType = type;
         paramsBundle = in.readBundle(getClass().getClassLoader());
         tlogLoggingUri = in.readParcelable(Uri.class.getClassLoader());
+        customConnection = null;
     }
 
     public static final Creator<ConnectionParameter> CREATOR = new Creator<ConnectionParameter>() {
