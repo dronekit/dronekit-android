@@ -2,15 +2,27 @@ package com.o3dr.services.android.lib.drone.property;
 
 import android.os.Parcel;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Created by fhuya on 10/28/14.
  */
 public class Battery implements DroneAttribute {
 
+    private static final int INT16_MAX = 65535;
+
     private double batteryVoltage;
     private double batteryRemain;
     private double batteryCurrent;
     private Double batteryDischarge;
+    private int currentConsumed;
+    private short temperature;
+    private int[] voltages;
+
+    private boolean mHasCellVoltages;
+    private boolean mHasTemperature;
 
     public Battery(){}
 
@@ -38,6 +50,20 @@ public class Battery implements DroneAttribute {
         this.batteryDischarge = batteryDischarge;
     }
 
+    public void setCurrentConsumed(int consumed) {
+        currentConsumed = consumed;
+    }
+
+    public void setTemperature(short temperature) {
+        this.temperature = temperature;
+        this.mHasTemperature = (temperature > 0);
+    }
+
+    public void setCellVoltages(int[] voltages) {
+        this.voltages = voltages;
+        this.mHasCellVoltages = (voltages != null);
+    }
+
     public double getBatteryVoltage() {
         return batteryVoltage;
     }
@@ -54,6 +80,28 @@ public class Battery implements DroneAttribute {
         return batteryDischarge;
     }
 
+    public int getCurrentConsumed() { return currentConsumed; }
+
+    public short getTemperature() { return temperature; }
+    public boolean hasTemperature() { return mHasTemperature; }
+
+    public int[] getCellVoltages() { return voltages; }
+    public boolean hasCellVoltages() { return mHasCellVoltages; }
+
+    public List<Integer> getValidCellVoltages() {
+        final List<Integer> list = new ArrayList<>();
+
+        if(voltages != null) {
+            for(int i = 0, size = voltages.length; i < size; ++i) {
+                if(voltages[i] < INT16_MAX) {
+                    list.add(voltages[i]);
+                }
+            }
+        }
+
+        return list;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -65,6 +113,13 @@ public class Battery implements DroneAttribute {
         dest.writeDouble(this.batteryRemain);
         dest.writeDouble(this.batteryCurrent);
         dest.writeValue(this.batteryDischarge);
+
+        dest.writeInt(this.currentConsumed);
+        dest.writeInt(this.temperature);
+
+        int len = (this.voltages != null)? this.voltages.length: 0;
+        dest.writeInt(len);
+        dest.writeIntArray((this.voltages != null)? this.voltages: new int[0]);
     }
 
     private Battery(Parcel in) {
@@ -72,6 +127,11 @@ public class Battery implements DroneAttribute {
         this.batteryRemain = in.readDouble();
         this.batteryCurrent = in.readDouble();
         this.batteryDischarge = (Double) in.readValue(Double.class.getClassLoader());
+        this.currentConsumed = in.readInt();
+        this.temperature = (short)in.readInt();
+
+        this.voltages = new int[in.readInt()];
+        in.readIntArray(this.voltages);
     }
 
     public static final Creator<Battery> CREATOR = new Creator<Battery>() {
@@ -83,4 +143,17 @@ public class Battery implements DroneAttribute {
             return new Battery[size];
         }
     };
+
+    @Override
+    public String toString() {
+        return "Battery{" +
+                "batteryVoltage=" + batteryVoltage +
+                ", batteryRemain=" + batteryRemain +
+                ", batteryCurrent=" + batteryCurrent +
+                ", batteryDischarge=" + batteryDischarge +
+                ", currentConsumed=" + currentConsumed +
+                ", temperature=" + temperature +
+                ", voltages=" + Arrays.toString(voltages) +
+                '}';
+    }
 }

@@ -9,6 +9,7 @@ import android.view.Surface;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.ardupilotmega.msg_ekf_status_report;
 import com.MAVLink.common.msg_attitude;
+import com.MAVLink.common.msg_battery_status;
 import com.MAVLink.common.msg_global_position_int;
 import com.MAVLink.common.msg_gps_raw_int;
 import com.MAVLink.common.msg_heartbeat;
@@ -609,6 +610,11 @@ public class GenericMavLinkDrone implements MavLinkDrone {
                 processSysStatus(m_sys);
                 break;
 
+            case msg_battery_status.MAVLINK_MSG_ID_BATTERY_STATUS:
+                msg_battery_status batt = (msg_battery_status)message;
+                processBatteryStatus(batt);
+                break;
+
             case msg_global_position_int.MAVLINK_MSG_ID_GLOBAL_POSITION_INT:
                 processGlobalPositionInt((msg_global_position_int) message);
                 break;
@@ -639,6 +645,12 @@ public class GenericMavLinkDrone implements MavLinkDrone {
     protected void processSysStatus(msg_sys_status m_sys) {
         processBatteryUpdate(m_sys.voltage_battery / 1000.0, m_sys.battery_remaining,
             m_sys.current_battery / 100.0);
+    }
+
+    protected void processBatteryStatus(msg_battery_status batt) {
+        processBatteryStatusUpdate(
+            batt.id, batt.battery_function, batt.current_consumed, batt.temperature, batt.voltages
+        );
     }
 
     private void processHeartbeat(msg_heartbeat msg_heart) {
@@ -728,6 +740,14 @@ public class GenericMavLinkDrone implements MavLinkDrone {
 
             notifyDroneEvent(DroneInterfaces.DroneEventsType.BATTERY);
         }
+    }
+
+    protected void processBatteryStatusUpdate(
+            short id, short battery_function, int current_consumed, short temperature, int[] voltages) {
+        // Update the battery. BATTERY events will be sent when sys_status is updated.
+        battery.setCurrentConsumed(current_consumed);
+        battery.setTemperature(temperature);
+        battery.setCellVoltages(voltages);
     }
 
     private void processVibrationMessage(msg_vibration vibrationMsg) {
