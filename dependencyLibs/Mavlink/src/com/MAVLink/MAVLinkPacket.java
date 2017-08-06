@@ -7,12 +7,61 @@
 
 package com.MAVLink;
 
-import java.io.Serializable;
-import com.MAVLink.Messages.MAVLinkPayload;
 import com.MAVLink.Messages.MAVLinkMessage;
+import com.MAVLink.Messages.MAVLinkPayload;
 import com.MAVLink.ardupilotmega.CRC;
+import com.MAVLink.ardupilotmega.msg_ahrs;
+import com.MAVLink.ardupilotmega.msg_ahrs2;
+import com.MAVLink.ardupilotmega.msg_ahrs3;
+import com.MAVLink.ardupilotmega.msg_airspeed_autocal;
+import com.MAVLink.ardupilotmega.msg_ap_adc;
+import com.MAVLink.ardupilotmega.msg_autopilot_version_request;
+import com.MAVLink.ardupilotmega.msg_battery2;
+import com.MAVLink.ardupilotmega.msg_camera_feedback;
+import com.MAVLink.ardupilotmega.msg_camera_status;
+import com.MAVLink.ardupilotmega.msg_compassmot_status;
+import com.MAVLink.ardupilotmega.msg_data16;
+import com.MAVLink.ardupilotmega.msg_data32;
+import com.MAVLink.ardupilotmega.msg_data64;
+import com.MAVLink.ardupilotmega.msg_data96;
+import com.MAVLink.ardupilotmega.msg_digicam_configure;
+import com.MAVLink.ardupilotmega.msg_digicam_control;
+import com.MAVLink.ardupilotmega.msg_ekf_status_report;
+import com.MAVLink.ardupilotmega.msg_fence_fetch_point;
+import com.MAVLink.ardupilotmega.msg_fence_point;
+import com.MAVLink.ardupilotmega.msg_fence_status;
+import com.MAVLink.ardupilotmega.msg_gimbal_control;
+import com.MAVLink.ardupilotmega.msg_gimbal_report;
+import com.MAVLink.ardupilotmega.msg_gimbal_torque_cmd_report;
+import com.MAVLink.ardupilotmega.msg_gopro_get_request;
+import com.MAVLink.ardupilotmega.msg_gopro_get_response;
+import com.MAVLink.ardupilotmega.msg_gopro_heartbeat;
+import com.MAVLink.ardupilotmega.msg_gopro_set_request;
+import com.MAVLink.ardupilotmega.msg_gopro_set_response;
+import com.MAVLink.ardupilotmega.msg_gps_accuracy;
+import com.MAVLink.ardupilotmega.msg_hwstatus;
+import com.MAVLink.ardupilotmega.msg_led_control;
+import com.MAVLink.ardupilotmega.msg_limits_status;
+import com.MAVLink.ardupilotmega.msg_mag_cal_progress;
+import com.MAVLink.ardupilotmega.msg_mag_cal_report;
+import com.MAVLink.ardupilotmega.msg_meminfo;
+import com.MAVLink.ardupilotmega.msg_mount_configure;
+import com.MAVLink.ardupilotmega.msg_mount_control;
+import com.MAVLink.ardupilotmega.msg_mount_status;
+import com.MAVLink.ardupilotmega.msg_pid_tuning;
+import com.MAVLink.ardupilotmega.msg_radio;
+import com.MAVLink.ardupilotmega.msg_rally_fetch_point;
+import com.MAVLink.ardupilotmega.msg_rally_point;
+import com.MAVLink.ardupilotmega.msg_rangefinder;
+import com.MAVLink.ardupilotmega.msg_remote_log_block_status;
+import com.MAVLink.ardupilotmega.msg_remote_log_data_block;
+import com.MAVLink.ardupilotmega.msg_sensor_offsets;
+import com.MAVLink.ardupilotmega.msg_set_mag_offsets;
+import com.MAVLink.ardupilotmega.msg_simstate;
+import com.MAVLink.ardupilotmega.msg_wind;
 import com.MAVLink.common.*;
-import com.MAVLink.ardupilotmega.*;
+
+import java.io.Serializable;
 
 /**
 * Common interface for all MAVLink Messages
@@ -685,6 +734,14 @@ public class MAVLinkPacket implements Serializable {
         }
     }
 
+    @Override
+    public String toString() {
+        return "MAVLinkPacket{" +
+                "len=" + len +
+                ", seq=" + seq +
+                ", msgid=" + msgid +
+                '}';
+    }
 }
 
         

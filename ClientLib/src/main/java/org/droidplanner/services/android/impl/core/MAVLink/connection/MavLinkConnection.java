@@ -133,6 +133,8 @@ public abstract class MavLinkConnection {
 
                 final byte[] readBuffer = new byte[READ_BUFFER_SIZE];
 
+                mLogger.logInfo(TAG, String.format("mConnectionStatus=%d", mConnectionStatus.get()));
+
                 while (mConnectionStatus.get() == MAVLINK_CONNECTED) {
                     int bufferSize = readDataBlock(readBuffer);
                     handleData(parser, bufferSize, readBuffer);
@@ -328,7 +330,17 @@ public abstract class MavLinkConnection {
         return mConnectionStatus.get();
     }
 
+    static String toString(MAVLinkPacket packet) {
+        if(packet != null) {
+            return String.format("%s: %d", packet.getClass().getSimpleName(), packet.msgid);
+        } else {
+            return null;
+        }
+    }
+
     public void sendMavPacket(MAVLinkPacket packet) {
+//        mLogger.logInfo(TAG, String.format("sendMavPacket(): packet=%s", toString(packet)));
+
         final byte[] packetData = packet.encodePacket();
         if (!mPacketsToSend.offer(packetData)) {
             mLogger.logErr(TAG, "Unable to send mavlink packet. Packet queue is full!");

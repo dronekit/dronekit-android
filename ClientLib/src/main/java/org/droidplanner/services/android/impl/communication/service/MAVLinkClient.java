@@ -52,6 +52,8 @@ public class MAVLinkClient implements DataLink.DataLinkProvider<MAVLinkMessage> 
 
         @Override
         public void onConnectionStatus(final LinkConnectionStatus connectionStatus) {
+            Timber.i("onConnectionStatus(): status=%s", connectionStatus);
+
             listener.onConnectionStatus(connectionStatus);
 
             switch (connectionStatus.getStatusCode()) {
@@ -96,10 +98,15 @@ public class MAVLinkClient implements DataLink.DataLinkProvider<MAVLinkMessage> 
      */
     @Override
     public synchronized void openConnection() {
-        if(isConnected() || isConnecting())
+        Timber.i("openConnection()");
+
+        if(isConnected() || isConnecting()) {
+            Timber.d("isConnected() || isConnecting()");
             return;
+        }
 
         final String tag = toString();
+        Timber.d("tag=%s mavlinkConn=%s", tag, mavlinkConn);
 
         //Create the mavlink connection
         final int connectionType = connParams.getConnectionType();
@@ -142,6 +149,12 @@ public class MAVLinkClient implements DataLink.DataLinkProvider<MAVLinkMessage> 
                     final String soloLinkId = paramsBundle.getString(ConnectionType.EXTRA_SOLO_LINK_ID, null);
                     final String linkPassword = paramsBundle.getString(ConnectionType.EXTRA_SOLO_LINK_PASSWORD, null);
                     mavlinkConn = new SoloConnection(context, soloLinkId, linkPassword);
+                    break;
+                }
+
+                case ConnectionType.TYPE_CUSTOM: {
+                    mavlinkConn = connParams.getCustomConnection();
+                    Timber.i("Creating custom connection: %s", mavlinkConn.getClass().getName());
                     break;
                 }
 
