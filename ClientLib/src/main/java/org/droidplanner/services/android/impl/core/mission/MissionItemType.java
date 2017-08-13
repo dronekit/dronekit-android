@@ -11,6 +11,7 @@ import org.droidplanner.services.android.impl.core.mission.commands.LoiterToAltI
 import org.droidplanner.services.android.impl.core.mission.commands.ReturnToHomeImpl;
 import org.droidplanner.services.android.impl.core.mission.commands.SetRelayImpl;
 import org.droidplanner.services.android.impl.core.mission.commands.SetServoImpl;
+import org.droidplanner.services.android.impl.core.mission.commands.TakePictureImpl;
 import org.droidplanner.services.android.impl.core.mission.commands.TakeoffImpl;
 import org.droidplanner.services.android.impl.core.mission.survey.SplineSurveyImpl;
 import org.droidplanner.services.android.impl.core.mission.survey.SurveyImpl;
@@ -43,7 +44,8 @@ public enum MissionItemType {
     SET_RELAY("Set Relay"),
     DO_LAND_START("Do Land Start"),
     DO_JUMP("Do Jump"),
-    LOITER_TO_ALT("Loiter to Alt")
+    LOITER_TO_ALT("Loiter to Alt"),
+    TAKE_PICTURE("Take Picture")
     ;
 
     private final String name;
@@ -68,6 +70,8 @@ public enum MissionItemType {
                 return new ChangeSpeedImpl(referenceItem);
             case LOITER_TO_ALT:
                 return new LoiterToAltImpl(referenceItem);
+            case TAKE_PICTURE:
+                return new TakePictureImpl(referenceItem);
             case CAMERA_TRIGGER:
                 return new CameraTriggerImpl(referenceItem);
             case EPM_GRIPPER:

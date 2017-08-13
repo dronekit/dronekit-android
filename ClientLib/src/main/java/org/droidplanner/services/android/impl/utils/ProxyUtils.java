@@ -13,6 +13,7 @@ import com.o3dr.services.android.lib.drone.mission.item.command.ResetROI;
 import com.o3dr.services.android.lib.drone.mission.item.command.ReturnToLaunch;
 import com.o3dr.services.android.lib.drone.mission.item.command.SetRelay;
 import com.o3dr.services.android.lib.drone.mission.item.command.SetServo;
+import com.o3dr.services.android.lib.drone.mission.item.command.TakePicture;
 import com.o3dr.services.android.lib.drone.mission.item.command.Takeoff;
 import com.o3dr.services.android.lib.drone.mission.item.command.YawCondition;
 import com.o3dr.services.android.lib.drone.mission.item.complex.CameraDetail;
@@ -38,6 +39,7 @@ import org.droidplanner.services.android.impl.core.mission.commands.LoiterToAltI
 import org.droidplanner.services.android.impl.core.mission.commands.ReturnToHomeImpl;
 import org.droidplanner.services.android.impl.core.mission.commands.SetRelayImpl;
 import org.droidplanner.services.android.impl.core.mission.commands.SetServoImpl;
+import org.droidplanner.services.android.impl.core.mission.commands.TakePictureImpl;
 import org.droidplanner.services.android.impl.core.mission.commands.TakeoffImpl;
 import org.droidplanner.services.android.impl.core.mission.survey.SplineSurveyImpl;
 import org.droidplanner.services.android.impl.core.mission.survey.SurveyImpl;
@@ -126,6 +128,11 @@ public class ProxyUtils {
                     missionItemImpl = null;
                 }
 
+                break;
+            }
+            case TAKE_PICTURE: {
+                TakePicture proxy = (TakePicture)proxyItem;
+                missionItemImpl = new TakePictureImpl(mission, 0);
                 break;
             }
             case EPM_GRIPPER: {
@@ -506,6 +513,12 @@ public class ProxyUtils {
                 temp.setCoordinate(new LatLongAlt(source.getLat(), source.getLng(), source.getAlt()));
 
                 proxyMissionItem = temp;
+                break;
+            }
+
+            case TAKE_PICTURE: {
+                TakePictureImpl source = (TakePictureImpl)itemImpl;
+                proxyMissionItem = new TakePicture();
                 break;
             }
 

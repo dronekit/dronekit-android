@@ -14,6 +14,7 @@ import com.o3dr.services.android.lib.drone.mission.item.command.ResetROI;
 import com.o3dr.services.android.lib.drone.mission.item.command.ReturnToLaunch;
 import com.o3dr.services.android.lib.drone.mission.item.command.SetRelay;
 import com.o3dr.services.android.lib.drone.mission.item.command.SetServo;
+import com.o3dr.services.android.lib.drone.mission.item.command.TakePicture;
 import com.o3dr.services.android.lib.drone.mission.item.command.Takeoff;
 import com.o3dr.services.android.lib.drone.mission.item.command.YawCondition;
 import com.o3dr.services.android.lib.drone.mission.item.complex.SplineSurvey;
@@ -277,6 +278,18 @@ public enum MissionItemType {
         @Override
         protected Creator<LoiterToAlt> getMissionItemCreator() {
             return LoiterToAlt.CREATOR;
+        }
+    },
+
+    TAKE_PICTURE("Take Picture") {
+        @Override
+        public MissionItem getNewItem() {
+            return new TakePicture();
+        }
+
+        @Override
+        protected Creator<TakePicture> getMissionItemCreator() {
+            return TakePicture.CREATOR;
         }
     },
     ;
