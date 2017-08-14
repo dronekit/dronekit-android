@@ -38,6 +38,7 @@ public class TLVMessageTypes {
     public static final int TYPE_SOLO_GOPRO_STATE_V2 = 5006;
     public static final int TYPE_SOLO_GOPRO_REQUEST_STATE = 5007;
     public static final int TYPE_SOLO_GOPRO_SET_EXTENDED_REQUEST = 5009;
+    public static final int TYPE_SOLO_GOPRO_PHOTO = 5020;
 
     /*
     Multi point cable cam message types

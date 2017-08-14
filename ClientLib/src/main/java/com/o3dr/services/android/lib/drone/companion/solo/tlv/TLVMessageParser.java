@@ -33,6 +33,7 @@ import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageT
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_GEOFENCE_CLEAR;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_GEOFENCE_SET_ACK;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_GET_BUTTON_SETTING;
+import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_GOPRO_PHOTO;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_GOPRO_RECORD;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_GOPRO_REQUEST_STATE;
 import static com.o3dr.services.android.lib.drone.companion.solo.tlv.TLVMessageTypes.TYPE_SOLO_GOPRO_SET_EXTENDED_REQUEST;
@@ -106,6 +107,7 @@ public class TLVMessageParser {
                 Log.d(TAG, String.format("Received message %d of with value of length %d. Remaining buffer size is %d", messageType, messageLength, remaining));
 
                 if (messageLength > remaining) {
+                    Log.d(TAG, String.format("messageLength %d > remaining %d", messageLength, remaining));
                     break;
                 }
 
@@ -217,6 +219,12 @@ public class TLVMessageParser {
                     case TYPE_SOLO_GOPRO_RECORD: {
                         @SoloGoproConstants.RecordCommand final int command = packetBuffer.getInt();
                         packet = new SoloGoproRecord(command);
+                        break;
+                    }
+
+                    case TYPE_SOLO_GOPRO_PHOTO: {
+                        packet = new SoloGoproPhoto(packetBuffer);
+                        Log.v(TAG, "packet=" + packet);
                         break;
                     }
 
@@ -372,8 +380,10 @@ public class TLVMessageParser {
                 }
 
                 if (packet != null && packet.getMessageLength() == messageLength) {
+                    Log.v(TAG, "add packet " + packet);
                     packetList.add(packet);
                 } else {
+                    Log.v(TAG, "reset packet buffer");
                     packetBuffer.reset();
                     packetBuffer.position(packetBuffer.position() + messageLength);
                 }
