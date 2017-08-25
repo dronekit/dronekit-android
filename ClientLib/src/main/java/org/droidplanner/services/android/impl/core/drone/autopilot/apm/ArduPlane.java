@@ -17,6 +17,7 @@ import org.droidplanner.services.android.impl.core.model.AutopilotWarningParser;
  * Created by Fredia Huya-Kouadio on 7/27/15.
  */
 public class ArduPlane extends ArduPilot {
+    static final String TAG = ArduPlane.class.getSimpleName();
 
     public ArduPlane(String droneId, Context context, DataLink.DataLinkProvider<MAVLinkMessage> mavClient, Handler handler, AutopilotWarningParser warningParser, LogMessageListener logListener) {
         super(droneId, context, mavClient, handler, warningParser, logListener);
@@ -37,7 +38,8 @@ public class ArduPlane extends ArduPilot {
 
     @Override
     protected void processVfrHud(msg_vfr_hud vfrHud){
-        //Nothing to do. Plane used GLOBAL_POSITION_INT to set altitude and speeds unlike copter
+        // Note: Don't use vfrHud altitude, it seems grossly inaccurate.
+        setGroundAndAirSpeeds(vfrHud.groundspeed, vfrHud.airspeed, vfrHud.climb);
     }
 
     /**
@@ -53,13 +55,11 @@ public class ArduPlane extends ArduPilot {
 
         final double relativeAlt = gpi.relative_alt / 1000.0;
 
-        final double groundSpeedX = gpi.vx / 100.0;
-        final double groundSpeedY = gpi.vy / 100.0;
-        final double groundSpeed = Math.sqrt(Math.pow(groundSpeedX, 2) + Math.pow(groundSpeedY, 2));
-
-        final double climbRate = gpi.vz / 100.0;
-        setAltitudeGroundAndAirSpeeds(relativeAlt, groundSpeed, groundSpeed, climbRate);
+//        final double groundSpeedX = gpi.vx / 100.0;
+//        final double groundSpeedY = gpi.vy / 100.0;
+//        final double groundSpeed = Math.sqrt(Math.pow(groundSpeedX, 2) + Math.pow(groundSpeedY, 2));
+//
+//        final double climbRate = gpi.vz / 100.0;
+        setAltitudes(relativeAlt);
     }
-
-
 }
