@@ -72,6 +72,8 @@ import timber.log.Timber;
  * Base class for the ArduPilot autopilots
  */
 public abstract class ArduPilot extends GenericMavLinkDrone {
+    static final String TAG = ArduPilot.class.getSimpleName();
+
     public static final int AUTOPILOT_COMPONENT_ID = 1;
     public static final int ARTOO_COMPONENT_ID = 0;
     public static final int TELEMETRY_RADIO_COMPONENT_ID = 68;
@@ -118,6 +120,23 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
             notifyDroneEvent(DroneInterfaces.DroneEventsType.ALTITUDE);
         }
 
+        if (speed.getGroundSpeed() != groundSpeed || speed.getAirSpeed() != airSpeed || speed.getVerticalSpeed() != climb) {
+            speed.setGroundSpeed(groundSpeed);
+            speed.setAirSpeed(airSpeed);
+            speed.setVerticalSpeed(climb);
+
+            notifyDroneEvent(DroneInterfaces.DroneEventsType.SPEED);
+        }
+    }
+
+    protected void setAltitudes(double altitude) {
+        if (this.altitude.getAltitude() != altitude) {
+            this.altitude.setAltitude(altitude);
+            notifyDroneEvent(DroneInterfaces.DroneEventsType.ALTITUDE);
+        }
+    }
+
+    protected void setGroundAndAirSpeeds(double groundSpeed, double airSpeed, double climb) {
         if (speed.getGroundSpeed() != groundSpeed || speed.getAirSpeed() != airSpeed || speed.getVerticalSpeed() != climb) {
             speed.setGroundSpeed(groundSpeed);
             speed.setAirSpeed(airSpeed);
@@ -528,6 +547,7 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
     }
 
     protected void processVfrHud(msg_vfr_hud vfrHud) {
+        Log.v(TAG, String.format("processVfrHud(%s)", vfrHud));
         if (vfrHud == null)
             return;
 
