@@ -216,7 +216,15 @@ public class MavLinkDroneManager extends DroneManager<MavLinkDrone, MAVLinkPacke
 
     @Override
     public void notifyReceivedData(MAVLinkPacket packet) {
-        MAVLinkMessage receivedMsg = packet.unpack();
+        MAVLinkMessage receivedMsg = null;
+
+        try {
+            receivedMsg = packet.unpack();
+        } catch(Throwable ex) {
+            Timber.e(ex, "Caught error unpacking packet with msgid %d", packet.msgid);
+            receivedMsg = null;
+        }
+
         if (receivedMsg == null)
             return;
 
