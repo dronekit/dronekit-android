@@ -547,7 +547,6 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
     }
 
     protected void processVfrHud(msg_vfr_hud vfrHud) {
-        Log.v(TAG, String.format("processVfrHud(%s)", vfrHud));
         if (vfrHud == null)
             return;
 

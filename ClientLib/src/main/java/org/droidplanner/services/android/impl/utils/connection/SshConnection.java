@@ -1,5 +1,6 @@
 package org.droidplanner.services.android.impl.utils.connection;
 
+import android.support.v4.util.Pair;
 import android.text.TextUtils;
 
 import com.jcraft.jsch.Channel;
@@ -113,6 +114,54 @@ public class SshConnection {
             }
 
             return response.toString();
+
+        } catch (JSchException e) {
+            throw new IOException(e);
+        } finally {
+            if (execChannel != null && execChannel.isConnected())
+                execChannel.disconnect();
+
+            if (session != null && session.isConnected())
+                session.disconnect();
+        }
+    }
+
+    public Pair<Integer, String> executeWithExitCode(String command) throws IOException {
+        if (TextUtils.isEmpty(command))
+            return null;
+
+        Session session = null;
+        Channel execChannel = null;
+        try {
+            session = getSession();
+
+            execChannel = session.openChannel(EXEC_CHANNEL_TYPE);
+            ((ChannelExec) execChannel).setCommand(command);
+            execChannel.setInputStream(null);
+
+            final InputStream in = execChannel.getInputStream();
+            execChannel.connect(CONNECTION_TIMEOUT);
+
+            final int bufferSize = 1024;
+            final StringBuilder response = new StringBuilder();
+            final byte[] buffer = new byte[bufferSize];
+            while (true) {
+                while (in.available() > 0) {
+                    int dataSize = in.read(buffer, 0, bufferSize);
+                    if (dataSize < 0)
+                        break;
+
+                    response.append(new String(buffer, 0, dataSize));
+                }
+
+                if (execChannel.isClosed()) {
+                    if (in.available() > 0) continue;
+                    Timber.d("SSH command exit status: " + execChannel.getExitStatus());
+                    break;
+                }
+            }
+
+            return new Pair<Integer, String>(execChannel.getExitStatus(), response.toString());
 
         } catch (JSchException e) {
             throw new IOException(e);
