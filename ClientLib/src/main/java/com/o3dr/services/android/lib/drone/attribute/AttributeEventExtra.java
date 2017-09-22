@@ -121,4 +121,10 @@ public class AttributeEventExtra {
      */
     public static final String EXTRA_RETURN_TO_ME_STATE = PACKAGE_NAME + ".EXTRA_RETURN_TO_ME_STATE";
 
+    /** Extras for FENCE_STATUS */
+    public static final String EXTRA_BREACH_TIME = PACKAGE_NAME + ".EXTRA_FENCE_BREACH_TIME";
+    public static final String EXTRA_BREACH_COUNT = PACKAGE_NAME + ".EXTRA_FENCE_BREACH_COUNT";
+    public static final String EXTRA_BREACH_STATUS = PACKAGE_NAME + ".EXTRA_FENCE_BREACH_STATUS";
+    public static final String EXTRA_BREACH_TYPE = PACKAGE_NAME + ".EXTRA_FENCE_BREACH_TYPE";
+
 }

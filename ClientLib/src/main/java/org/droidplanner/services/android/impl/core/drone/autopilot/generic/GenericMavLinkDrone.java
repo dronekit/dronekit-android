@@ -8,6 +8,7 @@ import android.view.Surface;
 
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.ardupilotmega.msg_ekf_status_report;
+import com.MAVLink.ardupilotmega.msg_fence_status;
 import com.MAVLink.common.msg_attitude;
 import com.MAVLink.common.msg_battery_status;
 import com.MAVLink.common.msg_global_position_int;
@@ -37,6 +38,7 @@ import com.o3dr.services.android.lib.drone.property.Altitude;
 import com.o3dr.services.android.lib.drone.property.Attitude;
 import com.o3dr.services.android.lib.drone.property.Battery;
 import com.o3dr.services.android.lib.drone.property.DroneAttribute;
+import com.o3dr.services.android.lib.drone.property.FenceStatus;
 import com.o3dr.services.android.lib.drone.property.Gps;
 import com.o3dr.services.android.lib.drone.property.Home;
 import com.o3dr.services.android.lib.drone.property.Parameter;
@@ -109,6 +111,7 @@ public class GenericMavLinkDrone implements MavLinkDrone {
     protected final Signal signal = new Signal();
     protected final Attitude attitude = new Attitude();
     protected final Vibration vibration = new Vibration();
+    protected final FenceStatus fenceStatus = new FenceStatus();
 
     protected final Handler handler;
 
@@ -564,6 +567,9 @@ public class GenericMavLinkDrone implements MavLinkDrone {
 
             case AttributeType.TYPE:
                 return CommonApiUtils.getType(this);
+
+            case AttributeType.FENCE_STATUS:
+                return fenceStatus;
         }
 
         return null;
@@ -625,6 +631,10 @@ public class GenericMavLinkDrone implements MavLinkDrone {
 
             case msg_mission_item.MAVLINK_MSG_ID_MISSION_ITEM:
                 processHomeUpdate((msg_mission_item) message);
+                break;
+
+            case msg_fence_status.MAVLINK_MSG_ID_FENCE_STATUS:
+                processFenceStatus((msg_fence_status)message);
                 break;
 
             case msg_mission_current.MAVLINK_MSG_ID_MISSION_CURRENT:
@@ -890,12 +900,36 @@ public class GenericMavLinkDrone implements MavLinkDrone {
         }
     }
 
+    protected void processFenceStatus(msg_fence_status msg) {
+        Bundle extras = new Bundle();
+
+        extras.putLong(AttributeEventExtra.EXTRA_BREACH_TIME, msg.breach_time);
+        extras.putInt(AttributeEventExtra.EXTRA_BREACH_COUNT, msg.breach_count);
+        extras.putShort(AttributeEventExtra.EXTRA_BREACH_STATUS, msg.breach_status);
+        extras.putShort(AttributeEventExtra.EXTRA_BREACH_TYPE, msg.breach_type);
+
+        fenceStatus.setBreachTime(msg.breach_time);
+        fenceStatus.setBreachCount(msg.breach_count);
+        fenceStatus.setBreachStatus(msg.breach_status);
+        fenceStatus.setBreachType(msg.breach_type);
+
+        notifyAttributeListener(AttributeEvent.FENCE_STATUS, extras);
+    }
+
     protected void requestHomeUpdate() {
         requestHomeUpdate(this);
     }
 
     private static void requestHomeUpdate(MavLinkDrone drone) {
         MavLinkWaypoint.requestWayPoint(drone, APMConstants.HOME_WAYPOINT_INDEX);
+    }
+
+    protected boolean updateParametersFrom(Parameters input) {
+        if(this.parameters != null) {
+            return this.parameters.updateFrom(input);
+        }
+
+        return false;
     }
 
 }

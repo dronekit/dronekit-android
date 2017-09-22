@@ -3,9 +3,11 @@ package org.droidplanner.services.android.impl.core.MAVLink;
 import com.MAVLink.common.msg_param_request_list;
 import com.MAVLink.common.msg_param_request_read;
 import com.MAVLink.common.msg_param_set;
+import com.o3dr.services.android.lib.drone.property.Parameter;
 
 import org.droidplanner.services.android.impl.core.drone.autopilot.MavLinkDrone;
-import com.o3dr.services.android.lib.drone.property.Parameter;
+
+import timber.log.Timber;
 
 public class MavLinkParameters {
 	public static void requestParametersList(MavLinkDrone drone) {
@@ -37,6 +39,8 @@ public class MavLinkParameters {
 	}
 
 	public static void sendParameter(MavLinkDrone drone, String name, int type, float value) {
+		Timber.d("sendParameter(%s, %d, %.6f)", name, type, value);
+
 		msg_param_set msg = new msg_param_set();
 		msg.target_system = drone.getSysid();
 		msg.target_component = drone.getCompid();

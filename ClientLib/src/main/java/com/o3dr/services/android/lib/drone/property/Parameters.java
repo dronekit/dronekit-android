@@ -39,6 +39,40 @@ public class Parameters implements DroneAttribute {
         return null;
     }
 
+    public boolean updateParameter(Parameter param) {
+        boolean success = false;
+
+        if(param != null) {
+            for(int i = 0, size = parametersList.size(); i < size; ++i) {
+                Parameter p = parametersList.get(i);
+                if(p.getName().equals(param.getName())) {
+                    parametersList.set(i, param);
+                    success = true;
+                    break;
+                }
+            }
+        }
+
+        return success;
+    }
+
+    public boolean updateFrom(Parameters params) {
+        boolean success = false;
+
+        if(params != null) {
+            List<Parameter> list = params.getParameters();
+            for(Parameter param: list) {
+                if(updateParameter(param)) {
+                    success = true;
+                } else {
+                    success = false;
+                }
+            }
+        }
+
+        return success;
+    }
+
     public void setParametersList(Collection<Parameter> parametersList) {
         this.parametersList.clear();
         if(parametersList != null && !parametersList.isEmpty()) {

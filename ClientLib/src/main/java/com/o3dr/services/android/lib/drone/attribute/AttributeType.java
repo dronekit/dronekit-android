@@ -107,4 +107,9 @@ public class AttributeType {
      */
     public static final String RETURN_TO_ME_STATE = PACKAGE_NAME + ".RETURN_TO_ME_STATE";
 
+    /** Used to retrieve the fence status.
+     * @see {@link com.o3dr.services.android.lib.drone.property.FenceStatus}
+     */
+    public static final String FENCE_STATUS = PACKAGE_NAME + ".FENCE_STATUS";
+
 }

@@ -568,11 +568,15 @@ public class CommonApiUtils {
     }
 
     public static void writeParameters(MavLinkDrone drone, Parameters parameters) {
+        Timber.d("writeParameters(): params=%s", parameters);
+
         if (drone == null || parameters == null) return;
 
         List<Parameter> parametersList = parameters.getParameters();
-        if (parametersList.isEmpty())
+        if (parametersList.isEmpty()) {
+            Timber.w("No params to write");
             return;
+        }
 
         ParameterManager droneParams = drone.getParameterManager();
         for (Parameter proxyParam : parametersList) {

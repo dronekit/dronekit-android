@@ -213,4 +213,9 @@ public class AttributeEvent {
      */
     public static final String RETURN_TO_ME_STATE_UPDATE = PACKAGE_NAME + ".RETURN_TO_ME_STATE_UPDATE";
 
+    /**
+     * Signals an update to fence status.
+     */
+    public static final String FENCE_STATUS = PACKAGE_NAME + ".FENCE_STATUS";
+
 }
