@@ -1,5 +1,22 @@
 apply plugin: 'java'
 
+allprojects {
+    sourceCompatibility = JavaVersion.VERSION_1_7
+    targetCompatibility = JavaVersion.VERSION_1_7
+
+    println "sourceCompatibility=" + sourceCompatibility
+
+    sourceSets {
+        main {
+            java.srcDirs = ['src']
+        }
+
+        test {
+            java.srcDirs = ['test']
+        }
+    }
+}
+
 sourceSets {
     main {
         java.srcDirs = ['src']
