@@ -218,4 +218,9 @@ public class AttributeEvent {
      */
     public static final String FENCE_STATUS = PACKAGE_NAME + ".FENCE_STATUS";
 
+    /**
+     * Signals an update to the autopilot version.
+     */
+    public static final String AUTOPILOT_VERSION = PACKAGE_NAME + ".AUTOPILOT_VERSION";
+
 }

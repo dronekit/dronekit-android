@@ -10,6 +10,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.ardupilotmega.msg_ekf_status_report;
 import com.MAVLink.ardupilotmega.msg_fence_status;
 import com.MAVLink.common.msg_attitude;
+import com.MAVLink.common.msg_autopilot_version;
 import com.MAVLink.common.msg_battery_status;
 import com.MAVLink.common.msg_global_position_int;
 import com.MAVLink.common.msg_gps_raw_int;
@@ -36,6 +37,7 @@ import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError
 import com.o3dr.services.android.lib.drone.mission.action.MissionActions;
 import com.o3dr.services.android.lib.drone.property.Altitude;
 import com.o3dr.services.android.lib.drone.property.Attitude;
+import com.o3dr.services.android.lib.drone.property.AutopilotVersion;
 import com.o3dr.services.android.lib.drone.property.Battery;
 import com.o3dr.services.android.lib.drone.property.DroneAttribute;
 import com.o3dr.services.android.lib.drone.property.FenceStatus;
@@ -79,6 +81,8 @@ import org.droidplanner.services.android.impl.utils.CommonApiUtils;
 import org.droidplanner.services.android.impl.utils.prefs.DroidPlannerPrefs;
 import org.droidplanner.services.android.impl.utils.video.VideoManager;
 
+import timber.log.Timber;
+
 /**
  * Base drone implementation.
  * Supports mavlink messages belonging to the common set: https://pixhawk.ethz.ch/mavlink/
@@ -112,6 +116,7 @@ public class GenericMavLinkDrone implements MavLinkDrone {
     protected final Attitude attitude = new Attitude();
     protected final Vibration vibration = new Vibration();
     protected final FenceStatus fenceStatus = new FenceStatus();
+    protected final AutopilotVersion apVersion = new AutopilotVersion();
 
     protected final Handler handler;
 
@@ -570,6 +575,9 @@ public class GenericMavLinkDrone implements MavLinkDrone {
 
             case AttributeType.FENCE_STATUS:
                 return fenceStatus;
+
+            case AttributeType.AUTOPILOT_VERSION:
+                return apVersion;
         }
 
         return null;
@@ -649,7 +657,26 @@ public class GenericMavLinkDrone implements MavLinkDrone {
                 msg_nav_controller_output m_nav = (msg_nav_controller_output) message;
                 setDisttowpAndSpeedAltErrors(m_nav.wp_dist, m_nav.alt_error, m_nav.aspd_error);
                 break;
+
+            case msg_autopilot_version.MAVLINK_MSG_ID_AUTOPILOT_VERSION:
+                processAutopilotVersion((msg_autopilot_version) message);
+                break;
         }
+    }
+
+    protected void processAutopilotVersion(msg_autopilot_version msg) {
+        Timber.d("processAutopilotVersion(%s)", msg);
+
+        apVersion.setCapabilities(msg.capabilities);
+        apVersion.setUid(msg.uid);
+        apVersion.setFlightSwVersion(msg.flight_sw_version);
+        apVersion.setMiddlewareSwVersion(msg.middleware_sw_version);
+        apVersion.setOsSwVersion(msg.os_sw_version);
+        apVersion.setBoardVersion(msg.board_version);
+        apVersion.setProductId(msg.product_id);
+        apVersion.setVendorId(msg.vendor_id);
+
+        notifyAttributeListener(AttributeEvent.AUTOPILOT_VERSION);
     }
 
     protected void processSysStatus(msg_sys_status m_sys) {

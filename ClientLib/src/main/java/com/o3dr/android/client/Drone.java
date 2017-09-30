@@ -22,6 +22,7 @@ import com.o3dr.services.android.lib.drone.mission.Mission;
 import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
 import com.o3dr.services.android.lib.drone.property.Altitude;
 import com.o3dr.services.android.lib.drone.property.Attitude;
+import com.o3dr.services.android.lib.drone.property.AutopilotVersion;
 import com.o3dr.services.android.lib.drone.property.Battery;
 import com.o3dr.services.android.lib.drone.property.Gps;
 import com.o3dr.services.android.lib.drone.property.GuidedState;
@@ -371,6 +372,9 @@ public class Drone {
 
             case AttributeType.RETURN_TO_ME_STATE:
                 return (T) new ReturnToMeState();
+
+            case AttributeType.AUTOPILOT_VERSION:
+                return (T) new AutopilotVersion();
 
             case AttributeType.CAMERA:
             case SoloAttributes.SOLO_STATE:

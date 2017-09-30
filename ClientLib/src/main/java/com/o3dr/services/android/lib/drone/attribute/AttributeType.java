@@ -112,4 +112,10 @@ public class AttributeType {
      */
     public static final String FENCE_STATUS = PACKAGE_NAME + ".FENCE_STATUS";
 
+    /**
+     * Used to retrieve Autopilot version
+     *  * @see {@link com.o3dr.services.android.lib.drone.property.AutopilotVersion}
+     */
+    public static final String AUTOPILOT_VERSION = PACKAGE_NAME + ".AUTOPILOT_VERSION";
+
 }
