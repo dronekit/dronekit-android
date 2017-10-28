@@ -13,6 +13,7 @@ import com.MAVLink.common.msg_attitude;
 import com.MAVLink.common.msg_autopilot_version;
 import com.MAVLink.common.msg_battery_status;
 import com.MAVLink.common.msg_global_position_int;
+import com.MAVLink.common.msg_gps2_raw;
 import com.MAVLink.common.msg_gps_raw_int;
 import com.MAVLink.common.msg_heartbeat;
 import com.MAVLink.common.msg_mission_current;
@@ -108,6 +109,7 @@ public class GenericMavLinkDrone implements MavLinkDrone {
 
     private final Home vehicleHome = new Home();
     private final Gps vehicleGps = new Gps();
+    private final Gps vehicleGps2 = new Gps();
     private final Parameters parameters = new Parameters();
     protected final Altitude altitude = new Altitude();
     protected final Speed speed = new Speed();
@@ -559,6 +561,9 @@ public class GenericMavLinkDrone implements MavLinkDrone {
             case AttributeType.GPS:
                 return vehicleGps;
 
+            case AttributeType.GPS2_RAW:
+                return vehicleGps2;
+
             case AttributeType.HOME:
                 return vehicleHome;
 
@@ -635,6 +640,10 @@ public class GenericMavLinkDrone implements MavLinkDrone {
 
             case msg_gps_raw_int.MAVLINK_MSG_ID_GPS_RAW_INT:
                 processGpsState((msg_gps_raw_int) message);
+                break;
+
+            case msg_gps2_raw.MAVLINK_MSG_ID_GPS2_RAW:
+                processGps2State((msg_gps2_raw) message);
                 break;
 
             case msg_mission_item.MAVLINK_MSG_ID_MISSION_ITEM:
@@ -924,6 +933,43 @@ public class GenericMavLinkDrone implements MavLinkDrone {
         if (vehicleGps.getFixType() != gpsState.fix_type) {
             vehicleGps.setFixType(gpsState.fix_type);
             notifyAttributeListener(AttributeEvent.GPS_FIX);
+        }
+    }
+
+    private void processGps2State(msg_gps2_raw gpsState) {
+        if (gpsState == null)
+            return;
+
+        double newEph = gpsState.eph / 100.0; // convert from eph(cm) to gps_eph(m)
+        if (vehicleGps2.getSatellitesCount() != gpsState.satellites_visible
+            || vehicleGps2.getGpsEph() != newEph) {
+            vehicleGps2.setSatCount(gpsState.satellites_visible);
+            vehicleGps2.setGpsEph(newEph);
+            notifyAttributeListener(AttributeEvent.GPS_COUNT);
+        }
+
+        if (vehicleGps2.getFixType() != gpsState.fix_type) {
+            vehicleGps2.setFixType(gpsState.fix_type);
+            notifyAttributeListener(AttributeEvent.GPS2_FIX);
+        }
+
+        double newLat = gpsState.lat / 1E7;
+        double newLong = gpsState.lon / 1E7;
+
+        boolean positionUpdated = false;
+        LatLong gpsPosition = vehicleGps2.getPosition();
+        if (gpsPosition == null) {
+            gpsPosition = new LatLong(newLat, newLong);
+            vehicleGps2.setPosition(gpsPosition);
+            positionUpdated = true;
+        } else if (gpsPosition.getLatitude() != newLat || gpsPosition.getLongitude() != newLong) {
+            gpsPosition.setLatitude(newLat);
+            gpsPosition.setLongitude(newLong);
+            positionUpdated = true;
+        }
+
+        if (positionUpdated) {
+            notifyAttributeListener(AttributeEvent.GPS_POSITION);
         }
     }
 

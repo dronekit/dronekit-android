@@ -186,6 +186,7 @@ public class AttributeEvent {
      */
     public static final String GPS_POSITION = PACKAGE_NAME + ".GPS_POSITION";
     public static final String GPS_FIX = PACKAGE_NAME + ".GPS_FIX";
+    public static final String GPS2_FIX = PACKAGE_NAME + ".GPS2_FIX";
     public static final String GPS_COUNT = PACKAGE_NAME + ".GPS_COUNT";
     public static final String WARNING_NO_GPS = PACKAGE_NAME + ".WARNING_NO_GPS";
 

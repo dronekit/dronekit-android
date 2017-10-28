@@ -53,6 +53,12 @@ public class AttributeType {
     public static final String GPS = PACKAGE_NAME + ".GPS";
 
     /**
+     * Used to access the vehicle's GPS2 state.
+     * @see {@link com.o3dr.services.android.lib.drone.property.Gps} object.
+     */
+    public static final String GPS2_RAW = PACKAGE_NAME + ".GPS2_RAW";
+
+    /**
      * Used to access the vehicle's home state.
      * @see {@link com.o3dr.services.android.lib.drone.property.Home}
      */
