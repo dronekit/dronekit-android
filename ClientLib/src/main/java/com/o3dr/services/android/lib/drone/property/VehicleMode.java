@@ -39,6 +39,10 @@ public enum VehicleMode implements DroneAttribute {
     COPTER_AUTOTUNE(15, Type.TYPE_COPTER, "Autotune"),
     COPTER_POSHOLD(16, Type.TYPE_COPTER, "PosHold"),
     COPTER_BRAKE(17,Type.TYPE_COPTER,"Brake"),
+    COPTER_THROW(18,Type.TYPE_COPTER,"Throw"),
+    COPTER_AVOID_ADSB(19,Type.TYPE_COPTER,"Avoid ADSB"),
+    COPTER_GUIDED_NOGPS(20,Type.TYPE_COPTER,"Guided NoGPS"),
+    COPTER_SMART_RTL(21,Type.TYPE_COPTER,"Smart RTL"),
 
     ROVER_MANUAL(0, Type.TYPE_ROVER, "Manual"),
     ROVER_LEARNING(2, Type.TYPE_ROVER, "Learning"),
