@@ -9,7 +9,7 @@ package com.MAVLink.common;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-
+        
 /**
 * Stop log transfer and resume normal logging
 */
@@ -20,12 +20,12 @@ public class msg_log_request_end extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_LOG_REQUEST_END;
 
 
-    
+      
     /**
     * System ID
     */
     public short target_system;
-    
+      
     /**
     * Component ID
     */
@@ -41,9 +41,9 @@ public class msg_log_request_end extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_LOG_REQUEST_END;
-        
+              
         packet.payload.putUnsignedByte(target_system);
-        
+              
         packet.payload.putUnsignedByte(target_component);
         
         return packet;
@@ -56,9 +56,9 @@ public class msg_log_request_end extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-        
+              
         this.target_system = payload.getUnsignedByte();
-        
+              
         this.target_component = payload.getUnsignedByte();
         
     }
@@ -79,7 +79,7 @@ public class msg_log_request_end extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_LOG_REQUEST_END;
-        unpack(mavLinkPacket.payload);
+        unpack(mavLinkPacket.payload);        
     }
 
         
@@ -87,7 +87,7 @@ public class msg_log_request_end extends MAVLinkMessage{
     * Returns a string with the MSG name and data
     */
     public String toString(){
-        return "MAVLINK_MSG_ID_LOG_REQUEST_END -"+" target_system:"+target_system+" target_component:"+target_component+"";
+        return "MAVLINK_MSG_ID_LOG_REQUEST_END - sysid:"+sysid+" compid:"+compid+" target_system:"+target_system+" target_component:"+target_component+"";
     }
 }
         

@@ -9,7 +9,7 @@ package com.MAVLink.common;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-
+        
 /**
 * Provides state for additional features
 */
@@ -20,12 +20,12 @@ public class msg_extended_sys_state extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_EXTENDED_SYS_STATE;
 
 
-    
+      
     /**
     * The VTOL state if applicable. Is set to MAV_VTOL_STATE_UNDEFINED if UAV is not in VTOL configuration.
     */
     public short vtol_state;
-    
+      
     /**
     * The landed state. Is set to MAV_LANDED_STATE_UNDEFINED if landed state is unknown.
     */
@@ -41,9 +41,9 @@ public class msg_extended_sys_state extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_EXTENDED_SYS_STATE;
-        
+              
         packet.payload.putUnsignedByte(vtol_state);
-        
+              
         packet.payload.putUnsignedByte(landed_state);
         
         return packet;
@@ -56,9 +56,9 @@ public class msg_extended_sys_state extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-        
+              
         this.vtol_state = payload.getUnsignedByte();
-        
+              
         this.landed_state = payload.getUnsignedByte();
         
     }
@@ -79,7 +79,7 @@ public class msg_extended_sys_state extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_EXTENDED_SYS_STATE;
-        unpack(mavLinkPacket.payload);
+        unpack(mavLinkPacket.payload);        
     }
 
         
@@ -87,7 +87,7 @@ public class msg_extended_sys_state extends MAVLinkMessage{
     * Returns a string with the MSG name and data
     */
     public String toString(){
-        return "MAVLINK_MSG_ID_EXTENDED_SYS_STATE -"+" vtol_state:"+vtol_state+" landed_state:"+landed_state+"";
+        return "MAVLINK_MSG_ID_EXTENDED_SYS_STATE - sysid:"+sysid+" compid:"+compid+" vtol_state:"+vtol_state+" landed_state:"+landed_state+"";
     }
 }
         

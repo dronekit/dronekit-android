@@ -9,7 +9,7 @@ package com.MAVLink.common;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-
+        
 /**
 * Request for terrain data and terrain status
 */
@@ -20,22 +20,22 @@ public class msg_terrain_request extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_TERRAIN_REQUEST;
 
 
-    
+      
     /**
     * Bitmask of requested 4x4 grids (row major 8x7 array of grids, 56 bits)
     */
     public long mask;
-    
+      
     /**
     * Latitude of SW corner of first grid (degrees *10^7)
     */
     public int lat;
-    
+      
     /**
     * Longitude of SW corner of first grid (in degrees *10^7)
     */
     public int lon;
-    
+      
     /**
     * Grid spacing in meters
     */
@@ -51,13 +51,13 @@ public class msg_terrain_request extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_TERRAIN_REQUEST;
-        
+              
         packet.payload.putUnsignedLong(mask);
-        
+              
         packet.payload.putInt(lat);
-        
+              
         packet.payload.putInt(lon);
-        
+              
         packet.payload.putUnsignedShort(grid_spacing);
         
         return packet;
@@ -70,13 +70,13 @@ public class msg_terrain_request extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-        
+              
         this.mask = payload.getUnsignedLong();
-        
+              
         this.lat = payload.getInt();
-        
+              
         this.lon = payload.getInt();
-        
+              
         this.grid_spacing = payload.getUnsignedShort();
         
     }
@@ -97,7 +97,7 @@ public class msg_terrain_request extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_TERRAIN_REQUEST;
-        unpack(mavLinkPacket.payload);
+        unpack(mavLinkPacket.payload);        
     }
 
             
@@ -105,7 +105,7 @@ public class msg_terrain_request extends MAVLinkMessage{
     * Returns a string with the MSG name and data
     */
     public String toString(){
-        return "MAVLINK_MSG_ID_TERRAIN_REQUEST -"+" mask:"+mask+" lat:"+lat+" lon:"+lon+" grid_spacing:"+grid_spacing+"";
+        return "MAVLINK_MSG_ID_TERRAIN_REQUEST - sysid:"+sysid+" compid:"+compid+" mask:"+mask+" lat:"+lat+" lon:"+lon+" grid_spacing:"+grid_spacing+"";
     }
 }
         

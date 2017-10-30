@@ -9,7 +9,7 @@ package com.MAVLink.ardupilotmega;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-
+        
 /**
 * Response from a GOPRO_COMMAND set request
 */
@@ -20,12 +20,12 @@ public class msg_gopro_set_response extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_GOPRO_SET_RESPONSE;
 
 
-    
+      
     /**
     * Command ID
     */
     public short cmd_id;
-    
+      
     /**
     * Status
     */
@@ -41,9 +41,9 @@ public class msg_gopro_set_response extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_GOPRO_SET_RESPONSE;
-        
+              
         packet.payload.putUnsignedByte(cmd_id);
-        
+              
         packet.payload.putUnsignedByte(status);
         
         return packet;
@@ -56,9 +56,9 @@ public class msg_gopro_set_response extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-        
+              
         this.cmd_id = payload.getUnsignedByte();
-        
+              
         this.status = payload.getUnsignedByte();
         
     }
@@ -79,7 +79,7 @@ public class msg_gopro_set_response extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_GOPRO_SET_RESPONSE;
-        unpack(mavLinkPacket.payload);
+        unpack(mavLinkPacket.payload);        
     }
 
         
@@ -87,7 +87,7 @@ public class msg_gopro_set_response extends MAVLinkMessage{
     * Returns a string with the MSG name and data
     */
     public String toString(){
-        return "MAVLINK_MSG_ID_GOPRO_SET_RESPONSE -"+" cmd_id:"+cmd_id+" status:"+status+"";
+        return "MAVLINK_MSG_ID_GOPRO_SET_RESPONSE - sysid:"+sysid+" compid:"+compid+" cmd_id:"+cmd_id+" status:"+status+"";
     }
 }
         

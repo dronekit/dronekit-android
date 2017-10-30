@@ -9,7 +9,7 @@ package com.MAVLink.common;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-
+        
 /**
 * Status text message. These messages are printed in yellow in the COMM console of QGroundControl. WARNING: They consume quite some bandwidth, so use only for important status and error messages. If implemented wisely, these messages are buffered on the MCU and sent only at a limited rate (e.g. 10 Hz).
 */
@@ -20,12 +20,12 @@ public class msg_statustext extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_STATUSTEXT;
 
 
-    
+      
     /**
     * Severity of status. Relies on the definitions within RFC-5424. See enum MAV_SEVERITY.
     */
     public short severity;
-    
+      
     /**
     * Status text message, without null termination character
     */
@@ -41,9 +41,9 @@ public class msg_statustext extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_STATUSTEXT;
-        
+              
         packet.payload.putUnsignedByte(severity);
-        
+              
         
         for (int i = 0; i < text.length; i++) {
             packet.payload.putByte(text[i]);
@@ -60,10 +60,10 @@ public class msg_statustext extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-        
+              
         this.severity = payload.getUnsignedByte();
-        
-        
+              
+         
         for (int i = 0; i < this.text.length; i++) {
             this.text[i] = payload.getByte();
         }
@@ -87,7 +87,7 @@ public class msg_statustext extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_STATUSTEXT;
-        unpack(mavLinkPacket.payload);
+        unpack(mavLinkPacket.payload);        
     }
 
        
@@ -109,14 +109,14 @@ public class msg_statustext extends MAVLinkMessage{
     * Gets the message, formated as a string
     */
     public String getText() {
-        String result = "";
+        StringBuffer buf = new StringBuffer();
         for (int i = 0; i < 50; i++) {
             if (text[i] != 0)
-                result = result + (char) text[i];
+                buf.append((char) text[i]);
             else
                 break;
         }
-        return result;
+        return buf.toString();
 
     }
                          
@@ -124,7 +124,7 @@ public class msg_statustext extends MAVLinkMessage{
     * Returns a string with the MSG name and data
     */
     public String toString(){
-        return "MAVLINK_MSG_ID_STATUSTEXT -"+" severity:"+severity+" text:"+text+"";
+        return "MAVLINK_MSG_ID_STATUSTEXT - sysid:"+sysid+" compid:"+compid+" severity:"+severity+" text:"+text+"";
     }
 }
         

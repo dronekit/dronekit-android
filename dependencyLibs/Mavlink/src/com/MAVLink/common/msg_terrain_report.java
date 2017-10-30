@@ -9,7 +9,7 @@ package com.MAVLink.common;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-
+        
 /**
 * Response from a TERRAIN_CHECK request
 */
@@ -20,37 +20,37 @@ public class msg_terrain_report extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_TERRAIN_REPORT;
 
 
-    
+      
     /**
     * Latitude (degrees *10^7)
     */
     public int lat;
-    
+      
     /**
     * Longitude (degrees *10^7)
     */
     public int lon;
-    
+      
     /**
     * Terrain height in meters AMSL
     */
     public float terrain_height;
-    
+      
     /**
     * Current vehicle height above lat/lon terrain height (meters)
     */
     public float current_height;
-    
+      
     /**
     * grid spacing (zero if terrain at this location unavailable)
     */
     public int spacing;
-    
+      
     /**
     * Number of 4x4 terrain blocks waiting to be received or read from disk
     */
     public int pending;
-    
+      
     /**
     * Number of 4x4 terrain blocks in memory
     */
@@ -66,19 +66,19 @@ public class msg_terrain_report extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_TERRAIN_REPORT;
-        
+              
         packet.payload.putInt(lat);
-        
+              
         packet.payload.putInt(lon);
-        
+              
         packet.payload.putFloat(terrain_height);
-        
+              
         packet.payload.putFloat(current_height);
-        
+              
         packet.payload.putUnsignedShort(spacing);
-        
+              
         packet.payload.putUnsignedShort(pending);
-        
+              
         packet.payload.putUnsignedShort(loaded);
         
         return packet;
@@ -91,19 +91,19 @@ public class msg_terrain_report extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-        
+              
         this.lat = payload.getInt();
-        
+              
         this.lon = payload.getInt();
-        
+              
         this.terrain_height = payload.getFloat();
-        
+              
         this.current_height = payload.getFloat();
-        
+              
         this.spacing = payload.getUnsignedShort();
-        
+              
         this.pending = payload.getUnsignedShort();
-        
+              
         this.loaded = payload.getUnsignedShort();
         
     }
@@ -124,7 +124,7 @@ public class msg_terrain_report extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_TERRAIN_REPORT;
-        unpack(mavLinkPacket.payload);
+        unpack(mavLinkPacket.payload);        
     }
 
                   
@@ -132,7 +132,7 @@ public class msg_terrain_report extends MAVLinkMessage{
     * Returns a string with the MSG name and data
     */
     public String toString(){
-        return "MAVLINK_MSG_ID_TERRAIN_REPORT -"+" lat:"+lat+" lon:"+lon+" terrain_height:"+terrain_height+" current_height:"+current_height+" spacing:"+spacing+" pending:"+pending+" loaded:"+loaded+"";
+        return "MAVLINK_MSG_ID_TERRAIN_REPORT - sysid:"+sysid+" compid:"+compid+" lat:"+lat+" lon:"+lon+" terrain_height:"+terrain_height+" current_height:"+current_height+" spacing:"+spacing+" pending:"+pending+" loaded:"+loaded+"";
     }
 }
         

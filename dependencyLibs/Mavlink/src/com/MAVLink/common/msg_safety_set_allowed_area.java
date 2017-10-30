@@ -9,7 +9,7 @@ package com.MAVLink.common;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-
+        
 /**
 * Set a safety zone (volume), which is defined by two corners of a cube. This message can be used to tell the MAV which setpoints/MISSIONs to accept and which to reject. Safety areas are often enforced by national or competition regulations.
 */
@@ -20,47 +20,47 @@ public class msg_safety_set_allowed_area extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_SAFETY_SET_ALLOWED_AREA;
 
 
-    
+      
     /**
     * x position 1 / Latitude 1
     */
     public float p1x;
-    
+      
     /**
     * y position 1 / Longitude 1
     */
     public float p1y;
-    
+      
     /**
     * z position 1 / Altitude 1
     */
     public float p1z;
-    
+      
     /**
     * x position 2 / Latitude 2
     */
     public float p2x;
-    
+      
     /**
     * y position 2 / Longitude 2
     */
     public float p2y;
-    
+      
     /**
     * z position 2 / Altitude 2
     */
     public float p2z;
-    
+      
     /**
     * System ID
     */
     public short target_system;
-    
+      
     /**
     * Component ID
     */
     public short target_component;
-    
+      
     /**
     * Coordinate frame, as defined by MAV_FRAME enum in mavlink_types.h. Can be either global, GPS, right-handed with Z axis up or local, right handed, Z axis down.
     */
@@ -76,23 +76,23 @@ public class msg_safety_set_allowed_area extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_SAFETY_SET_ALLOWED_AREA;
-        
+              
         packet.payload.putFloat(p1x);
-        
+              
         packet.payload.putFloat(p1y);
-        
+              
         packet.payload.putFloat(p1z);
-        
+              
         packet.payload.putFloat(p2x);
-        
+              
         packet.payload.putFloat(p2y);
-        
+              
         packet.payload.putFloat(p2z);
-        
+              
         packet.payload.putUnsignedByte(target_system);
-        
+              
         packet.payload.putUnsignedByte(target_component);
-        
+              
         packet.payload.putUnsignedByte(frame);
         
         return packet;
@@ -105,23 +105,23 @@ public class msg_safety_set_allowed_area extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-        
+              
         this.p1x = payload.getFloat();
-        
+              
         this.p1y = payload.getFloat();
-        
+              
         this.p1z = payload.getFloat();
-        
+              
         this.p2x = payload.getFloat();
-        
+              
         this.p2y = payload.getFloat();
-        
+              
         this.p2z = payload.getFloat();
-        
+              
         this.target_system = payload.getUnsignedByte();
-        
+              
         this.target_component = payload.getUnsignedByte();
-        
+              
         this.frame = payload.getUnsignedByte();
         
     }
@@ -142,7 +142,7 @@ public class msg_safety_set_allowed_area extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_SAFETY_SET_ALLOWED_AREA;
-        unpack(mavLinkPacket.payload);
+        unpack(mavLinkPacket.payload);        
     }
 
                       
@@ -150,7 +150,7 @@ public class msg_safety_set_allowed_area extends MAVLinkMessage{
     * Returns a string with the MSG name and data
     */
     public String toString(){
-        return "MAVLINK_MSG_ID_SAFETY_SET_ALLOWED_AREA -"+" p1x:"+p1x+" p1y:"+p1y+" p1z:"+p1z+" p2x:"+p2x+" p2y:"+p2y+" p2z:"+p2z+" target_system:"+target_system+" target_component:"+target_component+" frame:"+frame+"";
+        return "MAVLINK_MSG_ID_SAFETY_SET_ALLOWED_AREA - sysid:"+sysid+" compid:"+compid+" p1x:"+p1x+" p1y:"+p1y+" p1z:"+p1z+" p2x:"+p2x+" p2y:"+p2y+" p2z:"+p2z+" target_system:"+target_system+" target_component:"+target_component+" frame:"+frame+"";
     }
 }
         

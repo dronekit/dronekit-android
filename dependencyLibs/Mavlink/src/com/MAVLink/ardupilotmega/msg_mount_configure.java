@@ -9,7 +9,7 @@ package com.MAVLink.ardupilotmega;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-
+        
 /**
 * Message to configure a camera mount, directional antenna, etc.
 */
@@ -20,32 +20,32 @@ public class msg_mount_configure extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_MOUNT_CONFIGURE;
 
 
-    
+      
     /**
     * System ID
     */
     public short target_system;
-    
+      
     /**
     * Component ID
     */
     public short target_component;
-    
+      
     /**
     * mount operating mode (see MAV_MOUNT_MODE enum)
     */
     public short mount_mode;
-    
+      
     /**
     * (1 = yes, 0 = no)
     */
     public short stab_roll;
-    
+      
     /**
     * (1 = yes, 0 = no)
     */
     public short stab_pitch;
-    
+      
     /**
     * (1 = yes, 0 = no)
     */
@@ -61,17 +61,17 @@ public class msg_mount_configure extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_MOUNT_CONFIGURE;
-        
+              
         packet.payload.putUnsignedByte(target_system);
-        
+              
         packet.payload.putUnsignedByte(target_component);
-        
+              
         packet.payload.putUnsignedByte(mount_mode);
-        
+              
         packet.payload.putUnsignedByte(stab_roll);
-        
+              
         packet.payload.putUnsignedByte(stab_pitch);
-        
+              
         packet.payload.putUnsignedByte(stab_yaw);
         
         return packet;
@@ -84,17 +84,17 @@ public class msg_mount_configure extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-        
+              
         this.target_system = payload.getUnsignedByte();
-        
+              
         this.target_component = payload.getUnsignedByte();
-        
+              
         this.mount_mode = payload.getUnsignedByte();
-        
+              
         this.stab_roll = payload.getUnsignedByte();
-        
+              
         this.stab_pitch = payload.getUnsignedByte();
-        
+              
         this.stab_yaw = payload.getUnsignedByte();
         
     }
@@ -115,7 +115,7 @@ public class msg_mount_configure extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_MOUNT_CONFIGURE;
-        unpack(mavLinkPacket.payload);
+        unpack(mavLinkPacket.payload);        
     }
 
                 
@@ -123,7 +123,7 @@ public class msg_mount_configure extends MAVLinkMessage{
     * Returns a string with the MSG name and data
     */
     public String toString(){
-        return "MAVLINK_MSG_ID_MOUNT_CONFIGURE -"+" target_system:"+target_system+" target_component:"+target_component+" mount_mode:"+mount_mode+" stab_roll:"+stab_roll+" stab_pitch:"+stab_pitch+" stab_yaw:"+stab_yaw+"";
+        return "MAVLINK_MSG_ID_MOUNT_CONFIGURE - sysid:"+sysid+" compid:"+compid+" target_system:"+target_system+" target_component:"+target_component+" mount_mode:"+mount_mode+" stab_roll:"+stab_roll+" stab_pitch:"+stab_pitch+" stab_yaw:"+stab_yaw+"";
     }
 }
         
