@@ -192,6 +192,17 @@ public class CommonApiUtils {
             case ROTOR_BRAKE:
                 return VehicleMode.COPTER_BRAKE;
 
+            case ROTOR_THROW:
+                return VehicleMode.COPTER_THROW;
+
+            case ROTOR_AVOID_ADSB:
+                return VehicleMode.COPTER_AVOID_ADSB;
+
+            case ROTOR_GUIDED_NOGPS:
+                return VehicleMode.COPTER_GUIDED_NOGPS;
+
+            case ROTOR_SMART_RTL:
+                return VehicleMode.COPTER_SMART_RTL;
 
             case ROVER_MANUAL:
                 return VehicleMode.ROVER_MANUAL;
