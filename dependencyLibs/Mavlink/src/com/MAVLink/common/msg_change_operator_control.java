@@ -9,7 +9,7 @@ package com.MAVLink.common;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-
+        
 /**
 * Request to control this MAV
 */
@@ -20,22 +20,22 @@ public class msg_change_operator_control extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_CHANGE_OPERATOR_CONTROL;
 
 
-    
+      
     /**
     * System the GCS requests control for
     */
     public short target_system;
-    
+      
     /**
     * 0: request control of this MAV, 1: Release control of this MAV
     */
     public short control_request;
-    
+      
     /**
     * 0: key as plaintext, 1-255: future, different hashing/encryption variants. The GCS should in general use the safest mode possible initially and then gradually move down the encryption level if it gets a NACK message indicating an encryption mismatch.
     */
     public short version;
-    
+      
     /**
     * Password / Key, depending on version plaintext or encrypted. 25 or less characters, NULL terminated. The characters may involve A-Z, a-z, 0-9, and "!?,.-"
     */
@@ -51,13 +51,13 @@ public class msg_change_operator_control extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_CHANGE_OPERATOR_CONTROL;
-        
+              
         packet.payload.putUnsignedByte(target_system);
-        
+              
         packet.payload.putUnsignedByte(control_request);
-        
+              
         packet.payload.putUnsignedByte(version);
-        
+              
         
         for (int i = 0; i < passkey.length; i++) {
             packet.payload.putByte(passkey[i]);
@@ -74,14 +74,14 @@ public class msg_change_operator_control extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-        
+              
         this.target_system = payload.getUnsignedByte();
-        
+              
         this.control_request = payload.getUnsignedByte();
-        
+              
         this.version = payload.getUnsignedByte();
-        
-        
+              
+         
         for (int i = 0; i < this.passkey.length; i++) {
             this.passkey[i] = payload.getByte();
         }
@@ -105,7 +105,7 @@ public class msg_change_operator_control extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_CHANGE_OPERATOR_CONTROL;
-        unpack(mavLinkPacket.payload);
+        unpack(mavLinkPacket.payload);        
     }
 
            
@@ -127,14 +127,14 @@ public class msg_change_operator_control extends MAVLinkMessage{
     * Gets the message, formated as a string
     */
     public String getPasskey() {
-        String result = "";
+        StringBuffer buf = new StringBuffer();
         for (int i = 0; i < 25; i++) {
             if (passkey[i] != 0)
-                result = result + (char) passkey[i];
+                buf.append((char) passkey[i]);
             else
                 break;
         }
-        return result;
+        return buf.toString();
 
     }
                          
@@ -142,7 +142,7 @@ public class msg_change_operator_control extends MAVLinkMessage{
     * Returns a string with the MSG name and data
     */
     public String toString(){
-        return "MAVLINK_MSG_ID_CHANGE_OPERATOR_CONTROL -"+" target_system:"+target_system+" control_request:"+control_request+" version:"+version+" passkey:"+passkey+"";
+        return "MAVLINK_MSG_ID_CHANGE_OPERATOR_CONTROL - sysid:"+sysid+" compid:"+compid+" target_system:"+target_system+" control_request:"+control_request+" version:"+version+" passkey:"+passkey+"";
     }
 }
         

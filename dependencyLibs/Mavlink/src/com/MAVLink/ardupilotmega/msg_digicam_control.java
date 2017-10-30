@@ -9,7 +9,7 @@ package com.MAVLink.ardupilotmega;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-
+        
 /**
 * Control on-board Camera Control System to take shots.
 */
@@ -20,52 +20,52 @@ public class msg_digicam_control extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_DIGICAM_CONTROL;
 
 
-    
+      
     /**
     * Correspondent value to given extra_param
     */
     public float extra_value;
-    
+      
     /**
     * System ID
     */
     public short target_system;
-    
+      
     /**
     * Component ID
     */
     public short target_component;
-    
+      
     /**
     * 0: stop, 1: start or keep it up //Session control e.g. show/hide lens
     */
     public short session;
-    
+      
     /**
     * 1 to N //Zoom's absolute position (0 means ignore)
     */
     public short zoom_pos;
-    
+      
     /**
     * -100 to 100 //Zooming step value to offset zoom from the current position
     */
     public byte zoom_step;
-    
+      
     /**
     * 0: unlock focus or keep unlocked, 1: lock focus or keep locked, 3: re-lock focus
     */
     public short focus_lock;
-    
+      
     /**
     * 0: ignore, 1: shot or start filming
     */
     public short shot;
-    
+      
     /**
     * Command Identity (incremental loop: 0 to 255)//A command sent multiple times will be executed or pooled just once
     */
     public short command_id;
-    
+      
     /**
     * Extra parameters enumeration (0 means ignore)
     */
@@ -81,25 +81,25 @@ public class msg_digicam_control extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_DIGICAM_CONTROL;
-        
+              
         packet.payload.putFloat(extra_value);
-        
+              
         packet.payload.putUnsignedByte(target_system);
-        
+              
         packet.payload.putUnsignedByte(target_component);
-        
+              
         packet.payload.putUnsignedByte(session);
-        
+              
         packet.payload.putUnsignedByte(zoom_pos);
-        
+              
         packet.payload.putByte(zoom_step);
-        
+              
         packet.payload.putUnsignedByte(focus_lock);
-        
+              
         packet.payload.putUnsignedByte(shot);
-        
+              
         packet.payload.putUnsignedByte(command_id);
-        
+              
         packet.payload.putUnsignedByte(extra_param);
         
         return packet;
@@ -112,25 +112,25 @@ public class msg_digicam_control extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-        
+              
         this.extra_value = payload.getFloat();
-        
+              
         this.target_system = payload.getUnsignedByte();
-        
+              
         this.target_component = payload.getUnsignedByte();
-        
+              
         this.session = payload.getUnsignedByte();
-        
+              
         this.zoom_pos = payload.getUnsignedByte();
-        
+              
         this.zoom_step = payload.getByte();
-        
+              
         this.focus_lock = payload.getUnsignedByte();
-        
+              
         this.shot = payload.getUnsignedByte();
-        
+              
         this.command_id = payload.getUnsignedByte();
-        
+              
         this.extra_param = payload.getUnsignedByte();
         
     }
@@ -151,7 +151,7 @@ public class msg_digicam_control extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_DIGICAM_CONTROL;
-        unpack(mavLinkPacket.payload);
+        unpack(mavLinkPacket.payload);        
     }
 
                         
@@ -159,7 +159,7 @@ public class msg_digicam_control extends MAVLinkMessage{
     * Returns a string with the MSG name and data
     */
     public String toString(){
-        return "MAVLINK_MSG_ID_DIGICAM_CONTROL -"+" extra_value:"+extra_value+" target_system:"+target_system+" target_component:"+target_component+" session:"+session+" zoom_pos:"+zoom_pos+" zoom_step:"+zoom_step+" focus_lock:"+focus_lock+" shot:"+shot+" command_id:"+command_id+" extra_param:"+extra_param+"";
+        return "MAVLINK_MSG_ID_DIGICAM_CONTROL - sysid:"+sysid+" compid:"+compid+" extra_value:"+extra_value+" target_system:"+target_system+" target_component:"+target_component+" session:"+session+" zoom_pos:"+zoom_pos+" zoom_step:"+zoom_step+" focus_lock:"+focus_lock+" shot:"+shot+" command_id:"+command_id+" extra_param:"+extra_param+"";
     }
 }
         

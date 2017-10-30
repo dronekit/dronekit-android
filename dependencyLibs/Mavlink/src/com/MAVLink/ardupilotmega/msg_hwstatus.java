@@ -9,7 +9,7 @@ package com.MAVLink.ardupilotmega;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-
+        
 /**
 * Status of key hardware
 */
@@ -20,12 +20,12 @@ public class msg_hwstatus extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_HWSTATUS;
 
 
-    
+      
     /**
     * board voltage (mV)
     */
     public int Vcc;
-    
+      
     /**
     * I2C error count
     */
@@ -41,9 +41,9 @@ public class msg_hwstatus extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_HWSTATUS;
-        
+              
         packet.payload.putUnsignedShort(Vcc);
-        
+              
         packet.payload.putUnsignedByte(I2Cerr);
         
         return packet;
@@ -56,9 +56,9 @@ public class msg_hwstatus extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-        
+              
         this.Vcc = payload.getUnsignedShort();
-        
+              
         this.I2Cerr = payload.getUnsignedByte();
         
     }
@@ -79,7 +79,7 @@ public class msg_hwstatus extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_HWSTATUS;
-        unpack(mavLinkPacket.payload);
+        unpack(mavLinkPacket.payload);        
     }
 
         
@@ -87,7 +87,7 @@ public class msg_hwstatus extends MAVLinkMessage{
     * Returns a string with the MSG name and data
     */
     public String toString(){
-        return "MAVLINK_MSG_ID_HWSTATUS -"+" Vcc:"+Vcc+" I2Cerr:"+I2Cerr+"";
+        return "MAVLINK_MSG_ID_HWSTATUS - sysid:"+sysid+" compid:"+compid+" Vcc:"+Vcc+" I2Cerr:"+I2Cerr+"";
     }
 }
         

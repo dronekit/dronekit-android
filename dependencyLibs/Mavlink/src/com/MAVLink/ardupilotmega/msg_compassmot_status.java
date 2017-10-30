@@ -9,7 +9,7 @@ package com.MAVLink.ardupilotmega;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-
+        
 /**
 * Status of compassmot calibration
 */
@@ -20,32 +20,32 @@ public class msg_compassmot_status extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_COMPASSMOT_STATUS;
 
 
-    
+      
     /**
-    * current (amps)
+    * current (Ampere)
     */
     public float current;
-    
+      
     /**
     * Motor Compensation X
     */
     public float CompensationX;
-    
+      
     /**
     * Motor Compensation Y
     */
     public float CompensationY;
-    
+      
     /**
     * Motor Compensation Z
     */
     public float CompensationZ;
-    
+      
     /**
     * throttle (percent*10)
     */
     public int throttle;
-    
+      
     /**
     * interference (percent)
     */
@@ -61,17 +61,17 @@ public class msg_compassmot_status extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_COMPASSMOT_STATUS;
-        
+              
         packet.payload.putFloat(current);
-        
+              
         packet.payload.putFloat(CompensationX);
-        
+              
         packet.payload.putFloat(CompensationY);
-        
+              
         packet.payload.putFloat(CompensationZ);
-        
+              
         packet.payload.putUnsignedShort(throttle);
-        
+              
         packet.payload.putUnsignedShort(interference);
         
         return packet;
@@ -84,17 +84,17 @@ public class msg_compassmot_status extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-        
+              
         this.current = payload.getFloat();
-        
+              
         this.CompensationX = payload.getFloat();
-        
+              
         this.CompensationY = payload.getFloat();
-        
+              
         this.CompensationZ = payload.getFloat();
-        
+              
         this.throttle = payload.getUnsignedShort();
-        
+              
         this.interference = payload.getUnsignedShort();
         
     }
@@ -115,7 +115,7 @@ public class msg_compassmot_status extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_COMPASSMOT_STATUS;
-        unpack(mavLinkPacket.payload);
+        unpack(mavLinkPacket.payload);        
     }
 
                 
@@ -123,7 +123,7 @@ public class msg_compassmot_status extends MAVLinkMessage{
     * Returns a string with the MSG name and data
     */
     public String toString(){
-        return "MAVLINK_MSG_ID_COMPASSMOT_STATUS -"+" current:"+current+" CompensationX:"+CompensationX+" CompensationY:"+CompensationY+" CompensationZ:"+CompensationZ+" throttle:"+throttle+" interference:"+interference+"";
+        return "MAVLINK_MSG_ID_COMPASSMOT_STATUS - sysid:"+sysid+" compid:"+compid+" current:"+current+" CompensationX:"+CompensationX+" CompensationY:"+CompensationY+" CompensationZ:"+CompensationZ+" throttle:"+throttle+" interference:"+interference+"";
     }
 }
         

@@ -9,7 +9,7 @@ package com.MAVLink.common;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-
+        
 /**
 * Second GPS data. Coordinate frame is right-handed, Z-axis up (GPS frame).
 */
@@ -20,62 +20,62 @@ public class msg_gps2_raw extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_GPS2_RAW;
 
 
-    
+      
     /**
     * Timestamp (microseconds since UNIX epoch or microseconds since system boot)
     */
     public long time_usec;
-    
+      
     /**
     * Latitude (WGS84), in degrees * 1E7
     */
     public int lat;
-    
+      
     /**
     * Longitude (WGS84), in degrees * 1E7
     */
     public int lon;
-    
+      
     /**
     * Altitude (AMSL, not WGS84), in meters * 1000 (positive for up)
     */
     public int alt;
-    
+      
     /**
     * Age of DGPS info
     */
     public long dgps_age;
-    
+      
     /**
     * GPS HDOP horizontal dilution of position in cm (m*100). If unknown, set to: UINT16_MAX
     */
     public int eph;
-    
+      
     /**
     * GPS VDOP vertical dilution of position in cm (m*100). If unknown, set to: UINT16_MAX
     */
     public int epv;
-    
+      
     /**
     * GPS ground speed (m/s * 100). If unknown, set to: UINT16_MAX
     */
     public int vel;
-    
+      
     /**
     * Course over ground (NOT heading, but direction of movement) in degrees * 100, 0.0..359.99 degrees. If unknown, set to: UINT16_MAX
     */
     public int cog;
-    
+      
     /**
-    * 0-1: no fix, 2: 2D fix, 3: 3D fix, 4: DGPS fix, 5: RTK Fix. Some applications will not use the value of this field unless it is at least two, so always correctly fill in the fix.
+    * See the GPS_FIX_TYPE enum.
     */
     public short fix_type;
-    
+      
     /**
     * Number of satellites visible. If unknown, set to 255
     */
     public short satellites_visible;
-    
+      
     /**
     * Number of DGPS satellites
     */
@@ -91,29 +91,29 @@ public class msg_gps2_raw extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_GPS2_RAW;
-        
+              
         packet.payload.putUnsignedLong(time_usec);
-        
+              
         packet.payload.putInt(lat);
-        
+              
         packet.payload.putInt(lon);
-        
+              
         packet.payload.putInt(alt);
-        
+              
         packet.payload.putUnsignedInt(dgps_age);
-        
+              
         packet.payload.putUnsignedShort(eph);
-        
+              
         packet.payload.putUnsignedShort(epv);
-        
+              
         packet.payload.putUnsignedShort(vel);
-        
+              
         packet.payload.putUnsignedShort(cog);
-        
+              
         packet.payload.putUnsignedByte(fix_type);
-        
+              
         packet.payload.putUnsignedByte(satellites_visible);
-        
+              
         packet.payload.putUnsignedByte(dgps_numch);
         
         return packet;
@@ -126,29 +126,29 @@ public class msg_gps2_raw extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-        
+              
         this.time_usec = payload.getUnsignedLong();
-        
+              
         this.lat = payload.getInt();
-        
+              
         this.lon = payload.getInt();
-        
+              
         this.alt = payload.getInt();
-        
+              
         this.dgps_age = payload.getUnsignedInt();
-        
+              
         this.eph = payload.getUnsignedShort();
-        
+              
         this.epv = payload.getUnsignedShort();
-        
+              
         this.vel = payload.getUnsignedShort();
-        
+              
         this.cog = payload.getUnsignedShort();
-        
+              
         this.fix_type = payload.getUnsignedByte();
-        
+              
         this.satellites_visible = payload.getUnsignedByte();
-        
+              
         this.dgps_numch = payload.getUnsignedByte();
         
     }
@@ -169,7 +169,7 @@ public class msg_gps2_raw extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_GPS2_RAW;
-        unpack(mavLinkPacket.payload);
+        unpack(mavLinkPacket.payload);        
     }
 
                             
@@ -177,7 +177,7 @@ public class msg_gps2_raw extends MAVLinkMessage{
     * Returns a string with the MSG name and data
     */
     public String toString(){
-        return "MAVLINK_MSG_ID_GPS2_RAW -"+" time_usec:"+time_usec+" lat:"+lat+" lon:"+lon+" alt:"+alt+" dgps_age:"+dgps_age+" eph:"+eph+" epv:"+epv+" vel:"+vel+" cog:"+cog+" fix_type:"+fix_type+" satellites_visible:"+satellites_visible+" dgps_numch:"+dgps_numch+"";
+        return "MAVLINK_MSG_ID_GPS2_RAW - sysid:"+sysid+" compid:"+compid+" time_usec:"+time_usec+" lat:"+lat+" lon:"+lon+" alt:"+alt+" dgps_age:"+dgps_age+" eph:"+eph+" epv:"+epv+" vel:"+vel+" cog:"+cog+" fix_type:"+fix_type+" satellites_visible:"+satellites_visible+" dgps_numch:"+dgps_numch+"";
     }
 }
         

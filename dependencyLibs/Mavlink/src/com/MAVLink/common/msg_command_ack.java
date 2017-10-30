@@ -9,7 +9,7 @@ package com.MAVLink.common;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-
+        
 /**
 * Report status of a command. Includes feedback wether the command was executed.
 */
@@ -20,12 +20,12 @@ public class msg_command_ack extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_COMMAND_ACK;
 
 
-    
+      
     /**
     * Command ID, as defined by MAV_CMD enum.
     */
     public int command;
-    
+      
     /**
     * See MAV_RESULT enum
     */
@@ -41,9 +41,9 @@ public class msg_command_ack extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_COMMAND_ACK;
-        
+              
         packet.payload.putUnsignedShort(command);
-        
+              
         packet.payload.putUnsignedByte(result);
         
         return packet;
@@ -56,9 +56,9 @@ public class msg_command_ack extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-        
+              
         this.command = payload.getUnsignedShort();
-        
+              
         this.result = payload.getUnsignedByte();
         
     }
@@ -79,7 +79,7 @@ public class msg_command_ack extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_COMMAND_ACK;
-        unpack(mavLinkPacket.payload);
+        unpack(mavLinkPacket.payload);        
     }
 
         
@@ -87,7 +87,7 @@ public class msg_command_ack extends MAVLinkMessage{
     * Returns a string with the MSG name and data
     */
     public String toString(){
-        return "MAVLINK_MSG_ID_COMMAND_ACK -"+" command:"+command+" result:"+result+"";
+        return "MAVLINK_MSG_ID_COMMAND_ACK - sysid:"+sysid+" compid:"+compid+" command:"+command+" result:"+result+"";
     }
 }
         

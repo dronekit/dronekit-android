@@ -9,7 +9,7 @@ package com.MAVLink.common;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-
+        
 /**
 * 
 */
@@ -20,42 +20,42 @@ public class msg_distance_sensor extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_DISTANCE_SENSOR;
 
 
-    
+      
     /**
     * Time since system boot
     */
     public long time_boot_ms;
-    
+      
     /**
     * Minimum distance the sensor can measure in centimeters
     */
     public int min_distance;
-    
+      
     /**
     * Maximum distance the sensor can measure in centimeters
     */
     public int max_distance;
-    
+      
     /**
     * Current distance reading
     */
     public int current_distance;
-    
+      
     /**
     * Type from MAV_DISTANCE_SENSOR enum.
     */
     public short type;
-    
+      
     /**
     * Onboard ID of the sensor
     */
     public short id;
-    
+      
     /**
     * Direction the sensor faces from MAV_SENSOR_ORIENTATION enum.
     */
     public short orientation;
-    
+      
     /**
     * Measurement covariance in centimeters, 0 for unknown / invalid readings
     */
@@ -71,21 +71,21 @@ public class msg_distance_sensor extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_DISTANCE_SENSOR;
-        
+              
         packet.payload.putUnsignedInt(time_boot_ms);
-        
+              
         packet.payload.putUnsignedShort(min_distance);
-        
+              
         packet.payload.putUnsignedShort(max_distance);
-        
+              
         packet.payload.putUnsignedShort(current_distance);
-        
+              
         packet.payload.putUnsignedByte(type);
-        
+              
         packet.payload.putUnsignedByte(id);
-        
+              
         packet.payload.putUnsignedByte(orientation);
-        
+              
         packet.payload.putUnsignedByte(covariance);
         
         return packet;
@@ -98,21 +98,21 @@ public class msg_distance_sensor extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-        
+              
         this.time_boot_ms = payload.getUnsignedInt();
-        
+              
         this.min_distance = payload.getUnsignedShort();
-        
+              
         this.max_distance = payload.getUnsignedShort();
-        
+              
         this.current_distance = payload.getUnsignedShort();
-        
+              
         this.type = payload.getUnsignedByte();
-        
+              
         this.id = payload.getUnsignedByte();
-        
+              
         this.orientation = payload.getUnsignedByte();
-        
+              
         this.covariance = payload.getUnsignedByte();
         
     }
@@ -133,7 +133,7 @@ public class msg_distance_sensor extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_DISTANCE_SENSOR;
-        unpack(mavLinkPacket.payload);
+        unpack(mavLinkPacket.payload);        
     }
 
                     
@@ -141,7 +141,7 @@ public class msg_distance_sensor extends MAVLinkMessage{
     * Returns a string with the MSG name and data
     */
     public String toString(){
-        return "MAVLINK_MSG_ID_DISTANCE_SENSOR -"+" time_boot_ms:"+time_boot_ms+" min_distance:"+min_distance+" max_distance:"+max_distance+" current_distance:"+current_distance+" type:"+type+" id:"+id+" orientation:"+orientation+" covariance:"+covariance+"";
+        return "MAVLINK_MSG_ID_DISTANCE_SENSOR - sysid:"+sysid+" compid:"+compid+" time_boot_ms:"+time_boot_ms+" min_distance:"+min_distance+" max_distance:"+max_distance+" current_distance:"+current_distance+" type:"+type+" id:"+id+" orientation:"+orientation+" covariance:"+covariance+"";
     }
 }
         

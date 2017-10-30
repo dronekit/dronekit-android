@@ -9,7 +9,7 @@ package com.MAVLink.ardupilotmega;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-
+        
 /**
 * Heartbeat from a HeroBus attached GoPro
 */
@@ -20,17 +20,17 @@ public class msg_gopro_heartbeat extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_GOPRO_HEARTBEAT;
 
 
-    
+      
     /**
     * Status
     */
     public short status;
-    
+      
     /**
     * Current capture mode
     */
     public short capture_mode;
-    
+      
     /**
     * additional status bits
     */
@@ -46,11 +46,11 @@ public class msg_gopro_heartbeat extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_GOPRO_HEARTBEAT;
-        
+              
         packet.payload.putUnsignedByte(status);
-        
+              
         packet.payload.putUnsignedByte(capture_mode);
-        
+              
         packet.payload.putUnsignedByte(flags);
         
         return packet;
@@ -63,11 +63,11 @@ public class msg_gopro_heartbeat extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-        
+              
         this.status = payload.getUnsignedByte();
-        
+              
         this.capture_mode = payload.getUnsignedByte();
-        
+              
         this.flags = payload.getUnsignedByte();
         
     }
@@ -88,7 +88,7 @@ public class msg_gopro_heartbeat extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_GOPRO_HEARTBEAT;
-        unpack(mavLinkPacket.payload);
+        unpack(mavLinkPacket.payload);        
     }
 
           
@@ -96,7 +96,7 @@ public class msg_gopro_heartbeat extends MAVLinkMessage{
     * Returns a string with the MSG name and data
     */
     public String toString(){
-        return "MAVLINK_MSG_ID_GOPRO_HEARTBEAT -"+" status:"+status+" capture_mode:"+capture_mode+" flags:"+flags+"";
+        return "MAVLINK_MSG_ID_GOPRO_HEARTBEAT - sysid:"+sysid+" compid:"+compid+" status:"+status+" capture_mode:"+capture_mode+" flags:"+flags+"";
     }
 }
         

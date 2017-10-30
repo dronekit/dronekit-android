@@ -9,7 +9,7 @@ package com.MAVLink.common;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-
+        
 /**
 * The location of a landing area captured from a downward facing camera
 */
@@ -20,42 +20,42 @@ public class msg_landing_target extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_LANDING_TARGET;
 
 
-    
+      
     /**
     * Timestamp (micros since boot or Unix epoch)
     */
     public long time_usec;
-    
+      
     /**
     * X-axis angular offset (in radians) of the target from the center of the image
     */
     public float angle_x;
-    
+      
     /**
     * Y-axis angular offset (in radians) of the target from the center of the image
     */
     public float angle_y;
-    
+      
     /**
     * Distance to the target from the vehicle in meters
     */
     public float distance;
-    
+      
     /**
     * Size in radians of target along x-axis
     */
     public float size_x;
-    
+      
     /**
     * Size in radians of target along y-axis
     */
     public float size_y;
-    
+      
     /**
     * The ID of the target if multiple targets are present
     */
     public short target_num;
-    
+      
     /**
     * MAV_FRAME enum specifying the whether the following feilds are earth-frame, body-frame, etc.
     */
@@ -71,21 +71,21 @@ public class msg_landing_target extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_LANDING_TARGET;
-        
+              
         packet.payload.putUnsignedLong(time_usec);
-        
+              
         packet.payload.putFloat(angle_x);
-        
+              
         packet.payload.putFloat(angle_y);
-        
+              
         packet.payload.putFloat(distance);
-        
+              
         packet.payload.putFloat(size_x);
-        
+              
         packet.payload.putFloat(size_y);
-        
+              
         packet.payload.putUnsignedByte(target_num);
-        
+              
         packet.payload.putUnsignedByte(frame);
         
         return packet;
@@ -98,21 +98,21 @@ public class msg_landing_target extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-        
+              
         this.time_usec = payload.getUnsignedLong();
-        
+              
         this.angle_x = payload.getFloat();
-        
+              
         this.angle_y = payload.getFloat();
-        
+              
         this.distance = payload.getFloat();
-        
+              
         this.size_x = payload.getFloat();
-        
+              
         this.size_y = payload.getFloat();
-        
+              
         this.target_num = payload.getUnsignedByte();
-        
+              
         this.frame = payload.getUnsignedByte();
         
     }
@@ -133,7 +133,7 @@ public class msg_landing_target extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_LANDING_TARGET;
-        unpack(mavLinkPacket.payload);
+        unpack(mavLinkPacket.payload);        
     }
 
                     
@@ -141,7 +141,7 @@ public class msg_landing_target extends MAVLinkMessage{
     * Returns a string with the MSG name and data
     */
     public String toString(){
-        return "MAVLINK_MSG_ID_LANDING_TARGET -"+" time_usec:"+time_usec+" angle_x:"+angle_x+" angle_y:"+angle_y+" distance:"+distance+" size_x:"+size_x+" size_y:"+size_y+" target_num:"+target_num+" frame:"+frame+"";
+        return "MAVLINK_MSG_ID_LANDING_TARGET - sysid:"+sysid+" compid:"+compid+" time_usec:"+time_usec+" angle_x:"+angle_x+" angle_y:"+angle_y+" distance:"+distance+" size_x:"+size_x+" size_y:"+size_y+" target_num:"+target_num+" frame:"+frame+"";
     }
 }
         
