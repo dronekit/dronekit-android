@@ -183,6 +183,9 @@ public class CommonApiUtils {
             case ROTOR_SPORT:
                 return VehicleMode.COPTER_SPORT;
 
+            case ROTOR_FLIP:
+                return VehicleMode.COPTER_FLIP;
+
             case ROTOR_AUTOTUNE:
                 return VehicleMode.COPTER_AUTOTUNE;
 
