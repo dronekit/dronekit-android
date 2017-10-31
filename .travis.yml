@@ -26,7 +26,6 @@ android:
     - extra-google-google_play_services
     - extra-google-m2repository
     - extra-android-m2repository
-    - extra-android-support
 
 before_script:
     - export GRADLE_OPTS="-XX:MaxPermSize=2048m -Xmx1536m"
