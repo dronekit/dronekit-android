@@ -9,7 +9,7 @@ package com.MAVLink.common;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-
+        
 /**
 * Set a parameter value TEMPORARILY to RAM. It will be reset to default on system reboot. Send the ACTION MAV_ACTION_STORAGE_WRITE to PERMANENTLY write the RAM contents to EEPROM. IMPORTANT: The receiving component should acknowledge the new parameter value by sending a param_value message to all communication partners. This will also ensure that multiple GCS all have an up-to-date list of all parameters. If the sending GCS did not receive a PARAM_VALUE message within its timeout time, it should re-send the PARAM_SET message.
 */
@@ -20,27 +20,27 @@ public class msg_param_set extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_PARAM_SET;
 
 
-    
+      
     /**
     * Onboard parameter value
     */
     public float param_value;
-    
+      
     /**
     * System ID
     */
     public short target_system;
-    
+      
     /**
     * Component ID
     */
     public short target_component;
-    
+      
     /**
     * Onboard parameter id, terminated by NULL if the length is less than 16 human-readable chars and WITHOUT null termination (NULL) byte if the length is exactly 16 chars - applications have to provide 16+1 bytes storage if the ID is stored as string
     */
     public byte param_id[] = new byte[16];
-    
+      
     /**
     * Onboard parameter type: see the MAV_PARAM_TYPE enum for supported data types.
     */
@@ -56,19 +56,19 @@ public class msg_param_set extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_PARAM_SET;
-        
+              
         packet.payload.putFloat(param_value);
-        
+              
         packet.payload.putUnsignedByte(target_system);
-        
+              
         packet.payload.putUnsignedByte(target_component);
-        
+              
         
         for (int i = 0; i < param_id.length; i++) {
             packet.payload.putByte(param_id[i]);
         }
                     
-        
+              
         packet.payload.putUnsignedByte(param_type);
         
         return packet;
@@ -81,19 +81,19 @@ public class msg_param_set extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-        
+              
         this.param_value = payload.getFloat();
-        
+              
         this.target_system = payload.getUnsignedByte();
-        
+              
         this.target_component = payload.getUnsignedByte();
-        
-        
+              
+         
         for (int i = 0; i < this.param_id.length; i++) {
             this.param_id[i] = payload.getByte();
         }
                 
-        
+              
         this.param_type = payload.getUnsignedByte();
         
     }
@@ -114,7 +114,7 @@ public class msg_param_set extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_PARAM_SET;
-        unpack(mavLinkPacket.payload);
+        unpack(mavLinkPacket.payload);        
     }
 
            
@@ -136,14 +136,14 @@ public class msg_param_set extends MAVLinkMessage{
     * Gets the message, formated as a string
     */
     public String getParam_Id() {
-        String result = "";
+        StringBuffer buf = new StringBuffer();
         for (int i = 0; i < 16; i++) {
             if (param_id[i] != 0)
-                result = result + (char) param_id[i];
+                buf.append((char) param_id[i]);
             else
                 break;
         }
-        return result;
+        return buf.toString();
 
     }
                            
@@ -151,7 +151,7 @@ public class msg_param_set extends MAVLinkMessage{
     * Returns a string with the MSG name and data
     */
     public String toString(){
-        return "MAVLINK_MSG_ID_PARAM_SET -"+" param_value:"+param_value+" target_system:"+target_system+" target_component:"+target_component+" param_id:"+param_id+" param_type:"+param_type+"";
+        return "MAVLINK_MSG_ID_PARAM_SET - sysid:"+sysid+" compid:"+compid+" param_value:"+param_value+" target_system:"+target_system+" target_component:"+target_component+" param_id:"+param_id+" param_type:"+param_type+"";
     }
 }
         

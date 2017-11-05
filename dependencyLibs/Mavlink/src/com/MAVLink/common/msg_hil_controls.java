@@ -9,7 +9,7 @@ package com.MAVLink.common;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-
+        
 /**
 * Sent from autopilot to simulation. Hardware in the loop control outputs
 */
@@ -20,57 +20,57 @@ public class msg_hil_controls extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_HIL_CONTROLS;
 
 
-    
+      
     /**
     * Timestamp (microseconds since UNIX epoch or microseconds since system boot)
     */
     public long time_usec;
-    
+      
     /**
     * Control output -1 .. 1
     */
     public float roll_ailerons;
-    
+      
     /**
     * Control output -1 .. 1
     */
     public float pitch_elevator;
-    
+      
     /**
     * Control output -1 .. 1
     */
     public float yaw_rudder;
-    
+      
     /**
     * Throttle 0 .. 1
     */
     public float throttle;
-    
+      
     /**
     * Aux 1, -1 .. 1
     */
     public float aux1;
-    
+      
     /**
     * Aux 2, -1 .. 1
     */
     public float aux2;
-    
+      
     /**
     * Aux 3, -1 .. 1
     */
     public float aux3;
-    
+      
     /**
     * Aux 4, -1 .. 1
     */
     public float aux4;
-    
+      
     /**
     * System mode (MAV_MODE)
     */
     public short mode;
-    
+      
     /**
     * Navigation mode (MAV_NAV_MODE)
     */
@@ -86,27 +86,27 @@ public class msg_hil_controls extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_HIL_CONTROLS;
-        
+              
         packet.payload.putUnsignedLong(time_usec);
-        
+              
         packet.payload.putFloat(roll_ailerons);
-        
+              
         packet.payload.putFloat(pitch_elevator);
-        
+              
         packet.payload.putFloat(yaw_rudder);
-        
+              
         packet.payload.putFloat(throttle);
-        
+              
         packet.payload.putFloat(aux1);
-        
+              
         packet.payload.putFloat(aux2);
-        
+              
         packet.payload.putFloat(aux3);
-        
+              
         packet.payload.putFloat(aux4);
-        
+              
         packet.payload.putUnsignedByte(mode);
-        
+              
         packet.payload.putUnsignedByte(nav_mode);
         
         return packet;
@@ -119,27 +119,27 @@ public class msg_hil_controls extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-        
+              
         this.time_usec = payload.getUnsignedLong();
-        
+              
         this.roll_ailerons = payload.getFloat();
-        
+              
         this.pitch_elevator = payload.getFloat();
-        
+              
         this.yaw_rudder = payload.getFloat();
-        
+              
         this.throttle = payload.getFloat();
-        
+              
         this.aux1 = payload.getFloat();
-        
+              
         this.aux2 = payload.getFloat();
-        
+              
         this.aux3 = payload.getFloat();
-        
+              
         this.aux4 = payload.getFloat();
-        
+              
         this.mode = payload.getUnsignedByte();
-        
+              
         this.nav_mode = payload.getUnsignedByte();
         
     }
@@ -160,7 +160,7 @@ public class msg_hil_controls extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_HIL_CONTROLS;
-        unpack(mavLinkPacket.payload);
+        unpack(mavLinkPacket.payload);        
     }
 
                           
@@ -168,7 +168,7 @@ public class msg_hil_controls extends MAVLinkMessage{
     * Returns a string with the MSG name and data
     */
     public String toString(){
-        return "MAVLINK_MSG_ID_HIL_CONTROLS -"+" time_usec:"+time_usec+" roll_ailerons:"+roll_ailerons+" pitch_elevator:"+pitch_elevator+" yaw_rudder:"+yaw_rudder+" throttle:"+throttle+" aux1:"+aux1+" aux2:"+aux2+" aux3:"+aux3+" aux4:"+aux4+" mode:"+mode+" nav_mode:"+nav_mode+"";
+        return "MAVLINK_MSG_ID_HIL_CONTROLS - sysid:"+sysid+" compid:"+compid+" time_usec:"+time_usec+" roll_ailerons:"+roll_ailerons+" pitch_elevator:"+pitch_elevator+" yaw_rudder:"+yaw_rudder+" throttle:"+throttle+" aux1:"+aux1+" aux2:"+aux2+" aux3:"+aux3+" aux4:"+aux4+" mode:"+mode+" nav_mode:"+nav_mode+"";
     }
 }
         

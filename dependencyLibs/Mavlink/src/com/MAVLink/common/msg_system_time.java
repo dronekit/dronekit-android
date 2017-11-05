@@ -9,7 +9,7 @@ package com.MAVLink.common;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-
+        
 /**
 * The system time is the time of the master clock, typically the computer clock of the main onboard computer.
 */
@@ -20,12 +20,12 @@ public class msg_system_time extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_SYSTEM_TIME;
 
 
-    
+      
     /**
     * Timestamp of the master clock in microseconds since UNIX epoch.
     */
     public long time_unix_usec;
-    
+      
     /**
     * Timestamp of the component clock since boot time in milliseconds.
     */
@@ -41,9 +41,9 @@ public class msg_system_time extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_SYSTEM_TIME;
-        
+              
         packet.payload.putUnsignedLong(time_unix_usec);
-        
+              
         packet.payload.putUnsignedInt(time_boot_ms);
         
         return packet;
@@ -56,9 +56,9 @@ public class msg_system_time extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-        
+              
         this.time_unix_usec = payload.getUnsignedLong();
-        
+              
         this.time_boot_ms = payload.getUnsignedInt();
         
     }
@@ -79,7 +79,7 @@ public class msg_system_time extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_SYSTEM_TIME;
-        unpack(mavLinkPacket.payload);
+        unpack(mavLinkPacket.payload);        
     }
 
         
@@ -87,7 +87,7 @@ public class msg_system_time extends MAVLinkMessage{
     * Returns a string with the MSG name and data
     */
     public String toString(){
-        return "MAVLINK_MSG_ID_SYSTEM_TIME -"+" time_unix_usec:"+time_unix_usec+" time_boot_ms:"+time_boot_ms+"";
+        return "MAVLINK_MSG_ID_SYSTEM_TIME - sysid:"+sysid+" compid:"+compid+" time_unix_usec:"+time_unix_usec+" time_boot_ms:"+time_boot_ms+"";
     }
 }
         

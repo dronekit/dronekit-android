@@ -5,7 +5,7 @@ buildscript {
         play_services_version = '8.4.0'
 
         android_build_sdk_version = 23
-        android_build_tools_version = '23.0.2'
+        android_build_tools_version = '23.0.3'
         android_build_target_sdk_version = 22
         android_build_min_sdk_version = 14
     }
@@ -15,7 +15,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.0'
+        classpath 'com.android.tools.build:gradle:2.2.2'
 
         //Dexcount gradle plugin
         classpath 'com.getkeepsafe.dexcount:dexcount-gradle-plugin:0.4.4'

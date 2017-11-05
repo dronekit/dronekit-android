@@ -9,7 +9,7 @@ package com.MAVLink.ardupilotmega;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-
+        
 /**
 * Status of secondary AHRS filter if available
 */
@@ -20,32 +20,32 @@ public class msg_ahrs2 extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_AHRS2;
 
 
-    
+      
     /**
     * Roll angle (rad)
     */
     public float roll;
-    
+      
     /**
     * Pitch angle (rad)
     */
     public float pitch;
-    
+      
     /**
     * Yaw angle (rad)
     */
     public float yaw;
-    
+      
     /**
     * Altitude (MSL)
     */
     public float altitude;
-    
+      
     /**
     * Latitude in degrees * 1E7
     */
     public int lat;
-    
+      
     /**
     * Longitude in degrees * 1E7
     */
@@ -61,17 +61,17 @@ public class msg_ahrs2 extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_AHRS2;
-        
+              
         packet.payload.putFloat(roll);
-        
+              
         packet.payload.putFloat(pitch);
-        
+              
         packet.payload.putFloat(yaw);
-        
+              
         packet.payload.putFloat(altitude);
-        
+              
         packet.payload.putInt(lat);
-        
+              
         packet.payload.putInt(lng);
         
         return packet;
@@ -84,17 +84,17 @@ public class msg_ahrs2 extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-        
+              
         this.roll = payload.getFloat();
-        
+              
         this.pitch = payload.getFloat();
-        
+              
         this.yaw = payload.getFloat();
-        
+              
         this.altitude = payload.getFloat();
-        
+              
         this.lat = payload.getInt();
-        
+              
         this.lng = payload.getInt();
         
     }
@@ -115,7 +115,7 @@ public class msg_ahrs2 extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_AHRS2;
-        unpack(mavLinkPacket.payload);
+        unpack(mavLinkPacket.payload);        
     }
 
                 
@@ -123,7 +123,7 @@ public class msg_ahrs2 extends MAVLinkMessage{
     * Returns a string with the MSG name and data
     */
     public String toString(){
-        return "MAVLINK_MSG_ID_AHRS2 -"+" roll:"+roll+" pitch:"+pitch+" yaw:"+yaw+" altitude:"+altitude+" lat:"+lat+" lng:"+lng+"";
+        return "MAVLINK_MSG_ID_AHRS2 - sysid:"+sysid+" compid:"+compid+" roll:"+roll+" pitch:"+pitch+" yaw:"+yaw+" altitude:"+altitude+" lat:"+lat+" lng:"+lng+"";
     }
 }
         

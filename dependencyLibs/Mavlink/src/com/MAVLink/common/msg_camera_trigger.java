@@ -9,7 +9,7 @@ package com.MAVLink.common;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-
+        
 /**
 * Camera-IMU triggering and synchronisation message.
 */
@@ -20,12 +20,12 @@ public class msg_camera_trigger extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_CAMERA_TRIGGER;
 
 
-    
+      
     /**
     * Timestamp for the image frame in microseconds
     */
     public long time_usec;
-    
+      
     /**
     * Image frame sequence
     */
@@ -41,9 +41,9 @@ public class msg_camera_trigger extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_CAMERA_TRIGGER;
-        
+              
         packet.payload.putUnsignedLong(time_usec);
-        
+              
         packet.payload.putUnsignedInt(seq);
         
         return packet;
@@ -56,9 +56,9 @@ public class msg_camera_trigger extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-        
+              
         this.time_usec = payload.getUnsignedLong();
-        
+              
         this.seq = payload.getUnsignedInt();
         
     }
@@ -79,7 +79,7 @@ public class msg_camera_trigger extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_CAMERA_TRIGGER;
-        unpack(mavLinkPacket.payload);
+        unpack(mavLinkPacket.payload);        
     }
 
         
@@ -87,7 +87,7 @@ public class msg_camera_trigger extends MAVLinkMessage{
     * Returns a string with the MSG name and data
     */
     public String toString(){
-        return "MAVLINK_MSG_ID_CAMERA_TRIGGER -"+" time_usec:"+time_usec+" seq:"+seq+"";
+        return "MAVLINK_MSG_ID_CAMERA_TRIGGER - sysid:"+sysid+" compid:"+compid+" time_usec:"+time_usec+" seq:"+seq+"";
     }
 }
         

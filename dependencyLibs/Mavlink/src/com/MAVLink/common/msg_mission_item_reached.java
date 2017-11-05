@@ -9,7 +9,7 @@ package com.MAVLink.common;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-
+        
 /**
 * A certain mission item has been reached. The system will either hold this position (or circle on the orbit) or (if the autocontinue on the WP was set) continue to the next MISSION.
 */
@@ -20,7 +20,7 @@ public class msg_mission_item_reached extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_MISSION_ITEM_REACHED;
 
 
-    
+      
     /**
     * Sequence
     */
@@ -36,7 +36,7 @@ public class msg_mission_item_reached extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_MISSION_ITEM_REACHED;
-        
+              
         packet.payload.putUnsignedShort(seq);
         
         return packet;
@@ -49,7 +49,7 @@ public class msg_mission_item_reached extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-        
+              
         this.seq = payload.getUnsignedShort();
         
     }
@@ -70,7 +70,7 @@ public class msg_mission_item_reached extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_MISSION_ITEM_REACHED;
-        unpack(mavLinkPacket.payload);
+        unpack(mavLinkPacket.payload);        
     }
 
       
@@ -78,7 +78,7 @@ public class msg_mission_item_reached extends MAVLinkMessage{
     * Returns a string with the MSG name and data
     */
     public String toString(){
-        return "MAVLINK_MSG_ID_MISSION_ITEM_REACHED -"+" seq:"+seq+"";
+        return "MAVLINK_MSG_ID_MISSION_ITEM_REACHED - sysid:"+sysid+" compid:"+compid+" seq:"+seq+"";
     }
 }
         

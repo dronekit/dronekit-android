@@ -9,7 +9,7 @@ package com.MAVLink.common;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-
+        
 /**
 * Control a serial port. This can be used for raw access to an onboard serial peripheral such as a GPS or telemetry radio. It is designed to make it possible to update the devices firmware via MAVLink messages or change the devices settings. A message with zero bytes can be used to change just the baudrate.
 */
@@ -20,32 +20,32 @@ public class msg_serial_control extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_SERIAL_CONTROL;
 
 
-    
+      
     /**
     * Baudrate of transfer. Zero means no change.
     */
     public long baudrate;
-    
+      
     /**
     * Timeout for reply data in milliseconds
     */
     public int timeout;
-    
+      
     /**
     * See SERIAL_CONTROL_DEV enum
     */
     public short device;
-    
+      
     /**
     * See SERIAL_CONTROL_FLAG enum
     */
     public short flags;
-    
+      
     /**
     * how many bytes in this transfer
     */
     public short count;
-    
+      
     /**
     * serial data
     */
@@ -61,17 +61,17 @@ public class msg_serial_control extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_SERIAL_CONTROL;
-        
+              
         packet.payload.putUnsignedInt(baudrate);
-        
+              
         packet.payload.putUnsignedShort(timeout);
-        
+              
         packet.payload.putUnsignedByte(device);
-        
+              
         packet.payload.putUnsignedByte(flags);
-        
+              
         packet.payload.putUnsignedByte(count);
-        
+              
         
         for (int i = 0; i < data.length; i++) {
             packet.payload.putUnsignedByte(data[i]);
@@ -88,18 +88,18 @@ public class msg_serial_control extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-        
+              
         this.baudrate = payload.getUnsignedInt();
-        
+              
         this.timeout = payload.getUnsignedShort();
-        
+              
         this.device = payload.getUnsignedByte();
-        
+              
         this.flags = payload.getUnsignedByte();
-        
+              
         this.count = payload.getUnsignedByte();
-        
-        
+              
+         
         for (int i = 0; i < this.data.length; i++) {
             this.data[i] = payload.getUnsignedByte();
         }
@@ -123,7 +123,7 @@ public class msg_serial_control extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_SERIAL_CONTROL;
-        unpack(mavLinkPacket.payload);
+        unpack(mavLinkPacket.payload);        
     }
 
                 
@@ -131,7 +131,7 @@ public class msg_serial_control extends MAVLinkMessage{
     * Returns a string with the MSG name and data
     */
     public String toString(){
-        return "MAVLINK_MSG_ID_SERIAL_CONTROL -"+" baudrate:"+baudrate+" timeout:"+timeout+" device:"+device+" flags:"+flags+" count:"+count+" data:"+data+"";
+        return "MAVLINK_MSG_ID_SERIAL_CONTROL - sysid:"+sysid+" compid:"+compid+" baudrate:"+baudrate+" timeout:"+timeout+" device:"+device+" flags:"+flags+" count:"+count+" data:"+data+"";
     }
 }
         

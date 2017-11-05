@@ -9,7 +9,7 @@ package com.MAVLink.common;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-
+        
 /**
 * Accept / deny control of this MAV
 */
@@ -20,17 +20,17 @@ public class msg_change_operator_control_ack extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_CHANGE_OPERATOR_CONTROL_ACK;
 
 
-    
+      
     /**
     * ID of the GCS this message 
     */
     public short gcs_system_id;
-    
+      
     /**
     * 0: request control of this MAV, 1: Release control of this MAV
     */
     public short control_request;
-    
+      
     /**
     * 0: ACK, 1: NACK: Wrong passkey, 2: NACK: Unsupported passkey encryption method, 3: NACK: Already under control
     */
@@ -46,11 +46,11 @@ public class msg_change_operator_control_ack extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_CHANGE_OPERATOR_CONTROL_ACK;
-        
+              
         packet.payload.putUnsignedByte(gcs_system_id);
-        
+              
         packet.payload.putUnsignedByte(control_request);
-        
+              
         packet.payload.putUnsignedByte(ack);
         
         return packet;
@@ -63,11 +63,11 @@ public class msg_change_operator_control_ack extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-        
+              
         this.gcs_system_id = payload.getUnsignedByte();
-        
+              
         this.control_request = payload.getUnsignedByte();
-        
+              
         this.ack = payload.getUnsignedByte();
         
     }
@@ -88,7 +88,7 @@ public class msg_change_operator_control_ack extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_CHANGE_OPERATOR_CONTROL_ACK;
-        unpack(mavLinkPacket.payload);
+        unpack(mavLinkPacket.payload);        
     }
 
           
@@ -96,7 +96,7 @@ public class msg_change_operator_control_ack extends MAVLinkMessage{
     * Returns a string with the MSG name and data
     */
     public String toString(){
-        return "MAVLINK_MSG_ID_CHANGE_OPERATOR_CONTROL_ACK -"+" gcs_system_id:"+gcs_system_id+" control_request:"+control_request+" ack:"+ack+"";
+        return "MAVLINK_MSG_ID_CHANGE_OPERATOR_CONTROL_ACK - sysid:"+sysid+" compid:"+compid+" gcs_system_id:"+gcs_system_id+" control_request:"+control_request+" ack:"+ack+"";
     }
 }
         

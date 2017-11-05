@@ -9,7 +9,7 @@ package com.MAVLink.common;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-
+        
 /**
 * Request that the vehicle report terrain height at the given location. Used by GCS to check if vehicle has all terrain data needed for a mission.
 */
@@ -20,12 +20,12 @@ public class msg_terrain_check extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_TERRAIN_CHECK;
 
 
-    
+      
     /**
     * Latitude (degrees *10^7)
     */
     public int lat;
-    
+      
     /**
     * Longitude (degrees *10^7)
     */
@@ -41,9 +41,9 @@ public class msg_terrain_check extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_TERRAIN_CHECK;
-        
+              
         packet.payload.putInt(lat);
-        
+              
         packet.payload.putInt(lon);
         
         return packet;
@@ -56,9 +56,9 @@ public class msg_terrain_check extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-        
+              
         this.lat = payload.getInt();
-        
+              
         this.lon = payload.getInt();
         
     }
@@ -79,7 +79,7 @@ public class msg_terrain_check extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_TERRAIN_CHECK;
-        unpack(mavLinkPacket.payload);
+        unpack(mavLinkPacket.payload);        
     }
 
         
@@ -87,7 +87,7 @@ public class msg_terrain_check extends MAVLinkMessage{
     * Returns a string with the MSG name and data
     */
     public String toString(){
-        return "MAVLINK_MSG_ID_TERRAIN_CHECK -"+" lat:"+lat+" lon:"+lon+"";
+        return "MAVLINK_MSG_ID_TERRAIN_CHECK - sysid:"+sysid+" compid:"+compid+" lat:"+lat+" lon:"+lon+"";
     }
 }
         
