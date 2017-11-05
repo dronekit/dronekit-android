@@ -9,7 +9,7 @@ package com.MAVLink.ardupilotmega;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-
+        
 /**
 * Accuracy statistics for GPS lock
 */
@@ -20,37 +20,37 @@ public class msg_gps_accuracy extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_GPS_ACCURACY;
 
 
-    
+      
     /**
     * GPS-reported horizontal accuracy
     */
     public float h_acc;
-    
+      
     /**
     * GPS-reported speed accuracy
     */
     public float s_acc;
-    
+      
     /**
     * GPS-reported, filtered horizontal velocity
     */
     public float h_vel_filt;
-    
+      
     /**
     * GPS-reported, filtered vertical velocity
     */
     public float v_vel_filt;
-    
+      
     /**
     * GPS position drift
     */
     public float p_drift;
-    
+      
     /**
     * Which instance of GPS we're reporting on
     */
     public short instance;
-    
+      
     /**
     * Which fields pass EKF checks
     */
@@ -66,19 +66,19 @@ public class msg_gps_accuracy extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_GPS_ACCURACY;
-        
+              
         packet.payload.putFloat(h_acc);
-        
+              
         packet.payload.putFloat(s_acc);
-        
+              
         packet.payload.putFloat(h_vel_filt);
-        
+              
         packet.payload.putFloat(v_vel_filt);
-        
+              
         packet.payload.putFloat(p_drift);
-        
+              
         packet.payload.putUnsignedByte(instance);
-        
+              
         packet.payload.putUnsignedByte(ekf_check_mask);
         
         return packet;
@@ -91,19 +91,19 @@ public class msg_gps_accuracy extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-        
+              
         this.h_acc = payload.getFloat();
-        
+              
         this.s_acc = payload.getFloat();
-        
+              
         this.h_vel_filt = payload.getFloat();
-        
+              
         this.v_vel_filt = payload.getFloat();
-        
+              
         this.p_drift = payload.getFloat();
-        
+              
         this.instance = payload.getUnsignedByte();
-        
+              
         this.ekf_check_mask = payload.getUnsignedByte();
         
     }
@@ -124,7 +124,7 @@ public class msg_gps_accuracy extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_GPS_ACCURACY;
-        unpack(mavLinkPacket.payload);
+        unpack(mavLinkPacket.payload);        
     }
 
                   
