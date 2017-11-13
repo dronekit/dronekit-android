@@ -8,6 +8,7 @@ import android.text.TextUtils;
 import android.view.Surface;
 
 import com.MAVLink.Messages.MAVLinkMessage;
+import com.MAVLink.common.msg_radio_status;
 import com.MAVLink.common.msg_statustext;
 import com.MAVLink.enums.MAV_TYPE;
 import com.o3dr.android.client.apis.CapabilityApi;
@@ -172,6 +173,26 @@ public class ArduSolo extends ArduCopter {
         return soloComp;
     }
 
+    @Override
+    public void onMavLinkMessageReceived(MAVLinkMessage message) {
+
+        switch(message.msgid) {
+            // Evidently the sysid on RADIO/RADIO_STATUS messages on solo don't have their
+            // sysid set properly, so we handle it here without checking for that.
+            case msg_radio_status.MAVLINK_MSG_ID_RADIO_STATUS: {
+                msg_radio_status m_radio_status = (msg_radio_status) message;
+                processSignalUpdate(m_radio_status.rxerrors, m_radio_status.fixed, m_radio_status.rssi,
+                        m_radio_status.remrssi, m_radio_status.txbuf, m_radio_status.noise, m_radio_status.remnoise);
+                break;
+            }
+
+            default: {
+                super.onMavLinkMessageReceived(message);
+                break;
+            }
+        }
+    }
+
     /**
      * No need to update the stream rates for Solo as it's being set by the companion computer
      * @return
@@ -257,7 +278,11 @@ public class ArduSolo extends ArduCopter {
     @Override
     public void notifyDroneEvent(final DroneInterfaces.DroneEventsType event) {
         switch (event) {
-            case HEARTBEAT_FIRST:
+            case HEARTBEAT_FIRST: {
+                Timber.i("heartbeat_first");
+                break;
+            }
+
             case CONNECTED:
                 Timber.i("Vehicle " + event.name().toLowerCase());
                 //Try connecting the companion computer
@@ -368,6 +393,8 @@ public class ArduSolo extends ArduCopter {
     @Override
     protected void processSignalUpdate(int rxerrors, int fixed, short rssi, short remrssi, short txbuf,
                                        short noise, short remnoise) {
+        Timber.d("processSignalUpdate(): rssi=" + rssi);
+
         final double unsignedRemRssi = remrssi & 0xFF;
 
         signal.setValid(true);
