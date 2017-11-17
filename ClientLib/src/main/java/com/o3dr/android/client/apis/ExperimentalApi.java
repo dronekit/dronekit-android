@@ -113,7 +113,7 @@ public class ExperimentalApi extends Api {
     public void sendMavlinkMessage(MavlinkMessageWrapper messageWrapper) {
         Bundle params = new Bundle();
         params.putParcelable(EXTRA_MAVLINK_MESSAGE, messageWrapper);
-        drone.performAsyncAction(new Action(ACTION_SEND_MAVLINK_MESSAGE, params));
+        drone.performAsyncActionOnDroneThread(new Action(ACTION_SEND_MAVLINK_MESSAGE, params), null);
     }
 
     /**

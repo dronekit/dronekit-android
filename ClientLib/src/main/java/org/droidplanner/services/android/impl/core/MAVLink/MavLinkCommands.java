@@ -1,5 +1,7 @@
 package org.droidplanner.services.android.impl.core.MAVLink;
 
+import android.util.Log;
+
 import com.MAVLink.common.msg_command_long;
 import com.MAVLink.common.msg_manual_control;
 import com.MAVLink.common.msg_mission_item;
@@ -17,6 +19,7 @@ import org.droidplanner.services.android.impl.core.drone.variables.ApmModes;
 import timber.log.Timber;
 
 public class MavLinkCommands {
+    static final String TAG = MavLinkCommands.class.getSimpleName();
 
     public static final int EMERGENCY_DISARM_MAGIC_NUMBER = 21196;
 
@@ -219,7 +222,10 @@ public class MavLinkCommands {
         msg.param6 = 0;
         msg.param7 = 0;
         msg.confirmation = 0;
+
+        Log.v(TAG, "send arm message");
         drone.getMavClient().sendMessage(msg, listener);
+        Log.v(TAG, "sent arm message");
     }
 
     public static void sendFlightTermination(MavLinkDrone drone, ICommandListener listener) {

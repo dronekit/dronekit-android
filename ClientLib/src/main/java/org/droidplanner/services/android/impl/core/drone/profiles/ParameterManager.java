@@ -7,6 +7,7 @@ import android.util.SparseBooleanArray;
 
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.common.msg_param_value;
+import com.o3dr.services.android.lib.drone.property.Parameter;
 
 import org.droidplanner.services.android.impl.core.MAVLink.MavLinkParameters;
 import org.droidplanner.services.android.impl.core.drone.DroneInterfaces;
@@ -14,7 +15,6 @@ import org.droidplanner.services.android.impl.core.drone.DroneInterfaces.DroneEv
 import org.droidplanner.services.android.impl.core.drone.DroneInterfaces.OnDroneListener;
 import org.droidplanner.services.android.impl.core.drone.DroneVariable;
 import org.droidplanner.services.android.impl.core.drone.autopilot.MavLinkDrone;
-import com.o3dr.services.android.lib.drone.property.Parameter;
 import org.droidplanner.services.android.impl.utils.file.IO.ParameterMetadataLoader;
 
 import java.util.Locale;
@@ -121,7 +121,7 @@ public class ParameterManager extends DroneVariable<MavLinkDrone> implements OnD
 
         parameters.put(param.getName().toLowerCase(Locale.US), param);
         int paramIndex = m_value.param_index;
-        if (paramIndex == -1) {
+        if (/*(paramIndex == -1) || */(paramIndex == (m_value.param_count - 1))) {
             // update listener
             notifyParameterReceipt(param, 0, 1);
 
