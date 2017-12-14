@@ -149,7 +149,6 @@ public class CommonApiUtils {
             case FIXED_WING_GUIDED:
                 return VehicleMode.PLANE_GUIDED;
 
-
             case ROTOR_STABILIZE:
                 return VehicleMode.COPTER_STABILIZE;
 
@@ -224,6 +223,12 @@ public class CommonApiUtils {
 
             case ROVER_RTL:
                 return VehicleMode.ROVER_RTL;
+
+            case ROVER_SMARTRTL:
+                return VehicleMode.ROVER_SMART_RTL;
+
+            case ROVER_ACRO:
+                return VehicleMode.ROVER_ACRO;
 
             case ROVER_GUIDED:
                 return VehicleMode.ROVER_GUIDED;
