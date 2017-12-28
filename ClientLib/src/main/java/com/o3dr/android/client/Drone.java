@@ -49,6 +49,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
 
+import timber.log.Timber;
+
 /**
  * Created by fhuya on 11/4/14.
  */
@@ -674,7 +676,11 @@ public class Drone {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        linkListener.onLinkStateUpdated(status);
+                        try {
+                            linkListener.onLinkStateUpdated(status);
+                        } catch(Throwable ex) {
+                            Timber.e(ex, ex.getMessage());
+                        }
                     }
                 });
             }
