@@ -45,11 +45,13 @@ public enum VehicleMode implements DroneAttribute {
     COPTER_SMART_RTL(21,Type.TYPE_COPTER,"Smart RTL"),
 
     ROVER_MANUAL(0, Type.TYPE_ROVER, "Manual"),
+    ROVER_ACRO(1, Type.TYPE_ROVER, "Acro"),
     ROVER_LEARNING(2, Type.TYPE_ROVER, "Learning"),
     ROVER_STEERING(3, Type.TYPE_ROVER, "Steering"),
     ROVER_HOLD(4, Type.TYPE_ROVER, "Hold"),
     ROVER_AUTO(10, Type.TYPE_ROVER, "Auto"),
     ROVER_RTL(11, Type.TYPE_ROVER, "RTL"),
+    ROVER_SMART_RTL(12, Type.TYPE_ROVER, "Smart RTL"),
     ROVER_GUIDED(15, Type.TYPE_ROVER, "Guided"),
     ROVER_INITIALIZING(16, Type.TYPE_ROVER, "Initializing"),
 
