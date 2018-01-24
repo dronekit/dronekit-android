@@ -8,6 +8,8 @@ import org.droidplanner.services.android.impl.core.drone.autopilot.apm.solo.Solo
 import org.droidplanner.services.android.impl.core.drone.manager.MavLinkDroneManager;
 import org.droidplanner.services.android.impl.core.gcs.location.Location;
 import org.droidplanner.services.android.impl.core.gcs.roi.ROIEstimator;
+
+import com.o3dr.services.android.lib.coordinate.Frame;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.companion.solo.tlv.SoloMessageLocation;
@@ -19,7 +21,7 @@ public class FollowSoloShot extends FollowAlgorithm {
 
     private final SoloComp soloComp;
 
-    private final LatLongAlt locationCoord = new LatLongAlt(0, 0, 0);
+    private final LatLongAlt locationCoord = new LatLongAlt(0, 0, 0, Frame.GLOBAL_RELATIVE);
     private final SoloMessageLocation locationSetter = new SoloMessageLocation(locationCoord);
 
     public FollowSoloShot(MavLinkDroneManager droneMgr, Handler handler) {
@@ -64,7 +66,7 @@ public class FollowSoloShot extends FollowAlgorithm {
 
     protected static class SoloROIEstimator extends ROIEstimator {
 
-        private final LatLongAlt locationCoord = new LatLongAlt(0, 0, 0);
+        private final LatLongAlt locationCoord = new LatLongAlt(0, 0, 0, Frame.GLOBAL_RELATIVE);
         private final SoloMessageLocation locationSetter = new SoloMessageLocation(locationCoord);
         private final SoloComp soloComp;
 

@@ -6,6 +6,7 @@ import android.os.Parcelable;
 /**
  * Stores latitude, longitude, and altitude information for a coordinate.
  */
+
 public class LatLongAlt extends LatLong {
 
     private static final long serialVersionUID =-4771550293045623743L;
@@ -14,24 +15,34 @@ public class LatLongAlt extends LatLong {
      * Stores the altitude in meters.
      */
     private double mAltitude;
+    private Frame mFrame;
 
-    public LatLongAlt(double latitude, double longitude, double altitude) {
-        super(latitude, longitude);
-        mAltitude = altitude;
+    public LatLongAlt() {
+        super();
+        mAltitude = 0.0;
+        mFrame = Frame.GLOBAL_RELATIVE;
     }
 
-    public LatLongAlt(LatLong location, double altitude){
+    public LatLongAlt(double latitude, double longitude, double altitude, Frame frame) {
+        super(latitude, longitude);
+        mAltitude = altitude;
+        mFrame = frame;
+    }
+
+    public LatLongAlt(LatLong location, double altitude, Frame frame){
         super(location);
         mAltitude = altitude;
+        mFrame = frame;
     }
 
     public LatLongAlt(LatLongAlt copy) {
-        this(copy.getLatitude(), copy.getLongitude(), copy.getAltitude());
+        this(copy.getLatitude(), copy.getLongitude(), copy.getAltitude(), copy.getFrame());
     }
 
-    public void set(LatLongAlt source){
+    public void set(LatLongAlt source){ // TODO: this looks wrong
         super.set(source);
         this.mAltitude = source.mAltitude;
+        this.mFrame = source.mFrame;
     }
 
     /**
@@ -45,6 +56,18 @@ public class LatLongAlt extends LatLong {
         this.mAltitude = altitude;
     }
 
+    public Frame getFrame() {
+        return mFrame;
+    }
+
+    public boolean setFrame(Frame frame) {
+        if (mFrame !=  frame) {
+            mFrame = frame;
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -53,7 +76,9 @@ public class LatLongAlt extends LatLong {
 
         LatLongAlt that = (LatLongAlt) o;
 
-        if (Double.compare(that.mAltitude, mAltitude) != 0) return false;
+        if ((Double.compare(that.mAltitude, mAltitude) != 0)
+            && (that.mFrame.asInt() != mFrame.asInt()) )
+            return false;
 
         return true;
     }
@@ -63,7 +88,7 @@ public class LatLongAlt extends LatLong {
         int result = super.hashCode();
         long temp;
         temp = Double.doubleToLongBits(mAltitude);
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        result = 31 * result + (int) (temp ^ (temp >>> 32)); // TODO Check this hash is OK with frame
         return result;
     }
 
@@ -73,6 +98,7 @@ public class LatLongAlt extends LatLong {
         return "LatLongAlt{" +
                 superToString +
                 ", mAltitude=" + mAltitude +
+                ", mFrame=" + mFrame.getAbbreviation() +
                 '}';
     }
 

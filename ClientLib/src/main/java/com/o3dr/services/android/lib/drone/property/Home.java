@@ -17,10 +17,6 @@ public class Home implements DroneAttribute {
 
     public Home(){}
 
-    public Home(double latitude, double longitude, double altitude){
-        mCoordinate = new LatLongAlt(latitude, longitude, altitude);
-    }
-
     public Home(LatLongAlt coordinate){
         mCoordinate = coordinate;
     }

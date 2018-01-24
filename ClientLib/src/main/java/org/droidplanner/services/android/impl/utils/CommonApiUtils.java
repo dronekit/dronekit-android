@@ -429,36 +429,6 @@ public class CommonApiUtils {
         return new Type(CommonApiUtils.getDroneProxyType(drone.getType()), drone.getFirmwareVersion());
     }
 
-    public static GuidedState getGuidedState(MavLinkDrone drone) {
-        if (drone == null)
-            return new GuidedState();
-
-        GuidedPoint guidedPoint = drone.getGuidedPoint();
-        int guidedState;
-        switch (guidedPoint.getState()) {
-            default:
-            case UNINITIALIZED:
-                guidedState = GuidedState.STATE_UNINITIALIZED;
-                break;
-
-            case ACTIVE:
-                guidedState = GuidedState.STATE_ACTIVE;
-                break;
-
-            case IDLE:
-                guidedState = GuidedState.STATE_IDLE;
-                break;
-        }
-
-        LatLong guidedCoord = guidedPoint.getCoord();
-        if (guidedCoord == null) {
-            guidedCoord = new LatLong(0, 0);
-        }
-
-        double guidedAlt = guidedPoint.getAltitude();
-        return new GuidedState(guidedState, new LatLongAlt(guidedCoord, guidedAlt));
-    }
-
     public static void changeVehicleMode(MavLinkDrone drone, VehicleMode newMode, ICommandListener listener) {
         if (drone == null)
             return;

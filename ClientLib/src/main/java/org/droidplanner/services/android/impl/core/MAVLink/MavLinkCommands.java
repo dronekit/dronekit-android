@@ -38,7 +38,7 @@ public class MavLinkCommands {
         msg_mission_item msg = new msg_mission_item();
         msg.seq = 0;
         msg.current = 2; // TODO use guided mode enum
-        msg.frame = MAV_FRAME.MAV_FRAME_GLOBAL_RELATIVE_ALT;
+        msg.frame = drone.getMavFrame();
         msg.command = MAV_CMD.MAV_CMD_NAV_WAYPOINT; //
         msg.param1 = 0; // TODO use correct parameter
         msg.param2 = 0; // TODO use correct parameter
@@ -56,7 +56,7 @@ public class MavLinkCommands {
     public static void sendGuidedPosition(MavLinkDrone drone, double latitude, double longitude, double altitude){
         msg_set_position_target_global_int msg = new msg_set_position_target_global_int();
         msg.type_mask = MAVLINK_SET_POS_TYPE_MASK_ACC_IGNORE | MAVLINK_SET_POS_TYPE_MASK_VEL_IGNORE;
-        msg.coordinate_frame = MAV_FRAME.MAV_FRAME_GLOBAL_RELATIVE_ALT_INT;
+        msg.coordinate_frame = drone.getMavFrameInt();
         msg.lat_int = (int) (latitude * 1E7);
         msg.lon_int = (int) (longitude * 1E7);
         msg.alt = (float) altitude;
@@ -68,7 +68,7 @@ public class MavLinkCommands {
     public static void sendGuidedVelocity(MavLinkDrone drone, double xVel, double yVel, double zVel){
         msg_set_position_target_global_int msg = new msg_set_position_target_global_int();
         msg.type_mask = MAVLINK_SET_POS_TYPE_MASK_ACC_IGNORE | MAVLINK_SET_POS_TYPE_MASK_POS_IGNORE;
-        msg.coordinate_frame = MAV_FRAME.MAV_FRAME_GLOBAL_RELATIVE_ALT_INT;
+        msg.coordinate_frame = drone.getMavFrameInt();
         msg.vx = (float) xVel;
         msg.vy = (float) yVel;
         msg.vz = (float) zVel;
@@ -92,7 +92,7 @@ public class MavLinkCommands {
                                                      double xVel, double yVel, double zVel){
         msg_set_position_target_global_int msg = new msg_set_position_target_global_int();
         msg.type_mask = MAVLINK_SET_POS_TYPE_MASK_ACC_IGNORE;
-        msg.coordinate_frame = MAV_FRAME.MAV_FRAME_GLOBAL_RELATIVE_ALT_INT;
+        msg.coordinate_frame = drone.getMavFrameInt();
         msg.lat_int = (int) (latitude * 1E7);
         msg.lon_int = (int) (longitude * 1E7);
         msg.alt = (float) altitude;

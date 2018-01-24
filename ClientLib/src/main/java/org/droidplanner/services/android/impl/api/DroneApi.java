@@ -15,6 +15,7 @@ import android.view.Surface;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.ardupilotmega.msg_mag_cal_progress;
 import com.MAVLink.ardupilotmega.msg_mag_cal_report;
+import com.o3dr.services.android.lib.coordinate.Frame;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.action.CameraActions;
 import com.o3dr.services.android.lib.drone.action.ConnectionActions;
@@ -211,7 +212,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
                                     missionItems.remove(i);
 
                                     RegionOfInterest replacement = new RegionOfInterest();
-                                    replacement.setCoordinate(new LatLongAlt(0, 0, 0));
+                                    replacement.setCoordinate(new LatLongAlt(0, 0, 0, Frame.GLOBAL_RELATIVE));
                                     missionItems.add(i, replacement);
                                 }
                             }

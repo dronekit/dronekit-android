@@ -18,6 +18,11 @@ public class LatLong implements Parcelable, Serializable {
     private double latitude;
     private double longitude;
 
+    public LatLong(){
+        this.latitude = -100.0; // TODO: Should we set this to invalid ie -100.0 ?
+        this.longitude = -190.0;// TODO: Should we set this to invalid ie -190.0 ?
+    }
+
     public LatLong(double latitude, double longitude){
         this.latitude = latitude;
         this.longitude = longitude;
@@ -30,6 +35,23 @@ public class LatLong implements Parcelable, Serializable {
     public void set(LatLong update){
         this.latitude = update.latitude;
         this.longitude = update.longitude;
+    }
+
+    /**
+     * @return if this is a valid LatLong global point
+     */
+    public boolean isValid() {
+
+        if ( this.longitude > 180.0 || this.latitude > 90.0
+            || this.longitude < -180.0 || this.latitude < -90.0 ) {
+            return false; // Not a valid location
+
+        } if (Double.compare(this.longitude, 0.0) == 0 && Double.compare(this.latitude, 0.0) == 0) {
+            return false; // Rarely in 0.0,0.0 a valid location, so reject.
+
+        } else {
+            return true;
+        }
     }
 
     /**

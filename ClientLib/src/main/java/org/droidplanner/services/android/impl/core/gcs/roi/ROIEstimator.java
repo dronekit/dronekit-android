@@ -7,6 +7,8 @@ import org.droidplanner.services.android.impl.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.impl.core.gcs.location.Location;
 import org.droidplanner.services.android.impl.core.gcs.location.Location.LocationReceiver;
 import org.droidplanner.services.android.impl.core.helpers.geoTools.GeoTools;
+
+import com.o3dr.services.android.lib.coordinate.Frame;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 
@@ -92,7 +94,8 @@ public class ROIEstimator implements LocationReceiver {
     }
 
     protected void sendUpdateROI(LatLong goCoord) {
-        MavLinkDoCmds.setROI(drone, new LatLongAlt(goCoord.getLatitude(), goCoord.getLongitude(), (0.0)), null);
+        MavLinkDoCmds.setROI(drone, new LatLongAlt(goCoord.getLatitude(), goCoord.getLongitude(),
+                                                    (0.0), Frame.GLOBAL_RELATIVE), null);
     }
 
     public boolean isFollowEnabled() {

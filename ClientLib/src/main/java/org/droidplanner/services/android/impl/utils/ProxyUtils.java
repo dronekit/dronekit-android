@@ -2,6 +2,7 @@ package org.droidplanner.services.android.impl.utils;
 
 import android.util.Log;
 
+import com.o3dr.services.android.lib.coordinate.Frame;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
 import com.o3dr.services.android.lib.drone.mission.item.command.CameraTrigger;
@@ -185,7 +186,7 @@ public class ProxyUtils {
 
             case RESET_ROI: {
                 //Sending a roi with all coordinates set to 0 will reset the current roi.
-                RegionOfInterestImpl temp = new RegionOfInterestImpl(missionImpl, new LatLongAlt(0, 0, 0));
+                RegionOfInterestImpl temp = new RegionOfInterestImpl(missionImpl, new LatLongAlt(0, 0, 0, Frame.GLOBAL_RELATIVE));
                 missionItemImpl = temp;
                 break;
             }

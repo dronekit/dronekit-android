@@ -2,6 +2,7 @@ package com.o3dr.services.android.lib.drone.companion.solo.tlv;
 
 import android.os.Parcel;
 
+import com.o3dr.services.android.lib.coordinate.Frame;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 
 import java.nio.ByteBuffer;
@@ -26,7 +27,7 @@ public class SoloCableCamWaypoint extends TLVPacket {
 
     public SoloCableCamWaypoint(double latitude, double longitude, float altitude, float degreesYaw, float pitch) {
         super(TLVMessageTypes.TYPE_SOLO_CABLE_CAM_WAYPOINT, 28);
-        this.coordinate = new LatLongAlt(latitude, longitude, altitude);
+        this.coordinate = new LatLongAlt(latitude, longitude, altitude, Frame.GLOBAL_RELATIVE);
         this.degreesYaw = degreesYaw;
         this.pitch = pitch;
     }

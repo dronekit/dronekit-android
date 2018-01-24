@@ -1,5 +1,6 @@
 package com.o3dr.services.android.lib.util;
 
+import com.o3dr.services.android.lib.coordinate.Frame;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 
@@ -44,7 +45,8 @@ public class MathUtilsTest extends TestCase {
 
     public void testGetDistance3D() throws Exception {
         //Test get distance altitude only.
-        double distance = MathUtils.getDistance3D(new LatLongAlt(0.0, 0.0, 50.0), new LatLongAlt(0.0, 0.0, 100.0));
+        double distance = MathUtils.getDistance3D(new LatLongAlt(0.0, 0.0, 50.0, Frame.GLOBAL_RELATIVE),
+                                                    new LatLongAlt(0.0, 0.0, 100.0, Frame.GLOBAL_RELATIVE));
         assertEquals(distance, 50.0, MARGIN_OF_ERROR);
     }
 
@@ -80,7 +82,8 @@ public class MathUtilsTest extends TestCase {
             toLongitude = randDouble(rand, MIN_LONGITUDE, MAX_LONGITUDE);
 
             //3D Distance equation
-            distance1 = MathUtils.getDistance3D(new LatLongAlt(fromLatitude, fromLongitude, 0.0), new LatLongAlt(toLatitude, toLongitude, 0.0));
+            distance1 = MathUtils.getDistance3D(new LatLongAlt(fromLatitude, fromLongitude, 0.0, Frame.GLOBAL_RELATIVE),
+                                                new LatLongAlt(toLatitude, toLongitude, 0.0, Frame.GLOBAL_RELATIVE));
             //2D Distance equation
             distance2 = MathUtils.getDistance2D(new LatLong(fromLatitude, fromLongitude), new LatLong(toLatitude, toLongitude));
 

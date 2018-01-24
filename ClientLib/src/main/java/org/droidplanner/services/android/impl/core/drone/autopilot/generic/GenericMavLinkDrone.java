@@ -19,10 +19,12 @@ import com.MAVLink.common.msg_nav_controller_output;
 import com.MAVLink.common.msg_radio_status;
 import com.MAVLink.common.msg_sys_status;
 import com.MAVLink.common.msg_vibration;
+import com.MAVLink.enums.MAV_FRAME;
 import com.MAVLink.enums.MAV_MODE_FLAG;
 import com.MAVLink.enums.MAV_STATE;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
+import com.o3dr.services.android.lib.coordinate.Frame;
 import com.o3dr.services.android.lib.drone.action.CapabilityActions;
 import com.o3dr.services.android.lib.drone.action.ControlActions;
 import com.o3dr.services.android.lib.drone.action.ExperimentalActions;
@@ -107,6 +109,7 @@ public class GenericMavLinkDrone implements MavLinkDrone {
     private final Gps vehicleGps = new Gps();
     private final Parameters parameters = new Parameters();
     protected final Altitude altitude = new Altitude();
+    protected Frame frame = Frame.GLOBAL_RELATIVE;  // Frame in which the vehicle operates.
     protected final Speed speed = new Speed();
     protected final Battery battery = new Battery();
     protected final Signal signal = new Signal();
@@ -250,6 +253,42 @@ public class GenericMavLinkDrone implements MavLinkDrone {
     @Override
     public short getCompid() {
         return heartbeat.getCompid();
+    }
+
+    @Override
+    public Frame getFrame() {
+        return this.frame;
+    }
+
+    @Override
+    public void setFrame(Frame frame){
+        this.frame = frame;
+    }
+
+    @Override
+    public short getMavFrame() {
+        switch (frame) {
+            case GLOBAL_ABS:
+                return MAV_FRAME.MAV_FRAME_GLOBAL;
+            case GLOBAL_TERRAIN:
+                return MAV_FRAME.MAV_FRAME_GLOBAL_TERRAIN_ALT;
+            case GLOBAL_RELATIVE:
+            default:
+                return MAV_FRAME.MAV_FRAME_GLOBAL_RELATIVE_ALT;
+        }
+    }
+
+    @Override
+    public short getMavFrameInt() {
+        switch (frame) {
+            case GLOBAL_ABS:
+                return MAV_FRAME.MAV_FRAME_GLOBAL_INT;
+            case GLOBAL_TERRAIN:
+                return MAV_FRAME.MAV_FRAME_GLOBAL_TERRAIN_ALT_INT;
+            case GLOBAL_RELATIVE:
+            default:
+                return MAV_FRAME.MAV_FRAME_GLOBAL_RELATIVE_ALT_INT;
+        }
     }
 
     @Override
@@ -715,6 +754,7 @@ public class GenericMavLinkDrone implements MavLinkDrone {
             return;
         }
 
+        Frame frame = Frame.getFrame(missionItem.frame);
         float latitude = missionItem.x;
         float longitude = missionItem.y;
         float altitude = missionItem.z;
@@ -722,15 +762,17 @@ public class GenericMavLinkDrone implements MavLinkDrone {
 
         LatLongAlt homeCoord = vehicleHome.getCoordinate();
         if (homeCoord == null) {
-            vehicleHome.setCoordinate(new LatLongAlt(latitude, longitude, altitude));
+            vehicleHome.setCoordinate(new LatLongAlt(latitude, longitude, altitude, frame ));
             homeUpdated = true;
         } else {
             if (homeCoord.getLatitude() != latitude
                     || homeCoord.getLongitude() != longitude
-                    || homeCoord.getAltitude() != altitude) {
+                    || homeCoord.getAltitude() != altitude
+                    || homeCoord.getFrame() != frame) {
                 homeCoord.setLatitude(latitude);
                 homeCoord.setLongitude(longitude);
                 homeCoord.setAltitude(altitude);
+                homeCoord.setFrame(frame);
                 homeUpdated = true;
             }
         }
