@@ -12,13 +12,17 @@ public class Gps implements DroneAttribute {
     public static final String LOCK_2D = "2D";
     public static final String LOCK_3D = "3D";
     public static final String LOCK_3D_DGPS = "3D+DGPS";
-    public static final String LOCK_3D_RTK = "3D+RTK";
+    public static final String LOCK_3D_RTK_FLOAT_NAME = "RTK Float";
+    public static final String LOCK_3D_RTK_FIXED_NAME = "RTK Fixed";
+    public static final String LOCK_STATIC_NAME = "Static";
     public static final String NO_FIX = "NoFix";
 
     private final static int LOCK_2D_TYPE = 2;
     private final static int LOCK_3D_TYPE = 3;
     private final static int LOCK_3D_DGPS_TYPE = 4;
-    private final static int LOCK_3D_RTK_TYPE = 5;
+    private final static int LOCK_3D_RTK_FLOAT = 5;
+    private final static int LOCK_3D_RTK_FIXED = 6;
+    private final static int LOCK_STATIC = 7;
 
     private double gpsEph;
     private int satCount;
@@ -72,8 +76,14 @@ public class Gps implements DroneAttribute {
             case LOCK_3D_DGPS_TYPE:
                 return LOCK_3D_DGPS;
 
-            case LOCK_3D_RTK_TYPE:
-                return LOCK_3D_RTK;
+            case LOCK_3D_RTK_FLOAT:
+                return LOCK_3D_RTK_FLOAT_NAME;
+
+            case LOCK_3D_RTK_FIXED:
+                return LOCK_3D_RTK_FIXED_NAME;
+
+            case LOCK_STATIC:
+                return LOCK_STATIC_NAME;
 
             default:
                 return NO_FIX;
@@ -119,7 +129,9 @@ public class Gps implements DroneAttribute {
     public boolean has3DLock(){
         return (fixType == LOCK_3D_TYPE) ||
             (fixType == LOCK_3D_DGPS_TYPE) ||
-            (fixType == LOCK_3D_RTK_TYPE);
+            (fixType == LOCK_3D_RTK_FLOAT) ||
+            (fixType == LOCK_3D_RTK_FIXED)
+            ;
     }
 
     @Override
