@@ -129,7 +129,7 @@ public abstract class MavLinkConnection {
                 loggingThread.start();
 
                 final Parser parser = new Parser();
-                parser.stats.resetStats();
+                parser.stats.mavlinkResetStats();
 
                 final byte[] readBuffer = new byte[READ_BUFFER_SIZE];
 
