@@ -1,7 +1,8 @@
 package org.droidplanner.services.android.impl.core.survey.grid;
 
-import org.droidplanner.services.android.impl.core.helpers.geoTools.PolylineTools;
 import com.o3dr.services.android.lib.coordinate.LatLong;
+
+import org.droidplanner.services.android.impl.core.helpers.geoTools.PolylineTools;
 
 import java.util.List;
 

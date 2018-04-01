@@ -4,6 +4,8 @@ import com.MAVLink.common.msg_mission_item;
 import com.MAVLink.enums.MAV_CMD;
 import com.MAVLink.enums.MAV_FRAME;
 import com.o3dr.services.android.lib.coordinate.LatLong;
+import com.o3dr.services.android.lib.coordinate.LatLongAlt;
+import com.o3dr.services.android.lib.util.MathUtils;
 
 import org.droidplanner.services.android.impl.core.mission.Mission;
 import org.droidplanner.services.android.impl.core.mission.MissionItemImpl;
@@ -16,12 +18,18 @@ import org.droidplanner.services.android.impl.core.survey.grid.Grid;
 import org.droidplanner.services.android.impl.core.survey.grid.GridBuilder;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+
+import timber.log.Timber;
 
 public class SurveyImpl extends MissionItemImpl {
 
     public Polygon polygon = new Polygon();
     public SurveyData surveyData = new SurveyData();
+    private final ArrayList<LatLongAlt> cameraElevations = new ArrayList<>();
+    private double centerElevation = 0;
     public Grid grid;
 
     private boolean startCameraBeforeFirstWaypoint;
@@ -30,6 +38,15 @@ public class SurveyImpl extends MissionItemImpl {
         super(mission);
         polygon.addPoints(points);
     }
+
+    public List<LatLongAlt> getCameraElevations() { return cameraElevations; }
+    public void setCameraElevations(List<LatLongAlt> elevations) {
+        cameraElevations.clear();
+        cameraElevations.addAll(elevations);
+    }
+
+    public double getCenterElevation() { return centerElevation; }
+    public void setCenterElevation(double elevation) { centerElevation = elevation; }
 
     public void update(double angle, double altitude, double overlap, double sidelap, boolean lockOrientation) {
         surveyData.update(angle, altitude, overlap, sidelap, lockOrientation);
@@ -79,6 +96,7 @@ public class SurveyImpl extends MissionItemImpl {
         }
 
         final double altitude = surveyData.getAltitude();
+        Timber.d("centerElevation=%.2f", centerElevation);
 
         //Add the camera trigger after the first waypoint if it wasn't added before.
         boolean addToFirst = !startCameraBeforeFirstWaypoint;
@@ -101,6 +119,18 @@ public class SurveyImpl extends MissionItemImpl {
     }
 
     protected msg_mission_item getSurveyPoint(LatLong point, double altitude){
+        final LatLongAlt nearest = findNearestElevation(cameraElevations, point);
+
+        if(nearest != null && centerElevation > 0) {
+            final double elevation = nearest.getAltitude();
+            final double diff = (elevation - centerElevation);
+            final double newAlt = (altitude + diff);
+
+            Timber.d("point=%s elevation=%.2f alt=%.2f newAlt=%.2f", point, elevation, altitude, newAlt);
+
+            altitude = newAlt;
+        }
+
         return packSurveyPoint(point, altitude);
     }
 
@@ -144,4 +174,30 @@ public class SurveyImpl extends MissionItemImpl {
         return MissionItemType.SURVEY;
     }
 
+    public static LatLongAlt findNearestElevation(List<LatLongAlt> results, final LatLong location) {
+        Collections.sort(results, new Comparator<LatLongAlt>() {
+            @Override
+            public int compare(LatLongAlt o1, LatLongAlt o2) {
+                final LatLong ll1 = o1;
+                final LatLong ll2 = o2;
+
+                if(ll1 != null && ll2 != null) {
+                    final double d1 = MathUtils.getDistance2D(location, ll1);
+                    final double d2 = MathUtils.getDistance2D(location, ll2);
+
+                    if(d1 < d2) {
+                        return -1;
+                    } else if(d2 < d1) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                } else {
+                    return 0;
+                }
+            }
+        });
+
+        return (results.isEmpty())? null: results.get(0);
+    }
 }

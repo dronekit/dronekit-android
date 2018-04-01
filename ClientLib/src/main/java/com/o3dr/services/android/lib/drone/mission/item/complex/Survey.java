@@ -3,8 +3,9 @@ package com.o3dr.services.android.lib.drone.mission.item.complex;
 import android.os.Parcel;
 
 import com.o3dr.services.android.lib.coordinate.LatLong;
-import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
+import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.mission.MissionItemType;
+import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
 import com.o3dr.services.android.lib.util.MathUtils;
 
 import java.util.ArrayList;
@@ -27,6 +28,8 @@ public class Survey extends MissionItem implements MissionItem.ComplexItem<Surve
     private List<LatLong> polygonPoints = new ArrayList<LatLong>();
     private List<LatLong> gridPoints = new ArrayList<LatLong>();
     private List<LatLong> cameraLocations = new ArrayList<LatLong>();
+    private List<LatLongAlt> cameraElevations = new ArrayList<>();
+    private double centerElevation = 0;
     private boolean isValid;
     private boolean startCameraBeforeFirstWaypoint;
 
@@ -49,6 +52,7 @@ public class Survey extends MissionItem implements MissionItem.ComplexItem<Surve
         this.polygonPoints = copyPointsList(source.polygonPoints);
         this.gridPoints = copyPointsList(source.gridPoints);
         this.cameraLocations = copyPointsList(source.cameraLocations);
+        this.cameraElevations.addAll(source.cameraElevations);
         this.isValid = source.isValid;
         this.startCameraBeforeFirstWaypoint = source.startCameraBeforeFirstWaypoint;
     }
@@ -118,6 +122,26 @@ public class Survey extends MissionItem implements MissionItem.ComplexItem<Surve
         this.cameraLocations = cameraLocations;
     }
 
+    public List<LatLongAlt> getCameraElevations() {
+        if(cameraElevations == null) cameraElevations = new ArrayList<>();
+
+        return cameraElevations;
+    }
+
+    public double getCenterElevation() {
+        return centerElevation;
+    }
+
+    public void setCenterElevation(double elevation) {
+        centerElevation = elevation;
+    }
+
+    public void setCameraElevations(List<LatLongAlt> elevations) {
+        if(cameraElevations == null) cameraElevations = new ArrayList<>();
+        cameraElevations.clear();
+        cameraElevations.addAll(elevations);
+    }
+
     /**
      * @since 2.8.1
      * @return true if the camera trigger should be started before reaching the first survey waypoint.
@@ -147,6 +171,7 @@ public class Survey extends MissionItem implements MissionItem.ComplexItem<Surve
                 ", polygonArea=" + polygonArea +
                 ", polygonPoints=" + polygonPoints +
                 ", gridPoints=" + gridPoints +
+                ", cameraElevations=" + cameraElevations +
                 ", isValid=" + isValid +
                 ", startCameraBeforeFirstWaypoint=" + startCameraBeforeFirstWaypoint +
                 '}';
@@ -169,6 +194,8 @@ public class Survey extends MissionItem implements MissionItem.ComplexItem<Surve
             return false;
         if (gridPoints != null ? !gridPoints.equals(survey.gridPoints) : survey.gridPoints != null)
             return false;
+        if (cameraElevations != null? !cameraElevations.equals(survey.cameraElevations): survey.cameraElevations != null)
+            return false;
         return !(cameraLocations != null ? !cameraLocations.equals(survey.cameraLocations) : survey.cameraLocations != null);
 
     }
@@ -183,6 +210,7 @@ public class Survey extends MissionItem implements MissionItem.ComplexItem<Surve
         result = 31 * result + (polygonPoints != null ? polygonPoints.hashCode() : 0);
         result = 31 * result + (gridPoints != null ? gridPoints.hashCode() : 0);
         result = 31 * result + (cameraLocations != null ? cameraLocations.hashCode() : 0);
+        result = 31 * result + (cameraElevations != null ? cameraElevations.hashCode() : 0);
         result = 31 * result + (isValid ? 1 : 0);
         result = 31 * result + (startCameraBeforeFirstWaypoint ? 1 : 0);
         return result;
@@ -196,6 +224,7 @@ public class Survey extends MissionItem implements MissionItem.ComplexItem<Surve
         dest.writeTypedList(polygonPoints);
         dest.writeTypedList(gridPoints);
         dest.writeTypedList(cameraLocations);
+        dest.writeTypedList(cameraElevations);
         dest.writeByte(isValid ? (byte) 1 : (byte) 0);
         dest.writeByte(startCameraBeforeFirstWaypoint ? (byte) 1: (byte) 0);
     }
@@ -207,6 +236,7 @@ public class Survey extends MissionItem implements MissionItem.ComplexItem<Surve
         in.readTypedList(polygonPoints, LatLong.CREATOR);
         in.readTypedList(gridPoints, LatLong.CREATOR);
         in.readTypedList(cameraLocations, LatLong.CREATOR);
+        in.readTypedList(cameraElevations, LatLongAlt.CREATOR);
         this.isValid = in.readByte() != 0;
         this.startCameraBeforeFirstWaypoint = in.readByte() != 0;
     }
