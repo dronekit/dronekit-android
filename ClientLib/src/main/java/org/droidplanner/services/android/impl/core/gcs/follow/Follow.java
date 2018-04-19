@@ -1,9 +1,11 @@
 package org.droidplanner.services.android.impl.core.gcs.follow;
 
+import android.os.Bundle;
 import android.os.Handler;
 
 import com.o3dr.services.android.lib.drone.action.ControlActions;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
+import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
 import com.o3dr.services.android.lib.gcs.follow.FollowLocationSource;
 import com.o3dr.services.android.lib.model.action.Action;
 
@@ -155,7 +157,10 @@ public class Follow implements OnDroneListener<MavLinkDrone>, LocationReceiver {
             state = FollowStates.FOLLOW_START;
         }
 
-        droneMgr.onAttributeEvent(AttributeEvent.FOLLOW_UPDATE, null);
+        final Bundle extras = new Bundle();
+        extras.putBoolean(AttributeEventExtra.EXTRA_ACCURATE, location.isAccurate());
+        extras.putFloat(AttributeEventExtra.EXTRA_ACCURACY, location.getAccuracy());
+        droneMgr.onAttributeEvent(AttributeEvent.FOLLOW_UPDATE, extras);
     }
 
     @Override

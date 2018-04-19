@@ -20,13 +20,15 @@ public class Location {
     private double speed = 0.0;
     private boolean isAccurate;
     private long fixTime;
+    private float accuracy;
 
-    public Location(LatLongAlt coord3d, float heading, float speed, boolean isAccurate, long fixTime) {
+    public Location(LatLongAlt coord3d, float heading, float speed, boolean isAccurate, long fixTime, float accuracy) {
         coordinate = coord3d;
         this.heading = heading;
         this.speed = speed;
         this.isAccurate = isAccurate;
         this.fixTime = fixTime;
+        this.accuracy = accuracy;
     }
 
     public LatLongAlt getCoord() {
@@ -36,6 +38,8 @@ public class Location {
     public boolean isAccurate() {
         return !isInvalid() && this.isAccurate;
     }
+
+    public float getAccuracy() { return accuracy; }
 
     private boolean isInvalid(){
         return this.coordinate == null || (this.coordinate.getLatitude() == 0

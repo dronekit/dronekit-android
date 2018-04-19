@@ -127,4 +127,7 @@ public class AttributeEventExtra {
     public static final String EXTRA_BREACH_STATUS = PACKAGE_NAME + ".EXTRA_FENCE_BREACH_STATUS";
     public static final String EXTRA_BREACH_TYPE = PACKAGE_NAME + ".EXTRA_FENCE_BREACH_TYPE";
 
+    /** Extras for Follow status */
+    public static final String EXTRA_ACCURATE = PACKAGE_NAME + ".EXTRA_ACCURATE";
+    public static final String EXTRA_ACCURACY = PACKAGE_NAME + ".EXTRA_ACCURACY";
 }

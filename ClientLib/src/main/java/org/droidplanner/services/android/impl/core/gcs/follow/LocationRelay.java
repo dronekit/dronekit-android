@@ -12,7 +12,7 @@ import timber.log.Timber;
 public class LocationRelay {
     static final String TAG = LocationRelay.class.getSimpleName();
 
-    private static final float LOCATION_ACCURACY_THRESHOLD = 10.0f;
+    private static final float LOCATION_ACCURACY_THRESHOLD = 15.0f;
     private static final float JUMP_FACTOR = 4.0f;
     private static boolean VERBOSE = true;
 
@@ -45,7 +45,7 @@ public class LocationRelay {
 
         Location gcsLocation = null;
 
-        if(VERBOSE) Timber.d("toLocation(): followLoc=" + androidLocation);
+        if(VERBOSE) Timber.d("toGcsLocation(): followLoc=" + androidLocation);
 
         if(androidLocation.getTime() <= 0) {
             androidLocation.setTime(System.currentTimeMillis());
@@ -54,7 +54,7 @@ public class LocationRelay {
         boolean ok = (androidLocation.hasAccuracy() && androidLocation.getTime() > 0);
 
         if(!ok) {
-            Timber.w("toLocation(): Location needs accuracy and time");
+            Timber.w("toGcsLocation(): Location needs accuracy and time");
         } else {
             float distanceToLast = -1.0f;
             long timeSinceLast = -1L;
@@ -73,7 +73,7 @@ public class LocationRelay {
 
             if(VERBOSE) {
                 Timber.d(
-                        "toLocation(): distancetoLast=%.2f timeToLast=%d currSpeed=%.2f accurate=%s",
+                        "toGcsLocation(): distancetoLast=%.2f timeToLast=%d currSpeed=%.2f accurate=%s",
                         distanceToLast, timeSinceLast, currentSpeed, isAccurate);
             }
 
@@ -87,7 +87,8 @@ public class LocationRelay {
                     androidLocation.getBearing(),
                     androidLocation.getSpeed(),
                     isAccurate,
-                    androidLocation.getTime()
+                    androidLocation.getTime(),
+                    androidLocation.getAccuracy()
                 );
 
             mLastLocation = androidLocation;
