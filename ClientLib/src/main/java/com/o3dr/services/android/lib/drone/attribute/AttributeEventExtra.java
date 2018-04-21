@@ -95,6 +95,13 @@ public class AttributeEventExtra {
     public static final String EXTRA_PARAMETER_VALUE = PACKAGE_NAME + ".PARAMETER_VALUE";
 
     /**
+     * Used to retrieve the type of the received parameter.
+     *
+     * @see {@link AttributeEvent#PARAMETER_RECEIVED}
+     */
+    public static final String EXTRA_PARAMETER_TYPE = PACKAGE_NAME + ".PARAMETER_TYPE";
+
+    /**
      * Used to retrieve the gimbal pitch angle in degree.
      *
      * @see {@link AttributeEvent#GIMBAL_ORIENTATION_UPDATED}

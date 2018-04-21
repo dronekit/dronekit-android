@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v4.util.Pair;
 
 import com.MAVLink.MAVLinkPacket;
+import com.MAVLink.Messages.MAVLinkStats;
 import com.MAVLink.Parser;
 import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
 
@@ -20,6 +21,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+
+import timber.log.Timber;
 
 /**
  * Base for mavlink connection implementations.
@@ -171,6 +174,11 @@ public abstract class MavLinkConnection {
                     reportReceivedPacket(receivedPacket);
                 }
             }
+
+//            final MAVLinkStats stats = parser.stats;
+//            if(stats != null) {
+//                Timber.d("stats: lostPacketCount=%d crcErrorCount=%d receivedCount=%d", stats.lostPacketCount, stats.crcErrorCount, stats.receivedPacketCount);
+//            }
         }
     };
 
@@ -503,6 +511,8 @@ public abstract class MavLinkConnection {
      * @param packet received mavlink packet
      */
     private void reportReceivedPacket(MAVLinkPacket packet) {
+//        Timber.i("packet.msgid=%d", packet.msgid);
+
         if (mListeners.isEmpty()) {
             return;
         }

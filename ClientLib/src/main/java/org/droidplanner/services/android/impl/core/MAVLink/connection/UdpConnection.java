@@ -6,6 +6,8 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.concurrent.atomic.AtomicReference;
 
+import timber.log.Timber;
+
 /**
  * Provides support for mavlink connection via udp.
  */
@@ -60,7 +62,7 @@ public abstract class UdpConnection extends MavLinkConnection {
                 socket.send(sendPacket);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Timber.e(e, e.getMessage());
         }
     }
 
@@ -87,7 +89,10 @@ public abstract class UdpConnection extends MavLinkConnection {
             receivePacket.setData(readData);
         }
 
+//        final long then = SystemClock.elapsedRealtime();
         socket.receive(receivePacket);
+//        Timber.d("socket.receive() time=%d", (SystemClock.elapsedRealtime() - then));
+
         hostAdd = receivePacket.getAddress();
         hostPort = receivePacket.getPort();
         return receivePacket.getLength();
