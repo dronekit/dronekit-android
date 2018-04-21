@@ -668,6 +668,7 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
         paramsBundle.putInt(AttributeEventExtra.EXTRA_PARAMETERS_COUNT, count);
         paramsBundle.putString(AttributeEventExtra.EXTRA_PARAMETER_NAME, parameter.getName());
         paramsBundle.putDouble(AttributeEventExtra.EXTRA_PARAMETER_VALUE, parameter.getValue());
+        paramsBundle.putInt(AttributeEventExtra.EXTRA_PARAMETER_TYPE, parameter.getType());
         notifyAttributeUpdate(AttributeEvent.PARAMETER_RECEIVED, paramsBundle);
     }
 
