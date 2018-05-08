@@ -18,12 +18,12 @@ public class LocationRelay {
     private static boolean VERBOSE = false;
     
     
-    LocationRelay() {
+    public LocationRelay() {
         LOCATION_ACCURACY_THRESHOLD = 10.0f;
     }
     
-    LocationRelay(float location_accuracy_threshold) {
-     LOCATION_ACCURACY_THRESHOLD = location_accuracy_threshold;
+    public LocationRelay(float location_accuracy_threshold) {
+        LOCATION_ACCURACY_THRESHOLD = location_accuracy_threshold;
         Timber.w("Location Accuracy of Target has been overriden to " + location_accuracy_threshold);
     }
     
