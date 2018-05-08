@@ -13,10 +13,20 @@ import timber.log.Timber;
 public class LocationRelay {
     static final String TAG = LocationRelay.class.getSimpleName();
 
-    private static final float LOCATION_ACCURACY_THRESHOLD = 10.0f;
+    private final float LOCATION_ACCURACY_THRESHOLD;
     private static final float JUMP_FACTOR = 4.0f;
     private static boolean VERBOSE = false;
-
+    
+    
+    public LocationRelay() {
+        LOCATION_ACCURACY_THRESHOLD = 10.0f;
+    }
+    
+    public LocationRelay(float location_accuracy_threshold) {
+        LOCATION_ACCURACY_THRESHOLD = location_accuracy_threshold;
+        Timber.w("Location Accuracy of Target has been overriden to " + location_accuracy_threshold);
+    }
+    
     public static String getLatLongFromLocation(final android.location.Location location) {
         return android.location.Location.convert(location.getLatitude(), android.location.Location.FORMAT_DEGREES) + " " +
                 android.location.Location.convert(location.getLongitude(), android.location.Location.FORMAT_DEGREES);
