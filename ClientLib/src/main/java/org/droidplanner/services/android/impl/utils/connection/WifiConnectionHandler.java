@@ -99,18 +99,22 @@ public class WifiConnectionHandler {
                     switch (networkState) {
                         case CONNECTED:
                             final WifiInfo wifiInfo = intent.getParcelableExtra(WifiManager.EXTRA_WIFI_INFO);
-                            final String wifiSSID = wifiInfo.getSSID();
-                            Timber.i("Connected to " + wifiSSID);
+                            if(wifiInfo != null) {
+                                final String wifiSSID = wifiInfo.getSSID();
+                                Timber.i("Connected to " + wifiSSID);
 
-                            final DhcpInfo dhcpInfo = wifiMgr.getDhcpInfo();
-                            if (dhcpInfo != null) {
-                                Timber.i("Dhcp info: %s", dhcpInfo.toString());
+                                final DhcpInfo dhcpInfo = wifiMgr.getDhcpInfo();
+                                if (dhcpInfo != null) {
+                                    Timber.i("Dhcp info: %s", dhcpInfo.toString());
+                                } else {
+                                    Timber.w("Dhcp info is not available.");
+                                }
+
+                                if (wifiSSID != null) {
+                                    setDefaultNetworkIfNecessary(wifiSSID);
+                                }
                             } else {
-                                Timber.w("Dhcp info is not available.");
-                            }
-
-                            if (wifiSSID != null) {
-                                setDefaultNetworkIfNecessary(wifiSSID);
+                                Timber.w("No wifiInfo!!");
                             }
                             break;
 
@@ -171,9 +175,9 @@ public class WifiConnectionHandler {
                 private void getNetworkInfo(Network network) {
                     if (network == null) {
                         Timber.i("Network is null.");
-                    } else {
+                    } else if(connMgr != null) {
                         Timber.i("Network: %s, active : %s", network, connMgr.isDefaultNetworkActive());
-                        LinkProperties linkProps = connMgr.getLinkProperties(network);
+                        final LinkProperties linkProps = connMgr.getLinkProperties(network);
                         Timber.i("Network link properties: %s", linkProps.toString());
                         Timber.i("Network capabilities: %s", connMgr.getNetworkCapabilities(network));
                     }
