@@ -891,6 +891,7 @@ public class GenericMavLinkDrone implements MavLinkDrone {
 
         double newLat = gpi.lat / 1E7;
         double newLong = gpi.lon / 1E7;
+        final double meters = ((float)gpi.relative_alt / 1000f);
 
         boolean positionUpdated = false;
         LatLong gpsPosition = vehicleGps.getPosition();
@@ -902,6 +903,11 @@ public class GenericMavLinkDrone implements MavLinkDrone {
             gpsPosition.setLatitude(newLat);
             gpsPosition.setLongitude(newLong);
             positionUpdated = true;
+        }
+
+        if (this.altitude.getAltitude() != meters) {
+            this.altitude.setAltitude(meters);
+            notifyDroneEvent(DroneInterfaces.DroneEventsType.ALTITUDE);
         }
 
         if (positionUpdated) {

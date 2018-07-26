@@ -13,6 +13,7 @@ import com.MAVLink.ardupilotmega.msg_mag_cal_report;
 import com.MAVLink.ardupilotmega.msg_mount_configure;
 import com.MAVLink.ardupilotmega.msg_mount_status;
 import com.MAVLink.ardupilotmega.msg_radio;
+import com.MAVLink.common.msg_global_position_int;
 import com.MAVLink.common.msg_named_value_int;
 import com.MAVLink.common.msg_raw_imu;
 import com.MAVLink.common.msg_rc_channels_raw;
@@ -115,10 +116,10 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
     }
 
     protected void setAltitudeGroundAndAirSpeeds(double altitude, double groundSpeed, double airSpeed, double climb) {
-        if (this.altitude.getAltitude() != altitude) {
-            this.altitude.setAltitude(altitude);
-            notifyDroneEvent(DroneInterfaces.DroneEventsType.ALTITUDE);
-        }
+//        if (this.altitude.getAltitude() != altitude) {
+//            this.altitude.setAltitude(altitude);
+//            notifyDroneEvent(DroneInterfaces.DroneEventsType.ALTITUDE);
+//        }
 
         if (speed.getGroundSpeed() != groundSpeed || speed.getAirSpeed() != airSpeed || speed.getVerticalSpeed() != climb) {
             speed.setGroundSpeed(groundSpeed);
@@ -548,6 +549,17 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
             getState().parseAutopilotError("RC FAILSAFE");
         }
     }
+
+//    protected void processGlobalPositionInt(msg_global_position_int msg) {
+//        if(msg == null) return;
+//
+//        final double meters = msg.relative_alt / 1000;
+//
+//        if (this.altitude.getAltitude() != meters) {
+//            this.altitude.setAltitude(meters);
+//            notifyDroneEvent(DroneInterfaces.DroneEventsType.ALTITUDE);
+//        }
+//    }
 
     protected void processVfrHud(msg_vfr_hud vfrHud) {
         if (vfrHud == null)
