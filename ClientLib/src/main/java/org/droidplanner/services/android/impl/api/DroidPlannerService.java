@@ -1,12 +1,16 @@
 package org.droidplanner.services.android.impl.api;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
@@ -215,12 +219,33 @@ public class DroidPlannerService extends Service {
         updateForegroundNotification();
     }
 
+    @TargetApi(Build.VERSION_CODES.O)
+    private NotificationChannel createNotificationChannel(final String channelId) {
+        final NotificationChannel notificationChannel = new NotificationChannel(channelId, "DroneKit-Android", NotificationManager.IMPORTANCE_DEFAULT);
+        notificationChannel.enableLights(false);
+        notificationChannel.enableVibration(false);
+        notificationChannel.setImportance(NotificationManager.IMPORTANCE_LOW);
+
+        return notificationChannel;
+    }
+
     @SuppressLint("NewApi")
     private void updateForegroundNotification() {
         final Context context = getApplicationContext();
 
+        final String channelId = "DroneKit-Android_default_id";
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            final NotificationChannel channel = createNotificationChannel(channelId);
+            final NotificationManager manager = ((NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE));
+            if(manager != null)
+                manager.createNotificationChannel(channel);
+            else
+                return;
+        }
+
         //Put the service in the foreground
-        final NotificationCompat.Builder notifBuilder = new NotificationCompat.Builder(context)
+        final NotificationCompat.Builder notifBuilder = new NotificationCompat.Builder(context, channelId)
                 .setContentTitle("DroneKit-Android")
                 .setPriority(NotificationCompat.PRIORITY_MIN)
                 .setSmallIcon(R.drawable.ic_stat_notify);
