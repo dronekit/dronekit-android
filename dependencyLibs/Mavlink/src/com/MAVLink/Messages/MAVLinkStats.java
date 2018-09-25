@@ -74,4 +74,13 @@ public class MAVLinkStats /* implements Serializable */{
         receivedPacketCount = 0;
     }
 
+    @Override
+    public String toString() {
+        return "MAVLinkStats{" +
+                "receivedPacketCount=" + receivedPacketCount +
+                ", crcErrorCount=" + crcErrorCount +
+                ", lostPacketCount=" + lostPacketCount +
+                ", lastPacketSeq=" + lastPacketSeq +
+                '}';
+    }
 }

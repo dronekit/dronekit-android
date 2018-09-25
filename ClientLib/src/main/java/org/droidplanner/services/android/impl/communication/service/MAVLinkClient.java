@@ -62,6 +62,13 @@ public class MAVLinkClient implements DataLink.DataLinkProvider<MAVLinkMessage> 
                     break;
             }
         }
+
+        @Override
+        public void onMavlinkStatsUpdate(int received, int crcErrors, int lostPackets) {
+            receivedCount = received;
+            crcErrorCount = crcErrors;
+            lostPacketCount = lostPackets;
+        }
     };
 
     private AndroidMavLinkConnection mavlinkConn;
@@ -74,6 +81,10 @@ public class MAVLinkClient implements DataLink.DataLinkProvider<MAVLinkMessage> 
 
     private DroneCommandTracker commandTracker;
 
+    private int receivedCount;
+    private int crcErrorCount;
+    private int lostPacketCount;
+
     public MAVLinkClient(Context context, DataLink.DataLinkListener<MAVLinkPacket> listener,
                          ConnectionParameter connParams, DroneCommandTracker commandTracker) {
         this.context = context;
@@ -85,6 +96,21 @@ public class MAVLinkClient implements DataLink.DataLinkProvider<MAVLinkMessage> 
 
         this.connParams = connParams;
         this.commandTracker = commandTracker;
+    }
+
+    @Override
+    public int getReceivedCount() {
+        return receivedCount;
+    }
+
+    @Override
+    public int getCrcErrorCount() {
+        return crcErrorCount;
+    }
+
+    @Override
+    public int getLostPacketCount() {
+        return lostPacketCount;
     }
 
     private int getConnectionStatus(){

@@ -2,6 +2,7 @@ package org.droidplanner.services.android.impl.core.MAVLink.connection;
 
 import android.os.Bundle;
 import android.support.v4.util.Pair;
+import android.util.Log;
 
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkStats;
@@ -21,8 +22,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
-
-import timber.log.Timber;
 
 /**
  * Base for mavlink connection implementations.
@@ -174,6 +173,8 @@ public abstract class MavLinkConnection {
                     reportReceivedPacket(receivedPacket);
                 }
             }
+
+            reportMavlinkStats(parser.stats);
 
 //            final MAVLinkStats stats = parser.stats;
 //            if(stats != null) {
@@ -519,6 +520,17 @@ public abstract class MavLinkConnection {
 
         for (MavLinkConnectionListener listener : mListeners.values()) {
             listener.onReceivePacket(packet);
+        }
+    }
+
+    private void reportMavlinkStats(MAVLinkStats stats) {
+        if(mListeners.isEmpty()) {
+            Log.v(TAG, "No listeners");
+            return;
+        }
+
+        for(MavLinkConnectionListener listener: mListeners.values()) {
+            listener.onMavlinkStatsUpdate(stats.receivedPacketCount, stats.crcErrorCount, stats.lostPacketCount);
         }
     }
 

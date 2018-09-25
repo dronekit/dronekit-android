@@ -44,6 +44,7 @@ import com.o3dr.services.android.lib.drone.property.DroneAttribute;
 import com.o3dr.services.android.lib.drone.property.FenceStatus;
 import com.o3dr.services.android.lib.drone.property.Gps;
 import com.o3dr.services.android.lib.drone.property.Home;
+import com.o3dr.services.android.lib.drone.property.MavlinkConnectionStats;
 import com.o3dr.services.android.lib.drone.property.Parameter;
 import com.o3dr.services.android.lib.drone.property.Parameters;
 import com.o3dr.services.android.lib.drone.property.Signal;
@@ -119,6 +120,7 @@ public class GenericMavLinkDrone implements MavLinkDrone {
     protected final Vibration vibration = new Vibration();
     protected final FenceStatus fenceStatus = new FenceStatus();
     protected final AutopilotVersion apVersion = new AutopilotVersion();
+    protected final MavlinkConnectionStats mavlinkStats = new MavlinkConnectionStats();
 
     protected final Handler handler;
 
@@ -558,6 +560,9 @@ public class GenericMavLinkDrone implements MavLinkDrone {
             case AttributeType.STATE:
                 return CommonApiUtils.getState(this, isConnected(), vibration);
 
+            case AttributeType.MAVLINK_STATS:
+                return mavlinkStats;
+
             case AttributeType.GPS:
                 return vehicleGps;
 
@@ -612,6 +617,7 @@ public class GenericMavLinkDrone implements MavLinkDrone {
             case msg_heartbeat.MAVLINK_MSG_ID_HEARTBEAT:
                 msg_heartbeat msg_heart = (msg_heartbeat) message;
                 processHeartbeat(msg_heart);
+                updateConnectionStats();
                 break;
 
             case msg_vibration.MAVLINK_MSG_ID_VIBRATION:
@@ -704,6 +710,10 @@ public class GenericMavLinkDrone implements MavLinkDrone {
         checkIfFlying(msg_heart);
         processState(msg_heart);
         processVehicleMode(msg_heart);
+    }
+
+    private void updateConnectionStats() {
+        mavlinkStats.set(mavClient.getReceivedCount(), mavClient.getCrcErrorCount(), mavClient.getLostPacketCount());
     }
 
     private void processVehicleMode(msg_heartbeat msg_heart) {
