@@ -13,6 +13,7 @@ import com.MAVLink.ardupilotmega.msg_mag_cal_report;
 import com.MAVLink.ardupilotmega.msg_mount_configure;
 import com.MAVLink.ardupilotmega.msg_mount_status;
 import com.MAVLink.ardupilotmega.msg_radio;
+import com.MAVLink.common.msg_global_position_int;
 import com.MAVLink.common.msg_named_value_int;
 import com.MAVLink.common.msg_raw_imu;
 import com.MAVLink.common.msg_rc_channels_raw;
@@ -416,10 +417,6 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
                     processStatusText(msg_statustext);
                     break;
 
-                case msg_vfr_hud.MAVLINK_MSG_ID_VFR_HUD:
-                    processVfrHud((msg_vfr_hud) message);
-                    break;
-
                 case msg_raw_imu.MAVLINK_MSG_ID_RAW_IMU:
                     msg_raw_imu msg_imu = (msg_raw_imu) message;
                     mag.newData(msg_imu);
@@ -511,11 +508,25 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
         }
     }
 
-    protected void processVfrHud(msg_vfr_hud vfrHud) {
-        if (vfrHud == null)
+    /**
+     * Used to update the vehicle location, and altitude.
+     * @param gpi
+     */
+    @Override
+    protected void processGlobalPositionInt(msg_global_position_int gpi) {
+        if(gpi == null)
             return;
 
-        setAltitudeGroundAndAirSpeeds(vfrHud.alt, vfrHud.groundspeed, vfrHud.airspeed, vfrHud.climb);
+        super.processGlobalPositionInt(gpi);
+
+        final double relativeAlt = gpi.relative_alt / 1000.0;
+
+        final double groundSpeedX = gpi.vx / 100.0;
+        final double groundSpeedY = gpi.vy / 100.0;
+        final double groundSpeed = Math.sqrt(Math.pow(groundSpeedX, 2) + Math.pow(groundSpeedY, 2));
+
+        final double climbRate = gpi.vz / 100.0;
+        setAltitudeGroundAndAirSpeeds(relativeAlt, groundSpeed, groundSpeed, climbRate);
     }
 
     protected void processMountStatus(msg_mount_status mountStatus) {
