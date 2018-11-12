@@ -392,7 +392,7 @@ public class CommonApiUtils {
         return new CameraProxy(camDetail, currentFieldOfView, proxyPrints, cameraDetails);
     }
 
-    public static State getState(MavLinkDrone drone, boolean isConnected, Vibration vibration) {
+    public static State getState(MavLinkDrone drone, boolean isConnected, Vibration vibration, short sysid, short compid) {
         if (drone == null)
             return new State();
 
@@ -406,7 +406,7 @@ public class CommonApiUtils {
         return new State(isConnected, CommonApiUtils.getVehicleMode(droneMode), droneState.isArmed(),
             droneState.isFlying(), droneState.getErrorId(), drone.getMavlinkVersion(), calibrationMessage,
             droneState.getFlightStartTime(), generateEkfStatus(droneState.getEkfStatus()),
-            isConnected && drone.isConnectionAlive(), vibration);
+            isConnected && drone.isConnectionAlive(), vibration, sysid, compid);
     }
 
     public static EkfStatus generateEkfStatus(msg_ekf_status_report ekfStatus) {

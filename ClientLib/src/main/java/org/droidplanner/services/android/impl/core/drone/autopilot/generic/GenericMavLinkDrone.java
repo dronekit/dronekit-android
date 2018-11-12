@@ -556,7 +556,7 @@ public class GenericMavLinkDrone implements MavLinkDrone {
                 return altitude;
 
             case AttributeType.STATE:
-                return CommonApiUtils.getState(this, isConnected(), vibration);
+                return CommonApiUtils.getState(this, isConnected(), vibration, getSysid(), getCompid());
 
             case AttributeType.GPS:
                 return vehicleGps;
