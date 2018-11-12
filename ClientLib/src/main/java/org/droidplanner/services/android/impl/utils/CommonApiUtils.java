@@ -3,6 +3,7 @@ package org.droidplanner.services.android.impl.utils;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Surface;
 
 import com.MAVLink.Messages.MAVLinkMessage;
@@ -74,6 +75,7 @@ import timber.log.Timber;
  * Created by Fredia Huya-Kouadio on 3/23/15.
  */
 public class CommonApiUtils {
+    static final String TAG = CommonApiUtils.class.getSimpleName();
 
     //Private to prevent instantiation
     private CommonApiUtils() {
@@ -833,7 +835,9 @@ public class CommonApiUtils {
 
             target_system.setShort(message, (short)message.sysid);
             target_component.setShort(message, (short)message.compid);
-        } catch (NoSuchFieldException | SecurityException | IllegalAccessException | IllegalArgumentException | ExceptionInInitializerError e) {
+        } catch (NoSuchFieldException e) {
+            Log.v(TAG, String.format("No target_system/target_component fields in %s", message.getClass().getName()));
+        } catch(SecurityException | IllegalAccessException | IllegalArgumentException | ExceptionInInitializerError e) {
             Timber.e(e, e.getMessage());
         }
 
