@@ -6,10 +6,10 @@
 
 package com.MAVLink;
 
-import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkStats;
 
 public class Parser {
+    static final String TAG = "MavlinkParser";
 
     /**
      * States from the parsing state machine
@@ -98,6 +98,8 @@ public class Parser {
                     m.crc.start_checksum();
                 }
                 stats.crcError();
+
+               System.out.println(String.format("%s stats=%s", TAG, stats));
             } else {
                 state = MAV_states.MAVLINK_PARSE_STATE_GOT_CRC1;
             }
@@ -113,6 +115,7 @@ public class Parser {
                     m.crc.start_checksum();
                 }
                 stats.crcError();
+                System.out.println(String.format("%s stats=%s", TAG, stats));
             } else { // Successfully received the message
                 stats.newPacket(m);
                 msg_received = true;
@@ -123,6 +126,7 @@ public class Parser {
 
         }
         if (msg_received) {
+            System.out.println(String.format("%s msg_received (%d)", m.msgid));
             return m;
         } else {
             return null;

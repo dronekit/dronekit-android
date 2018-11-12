@@ -96,6 +96,11 @@ public class AttributeType {
     public static final String STATE = PACKAGE_NAME + ".STATE";
 
     /**
+     * Used to access mavlink connection stats.
+     */
+    public static final String MAVLINK_STATS = PACKAGE_NAME + ".MAVLINK_STATS";
+
+    /**
      * Used to access the vehicle type.
      * @see {@link com.o3dr.services.android.lib.drone.property.Type}
      */

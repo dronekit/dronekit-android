@@ -15,6 +15,10 @@ public class DataLink {
 
         void closeConnection();
 
+        int getReceivedCount();
+        int getCrcErrorCount();
+        int getLostPacketCount();
+
     }
 
     public interface DataLinkListener<T> {

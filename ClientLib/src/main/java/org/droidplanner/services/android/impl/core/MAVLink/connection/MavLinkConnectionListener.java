@@ -22,4 +22,9 @@ public interface MavLinkConnectionListener {
      */
     void onConnectionStatus(LinkConnectionStatus connectionStatus);
 
+
+    /**
+     * Provides information about mavlink stats
+     */
+    void onMavlinkStatsUpdate(int receivedCount, int crcErrorCount, int lostPacketCount);
 }

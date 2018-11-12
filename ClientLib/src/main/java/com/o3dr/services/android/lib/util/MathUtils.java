@@ -227,6 +227,7 @@ public class MathUtils {
 
             // Build the result list.
             recResults1.remove(recResults1.size() - 1);
+
             ResultList.addAll(recResults1);
             ResultList.addAll(recResults2);
         } else {

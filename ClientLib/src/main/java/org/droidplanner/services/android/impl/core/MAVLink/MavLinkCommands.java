@@ -60,7 +60,7 @@ public class MavLinkCommands {
         drone.getMavClient().sendMessage(msg, null);
     }
 
-    public static void sendGuidedPosition(MavLinkDrone drone, double latitude, double longitude, double altitude){
+    public static void sendGuidedPosition(MavLinkDrone drone, double latitude, double longitude, double altitude) {
         msg_set_position_target_global_int msg = new msg_set_position_target_global_int();
         msg.type_mask = MAVLINK_SET_POS_TYPE_MASK_ACC_IGNORE | MAVLINK_SET_POS_TYPE_MASK_VEL_IGNORE;
         msg.coordinate_frame = MAV_FRAME.MAV_FRAME_GLOBAL_RELATIVE_ALT_INT;
@@ -72,7 +72,7 @@ public class MavLinkCommands {
         drone.getMavClient().sendMessage(msg, null);
     }
 
-    public static void sendGuidedVelocity(MavLinkDrone drone, double xVel, double yVel, double zVel){
+    public static void sendGuidedVelocity(MavLinkDrone drone, double xVel, double yVel, double zVel) {
         msg_set_position_target_global_int msg = new msg_set_position_target_global_int();
         msg.type_mask = MAVLINK_SET_POS_TYPE_MASK_ACC_IGNORE | MAVLINK_SET_POS_TYPE_MASK_POS_IGNORE;
         msg.coordinate_frame = MAV_FRAME.MAV_FRAME_GLOBAL_RELATIVE_ALT_INT;
@@ -84,7 +84,7 @@ public class MavLinkCommands {
         drone.getMavClient().sendMessage(msg, null);
     }
 
-    public static void setVelocityInLocalFrame(MavLinkDrone drone, float xVel, float yVel, float zVel, ICommandListener listener){
+    public static void setVelocityInLocalFrame(MavLinkDrone drone, float xVel, float yVel, float zVel, ICommandListener listener) {
         msg_set_position_target_local_ned msg = new msg_set_position_target_local_ned();
         msg.type_mask = MAVLINK_SET_POS_TYPE_MASK_ACC_IGNORE | MAVLINK_SET_POS_TYPE_MASK_POS_IGNORE;
         msg.vx = xVel;
@@ -96,7 +96,7 @@ public class MavLinkCommands {
     }
 
     public static void sendGuidedPositionAndVelocity(MavLinkDrone drone, double latitude, double longitude, double altitude,
-                                                     double xVel, double yVel, double zVel){
+                                                     double xVel, double yVel, double zVel) {
         msg_set_position_target_global_int msg = new msg_set_position_target_global_int();
         msg.type_mask = MAVLINK_SET_POS_TYPE_MASK_ACC_IGNORE;
         msg.coordinate_frame = MAV_FRAME.MAV_FRAME_GLOBAL_RELATIVE_ALT_INT;
@@ -120,7 +120,7 @@ public class MavLinkCommands {
     }
 
     public static void setConditionYaw(MavLinkDrone drone, float targetAngle, float yawRate, boolean isClockwise,
-                                       boolean isRelative, ICommandListener listener){
+                                       boolean isRelative, ICommandListener listener) {
         msg_command_long msg = new msg_command_long();
         msg.target_system = drone.getSysid();
         msg.target_component = drone.getCompid();
@@ -137,17 +137,17 @@ public class MavLinkCommands {
     /**
      * API for sending manually control to the vehicle using standard joystick axes nomenclature, along with a joystick-like input device.
      * Unused axes can be disabled and buttons are also transmit as boolean values.
-     * @see <a href="MANUAL_CONTROL">https://pixhawk.ethz.ch/mavlink/#MANUAL_CONTROL</a>
      *
      * @param drone
-     * @param x X-axis, normalized to the range [-1000,1000]. A value of INT16_MAX indicates that this axis is invalid. Generally corresponds to forward(1000)-backward(-1000) movement on a joystick and the pitch of a vehicle.
-     * @param y Y-axis, normalized to the range [-1000,1000]. A value of INT16_MAX indicates that this axis is invalid. Generally corresponds to left(-1000)-right(1000) movement on a joystick and the roll of a vehicle.
-     * @param z Z-axis, normalized to the range [-1000,1000]. A value of INT16_MAX indicates that this axis is invalid. Generally corresponds to a separate slider movement with maximum being 1000 and minimum being -1000 on a joystick and the thrust of a vehicle.
-     * @param r R-axis, normalized to the range [-1000,1000]. A value of INT16_MAX indicates that this axis is invalid. Generally corresponds to a twisting of the joystick, with counter-clockwise being 1000 and clockwise being -1000, and the yaw of a vehicle.
-     * @param buttons A bitfield corresponding to the joystick buttons' current state, 1 for pressed, 0 for released. The lowest bit corresponds to Button 1.
+     * @param x        X-axis, normalized to the range [-1000,1000]. A value of INT16_MAX indicates that this axis is invalid. Generally corresponds to forward(1000)-backward(-1000) movement on a joystick and the pitch of a vehicle.
+     * @param y        Y-axis, normalized to the range [-1000,1000]. A value of INT16_MAX indicates that this axis is invalid. Generally corresponds to left(-1000)-right(1000) movement on a joystick and the roll of a vehicle.
+     * @param z        Z-axis, normalized to the range [-1000,1000]. A value of INT16_MAX indicates that this axis is invalid. Generally corresponds to a separate slider movement with maximum being 1000 and minimum being -1000 on a joystick and the thrust of a vehicle.
+     * @param r        R-axis, normalized to the range [-1000,1000]. A value of INT16_MAX indicates that this axis is invalid. Generally corresponds to a twisting of the joystick, with counter-clockwise being 1000 and clockwise being -1000, and the yaw of a vehicle.
+     * @param buttons  A bitfield corresponding to the joystick buttons' current state, 1 for pressed, 0 for released. The lowest bit corresponds to Button 1.
      * @param listener
+     * @see <a href="MANUAL_CONTROL">https://pixhawk.ethz.ch/mavlink/#MANUAL_CONTROL</a>
      */
-    public static void sendManualControl(MavLinkDrone drone, short x, short y, short z, short r, int buttons, ICommandListener listener){
+    public static void sendManualControl(MavLinkDrone drone, short x, short y, short z, short r, int buttons, ICommandListener listener) {
         msg_manual_control msg = new msg_manual_control();
         msg.target = drone.getSysid();
         msg.x = x;
@@ -169,7 +169,7 @@ public class MavLinkCommands {
         drone.getMavClient().sendMessage(msg, listener);
     }
 
-    public static void sendNavLand(MavLinkDrone drone, ICommandListener listener){
+    public static void sendNavLand(MavLinkDrone drone, ICommandListener listener) {
         msg_command_long msg = new msg_command_long();
         msg.target_system = drone.getSysid();
         msg.target_component = drone.getCompid();
@@ -178,7 +178,7 @@ public class MavLinkCommands {
         drone.getMavClient().sendMessage(msg, listener);
     }
 
-    public static void sendNavRTL(MavLinkDrone drone, ICommandListener listener){
+    public static void sendNavRTL(MavLinkDrone drone, ICommandListener listener) {
         msg_command_long msg = new msg_command_long();
         msg.target_system = drone.getSysid();
         msg.target_component = drone.getCompid();
@@ -187,7 +187,7 @@ public class MavLinkCommands {
         drone.getMavClient().sendMessage(msg, listener);
     }
 
-    public static void sendPause(MavLinkDrone drone, ICommandListener listener){
+    public static void sendPause(MavLinkDrone drone, ICommandListener listener) {
         msg_command_long msg = new msg_command_long();
         msg.target_system = drone.getSysid();
         msg.target_component = drone.getCompid();
@@ -199,7 +199,7 @@ public class MavLinkCommands {
         drone.getMavClient().sendMessage(msg, listener);
     }
 
-    public static void startMission(MavLinkDrone drone, ICommandListener listener){
+    public static void startMission(MavLinkDrone drone, ICommandListener listener) {
         msg_command_long msg = new msg_command_long();
         msg.target_system = drone.getSysid();
         msg.target_component = drone.getCompid();

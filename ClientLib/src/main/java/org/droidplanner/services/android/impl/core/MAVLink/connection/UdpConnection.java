@@ -1,5 +1,7 @@
 package org.droidplanner.services.android.impl.core.MAVLink.connection;
 
+import android.util.Log;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -12,6 +14,9 @@ import timber.log.Timber;
  * Provides support for mavlink connection via udp.
  */
 public abstract class UdpConnection extends MavLinkConnection {
+    static final String TAG = UdpConnection.class.getSimpleName();
+
+    private static final int BUFSIZE = 32768;
 
     private AtomicReference<DatagramSocket> socketRef = new AtomicReference<>();
     private int serverPort;
@@ -22,9 +27,16 @@ public abstract class UdpConnection extends MavLinkConnection {
     private DatagramPacket receivePacket;
 
     private void getUdpStream() throws IOException {
+        Log.v(TAG, "getUdpStream()");
+
         final DatagramSocket socket = new DatagramSocket(serverPort);
         socket.setBroadcast(true);
         socket.setReuseAddress(true);
+
+        socket.setSendBufferSize(BUFSIZE);
+        socket.setReceiveBufferSize(BUFSIZE);
+
+        android.util.Log.v(TAG, String.format("receiveSize=%d sendSize=%d", socket.getReceiveBufferSize(), socket.getSendBufferSize()));
         socketRef.set(socket);
     }
 
