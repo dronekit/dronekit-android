@@ -33,9 +33,9 @@ public abstract class UdpConnection extends MavLinkConnection {
         socket.setBroadcast(true);
         socket.setReuseAddress(true);
 
-        socket.setSendBufferSize(BUFSIZE);
-        socket.setReceiveBufferSize(BUFSIZE);
-
+//        socket.setSendBufferSize(BUFSIZE);
+//        socket.setReceiveBufferSize(BUFSIZE);
+//
         android.util.Log.v(TAG, String.format("receiveSize=%d sendSize=%d", socket.getReceiveBufferSize(), socket.getSendBufferSize()));
         socketRef.set(socket);
     }
