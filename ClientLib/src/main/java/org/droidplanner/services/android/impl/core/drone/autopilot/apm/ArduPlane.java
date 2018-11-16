@@ -42,32 +42,6 @@ public class ArduPlane extends ArduPilot {
     }
 
     @Override
-    protected void processVfrHud(msg_vfr_hud vfrHud){
-        //Nothing to do. Plane used GLOBAL_POSITION_INT to set altitude and speeds unlike copter
-    }
-
-    /**
-     * Used to update the vehicle location, and altitude.
-     * @param gpi
-     */
-    @Override
-    protected void processGlobalPositionInt(msg_global_position_int gpi){
-        if(gpi == null)
-            return;
-
-        super.processGlobalPositionInt(gpi);
-
-        final double relativeAlt = gpi.relative_alt / 1000.0;
-
-        final double groundSpeedX = gpi.vx / 100.0;
-        final double groundSpeedY = gpi.vy / 100.0;
-        final double groundSpeed = Math.sqrt(Math.pow(groundSpeedX, 2) + Math.pow(groundSpeedY, 2));
-
-        final double climbRate = gpi.vz / 100.0;
-        setAltitudeGroundAndAirSpeeds(relativeAlt, groundSpeed, groundSpeed, climbRate);
-    }
-
-    @Override
     protected boolean isFeatureSupported(String featureId){
         switch(featureId){
             case CapabilityApi.FeatureIds.COMPASS_CALIBRATION:
