@@ -17,6 +17,8 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
+import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
 import com.o3dr.android.client.R;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
@@ -227,32 +229,53 @@ public class DroidPlannerService extends Service {
     private void updateForegroundNotification() {
         final Context context = getApplicationContext();
 
-        final String channelId = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)?
-                createNotificationChannel("droidPlannerService", "DroidPlannerService"):
-                "";
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Log.v(TAG, "Using new-style notifications");
+            final String channelId = createNotificationChannel("droidPlannerService", "DroidPlannerService");
 
-        //Put the service in the foreground
-        final Notification.Builder notifBuilder = new Notification.Builder(context)
-                .setContentTitle("Dronekit-Android")
-                .setPriority(Notification.PRIORITY_MIN)
-                .setSmallIcon(R.drawable.ic_stat_notify)
-                .setCategory(Notification.CATEGORY_SERVICE)
-                .setChannelId(channelId)
-                ;
-//                .setContentIntent(PendingIntent.getActivity(context, 0, new Intent(context,
-//                        MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK), 0));
+            //Put the service in the foreground
+            final Notification.Builder notifBuilder = new Notification.Builder(context)
+                    .setContentTitle("Dronekit-Android")
+                    .setPriority(Notification.PRIORITY_MIN)
+                    .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setCategory(Notification.CATEGORY_SERVICE)
+                    .setChannelId(channelId)
+                    ;
 
-        final int connectedCount = droneApiStore.size();
-        if (connectedCount > 0) {
-            if (connectedCount == 1) {
-                notifBuilder.setContentText("1 connected app");
-            } else {
-                notifBuilder.setContentText(connectedCount + " connected apps");
+            final int connectedCount = droneApiStore.size();
+            if (connectedCount > 0) {
+                if (connectedCount == 1) {
+                    notifBuilder.setContentText("1 connected app");
+                } else {
+                    notifBuilder.setContentText(connectedCount + " connected apps");
+                }
             }
+
+            final Notification notification = notifBuilder.build();
+            startForeground(FOREGROUND_ID, notification);
+        } else {
+            Log.v(TAG, "Using old-style notifications");
+            //Put the service in the foreground
+            final NotificationCompat.Builder notifBuilder = new NotificationCompat.Builder(context)
+                    .setContentTitle("Dronekit-Android")
+                    .setPriority(NotificationCompat.PRIORITY_MIN)
+                    .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setCategory(Notification.CATEGORY_SERVICE)
+                    ;
+
+            final int connectedCount = droneApiStore.size();
+            if (connectedCount > 0) {
+                if (connectedCount == 1) {
+                    notifBuilder.setContentText("1 connected app");
+                } else {
+                    notifBuilder.setContentText(connectedCount + " connected apps");
+                }
+            }
+
+            final Notification notification = notifBuilder.build();
+            startForeground(FOREGROUND_ID, notification);
         }
 
-        final Notification notification = notifBuilder.build();
-        startForeground(FOREGROUND_ID, notification);
     }
 
     @TargetApi(Build.VERSION_CODES.O)
