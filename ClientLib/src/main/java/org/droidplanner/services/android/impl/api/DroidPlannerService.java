@@ -1,16 +1,20 @@
 package org.droidplanner.services.android.impl.api;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
@@ -223,11 +227,18 @@ public class DroidPlannerService extends Service {
     private void updateForegroundNotification() {
         final Context context = getApplicationContext();
 
+        final String channelId = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)?
+                createNotificationChannel("droidPlannerService", "DroidPlannerService"):
+                "";
+
         //Put the service in the foreground
-        final NotificationCompat.Builder notifBuilder = new NotificationCompat.Builder(context)
+        final Notification.Builder notifBuilder = new Notification.Builder(context)
                 .setContentTitle("Dronekit-Android")
-                .setPriority(NotificationCompat.PRIORITY_MIN)
-                .setSmallIcon(R.drawable.ic_stat_notify);
+                .setPriority(Notification.PRIORITY_MIN)
+                .setSmallIcon(R.drawable.ic_stat_notify)
+                .setCategory(Notification.CATEGORY_SERVICE)
+                .setChannelId(channelId)
+                ;
 //                .setContentIntent(PendingIntent.getActivity(context, 0, new Intent(context,
 //                        MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK), 0));
 
@@ -242,6 +253,16 @@ public class DroidPlannerService extends Service {
 
         final Notification notification = notifBuilder.build();
         startForeground(FOREGROUND_ID, notification);
+    }
+
+    @TargetApi(Build.VERSION_CODES.O)
+    private String createNotificationChannel(String chanId, CharSequence name) {
+        final NotificationChannel channel = new NotificationChannel(chanId, name, NotificationManager.IMPORTANCE_NONE);
+        channel.setLightColor(Color.BLUE);
+        channel.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+        final NotificationManager service = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+        service.createNotificationChannel(channel);
+        return chanId;
     }
 
     @Override
