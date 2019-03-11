@@ -126,8 +126,8 @@ class UsbCDCConnection extends UsbConnection.UsbConnectionImpl {
         } else {
             removeWatchdog();
 
-            scheduler = Executors.newSingleThreadScheduledExecutor();
-            scheduler.schedule(permissionWatchdog, 15, TimeUnit.SECONDS);
+            //scheduler = Executors.newSingleThreadScheduledExecutor();
+            //scheduler.schedule(permissionWatchdog, 15, TimeUnit.SECONDS);
             Log.d(TAG, "Requesting permission to access usb device " + device.getDeviceName());
             manager.requestPermission(device, usbPermissionIntent);
         }
