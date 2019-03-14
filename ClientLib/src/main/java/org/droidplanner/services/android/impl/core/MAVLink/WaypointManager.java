@@ -16,6 +16,7 @@ import org.droidplanner.services.android.impl.core.drone.autopilot.MavLinkDrone;
 
 import java.util.ArrayList;
 import java.util.List;
+import android.util.Log;
 
 /**
  * Class to manage the communication of waypoints to the MAV.
@@ -25,6 +26,8 @@ import java.util.List;
  * MAV Message.
  */
 public class WaypointManager extends DroneVariable {
+    static final String TAG = WaypointManager.class.getSimpleName();
+
     enum WaypointStates {
         IDLE, READ_REQUEST, READING_WP, WRITING_WP_COUNT, WRITING_WP, WAITING_WRITE_ACK
     }
@@ -106,6 +109,8 @@ public class WaypointManager extends DroneVariable {
      */
 
     public void writeWaypoints(List<msg_mission_item> data) {
+        Log.v(TAG, "writeWaypoints()");
+
         // ensure that WPManager is not doing anything else
         if (state != WaypointStates.IDLE)
             return;
@@ -116,6 +121,8 @@ public class WaypointManager extends DroneVariable {
             mission.addAll(data);
             writeIndex = 0;
             state = WaypointStates.WRITING_WP_COUNT;
+            Log.v(TAG, "sendWaypointCount()");
+
             MavLinkWaypoint.sendWaypointCount(myDrone, mission.size());
 
             startWatchdog();
@@ -203,6 +210,8 @@ public class WaypointManager extends DroneVariable {
                 state = WaypointStates.WRITING_WP;
             case WRITING_WP:
                 if (msg.msgid == msg_mission_request.MAVLINK_MSG_ID_MISSION_REQUEST) {
+                    Log.v(TAG, "got MISSION_REQUEST");
+
                     startWatchdog();
                     processWaypointToSend((msg_mission_request) msg);
                     doWaypointEvent(WaypointEvent_Type.WP_UPLOAD, writeIndex + 1, mission.size());
@@ -212,6 +221,8 @@ public class WaypointManager extends DroneVariable {
 
             case WAITING_WRITE_ACK:
                 if (msg.msgid == msg_mission_ack.MAVLINK_MSG_ID_MISSION_ACK) {
+                    Log.v(TAG, "got MISSION_ACK");
+
                     stopWatchdog();
                     myDrone.getMission().onWriteWaypoints((msg_mission_ack) msg);
                     state = WaypointStates.IDLE;
@@ -284,6 +295,8 @@ public class WaypointManager extends DroneVariable {
 		 */
         writeIndex = msg.seq;
         msg_mission_item item = mission.get(writeIndex);
+        item.isMavlink2 = true;
+        item.mission_type = 0;
         item.target_system = myDrone.getSysid();
         item.target_component = myDrone.getCompid();
         myDrone.getMavClient().sendMessage(item, null);

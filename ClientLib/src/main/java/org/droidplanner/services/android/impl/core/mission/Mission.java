@@ -350,6 +350,8 @@ public class Mission extends DroneVariable<GenericMavLinkDrone> {
             MissionItemImpl item = items.get(i);
             for(msg_mission_item msg_item: item.packMissionItem()){
                 msg_item.seq = waypointCount++;
+                msg_item.isMavlink2 = true;
+                msg_item.mission_type = 0;
                 data.add(msg_item);
             }
         }
