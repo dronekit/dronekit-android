@@ -140,12 +140,14 @@ public class msg_camera_information extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.vendor_name.length; i++) {
+            if(!payload.hasRemaining()) break;
             this.vendor_name[i] = payload.getUnsignedByte();
         }
                 
         
          
         for (int i = 0; i < this.model_name.length; i++) {
+            if(!payload.hasRemaining()) break;
             this.model_name[i] = payload.getUnsignedByte();
         }
                 

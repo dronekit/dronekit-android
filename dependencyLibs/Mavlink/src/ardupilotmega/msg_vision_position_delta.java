@@ -95,12 +95,14 @@ public class msg_vision_position_delta extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.angle_delta.length; i++) {
+            if(!payload.hasRemaining()) break;
             this.angle_delta[i] = payload.getFloat();
         }
                 
         
          
         for (int i = 0; i < this.position_delta.length; i++) {
+            if(!payload.hasRemaining()) break;
             this.position_delta[i] = payload.getFloat();
         }
                 

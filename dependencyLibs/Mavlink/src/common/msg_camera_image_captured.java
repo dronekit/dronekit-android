@@ -145,6 +145,7 @@ public class msg_camera_image_captured extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.q.length; i++) {
+            if(!payload.hasRemaining()) break;
             this.q[i] = payload.getFloat();
         }
                 
@@ -157,6 +158,7 @@ public class msg_camera_image_captured extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.file_url.length; i++) {
+            if(!payload.hasRemaining()) break;
             this.file_url[i] = payload.getByte();
         }
                 

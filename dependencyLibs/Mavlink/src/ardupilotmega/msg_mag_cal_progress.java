@@ -131,6 +131,7 @@ public class msg_mag_cal_progress extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.completion_mask.length; i++) {
+            if(!payload.hasRemaining()) break;
             this.completion_mask[i] = payload.getUnsignedByte();
         }
                 

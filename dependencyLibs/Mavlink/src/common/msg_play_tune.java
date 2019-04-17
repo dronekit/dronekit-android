@@ -88,6 +88,7 @@ public class msg_play_tune extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.tune.length; i++) {
+            if(!payload.hasRemaining()) break;
             this.tune[i] = payload.getByte();
         }
                 
@@ -96,6 +97,7 @@ public class msg_play_tune extends MAVLinkMessage {
             
              
         for (int i = 0; i < this.tune2.length; i++) {
+            if(!payload.hasRemaining()) break;
             this.tune2[i] = payload.getByte();
         }
                 

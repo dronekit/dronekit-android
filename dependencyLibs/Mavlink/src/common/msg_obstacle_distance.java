@@ -96,6 +96,7 @@ public class msg_obstacle_distance extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.distances.length; i++) {
+            if(!payload.hasRemaining()) break;
             this.distances[i] = payload.getUnsignedShort();
         }
                 

@@ -124,6 +124,7 @@ public class msg_vicon_position_estimate extends MAVLinkMessage {
             
              
         for (int i = 0; i < this.covariance.length; i++) {
+            if(!payload.hasRemaining()) break;
             this.covariance[i] = payload.getFloat();
         }
                 

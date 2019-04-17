@@ -138,6 +138,7 @@ public class msg_device_op_write extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.busname.length; i++) {
+            if(!payload.hasRemaining()) break;
             this.busname[i] = payload.getByte();
         }
                 
@@ -148,6 +149,7 @@ public class msg_device_op_write extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.data.length; i++) {
+            if(!payload.hasRemaining()) break;
             this.data[i] = payload.getUnsignedByte();
         }
                 

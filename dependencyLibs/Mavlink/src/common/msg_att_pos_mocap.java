@@ -100,6 +100,7 @@ public class msg_att_pos_mocap extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.q.length; i++) {
+            if(!payload.hasRemaining()) break;
             this.q[i] = payload.getFloat();
         }
                 
@@ -114,6 +115,7 @@ public class msg_att_pos_mocap extends MAVLinkMessage {
             
              
         for (int i = 0; i < this.covariance.length; i++) {
+            if(!payload.hasRemaining()) break;
             this.covariance[i] = payload.getFloat();
         }
                 

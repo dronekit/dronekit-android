@@ -77,6 +77,7 @@ public class msg_data64 extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.data.length; i++) {
+            if(!payload.hasRemaining()) break;
             this.data[i] = payload.getUnsignedByte();
         }
                 

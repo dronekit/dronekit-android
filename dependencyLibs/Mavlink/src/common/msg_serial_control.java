@@ -104,6 +104,7 @@ public class msg_serial_control extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.data.length; i++) {
+            if(!payload.hasRemaining()) break;
             this.data[i] = payload.getUnsignedByte();
         }
                 

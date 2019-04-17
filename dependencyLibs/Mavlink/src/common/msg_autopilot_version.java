@@ -164,18 +164,21 @@ public class msg_autopilot_version extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.flight_custom_version.length; i++) {
+            if(!payload.hasRemaining()) break;
             this.flight_custom_version[i] = payload.getUnsignedByte();
         }
                 
         
          
         for (int i = 0; i < this.middleware_custom_version.length; i++) {
+            if(!payload.hasRemaining()) break;
             this.middleware_custom_version[i] = payload.getUnsignedByte();
         }
                 
         
          
         for (int i = 0; i < this.os_custom_version.length; i++) {
+            if(!payload.hasRemaining()) break;
             this.os_custom_version[i] = payload.getUnsignedByte();
         }
                 
@@ -184,6 +187,7 @@ public class msg_autopilot_version extends MAVLinkMessage {
             
              
         for (int i = 0; i < this.uid2.length; i++) {
+            if(!payload.hasRemaining()) break;
             this.uid2[i] = payload.getUnsignedByte();
         }
                 

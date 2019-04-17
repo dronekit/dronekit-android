@@ -86,6 +86,7 @@ public class msg_setup_signing extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.secret_key.length; i++) {
+            if(!payload.hasRemaining()) break;
             this.secret_key[i] = payload.getUnsignedByte();
         }
                 

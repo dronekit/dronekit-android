@@ -100,6 +100,7 @@ public class msg_attitude_quaternion_cov extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.q.length; i++) {
+            if(!payload.hasRemaining()) break;
             this.q[i] = payload.getFloat();
         }
                 
@@ -112,6 +113,7 @@ public class msg_attitude_quaternion_cov extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.covariance.length; i++) {
+            if(!payload.hasRemaining()) break;
             this.covariance[i] = payload.getFloat();
         }
                 

@@ -112,6 +112,7 @@ public class msg_uavionix_adsb_out_cfg extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.callsign.length; i++) {
+            if(!payload.hasRemaining()) break;
             this.callsign[i] = payload.getByte();
         }
                 

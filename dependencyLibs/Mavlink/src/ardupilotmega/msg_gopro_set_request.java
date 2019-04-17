@@ -86,6 +86,7 @@ public class msg_gopro_set_request extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.value.length; i++) {
+            if(!payload.hasRemaining()) break;
             this.value[i] = payload.getUnsignedByte();
         }
                 

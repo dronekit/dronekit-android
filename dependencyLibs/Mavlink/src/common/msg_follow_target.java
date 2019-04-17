@@ -155,30 +155,35 @@ public class msg_follow_target extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.vel.length; i++) {
+            if(!payload.hasRemaining()) break;
             this.vel[i] = payload.getFloat();
         }
                 
         
          
         for (int i = 0; i < this.acc.length; i++) {
+            if(!payload.hasRemaining()) break;
             this.acc[i] = payload.getFloat();
         }
                 
         
          
         for (int i = 0; i < this.attitude_q.length; i++) {
+            if(!payload.hasRemaining()) break;
             this.attitude_q[i] = payload.getFloat();
         }
                 
         
          
         for (int i = 0; i < this.rates.length; i++) {
+            if(!payload.hasRemaining()) break;
             this.rates[i] = payload.getFloat();
         }
                 
         
          
         for (int i = 0; i < this.position_cov.length; i++) {
+            if(!payload.hasRemaining()) break;
             this.position_cov[i] = payload.getFloat();
         }
                 

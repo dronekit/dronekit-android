@@ -86,6 +86,7 @@ public class msg_change_operator_control extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.passkey.length; i++) {
+            if(!payload.hasRemaining()) break;
             this.passkey[i] = payload.getByte();
         }
                 

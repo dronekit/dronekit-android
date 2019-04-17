@@ -77,7 +77,13 @@ public class msg_data96 extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.data.length; i++) {
+            if(!payload.hasRemaining()) {
+                System.out.println(String.format("Out of data at %d bytes", (i + 1)));
+                break;
+            }
+
             this.data[i] = payload.getUnsignedByte();
+            System.out.println(String.format("data96.unpack(): data[%d]=%d", i, this.data[i]));
         }
                 
         

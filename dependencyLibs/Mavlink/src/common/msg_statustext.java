@@ -68,6 +68,7 @@ public class msg_statustext extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.text.length; i++) {
+            if(!payload.hasRemaining()) break;
             this.text[i] = payload.getByte();
         }
                 
