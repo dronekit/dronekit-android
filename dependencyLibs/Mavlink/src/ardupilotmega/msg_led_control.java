@@ -104,8 +104,7 @@ public class msg_led_control extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.custom_bytes.length; i++) {
-            if(!payload.hasRemaining()) break;
-            this.custom_bytes[i] = payload.getUnsignedByte();
+            try { this.custom_bytes[i] = payload.getUnsignedByte(); } catch(IndexOutOfBoundsException ex) { break; }
         }
                 
         

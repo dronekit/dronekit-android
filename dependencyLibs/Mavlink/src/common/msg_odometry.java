@@ -173,8 +173,7 @@ public class msg_odometry extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.q.length; i++) {
-            if(!payload.hasRemaining()) break;
-            this.q[i] = payload.getFloat();
+            try { this.q[i] = payload.getFloat(); } catch(IndexOutOfBoundsException ex) { break; }
         }
                 
         
@@ -192,15 +191,13 @@ public class msg_odometry extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.pose_covariance.length; i++) {
-            if(!payload.hasRemaining()) break;
-            this.pose_covariance[i] = payload.getFloat();
+            try { this.pose_covariance[i] = payload.getFloat(); } catch(IndexOutOfBoundsException ex) { break; }
         }
                 
         
          
         for (int i = 0; i < this.twist_covariance.length; i++) {
-            if(!payload.hasRemaining()) break;
-            this.twist_covariance[i] = payload.getFloat();
+            try { this.twist_covariance[i] = payload.getFloat(); } catch(IndexOutOfBoundsException ex) { break; }
         }
                 
         

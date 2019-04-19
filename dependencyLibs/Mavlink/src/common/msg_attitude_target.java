@@ -103,8 +103,7 @@ public class msg_attitude_target extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.q.length; i++) {
-            if(!payload.hasRemaining()) break;
-            this.q[i] = payload.getFloat();
+            try { this.q[i] = payload.getFloat(); } catch(IndexOutOfBoundsException ex) { break; }
         }
                 
         

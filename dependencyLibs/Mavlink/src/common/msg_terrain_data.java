@@ -93,8 +93,7 @@ public class msg_terrain_data extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.data.length; i++) {
-            if(!payload.hasRemaining()) break;
-            this.data[i] = payload.getShort();
+            try { this.data[i] = payload.getShort(); } catch(IndexOutOfBoundsException ex) { break; }
         }
                 
         

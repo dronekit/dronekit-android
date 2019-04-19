@@ -86,8 +86,7 @@ public class msg_file_transfer_protocol extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.payload.length; i++) {
-            if(!payload.hasRemaining()) break;
-            this.payload[i] = payload.getUnsignedByte();
+            try { this.payload[i] = payload.getUnsignedByte(); } catch(IndexOutOfBoundsException ex) { break; }
         }
                 
         

@@ -166,8 +166,7 @@ public class msg_hil_state_quaternion extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.attitude_quaternion.length; i++) {
-            if(!payload.hasRemaining()) break;
-            this.attitude_quaternion[i] = payload.getFloat();
+            try { this.attitude_quaternion[i] = payload.getFloat(); } catch(IndexOutOfBoundsException ex) { break; }
         }
                 
         

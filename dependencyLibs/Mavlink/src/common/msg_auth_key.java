@@ -59,8 +59,7 @@ public class msg_auth_key extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.key.length; i++) {
-            if(!payload.hasRemaining()) break;
-            this.key[i] = payload.getByte();
+            try { this.key[i] = payload.getByte(); } catch(IndexOutOfBoundsException ex) { break; }
         }
                 
         

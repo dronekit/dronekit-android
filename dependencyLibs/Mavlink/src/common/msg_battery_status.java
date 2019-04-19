@@ -135,8 +135,7 @@ public class msg_battery_status extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.voltages.length; i++) {
-            if(!payload.hasRemaining()) break;
-            this.voltages[i] = payload.getUnsignedShort();
+            try { this.voltages[i] = payload.getUnsignedShort(); } catch(IndexOutOfBoundsException ex) { break; }
         }
                 
         

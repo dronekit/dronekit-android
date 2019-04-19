@@ -163,8 +163,7 @@ public class msg_adsb_vehicle extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.callsign.length; i++) {
-            if(!payload.hasRemaining()) break;
-            this.callsign[i] = payload.getByte();
+            try { this.callsign[i] = payload.getByte(); } catch(IndexOutOfBoundsException ex) { break; }
         }
                 
         

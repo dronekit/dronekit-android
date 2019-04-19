@@ -89,8 +89,7 @@ public class msg_set_actuator_control_target extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.controls.length; i++) {
-            if(!payload.hasRemaining()) break;
-            this.controls[i] = payload.getFloat();
+            try { this.controls[i] = payload.getFloat(); } catch(IndexOutOfBoundsException ex) { break; }
         }
                 
         

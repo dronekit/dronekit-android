@@ -77,8 +77,7 @@ public class msg_named_value_float extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.name.length; i++) {
-            if(!payload.hasRemaining()) break;
-            this.name[i] = payload.getByte();
+            try { this.name[i] = payload.getByte(); } catch(IndexOutOfBoundsException ex) { break; }
         }
                 
         

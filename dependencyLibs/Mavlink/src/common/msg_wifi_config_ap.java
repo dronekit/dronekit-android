@@ -70,15 +70,13 @@ public class msg_wifi_config_ap extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.ssid.length; i++) {
-            if(!payload.hasRemaining()) break;
-            this.ssid[i] = payload.getByte();
+            try { this.ssid[i] = payload.getByte(); } catch(IndexOutOfBoundsException ex) { break; }
         }
                 
         
          
         for (int i = 0; i < this.password.length; i++) {
-            if(!payload.hasRemaining()) break;
-            this.password[i] = payload.getByte();
+            try { this.password[i] = payload.getByte(); } catch(IndexOutOfBoundsException ex) { break; }
         }
                 
         

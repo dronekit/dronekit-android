@@ -95,8 +95,7 @@ public class msg_resource_request extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.uri.length; i++) {
-            if(!payload.hasRemaining()) break;
-            this.uri[i] = payload.getUnsignedByte();
+            try { this.uri[i] = payload.getUnsignedByte(); } catch(IndexOutOfBoundsException ex) { break; }
         }
                 
         
@@ -104,8 +103,7 @@ public class msg_resource_request extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.storage.length; i++) {
-            if(!payload.hasRemaining()) break;
-            this.storage[i] = payload.getUnsignedByte();
+            try { this.storage[i] = payload.getUnsignedByte(); } catch(IndexOutOfBoundsException ex) { break; }
         }
                 
         

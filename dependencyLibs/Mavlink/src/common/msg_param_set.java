@@ -93,8 +93,7 @@ public class msg_param_set extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.param_id.length; i++) {
-            if(!payload.hasRemaining()) break;
-            this.param_id[i] = payload.getByte();
+            try { this.param_id[i] = payload.getByte(); } catch(IndexOutOfBoundsException ex) { break; }
         }
                 
         

@@ -114,43 +114,37 @@ public class msg_esc_telemetry_9_to_12 extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.voltage.length; i++) {
-            if(!payload.hasRemaining()) break;
-            this.voltage[i] = payload.getUnsignedShort();
+            try { this.voltage[i] = payload.getUnsignedShort(); } catch(IndexOutOfBoundsException ex) { break; }
         }
                 
         
          
         for (int i = 0; i < this.current.length; i++) {
-            if(!payload.hasRemaining()) break;
-            this.current[i] = payload.getUnsignedShort();
+            try { this.current[i] = payload.getUnsignedShort(); } catch(IndexOutOfBoundsException ex) { break; }
         }
                 
         
          
         for (int i = 0; i < this.totalcurrent.length; i++) {
-            if(!payload.hasRemaining()) break;
-            this.totalcurrent[i] = payload.getUnsignedShort();
+            try { this.totalcurrent[i] = payload.getUnsignedShort(); } catch(IndexOutOfBoundsException ex) { break; }
         }
                 
         
          
         for (int i = 0; i < this.rpm.length; i++) {
-            if(!payload.hasRemaining()) break;
-            this.rpm[i] = payload.getUnsignedShort();
+            try { this.rpm[i] = payload.getUnsignedShort(); } catch(IndexOutOfBoundsException ex) { break; }
         }
                 
         
          
         for (int i = 0; i < this.count.length; i++) {
-            if(!payload.hasRemaining()) break;
-            this.count[i] = payload.getUnsignedShort();
+            try { this.count[i] = payload.getUnsignedShort(); } catch(IndexOutOfBoundsException ex) { break; }
         }
                 
         
          
         for (int i = 0; i < this.temperature.length; i++) {
-            if(!payload.hasRemaining()) break;
-            this.temperature[i] = payload.getUnsignedByte();
+            try { this.temperature[i] = payload.getUnsignedByte(); } catch(IndexOutOfBoundsException ex) { break; }
         }
                 
         

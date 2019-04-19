@@ -201,22 +201,19 @@ public class msg_control_system_state extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.vel_variance.length; i++) {
-            if(!payload.hasRemaining()) break;
-            this.vel_variance[i] = payload.getFloat();
+            try { this.vel_variance[i] = payload.getFloat(); } catch(IndexOutOfBoundsException ex) { break; }
         }
                 
         
          
         for (int i = 0; i < this.pos_variance.length; i++) {
-            if(!payload.hasRemaining()) break;
-            this.pos_variance[i] = payload.getFloat();
+            try { this.pos_variance[i] = payload.getFloat(); } catch(IndexOutOfBoundsException ex) { break; }
         }
                 
         
          
         for (int i = 0; i < this.q.length; i++) {
-            if(!payload.hasRemaining()) break;
-            this.q[i] = payload.getFloat();
+            try { this.q[i] = payload.getFloat(); } catch(IndexOutOfBoundsException ex) { break; }
         }
                 
         

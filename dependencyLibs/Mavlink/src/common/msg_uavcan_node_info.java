@@ -125,8 +125,7 @@ public class msg_uavcan_node_info extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.name.length; i++) {
-            if(!payload.hasRemaining()) break;
-            this.name[i] = payload.getByte();
+            try { this.name[i] = payload.getByte(); } catch(IndexOutOfBoundsException ex) { break; }
         }
                 
         
@@ -136,8 +135,7 @@ public class msg_uavcan_node_info extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.hw_unique_id.length; i++) {
-            if(!payload.hasRemaining()) break;
-            this.hw_unique_id[i] = payload.getUnsignedByte();
+            try { this.hw_unique_id[i] = payload.getUnsignedByte(); } catch(IndexOutOfBoundsException ex) { break; }
         }
                 
         

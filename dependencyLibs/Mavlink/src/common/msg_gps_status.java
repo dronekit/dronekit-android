@@ -112,36 +112,31 @@ public class msg_gps_status extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.satellite_prn.length; i++) {
-            if(!payload.hasRemaining()) break;
-            this.satellite_prn[i] = payload.getUnsignedByte();
+            try { this.satellite_prn[i] = payload.getUnsignedByte(); } catch(IndexOutOfBoundsException ex) { break; }
         }
                 
         
          
         for (int i = 0; i < this.satellite_used.length; i++) {
-            if(!payload.hasRemaining()) break;
-            this.satellite_used[i] = payload.getUnsignedByte();
+            try { this.satellite_used[i] = payload.getUnsignedByte(); } catch(IndexOutOfBoundsException ex) { break; }
         }
                 
         
          
         for (int i = 0; i < this.satellite_elevation.length; i++) {
-            if(!payload.hasRemaining()) break;
-            this.satellite_elevation[i] = payload.getUnsignedByte();
+            try { this.satellite_elevation[i] = payload.getUnsignedByte(); } catch(IndexOutOfBoundsException ex) { break; }
         }
                 
         
          
         for (int i = 0; i < this.satellite_azimuth.length; i++) {
-            if(!payload.hasRemaining()) break;
-            this.satellite_azimuth[i] = payload.getUnsignedByte();
+            try { this.satellite_azimuth[i] = payload.getUnsignedByte(); } catch(IndexOutOfBoundsException ex) { break; }
         }
                 
         
          
         for (int i = 0; i < this.satellite_snr.length; i++) {
-            if(!payload.hasRemaining()) break;
-            this.satellite_snr[i] = payload.getUnsignedByte();
+            try { this.satellite_snr[i] = payload.getUnsignedByte(); } catch(IndexOutOfBoundsException ex) { break; }
         }
                 
         
