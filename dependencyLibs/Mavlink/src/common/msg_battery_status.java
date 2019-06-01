@@ -82,7 +82,7 @@ public class msg_battery_status extends MAVLinkMessage {
      * @return
      */
     public MAVLinkPacket pack() {
-        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH);
+        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH,isMavlink2);
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_BATTERY_STATUS;
@@ -135,7 +135,7 @@ public class msg_battery_status extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.voltages.length; i++) {
-            try { this.voltages[i] = payload.getUnsignedShort(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.voltages[i] = payload.getUnsignedShort();
         }
                 
         

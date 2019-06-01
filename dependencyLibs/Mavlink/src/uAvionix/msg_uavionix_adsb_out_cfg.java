@@ -67,7 +67,7 @@ public class msg_uavionix_adsb_out_cfg extends MAVLinkMessage {
      * @return
      */
     public MAVLinkPacket pack() {
-        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH);
+        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH,isMavlink2);
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_UAVIONIX_ADSB_OUT_CFG;
@@ -112,7 +112,7 @@ public class msg_uavionix_adsb_out_cfg extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.callsign.length; i++) {
-            try { this.callsign[i] = payload.getByte(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.callsign[i] = payload.getByte();
         }
                 
         

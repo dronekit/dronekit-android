@@ -30,11 +30,8 @@ public class MAVLinkPayload {
     public int index;
 
     public MAVLinkPayload(int payloadSize) {
-       if(payloadSize > MAX_PAYLOAD_SIZE) {
-            payload = ByteBuffer.allocate(MAX_PAYLOAD_SIZE);
-        } else {
-            payload = ByteBuffer.allocate(payloadSize);
-        }
+       // This has to be larger than the received payloadSize since MAVLINK V2 will truncate the payloads to the last non-zero value
+       payload = ByteBuffer.allocate(MAX_PAYLOAD_SIZE);
     }
 
     public ByteBuffer getData() {
@@ -43,10 +40,6 @@ public class MAVLinkPayload {
 
     public int size() {
         return payload.position();
-    }
-
-    public boolean hasRemaining() {
-        return payload.hasRemaining();
     }
 
     public void add(byte c) {
@@ -142,6 +135,10 @@ public class MAVLinkPayload {
     public float getFloat() {
         return Float.intBitsToFloat(getInt());
     }
+
+    public double getDouble() {
+        return Double.longBitsToDouble(getLong());
+    }   
     
     public void putByte(byte data) {
         add(data);
@@ -204,6 +201,10 @@ public class MAVLinkPayload {
 
     public void putFloat(float data) {
         putInt(Float.floatToIntBits(data));
+    }
+
+    public void putDouble(double data) {
+        putLong(Double.doubleToLongBits(data));
     }
 
 }

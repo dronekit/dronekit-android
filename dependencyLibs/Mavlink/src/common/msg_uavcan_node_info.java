@@ -72,7 +72,7 @@ public class msg_uavcan_node_info extends MAVLinkMessage {
      * @return
      */
     public MAVLinkPacket pack() {
-        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH);
+        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH,isMavlink2);
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_UAVCAN_NODE_INFO;
@@ -125,7 +125,7 @@ public class msg_uavcan_node_info extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.name.length; i++) {
-            try { this.name[i] = payload.getByte(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.name[i] = payload.getByte();
         }
                 
         
@@ -135,7 +135,7 @@ public class msg_uavcan_node_info extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.hw_unique_id.length; i++) {
-            try { this.hw_unique_id[i] = payload.getUnsignedByte(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.hw_unique_id[i] = payload.getUnsignedByte();
         }
                 
         

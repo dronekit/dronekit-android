@@ -42,7 +42,7 @@ public class msg_data96 extends MAVLinkMessage {
      * @return
      */
     public MAVLinkPacket pack() {
-        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH);
+        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH,isMavlink2);
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_DATA96;
@@ -77,7 +77,7 @@ public class msg_data96 extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.data.length; i++) {
-            try { this.data[i] = payload.getUnsignedByte(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.data[i] = payload.getUnsignedByte();
         }
                 
         

@@ -52,7 +52,7 @@ public class msg_resource_request extends MAVLinkMessage {
      * @return
      */
     public MAVLinkPacket pack() {
-        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH);
+        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH,isMavlink2);
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_RESOURCE_REQUEST;
@@ -95,7 +95,7 @@ public class msg_resource_request extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.uri.length; i++) {
-            try { this.uri[i] = payload.getUnsignedByte(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.uri[i] = payload.getUnsignedByte();
         }
                 
         
@@ -103,7 +103,7 @@ public class msg_resource_request extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.storage.length; i++) {
-            try { this.storage[i] = payload.getUnsignedByte(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.storage[i] = payload.getUnsignedByte();
         }
                 
         

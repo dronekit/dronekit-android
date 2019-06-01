@@ -57,7 +57,7 @@ public class msg_esc_telemetry_9_to_12 extends MAVLinkMessage {
      * @return
      */
     public MAVLinkPacket pack() {
-        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH);
+        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH,isMavlink2);
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_ESC_TELEMETRY_9_TO_12;
@@ -114,37 +114,37 @@ public class msg_esc_telemetry_9_to_12 extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.voltage.length; i++) {
-            try { this.voltage[i] = payload.getUnsignedShort(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.voltage[i] = payload.getUnsignedShort();
         }
                 
         
          
         for (int i = 0; i < this.current.length; i++) {
-            try { this.current[i] = payload.getUnsignedShort(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.current[i] = payload.getUnsignedShort();
         }
                 
         
          
         for (int i = 0; i < this.totalcurrent.length; i++) {
-            try { this.totalcurrent[i] = payload.getUnsignedShort(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.totalcurrent[i] = payload.getUnsignedShort();
         }
                 
         
          
         for (int i = 0; i < this.rpm.length; i++) {
-            try { this.rpm[i] = payload.getUnsignedShort(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.rpm[i] = payload.getUnsignedShort();
         }
                 
         
          
         for (int i = 0; i < this.count.length; i++) {
-            try { this.count[i] = payload.getUnsignedShort(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.count[i] = payload.getUnsignedShort();
         }
                 
         
          
         for (int i = 0; i < this.temperature.length; i++) {
-            try { this.temperature[i] = payload.getUnsignedByte(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.temperature[i] = payload.getUnsignedByte();
         }
                 
         

@@ -37,7 +37,7 @@ public class msg_wifi_config_ap extends MAVLinkMessage {
      * @return
      */
     public MAVLinkPacket pack() {
-        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH);
+        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH,isMavlink2);
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_WIFI_CONFIG_AP;
@@ -70,13 +70,13 @@ public class msg_wifi_config_ap extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.ssid.length; i++) {
-            try { this.ssid[i] = payload.getByte(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.ssid[i] = payload.getByte();
         }
                 
         
          
         for (int i = 0; i < this.password.length; i++) {
-            try { this.password[i] = payload.getByte(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.password[i] = payload.getByte();
         }
                 
         

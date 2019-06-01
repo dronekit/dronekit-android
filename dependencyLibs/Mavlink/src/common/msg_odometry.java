@@ -102,7 +102,7 @@ public class msg_odometry extends MAVLinkMessage {
      * @return
      */
     public MAVLinkPacket pack() {
-        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH);
+        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH,isMavlink2);
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_ODOMETRY;
@@ -173,7 +173,7 @@ public class msg_odometry extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.q.length; i++) {
-            try { this.q[i] = payload.getFloat(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.q[i] = payload.getFloat();
         }
                 
         
@@ -191,13 +191,13 @@ public class msg_odometry extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.pose_covariance.length; i++) {
-            try { this.pose_covariance[i] = payload.getFloat(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.pose_covariance[i] = payload.getFloat();
         }
                 
         
          
         for (int i = 0; i < this.twist_covariance.length; i++) {
-            try { this.twist_covariance[i] = payload.getFloat(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.twist_covariance[i] = payload.getFloat();
         }
                 
         

@@ -42,7 +42,7 @@ public class msg_named_value_float extends MAVLinkMessage {
      * @return
      */
     public MAVLinkPacket pack() {
-        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH);
+        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH,isMavlink2);
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_NAMED_VALUE_FLOAT;
@@ -77,7 +77,7 @@ public class msg_named_value_float extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.name.length; i++) {
-            try { this.name[i] = payload.getByte(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.name[i] = payload.getByte();
         }
                 
         

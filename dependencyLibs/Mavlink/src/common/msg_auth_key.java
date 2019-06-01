@@ -32,7 +32,7 @@ public class msg_auth_key extends MAVLinkMessage {
      * @return
      */
     public MAVLinkPacket pack() {
-        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH);
+        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH,isMavlink2);
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_AUTH_KEY;
@@ -59,7 +59,7 @@ public class msg_auth_key extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.key.length; i++) {
-            try { this.key[i] = payload.getByte(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.key[i] = payload.getByte();
         }
                 
         

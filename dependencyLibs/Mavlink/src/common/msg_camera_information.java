@@ -77,7 +77,7 @@ public class msg_camera_information extends MAVLinkMessage {
      * @return
      */
     public MAVLinkPacket pack() {
-        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH);
+        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH,isMavlink2);
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_CAMERA_INFORMATION;
@@ -140,13 +140,13 @@ public class msg_camera_information extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.vendor_name.length; i++) {
-            try { this.vendor_name[i] = payload.getUnsignedByte(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.vendor_name[i] = payload.getUnsignedByte();
         }
                 
         
          
         for (int i = 0; i < this.model_name.length; i++) {
-            try { this.model_name[i] = payload.getUnsignedByte(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.model_name[i] = payload.getUnsignedByte();
         }
                 
         

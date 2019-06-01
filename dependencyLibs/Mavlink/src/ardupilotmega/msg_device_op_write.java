@@ -77,7 +77,7 @@ public class msg_device_op_write extends MAVLinkMessage {
      * @return
      */
     public MAVLinkPacket pack() {
-        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH);
+        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH,isMavlink2);
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_DEVICE_OP_WRITE;
@@ -138,7 +138,7 @@ public class msg_device_op_write extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.busname.length; i++) {
-            try { this.busname[i] = payload.getByte(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.busname[i] = payload.getByte();
         }
                 
         
@@ -148,7 +148,7 @@ public class msg_device_op_write extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.data.length; i++) {
-            try { this.data[i] = payload.getUnsignedByte(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.data[i] = payload.getUnsignedByte();
         }
                 
         

@@ -47,7 +47,7 @@ public class msg_change_operator_control extends MAVLinkMessage {
      * @return
      */
     public MAVLinkPacket pack() {
-        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH);
+        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH,isMavlink2);
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_CHANGE_OPERATOR_CONTROL;
@@ -86,7 +86,7 @@ public class msg_change_operator_control extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.passkey.length; i++) {
-            try { this.passkey[i] = payload.getByte(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.passkey[i] = payload.getByte();
         }
                 
         

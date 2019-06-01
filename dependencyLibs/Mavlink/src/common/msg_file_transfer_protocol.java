@@ -47,7 +47,7 @@ public class msg_file_transfer_protocol extends MAVLinkMessage {
      * @return
      */
     public MAVLinkPacket pack() {
-        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH);
+        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH,isMavlink2);
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_FILE_TRANSFER_PROTOCOL;
@@ -86,7 +86,7 @@ public class msg_file_transfer_protocol extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.payload.length; i++) {
-            try { this.payload[i] = payload.getUnsignedByte(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.payload[i] = payload.getUnsignedByte();
         }
                 
         

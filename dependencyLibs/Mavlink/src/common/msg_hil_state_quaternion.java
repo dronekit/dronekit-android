@@ -107,7 +107,7 @@ public class msg_hil_state_quaternion extends MAVLinkMessage {
      * @return
      */
     public MAVLinkPacket pack() {
-        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH);
+        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH,isMavlink2);
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_HIL_STATE_QUATERNION;
@@ -166,7 +166,7 @@ public class msg_hil_state_quaternion extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.attitude_quaternion.length; i++) {
-            try { this.attitude_quaternion[i] = payload.getFloat(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.attitude_quaternion[i] = payload.getFloat();
         }
                 
         

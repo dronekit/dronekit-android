@@ -87,7 +87,7 @@ public class msg_autopilot_version extends MAVLinkMessage {
      * @return
      */
     public MAVLinkPacket pack() {
-        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH);
+        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH,isMavlink2);
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_AUTOPILOT_VERSION;
@@ -164,19 +164,19 @@ public class msg_autopilot_version extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.flight_custom_version.length; i++) {
-            try { this.flight_custom_version[i] = payload.getUnsignedByte(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.flight_custom_version[i] = payload.getUnsignedByte();
         }
                 
         
          
         for (int i = 0; i < this.middleware_custom_version.length; i++) {
-            try { this.middleware_custom_version[i] = payload.getUnsignedByte(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.middleware_custom_version[i] = payload.getUnsignedByte();
         }
                 
         
          
         for (int i = 0; i < this.os_custom_version.length; i++) {
-            try { this.os_custom_version[i] = payload.getUnsignedByte(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.os_custom_version[i] = payload.getUnsignedByte();
         }
                 
         
@@ -184,7 +184,7 @@ public class msg_autopilot_version extends MAVLinkMessage {
             
              
         for (int i = 0; i < this.uid2.length; i++) {
-            try { this.uid2[i] = payload.getUnsignedByte(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.uid2[i] = payload.getUnsignedByte();
         }
                 
             

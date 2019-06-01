@@ -82,7 +82,7 @@ public class msg_follow_target extends MAVLinkMessage {
      * @return
      */
     public MAVLinkPacket pack() {
-        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH);
+        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH,isMavlink2);
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_FOLLOW_TARGET;
@@ -155,31 +155,31 @@ public class msg_follow_target extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.vel.length; i++) {
-            try { this.vel[i] = payload.getFloat(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.vel[i] = payload.getFloat();
         }
                 
         
          
         for (int i = 0; i < this.acc.length; i++) {
-            try { this.acc[i] = payload.getFloat(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.acc[i] = payload.getFloat();
         }
                 
         
          
         for (int i = 0; i < this.attitude_q.length; i++) {
-            try { this.attitude_q[i] = payload.getFloat(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.attitude_q[i] = payload.getFloat();
         }
                 
         
          
         for (int i = 0; i < this.rates.length; i++) {
-            try { this.rates[i] = payload.getFloat(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.rates[i] = payload.getFloat();
         }
                 
         
          
         for (int i = 0; i < this.position_cov.length; i++) {
-            try { this.position_cov[i] = payload.getFloat(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.position_cov[i] = payload.getFloat();
         }
                 
         

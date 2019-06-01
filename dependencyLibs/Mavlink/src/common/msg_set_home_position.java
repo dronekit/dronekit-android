@@ -87,7 +87,7 @@ public class msg_set_home_position extends MAVLinkMessage {
      * @return
      */
     public MAVLinkPacket pack() {
-        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH);
+        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH,isMavlink2);
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_SET_HOME_POSITION;
@@ -148,7 +148,7 @@ public class msg_set_home_position extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.q.length; i++) {
-            try { this.q[i] = payload.getFloat(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.q[i] = payload.getFloat();
         }
                 
         

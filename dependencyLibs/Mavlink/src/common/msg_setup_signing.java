@@ -47,7 +47,7 @@ public class msg_setup_signing extends MAVLinkMessage {
      * @return
      */
     public MAVLinkPacket pack() {
-        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH);
+        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH,isMavlink2);
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_SETUP_SIGNING;
@@ -86,7 +86,7 @@ public class msg_setup_signing extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.secret_key.length; i++) {
-            try { this.secret_key[i] = payload.getUnsignedByte(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.secret_key[i] = payload.getUnsignedByte();
         }
                 
         

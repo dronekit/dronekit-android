@@ -47,7 +47,7 @@ public class msg_hil_actuator_controls extends MAVLinkMessage {
      * @return
      */
     public MAVLinkPacket pack() {
-        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH);
+        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH,isMavlink2);
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_HIL_ACTUATOR_CONTROLS;
@@ -84,7 +84,7 @@ public class msg_hil_actuator_controls extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.controls.length; i++) {
-            try { this.controls[i] = payload.getFloat(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.controls[i] = payload.getFloat();
         }
                 
         

@@ -47,7 +47,7 @@ public class msg_gopro_set_request extends MAVLinkMessage {
      * @return
      */
     public MAVLinkPacket pack() {
-        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH);
+        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH,isMavlink2);
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_GOPRO_SET_REQUEST;
@@ -86,7 +86,7 @@ public class msg_gopro_set_request extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.value.length; i++) {
-            try { this.value[i] = payload.getUnsignedByte(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.value[i] = payload.getUnsignedByte();
         }
                 
         

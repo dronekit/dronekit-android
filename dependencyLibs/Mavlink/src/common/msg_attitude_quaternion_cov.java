@@ -57,7 +57,7 @@ public class msg_attitude_quaternion_cov extends MAVLinkMessage {
      * @return
      */
     public MAVLinkPacket pack() {
-        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH);
+        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH,isMavlink2);
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_ATTITUDE_QUATERNION_COV;
@@ -100,7 +100,7 @@ public class msg_attitude_quaternion_cov extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.q.length; i++) {
-            try { this.q[i] = payload.getFloat(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.q[i] = payload.getFloat();
         }
                 
         
@@ -112,7 +112,7 @@ public class msg_attitude_quaternion_cov extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.covariance.length; i++) {
-            try { this.covariance[i] = payload.getFloat(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.covariance[i] = payload.getFloat();
         }
                 
         

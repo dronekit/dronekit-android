@@ -72,7 +72,7 @@ public class msg_mag_cal_progress extends MAVLinkMessage {
      * @return
      */
     public MAVLinkPacket pack() {
-        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH);
+        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH,isMavlink2);
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_MAG_CAL_PROGRESS;
@@ -131,7 +131,7 @@ public class msg_mag_cal_progress extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.completion_mask.length; i++) {
-            try { this.completion_mask[i] = payload.getUnsignedByte(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.completion_mask[i] = payload.getUnsignedByte();
         }
                 
         

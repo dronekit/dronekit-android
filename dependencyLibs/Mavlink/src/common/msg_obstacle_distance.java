@@ -57,7 +57,7 @@ public class msg_obstacle_distance extends MAVLinkMessage {
      * @return
      */
     public MAVLinkPacket pack() {
-        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH);
+        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH,isMavlink2);
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_OBSTACLE_DISTANCE;
@@ -96,7 +96,7 @@ public class msg_obstacle_distance extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.distances.length; i++) {
-            try { this.distances[i] = payload.getUnsignedShort(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.distances[i] = payload.getUnsignedShort();
         }
                 
         

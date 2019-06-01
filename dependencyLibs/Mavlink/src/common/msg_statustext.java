@@ -37,7 +37,7 @@ public class msg_statustext extends MAVLinkMessage {
      * @return
      */
     public MAVLinkPacket pack() {
-        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH);
+        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH,isMavlink2);
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_STATUSTEXT;
@@ -68,7 +68,7 @@ public class msg_statustext extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.text.length; i++) {
-            try { this.text[i] = payload.getByte(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.text[i] = payload.getByte();
         }
                 
         

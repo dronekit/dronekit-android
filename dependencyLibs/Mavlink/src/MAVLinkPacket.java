@@ -64,8 +64,8 @@ import com.MAVLink.icarous.*;
 public class MAVLinkPacket implements Serializable {
     private static final long serialVersionUID = 2095947771227815314L;
 
-    public static final int MAVLINK1_STX = 0xFE; // 254
-    public static final int MAVLINK2_STX = 0xFD; // 253
+    public static final int MAVLINK_STX_MAVLINK1 = 0xFE; // 254
+    public static final int MAVLINK_STX_MAVLINK2 = 0xFD; // 253
     public static final int MAVLINK1_HEADER_LEN = 6;
     public static final int MAVLINK2_HEADER_LEN = 10;
     public static final int MAVLINK1_NONPAYLOAD_LEN = MAVLINK1_HEADER_LEN + 2;
@@ -145,7 +145,7 @@ public class MAVLinkPacket implements Serializable {
         this(payloadLength, false);
     }
 
-    public MAVLinkPacket(int payloadLength, boolean isMavlink2) {
+    public MAVLinkPacket(final int payloadLength, final boolean isMavlink2) {
         len = payloadLength;
         payload = new MAVLinkPayload(payloadLength);
         this.isMavlink2 = isMavlink2;
@@ -161,7 +161,7 @@ public class MAVLinkPacket implements Serializable {
     /**
      * Update CRC for this packet.
      */
-    public void generateCRC() {
+    public void generateCRC(final int payloadSize) {
         if(crc == null) {
             crc = new CRC();
         } else {
@@ -169,7 +169,7 @@ public class MAVLinkPacket implements Serializable {
         }
 
         if(isMavlink2) {
-            crc.update_checksum(len);
+            crc.update_checksum(payloadSize);
             crc.update_checksum(incompatFlags);
             crc.update_checksum(compatFlags);
             crc.update_checksum(seq);
@@ -179,7 +179,7 @@ public class MAVLinkPacket implements Serializable {
             crc.update_checksum(msgid >>> 8);
             crc.update_checksum(msgid >>> 16);
         } else {
-            crc.update_checksum(len);
+            crc.update_checksum(payloadSize);
             crc.update_checksum(seq);
             crc.update_checksum(sysid);
             crc.update_checksum(compid);
@@ -188,7 +188,6 @@ public class MAVLinkPacket implements Serializable {
 
         payload.resetIndex();
 
-        final int payloadSize = payload.size();
         for (int i = 0; i < payloadSize; i++) {
             crc.update_checksum(payload.getByte());
         }
@@ -208,48 +207,67 @@ public class MAVLinkPacket implements Serializable {
     }
 
     /**
+     * Return length of actual data after triming zeros at the end.
+     * @param payload
+     * @return minimum length of valid data
+     */
+    private int mavTrimPayload(final byte[] payload)
+    {
+        int length = payload.length;
+        while (length > 1 && payload[length-1] == 0) {
+            length--;
+        }
+        return length;
+    }
+    
+    /**
      * Encode this packet for transmission.
      *
      * @return Array with bytes to be transmitted
      */
     public byte[] encodePacket() {
-        int bufLen;
-        if(isMavlink2) {
-            bufLen = MAVLINK2_HEADER_LEN + len + 2;
+        final int bufLen;
+        final int payloadSize;
+        
+        if (isMavlink2) {
+            payloadSize = mavTrimPayload(payload.payload.array());
+            bufLen = MAVLINK2_HEADER_LEN + payloadSize + 2;
 
             //TODO: implement signature, maybe in encodeSignedPacket()
-            //bufLen = MAVLINK2_HEADER_LEN + len + 2 + Signature.MAX_SIGNATURE_SIZE;
+            //bufLen = MAVLINK2_HEADER_LEN + payloadSize + 2 + Signature.MAX_SIGNATURE_SIZE;
         } else {
-            bufLen = MAVLINK1_HEADER_LEN + len + 2;
+            payloadSize = payload.size();
+            bufLen = MAVLINK1_HEADER_LEN + payloadSize + 2;
+
         }
         byte[] buffer = new byte[bufLen];
         
         int i = 0;
         if(isMavlink2) {
-            buffer[i++] = (byte) MAVLINK2_STX;
-            buffer[i++] = (byte) len;
+            buffer[i++] = (byte) MAVLINK_STX_MAVLINK2;
+            buffer[i++] = (byte) payloadSize;
             buffer[i++] = (byte) incompatFlags;
             buffer[i++] = (byte) compatFlags;
             buffer[i++] = (byte) seq;
             buffer[i++] = (byte) sysid;
             buffer[i++] = (byte) compid;
-            buffer[i++] = (byte) msgid;
-            buffer[i++] = (byte) (msgid >>> 8);
-            buffer[i++] = (byte) (msgid >>> 16);
+            buffer[i++] = (byte) (msgid & 0XFF);
+            buffer[i++] = (byte) ((msgid >>> 8) & 0XFF);
+            buffer[i++] = (byte) ((msgid >>> 16) & 0XFF);
         } else {
-            buffer[i++] = (byte) MAVLINK1_STX;
-            buffer[i++] = (byte) len;
+            buffer[i++] = (byte) MAVLINK_STX_MAVLINK1;
+            buffer[i++] = (byte) payloadSize;
             buffer[i++] = (byte) seq;
             buffer[i++] = (byte) sysid;
             buffer[i++] = (byte) compid;
             buffer[i++] = (byte) msgid;
         }
 
-        for (int j = 0, size = payload.size(); j < size; ++j) {
+        for (int j = 0; j < payloadSize; ++j) {
             buffer[i++] = payload.payload.get(j);
         }
 
-        generateCRC();
+        generateCRC(payloadSize);
         buffer[i++] = (byte) (crc.getLSB());
         buffer[i++] = (byte) (crc.getMSB());
 

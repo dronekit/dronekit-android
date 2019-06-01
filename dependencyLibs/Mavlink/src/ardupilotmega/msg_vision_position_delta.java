@@ -52,7 +52,7 @@ public class msg_vision_position_delta extends MAVLinkMessage {
      * @return
      */
     public MAVLinkPacket pack() {
-        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH);
+        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH,isMavlink2);
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_VISION_POSITION_DELTA;
@@ -95,13 +95,13 @@ public class msg_vision_position_delta extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.angle_delta.length; i++) {
-            try { this.angle_delta[i] = payload.getFloat(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.angle_delta[i] = payload.getFloat();
         }
                 
         
          
         for (int i = 0; i < this.position_delta.length; i++) {
-            try { this.position_delta[i] = payload.getFloat(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.position_delta[i] = payload.getFloat();
         }
                 
         

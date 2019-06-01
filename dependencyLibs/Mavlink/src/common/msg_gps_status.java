@@ -57,7 +57,7 @@ public class msg_gps_status extends MAVLinkMessage {
      * @return
      */
     public MAVLinkPacket pack() {
-        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH);
+        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH,isMavlink2);
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_GPS_STATUS;
@@ -112,31 +112,31 @@ public class msg_gps_status extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.satellite_prn.length; i++) {
-            try { this.satellite_prn[i] = payload.getUnsignedByte(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.satellite_prn[i] = payload.getUnsignedByte();
         }
                 
         
          
         for (int i = 0; i < this.satellite_used.length; i++) {
-            try { this.satellite_used[i] = payload.getUnsignedByte(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.satellite_used[i] = payload.getUnsignedByte();
         }
                 
         
          
         for (int i = 0; i < this.satellite_elevation.length; i++) {
-            try { this.satellite_elevation[i] = payload.getUnsignedByte(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.satellite_elevation[i] = payload.getUnsignedByte();
         }
                 
         
          
         for (int i = 0; i < this.satellite_azimuth.length; i++) {
-            try { this.satellite_azimuth[i] = payload.getUnsignedByte(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.satellite_azimuth[i] = payload.getUnsignedByte();
         }
                 
         
          
         for (int i = 0; i < this.satellite_snr.length; i++) {
-            try { this.satellite_snr[i] = payload.getUnsignedByte(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.satellite_snr[i] = payload.getUnsignedByte();
         }
                 
         

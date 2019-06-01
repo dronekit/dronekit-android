@@ -47,7 +47,7 @@ public class msg_play_tune extends MAVLinkMessage {
      * @return
      */
     public MAVLinkPacket pack() {
-        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH);
+        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH,isMavlink2);
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_PLAY_TUNE;
@@ -88,7 +88,7 @@ public class msg_play_tune extends MAVLinkMessage {
         
          
         for (int i = 0; i < this.tune.length; i++) {
-            try { this.tune[i] = payload.getByte(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.tune[i] = payload.getByte();
         }
                 
         
@@ -96,7 +96,7 @@ public class msg_play_tune extends MAVLinkMessage {
             
              
         for (int i = 0; i < this.tune2.length; i++) {
-            try { this.tune2[i] = payload.getByte(); } catch(IndexOutOfBoundsException ex) { break; }
+            this.tune2[i] = payload.getByte();
         }
                 
             
