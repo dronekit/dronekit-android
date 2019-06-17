@@ -16,7 +16,7 @@ public class MavLinkWaypoint {
 		msg.target_system = drone.getSysid();
 		msg.target_component = drone.getCompid();
 		msg.type = MAV_MISSION_RESULT.MAV_MISSION_ACCEPTED;
-		msg.isMavlink2 = true;
+		msg.isMavlink2 = false;
 		msg.mission_type = 0;
 		drone.getMavClient().sendMessage(msg, null);
 
@@ -27,7 +27,7 @@ public class MavLinkWaypoint {
 		msg.target_system = drone.getSysid();
 		msg.target_component = drone.getCompid();
 		msg.seq = index;
-		msg.isMavlink2 = true;
+		msg.isMavlink2 = false;
 		msg.mission_type = 0;
 		drone.getMavClient().sendMessage(msg, null);
 	}
@@ -46,7 +46,7 @@ public class MavLinkWaypoint {
 		msg.target_system = drone.getSysid();
 		msg.target_component = drone.getCompid();
 		msg.count = count;
-		msg.isMavlink2 = true;
+		msg.isMavlink2 = false;
 		msg.mission_type = 0;
 		drone.getMavClient().sendMessage(msg, null);
 	}

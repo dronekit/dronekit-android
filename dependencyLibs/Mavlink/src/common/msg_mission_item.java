@@ -136,11 +136,11 @@ public class msg_mission_item extends MAVLinkMessage {
         
         packet.payload.putUnsignedByte(autocontinue);
         
-        if(isMavlink2) {
+//        if(isMavlink2) {
             
             packet.payload.putUnsignedByte(mission_type);
             
-        }
+//        }
         return packet;
     }
 
@@ -215,4 +215,3 @@ public class msg_mission_item extends MAVLinkMessage {
         return "MAVLINK_MSG_ID_MISSION_ITEM - sysid:"+sysid+" compid:"+compid+" param1:"+param1+" param2:"+param2+" param3:"+param3+" param4:"+param4+" x:"+x+" y:"+y+" z:"+z+" seq:"+seq+" command:"+command+" target_system:"+target_system+" target_component:"+target_component+" frame:"+frame+" current:"+current+" autocontinue:"+autocontinue+" mission_type:"+mission_type+"";
     }
 }
-        

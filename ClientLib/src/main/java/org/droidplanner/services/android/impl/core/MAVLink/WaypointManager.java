@@ -236,6 +236,7 @@ public class WaypointManager extends DroneVariable {
             onWaypointReached(((msg_mission_item_reached) msg).seq);
             return true;
         }
+
         if (msg.msgid == msg_mission_current.MAVLINK_MSG_ID_MISSION_CURRENT) {
             onCurrentWaypointUpdate(((msg_mission_current) msg).seq);
             return true;
@@ -295,8 +296,8 @@ public class WaypointManager extends DroneVariable {
 		 */
         writeIndex = msg.seq;
         msg_mission_item item = mission.get(writeIndex);
-        item.isMavlink2 = true;
-        item.mission_type = 0;
+        item.isMavlink2 = false;
+        item.mission_type = 1;
         item.target_system = myDrone.getSysid();
         item.target_component = myDrone.getCompid();
         myDrone.getMavClient().sendMessage(item, null);
