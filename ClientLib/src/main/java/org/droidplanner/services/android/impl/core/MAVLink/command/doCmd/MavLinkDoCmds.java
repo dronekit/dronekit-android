@@ -33,10 +33,17 @@ public class MavLinkDoCmds {
         if (drone == null)
             return;
 
+        final boolean isClear = (coord.getLatitude() == 0 && coord.getLongitude() == 0);
+
+        if(isClear) {
+            resetROI(drone, listener);
+            return;
+        }
+
         msg_command_long msg = new msg_command_long();
         msg.target_system = drone.getSysid();
         msg.target_component = drone.getCompid();
-        msg.command = MAV_CMD.MAV_CMD_DO_SET_ROI;
+        msg.command = MAV_CMD.MAV_CMD_DO_SET_ROI_LOCATION;
 
         msg.param5 = (float) coord.getLatitude();
         msg.param6 = (float) coord.getLongitude();
@@ -49,7 +56,13 @@ public class MavLinkDoCmds {
         if (drone == null)
             return;
 
-        setROI(drone, new LatLongAlt(0, 0, 0), listener);
+        msg_command_long msg = new msg_command_long();
+        msg.target_system = drone.getSysid();
+        msg.target_component = drone.getCompid();
+        msg.command = MAV_CMD.MAV_CMD_DO_SET_ROI_NONE;
+
+        drone.getMavClient().sendMessage(msg, listener);
+        // setROI(drone, new LatLongAlt(0, 0, 0), listener);
     }
 
     public static void triggerCamera(MavLinkDrone drone) {
