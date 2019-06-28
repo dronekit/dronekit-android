@@ -43,7 +43,9 @@ public class MavLinkDoCmds {
         msg_command_long msg = new msg_command_long();
         msg.target_system = drone.getSysid();
         msg.target_component = drone.getCompid();
-        msg.command = MAV_CMD.MAV_CMD_DO_SET_ROI_LOCATION;
+        // msg.command = MAV_CMD.MAV_CMD_DO_SET_ROI_LOCATION;
+        // "Hurr durr, don't use this as of January 2018"
+        msg.command = MAV_CMD.MAV_CMD_DO_SET_ROI;
 
         msg.param5 = (float) coord.getLatitude();
         msg.param6 = (float) coord.getLongitude();
@@ -59,7 +61,9 @@ public class MavLinkDoCmds {
         msg_command_long msg = new msg_command_long();
         msg.target_system = drone.getSysid();
         msg.target_component = drone.getCompid();
-        msg.command = MAV_CMD.MAV_CMD_DO_SET_ROI_NONE;
+        // I'm warned to use this instead of DO_SET_ROI, but it's not fucking implemented
+        // msg.command = MAV_CMD.MAV_CMD_DO_SET_ROI_NONE;
+        msg.command = MAV_CMD.MAV_CMD_DO_SET_ROI;
 
         drone.getMavClient().sendMessage(msg, listener);
         // setROI(drone, new LatLongAlt(0, 0, 0), listener);
