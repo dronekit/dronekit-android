@@ -36,7 +36,11 @@ public class RegionOfInterestImpl extends SpatialCoordItem {
 	public List<msg_mission_item> packMissionItem() {
 		List<msg_mission_item> list = super.packMissionItem();
 		msg_mission_item mavMsg = list.get(0);
-		mavMsg.command = MAV_CMD.MAV_CMD_DO_SET_ROI;
+
+		mavMsg.command = (isReset())? 
+			MAV_CMD.MAV_CMD_DO_SET_ROI_NONE: 
+			MAV_CMD.MAV_CMD_DO_SET_ROI_LOCATION;
+
 		return list;
 	}
 

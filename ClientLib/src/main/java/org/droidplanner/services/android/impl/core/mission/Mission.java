@@ -266,7 +266,8 @@ public class Mission extends DroneVariable<GenericMavLinkDrone> {
                 case MAV_CMD.MAV_CMD_DO_GRIPPER:
                     received.add(new EpmGripperImpl(msg, this));
                     break;
-                case MAV_CMD.MAV_CMD_DO_SET_ROI:
+                case MAV_CMD.MAV_CMD_DO_SET_ROI_LOCATION:
+                case MAV_CMD.MAV_CMD_DO_SET_ROI_NONE:
                     received.add(new RegionOfInterestImpl(msg, this));
                     break;
                 case MAV_CMD.MAV_CMD_NAV_LOITER_TURNS:
