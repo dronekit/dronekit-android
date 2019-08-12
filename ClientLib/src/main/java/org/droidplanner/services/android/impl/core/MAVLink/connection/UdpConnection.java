@@ -33,9 +33,6 @@ public abstract class UdpConnection extends MavLinkConnection {
         socket.setBroadcast(true);
         socket.setReuseAddress(true);
 
-//        socket.setSendBufferSize(BUFSIZE);
-//        socket.setReceiveBufferSize(BUFSIZE);
-//
         android.util.Log.v(TAG, String.format("receiveSize=%d sendSize=%d", socket.getReceiveBufferSize(), socket.getSendBufferSize()));
         socketRef.set(socket);
     }
@@ -71,6 +68,7 @@ public abstract class UdpConnection extends MavLinkConnection {
                     sendPacket.setAddress(hostAdd);
                     sendPacket.setPort(hostPort);
                 }
+
                 socket.send(sendPacket);
             }
         } catch (Exception e) {
@@ -91,6 +89,7 @@ public abstract class UdpConnection extends MavLinkConnection {
     @Override
     public final int readDataBlock(byte[] readData) throws IOException {
         final DatagramSocket socket = socketRef.get();
+
         if (socket == null) {
             return 0;
         }
@@ -101,9 +100,8 @@ public abstract class UdpConnection extends MavLinkConnection {
             receivePacket.setData(readData);
         }
 
-//        final long then = SystemClock.elapsedRealtime();
+
         socket.receive(receivePacket);
-//        Timber.d("socket.receive() time=%d", (SystemClock.elapsedRealtime() - then));
 
         hostAdd = receivePacket.getAddress();
         hostPort = receivePacket.getPort();

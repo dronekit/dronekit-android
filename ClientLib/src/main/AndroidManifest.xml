@@ -54,8 +54,8 @@
 
         <service
             android:name="org.droidplanner.services.android.impl.api.DroidPlannerService"
-            android:enabled="false"
-            android:exported="false">
+            android:enabled="true"
+            android:exported="true">
 
             <!-- Filter and meta data for the Tower lib runtime -->
             <intent-filter>

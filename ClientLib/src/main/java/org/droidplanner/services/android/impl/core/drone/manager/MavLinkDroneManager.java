@@ -172,6 +172,8 @@ public class MavLinkDroneManager extends DroneManager<MavLinkDrone, MAVLinkPacke
 
     @Override
     protected void doConnect(String appId, DroneApi listener, @Nullable Uri tlogLoggingUri) {
+        Timber.d("doConnect(%s, %s)", appId, tlogLoggingUri);
+
         if (mavClient.isDisconnected()) {
             Timber.i("Opening connection for %s", appId);
             mavClient.openConnection();

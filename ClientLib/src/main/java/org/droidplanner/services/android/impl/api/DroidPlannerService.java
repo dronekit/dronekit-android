@@ -85,6 +85,8 @@ public class DroidPlannerService extends Service {
      * @return a IDroneApi instance
      */
     DroneApi registerDroneApi(IApiListener listener, String appId) {
+        Timber.d("registerDroneApi(): listener=%s appId=%s", listener, appId);
+
         if (listener == null)
             return null;
 
@@ -92,6 +94,8 @@ public class DroidPlannerService extends Service {
         droneApiStore.put(appId, droneApi);
         lbm.sendBroadcast(new Intent(ACTION_DRONE_CREATED));
         updateForegroundNotification();
+        Timber.d("registerDroneApi(): droneApi=%s", droneApi);
+
         return droneApi;
     }
 
@@ -101,6 +105,7 @@ public class DroidPlannerService extends Service {
      * @param appId Application id of the disconnecting client.
      */
     void releaseDroneApi(String appId) {
+        Timber.d("releaseDroneApi(%s)", appId);
         if (appId == null)
             return;
 
@@ -122,6 +127,8 @@ public class DroidPlannerService extends Service {
      * @return A DroneManager instance which acts as router between the connected vehicle and the listeneing client(s).
      */
     DroneManager connectDroneManager(ConnectionParameter connParams, String appId, DroneApi listener) {
+        Timber.d("connectDroneManager(%s, %s)", connParams, appId);
+
         if (connParams == null || TextUtils.isEmpty(appId) || listener == null)
             return null;
 
@@ -151,6 +158,8 @@ public class DroidPlannerService extends Service {
      * @param clientInfo Info of the disconnecting client.
      */
     void disconnectDroneManager(DroneManager droneMgr, DroneApi.ClientInfo clientInfo) {
+        Timber.d("disconnectDroneManager()");
+
         if (droneMgr == null || clientInfo == null || TextUtils.isEmpty(clientInfo.appId))
             return;
 
@@ -227,6 +236,8 @@ public class DroidPlannerService extends Service {
 
     @SuppressLint("NewApi")
     private void updateForegroundNotification() {
+        Timber.d("updateForegroundNotification()");
+
         final Context context = getApplicationContext();
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -280,6 +291,8 @@ public class DroidPlannerService extends Service {
 
     @TargetApi(Build.VERSION_CODES.O)
     private String createNotificationChannel(String chanId, CharSequence name) {
+        Timber.d("createNotificationChannel(%s, %s)", chanId, name);
+
         final NotificationChannel channel = new NotificationChannel(chanId, name, NotificationManager.IMPORTANCE_NONE);
         channel.setLightColor(Color.BLUE);
         channel.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
@@ -313,6 +326,8 @@ public class DroidPlannerService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Timber.d("onStartCommand(%s)", intent);
+
         if (intent != null) {
             final String action = intent.getAction();
             switch (action) {
@@ -333,12 +348,13 @@ public class DroidPlannerService extends Service {
      * @param context
      * @param enable
      */
-    public static void enableDroidPlannerService(Context context, boolean enable){
+    public static void enableDroidPlannerService(Context context, boolean enable) {
+        Timber.d("enableDroidPlannerService(%s)", enable);
+
         final ComponentName serviceComp = new ComponentName(context, DroidPlannerService.class);
         final int newState = enable ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED
                 : PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
 
         context.getPackageManager().setComponentEnabledSetting(serviceComp, newState, PackageManager.DONT_KILL_APP);
     }
-
 }

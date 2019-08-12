@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 import android.util.Log;
 
+import timber.log.Timber;
+
 /**
  * Class to manage the communication of waypoints to the MAV.
  * <p/>
@@ -297,9 +299,12 @@ public class WaypointManager extends DroneVariable {
         writeIndex = msg.seq;
         msg_mission_item item = mission.get(writeIndex);
         item.isMavlink2 = false;
-        item.mission_type = 1;
+        item.mission_type = 0;
         item.target_system = myDrone.getSysid();
         item.target_component = myDrone.getCompid();
+
+        Timber.d("send item %s", item);
+
         myDrone.getMavClient().sendMessage(item, null);
 
         if (writeIndex + 1 >= mission.size()) {

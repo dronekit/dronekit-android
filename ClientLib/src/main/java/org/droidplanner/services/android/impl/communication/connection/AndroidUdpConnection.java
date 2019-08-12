@@ -15,6 +15,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import timber.log.Timber;
+
 public class AndroidUdpConnection extends AndroidIpConnection {
 
     private static final String TAG = AndroidUdpConnection.class.getSimpleName();
@@ -43,11 +45,15 @@ public class AndroidUdpConnection extends AndroidIpConnection {
 
             @Override
             protected void onConnectionOpened() {
+                Timber.d("onConnectionOpened()");
+
                 AndroidUdpConnection.this.onConnectionOpened();
             }
 
             @Override
             protected void onConnectionStatus(LinkConnectionStatus connectionStatus) {
+                Timber.d("onConnectionStatus(): %s", connectionStatus);
+
                 AndroidUdpConnection.this.onConnectionStatus(connectionStatus);
             }
         };
@@ -58,6 +64,8 @@ public class AndroidUdpConnection extends AndroidIpConnection {
     }
 
     public void addPingTarget(final InetAddress address, final int port, final long period, final byte[] payload) {
+        Timber.d("addPingTarget(%s, %d, %d, %s)", address, port, period, payload);
+
         if (address == null || payload == null || period <= 0)
             return;
 

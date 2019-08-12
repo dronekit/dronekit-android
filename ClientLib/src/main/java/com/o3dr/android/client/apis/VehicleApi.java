@@ -1,6 +1,7 @@
 package com.o3dr.android.client.apis;
 
 import android.os.Bundle;
+import android.util.Log;
 
 import com.o3dr.android.client.Drone;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
@@ -11,6 +12,8 @@ import com.o3dr.services.android.lib.model.AbstractCommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
 
 import java.util.concurrent.ConcurrentHashMap;
+
+import timber.log.Timber;
 
 import static com.o3dr.services.android.lib.drone.action.ConnectionActions.ACTION_CONNECT;
 import static com.o3dr.services.android.lib.drone.action.ConnectionActions.ACTION_DISCONNECT;
@@ -65,9 +68,11 @@ public class VehicleApi extends Api {
      * @param parameter parameter for the connection.
      */
     public void connect(ConnectionParameter parameter) {
+        Timber.d("connect(): param=%s", parameter);
         Bundle params = new Bundle();
         params.putParcelable(EXTRA_CONNECT_PARAMETER, parameter);
         Action connectAction = new Action(ACTION_CONNECT, params);
+        Timber.d("performAsyncAction on %s", drone);
         drone.performAsyncAction(connectAction);
     }
 

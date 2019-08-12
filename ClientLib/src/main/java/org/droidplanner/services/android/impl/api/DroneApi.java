@@ -207,6 +207,8 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
                 ? this.connectionParams
                 : checkConnectionParameter(this.connectionParams);
 
+            Timber.d("connect(): equals? %s", connParams.equals(currentConnParams));
+
             if (!connParams.equals(currentConnParams)) {
                 if (this.droneMgr != null) {
                     LinkConnectionStatus connectionStatus = LinkConnectionStatus
@@ -220,6 +222,8 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
                 this.droneMgr = service.connectDroneManager(this.connectionParams, ownerId, this);
             }
         } catch (ConnectionException e) {
+            Timber.e(e, e.getMessage());
+
             LinkConnectionStatus connectionStatus = LinkConnectionStatus
                 .newFailedConnectionStatus(LinkConnectionStatus.INVALID_CREDENTIALS, e.getMessage());
             onConnectionStatus(connectionStatus);
@@ -278,6 +282,8 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
 
     @Override
     public void executeAction(Action action, ICommandListener listener) throws RemoteException {
+        Timber.d("executeAction(): action=%s", action);
+
         if (action == null) {
             return;
         }

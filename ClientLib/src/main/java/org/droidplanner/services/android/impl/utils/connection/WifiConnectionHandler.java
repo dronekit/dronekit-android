@@ -67,6 +67,8 @@ public class WifiConnectionHandler {
         @Override
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
+//            Timber.d("broadcastReceiver: action=%s", action);
+
             switch (action) {
 
                 case WifiManager.SCAN_RESULTS_AVAILABLE_ACTION:

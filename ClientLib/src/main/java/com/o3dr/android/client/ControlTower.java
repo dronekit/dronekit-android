@@ -17,6 +17,8 @@ import com.o3dr.services.android.lib.model.IDroneApi;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import timber.log.Timber;
+
 /**
  * Created by fhuya on 11/12/14.
  */
@@ -35,6 +37,8 @@ public class ControlTower {
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
+            Timber.d("onServiceConnected(%s, %s)", name, service);
+
             isServiceConnecting.set(false);
 
             o3drServices = IDroidPlannerService.Stub.asInterface(service);
@@ -42,12 +46,15 @@ public class ControlTower {
                 o3drServices.asBinder().linkToDeath(binderDeathRecipient, 0);
                 notifyTowerConnected();
             } catch (RemoteException e) {
+                Timber.e(e, e.getMessage());
                 notifyTowerDisconnected();
             }
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
+            Timber.d("onServiceDisconnected(%s)", name);
+
             isServiceConnecting.set(false);
             notifyTowerDisconnected();
         }
@@ -70,6 +77,8 @@ public class ControlTower {
     }
 
     void notifyTowerConnected() {
+        Timber.d("notifyTowerConnected()");
+
         if (towerListener == null)
             return;
 
@@ -119,8 +128,10 @@ public class ControlTower {
     }
 
     public void connect(TowerListener listener) {
-        if (towerListener != null && (isServiceConnecting.get() || isTowerConnected()))
+        if (towerListener != null && (isServiceConnecting.get() || isTowerConnected())) {
+            Timber.d("not connecting: alreadyConnecting=%s, isTowerConnected=%s", isServiceConnecting.get(), isTowerConnected());
             return;
+        }
 
         if (listener == null) {
             throw new IllegalArgumentException("ServiceListener argument cannot be null.");
@@ -130,6 +141,9 @@ public class ControlTower {
 
         if (!isTowerConnected() && !isServiceConnecting.get()) {
             final Intent serviceIntent = ApiAvailability.getInstance().getAvailableServicesInstance(context);
+            Timber.d("serviceIntent=%s", serviceIntent);
+
+            Timber.d("Bind the service to %s", o3drServicesConnection);
             isServiceConnecting.set(context.bindService(serviceIntent, o3drServicesConnection,
                     Context.BIND_AUTO_CREATE));
         }
