@@ -79,6 +79,10 @@ public class DroneManager<T extends Drone, D> implements DataLink.DataLinkListen
 
     }
 
+    protected void doConnect(String appId, DroneApi listener, @Nullable Uri tlogLoggingUri) {
+
+    }
+
     public synchronized void connect(String appId, DroneApi listener, Uri tlogLoggingUri) {
         if (listener == null || TextUtils.isEmpty(appId)) {
             return;
@@ -86,10 +90,6 @@ public class DroneManager<T extends Drone, D> implements DataLink.DataLinkListen
 
         connectedApps.put(appId, listener);
         doConnect(appId, listener, tlogLoggingUri);
-    }
-
-    protected void doConnect(String appId, DroneApi listener, @Nullable Uri tlogLoggingUri) {
-
     }
 
     private void disconnect() {

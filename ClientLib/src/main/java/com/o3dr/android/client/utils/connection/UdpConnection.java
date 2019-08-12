@@ -43,6 +43,11 @@ public class UdpConnection extends AbstractIpConnection {
         }
     }
 
+    public UdpConnection(Handler handler, String ip, int port, int readBufferSize, boolean polling, int readTimeout) throws UnknownHostException {
+        this(handler, port, readBufferSize, polling, readTimeout);
+        this.hostAddress = InetAddress.getByName(ip);
+    }
+
     public UdpConnection(Handler handler, String address, int hostPort, int serverPort) throws UnknownHostException {
         super(handler, false, true);
         this.serverPort = serverPort;

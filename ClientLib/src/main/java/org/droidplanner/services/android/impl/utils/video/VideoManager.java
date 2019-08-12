@@ -18,6 +18,7 @@ import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError
 import com.o3dr.services.android.lib.model.ICommandListener;
 
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -92,8 +93,8 @@ public class VideoManager implements IpConnectionListener {
         streamRecorder.disableRecording();
     }
 
-    public void startDecoding(final int udpPort, final Surface surface, final DecoderListener listener) {
-        start(udpPort, null);
+    public void startDecoding(final String udpIP, final int udpPort, final Surface surface, final DecoderListener listener) {
+        start(udpIP, udpPort, null);
 
         final Surface currentSurface = mediaCodecManager.getSurface();
         if (surface == currentSurface) {
@@ -148,15 +149,24 @@ public class VideoManager implements IpConnectionListener {
         return this.linkConn != null && this.linkConn.getConnectionStatus() == AbstractIpConnection.STATE_CONNECTED;
     }
 
-    private void start(int udpPort, LinkListener listener) {
+    private void start(String udpIP, int udpPort, LinkListener listener) {
         if (this.linkConn == null || udpPort != this.linkPort){
             if (isStarted.get()){
                 stop();
             }
 
-            this.linkConn = new UdpConnection(handler, udpPort, UDP_BUFFER_SIZE, true, 42);
-            this.linkConn.setIpConnectionListener(this);
-            this.linkPort = udpPort;
+            try {
+                this.linkConn = (udpIP != null)?
+                        new UdpConnection(handler, udpIP, udpPort, UDP_BUFFER_SIZE, true, 42):
+                        new UdpConnection(handler, udpPort, UDP_BUFFER_SIZE, true, 42);
+                this.linkConn.setIpConnectionListener(this);
+                this.linkPort = udpPort;
+            } catch(UnknownHostException ex) {
+                Timber.e(ex, ex.getMessage());
+                listener.onLinkDisconnected();
+                handler.removeCallbacks(reconnectTask);
+                return;
+            }
         }
 
         Log.d(TAG, "Starting video manager");
@@ -309,6 +319,9 @@ public class VideoManager implements IpConnectionListener {
             return;
         }
 
+        // UDP IP is optional. May not actually be necessary.
+        final String udpIP = videoProps.getString(CameraActions.EXTRA_VIDEO_PROPS_UDP_IP, null);
+
         if (newVideoTag == null)
             newVideoTag = "";
 
@@ -332,7 +345,7 @@ public class VideoManager implements IpConnectionListener {
             checkForLocalRecording(appId, videoProps);
 
             Timber.i("Starting video decoding.");
-            startDecoding(udpPort, videoSurface, new DecoderListener() {
+            startDecoding(udpIP, udpPort, videoSurface, new DecoderListener() {
 
                 @Override
                 public void onDecodingStarted() {

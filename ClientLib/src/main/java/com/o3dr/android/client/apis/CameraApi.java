@@ -16,6 +16,7 @@ import static com.o3dr.services.android.lib.drone.action.CameraActions.ACTION_ST
 import static com.o3dr.services.android.lib.drone.action.CameraActions.EXTRA_VIDEO_DISPLAY;
 import static com.o3dr.services.android.lib.drone.action.CameraActions.EXTRA_VIDEO_ENABLE_LOCAL_RECORDING;
 import static com.o3dr.services.android.lib.drone.action.CameraActions.EXTRA_VIDEO_LOCAL_RECORDING_FILENAME;
+import static com.o3dr.services.android.lib.drone.action.CameraActions.EXTRA_VIDEO_PROPS_UDP_IP;
 import static com.o3dr.services.android.lib.drone.action.CameraActions.EXTRA_VIDEO_PROPS_UDP_PORT;
 import static com.o3dr.services.android.lib.drone.action.CameraActions.EXTRA_VIDEO_TAG;
 import static com.o3dr.services.android.lib.drone.action.CameraActions.EXTRA_VIDEO_PROPERTIES;
@@ -39,6 +40,11 @@ public class CameraApi extends Api {
      * Used to specify the udp port from which to access the streamed video.
      */
     public static final String VIDEO_PROPS_UDP_PORT = EXTRA_VIDEO_PROPS_UDP_PORT;
+
+    /**
+     * Used to specify which IP from which to access the streamed video.
+     */
+    public static final String VIDEO_PROPS_UDP_IP = EXTRA_VIDEO_PROPS_UDP_IP;
 
     /**
      * Key to specify whether to enable/disable local recording of the video stream.

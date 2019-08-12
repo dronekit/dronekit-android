@@ -17,6 +17,7 @@ public class CameraActions {
 
     public static final String EXTRA_VIDEO_PROPERTIES = "extra_video_properties";
     public static final String EXTRA_VIDEO_PROPS_UDP_PORT = "extra_video_props_udp_port";
+    public static final String EXTRA_VIDEO_PROPS_UDP_IP = "extra_video_props_udp_ip";
     public static final String EXTRA_VIDEO_ENABLE_LOCAL_RECORDING = "extra_video_enable_local_recording";
     public static final String EXTRA_VIDEO_LOCAL_RECORDING_FILENAME = "extra_video_local_recording_filename";
 
