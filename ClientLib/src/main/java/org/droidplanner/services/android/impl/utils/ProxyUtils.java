@@ -8,6 +8,7 @@ import com.o3dr.services.android.lib.drone.mission.item.command.CameraTrigger;
 import com.o3dr.services.android.lib.drone.mission.item.command.ChangeSpeed;
 import com.o3dr.services.android.lib.drone.mission.item.command.DoJump;
 import com.o3dr.services.android.lib.drone.mission.item.command.EpmGripper;
+import com.o3dr.services.android.lib.drone.mission.item.command.LoiterTime;
 import com.o3dr.services.android.lib.drone.mission.item.command.LoiterToAlt;
 import com.o3dr.services.android.lib.drone.mission.item.command.ResetROI;
 import com.o3dr.services.android.lib.drone.mission.item.command.ReturnToLaunch;
@@ -35,6 +36,7 @@ import org.droidplanner.services.android.impl.core.mission.commands.ChangeSpeedI
 import org.droidplanner.services.android.impl.core.mission.commands.ConditionYawImpl;
 import org.droidplanner.services.android.impl.core.mission.commands.DoJumpImpl;
 import org.droidplanner.services.android.impl.core.mission.commands.EpmGripperImpl;
+import org.droidplanner.services.android.impl.core.mission.commands.LoiterTimeImpl;
 import org.droidplanner.services.android.impl.core.mission.commands.LoiterToAltImpl;
 import org.droidplanner.services.android.impl.core.mission.commands.ReturnToHomeImpl;
 import org.droidplanner.services.android.impl.core.mission.commands.SetRelayImpl;
@@ -130,6 +132,21 @@ public class ProxyUtils {
 
                 break;
             }
+
+            case LOITER_TIME: {
+                LoiterTime proxy = (LoiterTime)proxyItem;
+                final LatLongAlt coord = proxy.getCoordinate();
+
+                if(coord != null) {
+                    LoiterTimeImpl impl = new LoiterTimeImpl(mission, coord.getLatitude(), coord.getLongitude(), coord.getAltitude(), proxy.getDelay(), proxy.getRadius());
+                    missionItemImpl = impl;
+                } else {
+                    missionItemImpl = null;
+                }
+
+                break;
+            }
+
             case TAKE_PICTURE: {
                 TakePicture proxy = (TakePicture)proxyItem;
                 missionItemImpl = new TakePictureImpl(mission, 0);
@@ -522,8 +539,18 @@ public class ProxyUtils {
                 break;
             }
 
+            case LOITER_TIME: {
+                LoiterTimeImpl source = (LoiterTimeImpl)itemImpl;
+                LoiterTime tmp = new LoiterTime();
+                tmp.setCoordinate(new LatLongAlt(source.getLat(), source.getLng(), source.getAlt()));
+                tmp.setDelay(source.getDelay());
+                tmp.setRadius(source.getRadius());
+
+                proxyMissionItem = tmp;
+                break;
+            }
+
             case TAKE_PICTURE: {
-                TakePictureImpl source = (TakePictureImpl)itemImpl;
                 proxyMissionItem = new TakePicture();
                 break;
             }
