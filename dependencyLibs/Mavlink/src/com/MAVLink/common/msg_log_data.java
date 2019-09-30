@@ -9,7 +9,7 @@ package com.MAVLink.common;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-
+        
 /**
 * Reply to LOG_REQUEST_DATA
 */
@@ -20,22 +20,22 @@ public class msg_log_data extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_LOG_DATA;
 
 
-    
+      
     /**
     * Offset into the log
     */
     public long ofs;
-    
+      
     /**
     * Log id (from LOG_ENTRY reply)
     */
     public int id;
-    
+      
     /**
     * Number of bytes (zero for end of log)
     */
     public short count;
-    
+      
     /**
     * log data
     */
@@ -51,13 +51,13 @@ public class msg_log_data extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_LOG_DATA;
-        
+              
         packet.payload.putUnsignedInt(ofs);
-        
+              
         packet.payload.putUnsignedShort(id);
-        
+              
         packet.payload.putUnsignedByte(count);
-        
+              
         
         for (int i = 0; i < data.length; i++) {
             packet.payload.putUnsignedByte(data[i]);
@@ -74,14 +74,14 @@ public class msg_log_data extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-        
+              
         this.ofs = payload.getUnsignedInt();
-        
+              
         this.id = payload.getUnsignedShort();
-        
+              
         this.count = payload.getUnsignedByte();
-        
-        
+              
+         
         for (int i = 0; i < this.data.length; i++) {
             this.data[i] = payload.getUnsignedByte();
         }
@@ -105,7 +105,7 @@ public class msg_log_data extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_LOG_DATA;
-        unpack(mavLinkPacket.payload);
+        unpack(mavLinkPacket.payload);        
     }
 
             
@@ -113,7 +113,7 @@ public class msg_log_data extends MAVLinkMessage{
     * Returns a string with the MSG name and data
     */
     public String toString(){
-        return "MAVLINK_MSG_ID_LOG_DATA -"+" ofs:"+ofs+" id:"+id+" count:"+count+" data:"+data+"";
+        return "MAVLINK_MSG_ID_LOG_DATA - sysid:"+sysid+" compid:"+compid+" ofs:"+ofs+" id:"+id+" count:"+count+" data:"+data+"";
     }
 }
         

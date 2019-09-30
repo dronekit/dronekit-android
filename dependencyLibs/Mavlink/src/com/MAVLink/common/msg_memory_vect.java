@@ -9,7 +9,7 @@ package com.MAVLink.common;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-
+        
 /**
 * Send raw controller memory. The use of this message is discouraged for normal packets, but a quite efficient way for testing new messages and getting experimental debug output.
 */
@@ -20,22 +20,22 @@ public class msg_memory_vect extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_MEMORY_VECT;
 
 
-    
+      
     /**
     * Starting address of the debug variables
     */
     public int address;
-    
+      
     /**
     * Version code of the type variable. 0=unknown, type ignored and assumed int16_t. 1=as below
     */
     public short ver;
-    
+      
     /**
     * Type code of the memory variables. for ver = 1: 0=16 x int16_t, 1=16 x uint16_t, 2=16 x Q15, 3=16 x 1Q14
     */
     public short type;
-    
+      
     /**
     * Memory contents at specified address
     */
@@ -51,13 +51,13 @@ public class msg_memory_vect extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_MEMORY_VECT;
-        
+              
         packet.payload.putUnsignedShort(address);
-        
+              
         packet.payload.putUnsignedByte(ver);
-        
+              
         packet.payload.putUnsignedByte(type);
-        
+              
         
         for (int i = 0; i < value.length; i++) {
             packet.payload.putByte(value[i]);
@@ -74,14 +74,14 @@ public class msg_memory_vect extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-        
+              
         this.address = payload.getUnsignedShort();
-        
+              
         this.ver = payload.getUnsignedByte();
-        
+              
         this.type = payload.getUnsignedByte();
-        
-        
+              
+         
         for (int i = 0; i < this.value.length; i++) {
             this.value[i] = payload.getByte();
         }
@@ -105,7 +105,7 @@ public class msg_memory_vect extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_MEMORY_VECT;
-        unpack(mavLinkPacket.payload);
+        unpack(mavLinkPacket.payload);        
     }
 
             
@@ -113,7 +113,7 @@ public class msg_memory_vect extends MAVLinkMessage{
     * Returns a string with the MSG name and data
     */
     public String toString(){
-        return "MAVLINK_MSG_ID_MEMORY_VECT -"+" address:"+address+" ver:"+ver+" type:"+type+" value:"+value+"";
+        return "MAVLINK_MSG_ID_MEMORY_VECT - sysid:"+sysid+" compid:"+compid+" address:"+address+" ver:"+ver+" type:"+type+" value:"+value+"";
     }
 }
         

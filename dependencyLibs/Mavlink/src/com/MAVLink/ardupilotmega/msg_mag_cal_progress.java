@@ -9,7 +9,7 @@ package com.MAVLink.ardupilotmega;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-
+        
 /**
 * Reports progress of compass calibration.
 */
@@ -20,47 +20,47 @@ public class msg_mag_cal_progress extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_MAG_CAL_PROGRESS;
 
 
-    
+      
     /**
     * Body frame direction vector for display
     */
     public float direction_x;
-    
+      
     /**
     * Body frame direction vector for display
     */
     public float direction_y;
-    
+      
     /**
     * Body frame direction vector for display
     */
     public float direction_z;
-    
+      
     /**
     * Compass being calibrated
     */
     public short compass_id;
-    
+      
     /**
     * Bitmask of compasses being calibrated
     */
     public short cal_mask;
-    
+      
     /**
     * Status (see MAG_CAL_STATUS enum)
     */
     public short cal_status;
-    
+      
     /**
     * Attempt number
     */
     public short attempt;
-    
+      
     /**
     * Completion percentage
     */
     public short completion_pct;
-    
+      
     /**
     * Bitmask of sphere sections (see http://en.wikipedia.org/wiki/Geodesic_grid)
     */
@@ -76,23 +76,23 @@ public class msg_mag_cal_progress extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_MAG_CAL_PROGRESS;
-        
+              
         packet.payload.putFloat(direction_x);
-        
+              
         packet.payload.putFloat(direction_y);
-        
+              
         packet.payload.putFloat(direction_z);
-        
+              
         packet.payload.putUnsignedByte(compass_id);
-        
+              
         packet.payload.putUnsignedByte(cal_mask);
-        
+              
         packet.payload.putUnsignedByte(cal_status);
-        
+              
         packet.payload.putUnsignedByte(attempt);
-        
+              
         packet.payload.putUnsignedByte(completion_pct);
-        
+              
         
         for (int i = 0; i < completion_mask.length; i++) {
             packet.payload.putUnsignedByte(completion_mask[i]);
@@ -109,24 +109,24 @@ public class msg_mag_cal_progress extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-        
+              
         this.direction_x = payload.getFloat();
-        
+              
         this.direction_y = payload.getFloat();
-        
+              
         this.direction_z = payload.getFloat();
-        
+              
         this.compass_id = payload.getUnsignedByte();
-        
+              
         this.cal_mask = payload.getUnsignedByte();
-        
+              
         this.cal_status = payload.getUnsignedByte();
-        
+              
         this.attempt = payload.getUnsignedByte();
-        
+              
         this.completion_pct = payload.getUnsignedByte();
-        
-        
+              
+         
         for (int i = 0; i < this.completion_mask.length; i++) {
             this.completion_mask[i] = payload.getUnsignedByte();
         }
@@ -150,7 +150,7 @@ public class msg_mag_cal_progress extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_MAG_CAL_PROGRESS;
-        unpack(mavLinkPacket.payload);
+        unpack(mavLinkPacket.payload);        
     }
 
                       
@@ -158,7 +158,7 @@ public class msg_mag_cal_progress extends MAVLinkMessage{
     * Returns a string with the MSG name and data
     */
     public String toString(){
-        return "MAVLINK_MSG_ID_MAG_CAL_PROGRESS -"+" direction_x:"+direction_x+" direction_y:"+direction_y+" direction_z:"+direction_z+" compass_id:"+compass_id+" cal_mask:"+cal_mask+" cal_status:"+cal_status+" attempt:"+attempt+" completion_pct:"+completion_pct+" completion_mask:"+completion_mask+"";
+        return "MAVLINK_MSG_ID_MAG_CAL_PROGRESS - sysid:"+sysid+" compid:"+compid+" direction_x:"+direction_x+" direction_y:"+direction_y+" direction_z:"+direction_z+" compass_id:"+compass_id+" cal_mask:"+cal_mask+" cal_status:"+cal_status+" attempt:"+attempt+" completion_pct:"+completion_pct+" completion_mask:"+completion_mask+"";
     }
 }
         

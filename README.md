@@ -3,12 +3,10 @@
 ![dronekit_python_logo](https://cloud.githubusercontent.com/assets/5368500/10805537/90dd4b14-7e22-11e5-9592-5925348a7df9.png)
 
 [![Build Status](https://travis-ci.org/dronekit/dronekit-android.svg?branch=develop)](https://travis-ci.org/dronekit/dronekit-android)
-[![Issue Stats](http://issuestats.com/github/dronekit/DroneKit-Android/badge/pr)](http://issuestats.com/github/dronekit/DroneKit-Android)
-[![Issue Stats](http://issuestats.com/github/dronekit/DroneKit-Android/badge/issue)](http://issuestats.com/github/dronekit/DroneKit-Android) <a alt="Join the chat at https://gitter.im/dronekit/dronekit-android" href="https://gitter.im/dronekit/dronekit-android?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge"><img align="right" src="https://badges.gitter.im/Join%20Chat.svg"></img></a>
-
+[![Issue Stats](http://issuestats.com/github/dronekit/dronekit-android/badge/pr)](http://issuestats.com/github/dronekit/dronekit-android)
+[![Issue Stats](http://issuestats.com/github/dronekit/dronekit-android/badge/issue)](http://issuestats.com/github/dronekit/dronekit-android) <a alt="Join the chat at https://gitter.im/dronekit/dronekit-android" href="https://gitter.im/dronekit/dronekit-android?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge"><img align="right" src="https://badges.gitter.im/Join%20Chat.svg"></img></a>
 
 DroneKit-Android helps you create powerful Android apps for UAVs.
-
 
 ## Overview
 

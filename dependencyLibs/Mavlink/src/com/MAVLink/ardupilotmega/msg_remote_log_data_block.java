@@ -9,7 +9,7 @@ package com.MAVLink.ardupilotmega;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-
+        
 /**
 * Send a block of log data to remote location
 */
@@ -20,22 +20,22 @@ public class msg_remote_log_data_block extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_REMOTE_LOG_DATA_BLOCK;
 
 
-    
+      
     /**
     * log data block sequence number
     */
     public long seqno;
-    
+      
     /**
     * System ID
     */
     public short target_system;
-    
+      
     /**
     * Component ID
     */
     public short target_component;
-    
+      
     /**
     * log data block
     */
@@ -51,13 +51,13 @@ public class msg_remote_log_data_block extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_REMOTE_LOG_DATA_BLOCK;
-        
+              
         packet.payload.putUnsignedInt(seqno);
-        
+              
         packet.payload.putUnsignedByte(target_system);
-        
+              
         packet.payload.putUnsignedByte(target_component);
-        
+              
         
         for (int i = 0; i < data.length; i++) {
             packet.payload.putUnsignedByte(data[i]);
@@ -74,14 +74,14 @@ public class msg_remote_log_data_block extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-        
+              
         this.seqno = payload.getUnsignedInt();
-        
+              
         this.target_system = payload.getUnsignedByte();
-        
+              
         this.target_component = payload.getUnsignedByte();
-        
-        
+              
+         
         for (int i = 0; i < this.data.length; i++) {
             this.data[i] = payload.getUnsignedByte();
         }
@@ -105,7 +105,7 @@ public class msg_remote_log_data_block extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_REMOTE_LOG_DATA_BLOCK;
-        unpack(mavLinkPacket.payload);
+        unpack(mavLinkPacket.payload);        
     }
 
             
@@ -113,7 +113,7 @@ public class msg_remote_log_data_block extends MAVLinkMessage{
     * Returns a string with the MSG name and data
     */
     public String toString(){
-        return "MAVLINK_MSG_ID_REMOTE_LOG_DATA_BLOCK -"+" seqno:"+seqno+" target_system:"+target_system+" target_component:"+target_component+" data:"+data+"";
+        return "MAVLINK_MSG_ID_REMOTE_LOG_DATA_BLOCK - sysid:"+sysid+" compid:"+compid+" seqno:"+seqno+" target_system:"+target_system+" target_component:"+target_component+" data:"+data+"";
     }
 }
         

@@ -9,7 +9,7 @@ package com.MAVLink.common;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-
+        
 /**
 * Once the MAV sets a new GPS-Local correspondence, this message announces the origin (0,0,0) position
 */
@@ -20,17 +20,17 @@ public class msg_gps_global_origin extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_GPS_GLOBAL_ORIGIN;
 
 
-    
+      
     /**
     * Latitude (WGS84), in degrees * 1E7
     */
     public int latitude;
-    
+      
     /**
     * Longitude (WGS84), in degrees * 1E7
     */
     public int longitude;
-    
+      
     /**
     * Altitude (AMSL), in meters * 1000 (positive for up)
     */
@@ -46,11 +46,11 @@ public class msg_gps_global_origin extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_GPS_GLOBAL_ORIGIN;
-        
+              
         packet.payload.putInt(latitude);
-        
+              
         packet.payload.putInt(longitude);
-        
+              
         packet.payload.putInt(altitude);
         
         return packet;
@@ -63,11 +63,11 @@ public class msg_gps_global_origin extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-        
+              
         this.latitude = payload.getInt();
-        
+              
         this.longitude = payload.getInt();
-        
+              
         this.altitude = payload.getInt();
         
     }
@@ -88,7 +88,7 @@ public class msg_gps_global_origin extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_GPS_GLOBAL_ORIGIN;
-        unpack(mavLinkPacket.payload);
+        unpack(mavLinkPacket.payload);        
     }
 
           
@@ -96,7 +96,7 @@ public class msg_gps_global_origin extends MAVLinkMessage{
     * Returns a string with the MSG name and data
     */
     public String toString(){
-        return "MAVLINK_MSG_ID_GPS_GLOBAL_ORIGIN -"+" latitude:"+latitude+" longitude:"+longitude+" altitude:"+altitude+"";
+        return "MAVLINK_MSG_ID_GPS_GLOBAL_ORIGIN - sysid:"+sysid+" compid:"+compid+" latitude:"+latitude+" longitude:"+longitude+" altitude:"+altitude+"";
     }
 }
         

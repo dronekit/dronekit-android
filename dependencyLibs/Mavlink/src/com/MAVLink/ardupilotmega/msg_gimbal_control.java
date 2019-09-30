@@ -9,7 +9,7 @@ package com.MAVLink.ardupilotmega;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-
+        
 /**
 * Control message for rate gimbal
 */
@@ -20,27 +20,27 @@ public class msg_gimbal_control extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_GIMBAL_CONTROL;
 
 
-    
+      
     /**
     * Demanded angular rate X (rad/s)
     */
     public float demanded_rate_x;
-    
+      
     /**
     * Demanded angular rate Y (rad/s)
     */
     public float demanded_rate_y;
-    
+      
     /**
     * Demanded angular rate Z (rad/s)
     */
     public float demanded_rate_z;
-    
+      
     /**
     * System ID
     */
     public short target_system;
-    
+      
     /**
     * Component ID
     */
@@ -56,15 +56,15 @@ public class msg_gimbal_control extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_GIMBAL_CONTROL;
-        
+              
         packet.payload.putFloat(demanded_rate_x);
-        
+              
         packet.payload.putFloat(demanded_rate_y);
-        
+              
         packet.payload.putFloat(demanded_rate_z);
-        
+              
         packet.payload.putUnsignedByte(target_system);
-        
+              
         packet.payload.putUnsignedByte(target_component);
         
         return packet;
@@ -77,15 +77,15 @@ public class msg_gimbal_control extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-        
+              
         this.demanded_rate_x = payload.getFloat();
-        
+              
         this.demanded_rate_y = payload.getFloat();
-        
+              
         this.demanded_rate_z = payload.getFloat();
-        
+              
         this.target_system = payload.getUnsignedByte();
-        
+              
         this.target_component = payload.getUnsignedByte();
         
     }
@@ -106,7 +106,7 @@ public class msg_gimbal_control extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_GIMBAL_CONTROL;
-        unpack(mavLinkPacket.payload);
+        unpack(mavLinkPacket.payload);        
     }
 
               
@@ -114,7 +114,7 @@ public class msg_gimbal_control extends MAVLinkMessage{
     * Returns a string with the MSG name and data
     */
     public String toString(){
-        return "MAVLINK_MSG_ID_GIMBAL_CONTROL -"+" demanded_rate_x:"+demanded_rate_x+" demanded_rate_y:"+demanded_rate_y+" demanded_rate_z:"+demanded_rate_z+" target_system:"+target_system+" target_component:"+target_component+"";
+        return "MAVLINK_MSG_ID_GIMBAL_CONTROL - sysid:"+sysid+" compid:"+compid+" demanded_rate_x:"+demanded_rate_x+" demanded_rate_y:"+demanded_rate_y+" demanded_rate_z:"+demanded_rate_z+" target_system:"+target_system+" target_component:"+target_component+"";
     }
 }
         

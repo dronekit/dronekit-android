@@ -9,7 +9,7 @@ package com.MAVLink.ardupilotmega;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-
+        
 /**
 * Request a current fence point from MAV
 */
@@ -20,17 +20,17 @@ public class msg_fence_fetch_point extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_FENCE_FETCH_POINT;
 
 
-    
+      
     /**
     * System ID
     */
     public short target_system;
-    
+      
     /**
     * Component ID
     */
     public short target_component;
-    
+      
     /**
     * point index (first point is 1, 0 is for return point)
     */
@@ -46,11 +46,11 @@ public class msg_fence_fetch_point extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_FENCE_FETCH_POINT;
-        
+              
         packet.payload.putUnsignedByte(target_system);
-        
+              
         packet.payload.putUnsignedByte(target_component);
-        
+              
         packet.payload.putUnsignedByte(idx);
         
         return packet;
@@ -63,11 +63,11 @@ public class msg_fence_fetch_point extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-        
+              
         this.target_system = payload.getUnsignedByte();
-        
+              
         this.target_component = payload.getUnsignedByte();
-        
+              
         this.idx = payload.getUnsignedByte();
         
     }
@@ -88,7 +88,7 @@ public class msg_fence_fetch_point extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_FENCE_FETCH_POINT;
-        unpack(mavLinkPacket.payload);
+        unpack(mavLinkPacket.payload);        
     }
 
           
@@ -96,7 +96,7 @@ public class msg_fence_fetch_point extends MAVLinkMessage{
     * Returns a string with the MSG name and data
     */
     public String toString(){
-        return "MAVLINK_MSG_ID_FENCE_FETCH_POINT -"+" target_system:"+target_system+" target_component:"+target_component+" idx:"+idx+"";
+        return "MAVLINK_MSG_ID_FENCE_FETCH_POINT - sysid:"+sysid+" compid:"+compid+" target_system:"+target_system+" target_component:"+target_component+" idx:"+idx+"";
     }
 }
         

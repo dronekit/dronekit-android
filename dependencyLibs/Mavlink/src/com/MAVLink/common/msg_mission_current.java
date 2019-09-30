@@ -9,7 +9,7 @@ package com.MAVLink.common;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-
+        
 /**
 * Message that announces the sequence number of the current active mission item. The MAV will fly towards this mission item.
 */
@@ -20,7 +20,7 @@ public class msg_mission_current extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_MISSION_CURRENT;
 
 
-    
+      
     /**
     * Sequence
     */
@@ -36,7 +36,7 @@ public class msg_mission_current extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_MISSION_CURRENT;
-        
+              
         packet.payload.putUnsignedShort(seq);
         
         return packet;
@@ -49,7 +49,7 @@ public class msg_mission_current extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-        
+              
         this.seq = payload.getUnsignedShort();
         
     }
@@ -70,7 +70,7 @@ public class msg_mission_current extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_MISSION_CURRENT;
-        unpack(mavLinkPacket.payload);
+        unpack(mavLinkPacket.payload);        
     }
 
       
@@ -78,7 +78,7 @@ public class msg_mission_current extends MAVLinkMessage{
     * Returns a string with the MSG name and data
     */
     public String toString(){
-        return "MAVLINK_MSG_ID_MISSION_CURRENT -"+" seq:"+seq+"";
+        return "MAVLINK_MSG_ID_MISSION_CURRENT - sysid:"+sysid+" compid:"+compid+" seq:"+seq+"";
     }
 }
         

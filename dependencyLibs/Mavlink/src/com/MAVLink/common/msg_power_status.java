@@ -9,7 +9,7 @@ package com.MAVLink.common;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-
+        
 /**
 * Power supply status
 */
@@ -20,17 +20,17 @@ public class msg_power_status extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_POWER_STATUS;
 
 
-    
+      
     /**
     * 5V rail voltage in millivolts
     */
     public int Vcc;
-    
+      
     /**
     * servo rail voltage in millivolts
     */
     public int Vservo;
-    
+      
     /**
     * power supply status flags (see MAV_POWER_STATUS enum)
     */
@@ -46,11 +46,11 @@ public class msg_power_status extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_POWER_STATUS;
-        
+              
         packet.payload.putUnsignedShort(Vcc);
-        
+              
         packet.payload.putUnsignedShort(Vservo);
-        
+              
         packet.payload.putUnsignedShort(flags);
         
         return packet;
@@ -63,11 +63,11 @@ public class msg_power_status extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-        
+              
         this.Vcc = payload.getUnsignedShort();
-        
+              
         this.Vservo = payload.getUnsignedShort();
-        
+              
         this.flags = payload.getUnsignedShort();
         
     }
@@ -88,7 +88,7 @@ public class msg_power_status extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_POWER_STATUS;
-        unpack(mavLinkPacket.payload);
+        unpack(mavLinkPacket.payload);        
     }
 
           
@@ -96,7 +96,7 @@ public class msg_power_status extends MAVLinkMessage{
     * Returns a string with the MSG name and data
     */
     public String toString(){
-        return "MAVLINK_MSG_ID_POWER_STATUS -"+" Vcc:"+Vcc+" Vservo:"+Vservo+" flags:"+flags+"";
+        return "MAVLINK_MSG_ID_POWER_STATUS - sysid:"+sysid+" compid:"+compid+" Vcc:"+Vcc+" Vservo:"+Vservo+" flags:"+flags+"";
     }
 }
         

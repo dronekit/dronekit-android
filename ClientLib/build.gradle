@@ -4,8 +4,8 @@ apply plugin: 'com.getkeepsafe.dexcount'
 ext {
     VERSION_MAJOR = 3
     VERSION_MINOR = 0
-    VERSION_PATCH = 2
-    VERSION_SUFFIX = "release"
+    VERSION_PATCH = 4
+    VERSION_SUFFIX = "beta"
 
     PUBLISH_ARTIFACT_ID = 'dronekit-android'
     PUBLISH_VERSION = generateVersionName("", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH, VERSION_SUFFIX)

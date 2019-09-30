@@ -9,7 +9,7 @@ package com.MAVLink.common;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-
+        
 /**
 * 
 */
@@ -20,12 +20,12 @@ public class msg_encapsulated_data extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_ENCAPSULATED_DATA;
 
 
-    
+      
     /**
     * sequence number (starting with 0 on every transmission)
     */
     public int seqnr;
-    
+      
     /**
     * image data bytes
     */
@@ -41,9 +41,9 @@ public class msg_encapsulated_data extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_ENCAPSULATED_DATA;
-        
+              
         packet.payload.putUnsignedShort(seqnr);
-        
+              
         
         for (int i = 0; i < data.length; i++) {
             packet.payload.putUnsignedByte(data[i]);
@@ -60,10 +60,10 @@ public class msg_encapsulated_data extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-        
+              
         this.seqnr = payload.getUnsignedShort();
-        
-        
+              
+         
         for (int i = 0; i < this.data.length; i++) {
             this.data[i] = payload.getUnsignedByte();
         }
@@ -87,7 +87,7 @@ public class msg_encapsulated_data extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_ENCAPSULATED_DATA;
-        unpack(mavLinkPacket.payload);
+        unpack(mavLinkPacket.payload);        
     }
 
         
@@ -95,7 +95,7 @@ public class msg_encapsulated_data extends MAVLinkMessage{
     * Returns a string with the MSG name and data
     */
     public String toString(){
-        return "MAVLINK_MSG_ID_ENCAPSULATED_DATA -"+" seqnr:"+seqnr+" data:"+data+"";
+        return "MAVLINK_MSG_ID_ENCAPSULATED_DATA - sysid:"+sysid+" compid:"+compid+" seqnr:"+seqnr+" data:"+data+"";
     }
 }
         

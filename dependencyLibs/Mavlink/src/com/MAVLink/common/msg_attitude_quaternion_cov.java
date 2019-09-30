@@ -9,43 +9,43 @@ package com.MAVLink.common;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-
+        
 /**
 * The attitude in the aeronautical frame (right-handed, Z-down, X-front, Y-right), expressed as quaternion. Quaternion order is w, x, y, z and a zero rotation would be expressed as (1 0 0 0).
 */
 public class msg_attitude_quaternion_cov extends MAVLinkMessage{
 
     public static final int MAVLINK_MSG_ID_ATTITUDE_QUATERNION_COV = 61;
-    public static final int MAVLINK_MSG_LENGTH = 68;
+    public static final int MAVLINK_MSG_LENGTH = 72;
     private static final long serialVersionUID = MAVLINK_MSG_ID_ATTITUDE_QUATERNION_COV;
 
 
-    
+      
     /**
-    * Timestamp (milliseconds since system boot)
+    * Timestamp (microseconds since system boot or since UNIX epoch)
     */
-    public long time_boot_ms;
-    
+    public long time_usec;
+      
     /**
     * Quaternion components, w, x, y, z (1 0 0 0 is the null-rotation)
     */
     public float q[] = new float[4];
-    
+      
     /**
     * Roll angular speed (rad/s)
     */
     public float rollspeed;
-    
+      
     /**
     * Pitch angular speed (rad/s)
     */
     public float pitchspeed;
-    
+      
     /**
     * Yaw angular speed (rad/s)
     */
     public float yawspeed;
-    
+      
     /**
     * Attitude covariance
     */
@@ -61,21 +61,21 @@ public class msg_attitude_quaternion_cov extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_ATTITUDE_QUATERNION_COV;
-        
-        packet.payload.putUnsignedInt(time_boot_ms);
-        
+              
+        packet.payload.putUnsignedLong(time_usec);
+              
         
         for (int i = 0; i < q.length; i++) {
             packet.payload.putFloat(q[i]);
         }
                     
-        
+              
         packet.payload.putFloat(rollspeed);
-        
+              
         packet.payload.putFloat(pitchspeed);
-        
+              
         packet.payload.putFloat(yawspeed);
-        
+              
         
         for (int i = 0; i < covariance.length; i++) {
             packet.payload.putFloat(covariance[i]);
@@ -92,22 +92,22 @@ public class msg_attitude_quaternion_cov extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-        
-        this.time_boot_ms = payload.getUnsignedInt();
-        
-        
+              
+        this.time_usec = payload.getUnsignedLong();
+              
+         
         for (int i = 0; i < this.q.length; i++) {
             this.q[i] = payload.getFloat();
         }
                 
-        
+              
         this.rollspeed = payload.getFloat();
-        
+              
         this.pitchspeed = payload.getFloat();
-        
+              
         this.yawspeed = payload.getFloat();
-        
-        
+              
+         
         for (int i = 0; i < this.covariance.length; i++) {
             this.covariance[i] = payload.getFloat();
         }
@@ -131,7 +131,7 @@ public class msg_attitude_quaternion_cov extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_ATTITUDE_QUATERNION_COV;
-        unpack(mavLinkPacket.payload);
+        unpack(mavLinkPacket.payload);        
     }
 
                 
@@ -139,7 +139,7 @@ public class msg_attitude_quaternion_cov extends MAVLinkMessage{
     * Returns a string with the MSG name and data
     */
     public String toString(){
-        return "MAVLINK_MSG_ID_ATTITUDE_QUATERNION_COV -"+" time_boot_ms:"+time_boot_ms+" q:"+q+" rollspeed:"+rollspeed+" pitchspeed:"+pitchspeed+" yawspeed:"+yawspeed+" covariance:"+covariance+"";
+        return "MAVLINK_MSG_ID_ATTITUDE_QUATERNION_COV - sysid:"+sysid+" compid:"+compid+" time_usec:"+time_usec+" q:"+q+" rollspeed:"+rollspeed+" pitchspeed:"+pitchspeed+" yawspeed:"+yawspeed+" covariance:"+covariance+"";
     }
 }
         

@@ -9,10 +9,9 @@ package com.MAVLink.ardupilotmega;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-
+        
 /**
-* Status of AP_Limits. Sent in extended
-      status stream when AP_Limits is enabled
+* Status of AP_Limits. Sent in extended status stream when AP_Limits is enabled
 */
 public class msg_limits_status extends MAVLinkMessage{
 
@@ -21,47 +20,47 @@ public class msg_limits_status extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_LIMITS_STATUS;
 
 
-    
+      
     /**
     * time of last breach in milliseconds since boot
     */
     public long last_trigger;
-    
+      
     /**
     * time of last recovery action in milliseconds since boot
     */
     public long last_action;
-    
+      
     /**
     * time of last successful recovery in milliseconds since boot
     */
     public long last_recovery;
-    
+      
     /**
     * time of last all-clear in milliseconds since boot
     */
     public long last_clear;
-    
+      
     /**
     * number of fence breaches
     */
     public int breach_count;
-    
+      
     /**
     * state of AP_Limits, (see enum LimitState, LIMITS_STATE)
     */
     public short limits_state;
-    
+      
     /**
     * AP_Limit_Module bitfield of enabled modules, (see enum moduleid or LIMIT_MODULE)
     */
     public short mods_enabled;
-    
+      
     /**
     * AP_Limit_Module bitfield of required modules, (see enum moduleid or LIMIT_MODULE)
     */
     public short mods_required;
-    
+      
     /**
     * AP_Limit_Module bitfield of triggered modules, (see enum moduleid or LIMIT_MODULE)
     */
@@ -77,23 +76,23 @@ public class msg_limits_status extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_LIMITS_STATUS;
-        
+              
         packet.payload.putUnsignedInt(last_trigger);
-        
+              
         packet.payload.putUnsignedInt(last_action);
-        
+              
         packet.payload.putUnsignedInt(last_recovery);
-        
+              
         packet.payload.putUnsignedInt(last_clear);
-        
+              
         packet.payload.putUnsignedShort(breach_count);
-        
+              
         packet.payload.putUnsignedByte(limits_state);
-        
+              
         packet.payload.putUnsignedByte(mods_enabled);
-        
+              
         packet.payload.putUnsignedByte(mods_required);
-        
+              
         packet.payload.putUnsignedByte(mods_triggered);
         
         return packet;
@@ -106,23 +105,23 @@ public class msg_limits_status extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-        
+              
         this.last_trigger = payload.getUnsignedInt();
-        
+              
         this.last_action = payload.getUnsignedInt();
-        
+              
         this.last_recovery = payload.getUnsignedInt();
-        
+              
         this.last_clear = payload.getUnsignedInt();
-        
+              
         this.breach_count = payload.getUnsignedShort();
-        
+              
         this.limits_state = payload.getUnsignedByte();
-        
+              
         this.mods_enabled = payload.getUnsignedByte();
-        
+              
         this.mods_required = payload.getUnsignedByte();
-        
+              
         this.mods_triggered = payload.getUnsignedByte();
         
     }
@@ -143,7 +142,7 @@ public class msg_limits_status extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_LIMITS_STATUS;
-        unpack(mavLinkPacket.payload);
+        unpack(mavLinkPacket.payload);        
     }
 
                       
@@ -151,7 +150,7 @@ public class msg_limits_status extends MAVLinkMessage{
     * Returns a string with the MSG name and data
     */
     public String toString(){
-        return "MAVLINK_MSG_ID_LIMITS_STATUS -"+" last_trigger:"+last_trigger+" last_action:"+last_action+" last_recovery:"+last_recovery+" last_clear:"+last_clear+" breach_count:"+breach_count+" limits_state:"+limits_state+" mods_enabled:"+mods_enabled+" mods_required:"+mods_required+" mods_triggered:"+mods_triggered+"";
+        return "MAVLINK_MSG_ID_LIMITS_STATUS - sysid:"+sysid+" compid:"+compid+" last_trigger:"+last_trigger+" last_action:"+last_action+" last_recovery:"+last_recovery+" last_clear:"+last_clear+" breach_count:"+breach_count+" limits_state:"+limits_state+" mods_enabled:"+mods_enabled+" mods_required:"+mods_required+" mods_triggered:"+mods_triggered+"";
     }
 }
         

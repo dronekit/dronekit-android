@@ -9,7 +9,7 @@ package com.MAVLink.common;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
-
+        
 /**
 * A ping message either requesting or responding to a ping. This allows to measure the system latencies, including serial port, radio modem and UDP connections.
 */
@@ -20,22 +20,22 @@ public class msg_ping extends MAVLinkMessage{
     private static final long serialVersionUID = MAVLINK_MSG_ID_PING;
 
 
-    
+      
     /**
     * Unix timestamp in microseconds or since system boot if smaller than MAVLink epoch (1.1.2009)
     */
     public long time_usec;
-    
+      
     /**
     * PING sequence
     */
     public long seq;
-    
+      
     /**
     * 0: request ping from all receiving systems, if greater than 0: message is a ping response and number is the system id of the requesting system
     */
     public short target_system;
-    
+      
     /**
     * 0: request ping from all receiving components, if greater than 0: message is a ping response and number is the system id of the requesting system
     */
@@ -51,13 +51,13 @@ public class msg_ping extends MAVLinkMessage{
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_PING;
-        
+              
         packet.payload.putUnsignedLong(time_usec);
-        
+              
         packet.payload.putUnsignedInt(seq);
-        
+              
         packet.payload.putUnsignedByte(target_system);
-        
+              
         packet.payload.putUnsignedByte(target_component);
         
         return packet;
@@ -70,13 +70,13 @@ public class msg_ping extends MAVLinkMessage{
     */
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-        
+              
         this.time_usec = payload.getUnsignedLong();
-        
+              
         this.seq = payload.getUnsignedInt();
-        
+              
         this.target_system = payload.getUnsignedByte();
-        
+              
         this.target_component = payload.getUnsignedByte();
         
     }
@@ -97,7 +97,7 @@ public class msg_ping extends MAVLinkMessage{
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
         this.msgid = MAVLINK_MSG_ID_PING;
-        unpack(mavLinkPacket.payload);
+        unpack(mavLinkPacket.payload);        
     }
 
             
@@ -105,7 +105,7 @@ public class msg_ping extends MAVLinkMessage{
     * Returns a string with the MSG name and data
     */
     public String toString(){
-        return "MAVLINK_MSG_ID_PING -"+" time_usec:"+time_usec+" seq:"+seq+" target_system:"+target_system+" target_component:"+target_component+"";
+        return "MAVLINK_MSG_ID_PING - sysid:"+sysid+" compid:"+compid+" time_usec:"+time_usec+" seq:"+seq+" target_system:"+target_system+" target_component:"+target_component+"";
     }
 }
         
