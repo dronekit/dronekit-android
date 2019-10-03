@@ -13,6 +13,7 @@ import com.MAVLink.ardupilotmega.msg_mag_cal_report;
 import com.MAVLink.ardupilotmega.msg_mount_configure;
 import com.MAVLink.ardupilotmega.msg_mount_status;
 import com.MAVLink.ardupilotmega.msg_radio;
+import com.MAVLink.common.msg_radio_status;
 import com.MAVLink.common.msg_global_position_int;
 import com.MAVLink.common.msg_named_value_int;
 import com.MAVLink.common.msg_raw_imu;

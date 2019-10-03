@@ -410,7 +410,17 @@ public class GenericMavLinkDrone implements MavLinkDrone {
             case ExperimentalActions.ACTION_SEND_MAVLINK_MESSAGE:
                 data.setClassLoader(MavlinkMessageWrapper.class.getClassLoader());
                 MavlinkMessageWrapper messageWrapper = data.getParcelable(ExperimentalActions.EXTRA_MAVLINK_MESSAGE);
-                CommonApiUtils.sendMavlinkMessage(this, messageWrapper);
+
+                final short targetSys = data.getShort(ExperimentalActions.EXTRA_TARGET_SYS, (short)-1);
+                final short targetComp = data.getShort(ExperimentalActions.EXTRA_TARGET_COMPONENT, (short)-1);
+
+                if(targetSys != -1 && targetComp != -1) {
+                    Timber.d("Send message to sys %d, target %d", targetSys, targetComp);
+                    CommonApiUtils.sendMavlinkMessage(this, messageWrapper, targetSys, targetComp);
+                } else {
+                    CommonApiUtils.sendMavlinkMessage(this, messageWrapper);
+                }
+
                 return true;
 
             // INTERNAL DRONE ACTIONS
@@ -599,7 +609,6 @@ public class GenericMavLinkDrone implements MavLinkDrone {
 
     @Override
     public void onMavLinkMessageReceived(MAVLinkMessage message) {
-
         onHeartbeat(message);
 
         switch (message.msgid) {

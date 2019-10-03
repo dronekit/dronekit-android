@@ -30,6 +30,8 @@ import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.EXT
 import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.EXTRA_SERVO_CHANNEL;
 import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.EXTRA_SERVO_PWM;
 import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.EXTRA_SET_ROI_LAT_LONG_ALT;
+import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.EXTRA_TARGET_COMPONENT;
+import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.EXTRA_TARGET_SYS;
 
 /**
  * Contains drone commands with no defined interaction model yet.
@@ -113,6 +115,14 @@ public class ExperimentalApi extends Api {
     public void sendMavlinkMessage(MavlinkMessageWrapper messageWrapper) {
         Bundle params = new Bundle();
         params.putParcelable(EXTRA_MAVLINK_MESSAGE, messageWrapper);
+        drone.performAsyncActionOnDroneThread(new Action(ACTION_SEND_MAVLINK_MESSAGE, params), null);
+    }
+
+    public void sendMavlinkMessage(MavlinkMessageWrapper messageWrapper, short targetSys, short targetComponent) {
+        Bundle params = new Bundle();
+        params.putParcelable(EXTRA_MAVLINK_MESSAGE, messageWrapper);
+        params.putShort(EXTRA_TARGET_SYS, targetSys);
+        params.putShort(EXTRA_TARGET_COMPONENT, targetComponent);
         drone.performAsyncActionOnDroneThread(new Action(ACTION_SEND_MAVLINK_MESSAGE, params), null);
     }
 

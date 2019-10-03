@@ -7,6 +7,8 @@ import android.util.Log;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkStats;
 import com.MAVLink.Parser;
+import com.MAVLink.common.msg_heartbeat;
+import com.MAVLink.enums.MAV_COMPONENT;
 import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
 
 import org.droidplanner.services.android.impl.core.model.Logger;

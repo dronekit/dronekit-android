@@ -15,6 +15,7 @@ import com.MAVLink.ardupilotmega.*;
 import com.MAVLink.common.*;
 import com.MAVLink.uAvionix.*;
 import com.MAVLink.icarous.*;
+import com.MAVLink.herelink_custom.*;
 
 /**
  * Common interface for all MAVLink Messages
@@ -880,6 +881,12 @@ public class MAVLinkPacket implements Serializable {
              
             case msg_logging_ack.MAVLINK_MSG_ID_LOGGING_ACK:
                 return  new msg_logging_ack(this);
+             
+            case msg_video_stream_information.MAVLINK_MSG_ID_VIDEO_STREAM_INFORMATION:
+                return  new msg_video_stream_information(this);
+             
+            case msg_set_video_stream_settings.MAVLINK_MSG_ID_SET_VIDEO_STREAM_SETTINGS:
+                return  new msg_set_video_stream_settings(this);
              
             case msg_wifi_config_ap.MAVLINK_MSG_ID_WIFI_CONFIG_AP:
                 return  new msg_wifi_config_ap(this);

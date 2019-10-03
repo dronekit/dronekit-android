@@ -844,6 +844,43 @@ public class CommonApiUtils {
         drone.getMavClient().sendMessage(message, null);
     }
 
+    public static void sendMavlinkMessage(MavLinkDrone drone, MavlinkMessageWrapper messageWrapper,
+                                          short targetSysId, short targetComponentId) {
+        if (drone == null || messageWrapper == null) {
+            Timber.d("No drone or messageWrapper");
+            return;
+        }
+
+        MAVLinkMessage message = messageWrapper.getMavLinkMessage();
+        if (message == null) {
+            Timber.d("No message to send");
+            return;
+        }
+
+        message.compid = drone.getCompid();
+        message.sysid = drone.getSysid();
+
+        Timber.d("sendMavlinkMessage(): msg.sysid=%d msg.compid=%d targetSys=%d targetComp=%d",
+                message.sysid, message.compid, targetSysId, targetComponentId);
+
+        //Set the target system and target component for MAVLink messages that support those
+        //attributes.
+        try {
+            Class<?> tempMessage = message.getClass();
+            Field target_system = tempMessage.getDeclaredField("target_system");
+            Field target_component = tempMessage.getDeclaredField("target_component");
+
+            target_system.setShort(message, targetSysId);
+            target_component.setShort(message, targetComponentId);
+        } catch (NoSuchFieldException e) {
+            Log.v(TAG, String.format("No target_system/target_component fields in %s", message.getClass().getName()));
+        } catch(SecurityException | IllegalAccessException | IllegalArgumentException | ExceptionInInitializerError e) {
+            Timber.e(e, e.getMessage());
+        }
+
+        drone.getMavClient().sendMessage(message, null);
+    }
+
     public static void sendGuidedPoint(MavLinkDrone drone, LatLongAlt point, boolean force, ICommandListener listener) {
         if (drone == null)
             return;

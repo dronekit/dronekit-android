@@ -12,6 +12,8 @@ import android.view.Surface;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.ardupilotmega.msg_mag_cal_progress;
 import com.MAVLink.ardupilotmega.msg_mag_cal_report;
+import com.MAVLink.common.msg_heartbeat;
+import com.MAVLink.enums.MAV_COMPONENT;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.action.CameraActions;
 import com.o3dr.services.android.lib.drone.action.ConnectionActions;
@@ -419,6 +421,12 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
         if (msg != null) {
             MavlinkMessageWrapper msgWrapper = new MavlinkMessageWrapper(msg);
             for (IMavlinkObserver observer : mavlinkObserversList) {
+
+                // TODO: Remove after debugging this crap
+                if(msg.compid == MAV_COMPONENT.MAV_COMP_ID_CAMERA && msg.msgid != msg_heartbeat.MAVLINK_MSG_ID_HEARTBEAT) {
+                    Timber.d("Relaying %d from camera", msg.msgid);
+                }
+
                 try {
                     observer.onMavlinkMessageReceived(msgWrapper);
                 } catch (RemoteException e) {

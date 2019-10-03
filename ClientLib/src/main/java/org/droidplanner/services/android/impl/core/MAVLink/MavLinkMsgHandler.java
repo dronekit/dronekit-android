@@ -3,10 +3,13 @@ package org.droidplanner.services.android.impl.core.MAVLink;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.common.msg_heartbeat;
 import com.MAVLink.enums.MAV_AUTOPILOT;
+import com.MAVLink.enums.MAV_COMPONENT;
 import com.MAVLink.enums.MAV_TYPE;
 
 import org.droidplanner.services.android.impl.core.drone.manager.MavLinkDroneManager;
 import org.droidplanner.services.android.impl.core.firmware.FirmwareType;
+
+import timber.log.Timber;
 
 /**
  * Parse the received mavlink messages, and update the drone state appropriately.
@@ -23,7 +26,19 @@ public class MavLinkMsgHandler {
 
     public void receiveData(MAVLinkMessage msg) {
         if (msg.compid != AUTOPILOT_COMPONENT_ID) {
-            return;
+            if(msg.compid == MAV_COMPONENT.MAV_COMP_ID_SYSTEM_CONTROL) {
+                return;
+            }
+
+            // Filter these out to prevent some non-vehicle component from deciding what kind of
+            // vehicle this is.
+            if(msg.msgid == msg_heartbeat.MAVLINK_MSG_ID_HEARTBEAT) {
+//                Timber.d("heartbeat from some other component");
+                return;
+            }
+
+            Timber.d("Message is from component %d", msg.compid);
+//            return;
         }
 
         switch (msg.msgid) {
