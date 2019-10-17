@@ -1,12 +1,16 @@
 package org.droidplanner.services.android.impl.api;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
@@ -219,20 +223,46 @@ public class DroidPlannerService extends Service {
     private void updateForegroundNotification() {
         final Context context = getApplicationContext();
 
-        //Put the service in the foreground
-        final NotificationCompat.Builder notifBuilder = new NotificationCompat.Builder(context)
-                .setContentTitle("DroneKit-Android")
-                .setPriority(NotificationCompat.PRIORITY_MIN)
-                .setSmallIcon(R.drawable.ic_stat_notify);
-
-        final int connectedCount = droneApiStore.size();
-        if (connectedCount > 1) {
-            notifBuilder.setContentText(connectedCount + " connected apps");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startMyOwnForeground();
         }
+        else {
+            //Put the service in the foreground
+            final NotificationCompat.Builder notifBuilder = new NotificationCompat.Builder(context)
+                    .setContentTitle("DroneKit-Android")
+                    .setPriority(NotificationCompat.PRIORITY_MIN)
+                    .setSmallIcon(R.drawable.ic_stat_notify);
 
-        final Notification notification = notifBuilder.build();
+            final int connectedCount = droneApiStore.size();
+            if (connectedCount > 1) {
+                notifBuilder.setContentText(connectedCount + " connected apps");
+            }
+
+            final Notification notification = notifBuilder.build();
+            startForeground(FOREGROUND_ID, notification);
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.O)
+    private void startMyOwnForeground(){
+        String NOTIFICATION_CHANNEL_ID = "DroneKit-Android";
+        String channelName = "DroidPlanner Service";
+        NotificationChannel chan = new NotificationChannel(NOTIFICATION_CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_NONE);
+        chan.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        assert manager != null;
+        manager.createNotificationChannel(chan);
+
+        Notification.Builder notificationBuilder = new Notification.Builder(this, NOTIFICATION_CHANNEL_ID);
+        Notification notification = notificationBuilder.setOngoing(true)
+                .setSmallIcon(R.drawable.ic_stat_notify)
+                .setContentTitle("DroneKit-Android")
+                .setPriority(Notification.PRIORITY_MIN)
+                .setCategory(Notification.CATEGORY_SERVICE)
+                .build();
         startForeground(FOREGROUND_ID, notification);
     }
+
 
     @Override
     public void onDestroy() {
