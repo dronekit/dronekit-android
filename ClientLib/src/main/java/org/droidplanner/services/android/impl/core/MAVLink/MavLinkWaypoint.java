@@ -36,7 +36,7 @@ public class MavLinkWaypoint {
 		msg_mission_request_list msg = new msg_mission_request_list();
 		msg.target_system = drone.getSysid();
 		msg.target_component = drone.getCompid();
-		msg.isMavlink2 = true;
+		msg.isMavlink2 = false;
 		msg.mission_type = 0;
 		drone.getMavClient().sendMessage(msg, null);
 	}
