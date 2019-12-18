@@ -29,25 +29,47 @@ public enum ApmModes {
 	ROTOR_RTL(6, "RTL",MAV_TYPE.MAV_TYPE_QUADROTOR),
 	ROTOR_CIRCLE(7, "Circle",MAV_TYPE.MAV_TYPE_QUADROTOR),
 	ROTOR_LAND(9, "Land",MAV_TYPE.MAV_TYPE_QUADROTOR),
-	ROTOR_TOY(11, "Drift",MAV_TYPE.MAV_TYPE_QUADROTOR),
+	ROTOR_DRIFT(11, "Drift",MAV_TYPE.MAV_TYPE_QUADROTOR),
 	ROTOR_SPORT(13, "Sport",MAV_TYPE.MAV_TYPE_QUADROTOR),
 	ROTOR_AUTOTUNE(15, "Autotune",MAV_TYPE.MAV_TYPE_QUADROTOR),
 	ROTOR_POSHOLD(16, "PosHold",MAV_TYPE.MAV_TYPE_QUADROTOR),
 	ROTOR_BRAKE(17,"Brake",MAV_TYPE.MAV_TYPE_QUADROTOR),
+	ROTOR_THROW(18,"Brake",MAV_TYPE.MAV_TYPE_QUADROTOR),
+	ROTOR_AVOID_ADSB(19,"Brake",MAV_TYPE.MAV_TYPE_QUADROTOR),
+	ROTOR_GUIDED_NOGPS(20,"Brake",MAV_TYPE.MAV_TYPE_QUADROTOR),
+	ROTOR_SMART_RTL(21,"SmartRTL",MAV_TYPE.MAV_TYPE_QUADROTOR),
+	ROTOR_FLOWHOLD(22,"Follow",MAV_TYPE.MAV_TYPE_QUADROTOR),
+	ROTOR_FOLLOW(23,"Follow",MAV_TYPE.MAV_TYPE_QUADROTOR),
+	ROTOR_ZIGZAG(24,"Follow",MAV_TYPE.MAV_TYPE_QUADROTOR),
 
 	ROVER_MANUAL(0, "MANUAL", MAV_TYPE.MAV_TYPE_GROUND_ROVER),
+	ROVER_ACRO(1, "LEARNING", MAV_TYPE.MAV_TYPE_GROUND_ROVER),
 	ROVER_LEARNING(2, "LEARNING", MAV_TYPE.MAV_TYPE_GROUND_ROVER),
 	ROVER_STEERING(3, "STEERING", MAV_TYPE.MAV_TYPE_GROUND_ROVER),
 	ROVER_HOLD(4, "HOLD", MAV_TYPE.MAV_TYPE_GROUND_ROVER),
+	ROVER_FOLLOW(6, "FOLLOW", MAV_TYPE.MAV_TYPE_GROUND_ROVER),
 	ROVER_AUTO(10, "AUTO", MAV_TYPE.MAV_TYPE_GROUND_ROVER),
 	ROVER_RTL(11, "RTL", MAV_TYPE.MAV_TYPE_GROUND_ROVER),
+	ROVER_SMART_RTL(12, "SmartRTL", MAV_TYPE.MAV_TYPE_GROUND_ROVER),
 	ROVER_GUIDED(15, "GUIDED", MAV_TYPE.MAV_TYPE_GROUND_ROVER),
 	ROVER_INITIALIZING(16, "INITIALIZING", MAV_TYPE.MAV_TYPE_GROUND_ROVER),
+
+
+	SUBMARINE_STABILIZE (0, "Stabilize", MAV_TYPE.MAV_TYPE_SUBMARINE),
+	SUBMARINE_ACRO (1, "Acro", MAV_TYPE.MAV_TYPE_SUBMARINE),
+	SUBMARINE_ALT_HOLD (2, "Alt Hold", MAV_TYPE.MAV_TYPE_SUBMARINE),
+	SUBMARINE_AUTO (3, "Auto", MAV_TYPE.MAV_TYPE_SUBMARINE),
+	SUBMARINE_GUIDED (4, "GUIDED", MAV_TYPE.MAV_TYPE_SUBMARINE),
+	SUBMARINE_CIRCLE (7, "Circle", MAV_TYPE.MAV_TYPE_SUBMARINE),
+	SUBMARINE_SURFACE (9, "Surface", MAV_TYPE.MAV_TYPE_SUBMARINE),
+	SUBMARINE_POSHOLD (16, "PosHold", MAV_TYPE.MAV_TYPE_SUBMARINE),
+	SUBMARINE_MANUAL(19,"MANUAL", MAV_TYPE.MAV_TYPE_SUBMARINE),
+	SUBMARINE_MOTOR_DETECT (20, "Motor Detect", MAV_TYPE.MAV_TYPE_SUBMARINE),
 
 	UNKNOWN(-1, "Unknown", MAV_TYPE.MAV_TYPE_GENERIC);
 
 	private final long number;
-    private final String name;
+	private final String name;
 	private final int type;
 
 	ApmModes(long number,String name, int type){
@@ -69,9 +91,9 @@ public enum ApmModes {
 	}
 
 	public static ApmModes getMode(long i, int type) {
-        if (isCopter(type)) {
-            type = MAV_TYPE.MAV_TYPE_QUADROTOR;
-        }
+		if (isCopter(type)) {
+			type = MAV_TYPE.MAV_TYPE_QUADROTOR;
+		}
 
 		for (ApmModes mode : ApmModes.values()) {
 			if (i == mode.getNumber() && type == mode.getType()) {
@@ -82,9 +104,9 @@ public enum ApmModes {
 	}
 
 	public static ApmModes getMode(String str, int type) {
-        if (isCopter(type)) {
-            type = MAV_TYPE.MAV_TYPE_QUADROTOR;
-        }
+		if (isCopter(type)) {
+			type = MAV_TYPE.MAV_TYPE_QUADROTOR;
+		}
 
 		for (ApmModes mode : ApmModes.values()) {
 			if (str.equals(mode.getName()) && type == mode.getType()) {
@@ -116,15 +138,15 @@ public enum ApmModes {
 
 	public static boolean isCopter(int type){
 		switch (type) {
-		case MAV_TYPE.MAV_TYPE_TRICOPTER:
-		case MAV_TYPE.MAV_TYPE_QUADROTOR:
-		case MAV_TYPE.MAV_TYPE_HEXAROTOR:
-		case MAV_TYPE.MAV_TYPE_OCTOROTOR:
-		case MAV_TYPE.MAV_TYPE_HELICOPTER:
-			return true;
+			case MAV_TYPE.MAV_TYPE_TRICOPTER:
+			case MAV_TYPE.MAV_TYPE_QUADROTOR:
+			case MAV_TYPE.MAV_TYPE_HEXAROTOR:
+			case MAV_TYPE.MAV_TYPE_OCTOROTOR:
+			case MAV_TYPE.MAV_TYPE_HELICOPTER:
+				return true;
 
-		default:
-			return false;
+			default:
+				return false;
 		}
 	}
 

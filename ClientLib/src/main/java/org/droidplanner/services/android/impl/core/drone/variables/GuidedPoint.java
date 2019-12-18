@@ -80,6 +80,11 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener<MavLin
             return droneMode == ApmModes.ROVER_GUIDED || droneMode == ApmModes.ROVER_HOLD;
         }
 
+        if (Type.isSubMarine(droneType)) {
+            return droneMode == ApmModes.SUBMARINE_GUIDED;
+        }
+
+
         return false;
     }
 
@@ -112,6 +117,8 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener<MavLin
             forceSendGuidedPoint(drone, getGpsPosition(drone), getDroneAltConstrained(drone));
         } else if (Type.isRover(droneType)) {
             droneState.changeFlightMode(ApmModes.ROVER_GUIDED, listener);
+        }else if (Type.isSubMarine(droneType)) {
+            droneState.changeFlightMode(ApmModes.SUBMARINE_GUIDED, listener);
         }
     }
 
@@ -314,6 +321,7 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener<MavLin
 
     public static void forceSendGuidedPoint(MavLinkDrone drone, LatLong coord, double altitudeInMeters) {
         drone.notifyDroneEvent(DroneEventsType.GUIDEDPOINT);
+        //MHEFNY: BUG when calling change altitude without setting a first destination point coord is NULL
         if (coord != null) {
             MavLinkCommands.setGuidedMode(drone, coord.getLatitude(), coord.getLongitude(), altitudeInMeters);
         }

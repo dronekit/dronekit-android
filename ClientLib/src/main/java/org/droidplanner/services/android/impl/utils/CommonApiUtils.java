@@ -172,13 +172,16 @@ public class CommonApiUtils {
             case ROTOR_RTL:
                 return VehicleMode.COPTER_RTL;
 
+            case ROTOR_SMART_RTL:
+                return VehicleMode.COPTER_SMART_RTL;
+
             case ROTOR_CIRCLE:
                 return VehicleMode.COPTER_CIRCLE;
 
             case ROTOR_LAND:
                 return VehicleMode.COPTER_LAND;
 
-            case ROTOR_TOY:
+            case ROTOR_DRIFT:
                 return VehicleMode.COPTER_DRIFT;
 
             case ROTOR_SPORT:
@@ -193,9 +196,30 @@ public class CommonApiUtils {
             case ROTOR_BRAKE:
                 return VehicleMode.COPTER_BRAKE;
 
+            case ROTOR_THROW:
+                return VehicleMode.COPTER_THROW;
+
+            case ROTOR_AVOID_ADSB:
+                return VehicleMode.COPTER_AVOID_ADSB;
+
+            case ROTOR_GUIDED_NOGPS:
+                return VehicleMode.COPTER_GUIDED_NOGPS;
+
+            case ROTOR_FLOWHOLD:
+                return VehicleMode.COPTER_FOLLOW;
+
+            case ROTOR_FOLLOW:
+                return VehicleMode.COPTER_FOLLOW;
+
+            case ROTOR_ZIGZAG:
+                return VehicleMode.COPTER_FOLLOW;
+
 
             case ROVER_MANUAL:
                 return VehicleMode.ROVER_MANUAL;
+
+            case ROVER_ACRO:
+                return VehicleMode.ROVER_ACRO;
 
             case ROVER_LEARNING:
                 return VehicleMode.ROVER_LEARNING;
@@ -209,14 +233,41 @@ public class CommonApiUtils {
             case ROVER_AUTO:
                 return VehicleMode.ROVER_AUTO;
 
+            case ROVER_FOLLOW:
+                return VehicleMode.ROVER_FOLLOW;
+
             case ROVER_RTL:
                 return VehicleMode.ROVER_RTL;
+
+            case ROVER_SMART_RTL:
+                return VehicleMode.ROVER_SMART_RTL;
 
             case ROVER_GUIDED:
                 return VehicleMode.ROVER_GUIDED;
 
             case ROVER_INITIALIZING:
                 return VehicleMode.ROVER_INITIALIZING;
+
+            case SUBMARINE_STABILIZE:
+                return VehicleMode.SUBMARINE_STABILIZE;
+            case SUBMARINE_ACRO:
+                return VehicleMode.SUBMARINE_ACRO;
+            case SUBMARINE_ALT_HOLD:
+                return VehicleMode.SUBMARINE_ALT_HOLD;
+            case SUBMARINE_AUTO:
+                return VehicleMode.SUBMARINE_AUTO;
+            case SUBMARINE_GUIDED:
+                return VehicleMode.SUBMARINE_GUIDED;
+            case SUBMARINE_CIRCLE:
+                return VehicleMode.SUBMARINE_CIRCLE;
+            case SUBMARINE_SURFACE:
+                return VehicleMode.SUBMARINE_SURFACE;
+            case SUBMARINE_POSHOLD:
+                return VehicleMode.SUBMARINE_POSHOLD;
+            case SUBMARINE_MANUAL:
+                return VehicleMode.SUBMARINE_MANUAL;
+            case SUBMARINE_MOTOR_DETECT:
+                return VehicleMode.SUBMARINE_MOTOR_DETECT;
 
             default:
             case UNKNOWN:
@@ -240,6 +291,9 @@ public class CommonApiUtils {
             case MAV_TYPE.MAV_TYPE_GROUND_ROVER:
             case MAV_TYPE.MAV_TYPE_SURFACE_BOAT:
                 return Type.TYPE_ROVER;
+
+            case MAV_TYPE.MAV_TYPE_SUBMARINE:
+                return Type.TYPE_SUBMARINE;
 
             default:
                 return -1;
@@ -386,9 +440,9 @@ public class CommonApiUtils {
                 : null;
 
         return new State(isConnected, CommonApiUtils.getVehicleMode(droneMode), droneState.isArmed(),
-            droneState.isFlying(), droneState.getErrorId(), drone.getMavlinkVersion(), calibrationMessage,
-            droneState.getFlightStartTime(), generateEkfStatus(droneState.getEkfStatus()),
-            isConnected && drone.isConnectionAlive(), vibration);
+                droneState.isFlying(), droneState.getErrorId(), drone.getMavlinkVersion(), calibrationMessage,
+                droneState.getFlightStartTime(), generateEkfStatus(droneState.getEkfStatus()),
+                isConnected && drone.isConnectionAlive(), vibration);
     }
 
     public static EkfStatus generateEkfStatus(msg_ekf_status_report ekfStatus) {
@@ -397,8 +451,8 @@ public class CommonApiUtils {
         }
 
         EkfStatus proxyEkfStatus = new EkfStatus(ekfStatus.flags, ekfStatus.compass_variance,
-            ekfStatus.pos_horiz_variance, ekfStatus.terrain_alt_variance, ekfStatus.velocity_variance,
-            ekfStatus.pos_vert_variance);
+                ekfStatus.pos_horiz_variance, ekfStatus.terrain_alt_variance, ekfStatus.velocity_variance,
+                ekfStatus.pos_vert_variance);
 
         return proxyEkfStatus;
     }
@@ -987,7 +1041,7 @@ public class CommonApiUtils {
     }
 
     public static void startVideoStreamForObserver(Drone drone, String appId, String videoTag,
-                                        ICommandListener listener) {
+                                                   ICommandListener listener) {
         if (!(drone instanceof GenericMavLinkDrone)) {
             postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
             return;
@@ -998,7 +1052,7 @@ public class CommonApiUtils {
     }
 
     public static void stopVideoStreamForObserver(Drone drone, String appId, String videoTag,
-                                       ICommandListener listener) {
+                                                  ICommandListener listener) {
         if (!(drone instanceof GenericMavLinkDrone)) {
             postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
             return;
