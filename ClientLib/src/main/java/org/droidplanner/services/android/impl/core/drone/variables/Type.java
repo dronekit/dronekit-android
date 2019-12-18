@@ -63,6 +63,10 @@ public class Type extends DroneVariable<MavLinkDrone> implements DroneInterfaces
         return type == MAV_TYPE.MAV_TYPE_GROUND_ROVER;
     }
 
+    public static boolean isSubMarine(int type){
+        return type == MAV_TYPE.MAV_TYPE_SUBMARINE;
+    }
+
     @Override
     public void onDroneEvent(DroneEventsType event, MavLinkDrone drone) {
         switch(event){

@@ -34,6 +34,7 @@ import org.droidplanner.services.android.impl.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.impl.core.drone.autopilot.apm.ArduCopter;
 import org.droidplanner.services.android.impl.core.drone.autopilot.apm.ArduPlane;
 import org.droidplanner.services.android.impl.core.drone.autopilot.apm.ArduRover;
+import org.droidplanner.services.android.impl.core.drone.autopilot.apm.ArduSub;
 import org.droidplanner.services.android.impl.core.drone.autopilot.apm.solo.ArduSolo;
 import org.droidplanner.services.android.impl.core.drone.autopilot.generic.GenericMavLinkDrone;
 import org.droidplanner.services.android.impl.core.drone.autopilot.px4.Px4Native;
@@ -119,6 +120,11 @@ public class MavLinkDroneManager extends DroneManager<MavLinkDrone, MAVLinkPacke
             case ARDU_ROVER:
                 Timber.i("Instantiating ArduPlane autopilot.");
                 this.drone = new ArduRover(droneId, context, mavClient, handler, new AndroidApWarningParser(), this);
+                break;
+
+            case ARDU_SUB:
+                Timber.i("Instantiating ArduSub autopilot.");
+                this.drone = new ArduSub(droneId, context, mavClient, handler, new AndroidApWarningParser(), this);
                 break;
 
             case PX4_NATIVE:

@@ -56,6 +56,10 @@ public class MavLinkMsgHandler {
                         droneMgr.onVehicleTypeReceived(FirmwareType.ARDU_COPTER);
                         break;
 
+                    case MAV_TYPE.MAV_TYPE_SUBMARINE:
+                        droneMgr.onVehicleTypeReceived(FirmwareType.ARDU_SUB);
+                        break;
+
                     case MAV_TYPE.MAV_TYPE_GROUND_ROVER:
                     case MAV_TYPE.MAV_TYPE_SURFACE_BOAT:
                         droneMgr.onVehicleTypeReceived(FirmwareType.ARDU_ROVER);
