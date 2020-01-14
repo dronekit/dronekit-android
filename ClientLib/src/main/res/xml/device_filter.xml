@@ -1,18 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- 0x0403 / 0x6001: FTDI FT232R UART -->
-	<usb-device vendor-id="1027" product-id="24577" /> <!-- FT232RL -->
-	<usb-device vendor-id="1027" product-id="24596" /> <!-- FT232H -->
-	<usb-device vendor-id="1027" product-id="24597" /> <!-- FT231X 0x0403 / 0x6015 -->
-	<usb-device vendor-id="1027" product-id="24592" /> <!-- FT2232C/D/HL -->
-	<usb-device vendor-id="1027" product-id="24593" /> <!-- FT4232HL -->
-	<usb-device vendor-id="1027" product-id="24597" /> <!-- FT230X -->
-	<usb-device vendor-id="1412" product-id="45088" /> <!-- REX-USB60F -->
-    <usb-device vendor-id="9025" product-id="16" /><!-- APM 2.5 device -->    
-    <usb-device vendor-id="9900" product-id="16" /><!-- APM 2.5 device -->
-    <usb-device vendor-id="9900" product-id="17" /><!-- Pixhawk device -->
-    <usb-device vendor-id="5824" product-id="1155" /><!--  Teensyduino  -->
-    <usb-device vendor-id="4292" product-id="60000" /><!-- CP210x UART Bridge -->
+    <usb-device vendor-id="1003" product-id="8260" />   <!-- VENDOR_ATMEL = 0x03EB ATMEL_LUFA_CDC_DEMO_APP = 0x2044-->
+    <usb-device vendor-id="1027" product-id="24577" />  <!-- VENDOR_FTDI FTDI_FT232R -->
+    <usb-device vendor-id="1027" product-id="24596" />  <!-- FT232H -->
+    <usb-device vendor-id="1027" product-id="24597" />  <!-- VENDOR_FTDI FTDI_FT231X -->
+    <usb-device vendor-id="1027" product-id="24592" />  <!-- FT2232C/D/HL -->
+    <usb-device vendor-id="1027" product-id="24593" />  <!-- FT4232HL -->
+    <usb-device vendor-id="1027" product-id="24577" />  <!-- VENDOR_FTDI Pixhawk 2.1 Cube USB\VID_0403&PID_6001&REV_0600-->
+    <usb-device vendor-id="1027" product-id="24597" />  <!-- FT230X -->
     <usb-device vendor-id="1118" product-id="688"/>
-    <usb-device vendor-id="1659" product-id="8963" /><!-- PL2303 -->
+    <usb-device vendor-id="1155" product-id="22336" />  <!-- VENDOR_ARDUPILOT_CHIBIOS1 DEVICE_ARDUPILOT_CHIBIOS-->
+    <usb-device vendor-id="1412" product-id="45088" />  <!-- REX-USB60F -->
+    <usb-device vendor-id="1659" product-id="8963" />   <!-- PL2303 -->
+    <usb-device vendor-id="4292" product-id="60000" />  <!-- CP210x UART Bridge -->
+    <usb-device vendor-id="4617" product-id="22336" />  <!-- VENDOR_ARDUPILOT_CHIBIOS2 DEVICE_ARDUPILOT_CHIBIOS-->
+
+    <usb-device vendor-id="5446" product-id="421" />  <!-- VENDOR_UBLOX DEVICE_UBLOX_5-->
+    <usb-device vendor-id="5446" product-id="422" />  <!-- VENDOR_UBLOX DEVICE_UBLOX_6-->
+    <usb-device vendor-id="5446" product-id="423" />  <!-- VENDOR_UBLOX DEVICE_UBLOX_7-->
+    <usb-device vendor-id="5446" product-id="424" />  <!-- VENDOR_UBLOX DEVICE_UBLOX_8-->
+
+    <usb-device vendor-id="5824" product-id="1155" />   <!--  VAN_OOIJEN_TECH_TEENSYDUINO_SERIAL  -->
+    <usb-device vendor-id="9025" product-id="16" />     <!-- APM 2.5 device -->
+    <usb-device vendor-id="9900" product-id="17" />     <!-- VENDOR_PX4  DEVICE_PX4FMU  ALSO VENDOR_ARDUINO2 PIXHAWK-->
+    <usb-device vendor-id="9025" product-id="1002" />   <!-- RCGroups-->
+    <usb-device vendor-id="9025" product-id="1002" />   <!-- CHEERSON CX-20  [http://www.bestquadcoptersreviews.com/cheerson-cx-20-review-on-the-auto-pathfinder-model/] -->
+    <usb-device vendor-id="9025" product-id="1002" />   <!-- RCGroup -->
+    <usb-device vendor-id="9900" product-id="16" />     <!-- APM 2.5 device -->
+    <usb-device vendor-id="9900" product-id="22" />     <!-- VENDOR_RADIOLINK_MINI  USB\VID_26AC&PID_0016&REV_0101 -->
+    <usb-device vendor-id="4617" product-id="22336" />  <!--  VENDOR_ARDUPILOT_CHIBIOS2 = 0x1209&PID_5740&REV_0200-->
+    <usb-device vendor-id="8137" product-id="131" />    <!-- VENDOR_DRAGONLINK = 0x1FC9 &DEVICE_DRAGONLINK = 0x0083;-->
+
+    <usb-device vendor-id="8352" product-id="16733" />  <!-- VENDOR_OPENPILOT DEVICE_CC3D-->
+    <usb-device vendor-id="8352" product-id="16848" />  <!-- VENDOR_OPENPILOT DEVICE_SPARKY2-->
+    <usb-device vendor-id="8352" product-id="16732" />  <!-- VENDOR_OPENPILOT DEVICE_OPLINK-->
+    <usb-device vendor-id="8352" product-id="16734" />  <!-- VENDOR_OPENPILOT DEVICE_REVOLUTION-->
+
+    <usb-device vendor-id="11694" product-id="4113" />  <!-- Pixhawk 2.1 Cube USB\VID_2DAE&PID_1011&REV_0200-->
+
+
+
+
+
+
+
+
 </resources>
