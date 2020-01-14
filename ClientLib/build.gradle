@@ -111,7 +111,6 @@ dependencies {
     //MP4 generation library
     compile 'com.googlecode.mp4parser:isoparser:1.1.7'
 
-    compile 'org.droidplanner.android:usb-serial-android:0.1.0'
 
     debugCompile project(':Mavlink')
 //    sitlCompile project(':Mavlink')
