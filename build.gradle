@@ -5,18 +5,19 @@ buildscript {
         play_services_version = '8.4.0'
         support_lib_version = '23.4.0'
 
-        android_build_sdk_version = 27
-        android_build_tools_version = '27.0.3'
+        android_build_sdk_version = 28
+//        android_build_tools_version = '28.0.3'
         android_build_target_sdk_version = 22
         android_build_min_sdk_version = 14
     }
 
     repositories {
+        google()
         jcenter()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.5.0'
+        classpath 'com.android.tools.build:gradle:3.2.1'
 
         //Dexcount gradle plugin
         classpath 'com.getkeepsafe.dexcount:dexcount-gradle-plugin:0.4.4'
@@ -105,14 +106,15 @@ subprojects {
 
 allprojects {
     repositories {
+        google()
         jcenter()
 
-        maven {
-            url getMavenRepoUrl()
-            credentials {
-                username getMavenUsername()
-                password getMavenApiKey()
-            }
-        }
+//        maven {
+//            url getMavenRepoUrl()
+//            credentials {
+//                username getMavenUsername()
+//                password getMavenApiKey()
+//            }
+//        }
     }
 }
