@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * Ack message during waypoint handling. The type field states if this message is a positive ack (type=0) or if an error happened (type=non-zero).
+ * Acknowledgment message during waypoint handling. The type field states if this message is a positive ack (type=0) or if an error happened (type=non-zero).
  */
 public class msg_mission_ack extends MAVLinkMessage {
 
@@ -32,12 +32,12 @@ public class msg_mission_ack extends MAVLinkMessage {
     public short target_component;
       
     /**
-     * See MAV_MISSION_RESULT enum
+     * Mission result.
      */
     public short type;
       
     /**
-     * Mission type, see MAV_MISSION_TYPE
+     * Mission type.
      */
     public short mission_type;
     

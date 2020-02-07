@@ -22,27 +22,27 @@ public class msg_mount_orientation extends MAVLinkMessage {
 
       
     /**
-     * Timestamp (milliseconds since system boot)
+     * Timestamp (time since system boot).
      */
     public long time_boot_ms;
       
     /**
-     * Roll in global frame in degrees (set to NaN for invalid).
+     * Roll in global frame (set to NaN for invalid).
      */
     public float roll;
       
     /**
-     * Pitch in global frame in degrees (set to NaN for invalid).
+     * Pitch in global frame (set to NaN for invalid).
      */
     public float pitch;
       
     /**
-     * Yaw relative to vehicle in degrees (set to NaN for invalid).
+     * Yaw relative to vehicle(set to NaN for invalid).
      */
     public float yaw;
       
     /**
-     * Yaw in absolute frame in degrees, North is 0 (set to NaN for invalid).
+     * Yaw in absolute frame, North is 0 (set to NaN for invalid).
      */
     public float yaw_absolute;
     

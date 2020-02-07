@@ -32,7 +32,7 @@ public class msg_mission_request_list extends MAVLinkMessage {
     public short target_component;
       
     /**
-     * Mission type, see MAV_MISSION_TYPE
+     * Mission type.
      */
     public short mission_type;
     

@@ -27,17 +27,17 @@ public class msg_serial_control extends MAVLinkMessage {
     public long baudrate;
       
     /**
-     * Timeout for reply data in milliseconds
+     * Timeout for reply data
      */
     public int timeout;
       
     /**
-     * See SERIAL_CONTROL_DEV enum
+     * Serial control device type.
      */
     public short device;
       
     /**
-     * See SERIAL_CONTROL_FLAG enum
+     * Bitmap of serial control flags.
      */
     public short flags;
       

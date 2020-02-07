@@ -22,12 +22,12 @@ public class msg_uavcan_node_info extends MAVLinkMessage {
 
       
     /**
-     * Timestamp (microseconds since UNIX epoch or microseconds since system boot)
+     * Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude the number.
      */
     public long time_usec;
       
     /**
-     * The number of seconds since the start-up of the node.
+     * Time since the start-up of the node.
      */
     public long uptime_sec;
       

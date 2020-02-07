@@ -22,37 +22,37 @@ public class msg_attitude extends MAVLinkMessage {
 
       
     /**
-     * Timestamp (milliseconds since system boot)
+     * Timestamp (time since system boot).
      */
     public long time_boot_ms;
       
     /**
-     * Roll angle (rad, -pi..+pi)
+     * Roll angle (-pi..+pi)
      */
     public float roll;
       
     /**
-     * Pitch angle (rad, -pi..+pi)
+     * Pitch angle (-pi..+pi)
      */
     public float pitch;
       
     /**
-     * Yaw angle (rad, -pi..+pi)
+     * Yaw angle (-pi..+pi)
      */
     public float yaw;
       
     /**
-     * Roll angular speed (rad/s)
+     * Roll angular speed
      */
     public float rollspeed;
       
     /**
-     * Pitch angular speed (rad/s)
+     * Pitch angular speed
      */
     public float pitchspeed;
       
     /**
-     * Yaw angular speed (rad/s)
+     * Yaw angular speed
      */
     public float yawspeed;
     

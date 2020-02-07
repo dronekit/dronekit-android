@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * raw ADC output
+ * Raw ADC output.
  */
 public class msg_ap_adc extends MAVLinkMessage {
 
@@ -22,32 +22,32 @@ public class msg_ap_adc extends MAVLinkMessage {
 
       
     /**
-     * ADC output 1
+     * ADC output 1.
      */
     public int adc1;
       
     /**
-     * ADC output 2
+     * ADC output 2.
      */
     public int adc2;
       
     /**
-     * ADC output 3
+     * ADC output 3.
      */
     public int adc3;
       
     /**
-     * ADC output 4
+     * ADC output 4.
      */
     public int adc4;
       
     /**
-     * ADC output 5
+     * ADC output 5.
      */
     public int adc5;
       
     /**
-     * ADC output 6
+     * ADC output 6.
      */
     public int adc6;
     

@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * Bind a RC channel to a parameter. The parameter should change accoding to the RC channel value.
+ * Bind a RC channel to a parameter. The parameter should change according to the RC channel value.
  */
 public class msg_param_map_rc extends MAVLinkMessage {
 
@@ -62,7 +62,7 @@ public class msg_param_map_rc extends MAVLinkMessage {
     public byte param_id[] = new byte[16];
       
     /**
-     * Index of parameter RC channel. Not equal to the RC channel id. Typically correpsonds to a potentiometer-knob on the RC.
+     * Index of parameter RC channel. Not equal to the RC channel id. Typically corresponds to a potentiometer-knob on the RC.
      */
     public short parameter_rc_channel_index;
     

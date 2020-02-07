@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * Status of simulation environment, if used
+ * Status of simulation environment, if used.
  */
 public class msg_simstate extends MAVLinkMessage {
 
@@ -22,57 +22,57 @@ public class msg_simstate extends MAVLinkMessage {
 
       
     /**
-     * Roll angle (rad)
+     * Roll angle.
      */
     public float roll;
       
     /**
-     * Pitch angle (rad)
+     * Pitch angle.
      */
     public float pitch;
       
     /**
-     * Yaw angle (rad)
+     * Yaw angle.
      */
     public float yaw;
       
     /**
-     * X acceleration m/s/s
+     * X acceleration.
      */
     public float xacc;
       
     /**
-     * Y acceleration m/s/s
+     * Y acceleration.
      */
     public float yacc;
       
     /**
-     * Z acceleration m/s/s
+     * Z acceleration.
      */
     public float zacc;
       
     /**
-     * Angular speed around X axis rad/s
+     * Angular speed around X axis.
      */
     public float xgyro;
       
     /**
-     * Angular speed around Y axis rad/s
+     * Angular speed around Y axis.
      */
     public float ygyro;
       
     /**
-     * Angular speed around Z axis rad/s
+     * Angular speed around Z axis.
      */
     public float zgyro;
       
     /**
-     * Latitude in degrees * 1E7
+     * Latitude.
      */
     public int lat;
       
     /**
-     * Longitude in degrees * 1E7
+     * Longitude.
      */
     public int lng;
     

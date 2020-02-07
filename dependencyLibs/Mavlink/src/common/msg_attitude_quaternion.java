@@ -22,7 +22,7 @@ public class msg_attitude_quaternion extends MAVLinkMessage {
 
       
     /**
-     * Timestamp (milliseconds since system boot)
+     * Timestamp (time since system boot).
      */
     public long time_boot_ms;
       
@@ -47,17 +47,17 @@ public class msg_attitude_quaternion extends MAVLinkMessage {
     public float q4;
       
     /**
-     * Roll angular speed (rad/s)
+     * Roll angular speed
      */
     public float rollspeed;
       
     /**
-     * Pitch angular speed (rad/s)
+     * Pitch angular speed
      */
     public float pitchspeed;
       
     /**
-     * Yaw angular speed (rad/s)
+     * Yaw angular speed
      */
     public float yawspeed;
     

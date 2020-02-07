@@ -22,32 +22,32 @@ public class msg_mount_configure extends MAVLinkMessage {
 
       
     /**
-     * System ID
+     * System ID.
      */
     public short target_system;
       
     /**
-     * Component ID
+     * Component ID.
      */
     public short target_component;
       
     /**
-     * mount operating mode (see MAV_MOUNT_MODE enum)
+     * Mount operating mode.
      */
     public short mount_mode;
       
     /**
-     * (1 = yes, 0 = no)
+     * (1 = yes, 0 = no).
      */
     public short stab_roll;
       
     /**
-     * (1 = yes, 0 = no)
+     * (1 = yes, 0 = no).
      */
     public short stab_pitch;
       
     /**
-     * (1 = yes, 0 = no)
+     * (1 = yes, 0 = no).
      */
     public short stab_yaw;
     

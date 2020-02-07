@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * The heartbeat message shows that a system is present and responding. The type of the MAV and Autopilot hardware allow the receiving system to treat further messages from this system appropriate (e.g. by laying out the user interface based on the autopilot).
+ * The heartbeat message shows that a system or component is present and responding. The type and autopilot fields (along with the message component id), allow the receiving system to treat further messages from this system appropriately (e.g. by laying out the user interface based on the autopilot). This microservice is documented at https://mavlink.io/en/services/heartbeat.html
  */
 public class msg_heartbeat extends MAVLinkMessage {
 
@@ -27,22 +27,22 @@ public class msg_heartbeat extends MAVLinkMessage {
     public long custom_mode;
       
     /**
-     * Type of the MAV (quadrotor, helicopter, etc., up to 15 types, defined in MAV_TYPE ENUM)
+     * Vehicle or component type. For a flight controller component the vehicle type (quadrotor, helicopter, etc.). For other components the component type (e.g. camera, gimbal, etc.). This should be used in preference to component id for identifying the component type.
      */
     public short type;
       
     /**
-     * Autopilot type / class. defined in MAV_AUTOPILOT ENUM
+     * Autopilot type / class. Use MAV_AUTOPILOT_INVALID for components that are not flight controllers.
      */
     public short autopilot;
       
     /**
-     * System mode bitfield, as defined by MAV_MODE_FLAG enum
+     * System mode bitmap.
      */
     public short base_mode;
       
     /**
-     * System status flag, as defined by MAV_STATE enum
+     * System status flag.
      */
     public short system_status;
       

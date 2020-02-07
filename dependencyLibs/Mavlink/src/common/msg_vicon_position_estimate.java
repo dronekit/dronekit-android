@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * 
+ * Global position estimate from a Vicon motion system source.
  */
 public class msg_vicon_position_estimate extends MAVLinkMessage {
 
@@ -22,7 +22,7 @@ public class msg_vicon_position_estimate extends MAVLinkMessage {
 
       
     /**
-     * Timestamp (microseconds, synced to UNIX time or since system boot)
+     * Timestamp (UNIX time or time since system boot)
      */
     public long usec;
       
@@ -42,22 +42,22 @@ public class msg_vicon_position_estimate extends MAVLinkMessage {
     public float z;
       
     /**
-     * Roll angle in rad
+     * Roll angle
      */
     public float roll;
       
     /**
-     * Pitch angle in rad
+     * Pitch angle
      */
     public float pitch;
       
     /**
-     * Yaw angle in rad
+     * Yaw angle
      */
     public float yaw;
       
     /**
-     * Pose covariance matrix upper right triangular (first six entries are the first ROW, next five entries are the second ROW, etc.)
+     * Row-major representation of 6x6 pose cross-covariance matrix upper right triangle (states: x, y, z, roll, pitch, yaw; first six entries are the first ROW, next five entries are the second ROW, etc.). If unknown, assign NaN value to first element in the array.
      */
     public float covariance[] = new float[21];
     

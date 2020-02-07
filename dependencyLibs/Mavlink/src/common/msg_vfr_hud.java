@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * Metrics typically displayed on a HUD for fixed wing aircraft
+ * Metrics typically displayed on a HUD for fixed wing aircraft.
  */
 public class msg_vfr_hud extends MAVLinkMessage {
 
@@ -22,32 +22,32 @@ public class msg_vfr_hud extends MAVLinkMessage {
 
       
     /**
-     * Current airspeed in m/s
+     * Current indicated airspeed (IAS).
      */
     public float airspeed;
       
     /**
-     * Current ground speed in m/s
+     * Current ground speed.
      */
     public float groundspeed;
       
     /**
-     * Current altitude (MSL), in meters
+     * Current altitude (MSL).
      */
     public float alt;
       
     /**
-     * Current climb rate in meters/second
+     * Current climb rate.
      */
     public float climb;
       
     /**
-     * Current heading in degrees, in compass units (0..360, 0=north)
+     * Current heading in compass units (0-360, 0=north).
      */
     public short heading;
       
     /**
-     * Current throttle setting in integer percent, 0 to 100
+     * Current throttle setting (0 to 100).
      */
     public int throttle;
     

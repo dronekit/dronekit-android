@@ -22,42 +22,42 @@ public class msg_rc_channels_override extends MAVLinkMessage {
 
       
     /**
-     * RC channel 1 value, in microseconds. A value of UINT16_MAX means to ignore this field.
+     * RC channel 1 value. A value of UINT16_MAX means to ignore this field.
      */
     public int chan1_raw;
       
     /**
-     * RC channel 2 value, in microseconds. A value of UINT16_MAX means to ignore this field.
+     * RC channel 2 value. A value of UINT16_MAX means to ignore this field.
      */
     public int chan2_raw;
       
     /**
-     * RC channel 3 value, in microseconds. A value of UINT16_MAX means to ignore this field.
+     * RC channel 3 value. A value of UINT16_MAX means to ignore this field.
      */
     public int chan3_raw;
       
     /**
-     * RC channel 4 value, in microseconds. A value of UINT16_MAX means to ignore this field.
+     * RC channel 4 value. A value of UINT16_MAX means to ignore this field.
      */
     public int chan4_raw;
       
     /**
-     * RC channel 5 value, in microseconds. A value of UINT16_MAX means to ignore this field.
+     * RC channel 5 value. A value of UINT16_MAX means to ignore this field.
      */
     public int chan5_raw;
       
     /**
-     * RC channel 6 value, in microseconds. A value of UINT16_MAX means to ignore this field.
+     * RC channel 6 value. A value of UINT16_MAX means to ignore this field.
      */
     public int chan6_raw;
       
     /**
-     * RC channel 7 value, in microseconds. A value of UINT16_MAX means to ignore this field.
+     * RC channel 7 value. A value of UINT16_MAX means to ignore this field.
      */
     public int chan7_raw;
       
     /**
-     * RC channel 8 value, in microseconds. A value of UINT16_MAX means to ignore this field.
+     * RC channel 8 value. A value of UINT16_MAX means to ignore this field.
      */
     public int chan8_raw;
       
@@ -72,52 +72,52 @@ public class msg_rc_channels_override extends MAVLinkMessage {
     public short target_component;
       
     /**
-     * RC channel 9 value, in microseconds. A value of 0 means to ignore this field.
+     * RC channel 9 value. A value of 0 or UINT16_MAX means to ignore this field.
      */
     public int chan9_raw;
       
     /**
-     * RC channel 10 value, in microseconds. A value of 0 or UINT16_MAX means to ignore this field.
+     * RC channel 10 value. A value of 0 or UINT16_MAX means to ignore this field.
      */
     public int chan10_raw;
       
     /**
-     * RC channel 11 value, in microseconds. A value of 0 or UINT16_MAX means to ignore this field.
+     * RC channel 11 value. A value of 0 or UINT16_MAX means to ignore this field.
      */
     public int chan11_raw;
       
     /**
-     * RC channel 12 value, in microseconds. A value of 0 or UINT16_MAX means to ignore this field.
+     * RC channel 12 value. A value of 0 or UINT16_MAX means to ignore this field.
      */
     public int chan12_raw;
       
     /**
-     * RC channel 13 value, in microseconds. A value of 0 or UINT16_MAX means to ignore this field.
+     * RC channel 13 value. A value of 0 or UINT16_MAX means to ignore this field.
      */
     public int chan13_raw;
       
     /**
-     * RC channel 14 value, in microseconds. A value of 0 or UINT16_MAX means to ignore this field.
+     * RC channel 14 value. A value of 0 or UINT16_MAX means to ignore this field.
      */
     public int chan14_raw;
       
     /**
-     * RC channel 15 value, in microseconds. A value of 0 or UINT16_MAX means to ignore this field.
+     * RC channel 15 value. A value of 0 or UINT16_MAX means to ignore this field.
      */
     public int chan15_raw;
       
     /**
-     * RC channel 16 value, in microseconds. A value of 0 or UINT16_MAX means to ignore this field.
+     * RC channel 16 value. A value of 0 or UINT16_MAX means to ignore this field.
      */
     public int chan16_raw;
       
     /**
-     * RC channel 17 value, in microseconds. A value of 0 or UINT16_MAX means to ignore this field.
+     * RC channel 17 value. A value of 0 or UINT16_MAX means to ignore this field.
      */
     public int chan17_raw;
       
     /**
-     * RC channel 18 value, in microseconds. A value of 0 or UINT16_MAX means to ignore this field.
+     * RC channel 18 value. A value of 0 or UINT16_MAX means to ignore this field.
      */
     public int chan18_raw;
     

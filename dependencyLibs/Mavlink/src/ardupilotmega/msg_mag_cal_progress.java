@@ -22,47 +22,47 @@ public class msg_mag_cal_progress extends MAVLinkMessage {
 
       
     /**
-     * Body frame direction vector for display
+     * Body frame direction vector for display.
      */
     public float direction_x;
       
     /**
-     * Body frame direction vector for display
+     * Body frame direction vector for display.
      */
     public float direction_y;
       
     /**
-     * Body frame direction vector for display
+     * Body frame direction vector for display.
      */
     public float direction_z;
       
     /**
-     * Compass being calibrated
+     * Compass being calibrated.
      */
     public short compass_id;
       
     /**
-     * Bitmask of compasses being calibrated
+     * Bitmask of compasses being calibrated.
      */
     public short cal_mask;
       
     /**
-     * Status (see MAG_CAL_STATUS enum)
+     * Calibration Status.
      */
     public short cal_status;
       
     /**
-     * Attempt number
+     * Attempt number.
      */
     public short attempt;
       
     /**
-     * Completion percentage
+     * Completion percentage.
      */
     public short completion_pct;
       
     /**
-     * Bitmask of sphere sections (see http://en.wikipedia.org/wiki/Geodesic_grid)
+     * Bitmask of sphere sections (see http://en.wikipedia.org/wiki/Geodesic_grid).
      */
     public short completion_mask[] = new short[10];
     

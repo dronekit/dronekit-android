@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * Status of AP_Limits. Sent in extended status stream when AP_Limits is enabled
+ * Status of AP_Limits. Sent in extended status stream when AP_Limits is enabled.
  */
 public class msg_limits_status extends MAVLinkMessage {
 
@@ -22,47 +22,47 @@ public class msg_limits_status extends MAVLinkMessage {
 
       
     /**
-     * time of last breach in milliseconds since boot
+     * Time (since boot) of last breach.
      */
     public long last_trigger;
       
     /**
-     * time of last recovery action in milliseconds since boot
+     * Time (since boot) of last recovery action.
      */
     public long last_action;
       
     /**
-     * time of last successful recovery in milliseconds since boot
+     * Time (since boot) of last successful recovery.
      */
     public long last_recovery;
       
     /**
-     * time of last all-clear in milliseconds since boot
+     * Time (since boot) of last all-clear.
      */
     public long last_clear;
       
     /**
-     * number of fence breaches
+     * Number of fence breaches.
      */
     public int breach_count;
       
     /**
-     * state of AP_Limits, (see enum LimitState, LIMITS_STATE)
+     * State of AP_Limits.
      */
     public short limits_state;
       
     /**
-     * AP_Limit_Module bitfield of enabled modules, (see enum moduleid or LIMIT_MODULE)
+     * AP_Limit_Module bitfield of enabled modules.
      */
     public short mods_enabled;
       
     /**
-     * AP_Limit_Module bitfield of required modules, (see enum moduleid or LIMIT_MODULE)
+     * AP_Limit_Module bitfield of required modules.
      */
     public short mods_required;
       
     /**
-     * AP_Limit_Module bitfield of triggered modules, (see enum moduleid or LIMIT_MODULE)
+     * AP_Limit_Module bitfield of triggered modules.
      */
     public short mods_triggered;
     

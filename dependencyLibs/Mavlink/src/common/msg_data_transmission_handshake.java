@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * 
+ * Handshake message to initiate, control and stop image streaming when using the Image Transmission Protocol: https://mavlink.io/en/services/image_transmission.html.
  */
 public class msg_data_transmission_handshake extends MAVLinkMessage {
 
@@ -22,37 +22,37 @@ public class msg_data_transmission_handshake extends MAVLinkMessage {
 
       
     /**
-     * total data size in bytes (set on ACK only)
+     * total data size (set on ACK only).
      */
     public long size;
       
     /**
-     * Width of a matrix or image
+     * Width of a matrix or image.
      */
     public int width;
       
     /**
-     * Height of a matrix or image
+     * Height of a matrix or image.
      */
     public int height;
       
     /**
-     * number of packets beeing sent (set on ACK only)
+     * Number of packets being sent (set on ACK only).
      */
     public int packets;
       
     /**
-     * type of requested/acknowledged data (as defined in ENUM DATA_TYPES in mavlink/include/mavlink_types.h)
+     * Type of requested/acknowledged data.
      */
     public short type;
       
     /**
-     * payload size per packet (normally 253 byte, see DATA field size in message ENCAPSULATED_DATA) (set on ACK only)
+     * Payload size per packet (normally 253 byte, see DATA field size in message ENCAPSULATED_DATA) (set on ACK only).
      */
     public short payload;
       
     /**
-     * JPEG quality out of [1,100]
+     * JPEG quality. Values: [1-100].
      */
     public short jpg_quality;
     

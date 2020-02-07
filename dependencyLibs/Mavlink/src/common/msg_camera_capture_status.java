@@ -11,73 +11,43 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * WIP: Information about the status of a capture
+ * Information about the status of a capture.
  */
 public class msg_camera_capture_status extends MAVLinkMessage {
 
     public static final int MAVLINK_MSG_ID_CAMERA_CAPTURE_STATUS = 262;
-    public static final int MAVLINK_MSG_LENGTH = 31;
+    public static final int MAVLINK_MSG_LENGTH = 18;
     private static final long serialVersionUID = MAVLINK_MSG_ID_CAMERA_CAPTURE_STATUS;
 
 
       
     /**
-     * Timestamp (milliseconds since system boot)
+     * Timestamp (time since system boot).
      */
     public long time_boot_ms;
       
     /**
-     * Image capture interval in seconds
+     * Image capture interval
      */
     public float image_interval;
       
     /**
-     * Video frame rate in Hz
-     */
-    public float video_framerate;
-      
-    /**
-     * Time in milliseconds since recording started
+     * Time since recording started
      */
     public long recording_time_ms;
       
     /**
-     * Available storage capacity in MiB
+     * Available storage capacity.
      */
     public float available_capacity;
       
     /**
-     * Image resolution in pixels horizontal
-     */
-    public int image_resolution_h;
-      
-    /**
-     * Image resolution in pixels vertical
-     */
-    public int image_resolution_v;
-      
-    /**
-     * Video resolution in pixels horizontal
-     */
-    public int video_resolution_h;
-      
-    /**
-     * Video resolution in pixels vertical
-     */
-    public int video_resolution_v;
-      
-    /**
-     * Camera ID if there are multiple
-     */
-    public short camera_id;
-      
-    /**
-     * Current status of image capturing (0: not running, 1: interval capture in progress)
+     * Current status of image capturing (0: idle, 1: capture in progress, 2: interval set but idle, 3: interval set and capture in progress)
      */
     public short image_status;
       
     /**
-     * Current status of video capturing (0: not running, 1: capture in progress)
+     * Current status of video capturing (0: idle, 1: capture in progress)
      */
     public short video_status;
     
@@ -96,21 +66,9 @@ public class msg_camera_capture_status extends MAVLinkMessage {
         
         packet.payload.putFloat(image_interval);
         
-        packet.payload.putFloat(video_framerate);
-        
         packet.payload.putUnsignedInt(recording_time_ms);
         
         packet.payload.putFloat(available_capacity);
-        
-        packet.payload.putUnsignedShort(image_resolution_h);
-        
-        packet.payload.putUnsignedShort(image_resolution_v);
-        
-        packet.payload.putUnsignedShort(video_resolution_h);
-        
-        packet.payload.putUnsignedShort(video_resolution_v);
-        
-        packet.payload.putUnsignedByte(camera_id);
         
         packet.payload.putUnsignedByte(image_status);
         
@@ -134,21 +92,9 @@ public class msg_camera_capture_status extends MAVLinkMessage {
         
         this.image_interval = payload.getFloat();
         
-        this.video_framerate = payload.getFloat();
-        
         this.recording_time_ms = payload.getUnsignedInt();
         
         this.available_capacity = payload.getFloat();
-        
-        this.image_resolution_h = payload.getUnsignedShort();
-        
-        this.image_resolution_v = payload.getUnsignedShort();
-        
-        this.video_resolution_h = payload.getUnsignedShort();
-        
-        this.video_resolution_v = payload.getUnsignedShort();
-        
-        this.camera_id = payload.getUnsignedByte();
         
         this.image_status = payload.getUnsignedByte();
         
@@ -179,12 +125,12 @@ public class msg_camera_capture_status extends MAVLinkMessage {
         unpack(mavLinkPacket.payload);        
     }
 
-                            
+                
     /**
      * Returns a string with the MSG name and data
      */
     public String toString() {
-        return "MAVLINK_MSG_ID_CAMERA_CAPTURE_STATUS - sysid:"+sysid+" compid:"+compid+" time_boot_ms:"+time_boot_ms+" image_interval:"+image_interval+" video_framerate:"+video_framerate+" recording_time_ms:"+recording_time_ms+" available_capacity:"+available_capacity+" image_resolution_h:"+image_resolution_h+" image_resolution_v:"+image_resolution_v+" video_resolution_h:"+video_resolution_h+" video_resolution_v:"+video_resolution_v+" camera_id:"+camera_id+" image_status:"+image_status+" video_status:"+video_status+"";
+        return "MAVLINK_MSG_ID_CAMERA_CAPTURE_STATUS - sysid:"+sysid+" compid:"+compid+" time_boot_ms:"+time_boot_ms+" image_interval:"+image_interval+" recording_time_ms:"+recording_time_ms+" available_capacity:"+available_capacity+" image_status:"+image_status+" video_status:"+video_status+"";
     }
 }
         

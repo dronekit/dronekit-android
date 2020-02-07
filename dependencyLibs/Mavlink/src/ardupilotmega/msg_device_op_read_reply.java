@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * Read registers reply
+ * Read registers reply.
  */
 public class msg_device_op_read_reply extends MAVLinkMessage {
 
@@ -22,27 +22,27 @@ public class msg_device_op_read_reply extends MAVLinkMessage {
 
       
     /**
-     * request ID - copied from request
+     * Request ID - copied from request.
      */
     public long request_id;
       
     /**
-     * 0 for success, anything else is failure code
+     * 0 for success, anything else is failure code.
      */
     public short result;
       
     /**
-     * starting register
+     * Starting register.
      */
     public short regstart;
       
     /**
-     * count of bytes read
+     * Count of bytes read.
      */
     public short count;
       
     /**
-     * reply data
+     * Reply data.
      */
     public short data[] = new short[128];
     

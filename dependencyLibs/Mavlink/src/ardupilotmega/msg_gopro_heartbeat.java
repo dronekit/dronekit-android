@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * Heartbeat from a HeroBus attached GoPro
+ * Heartbeat from a HeroBus attached GoPro.
  */
 public class msg_gopro_heartbeat extends MAVLinkMessage {
 
@@ -22,17 +22,17 @@ public class msg_gopro_heartbeat extends MAVLinkMessage {
 
       
     /**
-     * Status
+     * Status.
      */
     public short status;
       
     /**
-     * Current capture mode
+     * Current capture mode.
      */
     public short capture_mode;
       
     /**
-     * additional status bits
+     * Additional status bits.
      */
     public short flags;
     

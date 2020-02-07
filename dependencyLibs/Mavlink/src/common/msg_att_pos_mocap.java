@@ -22,7 +22,7 @@ public class msg_att_pos_mocap extends MAVLinkMessage {
 
       
     /**
-     * Timestamp (micros since boot or Unix epoch)
+     * Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude the number.
      */
     public long time_usec;
       
@@ -32,22 +32,22 @@ public class msg_att_pos_mocap extends MAVLinkMessage {
     public float q[] = new float[4];
       
     /**
-     * X position in meters (NED)
+     * X position (NED)
      */
     public float x;
       
     /**
-     * Y position in meters (NED)
+     * Y position (NED)
      */
     public float y;
       
     /**
-     * Z position in meters (NED)
+     * Z position (NED)
      */
     public float z;
       
     /**
-     * Pose covariance matrix upper right triangular (first six entries are the first ROW, next five entries are the second ROW, etc.)
+     * Row-major representation of a pose 6x6 cross-covariance matrix upper right triangle (states: x, y, z, roll, pitch, yaw; first six entries are the first ROW, next five entries are the second ROW, etc.). If unknown, assign NaN value to first element in the array.
      */
     public float covariance[] = new float[21];
     

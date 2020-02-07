@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * The scaled values of the RC channels received. (-100%) -10000, (0%) 0, (100%) 10000. Channels that are inactive should be set to UINT16_MAX.
+ * The scaled values of the RC channels received: (-100%) -10000, (0%) 0, (100%) 10000. Channels that are inactive should be set to UINT16_MAX.
  */
 public class msg_rc_channels_scaled extends MAVLinkMessage {
 
@@ -22,57 +22,57 @@ public class msg_rc_channels_scaled extends MAVLinkMessage {
 
       
     /**
-     * Timestamp (milliseconds since system boot)
+     * Timestamp (time since system boot).
      */
     public long time_boot_ms;
       
     /**
-     * RC channel 1 value scaled, (-100%) -10000, (0%) 0, (100%) 10000, (invalid) INT16_MAX.
+     * RC channel 1 value scaled.
      */
     public short chan1_scaled;
       
     /**
-     * RC channel 2 value scaled, (-100%) -10000, (0%) 0, (100%) 10000, (invalid) INT16_MAX.
+     * RC channel 2 value scaled.
      */
     public short chan2_scaled;
       
     /**
-     * RC channel 3 value scaled, (-100%) -10000, (0%) 0, (100%) 10000, (invalid) INT16_MAX.
+     * RC channel 3 value scaled.
      */
     public short chan3_scaled;
       
     /**
-     * RC channel 4 value scaled, (-100%) -10000, (0%) 0, (100%) 10000, (invalid) INT16_MAX.
+     * RC channel 4 value scaled.
      */
     public short chan4_scaled;
       
     /**
-     * RC channel 5 value scaled, (-100%) -10000, (0%) 0, (100%) 10000, (invalid) INT16_MAX.
+     * RC channel 5 value scaled.
      */
     public short chan5_scaled;
       
     /**
-     * RC channel 6 value scaled, (-100%) -10000, (0%) 0, (100%) 10000, (invalid) INT16_MAX.
+     * RC channel 6 value scaled.
      */
     public short chan6_scaled;
       
     /**
-     * RC channel 7 value scaled, (-100%) -10000, (0%) 0, (100%) 10000, (invalid) INT16_MAX.
+     * RC channel 7 value scaled.
      */
     public short chan7_scaled;
       
     /**
-     * RC channel 8 value scaled, (-100%) -10000, (0%) 0, (100%) 10000, (invalid) INT16_MAX.
+     * RC channel 8 value scaled.
      */
     public short chan8_scaled;
       
     /**
-     * Servo output port (set of 8 outputs = 1 port). Most MAVs will just use one, but this allows for more than 8 servos.
+     * Servo output port (set of 8 outputs = 1 port). Flight stacks running on Pixhawk should use: 0 = MAIN, 1 = AUX.
      */
     public short port;
       
     /**
-     * Receive signal strength indicator, 0: 0%, 100: 100%, 255: invalid/unknown.
+     * Receive signal strength indicator in device-dependent units/scale. Values: [0-254], 255: invalid/unknown.
      */
     public short rssi;
     

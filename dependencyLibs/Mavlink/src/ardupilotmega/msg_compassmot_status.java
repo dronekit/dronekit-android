@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * Status of compassmot calibration
+ * Status of compassmot calibration.
  */
 public class msg_compassmot_status extends MAVLinkMessage {
 
@@ -22,32 +22,32 @@ public class msg_compassmot_status extends MAVLinkMessage {
 
       
     /**
-     * current (Ampere)
+     * Current.
      */
     public float current;
       
     /**
-     * Motor Compensation X
+     * Motor Compensation X.
      */
     public float CompensationX;
       
     /**
-     * Motor Compensation Y
+     * Motor Compensation Y.
      */
     public float CompensationY;
       
     /**
-     * Motor Compensation Z
+     * Motor Compensation Z.
      */
     public float CompensationZ;
       
     /**
-     * throttle (percent*10)
+     * Throttle.
      */
     public int throttle;
       
     /**
-     * interference (percent)
+     * Interference.
      */
     public int interference;
     

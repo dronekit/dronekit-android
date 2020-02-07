@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * 
+ * Data packet for images sent using the Image Transmission Protocol: https://mavlink.io/en/services/image_transmission.html.
  */
 public class msg_encapsulated_data extends MAVLinkMessage {
 

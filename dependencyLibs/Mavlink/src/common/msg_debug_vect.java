@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * 
+ * To debug something using a named 3D vector.
  */
 public class msg_debug_vect extends MAVLinkMessage {
 
@@ -22,7 +22,7 @@ public class msg_debug_vect extends MAVLinkMessage {
 
       
     /**
-     * Timestamp
+     * Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude the number.
      */
     public long time_usec;
       

@@ -22,7 +22,7 @@ public class msg_debug extends MAVLinkMessage {
 
       
     /**
-     * Timestamp (milliseconds since system boot)
+     * Timestamp (time since system boot).
      */
     public long time_boot_ms;
       

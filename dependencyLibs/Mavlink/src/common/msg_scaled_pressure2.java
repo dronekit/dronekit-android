@@ -22,22 +22,22 @@ public class msg_scaled_pressure2 extends MAVLinkMessage {
 
       
     /**
-     * Timestamp (milliseconds since system boot)
+     * Timestamp (time since system boot).
      */
     public long time_boot_ms;
       
     /**
-     * Absolute pressure (hectopascal)
+     * Absolute pressure
      */
     public float press_abs;
       
     /**
-     * Differential pressure 1 (hectopascal)
+     * Differential pressure
      */
     public float press_diff;
       
     /**
-     * Temperature measurement (0.01 degrees celsius)
+     * Temperature measurement
      */
     public short temperature;
     

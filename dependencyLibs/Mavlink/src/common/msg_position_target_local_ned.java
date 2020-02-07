@@ -22,37 +22,37 @@ public class msg_position_target_local_ned extends MAVLinkMessage {
 
       
     /**
-     * Timestamp in milliseconds since system boot
+     * Timestamp (time since system boot).
      */
     public long time_boot_ms;
       
     /**
-     * X Position in NED frame in meters
+     * X Position in NED frame
      */
     public float x;
       
     /**
-     * Y Position in NED frame in meters
+     * Y Position in NED frame
      */
     public float y;
       
     /**
-     * Z Position in NED frame in meters (note, altitude is negative in NED)
+     * Z Position in NED frame (note, altitude is negative in NED)
      */
     public float z;
       
     /**
-     * X velocity in NED frame in meter / s
+     * X velocity in NED frame
      */
     public float vx;
       
     /**
-     * Y velocity in NED frame in meter / s
+     * Y velocity in NED frame
      */
     public float vy;
       
     /**
-     * Z velocity in NED frame in meter / s
+     * Z velocity in NED frame
      */
     public float vz;
       
@@ -72,17 +72,17 @@ public class msg_position_target_local_ned extends MAVLinkMessage {
     public float afz;
       
     /**
-     * yaw setpoint in rad
+     * yaw setpoint
      */
     public float yaw;
       
     /**
-     * yaw rate setpoint in rad/s
+     * yaw rate setpoint
      */
     public float yaw_rate;
       
     /**
-     * Bitmask to indicate which dimensions should be ignored by the vehicle: a value of 0b0000000000000000 or 0b0000001000000000 indicates that none of the setpoint dimensions should be ignored. If bit 10 is set the floats afx afy afz should be interpreted as force instead of acceleration. Mapping: bit 1: x, bit 2: y, bit 3: z, bit 4: vx, bit 5: vy, bit 6: vz, bit 7: ax, bit 8: ay, bit 9: az, bit 10: is force setpoint, bit 11: yaw, bit 12: yaw rate
+     * Bitmap to indicate which dimensions should be ignored by the vehicle.
      */
     public int type_mask;
       

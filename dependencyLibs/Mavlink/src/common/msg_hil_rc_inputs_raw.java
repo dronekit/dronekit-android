@@ -22,72 +22,72 @@ public class msg_hil_rc_inputs_raw extends MAVLinkMessage {
 
       
     /**
-     * Timestamp (microseconds since UNIX epoch or microseconds since system boot)
+     * Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude the number.
      */
     public long time_usec;
       
     /**
-     * RC channel 1 value, in microseconds
+     * RC channel 1 value
      */
     public int chan1_raw;
       
     /**
-     * RC channel 2 value, in microseconds
+     * RC channel 2 value
      */
     public int chan2_raw;
       
     /**
-     * RC channel 3 value, in microseconds
+     * RC channel 3 value
      */
     public int chan3_raw;
       
     /**
-     * RC channel 4 value, in microseconds
+     * RC channel 4 value
      */
     public int chan4_raw;
       
     /**
-     * RC channel 5 value, in microseconds
+     * RC channel 5 value
      */
     public int chan5_raw;
       
     /**
-     * RC channel 6 value, in microseconds
+     * RC channel 6 value
      */
     public int chan6_raw;
       
     /**
-     * RC channel 7 value, in microseconds
+     * RC channel 7 value
      */
     public int chan7_raw;
       
     /**
-     * RC channel 8 value, in microseconds
+     * RC channel 8 value
      */
     public int chan8_raw;
       
     /**
-     * RC channel 9 value, in microseconds
+     * RC channel 9 value
      */
     public int chan9_raw;
       
     /**
-     * RC channel 10 value, in microseconds
+     * RC channel 10 value
      */
     public int chan10_raw;
       
     /**
-     * RC channel 11 value, in microseconds
+     * RC channel 11 value
      */
     public int chan11_raw;
       
     /**
-     * RC channel 12 value, in microseconds
+     * RC channel 12 value
      */
     public int chan12_raw;
       
     /**
-     * Receive signal strength indicator, 0: 0%, 255: 100%
+     * Receive signal strength indicator in device-dependent units/scale. Values: [0-254], 255: invalid/unknown.
      */
     public short rssi;
     

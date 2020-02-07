@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * Send a command with up to seven parameters to the MAV
+ * Send a command with up to seven parameters to the MAV. The command microservice is documented at https://mavlink.io/en/services/command.html
  */
 public class msg_command_long extends MAVLinkMessage {
 
@@ -22,42 +22,42 @@ public class msg_command_long extends MAVLinkMessage {
 
       
     /**
-     * Parameter 1, as defined by MAV_CMD enum.
+     * Parameter 1 (for the specific command).
      */
     public float param1;
       
     /**
-     * Parameter 2, as defined by MAV_CMD enum.
+     * Parameter 2 (for the specific command).
      */
     public float param2;
       
     /**
-     * Parameter 3, as defined by MAV_CMD enum.
+     * Parameter 3 (for the specific command).
      */
     public float param3;
       
     /**
-     * Parameter 4, as defined by MAV_CMD enum.
+     * Parameter 4 (for the specific command).
      */
     public float param4;
       
     /**
-     * Parameter 5, as defined by MAV_CMD enum.
+     * Parameter 5 (for the specific command).
      */
     public float param5;
       
     /**
-     * Parameter 6, as defined by MAV_CMD enum.
+     * Parameter 6 (for the specific command).
      */
     public float param6;
       
     /**
-     * Parameter 7, as defined by MAV_CMD enum.
+     * Parameter 7 (for the specific command).
      */
     public float param7;
       
     /**
-     * Command ID, as defined by MAV_CMD enum.
+     * Command ID (of command to send).
      */
     public int command;
       

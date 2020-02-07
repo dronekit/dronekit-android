@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * Status of third AHRS filter if available. This is for ANU research group (Ali and Sean)
+ * Status of third AHRS filter if available. This is for ANU research group (Ali and Sean).
  */
 public class msg_ahrs3 extends MAVLinkMessage {
 
@@ -22,52 +22,52 @@ public class msg_ahrs3 extends MAVLinkMessage {
 
       
     /**
-     * Roll angle (rad)
+     * Roll angle.
      */
     public float roll;
       
     /**
-     * Pitch angle (rad)
+     * Pitch angle.
      */
     public float pitch;
       
     /**
-     * Yaw angle (rad)
+     * Yaw angle.
      */
     public float yaw;
       
     /**
-     * Altitude (MSL)
+     * Altitude (MSL).
      */
     public float altitude;
       
     /**
-     * Latitude in degrees * 1E7
+     * Latitude.
      */
     public int lat;
       
     /**
-     * Longitude in degrees * 1E7
+     * Longitude.
      */
     public int lng;
       
     /**
-     * test variable1
+     * Test variable1.
      */
     public float v1;
       
     /**
-     * test variable2
+     * Test variable2.
      */
     public float v2;
       
     /**
-     * test variable3
+     * Test variable3.
      */
     public float v3;
       
     /**
-     * test variable4
+     * Test variable4.
      */
     public float v4;
     

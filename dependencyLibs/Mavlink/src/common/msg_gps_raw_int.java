@@ -23,22 +23,22 @@ public class msg_gps_raw_int extends MAVLinkMessage {
 
       
     /**
-     * Timestamp (microseconds since UNIX epoch or microseconds since system boot)
+     * Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude the number.
      */
     public long time_usec;
       
     /**
-     * Latitude (WGS84, EGM96 ellipsoid), in degrees * 1E7
+     * Latitude (WGS84, EGM96 ellipsoid)
      */
     public int lat;
       
     /**
-     * Longitude (WGS84, EGM96 ellipsoid), in degrees * 1E7
+     * Longitude (WGS84, EGM96 ellipsoid)
      */
     public int lon;
       
     /**
-     * Altitude (AMSL, NOT WGS84), in meters * 1000 (positive for up). Note that virtually all GPS modules provide the AMSL altitude in addition to the WGS84 altitude.
+     * Altitude (MSL). Positive for up. Note that virtually all GPS modules provide the MSL altitude in addition to the WGS84 altitude.
      */
     public int alt;
       
@@ -53,7 +53,7 @@ public class msg_gps_raw_int extends MAVLinkMessage {
     public int epv;
       
     /**
-     * GPS ground speed (m/s * 100). If unknown, set to: UINT16_MAX
+     * GPS ground speed. If unknown, set to: UINT16_MAX
      */
     public int vel;
       
@@ -63,7 +63,7 @@ public class msg_gps_raw_int extends MAVLinkMessage {
     public int cog;
       
     /**
-     * See the GPS_FIX_TYPE enum.
+     * GPS fix type.
      */
     public short fix_type;
       
@@ -73,27 +73,27 @@ public class msg_gps_raw_int extends MAVLinkMessage {
     public short satellites_visible;
       
     /**
-     * Altitude (above WGS84, EGM96 ellipsoid), in meters * 1000 (positive for up).
+     * Altitude (above WGS84, EGM96 ellipsoid). Positive for up.
      */
     public int alt_ellipsoid;
       
     /**
-     * Position uncertainty in meters * 1000 (positive for up).
+     * Position uncertainty. Positive for up.
      */
     public long h_acc;
       
     /**
-     * Altitude uncertainty in meters * 1000 (positive for up).
+     * Altitude uncertainty. Positive for up.
      */
     public long v_acc;
       
     /**
-     * Speed uncertainty in meters * 1000 (positive for up).
+     * Speed uncertainty. Positive for up.
      */
     public long vel_acc;
       
     /**
-     * Heading / track uncertainty in degrees * 1e5.
+     * Heading / track uncertainty
      */
     public long hdg_acc;
     

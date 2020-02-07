@@ -7,7 +7,7 @@
 package com.MAVLink.enums;
 
 /** 
- * Enumeration for low battery states.
+ * Enumeration for battery charge states.
  */
 public class MAV_BATTERY_CHARGE_STATE {
    public static final int MAV_BATTERY_CHARGE_STATE_UNDEFINED = 0; /* Low battery state is not provided | */
@@ -17,6 +17,7 @@ public class MAV_BATTERY_CHARGE_STATE {
    public static final int MAV_BATTERY_CHARGE_STATE_EMERGENCY = 4; /* Battery state is too low for ordinary abort sequence. Perform fastest possible emergency stop to prevent damage. | */
    public static final int MAV_BATTERY_CHARGE_STATE_FAILED = 5; /* Battery failed, damage unavoidable. | */
    public static final int MAV_BATTERY_CHARGE_STATE_UNHEALTHY = 6; /* Battery is diagnosed to be defective or an error occurred, usage is discouraged / prohibited. | */
-   public static final int MAV_BATTERY_CHARGE_STATE_ENUM_END = 7; /*  | */
+   public static final int MAV_BATTERY_CHARGE_STATE_CHARGING = 7; /* Battery is charging. | */
+   public static final int MAV_BATTERY_CHARGE_STATE_ENUM_END = 8; /*  | */
 }
             

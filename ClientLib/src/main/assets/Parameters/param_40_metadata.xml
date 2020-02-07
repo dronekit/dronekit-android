@@ -1,0 +1,2065 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Params>
+  <APMrover2>
+    <FORMAT_VERSION>
+      <DisplayName>Eeprom format version number</DisplayName>
+      <Description>This value is incremented when changes are made to the eeprom format</Description>
+      <User>Advanced</User>
+    </FORMAT_VERSION>
+    <LOG_BITMASK>
+      <DisplayName>Log bitmask</DisplayName>
+      <Description>Bitmap of what log types to enable in on-board logger. This value is made up of the sum of each of the log types you want to be saved. On boards supporting microSD cards or other large block-storage devices it is usually best just to enable all log types by setting this to 65535. The individual bits are ATTITUDE_FAST=1, ATTITUDE_MEDIUM=2, GPS=4, PerformanceMonitoring=8, ControlTuning=16, NavigationTuning=32, Mode=64, IMU=128, Commands=256, Battery=512, Compass=1024, TECS=2048, Camera=4096, RCandServo=8192, Rangefinder=16384, Arming=32768, FullLogs=65535</Description>
+      <User>Advanced</User>
+      <Values>0:Disabled, 65535:Default</Values>
+      <Bitmask>0:ATTITUDE_FAST,1:ATTITUDE_MED,2:GPS,3:PM,4:THR,5:NTUN,7:IMU,8:CMD,9:CURRENT,10:RANGEFINDER,11:COMPASS,12:CAMERA,13:STEERING,14:RC,15:ARM/DISARM,19:IMU_RAW</Bitmask>
+    </LOG_BITMASK>
+    <RST_SWITCH_CH>
+      <DisplayName>Reset Switch Channel</DisplayName>
+      <Description>RC channel to use to reset to last flight mode after geofence takeover.</Description>
+      <User>Advanced</User>
+    </RST_SWITCH_CH>
+    <INITIAL_MODE>
+      <DisplayName>Initial driving mode</DisplayName>
+      <Description>This selects the mode to start in on boot. This is useful for when you want to start in AUTO mode on boot without a receiver. Usually used in combination with when AUTO_TRIGGER_PIN or AUTO_KICKSTART.</Description>
+      <User>Advanced</User>
+      <Values>0:Manual, 1:Acro, 3:Steering, 4:Hold, 5:Loiter, 6:Follow, 7:Simple, 10:Auto, 11:RTL, 12:SmartRTL, 15:Guided</Values>
+    </INITIAL_MODE>
+    <SYSID_THIS_MAV>
+      <DisplayName>MAVLink system ID of this vehicle</DisplayName>
+      <Description>Allows setting an individual MAVLink system id for this vehicle to distinguish it from others on the same network</Description>
+      <User>Advanced</User>
+      <Range>1 255</Range>
+    </SYSID_THIS_MAV>
+    <SYSID_MYGCS>
+      <DisplayName>MAVLink ground station ID</DisplayName>
+      <Description>The identifier of the ground station in the MAVLink protocol. Don't change this unless you also modify the ground station to match.</Description>
+      <User>Advanced</User>
+      <Range>1 255</Range>
+    </SYSID_MYGCS>
+    <TELEM_DELAY>
+      <DisplayName>Telemetry startup delay</DisplayName>
+      <Description>The amount of time (in seconds) to delay radio telemetry to prevent an Xbee bricking on power up</Description>
+      <User>Standard</User>
+      <Range>0 30</Range>
+      <Increment>1</Increment>
+      <Units>s</Units>
+      <UnitText>seconds</UnitText>
+    </TELEM_DELAY>
+    <GCS_PID_MASK>
+      <DisplayName>GCS PID tuning mask</DisplayName>
+      <Description>bitmask of PIDs to send MAVLink PID_TUNING messages for</Description>
+      <User>Advanced</User>
+      <Values>0:None, 1:Steering, 2:Throttle, 4:Pitch, 8:Left Wheel, 16:Right Wheel, 32:Sailboat Heel</Values>
+      <Bitmask>0:Steering,1:Throttle,2:Pitch,3:Left Wheel,4:Right Wheel,5:Sailboat Heel</Bitmask>
+    </GCS_PID_MASK>
+    <AUTO_TRIGGER_PIN>
+      <DisplayName>Auto mode trigger pin</DisplayName>
+      <Description>pin number to use to enable the throttle in auto mode. If set to -1 then don't use a trigger, otherwise this is a pin number which if held low in auto mode will enable the motor to run. If the switch is released while in AUTO then the motor will stop again. This can be used in combination with INITIAL_MODE to give a 'press button to start' rover with no receiver.</Description>
+      <User>Standard</User>
+      <Values>-1:Disabled, 0:APM TriggerPin0, 1:APM TriggerPin1, 2:APM TriggerPin2, 3:APM TriggerPin3, 4:APM TriggerPin4, 5:APM TriggerPin5, 6:APM TriggerPin6, 7:APM TriggerPin7, 8:APM TriggerPin8, 50:Pixhawk TriggerPin50, 51:Pixhawk TriggerPin51, 52:Pixhawk TriggerPin52, 53:Pixhawk TriggerPin53, 54:Pixhawk TriggerPin54, 55:Pixhawk TriggerPin55</Values>
+    </AUTO_TRIGGER_PIN>
+    <AUTO_KICKSTART>
+      <DisplayName>Auto mode trigger kickstart acceleration</DisplayName>
+      <Description>X acceleration in meters/second/second to use to trigger the motor start in auto mode. If set to zero then auto throttle starts immediately when the mode switch happens, otherwise the rover waits for the X acceleration to go above this value before it will start the motor</Description>
+      <User>Standard</User>
+      <Range>0 20</Range>
+      <Increment>0.1</Increment>
+      <Units>m/s/s</Units>
+      <UnitText>meters per square second</UnitText>
+    </AUTO_KICKSTART>
+    <CRUISE_SPEED>
+      <DisplayName>Target cruise speed in auto modes</DisplayName>
+      <Description>The target speed in auto missions.</Description>
+      <User>Standard</User>
+      <Range>0 100</Range>
+      <Increment>0.1</Increment>
+      <Units>m/s</Units>
+      <UnitText>meters per second</UnitText>
+    </CRUISE_SPEED>
+    <CRUISE_THROTTLE>
+      <DisplayName>Base throttle percentage in auto</DisplayName>
+      <Description>The base throttle percentage to use in auto mode. The CRUISE_SPEED parameter controls the target speed, but the rover starts with the CRUISE_THROTTLE setting as the initial estimate for how much throttle is needed to achieve that speed. It then adjusts the throttle based on how fast the rover is actually going.</Description>
+      <User>Standard</User>
+      <Range>0 100</Range>
+      <Increment>1</Increment>
+      <Units>%</Units>
+      <UnitText>percent</UnitText>
+    </CRUISE_THROTTLE>
+    <PILOT_STEER_TYPE>
+      <DisplayName>Pilot input steering type</DisplayName>
+      <Description>Set this to 1 for skid steering input rovers (tank track style in RC controller). When enabled, servo1 is used for the left track control, servo3 is used for right track control</Description>
+      <User>Standard</User>
+      <Values>0:Default, 1:Two Paddles Input, 2:Direction reversed when backing up, 3:Direction unchanged when backing up</Values>
+    </PILOT_STEER_TYPE>
+    <FS_ACTION>
+      <DisplayName>Failsafe Action</DisplayName>
+      <Description>What to do on a failsafe event</Description>
+      <User>Standard</User>
+      <Values>0:Nothing, 1:RTL, 2:Hold, 3:SmartRTL or RTL, 4:SmartRTL or Hold</Values>
+    </FS_ACTION>
+    <FS_TIMEOUT>
+      <DisplayName>Failsafe timeout</DisplayName>
+      <Description>The time in seconds that a failsafe condition must persist before the failsafe action is triggered</Description>
+      <User>Standard</User>
+      <Range>1 100</Range>
+      <Increment>0.5</Increment>
+      <Units>s</Units>
+      <UnitText>seconds</UnitText>
+    </FS_TIMEOUT>
+    <FS_THR_ENABLE>
+      <DisplayName>Throttle Failsafe Enable</DisplayName>
+      <Description>The throttle failsafe allows you to configure a software failsafe activated by a setting on the throttle input channel to a low value. This can be used to detect the RC transmitter going out of range. Failsafe will be triggered when the throttle channel goes below the FS_THR_VALUE for FS_TIMEOUT seconds.</Description>
+      <User>Standard</User>
+      <Values>0:Disabled, 1:Enabled, 2:Enabled Continue with Mission in Auto</Values>
+    </FS_THR_ENABLE>
+    <FS_THR_VALUE>
+      <DisplayName>Throttle Failsafe Value</DisplayName>
+      <Description>The PWM level on the throttle channel below which throttle failsafe triggers.</Description>
+      <User>Standard</User>
+      <Range>910 1100</Range>
+      <Increment>1</Increment>
+    </FS_THR_VALUE>
+    <FS_GCS_ENABLE>
+      <DisplayName>GCS failsafe enable</DisplayName>
+      <Description>Enable ground control station telemetry failsafe. When enabled the Rover will execute the FS_ACTION when it fails to receive MAVLink heartbeat packets for FS_TIMEOUT seconds.</Description>
+      <User>Standard</User>
+      <Values>0:Disabled, 1:Enabled, 2:Enabled Continue with Mission in Auto</Values>
+    </FS_GCS_ENABLE>
+    <FS_CRASH_CHECK>
+      <DisplayName>Crash check action</DisplayName>
+      <Description>What to do on a crash event. When enabled the rover will go to hold if a crash is detected.</Description>
+      <User>Standard</User>
+      <Values>0:Disabled, 1:Hold, 2:HoldAndDisarm</Values>
+    </FS_CRASH_CHECK>
+    <FS_EKF_ACTION>
+      <DisplayName>EKF Failsafe Action</DisplayName>
+      <Description>Controls the action that will be taken when an EKF failsafe is invoked</Description>
+      <User>Advanced</User>
+      <Values>0:Disabled, 1:Hold</Values>
+    </FS_EKF_ACTION>
+    <FS_EKF_THRESH>
+      <DisplayName>EKF failsafe variance threshold</DisplayName>
+      <Description>Allows setting the maximum acceptable compass and velocity variance</Description>
+      <User>Advanced</User>
+      <Values>0.6:Strict, 0.8:Default, 1.0:Relaxed</Values>
+    </FS_EKF_THRESH>
+    <MODE_CH>
+      <DisplayName>Mode channel</DisplayName>
+      <Description>RC Channel to use for driving mode control</Description>
+      <User>Advanced</User>
+    </MODE_CH>
+    <MODE1>
+      <DisplayName>Mode1</DisplayName>
+      <Description>Driving mode for switch position 1 (910 to 1230 and above 2049)</Description>
+      <User>Standard</User>
+      <Values>0:Manual, 1:Acro, 3:Steering, 4:Hold, 5:Loiter, 6:Follow, 7:Simple, 10:Auto, 11:RTL, 12:SmartRTL, 15:Guided</Values>
+    </MODE1>
+    <MODE2>
+      <DisplayName>Mode2</DisplayName>
+      <Description>Driving mode for switch position 2 (1231 to 1360)</Description>
+      <User>Standard</User>
+      <Values>0:Manual, 1:Acro, 3:Steering, 4:Hold, 5:Loiter, 6:Follow, 7:Simple, 10:Auto, 11:RTL, 12:SmartRTL, 15:Guided</Values>
+    </MODE2>
+    <MODE3>
+      <DisplayName>Mode3</DisplayName>
+      <Description>Driving mode for switch position 3 (1361 to 1490)</Description>
+      <User>Standard</User>
+      <Values>0:Manual, 1:Acro, 3:Steering, 4:Hold, 5:Loiter, 6:Follow, 7:Simple, 10:Auto, 11:RTL, 12:SmartRTL, 15:Guided</Values>
+    </MODE3>
+    <MODE4>
+      <DisplayName>Mode4</DisplayName>
+      <Description>Driving mode for switch position 4 (1491 to 1620)</Description>
+      <User>Standard</User>
+      <Values>0:Manual, 1:Acro, 3:Steering, 4:Hold, 5:Loiter, 6:Follow, 7:Simple, 10:Auto, 11:RTL, 12:SmartRTL, 15:Guided</Values>
+    </MODE4>
+    <MODE5>
+      <DisplayName>Mode5</DisplayName>
+      <Description>Driving mode for switch position 5 (1621 to 1749)</Description>
+      <User>Standard</User>
+      <Values>0:Manual, 1:Acro, 3:Steering, 4:Hold, 5:Loiter, 6:Follow, 7:Simple, 10:Auto, 11:RTL, 12:SmartRTL, 15:Guided</Values>
+    </MODE5>
+    <MODE6>
+      <DisplayName>Mode6</DisplayName>
+      <Description>Driving mode for switch position 6 (1750 to 2049)</Description>
+      <User>Standard</User>
+      <Values>0:Manual, 1:Acro, 3:Steering, 4:Hold, 5:Loiter, 6:Follow, 7:Simple, 10:Auto, 11:RTL, 12:SmartRTL, 15:Guided</Values>
+    </MODE6>
+    <TURN_MAX_G>
+      <DisplayName>Turning maximum G force</DisplayName>
+      <Description>The maximum turning acceleration (in units of gravities) that the rover can handle while remaining stable. The navigation code will keep the lateral acceleration below this level to avoid rolling over or slipping the wheels in turns</Description>
+      <User>Standard</User>
+      <Range>0.1 10</Range>
+      <Increment>0.01</Increment>
+      <Units>gravities</Units>
+      <UnitText>standard acceleration due to gravity</UnitText>
+    </TURN_MAX_G>
+    <SYSID_ENFORCE>
+      <DisplayName>GCS sysid enforcement</DisplayName>
+      <Description>This controls whether packets from other than the expected GCS system ID will be accepted</Description>
+      <User>Advanced</User>
+      <Values>0:NotEnforced, 1:Enforced</Values>
+    </SYSID_ENFORCE>
+    <TURN_RADIUS>
+      <DisplayName>Turn radius of vehicle</DisplayName>
+      <Description>Turn radius of vehicle in meters while at low speeds.  Lower values produce tighter turns in steering mode</Description>
+      <User>Standard</User>
+      <Range>0 10</Range>
+      <Increment>0.1</Increment>
+      <Units>m</Units>
+      <UnitText>meters</UnitText>
+    </TURN_RADIUS>
+    <ACRO_TURN_RATE>
+      <DisplayName>Acro mode turn rate maximum</DisplayName>
+      <Description>Acro mode turn rate maximum</Description>
+      <User>Standard</User>
+      <Range>0 360</Range>
+      <Increment>1</Increment>
+      <Units>deg/s</Units>
+      <UnitText>degrees per second</UnitText>
+    </ACRO_TURN_RATE>
+    <RTL_SPEED>
+      <DisplayName>Return-to-Launch speed default</DisplayName>
+      <Description>Return-to-Launch speed default.  If zero use WP_SPEED or CRUISE_SPEED.</Description>
+      <User>Standard</User>
+      <Range>0 100</Range>
+      <Increment>0.1</Increment>
+      <Units>m/s</Units>
+      <UnitText>meters per second</UnitText>
+    </RTL_SPEED>
+    <FRAME_CLASS>
+      <DisplayName>Frame Class</DisplayName>
+      <Description>Frame Class</Description>
+      <User>Standard</User>
+      <Values>0:Undefined, 1:Rover, 2:Boat, 3:BalanceBot</Values>
+    </FRAME_CLASS>
+    <BAL_PITCH_MAX>
+      <DisplayName>BalanceBot Maximum Pitch</DisplayName>
+      <Description>Pitch angle in degrees at 100% throttle</Description>
+      <User>Standard</User>
+      <Range>0 5</Range>
+      <Increment>0.1</Increment>
+      <Units>deg</Units>
+      <UnitText>degrees</UnitText>
+    </BAL_PITCH_MAX>
+    <CRASH_ANGLE>
+      <DisplayName>Crash Angle</DisplayName>
+      <Description>Pitch/Roll angle limit in degrees for crash check. Zero disables check</Description>
+      <User>Standard</User>
+      <Range>0 60</Range>
+      <Increment>1</Increment>
+      <Units>deg</Units>
+      <UnitText>degrees</UnitText>
+    </CRASH_ANGLE>
+    <FRAME_TYPE>
+      <DisplayName>Frame Type</DisplayName>
+      <Description>Frame Type</Description>
+      <User>Standard</User>
+      <Values>0:Undefined, 1:Omni3, 2:OmniX, 3:OmniPlus</Values>
+      <RebootRequired>True</RebootRequired>
+    </FRAME_TYPE>
+    <LOIT_TYPE>
+      <DisplayName>Loiter type</DisplayName>
+      <Description>Loiter behaviour when moving to the target point</Description>
+      <User>Standard</User>
+      <Values>0:Forward or reverse to target point, 1:Always face bow towards target point</Values>
+    </LOIT_TYPE>
+    <SIMPLE_TYPE>
+      <DisplayName>Simple_Type</DisplayName>
+      <Description>Simple mode types</Description>
+      <User>Standard</User>
+      <Values>0:InitialHeading, 1:CardinalDirections</Values>
+      <RebootRequired>True</RebootRequired>
+    </SIMPLE_TYPE>
+    <LOIT_RADIUS>
+      <DisplayName>Loiter radius</DisplayName>
+      <Description>Vehicle will drift when within this distance of the target position</Description>
+      <User>Standard</User>
+      <Range>0 20</Range>
+      <Increment>1</Increment>
+      <Units>m</Units>
+      <UnitText>meters</UnitText>
+    </LOIT_RADIUS>
+    <MIS_DONE_BEHAVE>
+      <DisplayName>Mission done behave</DisplayName>
+      <Description>Behaviour after mission completes</Description>
+      <User>Standard</User>
+      <Values>0:Hold, 1:Loiter, 2:Acro</Values>
+    </MIS_DONE_BEHAVE>
+    <BAL_PITCH_TRIM>
+      <DisplayName>Balance Bot pitch trim angle</DisplayName>
+      <Description>Balance Bot pitch trim for balancing. This offsets the tilt of the center of mass.</Description>
+      <User>Standard</User>
+      <Range>-2 2</Range>
+      <Increment>0.1</Increment>
+      <Units>deg</Units>
+      <UnitText>degrees</UnitText>
+    </BAL_PITCH_TRIM>
+    <STICK_MIXING>
+      <DisplayName>Stick Mixing</DisplayName>
+      <Description>When enabled, this adds steering user stick input in auto modes, allowing the user to have some degree of control without changing modes.</Description>
+      <User>Advanced</User>
+      <Values>0:Disabled, 1:Enabled</Values>
+    </STICK_MIXING>
+    <SPEED_MAX>
+      <DisplayName>Speed maximum</DisplayName>
+      <Description>Maximum speed vehicle can obtain at full throttle. If 0, it will be estimated based on CRUISE_SPEED and CRUISE_THROTTLE.</Description>
+      <User>Advanced</User>
+      <Range>0 30</Range>
+      <Increment>0.1</Increment>
+      <Units>m/s</Units>
+      <UnitText>meters per second</UnitText>
+    </SPEED_MAX>
+    <LOIT_SPEED_GAIN>
+      <DisplayName>Loiter speed gain</DisplayName>
+      <Description>Determines how agressively LOITER tries to correct for drift from loiter point. Higher is faster but default should be acceptable.</Description>
+      <User>Advanced</User>
+      <Range>0 5</Range>
+      <Increment>0.01</Increment>
+    </LOIT_SPEED_GAIN>
+    <FS_OPTIONS>
+      <DisplayName>Rover Failsafe Options</DisplayName>
+      <Description>Bitmask to enable Rover failsafe options</Description>
+      <User>Advanced</User>
+      <Values>0:None, 1:Failsafe enabled in Hold mode</Values>
+      <Bitmask>0:Failsafe enabled in Hold mode</Bitmask>
+    </FS_OPTIONS>
+    <CH7_OPTION>
+      <DisplayName>Channel 7 option</DisplayName>
+      <Description>What to do use channel 7 for</Description>
+      <User>Standard</User>
+      <Values>0:Nothing, 1:SaveWaypoint, 2:LearnCruiseSpeed, 3:ArmDisarm, 4:Manual, 5:Acro, 6:Steering, 7:Hold, 8:Auto, 9:RTL, 10:SmartRTL, 11:Guided, 12:Loiter</Values>
+    </CH7_OPTION>
+    <AUX_CH>
+      <DisplayName>Auxiliary switch channel</DisplayName>
+      <Description>RC Channel to use for auxiliary functions including saving waypoints</Description>
+      <User>Advanced</User>
+    </AUX_CH>
+    <PIVOT_TURN_ANGLE>
+      <DisplayName>Pivot turn angle</DisplayName>
+      <Description>Navigation angle threshold in degrees to switch to pivot steering when SKID_STEER_OUT is 1. This allows you to setup a skid steering rover to turn on the spot in auto mode when the angle it needs to turn it greater than this angle. An angle of zero means to disable pivot turning. Note that you will probably also want to set a low value for WP_RADIUS to get neat turns.</Description>
+      <User>Standard</User>
+      <Range>0 360</Range>
+      <Increment>1</Increment>
+      <Units>deg</Units>
+      <UnitText>degrees</UnitText>
+    </PIVOT_TURN_ANGLE>
+    <PIVOT_TURN_RATE>
+      <DisplayName>Pivot turn rate</DisplayName>
+      <Description>Desired pivot turn rate in deg/s.</Description>
+      <User>Standard</User>
+      <Range>0 360</Range>
+      <Increment>1</Increment>
+      <Units>deg/s</Units>
+      <UnitText>degrees per second</UnitText>
+    </PIVOT_TURN_RATE>
+    <AFS_ENABLE>
+      <DisplayName>Enable Advanced Failsafe</DisplayName>
+      <Description>This enables the advanced failsafe system. If this is set to zero (disable) then all the other AFS options have no effect</Description>
+      <User>Advanced</User>
+    </AFS_ENABLE>
+    <AFS_MAN_PIN>
+      <DisplayName>Manual Pin</DisplayName>
+      <Description>This sets a digital output pin to set high when in manual mode</Description>
+      <User>Advanced</User>
+    </AFS_MAN_PIN>
+    <AFS_HB_PIN>
+      <DisplayName>Heartbeat Pin</DisplayName>
+      <Description>This sets a digital output pin which is cycled at 10Hz when termination is not activated. Note that if a FS_TERM_PIN is set then the heartbeat pin will continue to cycle at 10Hz when termination is activated, to allow the termination board to distinguish between autopilot crash and termination.</Description>
+      <User>Advanced</User>
+      <Values>-1:Disabled, 49:BB Blue GP0 pin 4, 50:AUXOUT1, 51:AUXOUT2, 52:AUXOUT3, 53:AUXOUT4, 54:AUXOUT5, 55:AUXOUT6, 57:BB Blue GP0 pin 3, 113:BB Blue GP0 pin 6, 116:BB Blue GP0 pin 5</Values>
+    </AFS_HB_PIN>
+    <AFS_WP_COMMS>
+      <DisplayName>Comms Waypoint</DisplayName>
+      <Description>Waypoint number to navigate to on comms loss</Description>
+      <User>Advanced</User>
+    </AFS_WP_COMMS>
+    <AFS_GPS_LOSS>
+      <DisplayName>GPS Loss Waypoint</DisplayName>
+      <Description>Waypoint number to navigate to on GPS lock loss</Description>
+      <User>Advanced</User>
+    </AFS_GPS_LOSS>
+    <AFS_TERMINATE>
+      <DisplayName>Force Terminate</DisplayName>
+      <Description>Can be set in flight to force termination of the heartbeat signal</Description>
+      <User>Advanced</User>
+    </AFS_TERMINATE>
+    <AFS_TERM_ACTION>
+      <DisplayName>Terminate action</DisplayName>
+      <Description>This can be used to force an action on flight termination. Normally this is handled by an external failsafe board, but you can setup APM to handle it here. Please consult the wiki for more information on the possible values of the parameter</Description>
+      <User>Advanced</User>
+    </AFS_TERM_ACTION>
+    <AFS_TERM_PIN>
+      <DisplayName>Terminate Pin</DisplayName>
+      <Description>This sets a digital output pin to set high on flight termination</Description>
+      <User>Advanced</User>
+      <Values>-1:Disabled, 49:BB Blue GP0 pin 4, 50:AUXOUT1, 51:AUXOUT2, 52:AUXOUT3, 53:AUXOUT4, 54:AUXOUT5, 55:AUXOUT6, 57:BB Blue GP0 pin 3, 113:BB Blue GP0 pin 6, 116:BB Blue GP0 pin 5</Values>
+    </AFS_TERM_PIN>
+    <AFS_AMSL_LIMIT>
+      <DisplayName>AMSL limit</DisplayName>
+      <Description>This sets the AMSL (above mean sea level) altitude limit. If the pressure altitude determined by QNH exceeds this limit then flight termination will be forced. Note that this limit is in meters, whereas pressure altitude limits are often quoted in feet. A value of zero disables the pressure altitude limit.</Description>
+      <User>Advanced</User>
+      <Units>m</Units>
+      <UnitText>meters</UnitText>
+    </AFS_AMSL_LIMIT>
+    <AFS_AMSL_ERR_GPS>
+      <DisplayName>Error margin for GPS based AMSL limit</DisplayName>
+      <Description>This sets margin for error in GPS derived altitude limit. This error margin is only used if the barometer has failed. If the barometer fails then the GPS will be used to enforce the AMSL_LIMIT, but this margin will be subtracted from the AMSL_LIMIT first, to ensure that even with the given amount of GPS altitude error the pressure altitude is not breached. OBC users should set this to comply with their D2 safety case. A value of -1 will mean that barometer failure will lead to immediate termination.</Description>
+      <User>Advanced</User>
+      <Units>m</Units>
+      <UnitText>meters</UnitText>
+    </AFS_AMSL_ERR_GPS>
+    <AFS_QNH_PRESSURE>
+      <DisplayName>QNH pressure</DisplayName>
+      <Description>This sets the QNH pressure in millibars to be used for pressure altitude in the altitude limit. A value of zero disables the altitude limit.</Description>
+      <User>Advanced</User>
+      <Units>mbar</Units>
+      <UnitText>millibar</UnitText>
+    </AFS_QNH_PRESSURE>
+    <AFS_MAX_GPS_LOSS>
+      <DisplayName>Maximum number of GPS loss events</DisplayName>
+      <Description>Maximum number of GPS loss events before the aircraft stops returning to mission on GPS recovery. Use zero to allow for any number of GPS loss events.</Description>
+      <User>Advanced</User>
+    </AFS_MAX_GPS_LOSS>
+    <AFS_MAX_COM_LOSS>
+      <DisplayName>Maximum number of comms loss events</DisplayName>
+      <Description>Maximum number of comms loss events before the aircraft stops returning to mission on comms recovery. Use zero to allow for any number of comms loss events.</Description>
+      <User>Advanced</User>
+    </AFS_MAX_COM_LOSS>
+    <AFS_GEOFENCE>
+      <DisplayName>Enable geofence Advanced Failsafe</DisplayName>
+      <Description>This enables the geofence part of the AFS. Will only be in effect if AFS_ENABLE is also 1</Description>
+      <User>Advanced</User>
+    </AFS_GEOFENCE>
+    <AFS_RC>
+      <DisplayName>Enable RC Advanced Failsafe</DisplayName>
+      <Description>This enables the RC part of the AFS. Will only be in effect if AFS_ENABLE is also 1</Description>
+      <User>Advanced</User>
+    </AFS_RC>
+    <AFS_RC_MAN_ONLY>
+      <DisplayName>Enable RC Termination only in manual control modes</DisplayName>
+      <Description>If this parameter is set to 1, then an RC loss will only cause the plane to terminate in manual control modes. If it is 0, then the plane will terminate in any flight mode.</Description>
+      <User>Advanced</User>
+    </AFS_RC_MAN_ONLY>
+    <AFS_DUAL_LOSS>
+      <DisplayName>Enable dual loss terminate due to failure of both GCS and GPS simultaneously</DisplayName>
+      <Description>This enables the dual loss termination part of the AFS system. If this parameter is 1 and both GPS and the ground control station fail simultaneously, this will be considered a "dual loss" and cause termination.</Description>
+      <User>Advanced</User>
+    </AFS_DUAL_LOSS>
+    <AFS_RC_FAIL_TIME>
+      <DisplayName>RC failure time</DisplayName>
+      <Description>This is the time in seconds in manual mode that failsafe termination will activate if RC input is lost. For the OBC rules this should be (1.5). Use 0 to disable.</Description>
+      <User>Advanced</User>
+      <Units>s</Units>
+      <UnitText>seconds</UnitText>
+    </AFS_RC_FAIL_TIME>
+    <AFS_MAX_RANGE>
+      <DisplayName>Max allowed range</DisplayName>
+      <Description>This is the maximum range of the vehicle in kilometers from first arming. If the vehicle goes beyond this range then the TERM_ACTION is performed. A value of zero disables this feature.</Description>
+      <User>Advanced</User>
+      <Units>km</Units>
+      <UnitText>kilometers</UnitText>
+    </AFS_MAX_RANGE>
+  </APMrover2>
+  <ArduCopter2>
+    <SYSID_SW_MREV>
+      <DisplayName>Eeprom format version number</DisplayName>
+      <Description>This value is incremented when changes are made to the eeprom format</Description>
+      <User>Advanced</User>
+      <ReadOnly>True</ReadOnly>
+    </SYSID_SW_MREV>
+    <SYSID_THISMAV>
+      <DisplayName>MAVLink system ID of this vehicle</DisplayName>
+      <Description>Allows setting an individual MAVLink system id for this vehicle to distinguish it from others on the same network</Description>
+      <User>Advanced</User>
+      <Range>1 255</Range>
+    </SYSID_THISMAV>
+    <SYSID_MYGCS>
+      <DisplayName>My ground station number</DisplayName>
+      <Description>Allows restricting radio overrides to only come from my ground station</Description>
+      <User>Advanced</User>
+      <Values>255:Mission Planner and DroidPlanner, 252: AP Planner 2</Values>
+    </SYSID_MYGCS>
+    <PILOT_THR_FILT>
+      <DisplayName>Throttle filter cutoff</DisplayName>
+      <Description>Throttle filter cutoff (Hz) - active whenever altitude control is inactive - 0 to disable</Description>
+      <User>Advanced</User>
+      <Range>0 10</Range>
+      <Increment>.5</Increment>
+      <Units>Hz</Units>
+      <UnitText>hertz</UnitText>
+    </PILOT_THR_FILT>
+    <PILOT_TKOFF_ALT>
+      <DisplayName>Pilot takeoff altitude</DisplayName>
+      <Description>Altitude that altitude control modes will climb to when a takeoff is triggered with the throttle stick.</Description>
+      <User>Standard</User>
+      <Range>0.0 1000.0</Range>
+      <Increment>10</Increment>
+      <Units>cm</Units>
+      <UnitText>centimeters</UnitText>
+    </PILOT_TKOFF_ALT>
+    <PILOT_THR_BHV>
+      <DisplayName>Throttle stick behavior</DisplayName>
+      <Description>Bitmask containing various throttle stick options. TX with sprung throttle can set PILOT_THR_BHV to "1" so motor feedback when landed starts from mid-stick instead of bottom of stick.</Description>
+      <User>Standard</User>
+      <Values>0:None, 1:Feedback from mid stick, 2:High throttle cancels landing, 4:Disarm on land detection</Values>
+      <Bitmask>0:Feedback from mid stick,1:High throttle cancels landing,2:Disarm on land detection</Bitmask>
+    </PILOT_THR_BHV>
+    <TELEM_DELAY>
+      <DisplayName>Telemetry startup delay</DisplayName>
+      <Description>The amount of time (in seconds) to delay radio telemetry to prevent an Xbee bricking on power up</Description>
+      <User>Advanced</User>
+      <Range>0 30</Range>
+      <Increment>1</Increment>
+      <Units>s</Units>
+      <UnitText>seconds</UnitText>
+    </TELEM_DELAY>
+    <GCS_PID_MASK>
+      <DisplayName>GCS PID tuning mask</DisplayName>
+      <Description>bitmask of PIDs to send MAVLink PID_TUNING messages for</Description>
+      <User>Advanced</User>
+      <Values>0:None, 1:Roll, 2:Pitch, 4:Yaw, 8:AccelZ</Values>
+      <Bitmask>0:Roll,1:Pitch,2:Yaw,3:AccelZ</Bitmask>
+    </GCS_PID_MASK>
+    <RTL_ALT>
+      <DisplayName>RTL Altitude</DisplayName>
+      <Description>The minimum alt above home the vehicle will climb to before returning.  If the vehicle is flying higher than this value it will return at its current altitude.</Description>
+      <User>Standard</User>
+      <Range>200 8000</Range>
+      <Increment>1</Increment>
+      <Units>cm</Units>
+      <UnitText>centimeters</UnitText>
+    </RTL_ALT>
+    <RTL_CONE_SLOPE>
+      <DisplayName>RTL cone slope</DisplayName>
+      <Description>Defines a cone above home which determines maximum climb</Description>
+      <User>Standard</User>
+      <Values>0:Disabled, 1:Shallow, 3:Steep</Values>
+      <Range>0.5 10.0</Range>
+      <Increment>.1</Increment>
+    </RTL_CONE_SLOPE>
+    <RTL_SPEED>
+      <DisplayName>RTL speed</DisplayName>
+      <Description>Defines the speed in cm/s which the aircraft will attempt to maintain horizontally while flying home. If this is set to zero, WPNAV_SPEED will be used instead.</Description>
+      <User>Standard</User>
+      <Range>0 2000</Range>
+      <Increment>50</Increment>
+      <Units>cm/s</Units>
+      <UnitText>centimeters per second</UnitText>
+    </RTL_SPEED>
+    <RTL_ALT_FINAL>
+      <DisplayName>RTL Final Altitude</DisplayName>
+      <Description>This is the altitude the vehicle will move to as the final stage of Returning to Launch or after completing a mission.  Set to zero to land.</Description>
+      <User>Standard</User>
+      <Range>-1 1000</Range>
+      <Increment>1</Increment>
+      <Units>cm</Units>
+      <UnitText>centimeters</UnitText>
+    </RTL_ALT_FINAL>
+    <RTL_CLIMB_MIN>
+      <DisplayName>RTL minimum climb</DisplayName>
+      <Description>The vehicle will climb this many cm during the initial climb portion of the RTL</Description>
+      <User>Standard</User>
+      <Range>0 3000</Range>
+      <Increment>10</Increment>
+      <Units>cm</Units>
+      <UnitText>centimeters</UnitText>
+    </RTL_CLIMB_MIN>
+    <RTL_LOIT_TIME>
+      <DisplayName>RTL loiter time</DisplayName>
+      <Description>Time (in milliseconds) to loiter above home before beginning final descent</Description>
+      <User>Standard</User>
+      <Range>0 60000</Range>
+      <Increment>1000</Increment>
+      <Units>ms</Units>
+      <UnitText>milliseconds</UnitText>
+    </RTL_LOIT_TIME>
+    <RNGFND_GAIN>
+      <DisplayName>Rangefinder gain</DisplayName>
+      <Description>Used to adjust the speed with which the target altitude is changed when objects are sensed below the copter</Description>
+      <User>Standard</User>
+      <Range>0.01 2.0</Range>
+      <Increment>0.01</Increment>
+    </RNGFND_GAIN>
+    <FS_GCS_ENABLE>
+      <DisplayName>Ground Station Failsafe Enable</DisplayName>
+      <Description>Controls whether failsafe will be invoked (and what action to take) when connection with Ground station is lost for at least 5 seconds. NB. The GCS Failsafe is only active when RC_OVERRIDE is being used to control the vehicle.</Description>
+      <User>Standard</User>
+      <Values>0:Disabled, 1:Enabled always RTL, 2:Enabled Continue with Mission in Auto Mode (Deprecated in 4.0+), 3:Enabled always SmartRTL or RTL, 4:Enabled always SmartRTL or Land, 5:Enabled always land (4.0+ Only)</Values>
+    </FS_GCS_ENABLE>
+    <GPS_HDOP_GOOD>
+      <DisplayName>GPS Hdop Good</DisplayName>
+      <Description>GPS Hdop value at or below this value represent a good position.  Used for pre-arm checks</Description>
+      <User>Advanced</User>
+      <Range>100 900</Range>
+    </GPS_HDOP_GOOD>
+    <SUPER_SIMPLE>
+      <DisplayName>Super Simple Mode</DisplayName>
+      <Description>Bitmask to enable Super Simple mode for some flight modes. Setting this to Disabled(0) will disable Super Simple Mode</Description>
+      <User>Standard</User>
+      <Values>0:Disabled, 1:Mode1, 2:Mode2, 3:Mode1+2, 4:Mode3, 5:Mode1+3, 6:Mode2+3, 7:Mode1+2+3, 8:Mode4, 9:Mode1+4, 10:Mode2+4, 11:Mode1+2+4, 12:Mode3+4, 13:Mode1+3+4, 14:Mode2+3+4, 15:Mode1+2+3+4, 16:Mode5, 17:Mode1+5, 18:Mode2+5, 19:Mode1+2+5, 20:Mode3+5, 21:Mode1+3+5, 22:Mode2+3+5, 23:Mode1+2+3+5, 24:Mode4+5, 25:Mode1+4+5, 26:Mode2+4+5, 27:Mode1+2+4+5, 28:Mode3+4+5, 29:Mode1+3+4+5, 30:Mode2+3+4+5, 31:Mode1+2+3+4+5, 32:Mode6, 33:Mode1+6, 34:Mode2+6, 35:Mode1+2+6, 36:Mode3+6, 37:Mode1+3+6, 38:Mode2+3+6, 39:Mode1+2+3+6, 40:Mode4+6, 41:Mode1+4+6, 42:Mode2+4+6, 43:Mode1+2+4+6, 44:Mode3+4+6, 45:Mode1+3+4+6, 46:Mode2+3+4+6, 47:Mode1+2+3+4+6, 48:Mode5+6, 49:Mode1+5+6, 50:Mode2+5+6, 51:Mode1+2+5+6, 52:Mode3+5+6, 53:Mode1+3+5+6, 54:Mode2+3+5+6, 55:Mode1+2+3+5+6, 56:Mode4+5+6, 57:Mode1+4+5+6, 58:Mode2+4+5+6, 59:Mode1+2+4+5+6, 60:Mode3+4+5+6, 61:Mode1+3+4+5+6, 62:Mode2+3+4+5+6, 63:Mode1+2+3+4+5+6</Values>
+    </SUPER_SIMPLE>
+    <WP_YAW_BEHAVIOR>
+      <DisplayName>Yaw behaviour during missions</DisplayName>
+      <Description>Determines how the autopilot controls the yaw during missions and RTL</Description>
+      <User>Standard</User>
+      <Values>0:Never change yaw, 1:Face next waypoint, 2:Face next waypoint except RTL, 3:Face along GPS course</Values>
+    </WP_YAW_BEHAVIOR>
+    <LAND_SPEED>
+      <DisplayName>Land speed</DisplayName>
+      <Description>The descent speed for the final stage of landing in cm/s</Description>
+      <User>Standard</User>
+      <Range>30 200</Range>
+      <Increment>10</Increment>
+      <Units>cm/s</Units>
+      <UnitText>centimeters per second</UnitText>
+    </LAND_SPEED>
+    <LAND_SPEED_HIGH>
+      <DisplayName>Land speed high</DisplayName>
+      <Description>The descent speed for the first stage of landing in cm/s. If this is zero then WPNAV_SPEED_DN is used</Description>
+      <User>Standard</User>
+      <Range>0 500</Range>
+      <Increment>10</Increment>
+      <Units>cm/s</Units>
+      <UnitText>centimeters per second</UnitText>
+    </LAND_SPEED_HIGH>
+    <PILOT_SPEED_UP>
+      <DisplayName>Pilot maximum vertical speed ascending</DisplayName>
+      <Description>The maximum vertical ascending velocity the pilot may request in cm/s</Description>
+      <User>Standard</User>
+      <Range>50 500</Range>
+      <Increment>10</Increment>
+      <Units>cm/s</Units>
+      <UnitText>centimeters per second</UnitText>
+    </PILOT_SPEED_UP>
+    <PILOT_ACCEL_Z>
+      <DisplayName>Pilot vertical acceleration</DisplayName>
+      <Description>The vertical acceleration used when pilot is controlling the altitude</Description>
+      <User>Standard</User>
+      <Range>50 500</Range>
+      <Increment>10</Increment>
+      <Units>cm/s/s</Units>
+      <UnitText>centimeters per square second</UnitText>
+    </PILOT_ACCEL_Z>
+    <FS_THR_ENABLE>
+      <DisplayName>Throttle Failsafe Enable</DisplayName>
+      <Description>The throttle failsafe allows you to configure a software failsafe activated by a setting on the throttle input channel</Description>
+      <User>Standard</User>
+      <Values>0:Disabled, 1:Enabled always RTL, 2:Enabled Continue with Mission in Auto Mode (Deprecated in 4.0+), 3:Enabled always Land, 4:Enabled always SmartRTL or RTL, 5:Enabled always SmartRTL or Land</Values>
+    </FS_THR_ENABLE>
+    <FS_THR_VALUE>
+      <DisplayName>Throttle Failsafe Value</DisplayName>
+      <Description>The PWM level in microseconds on channel 3 below which throttle failsafe triggers</Description>
+      <User>Standard</User>
+      <Range>925 1100</Range>
+      <Increment>1</Increment>
+      <Units>PWM</Units>
+      <UnitText>PWM in microseconds</UnitText>
+    </FS_THR_VALUE>
+    <THR_DZ>
+      <DisplayName>Throttle deadzone</DisplayName>
+      <Description>The deadzone above and below mid throttle in PWM microseconds. Used in AltHold, Loiter, PosHold flight modes</Description>
+      <User>Standard</User>
+      <Range>0 300</Range>
+      <Increment>1</Increment>
+      <Units>PWM</Units>
+      <UnitText>PWM in microseconds</UnitText>
+    </THR_DZ>
+    <FLTMODE1>
+      <DisplayName>Flight Mode 1</DisplayName>
+      <Description>Flight mode when Channel 5 pwm is &lt;= 1230</Description>
+      <User>Standard</User>
+      <Values>0:Stabilize, 1:Acro, 2:AltHold, 3:Auto, 4:Guided, 5:Loiter, 6:RTL, 7:Circle, 9:Land, 11:Drift, 13:Sport, 14:Flip, 15:AutoTune, 16:PosHold, 17:Brake, 18:Throw, 19:Avoid_ADSB, 20:Guided_NoGPS, 21:Smart_RTL, 22:FlowHold, 23:Follow, 24:ZigZag, 25:SystemID, 26:Heli_Autorotate</Values>
+    </FLTMODE1>
+    <FLTMODE2>
+      <DisplayName>Flight Mode 2</DisplayName>
+      <Description>Flight mode when Channel 5 pwm is &gt;1230, &lt;= 1360</Description>
+      <User>Standard</User>
+      <Values>0:Stabilize, 1:Acro, 2:AltHold, 3:Auto, 4:Guided, 5:Loiter, 6:RTL, 7:Circle, 9:Land, 11:Drift, 13:Sport, 14:Flip, 15:AutoTune, 16:PosHold, 17:Brake, 18:Throw, 19:Avoid_ADSB, 20:Guided_NoGPS, 21:Smart_RTL, 22:FlowHold, 23:Follow, 24:ZigZag, 25:SystemID, 26:Heli_Autorotate</Values>
+    </FLTMODE2>
+    <FLTMODE3>
+      <DisplayName>Flight Mode 3</DisplayName>
+      <Description>Flight mode when Channel 5 pwm is &gt;1360, &lt;= 1490</Description>
+      <User>Standard</User>
+      <Values>0:Stabilize, 1:Acro, 2:AltHold, 3:Auto, 4:Guided, 5:Loiter, 6:RTL, 7:Circle, 9:Land, 11:Drift, 13:Sport, 14:Flip, 15:AutoTune, 16:PosHold, 17:Brake, 18:Throw, 19:Avoid_ADSB, 20:Guided_NoGPS, 21:Smart_RTL, 22:FlowHold, 23:Follow, 24:ZigZag, 25:SystemID, 26:Heli_Autorotate</Values>
+    </FLTMODE3>
+    <FLTMODE4>
+      <DisplayName>Flight Mode 4</DisplayName>
+      <Description>Flight mode when Channel 5 pwm is &gt;1490, &lt;= 1620</Description>
+      <User>Standard</User>
+      <Values>0:Stabilize, 1:Acro, 2:AltHold, 3:Auto, 4:Guided, 5:Loiter, 6:RTL, 7:Circle, 9:Land, 11:Drift, 13:Sport, 14:Flip, 15:AutoTune, 16:PosHold, 17:Brake, 18:Throw, 19:Avoid_ADSB, 20:Guided_NoGPS, 21:Smart_RTL, 22:FlowHold, 23:Follow, 24:ZigZag, 25:SystemID, 26:Heli_Autorotate</Values>
+    </FLTMODE4>
+    <FLTMODE5>
+      <DisplayName>Flight Mode 5</DisplayName>
+      <Description>Flight mode when Channel 5 pwm is &gt;1620, &lt;= 1749</Description>
+      <User>Standard</User>
+      <Values>0:Stabilize, 1:Acro, 2:AltHold, 3:Auto, 4:Guided, 5:Loiter, 6:RTL, 7:Circle, 9:Land, 11:Drift, 13:Sport, 14:Flip, 15:AutoTune, 16:PosHold, 17:Brake, 18:Throw, 19:Avoid_ADSB, 20:Guided_NoGPS, 21:Smart_RTL, 22:FlowHold, 23:Follow, 24:ZigZag, 25:SystemID, 26:Heli_Autorotate</Values>
+    </FLTMODE5>
+    <FLTMODE6>
+      <DisplayName>Flight Mode 6</DisplayName>
+      <Description>Flight mode when Channel 5 pwm is &gt;=1750</Description>
+      <User>Standard</User>
+      <Values>0:Stabilize, 1:Acro, 2:AltHold, 3:Auto, 4:Guided, 5:Loiter, 6:RTL, 7:Circle, 9:Land, 11:Drift, 13:Sport, 14:Flip, 15:AutoTune, 16:PosHold, 17:Brake, 18:Throw, 19:Avoid_ADSB, 20:Guided_NoGPS, 21:Smart_RTL, 22:FlowHold, 23:Follow, 24:ZigZag, 25:SystemID, 26:Heli_Autorotate</Values>
+    </FLTMODE6>
+    <FLTMODE_CH>
+      <DisplayName>Flightmode channel</DisplayName>
+      <Description>RC Channel to use for flight mode control</Description>
+      <User>Advanced</User>
+      <Values>0:Disabled, 5:Channel5, 6:Channel6, 7:Channel7, 8:Channel8</Values>
+    </FLTMODE_CH>
+    <SIMPLE>
+      <DisplayName>Simple mode bitmask</DisplayName>
+      <Description>Bitmask which holds which flight modes use simple heading mode (eg bit 0 = 1 means Flight Mode 0 uses simple mode)</Description>
+      <User>Advanced</User>
+    </SIMPLE>
+    <LOG_BITMASK>
+      <DisplayName>Log bitmask</DisplayName>
+      <Description>4 byte bitmap of log types to enable</Description>
+      <User>Standard</User>
+      <Values>830:Default, 894:Default+RCIN, 958:Default+IMU, 1854:Default+Motors, -6146:NearlyAll-AC315, 45054:NearlyAll, 131071:All+FastATT, 262142:All+MotBatt, 393214:All+FastIMU, 397310:All+FastIMU+PID, 655358:All+FullIMU, 0:Disabled</Values>
+      <Bitmask>0:ATTITUDE_FAST,1:ATTITUDE_MED,2:GPS,3:PM,4:CTUN,5:NTUN,6:RCIN,7:IMU,8:CMD,9:CURRENT,10:RCOUT,11:OPTFLOW,12:PID,13:COMPASS,14:INAV,15:CAMERA,17:MOTBATT,18:IMU_FAST,19:IMU_RAW</Bitmask>
+    </LOG_BITMASK>
+    <ESC_CALIBRATION>
+      <DisplayName>ESC Calibration</DisplayName>
+      <Description>Controls whether ArduCopter will enter ESC calibration on the next restart.  Do not adjust this parameter manually.</Description>
+      <User>Advanced</User>
+      <Values>0:Normal Start-up, 1:Start-up in ESC Calibration mode if throttle high, 2:Start-up in ESC Calibration mode regardless of throttle, 3:Start-up and automatically calibrate ESCs, 9:Disabled</Values>
+    </ESC_CALIBRATION>
+    <TUNE>
+      <DisplayName>Channel 6 Tuning</DisplayName>
+      <Description>Controls which parameters (normally PID gains) are being tuned with transmitter's channel 6 knob</Description>
+      <User>Standard</User>
+      <Values>0:None, 1:Stab Roll/Pitch kP, 4:Rate Roll/Pitch kP, 5:Rate Roll/Pitch kI, 21:Rate Roll/Pitch kD, 3:Stab Yaw kP, 6:Rate Yaw kP, 26:Rate Yaw kD, 56:Rate Yaw Filter, 55:Motor Yaw Headroom, 14:AltHold kP, 7:Throttle Rate kP, 34:Throttle Accel kP, 35:Throttle Accel kI, 36:Throttle Accel kD, 12:Loiter Pos kP, 22:Velocity XY kP, 28:Velocity XY kI, 10:WP Speed, 25:Acro RollPitch kP, 40:Acro Yaw kP, 45:RC Feel, 13:Heli Ext Gyro, 38:Declination, 39:Circle Rate, 41:RangeFinder Gain, 46:Rate Pitch kP, 47:Rate Pitch kI, 48:Rate Pitch kD, 49:Rate Roll kP, 50:Rate Roll kI, 51:Rate Roll kD, 52:Rate Pitch FF, 53:Rate Roll FF, 54:Rate Yaw FF, 57:Winch, 58:SysID Magnitude</Values>
+    </TUNE>
+    <FRAME_TYPE>
+      <DisplayName>Frame Type (+, X, V, etc)</DisplayName>
+      <Description>Controls motor mixing for multicopters.  Not used for Tri or Traditional Helicopters.</Description>
+      <User>Standard</User>
+      <Values>0:Plus, 1:X, 2:V, 3:H, 4:V-Tail, 5:A-Tail, 10:Y6B, 11:Y6F, 12:BetaFlightX, 13:DJIX, 14:ClockwiseX, 15: I</Values>
+      <RebootRequired>True</RebootRequired>
+    </FRAME_TYPE>
+    <DISARM_DELAY>
+      <DisplayName>Disarm delay</DisplayName>
+      <Description>Delay before automatic disarm in seconds. A value of zero disables auto disarm.</Description>
+      <User>Advanced</User>
+      <Range>0 127</Range>
+      <Units>s</Units>
+      <UnitText>seconds</UnitText>
+    </DISARM_DELAY>
+    <ANGLE_MAX>
+      <DisplayName>Angle Max</DisplayName>
+      <Description>Maximum lean angle in all flight modes</Description>
+      <User>Advanced</User>
+      <Range>1000 8000</Range>
+      <Units>cdeg</Units>
+      <UnitText>centidegrees</UnitText>
+    </ANGLE_MAX>
+    <PHLD_BRAKE_RATE>
+      <DisplayName>PosHold braking rate</DisplayName>
+      <Description>PosHold flight mode's rotation rate during braking in deg/sec</Description>
+      <User>Advanced</User>
+      <Range>4 12</Range>
+      <Units>deg/s</Units>
+      <UnitText>degrees per second</UnitText>
+    </PHLD_BRAKE_RATE>
+    <PHLD_BRAKE_ANGLE>
+      <DisplayName>PosHold braking angle max</DisplayName>
+      <Description>PosHold flight mode's max lean angle during braking in centi-degrees</Description>
+      <User>Advanced</User>
+      <Range>2000 4500</Range>
+      <Units>cdeg</Units>
+      <UnitText>centidegrees</UnitText>
+    </PHLD_BRAKE_ANGLE>
+    <LAND_REPOSITION>
+      <DisplayName>Land repositioning</DisplayName>
+      <Description>Enables user input during LAND mode, the landing phase of RTL, and auto mode landings.</Description>
+      <User>Advanced</User>
+      <Values>0:No repositioning, 1:Repositioning</Values>
+    </LAND_REPOSITION>
+    <FS_EKF_ACTION>
+      <DisplayName>EKF Failsafe Action</DisplayName>
+      <Description>Controls the action that will be taken when an EKF failsafe is invoked</Description>
+      <User>Advanced</User>
+      <Values>1:Land, 2:AltHold, 3:Land even in Stabilize</Values>
+    </FS_EKF_ACTION>
+    <FS_EKF_THRESH>
+      <DisplayName>EKF failsafe variance threshold</DisplayName>
+      <Description>Allows setting the maximum acceptable compass and velocity variance</Description>
+      <User>Advanced</User>
+      <Values>0.6:Strict, 0.8:Default, 1.0:Relaxed</Values>
+    </FS_EKF_THRESH>
+    <FS_CRASH_CHECK>
+      <DisplayName>Crash check enable</DisplayName>
+      <Description>This enables automatic crash checking. When enabled the motors will disarm if a crash is detected.</Description>
+      <User>Advanced</User>
+      <Values>0:Disabled, 1:Enabled</Values>
+    </FS_CRASH_CHECK>
+    <RC_SPEED>
+      <DisplayName>ESC Update Speed</DisplayName>
+      <Description>This is the speed in Hertz that your ESCs will receive updates</Description>
+      <User>Advanced</User>
+      <Range>50 490</Range>
+      <Increment>1</Increment>
+      <Units>Hz</Units>
+      <UnitText>hertz</UnitText>
+    </RC_SPEED>
+    <ACRO_RP_P>
+      <DisplayName>Acro Roll and Pitch P gain</DisplayName>
+      <Description>Converts pilot roll and pitch into a desired rate of rotation in ACRO and SPORT mode.  Higher values mean faster rate of rotation.</Description>
+      <User>Standard</User>
+      <Range>1 10</Range>
+    </ACRO_RP_P>
+    <ACRO_YAW_P>
+      <DisplayName>Acro Yaw P gain</DisplayName>
+      <Description>Converts pilot yaw input into a desired rate of rotation.  Higher values mean faster rate of rotation.</Description>
+      <User>Standard</User>
+      <Range>1 10</Range>
+    </ACRO_YAW_P>
+    <ACRO_BAL_ROLL>
+      <DisplayName>Acro Balance Roll</DisplayName>
+      <Description>rate at which roll angle returns to level in acro and sport mode.  A higher value causes the vehicle to return to level faster. For helicopter sets the decay rate of the virtual flybar in the roll axis. A higher value causes faster decay of desired to actual attitude.</Description>
+      <User>Advanced</User>
+      <Range>0 3</Range>
+      <Increment>0.1</Increment>
+    </ACRO_BAL_ROLL>
+    <ACRO_BAL_PITCH>
+      <DisplayName>Acro Balance Pitch</DisplayName>
+      <Description>rate at which pitch angle returns to level in acro and sport mode.  A higher value causes the vehicle to return to level faster. For helicopter sets the decay rate of the virtual flybar in the pitch axis. A higher value causes faster decay of desired to actual attitude.</Description>
+      <User>Advanced</User>
+      <Range>0 3</Range>
+      <Increment>0.1</Increment>
+    </ACRO_BAL_PITCH>
+    <ACRO_TRAINER>
+      <DisplayName>Acro Trainer</DisplayName>
+      <Description>Type of trainer used in acro mode</Description>
+      <User>Advanced</User>
+      <Values>0:Disabled, 1:Leveling, 2:Leveling and Limited</Values>
+    </ACRO_TRAINER>
+    <ACRO_RP_EXPO>
+      <DisplayName>Acro Roll/Pitch Expo</DisplayName>
+      <Description>Acro roll/pitch Expo to allow faster rotation when stick at edges</Description>
+      <User>Advanced</User>
+      <Values>0:Disabled, 0.1:Very Low, 0.2:Low, 0.3:Medium, 0.4:High, 0.5:Very High</Values>
+      <Range>-0.5 1.0</Range>
+    </ACRO_RP_EXPO>
+    <THROW_MOT_START>
+      <DisplayName>Start motors before throwing is detected</DisplayName>
+      <Description>Used by THROW mode. Controls whether motors will run at the speed set by THR_MIN or will be stopped when armed and waiting for the throw.</Description>
+      <User>Standard</User>
+      <Values>0:Stopped, 1:Running</Values>
+    </THROW_MOT_START>
+    <TERRAIN_FOLLOW>
+      <DisplayName>Terrain Following use control</DisplayName>
+      <Description>This enables terrain following for RTL and LAND flight modes. To use this option TERRAIN_ENABLE must be 1 and the GCS must  support sending terrain data to the aircraft.  In RTL the RTL_ALT will be considered a height above the terrain.  In LAND mode the vehicle will slow to LAND_SPEED 10m above terrain (instead of 10m above home).  This parameter does not affect AUTO and Guided which use a per-command flag to determine if the height is above-home, absolute or above-terrain.</Description>
+      <User>Standard</User>
+      <Values>0:Do Not Use in RTL and Land, 1:Use in RTL and Land</Values>
+    </TERRAIN_FOLLOW>
+    <WP_NAVALT_MIN>
+      <DisplayName>Minimum navigation altitude</DisplayName>
+      <Description>This is the altitude in meters above which for navigation can begin. This applies in auto takeoff and auto landing.</Description>
+      <User>Standard</User>
+      <Range>0 5</Range>
+    </WP_NAVALT_MIN>
+    <THROW_NEXTMODE>
+      <DisplayName>Throw mode's follow up mode</DisplayName>
+      <Description>Vehicle will switch to this mode after the throw is successfully completed.  Default is to stay in throw mode (18)</Description>
+      <User>Standard</User>
+      <Values>3:Auto, 4:Guided, 5:LOITER, 6:RTL, 9:Land, 17:Brake, 18:Throw</Values>
+    </THROW_NEXTMODE>
+    <THROW_TYPE>
+      <DisplayName>Type of Type</DisplayName>
+      <Description>Used by THROW mode. Specifies whether Copter is thrown upward or dropped.</Description>
+      <User>Standard</User>
+      <Values>0:Upward Throw, 1:Drop</Values>
+    </THROW_TYPE>
+    <GND_EFFECT_COMP>
+      <DisplayName>Ground Effect Compensation Enable/Disable</DisplayName>
+      <Description>Ground Effect Compensation Enable/Disable</Description>
+      <User>Advanced</User>
+      <Values>0:Disabled, 1:Enabled</Values>
+    </GND_EFFECT_COMP>
+    <DEV_OPTIONS>
+      <DisplayName>Development options</DisplayName>
+      <Description>Bitmask of developer options. The meanings of the bit fields in this parameter may vary at any time. Developers should check the source code for current meaning</Description>
+      <User>Advanced</User>
+      <Bitmask>0:ADSBMavlinkProcessing,1:DevOptionVFR_HUDRelativeAlt</Bitmask>
+    </DEV_OPTIONS>
+    <ACRO_Y_EXPO>
+      <DisplayName>Acro Yaw Expo</DisplayName>
+      <Description>Acro yaw expo to allow faster rotation when stick at edges</Description>
+      <User>Advanced</User>
+      <Values>0:Disabled, 0.1:Very Low, 0.2:Low, 0.3:Medium, 0.4:High, 0.5:Very High</Values>
+      <Range>-0.5 1.0</Range>
+    </ACRO_Y_EXPO>
+    <ACRO_THR_MID>
+      <DisplayName>Acro Thr Mid</DisplayName>
+      <Description>Acro Throttle Mid</Description>
+      <User>Advanced</User>
+      <Range>0 1</Range>
+    </ACRO_THR_MID>
+    <SYSID_ENFORCE>
+      <DisplayName>GCS sysid enforcement</DisplayName>
+      <Description>This controls whether packets from other than the expected GCS system ID will be accepted</Description>
+      <User>Advanced</User>
+      <Values>0:NotEnforced, 1:Enforced</Values>
+    </SYSID_ENFORCE>
+    <FRAME_CLASS>
+      <DisplayName>Frame Class</DisplayName>
+      <Description>Controls major frame class for multicopter component</Description>
+      <User>Standard</User>
+      <Values>0:Undefined, 1:Quad, 2:Hexa, 3:Octa, 4:OctaQuad, 5:Y6, 6:Heli, 7:Tri, 8:SingleCopter, 9:CoaxCopter, 10:BiCopter, 11:Heli_Dual, 12:DodecaHexa, 13:HeliQuad</Values>
+      <RebootRequired>True</RebootRequired>
+    </FRAME_CLASS>
+    <PILOT_SPEED_DN>
+      <DisplayName>Pilot maximum vertical speed descending</DisplayName>
+      <Description>The maximum vertical descending velocity the pilot may request in cm/s</Description>
+      <User>Standard</User>
+      <Range>50 500</Range>
+      <Increment>10</Increment>
+      <Units>cm/s</Units>
+      <UnitText>centimeters per second</UnitText>
+    </PILOT_SPEED_DN>
+    <LAND_ALT_LOW>
+      <DisplayName>Land alt low</DisplayName>
+      <Description>Altitude during Landing at which vehicle slows to LAND_SPEED</Description>
+      <User>Advanced</User>
+      <Range>100 10000</Range>
+      <Increment>10</Increment>
+      <Units>cm</Units>
+      <UnitText>centimeters</UnitText>
+    </LAND_ALT_LOW>
+    <TUNE_MIN>
+      <DisplayName>Tuning minimum</DisplayName>
+      <Description>Minimum value that the parameter currently being tuned with the transmitter's channel 6 knob will be set to</Description>
+      <User>Standard</User>
+    </TUNE_MIN>
+    <TUNE_MAX>
+      <DisplayName>Tuning maximum</DisplayName>
+      <Description>Maximum value that the parameter currently being tuned with the transmitter's channel 6 knob will be set to</Description>
+      <User>Standard</User>
+    </TUNE_MAX>
+    <FS_VIBE_ENABLE>
+      <DisplayName>Vibration Failsafe enable</DisplayName>
+      <Description>This enables the vibration failsafe which will use modified altitude estimation and control during high vibrations</Description>
+      <User>Standard</User>
+      <Values>0:Disabled, 1:Enabled</Values>
+    </FS_VIBE_ENABLE>
+    <FS_OPTIONS>
+      <DisplayName>Failsafe options bitmask</DisplayName>
+      <Description>Bitmask of additional options for battery, radio, &amp; GCS failsafes. 0 (default) disables all options.</Description>
+      <User>Advanced</User>
+      <Values>0:Disabled, 1:Continue if in Auto on RC failsafe only, 2:Continue if in Auto on GCS failsafe only, 3:Continue if in Auto on RC and/or GCS failsafe, 4:Continue if in Guided on RC failsafe only, 8:Continue if landing on any failsafe, 16:Continue if in pilot controlled modes on GCS failsafe, 19:Continue if in Auto on RC and/or GCS failsafe and continue if in pilot controlled modes on GCS failsafe</Values>
+      <Bitmask>0:Continue if in Auto on RC failsafe, 1:Continue if in Auto on GCS failsafe, 2:Continue if in Guided on RC failsafe, 3:Continue if landing on any failsafe, 4:Continue if in pilot controlled modes on GCS failsafe</Bitmask>
+    </FS_OPTIONS>
+    <CH7_OPT>
+      <DisplayName>Channel 7 option</DisplayName>
+      <Description>Select which function is performed when CH7 is above 1800 pwm</Description>
+      <User>Standard</User>
+      <Values>0:Do Nothing, 2:Flip, 3:Simple Mode, 4:RTL, 5:Save Trim, 7:Save WP, 9:Camera Trigger, 10:RangeFinder, 11:Fence, 13:Super Simple Mode, 14:Acro Trainer, 15:Sprayer, 16:Auto, 17:AutoTune, 18:Land, 19:Gripper, 21:Parachute Enable, 22:Parachute Release, 23:Parachute 3pos, 24:Auto Mission Reset, 25:AttCon Feed Forward, 26:AttCon Accel Limits, 27:Retract Mount, 28:Relay On/Off, 34:Relay2 On/Off, 35:Relay3 On/Off, 36:Relay4 On/Off, 29:Landing Gear, 30:Lost Copter Sound, 31:Motor Emergency Stop, 32:Motor Interlock, 33:Brake, 37:Throw, 38:ADSB-Avoidance, 39:PrecLoiter, 40:Object Avoidance, 41:ArmDisarm, 42:SmartRTL, 43:InvertedFlight, 44:Winch Enable, 45:WinchControl</Values>
+    </CH7_OPT>
+    <CH8_OPT>
+      <DisplayName>Channel 8 option</DisplayName>
+      <Description>Select which function is performed when CH8 is above 1800 pwm</Description>
+      <User>Standard</User>
+      <Values>0:Do Nothing, 2:Flip, 3:Simple Mode, 4:RTL, 5:Save Trim, 7:Save WP, 9:Camera Trigger, 10:RangeFinder, 11:Fence, 13:Super Simple Mode, 14:Acro Trainer, 15:Sprayer, 16:Auto, 17:AutoTune, 18:Land, 19:Gripper, 21:Parachute Enable, 22:Parachute Release, 23:Parachute 3pos, 24:Auto Mission Reset, 25:AttCon Feed Forward, 26:AttCon Accel Limits, 27:Retract Mount, 28:Relay On/Off, 34:Relay2 On/Off, 35:Relay3 On/Off, 36:Relay4 On/Off, 29:Landing Gear, 30:Lost Copter Sound, 31:Motor Emergency Stop, 32:Motor Interlock, 33:Brake, 37:Throw, 38:ADSB-Avoidance, 39:PrecLoiter, 40:Object Avoidance, 41:ArmDisarm, 42:SmartRTL, 43:InvertedFlight, 44:Winch Enable, 45:WinchControl</Values>
+    </CH8_OPT>
+    <CH9_OPT>
+      <DisplayName>Channel 9 option</DisplayName>
+      <Description>Select which function is performed when CH9 is above 1800 pwm</Description>
+      <User>Standard</User>
+      <Values>0:Do Nothing, 2:Flip, 3:Simple Mode, 4:RTL, 5:Save Trim, 7:Save WP, 9:Camera Trigger, 10:RangeFinder, 11:Fence, 13:Super Simple Mode, 14:Acro Trainer, 15:Sprayer, 16:Auto, 17:AutoTune, 18:Land, 19:Gripper, 21:Parachute Enable, 22:Parachute Release, 23:Parachute 3pos, 24:Auto Mission Reset, 25:AttCon Feed Forward, 26:AttCon Accel Limits, 27:Retract Mount, 28:Relay On/Off, 34:Relay2 On/Off, 35:Relay3 On/Off, 36:Relay4 On/Off, 29:Landing Gear, 30:Lost Copter Sound, 31:Motor Emergency Stop, 32:Motor Interlock, 33:Brake, 37:Throw, 38:ADSB-Avoidance, 39:PrecLoiter, 40:Object Avoidance, 41:ArmDisarm, 42:SmartRTL, 43:InvertedFlight, 44:Winch Enable, 45:WinchControl</Values>
+    </CH9_OPT>
+    <CH10_OPT>
+      <DisplayName>Channel 10 option</DisplayName>
+      <Description>Select which function is performed when CH10 is above 1800 pwm</Description>
+      <User>Standard</User>
+      <Values>0:Do Nothing, 2:Flip, 3:Simple Mode, 4:RTL, 5:Save Trim, 7:Save WP, 9:Camera Trigger, 10:RangeFinder, 11:Fence, 13:Super Simple Mode, 14:Acro Trainer, 15:Sprayer, 16:Auto, 17:AutoTune, 18:Land, 19:Gripper, 21:Parachute Enable, 22:Parachute Release, 23:Parachute 3pos, 24:Auto Mission Reset, 25:AttCon Feed Forward, 26:AttCon Accel Limits, 27:Retract Mount, 28:Relay On/Off, 34:Relay2 On/Off, 35:Relay3 On/Off, 36:Relay4 On/Off, 29:Landing Gear, 30:Lost Copter Sound, 31:Motor Emergency Stop, 32:Motor Interlock, 33:Brake, 37:Throw, 38:ADSB-Avoidance, 39:PrecLoiter, 40:Object Avoidance, 41:ArmDisarm, 42:SmartRTL, 43:InvertedFlight, 44:Winch Enable, 45:WinchControl</Values>
+    </CH10_OPT>
+    <CH11_OPT>
+      <DisplayName>Channel 11 option</DisplayName>
+      <Description>Select which function is performed when CH11 is above 1800 pwm</Description>
+      <User>Standard</User>
+      <Values>0:Do Nothing, 2:Flip, 3:Simple Mode, 4:RTL, 5:Save Trim, 7:Save WP, 9:Camera Trigger, 10:RangeFinder, 11:Fence, 13:Super Simple Mode, 14:Acro Trainer, 15:Sprayer, 16:Auto, 17:AutoTune, 18:Land, 19:Gripper, 21:Parachute Enable, 22:Parachute Release, 23:Parachute 3pos, 24:Auto Mission Reset, 25:AttCon Feed Forward, 26:AttCon Accel Limits, 27:Retract Mount, 28:Relay On/Off, 34:Relay2 On/Off, 35:Relay3 On/Off, 36:Relay4 On/Off, 29:Landing Gear, 30:Lost Copter Sound, 31:Motor Emergency Stop, 32:Motor Interlock, 33:Brake, 37:Throw, 38:ADSB-Avoidance, 39:PrecLoiter, 40:Object Avoidance, 41:ArmDisarm, 42:SmartRTL, 43:InvertedFlight, 44:Winch Enable, 45:WinchControl</Values>
+    </CH11_OPT>
+    <CH12_OPT>
+      <DisplayName>Channel 12 option</DisplayName>
+      <Description>Select which function is performed when CH12 is above 1800 pwm</Description>
+      <User>Standard</User>
+      <Values>0:Do Nothing, 2:Flip, 3:Simple Mode, 4:RTL, 5:Save Trim, 7:Save WP, 9:Camera Trigger, 10:RangeFinder, 11:Fence, 13:Super Simple Mode, 14:Acro Trainer, 15:Sprayer, 16:Auto, 17:AutoTune, 18:Land, 19:Gripper, 21:Parachute Enable, 22:Parachute Release, 23:Parachute 3pos, 24:Auto Mission Reset, 25:AttCon Feed Forward, 26:AttCon Accel Limits, 27:Retract Mount, 28:Relay On/Off, 34:Relay2 On/Off, 35:Relay3 On/Off, 36:Relay4 On/Off, 29:Landing Gear, 30:Lost Copter Sound, 31:Motor Emergency Stop, 32:Motor Interlock, 33:Brake, 37:Throw, 38:ADSB-Avoidance, 39:PrecLoiter, 40:Object Avoidance, 41:ArmDisarm, 42:SmartRTL, 43:InvertedFlight, 44:Winch Enable, 45:WinchControl</Values>
+    </CH12_OPT>
+    <TUNE_LOW>
+      <DisplayName>Tuning minimum</DisplayName>
+      <Description>The minimum value that will be applied to the parameter currently being tuned with the transmitter's channel 6 knob</Description>
+      <User>Standard</User>
+      <Range>0 32767</Range>
+    </TUNE_LOW>
+    <TUNE_HIGH>
+      <DisplayName>Tuning maximum</DisplayName>
+      <Description>The maximum value that will be applied to the parameter currently being tuned with the transmitter's channel 6 knob</Description>
+      <User>Standard</User>
+      <Range>0 32767</Range>
+    </TUNE_HIGH>
+    <ADSB_ENABLE>
+      <DisplayName>Enable ADSB</DisplayName>
+      <Description>Enable ADS-B</Description>
+      <User>Standard</User>
+      <Values>0:Disabled, 1:Enabled</Values>
+    </ADSB_ENABLE>
+    <ADSB_LIST_MAX>
+      <DisplayName>ADSB vehicle list size</DisplayName>
+      <Description>ADSB list size of nearest vehicles. Longer lists take longer to refresh with lower SRx_ADSB values.</Description>
+      <User>Advanced</User>
+      <Range>1 100</Range>
+    </ADSB_LIST_MAX>
+    <ADSB_LIST_RADIUS>
+      <DisplayName>ADSB vehicle list radius filter</DisplayName>
+      <Description>ADSB vehicle list radius filter. Vehicles detected outside this radius will be completely ignored. They will not show up in the SRx_ADSB stream to the GCS and will not be considered in any avoidance calculations. A value of 0 will disable this filter.</Description>
+      <User>Advanced</User>
+      <Range>0 100000</Range>
+      <Units>m</Units>
+      <UnitText>meters</UnitText>
+    </ADSB_LIST_RADIUS>
+    <ADSB_ICAO_ID>
+      <DisplayName>ICAO_ID vehicle identification number</DisplayName>
+      <Description>ICAO_ID unique vehicle identification number of this aircraft. This is a integer limited to 24bits. If set to 0 then one will be randomly generated. If set to -1 then static information is not sent, transceiver is assumed pre-programmed.</Description>
+      <User>Advanced</User>
+      <Range>-1 16777215</Range>
+    </ADSB_ICAO_ID>
+    <ADSB_EMIT_TYPE>
+      <DisplayName>Emitter type</DisplayName>
+      <Description>ADSB classification for the type of vehicle emitting the transponder signal. Default value is 14 (UAV).</Description>
+      <User>Advanced</User>
+      <Values>0:NoInfo, 1:Light, 2:Small, 3:Large, 4:HighVortexlarge, 5:Heavy, 6:HighlyManuv, 7:Rotocraft, 8:RESERVED, 9:Glider, 10:LightAir, 11:Parachute, 12:UltraLight, 13:RESERVED, 14:UAV, 15:Space, 16:RESERVED, 17:EmergencySurface, 18:ServiceSurface, 19:PointObstacle</Values>
+    </ADSB_EMIT_TYPE>
+    <ADSB_LEN_WIDTH>
+      <DisplayName>Aircraft length and width</DisplayName>
+      <Description>Aircraft length and width dimension options in Length and Width in meters. In most cases, use a value of 1 for smallest size.</Description>
+      <User>Advanced</User>
+      <Values>0:NO_DATA, 1:L15W23, 2:L25W28P5, 3:L25W34, 4:L35W33, 5:L35W38, 6:L45W39P5, 7:L45W45, 8:L55W45, 9:L55W52, 10:L65W59P5, 11:L65W67, 12:L75W72P5, 13:L75W80, 14:L85W80, 15:L85W90</Values>
+    </ADSB_LEN_WIDTH>
+    <ADSB_OFFSET_LAT>
+      <DisplayName>GPS antenna lateral offset</DisplayName>
+      <Description>GPS antenna lateral offset. This describes the physical location offest from center of the GPS antenna on the aircraft.</Description>
+      <User>Advanced</User>
+      <Values>0:NoData, 1:Left2m, 2:Left4m, 3:Left6m, 4:Center, 5:Right2m, 6:Right4m, 7:Right6m</Values>
+    </ADSB_OFFSET_LAT>
+    <ADSB_OFFSET_LON>
+      <DisplayName>GPS antenna longitudinal offset</DisplayName>
+      <Description>GPS antenna longitudinal offset. This is usually set to 1, Applied By Sensor</Description>
+      <User>Advanced</User>
+      <Values>0:NO_DATA, 1:AppliedBySensor</Values>
+    </ADSB_OFFSET_LON>
+    <ADSB_RF_SELECT>
+      <DisplayName>Transceiver RF selection</DisplayName>
+      <Description>Transceiver RF selection for Rx enable and/or Tx enable. This only effects devices that can Tx and Rx. Rx-only devices override this to always be Rx-only.</Description>
+      <User>Advanced</User>
+      <Values>0:Disabled, 1:Rx-Only, 2:Tx-Only, 3:Rx and Tx Enabled</Values>
+    </ADSB_RF_SELECT>
+    <ADSB_SQUAWK>
+      <DisplayName>Squawk code</DisplayName>
+      <Description>VFR squawk (Mode 3/A) code is a pre-programmed default code when the pilot is flying VFR and not in contact with ATC. In the USA, the VFR squawk code is octal 1200 (hex 0x280, decimal 640) and in most parts of Europe the VFR squawk code is octal 7000. If an invalid octal number is set then it will be reset to 1200.</Description>
+      <User>Advanced</User>
+      <Range>0 7777</Range>
+      <Units>octal</Units>
+      <UnitText>octal</UnitText>
+    </ADSB_SQUAWK>
+    <ADSB_RF_CAPABLE>
+      <DisplayName>RF capabilities</DisplayName>
+      <Description>Describes your hardware RF In/Out capabilities.</Description>
+      <User>Advanced</User>
+      <Values>0:Unknown, 1:Rx UAT only, 3:Rx UAT and 1090ES, 7:Rx&amp;Tx UAT and 1090ES</Values>
+      <Bitmask>0:UAT_in,1:1090ES_in,2:UAT_out,3:1090ES_out</Bitmask>
+    </ADSB_RF_CAPABLE>
+    <ADSB_LIST_ALT>
+      <DisplayName>ADSB vehicle list altitude filter</DisplayName>
+      <Description>ADSB vehicle list altitude filter. Vehicles detected above this altitude will be completely ignored. They will not show up in the SRx_ADSB stream to the GCS and will not be considered in any avoidance calculations. A value of 0 will disable this filter.</Description>
+      <User>Advanced</User>
+      <Range>0 32767</Range>
+      <Units>m</Units>
+      <UnitText>meters</UnitText>
+    </ADSB_LIST_ALT>
+    <ADSB_ICAO_SPECL>
+      <DisplayName>ICAO_ID of special vehicle</DisplayName>
+      <Description>ICAO_ID of special vehicle that ignores ADSB_LIST_RADIUS and ADSB_LIST_ALT. The vehicle is always tracked. Use 0 to disable.</Description>
+      <User>Advanced</User>
+    </ADSB_ICAO_SPECL>
+    <ADSB_LOG>
+      <DisplayName>ADS-B logging</DisplayName>
+      <Description>0: no logging, 1: log only special ID, 2:log all</Description>
+      <User>Advanced</User>
+      <Values>0:no logging, 1:log only special ID, 2:log all</Values>
+    </ADSB_LOG>
+  </ArduCopter2>
+  <ArduPlane>
+    <FORMAT_VERSION>
+      <DisplayName>Eeprom format version number</DisplayName>
+      <Description>This value is incremented when changes are made to the eeprom format</Description>
+      <User>Advanced</User>
+    </FORMAT_VERSION>
+    <SYSID_THISMAV>
+      <DisplayName>MAVLink system ID of this vehicle</DisplayName>
+      <Description>Allows setting an individual MAVLink system id for this vehicle to distinguish it from others on the same network</Description>
+      <User>Advanced</User>
+      <Range>1 255</Range>
+    </SYSID_THISMAV>
+    <SYSID_MYGCS>
+      <DisplayName>Ground station MAVLink system ID</DisplayName>
+      <Description>The identifier of the ground station in the MAVLink protocol. Don't change this unless you also modify the ground station to match.</Description>
+      <User>Advanced</User>
+      <Range>1 255</Range>
+    </SYSID_MYGCS>
+    <AUTOTUNE_LEVEL>
+      <DisplayName>Autotune level</DisplayName>
+      <Description>Level of aggressiveness of pitch and roll PID gains. Lower values result in a 'softer' tune. Level 6 recommended for most planes.</Description>
+      <User>Standard</User>
+      <Range>1 10</Range>
+      <Increment>1</Increment>
+    </AUTOTUNE_LEVEL>
+    <TELEM_DELAY>
+      <DisplayName>Telemetry startup delay </DisplayName>
+      <Description>The amount of time (in seconds) to delay radio telemetry to prevent an Xbee bricking on power up</Description>
+      <User>Standard</User>
+      <Range>0 30</Range>
+      <Increment>1</Increment>
+      <Units>s</Units>
+      <UnitText>seconds</UnitText>
+    </TELEM_DELAY>
+    <GCS_PID_MASK>
+      <DisplayName>GCS PID tuning mask</DisplayName>
+      <Description>bitmask of PIDs to send MAVLink PID_TUNING messages for</Description>
+      <User>Advanced</User>
+      <Bitmask>0:Roll,1:Pitch,2:Yaw,3:Steering,4:Landing</Bitmask>
+    </GCS_PID_MASK>
+    <KFF_RDDRMIX>
+      <DisplayName>Rudder Mix</DisplayName>
+      <Description>Amount of rudder to add during aileron movement. Increase if nose initially yaws away from roll. Reduces adverse yaw.</Description>
+      <User>Standard</User>
+      <Range>0 1</Range>
+      <Increment>0.01</Increment>
+    </KFF_RDDRMIX>
+    <KFF_THR2PTCH>
+      <DisplayName>Throttle to Pitch Mix</DisplayName>
+      <Description>Degrees of elevator added for full throttle application. Increase to compensate for throttle causing down pitch.</Description>
+      <User>Advanced</User>
+      <Range>0 5</Range>
+      <Increment>0.01</Increment>
+    </KFF_THR2PTCH>
+    <STAB_PITCH_DOWN>
+      <DisplayName>Low throttle pitch down trim </DisplayName>
+      <Description>Degrees of down pitch added when throttle is below TRIM_THROTTLE in FBWA and AUTOTUNE modes. Scales linearly so full value is added when THR_MIN is reached. Helps to keep airspeed higher in glides or landing approaches and prevents accidental stalls. 2 degrees recommended for most planes.</Description>
+      <User>Advanced</User>
+      <Range>0 15</Range>
+      <Increment>0.1</Increment>
+      <Units>deg</Units>
+      <UnitText>degrees</UnitText>
+    </STAB_PITCH_DOWN>
+    <GLIDE_SLOPE_MIN>
+      <DisplayName>Glide slope minimum</DisplayName>
+      <Description>This controls the minimum altitude change for a waypoint before a glide slope will be used instead of an immediate altitude change. The default value is 15 meters, which helps to smooth out waypoint missions where small altitude changes happen near waypoints. If you don't want glide slopes to be used in missions then you can set this to zero, which will disable glide slope calculations. Otherwise you can set it to a minimum number of meters of altitude error to the destination waypoint before a glide slope will be used to change altitude.</Description>
+      <User>Advanced</User>
+      <Range>0 1000</Range>
+      <Increment>1</Increment>
+      <Units>m</Units>
+      <UnitText>meters</UnitText>
+    </GLIDE_SLOPE_MIN>
+    <GLIDE_SLOPE_THR>
+      <DisplayName>Glide slope threshold</DisplayName>
+      <Description>This controls the height above the glide slope the plane may be before rebuilding a glide slope. This is useful for smoothing out an autotakeoff</Description>
+      <User>Advanced</User>
+      <Range>0 100</Range>
+      <Increment>1</Increment>
+      <Units>m</Units>
+      <UnitText>meters</UnitText>
+    </GLIDE_SLOPE_THR>
+    <STICK_MIXING>
+      <DisplayName>Stick Mixing</DisplayName>
+      <Description>When enabled, this adds user stick input to the control surfaces in auto modes, allowing the user to have some degree of flight control without changing modes.  There are two types of stick mixing available. If you set STICK_MIXING to 1 then it will use "fly by wire" mixing, which controls the roll and pitch in the same way that the FBWA mode does. This is the safest option if you usually fly ArduPlane in FBWA or FBWB mode. If you set STICK_MIXING to 2 then it will enable direct mixing mode, which is what the STABILIZE mode uses. That will allow for much more extreme maneuvers while in AUTO mode.</Description>
+      <User>Advanced</User>
+      <Values>0:Disabled, 1:FBWMixing, 2:DirectMixing</Values>
+    </STICK_MIXING>
+    <AUTO_FBW_STEER>
+      <DisplayName>Use FBWA steering in AUTO</DisplayName>
+      <Description>When enabled this option gives FBWA navigation and steering in AUTO mode. This can be used to allow manual stabilised piloting with waypoint logic for triggering payloads. With this enabled the pilot has the same control over the plane as in FBWA mode, and the normal AUTO navigation is completely disabled. THIS OPTION IS NOT RECOMMENDED FOR NORMAL USE.</Description>
+      <User>Advanced</User>
+      <Values>0:Disabled, 42:Enabled</Values>
+    </AUTO_FBW_STEER>
+    <TKOFF_THR_MINSPD>
+      <DisplayName>Takeoff throttle min speed</DisplayName>
+      <Description>Minimum GPS ground speed in m/s used by the speed check that un-suppresses throttle in auto-takeoff. This can be be used for catapult launches where you want the motor to engage only after the plane leaves the catapult, but it is preferable to use the TKOFF_THR_MINACC and TKOFF_THR_DELAY parameters for catapult launches due to the errors associated with GPS measurements. For hand launches with a pusher prop it is strongly advised that this parameter be set to a value no less than 4 m/s to provide additional protection against premature motor start. Note that the GPS velocity will lag the real velocity by about 0.5 seconds. The ground speed check is delayed by the TKOFF_THR_DELAY parameter.</Description>
+      <User>User</User>
+      <Range>0 30</Range>
+      <Increment>0.1</Increment>
+      <Units>m/s</Units>
+      <UnitText>meters per second</UnitText>
+    </TKOFF_THR_MINSPD>
+    <TKOFF_THR_MINACC>
+      <DisplayName>Takeoff throttle min acceleration</DisplayName>
+      <Description>Minimum forward acceleration in m/s/s before arming the ground speed check in auto-takeoff. This is meant to be used for hand launches. Setting this value to 0 disables the acceleration test which means the ground speed check will always be armed which could allow GPS velocity jumps to start the engine. For hand launches and bungee launches this should be set to around 15. Also see TKOFF_ACCEL_CNT paramter for control of full "shake to arm".</Description>
+      <User>User</User>
+      <Range>0 30</Range>
+      <Increment>0.1</Increment>
+      <Units>m/s/s</Units>
+      <UnitText>meters per square second</UnitText>
+    </TKOFF_THR_MINACC>
+    <TKOFF_THR_DELAY>
+      <DisplayName>Takeoff throttle delay</DisplayName>
+      <Description>This parameter sets the time delay (in 1/10ths of a second) that the ground speed check is delayed after the forward acceleration check controlled by TKOFF_THR_MINACC has passed. For hand launches with pusher propellers it is essential that this is set to a value of no less than 2 (0.2 seconds) to ensure that the aircraft is safely clear of the throwers arm before the motor can start. For bungee launches a larger value can be used (such as 30) to give time for the bungee to release from the aircraft before the motor is started.</Description>
+      <User>User</User>
+      <Range>0 127</Range>
+      <Increment>1</Increment>
+      <Units>ds</Units>
+      <UnitText>deciseconds</UnitText>
+    </TKOFF_THR_DELAY>
+    <TKOFF_TDRAG_ELEV>
+      <DisplayName>Takeoff tail dragger elevator</DisplayName>
+      <Description>This parameter sets the amount of elevator to apply during the initial stage of a takeoff. It is used to hold the tail wheel of a taildragger on the ground during the initial takeoff stage to give maximum steering. This option should be combined with the TKOFF_TDRAG_SPD1 option and the GROUND_STEER_ALT option along with tuning of the ground steering controller. A value of zero means to bypass the initial "tail hold" stage of takeoff. Set to zero for hand and catapult launch. For tail-draggers you should normally set this to 100, meaning full up elevator during the initial stage of takeoff. For most tricycle undercarriage aircraft a value of zero will work well, but for some tricycle aircraft a small negative value (say around -20 to -30) will apply down elevator which will hold the nose wheel firmly on the ground during initial acceleration. Only use a negative value if you find that the nosewheel doesn't grip well during takeoff. Too much down elevator on a tricycle undercarriage may cause instability in steering as the plane pivots around the nosewheel. Add down elevator 10 percent at a time.</Description>
+      <User>User</User>
+      <Range>-100 100</Range>
+      <Increment>1</Increment>
+      <Units>%</Units>
+      <UnitText>percent</UnitText>
+    </TKOFF_TDRAG_ELEV>
+    <TKOFF_TDRAG_SPD1>
+      <DisplayName>Takeoff tail dragger speed1</DisplayName>
+      <Description>This parameter sets the airspeed at which to stop holding the tail down and transition to rudder control of steering on the ground. When TKOFF_TDRAG_SPD1 is reached the pitch of the aircraft will be held level until TKOFF_ROTATE_SPD is reached, at which point the takeoff pitch specified in the mission will be used to "rotate" the pitch for takeoff climb. Set TKOFF_TDRAG_SPD1 to zero to go straight to rotation. This should be set to zero for hand launch and catapult launch. It should also be set to zero for tricycle undercarriages unless you are using the method above to genetly hold the nose wheel down. For tail dragger aircraft it should be set just below the stall speed.</Description>
+      <User>User</User>
+      <Range>0 30</Range>
+      <Increment>0.1</Increment>
+      <Units>m/s</Units>
+      <UnitText>meters per second</UnitText>
+    </TKOFF_TDRAG_SPD1>
+    <TKOFF_ROTATE_SPD>
+      <DisplayName>Takeoff rotate speed</DisplayName>
+      <Description>This parameter sets the airspeed at which the aircraft will "rotate", setting climb pitch specified in the mission. If TKOFF_ROTATE_SPD is zero then the climb pitch will be used as soon as takeoff is started. For hand launch and catapult launches a TKOFF_ROTATE_SPD of zero should be set. For all ground launches TKOFF_ROTATE_SPD should be set above the stall speed, usually by about 10 to 30 percent</Description>
+      <User>User</User>
+      <Range>0 30</Range>
+      <Increment>0.1</Increment>
+      <Units>m/s</Units>
+      <UnitText>meters per second</UnitText>
+    </TKOFF_ROTATE_SPD>
+    <TKOFF_THR_SLEW>
+      <DisplayName>Takeoff throttle slew rate</DisplayName>
+      <Description>This parameter sets the slew rate for the throttle during auto takeoff. When this is zero the THR_SLEWRATE parameter is used during takeoff. For rolling takeoffs it can be a good idea to set a lower slewrate for takeoff to give a slower acceleration which can improve ground steering control. The value is a percentage throttle change per second, so a value of 20 means to advance the throttle over 5 seconds on takeoff. Values below 20 are not recommended as they may cause the plane to try to climb out with too little throttle. A value of -1 means no limit on slew rate in takeoff.</Description>
+      <User>User</User>
+      <Range>-1 127</Range>
+      <Increment>1</Increment>
+      <Units>%/s</Units>
+      <UnitText>percent per second</UnitText>
+    </TKOFF_THR_SLEW>
+    <TKOFF_PLIM_SEC>
+      <DisplayName>Takeoff pitch limit reduction</DisplayName>
+      <Description>This parameter reduces the pitch minimum limit of an auto-takeoff just a few seconds before it reaches the target altitude. This reduces overshoot by allowing the flight controller to start leveling off a few seconds before reaching the target height. When set to zero, the mission pitch min is enforced all the way to and through the target altitude, otherwise the pitch min slowly reduces to zero in the final segment. This is the pitch_min, not the demand. The flight controller should still be commanding to gain altitude to finish the takeoff but with this param it is not forcing it higher than it wants to be.</Description>
+      <User>Advanced</User>
+      <Range>0 10</Range>
+      <Increment>0.5</Increment>
+      <Units>s</Units>
+      <UnitText>seconds</UnitText>
+    </TKOFF_PLIM_SEC>
+    <TKOFF_FLAP_PCNT>
+      <DisplayName>Takeoff flap percentage</DisplayName>
+      <Description>The amount of flaps (as a percentage) to apply in automatic takeoff</Description>
+      <User>Advanced</User>
+      <Range>0 100</Range>
+      <Units>%</Units>
+      <UnitText>percent</UnitText>
+    </TKOFF_FLAP_PCNT>
+    <FBWA_TDRAG_CHAN>
+      <DisplayName>FBWA taildragger channel</DisplayName>
+      <Description>This is a RC input channel which when it goes above 1700 enables FBWA taildragger takeoff mode. It should be assigned to a momentary switch. Once this feature is enabled it will stay enabled until the aircraft goes above TKOFF_TDRAG_SPD1 airspeed, changes mode, or the pitch goes above the initial pitch when this is engaged or goes below 0 pitch. When enabled the elevator will be forced to TKOFF_TDRAG_ELEV. This option allows for easier takeoffs on taildraggers in FBWA mode, and also makes it easier to test auto-takeoff steering handling in FBWA. Setting it to 0 disables this option.</Description>
+      <User>Standard</User>
+    </FBWA_TDRAG_CHAN>
+    <LEVEL_ROLL_LIMIT>
+      <DisplayName>Level flight roll limit</DisplayName>
+      <Description>This controls the maximum bank angle in degrees during flight modes where level flight is desired, such as in the final stages of landing, and during auto takeoff. This should be a small angle (such as 5 degrees) to prevent a wing hitting the runway during takeoff or landing. Setting this to zero will completely disable heading hold on auto takeoff and final landing approach.</Description>
+      <User>User</User>
+      <Range>0 45</Range>
+      <Increment>1</Increment>
+      <Units>deg</Units>
+      <UnitText>degrees</UnitText>
+    </LEVEL_ROLL_LIMIT>
+    <USE_REV_THRUST>
+      <DisplayName>Bitmask for when to allow negative reverse thrust</DisplayName>
+      <Description>This controls when to use reverse thrust. If set to zero then reverse thrust is never used. If set to a non-zero value then the bits correspond to flight stages where reverse thrust may be used. Note that reverse thrust is only ever auto-enabled in auto-throttle modes. In modes where throttle control is pilot controlled the ability to do reverse thrust is controlled by throttle stick input. The most commonly used value for USE_REV_THRUST is 2, which means AUTO_LAND only. That enables reverse thrust in the landing stage of AUTO mode. Another common choice is 1, which means to use reverse thrust in all auto flight stages.</Description>
+      <User>Advanced</User>
+      <Values>0:Never, 1:AutoAlways, 2:AutoLanding</Values>
+      <Bitmask>0:AUTO_ALWAYS,1:AUTO_LAND,2:AUTO_LOITER_TO_ALT,3:AUTO_LOITER_ALL,4:AUTO_WAYPOINTS,5:LOITER,6:RTL,7:CIRCLE,8:CRUISE,9:FBWB,10:GUIDED</Bitmask>
+    </USE_REV_THRUST>
+    <NAV_CONTROLLER>
+      <DisplayName>Navigation controller selection</DisplayName>
+      <Description>Which navigation controller to enable. Currently the only navigation controller available is L1. From time to time other experimental controllers will be added which are selected using this parameter.</Description>
+      <User>Standard</User>
+      <Values>0:Default, 1:L1Controller</Values>
+    </NAV_CONTROLLER>
+    <ALT_CTRL_ALG>
+      <DisplayName>Altitude control algorithm</DisplayName>
+      <Description>This sets what algorithm will be used for altitude control. The default is zero, which selects the most appropriate algorithm for your airframe. Currently the default is to use TECS (total energy control system). From time to time we will add other experimental altitude control algorithms which will be selected using this parameter.</Description>
+      <User>Advanced</User>
+      <Values>0:Automatic</Values>
+    </ALT_CTRL_ALG>
+    <ALT_OFFSET>
+      <DisplayName>Altitude offset</DisplayName>
+      <Description>This is added to the target altitude in automatic flight. It can be used to add a global altitude offset to a mission</Description>
+      <User>Advanced</User>
+      <Range>-32767 32767</Range>
+      <Increment>1</Increment>
+      <Units>m</Units>
+      <UnitText>meters</UnitText>
+    </ALT_OFFSET>
+    <WP_RADIUS>
+      <DisplayName>Waypoint Radius</DisplayName>
+      <Description>Defines the maximum distance from a waypoint that when crossed indicates the waypoint may be complete. To avoid the aircraft looping around the waypoint in case it misses by more than the WP_RADIUS an additional check is made to see if the aircraft has crossed a "finish line" passing through the waypoint and perpendicular to the flight path from the previous waypoint. If that finish line is crossed then the waypoint is considered complete. Note that the navigation controller may decide to turn later than WP_RADIUS before a waypoint, based on how sharp the turn is and the speed of the aircraft. It is safe to set WP_RADIUS much larger than the usual turn radius of your aircraft and the navigation controller will work out when to turn. If you set WP_RADIUS too small then you will tend to overshoot the turns.</Description>
+      <User>Standard</User>
+      <Range>1 32767</Range>
+      <Increment>1</Increment>
+      <Units>m</Units>
+      <UnitText>meters</UnitText>
+    </WP_RADIUS>
+    <WP_MAX_RADIUS>
+      <DisplayName>Waypoint Maximum Radius</DisplayName>
+      <Description>Sets the maximum distance to a waypoint for the waypoint to be considered complete. This overrides the "cross the finish line" logic that is normally used to consider a waypoint complete. For normal AUTO behaviour this parameter should be set to zero. Using a non-zero value is only recommended when it is critical that the aircraft does approach within the given radius, and should loop around until it has done so. This can cause the aircraft to loop forever if its turn radius is greater than the maximum radius set.</Description>
+      <User>Standard</User>
+      <Range>0 32767</Range>
+      <Increment>1</Increment>
+      <Units>m</Units>
+      <UnitText>meters</UnitText>
+    </WP_MAX_RADIUS>
+    <WP_LOITER_RAD>
+      <DisplayName>Waypoint Loiter Radius</DisplayName>
+      <Description>Defines the distance from the waypoint center, the plane will maintain during a loiter. If you set this value to a negative number then the default loiter direction will be counter-clockwise instead of clockwise.</Description>
+      <User>Standard</User>
+      <Range>-32767 32767</Range>
+      <Increment>1</Increment>
+      <Units>m</Units>
+      <UnitText>meters</UnitText>
+    </WP_LOITER_RAD>
+    <RTL_RADIUS>
+      <DisplayName>RTL loiter radius</DisplayName>
+      <Description>Defines the radius of the loiter circle when in RTL mode. If this is zero then WP_LOITER_RAD is used. If the radius is negative then a counter-clockwise is used. If positive then a clockwise loiter is used.</Description>
+      <User>Standard</User>
+      <Range>-32767 32767</Range>
+      <Increment>1</Increment>
+      <Units>m</Units>
+      <UnitText>meters</UnitText>
+    </RTL_RADIUS>
+    <FENCE_ACTION>
+      <DisplayName>Action on geofence breach</DisplayName>
+      <Description>What to do on fence breach. If this is set to 0 then no action is taken, and geofencing is disabled. If this is set to 1 then the plane will enter GUIDED mode, with the target waypoint as the fence return point. If this is set to 2 then the fence breach is reported to the ground station, but no other action is taken. If set to 3 then the plane enters guided mode but the pilot retains manual throttle control. If set to 4 the plane enters RTL mode, with the target waypoint as the closest rally point (or home point if there are no rally points).</Description>
+      <User>Standard</User>
+      <Values>0:None, 1:GuidedMode, 2:ReportOnly, 3:GuidedModeThrPass, 4:RTL_Mode</Values>
+    </FENCE_ACTION>
+    <FENCE_TOTAL>
+      <DisplayName>Fence Total</DisplayName>
+      <Description>Number of geofence points currently loaded</Description>
+      <User>Advanced</User>
+    </FENCE_TOTAL>
+    <FENCE_CHANNEL>
+      <DisplayName>Fence Channel</DisplayName>
+      <Description>RC Channel to use to enable geofence. PWM input above 1750 enables the geofence</Description>
+      <User>Standard</User>
+    </FENCE_CHANNEL>
+    <FENCE_MINALT>
+      <DisplayName>Fence Minimum Altitude</DisplayName>
+      <Description>Minimum altitude allowed before geofence triggers</Description>
+      <User>Standard</User>
+      <Range>0 32767</Range>
+      <Increment>1</Increment>
+      <Units>m</Units>
+      <UnitText>meters</UnitText>
+    </FENCE_MINALT>
+    <FENCE_MAXALT>
+      <DisplayName>Fence Maximum Altitude</DisplayName>
+      <Description>Maximum altitude allowed before geofence triggers</Description>
+      <User>Standard</User>
+      <Range>0 32767</Range>
+      <Increment>1</Increment>
+      <Units>m</Units>
+      <UnitText>meters</UnitText>
+    </FENCE_MAXALT>
+    <FENCE_RETALT>
+      <DisplayName>Fence Return Altitude</DisplayName>
+      <Description>Altitude the aircraft will transit to when a fence breach occurs.  If FENCE_RETALT is &lt;= 0 then the midpoint between FENCE_MAXALT and FENCE_MINALT is used, unless FENCE_MAXALT &lt; FENCE_MINALT.  If FENCE_MAXALT &lt; FENCE_MINALT AND FENCE_RETALT is &lt;= 0 then ALT_HOLD_RTL is the altitude used on a fence breach.</Description>
+      <User>Standard</User>
+      <Range>0 32767</Range>
+      <Increment>1</Increment>
+      <Units>m</Units>
+      <UnitText>meters</UnitText>
+    </FENCE_RETALT>
+    <FENCE_AUTOENABLE>
+      <DisplayName>Fence automatic enable</DisplayName>
+      <Description>When set to 1, geofence automatically enables after an auto takeoff and automatically disables at the beginning of an auto landing.  When on the ground before takeoff the fence is disabled.  When set to 2, the fence autoenables after an auto takeoff, but only disables the fence floor during landing. It is highly recommended to not use this option for line of sight flying and use a fence enable channel instead. When set to 3 the fence auto-enables when the vehicle is armed and disables when disarmed and arming will fail if the fence cannot be enabled or is outside the fence. Option 3 cannot be used with a non-zero FENCE_MINALT</Description>
+      <User>Standard</User>
+      <Values>0:NoAutoEnable, 1:AutoEnable, 2:AutoEnableDisableFloorOnly, 3:EnableWhenArmed</Values>
+    </FENCE_AUTOENABLE>
+    <FENCE_RET_RALLY>
+      <DisplayName>Fence Return to Rally</DisplayName>
+      <Description>When set to 1: on fence breach the plane will return to the nearest rally point rather than the fence return point.  If no rally points have been defined the plane will return to the home point.  </Description>
+      <User>Standard</User>
+      <Values>0:FenceReturnPoint, 1:NearestRallyPoint</Values>
+    </FENCE_RET_RALLY>
+    <STALL_PREVENTION>
+      <DisplayName>Enable stall prevention</DisplayName>
+      <Description>Enables roll limits at low airspeed in roll limiting flight modes. Roll limits based on aerodynamic load factor in turns and scale on ARSPD_FBW_MIN that must be set correctly. Without airspeed sensor, uses synthetic airspeed from wind speed estimate that may both be inaccurate.</Description>
+      <User>Standard</User>
+      <Values>0:Disabled, 1:Enabled</Values>
+    </STALL_PREVENTION>
+    <ARSPD_FBW_MIN>
+      <DisplayName>Minimum Airspeed</DisplayName>
+      <Description>Minimum airspeed demanded in automatic throttle modes. Should be set to 20% higher than level flight stall speed.</Description>
+      <User>Standard</User>
+      <Range>5 100</Range>
+      <Increment>1</Increment>
+      <Units>m/s</Units>
+      <UnitText>meters per second</UnitText>
+    </ARSPD_FBW_MIN>
+    <ARSPD_FBW_MAX>
+      <DisplayName>Maximum Airspeed</DisplayName>
+      <Description>Maximum airspeed demanded in automatic throttle modes. Should be set slightly less than level flight speed at THR_MAX and also at least 50% above ARSPD_FBW_MAX to allow for accurate TECS altitude control.</Description>
+      <User>Standard</User>
+      <Range>5 100</Range>
+      <Increment>1</Increment>
+      <Units>m/s</Units>
+      <UnitText>meters per second</UnitText>
+    </ARSPD_FBW_MAX>
+    <FBWB_ELEV_REV>
+      <DisplayName>Fly By Wire elevator reverse</DisplayName>
+      <Description>Reverse sense of elevator in FBWB and CRUISE modes. When set to 0 up elevator (pulling back on the stick) means to lower altitude. When set to 1, up elevator means to raise altitude.</Description>
+      <User>Standard</User>
+      <Values>0:Disabled, 1:Enabled</Values>
+    </FBWB_ELEV_REV>
+    <TERRAIN_FOLLOW>
+      <DisplayName>Use terrain following</DisplayName>
+      <Description>This enables terrain following for CRUISE mode, FBWB mode, RTL and for rally points. To use this option you also need to set TERRAIN_ENABLE to 1, which enables terrain data fetching from the GCS, and you need to have a GCS that supports sending terrain data to the aircraft. When terrain following is enabled then CRUISE and FBWB mode will hold height above terrain rather than height above home. In RTL the return to launch altitude will be considered to be a height above the terrain. Rally point altitudes will be taken as height above the terrain. This option does not affect mission items, which have a per-waypoint flag for whether they are height above home or height above the terrain. To use terrain following missions you need a ground station which can set the waypoint type to be a terrain height waypoint when creating the mission.</Description>
+      <User>Standard</User>
+      <Values>0:Disabled, 1:Enabled</Values>
+    </TERRAIN_FOLLOW>
+    <TERRAIN_LOOKAHD>
+      <DisplayName>Terrain lookahead</DisplayName>
+      <Description>This controls how far ahead the terrain following code looks to ensure it stays above upcoming terrain. A value of zero means no lookahead, so the controller will track only the terrain directly below the aircraft. The lookahead will never extend beyond the next waypoint when in AUTO mode.</Description>
+      <User>Standard</User>
+      <Range>0 10000</Range>
+      <Units>m</Units>
+      <UnitText>meters</UnitText>
+    </TERRAIN_LOOKAHD>
+    <FBWB_CLIMB_RATE>
+      <DisplayName>Fly By Wire B altitude change rate</DisplayName>
+      <Description>This sets the rate in m/s at which FBWB and CRUISE modes will change its target altitude for full elevator deflection. Note that the actual climb rate of the aircraft can be lower than this, depending on your airspeed and throttle control settings. If you have this parameter set to the default value of 2.0, then holding the elevator at maximum deflection for 10 seconds would change the target altitude by 20 meters.</Description>
+      <User>Standard</User>
+      <Range>1 10</Range>
+      <Increment>0.1</Increment>
+      <Units>m/s</Units>
+      <UnitText>meters per second</UnitText>
+    </FBWB_CLIMB_RATE>
+    <THR_MIN>
+      <DisplayName>Minimum Throttle</DisplayName>
+      <Description>Minimum throttle percentage used in all modes except manual, provided THR_PASS_STAB is not set. Negative values allow reverse thrust if hardware supports it.</Description>
+      <User>Standard</User>
+      <Range>-100 100</Range>
+      <Increment>1</Increment>
+      <Units>%</Units>
+      <UnitText>percent</UnitText>
+    </THR_MIN>
+    <THR_MAX>
+      <DisplayName>Maximum Throttle</DisplayName>
+      <Description>Maximum throttle percentage used in automatic throttle modes.</Description>
+      <User>Standard</User>
+      <Range>0 100</Range>
+      <Increment>1</Increment>
+      <Units>%</Units>
+      <UnitText>percent</UnitText>
+    </THR_MAX>
+    <TKOFF_THR_MAX>
+      <DisplayName>Maximum Throttle for takeoff</DisplayName>
+      <Description>The maximum throttle setting during automatic takeoff. If this is zero then THR_MAX is used for takeoff as well.</Description>
+      <User>Advanced</User>
+      <Range>0 100</Range>
+      <Increment>1</Increment>
+      <Units>%</Units>
+      <UnitText>percent</UnitText>
+    </TKOFF_THR_MAX>
+    <THR_SLEWRATE>
+      <DisplayName>Throttle slew rate</DisplayName>
+      <Description>Maximum change in throttle percentage per second. Lower limit  based on 1 microsend of servo increase per loop. Divide SCHED_LOOP_RATE by approximately 10 to determine minimum achievable value.</Description>
+      <User>Standard</User>
+      <Range>0 127</Range>
+      <Increment>1</Increment>
+      <Units>%/s</Units>
+      <UnitText>percent per second</UnitText>
+    </THR_SLEWRATE>
+    <FLAP_SLEWRATE>
+      <DisplayName>Flap slew rate</DisplayName>
+      <Description>maximum percentage change in flap output per second. A setting of 25 means to not change the flap by more than 25% of the full flap range in one second. A value of 0 means no rate limiting.</Description>
+      <User>Advanced</User>
+      <Range>0 100</Range>
+      <Increment>1</Increment>
+      <Units>%/s</Units>
+      <UnitText>percent per second</UnitText>
+    </FLAP_SLEWRATE>
+    <THR_SUPP_MAN>
+      <DisplayName>Throttle suppress manual passthru</DisplayName>
+      <Description>When throttle is suppressed in auto mode it is normally forced to zero. If you enable this option, then while suppressed it will be manual throttle. This is useful on petrol engines to hold the idle throttle manually while waiting for takeoff</Description>
+      <User>Advanced</User>
+      <Values>0:Disabled, 1:Enabled</Values>
+    </THR_SUPP_MAN>
+    <THR_PASS_STAB>
+      <DisplayName>Throttle passthru in stabilize</DisplayName>
+      <Description>If this is set then when in STABILIZE, FBWA or ACRO modes the throttle is a direct passthru from the transmitter. This means the THR_MIN and THR_MAX settings are not used in these modes. This is useful for petrol engines where you setup a throttle cut switch that suppresses the throttle below the normal minimum.</Description>
+      <User>Advanced</User>
+      <Values>0:Disabled, 1:Enabled</Values>
+    </THR_PASS_STAB>
+    <THR_FAILSAFE>
+      <DisplayName>Throttle and RC Failsafe Enable</DisplayName>
+      <Description>This enables failsafe on loss of RC input. How this is detected depends on the type of RC receiver being used. For older radios an input below the THR_FS_VALUE is used to trigger failsafe. For newer radios the failsafe trigger is part of the protocol between the autopilot and receiver.</Description>
+      <User>Standard</User>
+      <Values>0:Disabled, 1:Enabled</Values>
+    </THR_FAILSAFE>
+    <THR_FS_VALUE>
+      <DisplayName>Throttle Failsafe Value</DisplayName>
+      <Description>The PWM level on the throttle input channel below which throttle failsafe triggers. Note that this should be well below the normal minimum for your throttle channel.</Description>
+      <User>Standard</User>
+      <Range>925 2200</Range>
+      <Increment>1</Increment>
+    </THR_FS_VALUE>
+    <TRIM_THROTTLE>
+      <DisplayName>Throttle cruise percentage</DisplayName>
+      <Description>Target percentage of throttle to apply for flight in automatic throttle modes and throttle percentage that maintains TRIM_ARSPD_CM. Caution: low battery voltages at the end of flights may require higher throttle to maintain airspeed.</Description>
+      <User>Standard</User>
+      <Range>0 100</Range>
+      <Increment>1</Increment>
+      <Units>%</Units>
+      <UnitText>percent</UnitText>
+    </TRIM_THROTTLE>
+    <THROTTLE_NUDGE>
+      <DisplayName>Throttle nudge enable</DisplayName>
+      <Description>When enabled, this uses the throttle input in auto-throttle modes to 'nudge' the throttle or airspeed to higher or lower values. When you have an airspeed sensor the nudge affects the target airspeed, so that throttle inputs above 50% will increase the target airspeed from TRIM_ARSPD_CM up to a maximum of ARSPD_FBW_MAX. When no airspeed sensor is enabled the throttle nudge will push up the target throttle for throttle inputs above 50%.</Description>
+      <User>Standard</User>
+      <Values>0:Disabled, 1:Enabled</Values>
+    </THROTTLE_NUDGE>
+    <FS_SHORT_ACTN>
+      <DisplayName>Short failsafe action</DisplayName>
+      <Description>The action to take on a short (FS_SHORT_TIMEOUT) failsafe event. A short failsafe even can be triggered either by loss of RC control (see THR_FS_VALUE) or by loss of GCS control (see FS_GCS_ENABL). If in CIRCLE or RTL mode this parameter is ignored. A short failsafe event in stabilization and manual modes will cause an change to CIRCLE mode if FS_SHORT_ACTN is 0 or 1, and a change to FBWA mode if FS_SHORT_ACTN is 2. In all other modes (AUTO, GUIDED and LOITER) a short failsafe event will cause no mode change if FS_SHORT_ACTN is set to 0, will cause a change to CIRCLE mode if set to 1 and will change to FBWA mode if set to 2. Please see the documentation for FS_LONG_ACTN for the behaviour after FS_LONG_TIMEOUT seconds of failsafe.</Description>
+      <User>Standard</User>
+      <Values>0:CIRCLE/no change(if already in AUTO|GUIDED|LOITER), 1:CIRCLE, 2:FBWA, 3:Disable</Values>
+    </FS_SHORT_ACTN>
+    <FS_SHORT_TIMEOUT>
+      <DisplayName>Short failsafe timeout</DisplayName>
+      <Description>The time in seconds that a failsafe condition has to persist before a short failsafe event will occur. This defaults to 1.5 seconds</Description>
+      <User>Standard</User>
+      <Range>1 100</Range>
+      <Increment>0.5</Increment>
+      <Units>s</Units>
+      <UnitText>seconds</UnitText>
+    </FS_SHORT_TIMEOUT>
+    <FS_LONG_ACTN>
+      <DisplayName>Long failsafe action</DisplayName>
+      <Description>The action to take on a long (FS_LONG_TIMEOUT seconds) failsafe event. If the aircraft was in a stabilization or manual mode when failsafe started and a long failsafe occurs then it will change to RTL mode if FS_LONG_ACTN is 0 or 1, and will change to FBWA if FS_LONG_ACTN is set to 2. If the aircraft was in an auto mode (such as AUTO or GUIDED) when the failsafe started then it will continue in the auto mode if FS_LONG_ACTN is set to 0, will change to RTL mode if FS_LONG_ACTN is set to 1 and will change to FBWA mode if FS_LONG_ACTN is set to 2. If FS_LONG_ACTION is set to 3, the parachute will be deployed (make sure the chute is configured and enabled). </Description>
+      <User>Standard</User>
+      <Values>0:Continue, 1:ReturnToLaunch, 2:Glide, 3:Deploy Parachute</Values>
+    </FS_LONG_ACTN>
+    <FS_LONG_TIMEOUT>
+      <DisplayName>Long failsafe timeout</DisplayName>
+      <Description>The time in seconds that a failsafe condition has to persist before a long failsafe event will occur. This defaults to 5 seconds.</Description>
+      <User>Standard</User>
+      <Range>1 300</Range>
+      <Increment>0.5</Increment>
+      <Units>s</Units>
+      <UnitText>seconds</UnitText>
+    </FS_LONG_TIMEOUT>
+    <FS_GCS_ENABL>
+      <DisplayName>GCS failsafe enable</DisplayName>
+      <Description>Enable ground control station telemetry failsafe. Failsafe will trigger after FS_LONG_TIMEOUT seconds of no MAVLink heartbeat messages. There are three possible enabled settings. Seeing FS_GCS_ENABL to 1 means that GCS failsafe will be triggered when the aircraft has not received a MAVLink HEARTBEAT message. Setting FS_GCS_ENABL to 2 means that GCS failsafe will be triggered on either a loss of HEARTBEAT messages, or a RADIO_STATUS message from a MAVLink enabled 3DR radio indicating that the ground station is not receiving status updates from the aircraft, which is indicated by the RADIO_STATUS.remrssi field being zero (this may happen if you have a one way link due to asymmetric noise on the ground station and aircraft radios).Setting FS_GCS_ENABL to 3 means that GCS failsafe will be triggered by Heartbeat(like option one), but only in AUTO mode. WARNING: Enabling this option opens up the possibility of your plane going into failsafe mode and running the motor on the ground it it loses contact with your ground station. If this option is enabled on an electric plane then you should enable ARMING_REQUIRED.</Description>
+      <User>Standard</User>
+      <Values>0:Disabled, 1:Heartbeat, 2:HeartbeatAndREMRSSI, 3:HeartbeatAndAUTO</Values>
+    </FS_GCS_ENABL>
+    <FLTMODE_CH>
+      <DisplayName>Flightmode channel</DisplayName>
+      <Description>RC Channel to use for flight mode control</Description>
+      <User>Advanced</User>
+    </FLTMODE_CH>
+    <FLTMODE1>
+      <DisplayName>FlightMode1</DisplayName>
+      <Description>Flight mode for switch position 1 (910 to 1230 and above 2049)</Description>
+      <User>Standard</User>
+      <Values>0:Manual, 1:CIRCLE, 2:STABILIZE, 3:TRAINING, 4:ACRO, 5:FBWA, 6:FBWB, 7:CRUISE, 8:AUTOTUNE, 10:Auto, 11:RTL, 12:Loiter, 13:TAKEOFF, 14:AVOID_ADSB, 15:Guided, 17:QSTABILIZE, 18:QHOVER, 19:QLOITER, 20:QLAND, 21:QRTL, 22:QAUTOTUNE, 23:QACRO</Values>
+    </FLTMODE1>
+    <FLTMODE2>
+      <DisplayName>FlightMode2</DisplayName>
+      <Description>Flight mode for switch position 2 (1231 to 1360)</Description>
+      <User>Standard</User>
+      <Values>0:Manual, 1:CIRCLE, 2:STABILIZE, 3:TRAINING, 4:ACRO, 5:FBWA, 6:FBWB, 7:CRUISE, 8:AUTOTUNE, 10:Auto, 11:RTL, 12:Loiter, 13:TAKEOFF, 14:AVOID_ADSB, 15:Guided, 17:QSTABILIZE, 18:QHOVER, 19:QLOITER, 20:QLAND, 21:QRTL, 22:QAUTOTUNE, 23:QACRO</Values>
+    </FLTMODE2>
+    <FLTMODE3>
+      <DisplayName>FlightMode3</DisplayName>
+      <Description>Flight mode for switch position 3 (1361 to 1490)</Description>
+      <User>Standard</User>
+      <Values>0:Manual, 1:CIRCLE, 2:STABILIZE, 3:TRAINING, 4:ACRO, 5:FBWA, 6:FBWB, 7:CRUISE, 8:AUTOTUNE, 10:Auto, 11:RTL, 12:Loiter, 13:TAKEOFF, 14:AVOID_ADSB, 15:Guided, 17:QSTABILIZE, 18:QHOVER, 19:QLOITER, 20:QLAND, 21:QRTL, 22:QAUTOTUNE, 23:QACRO</Values>
+    </FLTMODE3>
+    <FLTMODE4>
+      <DisplayName>FlightMode4</DisplayName>
+      <Description>Flight mode for switch position 4 (1491 to 1620)</Description>
+      <User>Standard</User>
+      <Values>0:Manual, 1:CIRCLE, 2:STABILIZE, 3:TRAINING, 4:ACRO, 5:FBWA, 6:FBWB, 7:CRUISE, 8:AUTOTUNE, 10:Auto, 11:RTL, 12:Loiter, 13:TAKEOFF, 14:AVOID_ADSB, 15:Guided, 17:QSTABILIZE, 18:QHOVER, 19:QLOITER, 20:QLAND, 21:QRTL, 22:QAUTOTUNE, 23:QACRO</Values>
+    </FLTMODE4>
+    <FLTMODE5>
+      <DisplayName>FlightMode5</DisplayName>
+      <Description>Flight mode for switch position 5 (1621 to 1749)</Description>
+      <User>Standard</User>
+      <Values>0:Manual, 1:CIRCLE, 2:STABILIZE, 3:TRAINING, 4:ACRO, 5:FBWA, 6:FBWB, 7:CRUISE, 8:AUTOTUNE, 10:Auto, 11:RTL, 12:Loiter, 13:TAKEOFF, 14:AVOID_ADSB, 15:Guided, 17:QSTABILIZE, 18:QHOVER, 19:QLOITER, 20:QLAND, 21:QRTL, 22:QAUTOTUNE, 23:QACRO</Values>
+    </FLTMODE5>
+    <FLTMODE6>
+      <DisplayName>FlightMode6</DisplayName>
+      <Description>Flight mode for switch position 6 (1750 to 2049)</Description>
+      <User>Standard</User>
+      <Values>0:Manual, 1:CIRCLE, 2:STABILIZE, 3:TRAINING, 4:ACRO, 5:FBWA, 6:FBWB, 7:CRUISE, 8:AUTOTUNE, 10:Auto, 11:RTL, 12:Loiter, 13:TAKEOFF, 14:AVOID_ADSB, 15:Guided, 17:QSTABILIZE, 18:QHOVER, 19:QLOITER, 20:QLAND, 21:QRTL, 22:QAUTOTUNE, 23:QACRO</Values>
+    </FLTMODE6>
+    <INITIAL_MODE>
+      <DisplayName>Initial flight mode</DisplayName>
+      <Description>This selects the mode to start in on boot. This is useful for when you want to start in AUTO mode on boot without a receiver.</Description>
+      <User>Advanced</User>
+      <Values>0:Manual, 1:CIRCLE, 2:STABILIZE, 3:TRAINING, 4:ACRO, 5:FBWA, 6:FBWB, 7:CRUISE, 8:AUTOTUNE, 10:Auto, 11:RTL, 12:Loiter, 13:TAKEOFF, 14:AVOID_ADSB, 15:Guided, 17:QSTABILIZE, 18:QHOVER, 19:QLOITER, 20:QLAND, 21:QRTL, 22:QAUTOTUNE, 23:QACRO</Values>
+    </INITIAL_MODE>
+    <LIM_ROLL_CD>
+      <DisplayName>Maximum Bank Angle</DisplayName>
+      <Description>Maximum bank angle commanded in modes with stabilized limits. Increase this value for sharper turns, but decrease to prevent accelerated stalls.</Description>
+      <User>Standard</User>
+      <Range>0 9000</Range>
+      <Increment>1</Increment>
+      <Units>cdeg</Units>
+      <UnitText>centidegrees</UnitText>
+    </LIM_ROLL_CD>
+    <LIM_PITCH_MAX>
+      <DisplayName>Maximum Pitch Angle</DisplayName>
+      <Description>Maximum pitch up angle commanded in modes with stabilized limits.</Description>
+      <User>Standard</User>
+      <Range>0 9000</Range>
+      <Increment>1</Increment>
+      <Units>cdeg</Units>
+      <UnitText>centidegrees</UnitText>
+    </LIM_PITCH_MAX>
+    <LIM_PITCH_MIN>
+      <DisplayName>Minimum Pitch Angle</DisplayName>
+      <Description>Maximum pitch down angle commanded in modes with stabilized limits</Description>
+      <User>Standard</User>
+      <Range>-9000 0</Range>
+      <Increment>1</Increment>
+      <Units>cdeg</Units>
+      <UnitText>centidegrees</UnitText>
+    </LIM_PITCH_MIN>
+    <ACRO_ROLL_RATE>
+      <DisplayName>ACRO mode roll rate</DisplayName>
+      <Description>The maximum roll rate at full stick deflection in ACRO mode</Description>
+      <User>Standard</User>
+      <Range>10 500</Range>
+      <Increment>1</Increment>
+      <Units>deg/s</Units>
+      <UnitText>degrees per second</UnitText>
+    </ACRO_ROLL_RATE>
+    <ACRO_PITCH_RATE>
+      <DisplayName>ACRO mode pitch rate</DisplayName>
+      <Description>The maximum pitch rate at full stick deflection in ACRO mode</Description>
+      <User>Standard</User>
+      <Range>10 500</Range>
+      <Increment>1</Increment>
+      <Units>deg/s</Units>
+      <UnitText>degrees per second</UnitText>
+    </ACRO_PITCH_RATE>
+    <ACRO_LOCKING>
+      <DisplayName>ACRO mode attitude locking</DisplayName>
+      <Description>Enable attitude locking when sticks are released</Description>
+      <User>Standard</User>
+      <Values>0:Disabled, 1:Enabled</Values>
+    </ACRO_LOCKING>
+    <GROUND_STEER_ALT>
+      <DisplayName>Ground steer altitude</DisplayName>
+      <Description>Altitude at which to use the ground steering controller on the rudder. If non-zero then the STEER2SRV controller will be used to control the rudder for altitudes within this limit of the home altitude.</Description>
+      <User>Standard</User>
+      <Range>-100 100</Range>
+      <Increment>0.1</Increment>
+      <Units>m</Units>
+      <UnitText>meters</UnitText>
+    </GROUND_STEER_ALT>
+    <GROUND_STEER_DPS>
+      <DisplayName>Ground steer rate</DisplayName>
+      <Description>Ground steering rate in degrees per second for full rudder stick deflection</Description>
+      <User>Advanced</User>
+      <Range>10 360</Range>
+      <Increment>1</Increment>
+      <Units>deg/s</Units>
+      <UnitText>degrees per second</UnitText>
+    </GROUND_STEER_DPS>
+    <TRIM_AUTO>
+      <DisplayName>Automatic trim adjustment</DisplayName>
+      <Description>Enables the setting SERVOn_TRIM values to current levels when switching out of MANUAL mode. Should not be left on as mode switches while the plane is rolling or pitching can cause invalid trim values and subsequent unstable behavior. See newer and safer SERVO_AUTO_TRIM parameter for automated results.</Description>
+      <User>Standard</User>
+      <Values>0:Disabled, 1:Enabled</Values>
+    </TRIM_AUTO>
+    <MIXING_GAIN>
+      <DisplayName>Mixing Gain</DisplayName>
+      <Description>The gain for the Vtail and elevon output mixers. The default is 0.5, which ensures that the mixer doesn't saturate, allowing both input channels to go to extremes while retaining control over the output. Hardware mixers often have a 1.0 gain, which gives more servo throw, but can saturate. If you don't have enough throw on your servos with VTAIL_OUTPUT or ELEVON_OUTPUT enabled then you can raise the gain using MIXING_GAIN. The mixer allows outputs in the range 900 to 2100 microseconds.</Description>
+      <User>User</User>
+      <Range>0.5 1.2</Range>
+    </MIXING_GAIN>
+    <RUDDER_ONLY>
+      <DisplayName>Rudder only aircraft</DisplayName>
+      <Description>Enable rudder only mode. The rudder will control attitude in attitude controlled modes (such as FBWA). You should setup your transmitter to send roll stick inputs to the RCMAP_YAW channel (normally channel 4). The rudder servo should be attached to the RCMAP_YAW channel as well. Note that automatic ground steering will be disabled for rudder only aircraft. You should also set KFF_RDDRMIX to 1.0. You will also need to setup the YAW2SRV_DAMP yaw damping appropriately for your aircraft. A value of 0.5 for YAW2SRV_DAMP is a good starting point.</Description>
+      <User>User</User>
+      <Values>0:Disabled, 1:Enabled</Values>
+    </RUDDER_ONLY>
+    <MIXING_OFFSET>
+      <DisplayName>Mixing Offset</DisplayName>
+      <Description>The offset for the Vtail and elevon output mixers, as a percentage. This can be used in combination with MIXING_GAIN to configure how the control surfaces respond to input. The response to aileron or elevator input can be increased by setting this parameter to a positive or negative value. A common usage is to enter a positive value to increase the aileron response of the elevons of a flying wing. The default value of zero will leave the aileron-input response equal to the elevator-input response.</Description>
+      <User>User</User>
+      <Range>-1000 1000</Range>
+      <Units>d%</Units>
+      <UnitText>decipercent</UnitText>
+    </MIXING_OFFSET>
+    <DSPOILR_RUD_RATE>
+      <DisplayName>Differential spoilers rudder rate</DisplayName>
+      <Description>Sets the amount of deflection that the rudder output will apply to the differential spoilers, as a percentage. The default value of 100 results in full rudder applying full deflection. A value of 0 will result in the differential spoilers exactly following the elevons (no rudder effect).</Description>
+      <User>User</User>
+      <Range>-100 100</Range>
+      <Units>%</Units>
+      <UnitText>percent</UnitText>
+    </DSPOILR_RUD_RATE>
+    <SYS_NUM_RESETS>
+      <DisplayName>Num Resets</DisplayName>
+      <Description>Number of APM board resets</Description>
+      <User>Advanced</User>
+      <ReadOnly>True</ReadOnly>
+    </SYS_NUM_RESETS>
+    <LOG_BITMASK>
+      <DisplayName>Log bitmask</DisplayName>
+      <Description>Bitmap of what on-board log types to enable. This value is made up of the sum of each of the log types you want to be saved. It is usually best just to enable all log types by setting this to 65535. The individual bits are ATTITUDE_FAST=1, ATTITUDE_MEDIUM=2, GPS=4, PerformanceMonitoring=8, ControlTuning=16, NavigationTuning=32, Mode=64, IMU=128, Commands=256, Battery=512, Compass=1024, TECS=2048, Camera=4096, RCandServo=8192, Sonar=16384, Arming=32768, FullLogs=65535</Description>
+      <User>Advanced</User>
+      <Values>0:Disabled, 65535:All-Default</Values>
+      <Bitmask>0:ATTITUDE_FAST,1:ATTITUDE_MED,2:GPS,3:PM,4:CTUN,5:NTUN,6:MODE,7:IMU,8:CMD,9:CURRENT,10:COMPASS,11:TECS,12:CAMERA,13:RC,14:SONAR,15:ARM/DISARM,19:IMU_RAW</Bitmask>
+    </LOG_BITMASK>
+    <RST_SWITCH_CH>
+      <DisplayName>Reset Switch Channel</DisplayName>
+      <Description>RC channel to use to reset to last flight mode	after geofence takeover.</Description>
+      <User>Advanced</User>
+    </RST_SWITCH_CH>
+    <RST_MISSION_CH>
+      <DisplayName>Reset Mission Channel</DisplayName>
+      <Description>Enables a channel to reset the mission to the first waypoint. Mission restart is triggered by channel rising above 1750 PWM. 0 disables.</Description>
+      <User>Advanced</User>
+    </RST_MISSION_CH>
+    <TRIM_ARSPD_CM>
+      <DisplayName>Target airspeed</DisplayName>
+      <Description>Target airspeed in cm/s in automatic throttle modes. Value is as an indicated (calibrated/apparent) airspeed.</Description>
+      <User>User</User>
+      <Units>cm/s</Units>
+      <UnitText>centimeters per second</UnitText>
+    </TRIM_ARSPD_CM>
+    <SCALING_SPEED>
+      <DisplayName>speed used for speed scaling calculations</DisplayName>
+      <Description>Airspeed in m/s to use when calculating surface speed scaling. Note that changing this value will affect all PID values</Description>
+      <User>Advanced</User>
+      <Units>m/s</Units>
+      <UnitText>meters per second</UnitText>
+    </SCALING_SPEED>
+    <MIN_GNDSPD_CM>
+      <DisplayName>Minimum ground speed</DisplayName>
+      <Description>Minimum ground speed in cm/s when under airspeed control</Description>
+      <User>Advanced</User>
+      <Units>cm/s</Units>
+      <UnitText>centimeters per second</UnitText>
+    </MIN_GNDSPD_CM>
+    <TRIM_PITCH_CD>
+      <DisplayName>Pitch angle offset</DisplayName>
+      <Description>Offset applied to AHRS pitch used for in-flight pitch trimming. Correct ground leveling is better than changing this parameter.</Description>
+      <User>Advanced</User>
+      <Units>cdeg</Units>
+      <UnitText>centidegrees</UnitText>
+    </TRIM_PITCH_CD>
+    <ALT_HOLD_RTL>
+      <DisplayName>RTL altitude</DisplayName>
+      <Description>Target altitude above home for RTL mode. Maintains current altitude if set to -1. Rally point altitudes are used if plane does not return to home.</Description>
+      <User>User</User>
+      <Units>cm</Units>
+      <UnitText>centimeters</UnitText>
+    </ALT_HOLD_RTL>
+    <ALT_HOLD_FBWCM>
+      <DisplayName>Minimum altitude for FBWB mode</DisplayName>
+      <Description>This is the minimum altitude in centimeters that FBWB and CRUISE modes will allow. If you attempt to descend below this altitude then the plane will level off. A value of zero means no limit.</Description>
+      <User>User</User>
+      <Units>cm</Units>
+      <UnitText>centimeters</UnitText>
+    </ALT_HOLD_FBWCM>
+    <FLAP_IN_CHANNEL>
+      <DisplayName>Flap input channel</DisplayName>
+      <Description>An RC input channel to use for flaps control. If this is set to a RC channel number then that channel will be used for manual flaps control. When enabled, the percentage of flaps is taken as the percentage travel from the TRIM value of the channel to the MIN value of the channel. A value above the TRIM values will give inverse flaps (spoilers). This option needs to be enabled in conjunction with a FUNCTION setting on an output channel to one of the flap functions. When a FLAP_IN_CHANNEL is combined with auto-flaps the higher of the two flap percentages is taken.</Description>
+      <User>User</User>
+    </FLAP_IN_CHANNEL>
+    <FLAP_1_PERCNT>
+      <DisplayName>Flap 1 percentage</DisplayName>
+      <Description>The percentage change in flap position when FLAP_1_SPEED is reached. Use zero to disable flaps</Description>
+      <User>Advanced</User>
+      <Range>0 100</Range>
+      <Units>%</Units>
+      <UnitText>percent</UnitText>
+    </FLAP_1_PERCNT>
+    <FLAP_1_SPEED>
+      <DisplayName>Flap 1 speed</DisplayName>
+      <Description>The speed in meters per second at which to engage FLAP_1_PERCENT of flaps. Note that FLAP_1_SPEED should be greater than or equal to FLAP_2_SPEED</Description>
+      <User>Advanced</User>
+      <Range>0 100</Range>
+      <Increment>1</Increment>
+      <Units>m/s</Units>
+      <UnitText>meters per second</UnitText>
+    </FLAP_1_SPEED>
+    <FLAP_2_PERCNT>
+      <DisplayName>Flap 2 percentage</DisplayName>
+      <Description>The percentage change in flap position when FLAP_2_SPEED is reached. Use zero to disable flaps</Description>
+      <User>Advanced</User>
+      <Range>0 100</Range>
+      <Units>%</Units>
+      <UnitText>percent</UnitText>
+    </FLAP_2_PERCNT>
+    <FLAP_2_SPEED>
+      <DisplayName>Flap 2 speed</DisplayName>
+      <Description>The speed in meters per second at which to engage FLAP_2_PERCENT of flaps. Note that FLAP_1_SPEED should be greater than or equal to FLAP_2_SPEED</Description>
+      <User>Advanced</User>
+      <Range>0 100</Range>
+      <Increment>1</Increment>
+      <Units>m/s</Units>
+      <UnitText>meters per second</UnitText>
+    </FLAP_2_SPEED>
+    <OVERRIDE_CHAN>
+      <DisplayName>IO override channel</DisplayName>
+      <Description>If set to a non-zero value then this is an RC input channel number to use for giving IO manual control in case the main FMU microcontroller on a board with a IO co-processor fails. When this RC input channel goes above 1750 the FMU microcontroller will no longer be involved in controlling the servos and instead the IO microcontroller will directly control the servos. Note that IO manual control will be automatically activated if the FMU crashes for any reason. This parameter allows you to test for correct manual behaviour without actually crashing the FMU. This parameter is can be set to a non-zero value either for ground testing purposes or for giving the effect of an external override control board. Please also see the docs on OVERRIDE_SAFETY. Note that you may set OVERRIDE_CHAN to the same channel as FLTMODE_CH to get IO based override when in flight mode 6. Note that when override is triggered due to a FMU crash the 6 auxiliary output channels on Pixhawk will no longer be updated, so all the flight controls you need must be assigned to the first 8 channels.</Description>
+      <User>Advanced</User>
+    </OVERRIDE_CHAN>
+    <OVERRIDE_SAFETY>
+      <DisplayName>IO override safety switch</DisplayName>
+      <Description>This controls whether the safety switch is turned off when you activate override with OVERRIDE_CHAN. When set to 1 the safety switch is de-activated (activating the servos) then a IO override is triggered. In that case the safety remains de-activated after override is disabled. If OVERRIDE_SAFETTY is set to 0 then the safety switch state does not change. Note that regardless of the value of this parameter the servos will be active while override is active.</Description>
+      <User>Advanced</User>
+    </OVERRIDE_SAFETY>
+    <HIL_MODE>
+      <DisplayName>HIL mode enable</DisplayName>
+      <Description>This enables and disables hardware in the loop mode. If HIL_MODE is 1 then on the next reboot all sensors are replaced with HIL sensors which come from the GCS.</Description>
+      <User>Advanced</User>
+      <Values>0:Disabled, 1:Enabled</Values>
+      <RebootRequired>True</RebootRequired>
+    </HIL_MODE>
+    <HIL_SERVOS>
+      <DisplayName>HIL Servos enable</DisplayName>
+      <Description>This controls whether real servo controls are used in HIL mode. If you enable this then the APM will control the real servos in HIL mode. If disabled it will report servo values, but will not output to the real servos. Be careful that your motor and propeller are not connected if you enable this option.</Description>
+      <User>Advanced</User>
+      <Values>0:Disabled, 1:Enabled</Values>
+    </HIL_SERVOS>
+    <HIL_ERR_LIMIT>
+      <DisplayName>Limit of error in HIL attitude before reset</DisplayName>
+      <Description>This controls the maximum error in degrees on any axis before HIL will reset the DCM attitude to match the HIL_STATE attitude. This limit will prevent poor timing on HIL from causing a major attitude error. If the value is zero then no limit applies.</Description>
+      <User>Advanced</User>
+      <Range>0 90</Range>
+      <Increment>0.1</Increment>
+      <Units>deg</Units>
+      <UnitText>degrees</UnitText>
+    </HIL_ERR_LIMIT>
+    <RTL_AUTOLAND>
+      <DisplayName>RTL auto land</DisplayName>
+      <Description>Automatically begin landing sequence after arriving at RTL location. This requires the addition of a DO_LAND_START mission item, which acts as a marker for the start of a landing sequence. The closest landing sequence will be chosen to the current location. </Description>
+      <User>Standard</User>
+      <Values>0:Disable, 1:Enable - go HOME then land, 2:Enable - go directly to landing sequence</Values>
+    </RTL_AUTOLAND>
+    <CRASH_ACC_THRESH>
+      <DisplayName>Crash Deceleration Threshold</DisplayName>
+      <Description>X-Axis deceleration threshold to notify the crash detector that there was a possible impact which helps disarm the motor quickly after a crash. This value should be much higher than normal negative x-axis forces during normal flight, check flight log files to determine the average IMU.x values for your aircraft and motor type. Higher value means less sensative (triggers on higher impact). For electric planes that don't vibrate much during fight a value of 25 is good (that's about 2.5G). For petrol/nitro planes you'll want a higher value. Set to 0 to disable the collision detector.</Description>
+      <User>Advanced</User>
+      <Range>10 127</Range>
+      <Units>m/s/s</Units>
+      <UnitText>meters per square second</UnitText>
+    </CRASH_ACC_THRESH>
+    <CRASH_DETECT>
+      <DisplayName>Crash Detection</DisplayName>
+      <Description>Automatically detect a crash during AUTO flight and perform the bitmask selected action(s). Disarm will turn off motor for safety and to help against burning out ESC and motor. Setting the mode to manual will help save the servos from burning out by overexerting if the aircraft crashed in an odd orientation such as upsidedown. Set to 0 to disable crash detection.</Description>
+      <User>Advanced</User>
+      <Bitmask>0:Disarm</Bitmask>
+    </CRASH_DETECT>
+    <CHUTE_CHAN>
+      <DisplayName>Parachute release channel</DisplayName>
+      <Description>If set to a non-zero value then this is an RC input channel number to use for manually releasing the parachute. When this channel goes above 1700 the parachute will be released</Description>
+      <User>Advanced</User>
+    </CHUTE_CHAN>
+    <RNGFND_LANDING>
+      <DisplayName>Enable rangefinder for landing</DisplayName>
+      <Description>This enables the use of a rangefinder for automatic landing. The rangefinder will be used both on the landing approach and for final flare</Description>
+      <User>Standard</User>
+      <Values>0:Disabled, 1:Enabled</Values>
+    </RNGFND_LANDING>
+    <SYSID_ENFORCE>
+      <DisplayName>GCS sysid enforcement</DisplayName>
+      <Description>This controls whether packets from other than the expected GCS system ID will be accepted</Description>
+      <User>Advanced</User>
+      <Values>0:NotEnforced, 1:Enforced</Values>
+    </SYSID_ENFORCE>
+    <RUDD_DT_GAIN>
+      <DisplayName>rudder differential thrust gain</DisplayName>
+      <Description>gain control from rudder to differential thrust</Description>
+      <User>Standard</User>
+      <Range>0 100</Range>
+      <Increment>1</Increment>
+      <Units>%</Units>
+      <UnitText>percent</UnitText>
+    </RUDD_DT_GAIN>
+    <MANUAL_RCMASK>
+      <DisplayName>Manual R/C pass-through mask</DisplayName>
+      <Description>Mask of R/C channels to pass directly to corresponding output channel when in MANUAL mode. When in any mode except MANUAL the channels selected with this option behave normally. This parameter is designed to allow for complex mixing strategies to be used for MANUAL flight using transmitter based mixing. Note that when this option is used you need to be very careful with pre-flight checks to ensure that the output is correct both in MANUAL and non-MANUAL modes.</Description>
+      <User>Advanced</User>
+      <Bitmask>0:Chan1,1:Chan2,2:Chan3,3:Chan4,4:Chan5,5:Chan6,6:Chan7,7:Chan8,8:Chan9,9:Chan10,10:Chan11,11:Chan12,12:Chan13,13:Chan14,14:Chan15,15:Chan16</Bitmask>
+    </MANUAL_RCMASK>
+    <HOME_RESET_ALT>
+      <DisplayName>Home reset altitude threshold</DisplayName>
+      <Description>When the aircraft is within this altitude of the home waypoint, while disarmed it will automatically update the home position. Set to 0 to continously reset it.</Description>
+      <User>Advanced</User>
+      <Values>-1:Never reset, 0:Always reset</Values>
+      <Range>-1 127</Range>
+      <Units>m</Units>
+      <UnitText>meters</UnitText>
+    </HOME_RESET_ALT>
+    <FLIGHT_OPTIONS>
+      <DisplayName>Flight mode options</DisplayName>
+      <Description>Flight mode specific options</Description>
+      <User>Advanced</User>
+      <Bitmask>0:Rudder mixing in direct flight modes only (Manual / Stabilize / Acro),1:Use centered throttle in Cruise or FBWB to indicate trim airspeed, 2:Disable attitude check for takeoff arming, 3:Force target airspeed to trim airspeed in Cruise or FBWB</Bitmask>
+    </FLIGHT_OPTIONS>
+    <TKOFF_ACCEL_CNT>
+      <DisplayName>Takeoff throttle acceleration count</DisplayName>
+      <Description>This is the number of acceleration events to require for arming with TKOFF_THR_MINACC. The default is 1, which means a single forward acceleration above TKOFF_THR_MINACC will arm. By setting this higher than 1 you can require more forward/backward movements to arm.</Description>
+      <User>User</User>
+      <Range>1 10</Range>
+    </TKOFF_ACCEL_CNT>
+    <DSPOILER_CROW_W1>
+      <DisplayName>Differential spoiler crow flaps outer weight</DisplayName>
+      <Description>This is amount of deflection applied to the two outer surfaces for differential spoilers for flaps to give crow flaps. It is a number from 0 to 100. At zero no crow flaps are applied. A recommended starting value is 25.</Description>
+      <User>Advanced</User>
+      <Range>0 100</Range>
+      <Increment>1</Increment>
+      <Units>%</Units>
+      <UnitText>percent</UnitText>
+    </DSPOILER_CROW_W1>
+    <DSPOILER_CROW_W2>
+      <DisplayName>Differential spoiler crow flaps inner weight</DisplayName>
+      <Description>This is amount of deflection applied to the two inner surfaces for differential spoilers for flaps to give crow flaps. It is a number from 0 to 100. At zero no crow flaps are applied. A recommended starting value is 45.</Description>
+      <User>Advanced</User>
+      <Range>0 100</Range>
+      <Increment>1</Increment>
+      <Units>%</Units>
+      <UnitText>percent</UnitText>
+    </DSPOILER_CROW_W2>
+    <TKOFF_TIMEOUT>
+      <DisplayName>Takeoff timeout</DisplayName>
+      <Description>This is the timeout for an automatic takeoff. If this is non-zero and the aircraft does not reach a ground speed of at least 4 m/s within this number of seconds then the takeoff is aborted and the vehicle disarmed. If the value is zero then no timeout applies.</Description>
+      <User>User</User>
+      <Range>0 120</Range>
+      <Increment>1</Increment>
+      <Units>s</Units>
+      <UnitText>seconds</UnitText>
+    </TKOFF_TIMEOUT>
+    <DSPOILER_OPTS>
+      <DisplayName>Differential spoiler and crow flaps options</DisplayName>
+      <Description>Differential spoiler and crow flaps options</Description>
+      <User>Advanced</User>
+      <Bitmask>0:pitch control, 1:full span, 2:Progressive crow</Bitmask>
+      <Values>0: none, 1: D spoilers have pitch input, 2: use both control surfaces on each wing for roll, 4: Progressive crow flaps only first (0-50% flap in) then crow flaps (50 - 100% flap in)</Values>
+    </DSPOILER_OPTS>
+    <DSPOILER_AILMTCH>
+      <DisplayName>Differential spoiler aileron matching</DisplayName>
+      <Description>This scales down the inner flaps so less than full downwards range can be used for differential spoiler and full span ailerons, 100 is use full range, upwards travel is unaffected</Description>
+      <User>Advanced</User>
+      <Range>0 100</Range>
+      <Increment>1</Increment>
+      <Units>%</Units>
+      <UnitText>percent</UnitText>
+    </DSPOILER_AILMTCH>
+    <ADSB_ENABLE>
+      <DisplayName>Enable ADSB</DisplayName>
+      <Description>Enable ADS-B</Description>
+      <User>Standard</User>
+      <Values>0:Disabled, 1:Enabled</Values>
+    </ADSB_ENABLE>
+    <ADSB_LIST_MAX>
+      <DisplayName>ADSB vehicle list size</DisplayName>
+      <Description>ADSB list size of nearest vehicles. Longer lists take longer to refresh with lower SRx_ADSB values.</Description>
+      <User>Advanced</User>
+      <Range>1 100</Range>
+    </ADSB_LIST_MAX>
+    <ADSB_LIST_RADIUS>
+      <DisplayName>ADSB vehicle list radius filter</DisplayName>
+      <Description>ADSB vehicle list radius filter. Vehicles detected outside this radius will be completely ignored. They will not show up in the SRx_ADSB stream to the GCS and will not be considered in any avoidance calculations. A value of 0 will disable this filter.</Description>
+      <User>Advanced</User>
+      <Range>0 100000</Range>
+      <Units>m</Units>
+      <UnitText>meters</UnitText>
+    </ADSB_LIST_RADIUS>
+    <ADSB_ICAO_ID>
+      <DisplayName>ICAO_ID vehicle identification number</DisplayName>
+      <Description>ICAO_ID unique vehicle identification number of this aircraft. This is a integer limited to 24bits. If set to 0 then one will be randomly generated. If set to -1 then static information is not sent, transceiver is assumed pre-programmed.</Description>
+      <User>Advanced</User>
+      <Range>-1 16777215</Range>
+    </ADSB_ICAO_ID>
+    <ADSB_EMIT_TYPE>
+      <DisplayName>Emitter type</DisplayName>
+      <Description>ADSB classification for the type of vehicle emitting the transponder signal. Default value is 14 (UAV).</Description>
+      <User>Advanced</User>
+      <Values>0:NoInfo, 1:Light, 2:Small, 3:Large, 4:HighVortexlarge, 5:Heavy, 6:HighlyManuv, 7:Rotocraft, 8:RESERVED, 9:Glider, 10:LightAir, 11:Parachute, 12:UltraLight, 13:RESERVED, 14:UAV, 15:Space, 16:RESERVED, 17:EmergencySurface, 18:ServiceSurface, 19:PointObstacle</Values>
+    </ADSB_EMIT_TYPE>
+    <ADSB_LEN_WIDTH>
+      <DisplayName>Aircraft length and width</DisplayName>
+      <Description>Aircraft length and width dimension options in Length and Width in meters. In most cases, use a value of 1 for smallest size.</Description>
+      <User>Advanced</User>
+      <Values>0:NO_DATA, 1:L15W23, 2:L25W28P5, 3:L25W34, 4:L35W33, 5:L35W38, 6:L45W39P5, 7:L45W45, 8:L55W45, 9:L55W52, 10:L65W59P5, 11:L65W67, 12:L75W72P5, 13:L75W80, 14:L85W80, 15:L85W90</Values>
+    </ADSB_LEN_WIDTH>
+    <ADSB_OFFSET_LAT>
+      <DisplayName>GPS antenna lateral offset</DisplayName>
+      <Description>GPS antenna lateral offset. This describes the physical location offest from center of the GPS antenna on the aircraft.</Description>
+      <User>Advanced</User>
+      <Values>0:NoData, 1:Left2m, 2:Left4m, 3:Left6m, 4:Center, 5:Right2m, 6:Right4m, 7:Right6m</Values>
+    </ADSB_OFFSET_LAT>
+    <ADSB_OFFSET_LON>
+      <DisplayName>GPS antenna longitudinal offset</DisplayName>
+      <Description>GPS antenna longitudinal offset. This is usually set to 1, Applied By Sensor</Description>
+      <User>Advanced</User>
+      <Values>0:NO_DATA, 1:AppliedBySensor</Values>
+    </ADSB_OFFSET_LON>
+    <ADSB_RF_SELECT>
+      <DisplayName>Transceiver RF selection</DisplayName>
+      <Description>Transceiver RF selection for Rx enable and/or Tx enable. This only effects devices that can Tx and Rx. Rx-only devices override this to always be Rx-only.</Description>
+      <User>Advanced</User>
+      <Values>0:Disabled, 1:Rx-Only, 2:Tx-Only, 3:Rx and Tx Enabled</Values>
+    </ADSB_RF_SELECT>
+    <ADSB_SQUAWK>
+      <DisplayName>Squawk code</DisplayName>
+      <Description>VFR squawk (Mode 3/A) code is a pre-programmed default code when the pilot is flying VFR and not in contact with ATC. In the USA, the VFR squawk code is octal 1200 (hex 0x280, decimal 640) and in most parts of Europe the VFR squawk code is octal 7000. If an invalid octal number is set then it will be reset to 1200.</Description>
+      <User>Advanced</User>
+      <Range>0 7777</Range>
+      <Units>octal</Units>
+      <UnitText>octal</UnitText>
+    </ADSB_SQUAWK>
+    <ADSB_RF_CAPABLE>
+      <DisplayName>RF capabilities</DisplayName>
+      <Description>Describes your hardware RF In/Out capabilities.</Description>
+      <User>Advanced</User>
+      <Values>0:Unknown, 1:Rx UAT only, 3:Rx UAT and 1090ES, 7:Rx&amp;Tx UAT and 1090ES</Values>
+      <Bitmask>0:UAT_in,1:1090ES_in,2:UAT_out,3:1090ES_out</Bitmask>
+    </ADSB_RF_CAPABLE>
+    <ADSB_LIST_ALT>
+      <DisplayName>ADSB vehicle list altitude filter</DisplayName>
+      <Description>ADSB vehicle list altitude filter. Vehicles detected above this altitude will be completely ignored. They will not show up in the SRx_ADSB stream to the GCS and will not be considered in any avoidance calculations. A value of 0 will disable this filter.</Description>
+      <User>Advanced</User>
+      <Range>0 32767</Range>
+      <Units>m</Units>
+      <UnitText>meters</UnitText>
+    </ADSB_LIST_ALT>
+    <ADSB_ICAO_SPECL>
+      <DisplayName>ICAO_ID of special vehicle</DisplayName>
+      <Description>ICAO_ID of special vehicle that ignores ADSB_LIST_RADIUS and ADSB_LIST_ALT. The vehicle is always tracked. Use 0 to disable.</Description>
+      <User>Advanced</User>
+    </ADSB_ICAO_SPECL>
+    <ADSB_LOG>
+      <DisplayName>ADS-B logging</DisplayName>
+      <Description>0: no logging, 1: log only special ID, 2:log all</Description>
+      <User>Advanced</User>
+      <Values>0:no logging, 1:log only special ID, 2:log all</Values>
+    </ADSB_LOG>
+  </ArduPlane>
+</Params>

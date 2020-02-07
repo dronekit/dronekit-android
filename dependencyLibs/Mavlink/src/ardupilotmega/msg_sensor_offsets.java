@@ -22,62 +22,62 @@ public class msg_sensor_offsets extends MAVLinkMessage {
 
       
     /**
-     * magnetic declination (radians)
+     * Magnetic declination.
      */
     public float mag_declination;
       
     /**
-     * raw pressure from barometer
+     * Raw pressure from barometer.
      */
     public int raw_press;
       
     /**
-     * raw temperature from barometer
+     * Raw temperature from barometer.
      */
     public int raw_temp;
       
     /**
-     * gyro X calibration
+     * Gyro X calibration.
      */
     public float gyro_cal_x;
       
     /**
-     * gyro Y calibration
+     * Gyro Y calibration.
      */
     public float gyro_cal_y;
       
     /**
-     * gyro Z calibration
+     * Gyro Z calibration.
      */
     public float gyro_cal_z;
       
     /**
-     * accel X calibration
+     * Accel X calibration.
      */
     public float accel_cal_x;
       
     /**
-     * accel Y calibration
+     * Accel Y calibration.
      */
     public float accel_cal_y;
       
     /**
-     * accel Z calibration
+     * Accel Z calibration.
      */
     public float accel_cal_z;
       
     /**
-     * magnetometer X offset
+     * Magnetometer X offset.
      */
     public short mag_ofs_x;
       
     /**
-     * magnetometer Y offset
+     * Magnetometer Y offset.
      */
     public short mag_ofs_y;
       
     /**
-     * magnetometer Z offset
+     * Magnetometer Z offset.
      */
     public short mag_ofs_z;
     

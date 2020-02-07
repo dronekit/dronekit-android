@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * Deprecated. Use MAV_CMD_PREFLIGHT_SET_SENSOR_OFFSETS instead. Set the magnetometer offsets
+ * Set the magnetometer offsets
  */
 public class msg_set_mag_offsets extends MAVLinkMessage {
 
@@ -22,27 +22,27 @@ public class msg_set_mag_offsets extends MAVLinkMessage {
 
       
     /**
-     * magnetometer X offset
+     * Magnetometer X offset.
      */
     public short mag_ofs_x;
       
     /**
-     * magnetometer Y offset
+     * Magnetometer Y offset.
      */
     public short mag_ofs_y;
       
     /**
-     * magnetometer Z offset
+     * Magnetometer Z offset.
      */
     public short mag_ofs_z;
       
     /**
-     * System ID
+     * System ID.
      */
     public short target_system;
       
     /**
-     * Component ID
+     * Component ID.
      */
     public short target_component;
     

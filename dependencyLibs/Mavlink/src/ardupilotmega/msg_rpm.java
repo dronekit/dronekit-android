@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * RPM sensor output
+ * RPM sensor output.
  */
 public class msg_rpm extends MAVLinkMessage {
 
@@ -22,12 +22,12 @@ public class msg_rpm extends MAVLinkMessage {
 
       
     /**
-     * RPM Sensor1
+     * RPM Sensor1.
      */
     public float rpm1;
       
     /**
-     * RPM Sensor2
+     * RPM Sensor2.
      */
     public float rpm2;
     

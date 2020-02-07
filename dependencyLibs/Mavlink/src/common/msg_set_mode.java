@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * THIS INTERFACE IS DEPRECATED. USE COMMAND_LONG with MAV_CMD_DO_SET_MODE INSTEAD. Set the system mode, as defined by enum MAV_MODE. There is no target component id as the mode is by definition for the overall aircraft, not only for one component.
+ * Set the system mode, as defined by enum MAV_MODE. There is no target component id as the mode is by definition for the overall aircraft, not only for one component.
  */
 public class msg_set_mode extends MAVLinkMessage {
 
@@ -32,7 +32,7 @@ public class msg_set_mode extends MAVLinkMessage {
     public short target_system;
       
     /**
-     * The new base mode
+     * The new base mode.
      */
     public short base_mode;
     

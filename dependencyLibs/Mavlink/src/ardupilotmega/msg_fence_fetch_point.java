@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * Request a current fence point from MAV
+ * Request a current fence point from MAV.
  */
 public class msg_fence_fetch_point extends MAVLinkMessage {
 
@@ -22,17 +22,17 @@ public class msg_fence_fetch_point extends MAVLinkMessage {
 
       
     /**
-     * System ID
+     * System ID.
      */
     public short target_system;
       
     /**
-     * Component ID
+     * Component ID.
      */
     public short target_component;
       
     /**
-     * point index (first point is 1, 0 is for return point)
+     * Point index (first point is 1, 0 is for return point).
      */
     public short idx;
     

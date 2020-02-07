@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * Version and capability of autopilot software
+ * Version and capability of autopilot software. This should be emitted in response to a MAV_CMD_REQUEST_AUTOPILOT_CAPABILITIES command.
  */
 public class msg_autopilot_version extends MAVLinkMessage {
 
@@ -22,7 +22,7 @@ public class msg_autopilot_version extends MAVLinkMessage {
 
       
     /**
-     * bitmask of capabilities (see MAV_PROTOCOL_CAPABILITY enum)
+     * Bitmap of capabilities
      */
     public long capabilities;
       

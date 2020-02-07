@@ -60,5 +60,15 @@ public class ParameterMetadata implements Serializable {
 		this.values = values;
 	}
 
-
+	@Override
+	public String toString() {
+		return "ParameterMetadata{" +
+				"name='" + name + '\'' +
+				", displayName='" + displayName + '\'' +
+				", description='" + description + '\'' +
+				", units='" + units + '\'' +
+				", range='" + range + '\'' +
+				", values='" + values + '\'' +
+				'}';
+	}
 }

@@ -22,12 +22,12 @@ public class msg_autopilot_version_request extends MAVLinkMessage {
 
       
     /**
-     * System ID
+     * System ID.
      */
     public short target_system;
       
     /**
-     * Component ID
+     * Component ID.
      */
     public short target_component;
     

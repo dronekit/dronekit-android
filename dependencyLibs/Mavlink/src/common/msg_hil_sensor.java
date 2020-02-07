@@ -22,62 +22,62 @@ public class msg_hil_sensor extends MAVLinkMessage {
 
       
     /**
-     * Timestamp (microseconds, synced to UNIX time or since system boot)
+     * Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude the number.
      */
     public long time_usec;
       
     /**
-     * X acceleration (m/s^2)
+     * X acceleration
      */
     public float xacc;
       
     /**
-     * Y acceleration (m/s^2)
+     * Y acceleration
      */
     public float yacc;
       
     /**
-     * Z acceleration (m/s^2)
+     * Z acceleration
      */
     public float zacc;
       
     /**
-     * Angular speed around X axis in body frame (rad / sec)
+     * Angular speed around X axis in body frame
      */
     public float xgyro;
       
     /**
-     * Angular speed around Y axis in body frame (rad / sec)
+     * Angular speed around Y axis in body frame
      */
     public float ygyro;
       
     /**
-     * Angular speed around Z axis in body frame (rad / sec)
+     * Angular speed around Z axis in body frame
      */
     public float zgyro;
       
     /**
-     * X Magnetic field (Gauss)
+     * X Magnetic field
      */
     public float xmag;
       
     /**
-     * Y Magnetic field (Gauss)
+     * Y Magnetic field
      */
     public float ymag;
       
     /**
-     * Z Magnetic field (Gauss)
+     * Z Magnetic field
      */
     public float zmag;
       
     /**
-     * Absolute pressure in millibar
+     * Absolute pressure
      */
     public float abs_pressure;
       
     /**
-     * Differential pressure (airspeed) in millibar
+     * Differential pressure (airspeed)
      */
     public float diff_pressure;
       
@@ -87,12 +87,12 @@ public class msg_hil_sensor extends MAVLinkMessage {
     public float pressure_alt;
       
     /**
-     * Temperature in degrees celsius
+     * Temperature
      */
     public float temperature;
       
     /**
-     * Bitmask for fields that have updated since last message, bit 0 = xacc, bit 12: temperature, bit 31: full reset of attitude/position/velocities/etc was performed in sim.
+     * Bitmap for fields that have updated since last message, bit 0 = xacc, bit 12: temperature, bit 31: full reset of attitude/position/velocities/etc was performed in sim.
      */
     public long fields_updated;
     

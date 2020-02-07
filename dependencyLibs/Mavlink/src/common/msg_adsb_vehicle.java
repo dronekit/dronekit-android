@@ -27,37 +27,37 @@ public class msg_adsb_vehicle extends MAVLinkMessage {
     public long ICAO_address;
       
     /**
-     * Latitude, expressed as degrees * 1E7
+     * Latitude
      */
     public int lat;
       
     /**
-     * Longitude, expressed as degrees * 1E7
+     * Longitude
      */
     public int lon;
       
     /**
-     * Altitude(ASL) in millimeters
+     * Altitude(ASL)
      */
     public int altitude;
       
     /**
-     * Course over ground in centidegrees
+     * Course over ground
      */
     public int heading;
       
     /**
-     * The horizontal velocity in centimeters/second
+     * The horizontal velocity
      */
     public int hor_velocity;
       
     /**
-     * The vertical velocity in centimeters/second, positive is up
+     * The vertical velocity. Positive is up
      */
     public short ver_velocity;
       
     /**
-     * Flags to indicate various statuses including valid data fields
+     * Bitmap to indicate various statuses including valid data fields
      */
     public int flags;
       
@@ -67,7 +67,7 @@ public class msg_adsb_vehicle extends MAVLinkMessage {
     public int squawk;
       
     /**
-     * Type from ADSB_ALTITUDE_TYPE enum
+     * ADSB altitude type.
      */
     public short altitude_type;
       
@@ -77,7 +77,7 @@ public class msg_adsb_vehicle extends MAVLinkMessage {
     public byte callsign[] = new byte[9];
       
     /**
-     * Type from ADSB_EMITTER_TYPE enum
+     * ADSB emitter type.
      */
     public short emitter_type;
       

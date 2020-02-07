@@ -52,7 +52,7 @@ public class msg_safety_allowed_area extends MAVLinkMessage {
     public float p2z;
       
     /**
-     * Coordinate frame, as defined by MAV_FRAME enum. Can be either global, GPS, right-handed with Z axis up or local, right handed, Z axis down.
+     * Coordinate frame. Can be either global, GPS, right-handed with Z axis up or local, right handed, Z axis down.
      */
     public short frame;
     

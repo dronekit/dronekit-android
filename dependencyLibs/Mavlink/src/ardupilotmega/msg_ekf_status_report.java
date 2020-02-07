@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * EKF Status message including flags and variances
+ * EKF Status message including flags and variances.
  */
 public class msg_ekf_status_report extends MAVLinkMessage {
 
@@ -22,37 +22,37 @@ public class msg_ekf_status_report extends MAVLinkMessage {
 
       
     /**
-     * Velocity variance
+     * Velocity variance.
      */
     public float velocity_variance;
       
     /**
-     * Horizontal Position variance
+     * Horizontal Position variance.
      */
     public float pos_horiz_variance;
       
     /**
-     * Vertical Position variance
+     * Vertical Position variance.
      */
     public float pos_vert_variance;
       
     /**
-     * Compass variance
+     * Compass variance.
      */
     public float compass_variance;
       
     /**
-     * Terrain Altitude variance
+     * Terrain Altitude variance.
      */
     public float terrain_alt_variance;
       
     /**
-     * Flags
+     * Flags.
      */
     public int flags;
       
     /**
-     * Airspeed variance
+     * Airspeed variance.
      */
     public float airspeed_variance;
     

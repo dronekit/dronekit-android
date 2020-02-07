@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * This interface replaces DATA_STREAM
+ * The interval between messages for a particular MAVLink message ID. This message is the response to the MAV_CMD_GET_MESSAGE_INTERVAL command. This interface replaces DATA_STREAM.
  */
 public class msg_message_interval extends MAVLinkMessage {
 
@@ -22,7 +22,7 @@ public class msg_message_interval extends MAVLinkMessage {
 
       
     /**
-     * The interval between two messages, in microseconds. A value of -1 indicates this stream is disabled, 0 indicates it is not available, > 0 indicates the interval at which it is sent.
+     * The interval between two messages. A value of -1 indicates this stream is disabled, 0 indicates it is not available, > 0 indicates the interval at which it is sent.
      */
     public int interval_us;
       

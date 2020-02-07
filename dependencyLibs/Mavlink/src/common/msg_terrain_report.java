@@ -22,22 +22,22 @@ public class msg_terrain_report extends MAVLinkMessage {
 
       
     /**
-     * Latitude (degrees *10^7)
+     * Latitude
      */
     public int lat;
       
     /**
-     * Longitude (degrees *10^7)
+     * Longitude
      */
     public int lon;
       
     /**
-     * Terrain height in meters AMSL
+     * Terrain height MSL
      */
     public float terrain_height;
       
     /**
-     * Current vehicle height above lat/lon terrain height (meters)
+     * Current vehicle height above lat/lon terrain height
      */
     public float current_height;
       

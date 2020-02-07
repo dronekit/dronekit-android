@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * Data packet, size 16
+ * Data packet, size 16.
  */
 public class msg_data16 extends MAVLinkMessage {
 
@@ -22,17 +22,17 @@ public class msg_data16 extends MAVLinkMessage {
 
       
     /**
-     * data type
+     * Data type.
      */
     public short type;
       
     /**
-     * data length
+     * Data length.
      */
     public short len;
       
     /**
-     * raw data
+     * Raw data.
      */
     public short data[] = new short[16];
     

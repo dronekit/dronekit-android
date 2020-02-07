@@ -27,52 +27,52 @@ public class msg_high_latency extends MAVLinkMessage {
     public long custom_mode;
       
     /**
-     * Latitude, expressed as degrees * 1E7
+     * Latitude
      */
     public int latitude;
       
     /**
-     * Longitude, expressed as degrees * 1E7
+     * Longitude
      */
     public int longitude;
       
     /**
-     * roll (centidegrees)
+     * roll
      */
     public short roll;
       
     /**
-     * pitch (centidegrees)
+     * pitch
      */
     public short pitch;
       
     /**
-     * heading (centidegrees)
+     * heading
      */
     public int heading;
       
     /**
-     * heading setpoint (centidegrees)
+     * heading setpoint
      */
     public short heading_sp;
       
     /**
-     * Altitude above mean sea level (meters)
+     * Altitude above mean sea level
      */
     public short altitude_amsl;
       
     /**
-     * Altitude setpoint relative to the home position (meters)
+     * Altitude setpoint relative to the home position
      */
     public short altitude_sp;
       
     /**
-     * distance to target (meters)
+     * distance to target
      */
     public int wp_distance;
       
     /**
-     * System mode bitfield, as defined by MAV_MODE_FLAG enum.
+     * Bitmap of enabled system modes.
      */
     public short base_mode;
       
@@ -87,22 +87,22 @@ public class msg_high_latency extends MAVLinkMessage {
     public byte throttle;
       
     /**
-     * airspeed (m/s)
+     * airspeed
      */
     public short airspeed;
       
     /**
-     * airspeed setpoint (m/s)
+     * airspeed setpoint
      */
     public short airspeed_sp;
       
     /**
-     * groundspeed (m/s)
+     * groundspeed
      */
     public short groundspeed;
       
     /**
-     * climb rate (m/s)
+     * climb rate
      */
     public byte climb_rate;
       
@@ -112,7 +112,7 @@ public class msg_high_latency extends MAVLinkMessage {
     public short gps_nsat;
       
     /**
-     * See the GPS_FIX_TYPE enum.
+     * GPS Fix type.
      */
     public short gps_fix_type;
       

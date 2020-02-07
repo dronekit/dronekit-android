@@ -57,47 +57,47 @@ public class msg_sim_state extends MAVLinkMessage {
     public float yaw;
       
     /**
-     * X acceleration m/s/s
+     * X acceleration
      */
     public float xacc;
       
     /**
-     * Y acceleration m/s/s
+     * Y acceleration
      */
     public float yacc;
       
     /**
-     * Z acceleration m/s/s
+     * Z acceleration
      */
     public float zacc;
       
     /**
-     * Angular speed around X axis rad/s
+     * Angular speed around X axis
      */
     public float xgyro;
       
     /**
-     * Angular speed around Y axis rad/s
+     * Angular speed around Y axis
      */
     public float ygyro;
       
     /**
-     * Angular speed around Z axis rad/s
+     * Angular speed around Z axis
      */
     public float zgyro;
       
     /**
-     * Latitude in degrees
+     * Latitude
      */
     public float lat;
       
     /**
-     * Longitude in degrees
+     * Longitude
      */
     public float lon;
       
     /**
-     * Altitude in meters
+     * Altitude
      */
     public float alt;
       
@@ -112,17 +112,17 @@ public class msg_sim_state extends MAVLinkMessage {
     public float std_dev_vert;
       
     /**
-     * True velocity in m/s in NORTH direction in earth-fixed NED frame
+     * True velocity in NORTH direction in earth-fixed NED frame
      */
     public float vn;
       
     /**
-     * True velocity in m/s in EAST direction in earth-fixed NED frame
+     * True velocity in EAST direction in earth-fixed NED frame
      */
     public float ve;
       
     /**
-     * True velocity in m/s in DOWN direction in earth-fixed NED frame
+     * True velocity in DOWN direction in earth-fixed NED frame
      */
     public float vd;
     

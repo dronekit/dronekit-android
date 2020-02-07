@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * Camera Capture Feedback
+ * Camera Capture Feedback.
  */
 public class msg_camera_feedback extends MAVLinkMessage {
 
@@ -22,72 +22,72 @@ public class msg_camera_feedback extends MAVLinkMessage {
 
       
     /**
-     * Image timestamp (microseconds since UNIX epoch), as passed in by CAMERA_STATUS message (or autopilot if no CCB)
+     * Image timestamp (since UNIX epoch), as passed in by CAMERA_STATUS message (or autopilot if no CCB).
      */
     public long time_usec;
       
     /**
-     * Latitude in (deg * 1E7)
+     * Latitude.
      */
     public int lat;
       
     /**
-     * Longitude in (deg * 1E7)
+     * Longitude.
      */
     public int lng;
       
     /**
-     * Altitude Absolute (meters AMSL)
+     * Altitude (MSL).
      */
     public float alt_msl;
       
     /**
-     * Altitude Relative (meters above HOME location)
+     * Altitude (Relative to HOME location).
      */
     public float alt_rel;
       
     /**
-     * Camera Roll angle (earth frame, degrees, +-180)
+     * Camera Roll angle (earth frame, +-180).
      */
     public float roll;
       
     /**
-     * Camera Pitch angle (earth frame, degrees, +-180)
+     * Camera Pitch angle (earth frame, +-180).
      */
     public float pitch;
       
     /**
-     * Camera Yaw (earth frame, degrees, 0-360, true)
+     * Camera Yaw (earth frame, 0-360, true).
      */
     public float yaw;
       
     /**
-     * Focal Length (mm)
+     * Focal Length.
      */
     public float foc_len;
       
     /**
-     * Image index
+     * Image index.
      */
     public int img_idx;
       
     /**
-     * System ID
+     * System ID.
      */
     public short target_system;
       
     /**
-     * Camera ID
+     * Camera ID.
      */
     public short cam_idx;
       
     /**
-     * See CAMERA_FEEDBACK_FLAGS enum for definition of the bitmask
+     * Feedback flags.
      */
     public short flags;
       
     /**
-     * Completed image captures
+     * Completed image captures.
      */
     public int completed_captures;
     

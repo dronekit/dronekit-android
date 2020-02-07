@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * A rally point. Used to set a point when from GCS -> MAV. Also used to return a point from MAV -> GCS
+ * A rally point. Used to set a point when from GCS -> MAV. Also used to return a point from MAV -> GCS.
  */
 public class msg_rally_point extends MAVLinkMessage {
 
@@ -22,52 +22,52 @@ public class msg_rally_point extends MAVLinkMessage {
 
       
     /**
-     * Latitude of point in degrees * 1E7
+     * Latitude of point.
      */
     public int lat;
       
     /**
-     * Longitude of point in degrees * 1E7
+     * Longitude of point.
      */
     public int lng;
       
     /**
-     * Transit / loiter altitude in meters relative to home
+     * Transit / loiter altitude relative to home.
      */
     public short alt;
       
     /**
-     * Break altitude in meters relative to home
+     * Break altitude relative to home.
      */
     public short break_alt;
       
     /**
-     * Heading to aim for when landing. In centi-degrees.
+     * Heading to aim for when landing.
      */
     public int land_dir;
       
     /**
-     * System ID
+     * System ID.
      */
     public short target_system;
       
     /**
-     * Component ID
+     * Component ID.
      */
     public short target_component;
       
     /**
-     * point index (first point is 0)
+     * Point index (first point is 0).
      */
     public short idx;
       
     /**
-     * total number of points (for sanity checking)
+     * Total number of points (for sanity checking).
      */
     public short count;
       
     /**
-     * See RALLY_FLAGS enum for definition of the bitmask.
+     * Configuration flags.
      */
     public short flags;
     

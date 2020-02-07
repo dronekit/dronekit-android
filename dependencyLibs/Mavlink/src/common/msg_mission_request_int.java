@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * Request the information of the mission item with the sequence number seq. The response of the system to this message should be a MISSION_ITEM_INT message. https://mavlink.io/en/protocol/mission.html
+ * Request the information of the mission item with the sequence number seq. The response of the system to this message should be a MISSION_ITEM_INT message. https://mavlink.io/en/services/mission.html
  */
 public class msg_mission_request_int extends MAVLinkMessage {
 
@@ -37,7 +37,7 @@ public class msg_mission_request_int extends MAVLinkMessage {
     public short target_component;
       
     /**
-     * Mission type, see MAV_MISSION_TYPE
+     * Mission type.
      */
     public short mission_type;
     

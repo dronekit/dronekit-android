@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * As local waypoints exist, the global waypoint reference allows to transform between the local coordinate frame and the global (GPS) coordinate frame. This can be necessary when e.g. in- and outdoor settings are connected and the MAV should move from in- to outdoor.
+ * Sets the GPS co-ordinates of the vehicle local origin (0,0,0) position. Vehicle should emit GPS_GLOBAL_ORIGIN irrespective of whether the origin is changed. This enables transform between the local coordinate frame and the global (GPS) coordinate frame, which may be necessary when (for example) indoor and outdoor settings are connected and the MAV should move from in- to outdoor.
  */
 public class msg_set_gps_global_origin extends MAVLinkMessage {
 
@@ -22,17 +22,17 @@ public class msg_set_gps_global_origin extends MAVLinkMessage {
 
       
     /**
-     * Latitude (WGS84), in degrees * 1E7
+     * Latitude (WGS84)
      */
     public int latitude;
       
     /**
-     * Longitude (WGS84), in degrees * 1E7
+     * Longitude (WGS84)
      */
     public int longitude;
       
     /**
-     * Altitude (AMSL), in meters * 1000 (positive for up)
+     * Altitude (MSL). Positive for up.
      */
     public int altitude;
       
@@ -42,7 +42,7 @@ public class msg_set_gps_global_origin extends MAVLinkMessage {
     public short target_system;
       
     /**
-     * Timestamp (microseconds since UNIX epoch or microseconds since system boot)
+     * Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude the number.
      */
     public long time_usec;
     

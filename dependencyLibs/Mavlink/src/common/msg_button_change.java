@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * Report button state change
+ * Report button state change.
  */
 public class msg_button_change extends MAVLinkMessage {
 
@@ -22,17 +22,17 @@ public class msg_button_change extends MAVLinkMessage {
 
       
     /**
-     * Timestamp (milliseconds since system boot)
+     * Timestamp (time since system boot).
      */
     public long time_boot_ms;
       
     /**
-     * Time of last change of button state
+     * Time of last change of button state.
      */
     public long last_change_ms;
       
     /**
-     * Bitmap state of buttons
+     * Bitmap for state of buttons.
      */
     public short state;
     

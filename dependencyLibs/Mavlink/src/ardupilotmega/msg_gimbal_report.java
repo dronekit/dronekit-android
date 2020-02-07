@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * 3 axis gimbal mesuraments
+ * 3 axis gimbal measurements.
  */
 public class msg_gimbal_report extends MAVLinkMessage {
 
@@ -22,62 +22,62 @@ public class msg_gimbal_report extends MAVLinkMessage {
 
       
     /**
-     * Time since last update (seconds)
+     * Time since last update.
      */
     public float delta_time;
       
     /**
-     * Delta angle X (radians)
+     * Delta angle X.
      */
     public float delta_angle_x;
       
     /**
-     * Delta angle Y (radians)
+     * Delta angle Y.
      */
     public float delta_angle_y;
       
     /**
-     * Delta angle X (radians)
+     * Delta angle X.
      */
     public float delta_angle_z;
       
     /**
-     * Delta velocity X (m/s)
+     * Delta velocity X.
      */
     public float delta_velocity_x;
       
     /**
-     * Delta velocity Y (m/s)
+     * Delta velocity Y.
      */
     public float delta_velocity_y;
       
     /**
-     * Delta velocity Z (m/s)
+     * Delta velocity Z.
      */
     public float delta_velocity_z;
       
     /**
-     * Joint ROLL (radians)
+     * Joint ROLL.
      */
     public float joint_roll;
       
     /**
-     * Joint EL (radians)
+     * Joint EL.
      */
     public float joint_el;
       
     /**
-     * Joint AZ (radians)
+     * Joint AZ.
      */
     public float joint_az;
       
     /**
-     * System ID
+     * System ID.
      */
     public short target_system;
       
     /**
-     * Component ID
+     * Component ID.
      */
     public short target_component;
     

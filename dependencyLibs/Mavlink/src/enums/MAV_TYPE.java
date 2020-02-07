@@ -7,10 +7,10 @@
 package com.MAVLink.enums;
 
 /** 
- * 
+ * MAVLINK component type reported in HEARTBEAT message. Flight controllers must report the type of the vehicle on which they are mounted (e.g. MAV_TYPE_OCTOROTOR). All other components must report a value appropriate for their type (e.g. a camera must use MAV_TYPE_CAMERA).
  */
 public class MAV_TYPE {
-   public static final int MAV_TYPE_GENERIC = 0; /* Generic micro air vehicle. | */
+   public static final int MAV_TYPE_GENERIC = 0; /* Generic micro air vehicle | */
    public static final int MAV_TYPE_FIXED_WING = 1; /* Fixed wing aircraft. | */
    public static final int MAV_TYPE_QUADROTOR = 2; /* Quadrotor | */
    public static final int MAV_TYPE_COAXIAL = 3; /* Coaxial helicopter | */
@@ -36,13 +36,14 @@ public class MAV_TYPE {
    public static final int MAV_TYPE_VTOL_RESERVED3 = 23; /* VTOL reserved 3 | */
    public static final int MAV_TYPE_VTOL_RESERVED4 = 24; /* VTOL reserved 4 | */
    public static final int MAV_TYPE_VTOL_RESERVED5 = 25; /* VTOL reserved 5 | */
-   public static final int MAV_TYPE_GIMBAL = 26; /* Onboard gimbal | */
-   public static final int MAV_TYPE_ADSB = 27; /* Onboard ADSB peripheral | */
+   public static final int MAV_TYPE_GIMBAL = 26; /* Gimbal | */
+   public static final int MAV_TYPE_ADSB = 27; /* ADSB system | */
    public static final int MAV_TYPE_PARAFOIL = 28; /* Steerable, nonrigid airfoil | */
    public static final int MAV_TYPE_DODECAROTOR = 29; /* Dodecarotor | */
    public static final int MAV_TYPE_CAMERA = 30; /* Camera | */
    public static final int MAV_TYPE_CHARGING_STATION = 31; /* Charging station | */
-   public static final int MAV_TYPE_FLARM = 32; /* Onboard FLARM collision avoidance system | */
-   public static final int MAV_TYPE_ENUM_END = 33; /*  | */
+   public static final int MAV_TYPE_FLARM = 32; /* FLARM collision avoidance system | */
+   public static final int MAV_TYPE_SERVO = 33; /* Servo | */
+   public static final int MAV_TYPE_ENUM_END = 34; /*  | */
 }
             

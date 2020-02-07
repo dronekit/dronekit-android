@@ -12,7 +12,7 @@ package com.MAVLink.enums;
 public class MAV_MODE_FLAG_DECODE_POSITION {
    public static final int MAV_MODE_FLAG_DECODE_POSITION_CUSTOM_MODE = 1; /* Eighth bit: 00000001 | */
    public static final int MAV_MODE_FLAG_DECODE_POSITION_TEST = 2; /* Seventh bit: 00000010 | */
-   public static final int MAV_MODE_FLAG_DECODE_POSITION_AUTO = 4; /* Sixt bit:   00000100 | */
+   public static final int MAV_MODE_FLAG_DECODE_POSITION_AUTO = 4; /* Sixth bit:   00000100 | */
    public static final int MAV_MODE_FLAG_DECODE_POSITION_GUIDED = 8; /* Fifth bit:  00001000 | */
    public static final int MAV_MODE_FLAG_DECODE_POSITION_STABILIZE = 16; /* Fourth bit: 00010000 | */
    public static final int MAV_MODE_FLAG_DECODE_POSITION_HIL = 32; /* Third bit:  00100000 | */

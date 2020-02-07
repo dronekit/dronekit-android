@@ -22,7 +22,7 @@ public class msg_hil_actuator_controls extends MAVLinkMessage {
 
       
     /**
-     * Timestamp (microseconds since UNIX epoch or microseconds since system boot)
+     * Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude the number.
      */
     public long time_usec;
       
@@ -37,7 +37,7 @@ public class msg_hil_actuator_controls extends MAVLinkMessage {
     public float controls[] = new float[16];
       
     /**
-     * System mode (MAV_MODE), includes arming state.
+     * System mode. Includes arming state.
      */
     public short mode;
     

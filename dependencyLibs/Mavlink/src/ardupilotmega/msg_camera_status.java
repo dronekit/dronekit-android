@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * Camera Event
+ * Camera Event.
  */
 public class msg_camera_status extends MAVLinkMessage {
 
@@ -22,47 +22,47 @@ public class msg_camera_status extends MAVLinkMessage {
 
       
     /**
-     * Image timestamp (microseconds since UNIX epoch, according to camera clock)
+     * Image timestamp (since UNIX epoch, according to camera clock).
      */
     public long time_usec;
       
     /**
-     * Parameter 1 (meaning depends on event, see CAMERA_STATUS_TYPES enum)
+     * Parameter 1 (meaning depends on event_id, see CAMERA_STATUS_TYPES enum).
      */
     public float p1;
       
     /**
-     * Parameter 2 (meaning depends on event, see CAMERA_STATUS_TYPES enum)
+     * Parameter 2 (meaning depends on event_id, see CAMERA_STATUS_TYPES enum).
      */
     public float p2;
       
     /**
-     * Parameter 3 (meaning depends on event, see CAMERA_STATUS_TYPES enum)
+     * Parameter 3 (meaning depends on event_id, see CAMERA_STATUS_TYPES enum).
      */
     public float p3;
       
     /**
-     * Parameter 4 (meaning depends on event, see CAMERA_STATUS_TYPES enum)
+     * Parameter 4 (meaning depends on event_id, see CAMERA_STATUS_TYPES enum).
      */
     public float p4;
       
     /**
-     * Image index
+     * Image index.
      */
     public int img_idx;
       
     /**
-     * System ID
+     * System ID.
      */
     public short target_system;
       
     /**
-     * Camera ID
+     * Camera ID.
      */
     public short cam_idx;
       
     /**
-     * See CAMERA_STATUS_TYPES enum for definition of the bitmask
+     * Event type.
      */
     public short event_id;
     

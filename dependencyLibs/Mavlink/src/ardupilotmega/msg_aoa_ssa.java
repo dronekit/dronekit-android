@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * Angle of Attack and Side Slip Angle
+ * Angle of Attack and Side Slip Angle.
  */
 public class msg_aoa_ssa extends MAVLinkMessage {
 
@@ -22,17 +22,17 @@ public class msg_aoa_ssa extends MAVLinkMessage {
 
       
     /**
-     * Timestamp (micros since boot or Unix epoch)
+     * Timestamp (since boot or Unix epoch).
      */
     public long time_usec;
       
     /**
-     * Angle of Attack (degrees)
+     * Angle of Attack.
      */
     public float AOA;
       
     /**
-     * Side Slip Angle (degrees)
+     * Side Slip Angle.
      */
     public float SSA;
     

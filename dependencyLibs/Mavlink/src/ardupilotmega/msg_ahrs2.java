@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * Status of secondary AHRS filter if available
+ * Status of secondary AHRS filter if available.
  */
 public class msg_ahrs2 extends MAVLinkMessage {
 
@@ -22,32 +22,32 @@ public class msg_ahrs2 extends MAVLinkMessage {
 
       
     /**
-     * Roll angle (rad)
+     * Roll angle.
      */
     public float roll;
       
     /**
-     * Pitch angle (rad)
+     * Pitch angle.
      */
     public float pitch;
       
     /**
-     * Yaw angle (rad)
+     * Yaw angle.
      */
     public float yaw;
       
     /**
-     * Altitude (MSL)
+     * Altitude (MSL).
      */
     public float altitude;
       
     /**
-     * Latitude in degrees * 1E7
+     * Latitude.
      */
     public int lat;
       
     /**
-     * Longitude in degrees * 1E7
+     * Longitude.
      */
     public int lng;
     

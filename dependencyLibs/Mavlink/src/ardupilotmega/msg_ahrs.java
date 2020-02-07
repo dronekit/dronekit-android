@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * Status of DCM attitude estimator
+ * Status of DCM attitude estimator.
  */
 public class msg_ahrs extends MAVLinkMessage {
 
@@ -22,37 +22,37 @@ public class msg_ahrs extends MAVLinkMessage {
 
       
     /**
-     * X gyro drift estimate rad/s
+     * X gyro drift estimate.
      */
     public float omegaIx;
       
     /**
-     * Y gyro drift estimate rad/s
+     * Y gyro drift estimate.
      */
     public float omegaIy;
       
     /**
-     * Z gyro drift estimate rad/s
+     * Z gyro drift estimate.
      */
     public float omegaIz;
       
     /**
-     * average accel_weight
+     * Average accel_weight.
      */
     public float accel_weight;
       
     /**
-     * average renormalisation value
+     * Average renormalisation value.
      */
     public float renorm_val;
       
     /**
-     * average error_roll_pitch value
+     * Average error_roll_pitch value.
      */
     public float error_rp;
       
     /**
-     * average error_yaw value
+     * Average error_yaw value.
      */
     public float error_yaw;
     

@@ -16,60 +16,65 @@ import com.MAVLink.Messages.MAVLinkPayload;
 public class msg_scaled_imu extends MAVLinkMessage {
 
     public static final int MAVLINK_MSG_ID_SCALED_IMU = 26;
-    public static final int MAVLINK_MSG_LENGTH = 22;
+    public static final int MAVLINK_MSG_LENGTH = 24;
     private static final long serialVersionUID = MAVLINK_MSG_ID_SCALED_IMU;
 
 
       
     /**
-     * Timestamp (milliseconds since system boot)
+     * Timestamp (time since system boot).
      */
     public long time_boot_ms;
       
     /**
-     * X acceleration (mg)
+     * X acceleration
      */
     public short xacc;
       
     /**
-     * Y acceleration (mg)
+     * Y acceleration
      */
     public short yacc;
       
     /**
-     * Z acceleration (mg)
+     * Z acceleration
      */
     public short zacc;
       
     /**
-     * Angular speed around X axis (millirad /sec)
+     * Angular speed around X axis
      */
     public short xgyro;
       
     /**
-     * Angular speed around Y axis (millirad /sec)
+     * Angular speed around Y axis
      */
     public short ygyro;
       
     /**
-     * Angular speed around Z axis (millirad /sec)
+     * Angular speed around Z axis
      */
     public short zgyro;
       
     /**
-     * X Magnetic field (milli tesla)
+     * X Magnetic field
      */
     public short xmag;
       
     /**
-     * Y Magnetic field (milli tesla)
+     * Y Magnetic field
      */
     public short ymag;
       
     /**
-     * Z Magnetic field (milli tesla)
+     * Z Magnetic field
      */
     public short zmag;
+      
+    /**
+     * Temperature, 0: IMU does not provide temperature values. If the IMU is at 0C it must send 1 (0.01C).
+     */
+    public short temperature;
     
 
     /**
@@ -103,6 +108,8 @@ public class msg_scaled_imu extends MAVLinkMessage {
         packet.payload.putShort(zmag);
         
         if(isMavlink2) {
+            
+            packet.payload.putShort(temperature);
             
         }
         return packet;
@@ -138,6 +145,8 @@ public class msg_scaled_imu extends MAVLinkMessage {
         
         if(isMavlink2) {
             
+            this.temperature = payload.getShort();
+            
         }
     }
 
@@ -161,12 +170,12 @@ public class msg_scaled_imu extends MAVLinkMessage {
         unpack(mavLinkPacket.payload);        
     }
 
-                        
+                          
     /**
      * Returns a string with the MSG name and data
      */
     public String toString() {
-        return "MAVLINK_MSG_ID_SCALED_IMU - sysid:"+sysid+" compid:"+compid+" time_boot_ms:"+time_boot_ms+" xacc:"+xacc+" yacc:"+yacc+" zacc:"+zacc+" xgyro:"+xgyro+" ygyro:"+ygyro+" zgyro:"+zgyro+" xmag:"+xmag+" ymag:"+ymag+" zmag:"+zmag+"";
+        return "MAVLINK_MSG_ID_SCALED_IMU - sysid:"+sysid+" compid:"+compid+" time_boot_ms:"+time_boot_ms+" xacc:"+xacc+" yacc:"+yacc+" zacc:"+zacc+" xgyro:"+xgyro+" ygyro:"+ygyro+" zgyro:"+zgyro+" xmag:"+xmag+" ymag:"+ymag+" zmag:"+zmag+" temperature:"+temperature+"";
     }
 }
         

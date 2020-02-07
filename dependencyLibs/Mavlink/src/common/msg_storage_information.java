@@ -11,53 +11,58 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * WIP: Information about a storage medium
+ * Information about a storage medium. This message is sent in response to a request and whenever the status of the storage changes (STORAGE_STATUS).
  */
 public class msg_storage_information extends MAVLinkMessage {
 
     public static final int MAVLINK_MSG_ID_STORAGE_INFORMATION = 261;
-    public static final int MAVLINK_MSG_LENGTH = 26;
+    public static final int MAVLINK_MSG_LENGTH = 27;
     private static final long serialVersionUID = MAVLINK_MSG_ID_STORAGE_INFORMATION;
 
 
       
     /**
-     * Timestamp (milliseconds since system boot)
+     * Timestamp (time since system boot).
      */
     public long time_boot_ms;
       
     /**
-     * Total capacity in MiB
+     * Total capacity. If storage is not ready (STORAGE_STATUS_READY) value will be ignored.
      */
     public float total_capacity;
       
     /**
-     * Used capacity in MiB
+     * Used capacity. If storage is not ready (STORAGE_STATUS_READY) value will be ignored.
      */
     public float used_capacity;
       
     /**
-     * Available capacity in MiB
+     * Available storage capacity. If storage is not ready (STORAGE_STATUS_READY) value will be ignored.
      */
     public float available_capacity;
       
     /**
-     * Read speed in MiB/s
+     * Read speed.
      */
     public float read_speed;
       
     /**
-     * Write speed in MiB/s
+     * Write speed.
      */
     public float write_speed;
       
     /**
-     * Storage ID if there are multiple
+     * Storage ID (1 for first, 2 for second, etc.)
      */
     public short storage_id;
       
     /**
-     * Status of storage (0 not available, 1 unformatted, 2 formatted)
+     * Number of storage devices
+     */
+    public short storage_count;
+      
+    /**
+     * Status of storage
      */
     public short status;
     
@@ -85,6 +90,8 @@ public class msg_storage_information extends MAVLinkMessage {
         packet.payload.putFloat(write_speed);
         
         packet.payload.putUnsignedByte(storage_id);
+        
+        packet.payload.putUnsignedByte(storage_count);
         
         packet.payload.putUnsignedByte(status);
         
@@ -116,6 +123,8 @@ public class msg_storage_information extends MAVLinkMessage {
         
         this.storage_id = payload.getUnsignedByte();
         
+        this.storage_count = payload.getUnsignedByte();
+        
         this.status = payload.getUnsignedByte();
         
         if(isMavlink2) {
@@ -143,12 +152,12 @@ public class msg_storage_information extends MAVLinkMessage {
         unpack(mavLinkPacket.payload);        
     }
 
-                    
+                      
     /**
      * Returns a string with the MSG name and data
      */
     public String toString() {
-        return "MAVLINK_MSG_ID_STORAGE_INFORMATION - sysid:"+sysid+" compid:"+compid+" time_boot_ms:"+time_boot_ms+" total_capacity:"+total_capacity+" used_capacity:"+used_capacity+" available_capacity:"+available_capacity+" read_speed:"+read_speed+" write_speed:"+write_speed+" storage_id:"+storage_id+" status:"+status+"";
+        return "MAVLINK_MSG_ID_STORAGE_INFORMATION - sysid:"+sysid+" compid:"+compid+" time_boot_ms:"+time_boot_ms+" total_capacity:"+total_capacity+" used_capacity:"+used_capacity+" available_capacity:"+available_capacity+" read_speed:"+read_speed+" write_speed:"+write_speed+" storage_id:"+storage_id+" storage_count:"+storage_count+" status:"+status+"";
     }
 }
         

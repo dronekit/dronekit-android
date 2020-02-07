@@ -37,12 +37,12 @@ public class msg_uavionix_adsb_out_dynamic extends MAVLinkMessage {
     public int gpsLon;
       
     /**
-     * Altitude in mm (m * 1E-3) UP +ve. WGS84 altitude. If unknown set to INT32_MAX
+     * Altitude (WGS84). UP +ve. If unknown set to INT32_MAX
      */
     public int gpsAlt;
       
     /**
-     * Barometric pressure altitude relative to a standard atmosphere of 1013.2 mBar and NOT bar corrected altitude (m * 1E-3). (up +ve). If unknown set to INT32_MAX
+     * Barometric pressure altitude (MSL) relative to a standard atmosphere of 1013.2 mBar and NOT bar corrected altitude (m * 1E-3). (up +ve). If unknown set to INT32_MAX
      */
     public int baroAltMSL;
       

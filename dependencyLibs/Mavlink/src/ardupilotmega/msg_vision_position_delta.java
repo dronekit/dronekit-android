@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * camera vision based attitude and position deltas
+ * Camera vision based attitude and position deltas.
  */
 public class msg_vision_position_delta extends MAVLinkMessage {
 
@@ -22,27 +22,27 @@ public class msg_vision_position_delta extends MAVLinkMessage {
 
       
     /**
-     * Timestamp (microseconds, synced to UNIX time or since system boot)
+     * Timestamp (synced to UNIX time or since system boot).
      */
     public long time_usec;
       
     /**
-     * Time in microseconds since the last reported camera frame
+     * Time since the last reported camera frame.
      */
     public long time_delta_usec;
       
     /**
-     * Defines a rotation vector in body frame that rotates the vehicle from the previous to the current orientation
+     * Defines a rotation vector in body frame that rotates the vehicle from the previous to the current orientation.
      */
     public float angle_delta[] = new float[3];
       
     /**
-     * Change in position in meters from previous to current frame rotated into body frame (0=forward, 1=right, 2=down)
+     * Change in position from previous to current frame rotated into body frame (0=forward, 1=right, 2=down).
      */
     public float position_delta[] = new float[3];
       
     /**
-     * normalised confidence value from 0 to 100
+     * Normalised confidence value from 0 to 100.
      */
     public float confidence;
     

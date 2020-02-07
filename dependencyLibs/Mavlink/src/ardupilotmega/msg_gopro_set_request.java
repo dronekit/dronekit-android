@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * Request to set a GOPRO_COMMAND with a desired
+ * Request to set a GOPRO_COMMAND with a desired.
  */
 public class msg_gopro_set_request extends MAVLinkMessage {
 
@@ -22,22 +22,22 @@ public class msg_gopro_set_request extends MAVLinkMessage {
 
       
     /**
-     * System ID
+     * System ID.
      */
     public short target_system;
       
     /**
-     * Component ID
+     * Component ID.
      */
     public short target_component;
       
     /**
-     * Command ID
+     * Command ID.
      */
     public short cmd_id;
       
     /**
-     * Value
+     * Value.
      */
     public short value[] = new short[4];
     

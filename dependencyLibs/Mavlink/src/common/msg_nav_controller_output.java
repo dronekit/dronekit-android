@@ -22,42 +22,42 @@ public class msg_nav_controller_output extends MAVLinkMessage {
 
       
     /**
-     * Current desired roll in degrees
+     * Current desired roll
      */
     public float nav_roll;
       
     /**
-     * Current desired pitch in degrees
+     * Current desired pitch
      */
     public float nav_pitch;
       
     /**
-     * Current altitude error in meters
+     * Current altitude error
      */
     public float alt_error;
       
     /**
-     * Current airspeed error in meters/second
+     * Current airspeed error
      */
     public float aspd_error;
       
     /**
-     * Current crosstrack error on x-y plane in meters
+     * Current crosstrack error on x-y plane
      */
     public float xtrack_error;
       
     /**
-     * Current desired heading in degrees
+     * Current desired heading
      */
     public short nav_bearing;
       
     /**
-     * Bearing to current waypoint/target in degrees
+     * Bearing to current waypoint/target
      */
     public short target_bearing;
       
     /**
-     * Distance to active waypoint in meters
+     * Distance to active waypoint
      */
     public int wp_dist;
     

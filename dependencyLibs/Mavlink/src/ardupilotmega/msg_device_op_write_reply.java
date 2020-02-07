@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * Write registers reply
+ * Write registers reply.
  */
 public class msg_device_op_write_reply extends MAVLinkMessage {
 
@@ -22,12 +22,12 @@ public class msg_device_op_write_reply extends MAVLinkMessage {
 
       
     /**
-     * request ID - copied from request
+     * Request ID - copied from request.
      */
     public long request_id;
       
     /**
-     * 0 for success, anything else is failure code
+     * 0 for success, anything else is failure code.
      */
     public short result;
     

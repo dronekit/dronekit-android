@@ -8,7 +8,6 @@ import android.view.Surface;
 
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.ardupilotmega.msg_ekf_status_report;
-import com.MAVLink.ardupilotmega.msg_fence_status;
 import com.MAVLink.common.msg_attitude;
 import com.MAVLink.common.msg_autopilot_version;
 import com.MAVLink.common.msg_battery_status;
@@ -665,9 +664,9 @@ public class GenericMavLinkDrone implements MavLinkDrone {
                 processHomeUpdate((msg_mission_item) message);
                 break;
 
-            case msg_fence_status.MAVLINK_MSG_ID_FENCE_STATUS:
-                processFenceStatus((msg_fence_status)message);
-                break;
+//            case msg_fence_status.MAVLINK_MSG_ID_FENCE_STATUS:
+//                processFenceStatus((msg_fence_status)message);
+//                break;
 
             case msg_mission_current.MAVLINK_MSG_ID_MISSION_CURRENT:
                 missionStats.setWpno(((msg_mission_current) message).seq);
@@ -998,21 +997,21 @@ public class GenericMavLinkDrone implements MavLinkDrone {
         }
     }
 
-    protected void processFenceStatus(msg_fence_status msg) {
-        Bundle extras = new Bundle();
-
-        extras.putLong(AttributeEventExtra.EXTRA_BREACH_TIME, msg.breach_time);
-        extras.putInt(AttributeEventExtra.EXTRA_BREACH_COUNT, msg.breach_count);
-        extras.putShort(AttributeEventExtra.EXTRA_BREACH_STATUS, msg.breach_status);
-        extras.putShort(AttributeEventExtra.EXTRA_BREACH_TYPE, msg.breach_type);
-
-        fenceStatus.setBreachTime(msg.breach_time);
-        fenceStatus.setBreachCount(msg.breach_count);
-        fenceStatus.setBreachStatus(msg.breach_status);
-        fenceStatus.setBreachType(msg.breach_type);
-
-        notifyAttributeListener(AttributeEvent.FENCE_STATUS, extras);
-    }
+//    protected void processFenceStatus(msg_fence_status msg) {
+//        Bundle extras = new Bundle();
+//
+//        extras.putLong(AttributeEventExtra.EXTRA_BREACH_TIME, msg.breach_time);
+//        extras.putInt(AttributeEventExtra.EXTRA_BREACH_COUNT, msg.breach_count);
+//        extras.putShort(AttributeEventExtra.EXTRA_BREACH_STATUS, msg.breach_status);
+//        extras.putShort(AttributeEventExtra.EXTRA_BREACH_TYPE, msg.breach_type);
+//
+//        fenceStatus.setBreachTime(msg.breach_time);
+//        fenceStatus.setBreachCount(msg.breach_count);
+//        fenceStatus.setBreachStatus(msg.breach_status);
+//        fenceStatus.setBreachType(msg.breach_type);
+//
+//        notifyAttributeListener(AttributeEvent.FENCE_STATUS, extras);
+//    }
 
     protected void requestHomeUpdate() {
         requestHomeUpdate(this);

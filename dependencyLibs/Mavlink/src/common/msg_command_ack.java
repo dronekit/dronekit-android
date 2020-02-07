@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * Report status of a command. Includes feedback whether the command was executed.
+ * Report status of a command. Includes feedback whether the command was executed. The command microservice is documented at https://mavlink.io/en/services/command.html
  */
 public class msg_command_ack extends MAVLinkMessage {
 
@@ -22,12 +22,12 @@ public class msg_command_ack extends MAVLinkMessage {
 
       
     /**
-     * Command ID, as defined by MAV_CMD enum.
+     * Command ID (of acknowledged command).
      */
     public int command;
       
     /**
-     * See MAV_RESULT enum
+     * Result of command.
      */
     public short result;
     

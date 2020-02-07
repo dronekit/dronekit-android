@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * ESC Telemetry Data for ESCs 9 to 12, matching data sent by BLHeli ESCs
+ * ESC Telemetry Data for ESCs 9 to 12, matching data sent by BLHeli ESCs.
  */
 public class msg_esc_telemetry_9_to_12 extends MAVLinkMessage {
 
@@ -22,32 +22,32 @@ public class msg_esc_telemetry_9_to_12 extends MAVLinkMessage {
 
       
     /**
-     * Voltage
+     * Voltage.
      */
     public int voltage[] = new int[4];
       
     /**
-     * Current
+     * Current.
      */
     public int current[] = new int[4];
       
     /**
-     * Total current
+     * Total current.
      */
     public int totalcurrent[] = new int[4];
       
     /**
-     * RPM (eRPM)
+     * RPM (eRPM).
      */
     public int rpm[] = new int[4];
       
     /**
-     * count of telemetry packets received (wraps at 65535)
+     * count of telemetry packets received (wraps at 65535).
      */
     public int count[] = new int[4];
       
     /**
-     * Temperature
+     * Temperature.
      */
     public short temperature[] = new short[4];
     

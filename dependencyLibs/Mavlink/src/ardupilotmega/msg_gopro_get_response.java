@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * Response from a GOPRO_COMMAND get request
+ * Response from a GOPRO_COMMAND get request.
  */
 public class msg_gopro_get_response extends MAVLinkMessage {
 
@@ -22,17 +22,17 @@ public class msg_gopro_get_response extends MAVLinkMessage {
 
       
     /**
-     * Command ID
+     * Command ID.
      */
     public short cmd_id;
       
     /**
-     * Status
+     * Status.
      */
     public short status;
       
     /**
-     * Value
+     * Value.
      */
     public short value[] = new short[4];
     

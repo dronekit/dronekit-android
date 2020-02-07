@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * state of APM memory
+ * State of APM memory.
  */
 public class msg_meminfo extends MAVLinkMessage {
 
@@ -22,17 +22,17 @@ public class msg_meminfo extends MAVLinkMessage {
 
       
     /**
-     * heap top
+     * Heap top.
      */
     public int brkval;
       
     /**
-     * free memory
+     * Free memory.
      */
     public int freemem;
       
     /**
-     * free memory (32 bit)
+     * Free memory (32 bit).
      */
     public long freemem32;
     

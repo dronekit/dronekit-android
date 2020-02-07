@@ -22,7 +22,7 @@ public class msg_statustext extends MAVLinkMessage {
 
       
     /**
-     * Severity of status. Relies on the definitions within RFC-5424. See enum MAV_SEVERITY.
+     * Severity of status. Relies on the definitions within RFC-5424.
      */
     public short severity;
       

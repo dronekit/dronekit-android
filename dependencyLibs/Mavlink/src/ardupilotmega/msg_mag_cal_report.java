@@ -16,95 +16,100 @@ import com.MAVLink.Messages.MAVLinkPayload;
 public class msg_mag_cal_report extends MAVLinkMessage {
 
     public static final int MAVLINK_MSG_ID_MAG_CAL_REPORT = 192;
-    public static final int MAVLINK_MSG_LENGTH = 50;
+    public static final int MAVLINK_MSG_LENGTH = 54;
     private static final long serialVersionUID = MAVLINK_MSG_ID_MAG_CAL_REPORT;
 
 
       
     /**
-     * RMS milligauss residuals
+     * RMS milligauss residuals.
      */
     public float fitness;
       
     /**
-     * X offset
+     * X offset.
      */
     public float ofs_x;
       
     /**
-     * Y offset
+     * Y offset.
      */
     public float ofs_y;
       
     /**
-     * Z offset
+     * Z offset.
      */
     public float ofs_z;
       
     /**
-     * X diagonal (matrix 11)
+     * X diagonal (matrix 11).
      */
     public float diag_x;
       
     /**
-     * Y diagonal (matrix 22)
+     * Y diagonal (matrix 22).
      */
     public float diag_y;
       
     /**
-     * Z diagonal (matrix 33)
+     * Z diagonal (matrix 33).
      */
     public float diag_z;
       
     /**
-     * X off-diagonal (matrix 12 and 21)
+     * X off-diagonal (matrix 12 and 21).
      */
     public float offdiag_x;
       
     /**
-     * Y off-diagonal (matrix 13 and 31)
+     * Y off-diagonal (matrix 13 and 31).
      */
     public float offdiag_y;
       
     /**
-     * Z off-diagonal (matrix 32 and 23)
+     * Z off-diagonal (matrix 32 and 23).
      */
     public float offdiag_z;
       
     /**
-     * Compass being calibrated
+     * Compass being calibrated.
      */
     public short compass_id;
       
     /**
-     * Bitmask of compasses being calibrated
+     * Bitmask of compasses being calibrated.
      */
     public short cal_mask;
       
     /**
-     * Status (see MAG_CAL_STATUS enum)
+     * Calibration Status.
      */
     public short cal_status;
       
     /**
-     * 0=requires a MAV_CMD_DO_ACCEPT_MAG_CAL, 1=saved to parameters
+     * 0=requires a MAV_CMD_DO_ACCEPT_MAG_CAL, 1=saved to parameters.
      */
     public short autosaved;
       
     /**
-     * Confidence in orientation (higher is better)
+     * Confidence in orientation (higher is better).
      */
     public float orientation_confidence;
       
     /**
-     * orientation before calibration 
+     * orientation before calibration.
      */
     public short old_orientation;
       
     /**
-     * orientation before calibration
+     * orientation after calibration.
      */
     public short new_orientation;
+      
+    /**
+     * field radius correction factor
+     */
+    public float scale_factor;
     
 
     /**
@@ -152,6 +157,8 @@ public class msg_mag_cal_report extends MAVLinkMessage {
             packet.payload.putUnsignedByte(old_orientation);
             
             packet.payload.putUnsignedByte(new_orientation);
+            
+            packet.payload.putFloat(scale_factor);
             
         }
         return packet;
@@ -201,6 +208,8 @@ public class msg_mag_cal_report extends MAVLinkMessage {
             
             this.new_orientation = payload.getUnsignedByte();
             
+            this.scale_factor = payload.getFloat();
+            
         }
     }
 
@@ -224,12 +233,12 @@ public class msg_mag_cal_report extends MAVLinkMessage {
         unpack(mavLinkPacket.payload);        
     }
 
-                                      
+                                        
     /**
      * Returns a string with the MSG name and data
      */
     public String toString() {
-        return "MAVLINK_MSG_ID_MAG_CAL_REPORT - sysid:"+sysid+" compid:"+compid+" fitness:"+fitness+" ofs_x:"+ofs_x+" ofs_y:"+ofs_y+" ofs_z:"+ofs_z+" diag_x:"+diag_x+" diag_y:"+diag_y+" diag_z:"+diag_z+" offdiag_x:"+offdiag_x+" offdiag_y:"+offdiag_y+" offdiag_z:"+offdiag_z+" compass_id:"+compass_id+" cal_mask:"+cal_mask+" cal_status:"+cal_status+" autosaved:"+autosaved+" orientation_confidence:"+orientation_confidence+" old_orientation:"+old_orientation+" new_orientation:"+new_orientation+"";
+        return "MAVLINK_MSG_ID_MAG_CAL_REPORT - sysid:"+sysid+" compid:"+compid+" fitness:"+fitness+" ofs_x:"+ofs_x+" ofs_y:"+ofs_y+" ofs_z:"+ofs_z+" diag_x:"+diag_x+" diag_y:"+diag_y+" diag_z:"+diag_z+" offdiag_x:"+offdiag_x+" offdiag_y:"+offdiag_y+" offdiag_z:"+offdiag_z+" compass_id:"+compass_id+" cal_mask:"+cal_mask+" cal_status:"+cal_status+" autosaved:"+autosaved+" orientation_confidence:"+orientation_confidence+" old_orientation:"+old_orientation+" new_orientation:"+new_orientation+" scale_factor:"+scale_factor+"";
     }
 }
         

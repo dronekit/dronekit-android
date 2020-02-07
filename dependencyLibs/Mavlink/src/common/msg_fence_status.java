@@ -5,13 +5,13 @@
  */
 
 // MESSAGE FENCE_STATUS PACKING
-package com.MAVLink.ardupilotmega;
+package com.MAVLink.common;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * Status of geo-fencing. Sent in extended status stream when fencing enabled
+ * Status of geo-fencing. Sent in extended status stream when fencing enabled.
  */
 public class msg_fence_status extends MAVLinkMessage {
 
@@ -22,22 +22,22 @@ public class msg_fence_status extends MAVLinkMessage {
 
       
     /**
-     * time of last breach in milliseconds since boot
+     * Time (since boot) of last breach.
      */
     public long breach_time;
       
     /**
-     * number of fence breaches
+     * Number of fence breaches.
      */
     public int breach_count;
       
     /**
-     * 0 if currently inside fence, 1 if outside
+     * Breach status (0 if currently inside fence, 1 if outside).
      */
     public short breach_status;
       
     /**
-     * last breach type (see FENCE_BREACH_* enum)
+     * Last breach type.
      */
     public short breach_type;
     

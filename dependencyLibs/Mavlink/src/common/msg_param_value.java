@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * Emit the value of a onboard parameter. The inclusion of param_count and param_index in the message allows the recipient to keep track of received parameters and allows him to re-request missing parameters after a loss or timeout.
+ * Emit the value of a onboard parameter. The inclusion of param_count and param_index in the message allows the recipient to keep track of received parameters and allows him to re-request missing parameters after a loss or timeout. The parameter microservice is documented at https://mavlink.io/en/services/parameter.html
  */
 public class msg_param_value extends MAVLinkMessage {
 
@@ -42,7 +42,7 @@ public class msg_param_value extends MAVLinkMessage {
     public byte param_id[] = new byte[16];
       
     /**
-     * Onboard parameter type: see the MAV_PARAM_TYPE enum for supported data types.
+     * Onboard parameter type.
      */
     public short param_type;
     

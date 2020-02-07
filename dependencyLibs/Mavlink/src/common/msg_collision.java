@@ -27,17 +27,17 @@ public class msg_collision extends MAVLinkMessage {
     public long id;
       
     /**
-     * Estimated time until collision occurs (seconds)
+     * Estimated time until collision occurs
      */
     public float time_to_minimum_delta;
       
     /**
-     * Closest vertical distance in meters between vehicle and object
+     * Closest vertical distance between vehicle and object
      */
     public float altitude_minimum_delta;
       
     /**
-     * Closest horizontal distance in meteres between vehicle and object
+     * Closest horizontal distance between vehicle and object
      */
     public float horizontal_minimum_delta;
       

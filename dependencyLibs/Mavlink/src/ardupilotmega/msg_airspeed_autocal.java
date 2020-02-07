@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * Airspeed auto-calibration
+ * Airspeed auto-calibration.
  */
 public class msg_airspeed_autocal extends MAVLinkMessage {
 
@@ -22,62 +22,62 @@ public class msg_airspeed_autocal extends MAVLinkMessage {
 
       
     /**
-     * GPS velocity north m/s
+     * GPS velocity north.
      */
     public float vx;
       
     /**
-     * GPS velocity east m/s
+     * GPS velocity east.
      */
     public float vy;
       
     /**
-     * GPS velocity down m/s
+     * GPS velocity down.
      */
     public float vz;
       
     /**
-     * Differential pressure pascals
+     * Differential pressure.
      */
     public float diff_pressure;
       
     /**
-     * Estimated to true airspeed ratio
+     * Estimated to true airspeed ratio.
      */
     public float EAS2TAS;
       
     /**
-     * Airspeed ratio
+     * Airspeed ratio.
      */
     public float ratio;
       
     /**
-     * EKF state x
+     * EKF state x.
      */
     public float state_x;
       
     /**
-     * EKF state y
+     * EKF state y.
      */
     public float state_y;
       
     /**
-     * EKF state z
+     * EKF state z.
      */
     public float state_z;
       
     /**
-     * EKF Pax
+     * EKF Pax.
      */
     public float Pax;
       
     /**
-     * EKF Pby
+     * EKF Pby.
      */
     public float Pby;
       
     /**
-     * EKF Pcz
+     * EKF Pcz.
      */
     public float Pcz;
     

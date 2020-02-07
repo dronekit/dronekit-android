@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * 100 Hz gimbal torque command telemetry
+ * 100 Hz gimbal torque command telemetry.
  */
 public class msg_gimbal_torque_cmd_report extends MAVLinkMessage {
 
@@ -22,27 +22,27 @@ public class msg_gimbal_torque_cmd_report extends MAVLinkMessage {
 
       
     /**
-     * Roll Torque Command
+     * Roll Torque Command.
      */
     public short rl_torque_cmd;
       
     /**
-     * Elevation Torque Command
+     * Elevation Torque Command.
      */
     public short el_torque_cmd;
       
     /**
-     * Azimuth Torque Command
+     * Azimuth Torque Command.
      */
     public short az_torque_cmd;
       
     /**
-     * System ID
+     * System ID.
      */
     public short target_system;
       
     /**
-     * Component ID
+     * Component ID.
      */
     public short target_component;
     

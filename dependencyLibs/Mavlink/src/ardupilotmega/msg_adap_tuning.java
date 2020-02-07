@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * Adaptive Controller tuning information
+ * Adaptive Controller tuning information.
  */
 public class msg_adap_tuning extends MAVLinkMessage {
 
@@ -22,67 +22,67 @@ public class msg_adap_tuning extends MAVLinkMessage {
 
       
     /**
-     * desired rate (degrees/s)
+     * Desired rate.
      */
     public float desired;
       
     /**
-     * achieved rate (degrees/s)
+     * Achieved rate.
      */
     public float achieved;
       
     /**
-     * error between model and vehicle
+     * Error between model and vehicle.
      */
     public float error;
       
     /**
-     * theta estimated state predictor
+     * Theta estimated state predictor.
      */
     public float theta;
       
     /**
-     * omega estimated state predictor
+     * Omega estimated state predictor.
      */
     public float omega;
       
     /**
-     * sigma estimated state predictor
+     * Sigma estimated state predictor.
      */
     public float sigma;
       
     /**
-     * theta derivative
+     * Theta derivative.
      */
     public float theta_dot;
       
     /**
-     * omega derivative
+     * Omega derivative.
      */
     public float omega_dot;
       
     /**
-     * sigma derivative
+     * Sigma derivative.
      */
     public float sigma_dot;
       
     /**
-     * projection operator value
+     * Projection operator value.
      */
     public float f;
       
     /**
-     * projection operator derivative
+     * Projection operator derivative.
      */
     public float f_dot;
       
     /**
-     * u adaptive controlled output command
+     * u adaptive controlled output command.
      */
     public float u;
       
     /**
-     * axis
+     * Axis.
      */
     public short axis;
     

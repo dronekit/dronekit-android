@@ -22,12 +22,12 @@ public class msg_system_time extends MAVLinkMessage {
 
       
     /**
-     * Timestamp of the master clock in microseconds since UNIX epoch.
+     * Timestamp (UNIX epoch time).
      */
     public long time_unix_usec;
       
     /**
-     * Timestamp of the component clock since boot time in milliseconds.
+     * Timestamp (time since system boot).
      */
     public long time_boot_ms;
     

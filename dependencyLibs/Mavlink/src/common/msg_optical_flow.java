@@ -22,32 +22,32 @@ public class msg_optical_flow extends MAVLinkMessage {
 
       
     /**
-     * Timestamp (UNIX)
+     * Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude the number.
      */
     public long time_usec;
       
     /**
-     * Flow in meters in x-sensor direction, angular-speed compensated
+     * Flow in x-sensor direction, angular-speed compensated
      */
     public float flow_comp_m_x;
       
     /**
-     * Flow in meters in y-sensor direction, angular-speed compensated
+     * Flow in y-sensor direction, angular-speed compensated
      */
     public float flow_comp_m_y;
       
     /**
-     * Ground distance in meters. Positive value: distance known. Negative value: Unknown distance
+     * Ground distance. Positive value: distance known. Negative value: Unknown distance
      */
     public float ground_distance;
       
     /**
-     * Flow in pixels * 10 in x-sensor direction (dezi-pixels)
+     * Flow in x-sensor direction
      */
     public short flow_x;
       
     /**
-     * Flow in pixels * 10 in y-sensor direction (dezi-pixels)
+     * Flow in y-sensor direction
      */
     public short flow_y;
       
@@ -62,12 +62,12 @@ public class msg_optical_flow extends MAVLinkMessage {
     public short quality;
       
     /**
-     * Flow rate in radians/second about X axis
+     * Flow rate about X axis
      */
     public float flow_rate_x;
       
     /**
-     * Flow rate in radians/second about Y axis
+     * Flow rate about Y axis
      */
     public float flow_rate_y;
     

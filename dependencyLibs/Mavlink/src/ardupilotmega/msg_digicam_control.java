@@ -22,52 +22,52 @@ public class msg_digicam_control extends MAVLinkMessage {
 
       
     /**
-     * Correspondent value to given extra_param
+     * Correspondent value to given extra_param.
      */
     public float extra_value;
       
     /**
-     * System ID
+     * System ID.
      */
     public short target_system;
       
     /**
-     * Component ID
+     * Component ID.
      */
     public short target_component;
       
     /**
-     * 0: stop, 1: start or keep it up //Session control e.g. show/hide lens
+     * 0: stop, 1: start or keep it up //Session control e.g. show/hide lens.
      */
     public short session;
       
     /**
-     * 1 to N //Zoom's absolute position (0 means ignore)
+     * 1 to N //Zoom's absolute position (0 means ignore).
      */
     public short zoom_pos;
       
     /**
-     * -100 to 100 //Zooming step value to offset zoom from the current position
+     * -100 to 100 //Zooming step value to offset zoom from the current position.
      */
     public byte zoom_step;
       
     /**
-     * 0: unlock focus or keep unlocked, 1: lock focus or keep locked, 3: re-lock focus
+     * 0: unlock focus or keep unlocked, 1: lock focus or keep locked, 3: re-lock focus.
      */
     public short focus_lock;
       
     /**
-     * 0: ignore, 1: shot or start filming
+     * 0: ignore, 1: shot or start filming.
      */
     public short shot;
       
     /**
-     * Command Identity (incremental loop: 0 to 255)//A command sent multiple times will be executed or pooled just once
+     * Command Identity (incremental loop: 0 to 255)//A command sent multiple times will be executed or pooled just once.
      */
     public short command_id;
       
     /**
-     * Extra parameters enumeration (0 means ignore)
+     * Extra parameters enumeration (0 means ignore).
      */
     public short extra_param;
     

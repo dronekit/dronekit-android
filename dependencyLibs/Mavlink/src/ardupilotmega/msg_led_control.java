@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * Control vehicle LEDs
+ * Control vehicle LEDs.
  */
 public class msg_led_control extends MAVLinkMessage {
 
@@ -22,32 +22,32 @@ public class msg_led_control extends MAVLinkMessage {
 
       
     /**
-     * System ID
+     * System ID.
      */
     public short target_system;
       
     /**
-     * Component ID
+     * Component ID.
      */
     public short target_component;
       
     /**
-     * Instance (LED instance to control or 255 for all LEDs)
+     * Instance (LED instance to control or 255 for all LEDs).
      */
     public short instance;
       
     /**
-     * Pattern (see LED_PATTERN_ENUM)
+     * Pattern (see LED_PATTERN_ENUM).
      */
     public short pattern;
       
     /**
-     * Custom Byte Length
+     * Custom Byte Length.
      */
     public short custom_len;
       
     /**
-     * Custom Bytes
+     * Custom Bytes.
      */
     public short custom_bytes[] = new short[24];
     

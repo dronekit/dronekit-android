@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * Message encoding a command with parameters as scaled integers. Scaling depends on the actual command value.
+ * Message encoding a command with parameters as scaled integers. Scaling depends on the actual command value. The command microservice is documented at https://mavlink.io/en/services/command.html
  */
 public class msg_command_int extends MAVLinkMessage {
 
@@ -52,12 +52,12 @@ public class msg_command_int extends MAVLinkMessage {
     public int y;
       
     /**
-     * PARAM7 / z position: global: altitude in meters (relative or absolute, depending on frame.
+     * PARAM7 / z position: global: altitude in meters (relative or absolute, depending on frame).
      */
     public float z;
       
     /**
-     * The scheduled action for the mission item, as defined by MAV_CMD enum
+     * The scheduled action for the mission item.
      */
     public int command;
       
@@ -72,7 +72,7 @@ public class msg_command_int extends MAVLinkMessage {
     public short target_component;
       
     /**
-     * The coordinate system of the COMMAND, as defined by MAV_FRAME enum
+     * The coordinate system of the COMMAND.
      */
     public short frame;
       

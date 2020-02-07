@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * Send Status of each log block that autopilot board might have sent
+ * Send Status of each log block that autopilot board might have sent.
  */
 public class msg_remote_log_block_status extends MAVLinkMessage {
 
@@ -22,22 +22,22 @@ public class msg_remote_log_block_status extends MAVLinkMessage {
 
       
     /**
-     * log data block sequence number
+     * Log data block sequence number.
      */
     public long seqno;
       
     /**
-     * System ID
+     * System ID.
      */
     public short target_system;
       
     /**
-     * Component ID
+     * Component ID.
      */
     public short target_component;
       
     /**
-     * log data block status
+     * Log data block status.
      */
     public short status;
     

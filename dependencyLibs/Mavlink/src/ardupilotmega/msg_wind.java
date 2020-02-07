@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * Wind estimation
+ * Wind estimation.
  */
 public class msg_wind extends MAVLinkMessage {
 
@@ -22,17 +22,17 @@ public class msg_wind extends MAVLinkMessage {
 
       
     /**
-     * wind direction that wind is coming from (degrees)
+     * Wind direction (that wind is coming from).
      */
     public float direction;
       
     /**
-     * wind speed in ground plane (m/s)
+     * Wind speed in ground plane.
      */
     public float speed;
       
     /**
-     * vertical wind speed (m/s)
+     * Vertical wind speed.
      */
     public float speed_z;
     

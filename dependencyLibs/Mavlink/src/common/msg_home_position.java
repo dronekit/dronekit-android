@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * This message can be requested by sending the MAV_CMD_GET_HOME_POSITION command. The position the system will return to and land on. The position is set automatically by the system during the takeoff in case it was not explicitely set by the operator before or after. The position the system will return to and land on. The global and local positions encode the position in the respective coordinate frames, while the q parameter encodes the orientation of the surface. Under normal conditions it describes the heading and terrain slope, which can be used by the aircraft to adjust the approach. The approach 3D vector describes the point to which the system should fly in normal flight mode and then perform a landing sequence along the vector.
+ * This message can be requested by sending the MAV_CMD_GET_HOME_POSITION command. The position the system will return to and land on. The position is set automatically by the system during the takeoff in case it was not explicitly set by the operator before or after. The position the system will return to and land on. The global and local positions encode the position in the respective coordinate frames, while the q parameter encodes the orientation of the surface. Under normal conditions it describes the heading and terrain slope, which can be used by the aircraft to adjust the approach. The approach 3D vector describes the point to which the system should fly in normal flight mode and then perform a landing sequence along the vector.
  */
 public class msg_home_position extends MAVLinkMessage {
 
@@ -22,17 +22,17 @@ public class msg_home_position extends MAVLinkMessage {
 
       
     /**
-     * Latitude (WGS84), in degrees * 1E7
+     * Latitude (WGS84)
      */
     public int latitude;
       
     /**
-     * Longitude (WGS84, in degrees * 1E7
+     * Longitude (WGS84)
      */
     public int longitude;
       
     /**
-     * Altitude (AMSL), in meters * 1000 (positive for up)
+     * Altitude (MSL). Positive for up.
      */
     public int altitude;
       
@@ -72,7 +72,7 @@ public class msg_home_position extends MAVLinkMessage {
     public float approach_z;
       
     /**
-     * Timestamp (microseconds since UNIX epoch or microseconds since system boot)
+     * Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude the number.
      */
     public long time_usec;
     

@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * Status of key hardware
+ * Status of key hardware.
  */
 public class msg_hwstatus extends MAVLinkMessage {
 
@@ -22,12 +22,12 @@ public class msg_hwstatus extends MAVLinkMessage {
 
       
     /**
-     * board voltage (mV)
+     * Board voltage.
      */
     public int Vcc;
       
     /**
-     * I2C error count
+     * I2C error count.
      */
     public short I2Cerr;
     

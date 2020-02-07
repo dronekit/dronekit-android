@@ -22,7 +22,7 @@ public class msg_attitude_quaternion_cov extends MAVLinkMessage {
 
       
     /**
-     * Timestamp (microseconds since system boot or since UNIX epoch)
+     * Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude the number.
      */
     public long time_usec;
       
@@ -32,22 +32,22 @@ public class msg_attitude_quaternion_cov extends MAVLinkMessage {
     public float q[] = new float[4];
       
     /**
-     * Roll angular speed (rad/s)
+     * Roll angular speed
      */
     public float rollspeed;
       
     /**
-     * Pitch angular speed (rad/s)
+     * Pitch angular speed
      */
     public float pitchspeed;
       
     /**
-     * Yaw angular speed (rad/s)
+     * Yaw angular speed
      */
     public float yawspeed;
       
     /**
-     * Attitude covariance
+     * Row-major representation of a 3x3 attitude covariance matrix (states: roll, pitch, yaw; first three entries are the first ROW, next three entries are the second row, etc.). If unknown, assign NaN value to first element in the array.
      */
     public float covariance[] = new float[9];
     

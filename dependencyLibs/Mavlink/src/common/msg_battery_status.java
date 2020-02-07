@@ -22,27 +22,27 @@ public class msg_battery_status extends MAVLinkMessage {
 
       
     /**
-     * Consumed charge, in milliampere hours (1 = 1 mAh), -1: autopilot does not provide mAh consumption estimate
+     * Consumed charge, -1: autopilot does not provide consumption estimate
      */
     public int current_consumed;
       
     /**
-     * Consumed energy, in HectoJoules (intergrated U*I*dt)  (1 = 100 Joule), -1: autopilot does not provide energy consumption estimate
+     * Consumed energy, -1: autopilot does not provide energy consumption estimate
      */
     public int energy_consumed;
       
     /**
-     * Temperature of the battery in centi-degrees celsius. INT16_MAX for unknown temperature.
+     * Temperature of the battery. INT16_MAX for unknown temperature.
      */
     public short temperature;
       
     /**
-     * Battery voltage of cells, in millivolts (1 = 1 millivolt). Cells above the valid cell count for this battery should have the UINT16_MAX value.
+     * Battery voltage of cells. Cells above the valid cell count for this battery should have the UINT16_MAX value.
      */
     public int voltages[] = new int[10];
       
     /**
-     * Battery current, in 10*milliamperes (1 = 10 milliampere), -1: autopilot does not measure the current
+     * Battery current, -1: autopilot does not measure the current
      */
     public short current_battery;
       
@@ -62,12 +62,12 @@ public class msg_battery_status extends MAVLinkMessage {
     public short type;
       
     /**
-     * Remaining battery energy: (0%: 0, 100%: 100), -1: autopilot does not estimate the remaining battery
+     * Remaining battery energy. Values: [0-100], -1: autopilot does not estimate the remaining battery.
      */
     public byte battery_remaining;
       
     /**
-     * Remaining battery time, in seconds (1 = 1s = 0% energy left), 0: autopilot does not provide remaining battery time estimate
+     * Remaining battery time, 0: autopilot does not provide remaining battery time estimate
      */
     public int time_remaining;
       

@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * Rangefinder reporting
+ * Rangefinder reporting.
  */
 public class msg_rangefinder extends MAVLinkMessage {
 
@@ -22,12 +22,12 @@ public class msg_rangefinder extends MAVLinkMessage {
 
       
     /**
-     * distance in meters
+     * Distance.
      */
     public float distance;
       
     /**
-     * raw voltage if available, zero otherwise
+     * Raw voltage if available, zero otherwise.
      */
     public float voltage;
     

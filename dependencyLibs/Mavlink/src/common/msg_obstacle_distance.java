@@ -16,28 +16,28 @@ import com.MAVLink.Messages.MAVLinkPayload;
 public class msg_obstacle_distance extends MAVLinkMessage {
 
     public static final int MAVLINK_MSG_ID_OBSTACLE_DISTANCE = 330;
-    public static final int MAVLINK_MSG_LENGTH = 158;
+    public static final int MAVLINK_MSG_LENGTH = 167;
     private static final long serialVersionUID = MAVLINK_MSG_ID_OBSTACLE_DISTANCE;
 
 
       
     /**
-     * Timestamp (microseconds since system boot or since UNIX epoch).
+     * Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude the number.
      */
     public long time_usec;
       
     /**
-     * Distance of obstacles around the UAV with index 0 corresponding to local North. A value of 0 means that the obstacle is right in front of the sensor. A value of max_distance +1 means no obstacle is present. A value of UINT16_MAX for unknown/not used. In a array element, one unit corresponds to 1cm.
+     * Distance of obstacles around the vehicle with index 0 corresponding to North + angle_offset, unless otherwise specified in the frame. A value of 0 is valid and means that the obstacle is practically touching the sensor. A value of max_distance +1 means no obstacle is present. A value of UINT16_MAX for unknown/not used. In a array element, one unit corresponds to 1cm.
      */
     public int distances[] = new int[72];
       
     /**
-     * Minimum distance the sensor can measure in centimeters.
+     * Minimum distance the sensor can measure.
      */
     public int min_distance;
       
     /**
-     * Maximum distance the sensor can measure in centimeters.
+     * Maximum distance the sensor can measure.
      */
     public int max_distance;
       
@@ -47,9 +47,24 @@ public class msg_obstacle_distance extends MAVLinkMessage {
     public short sensor_type;
       
     /**
-     * Angular width in degrees of each array element.
+     * Angular width in degrees of each array element. Increment direction is clockwise. This field is ignored if increment_f is non-zero.
      */
     public short increment;
+      
+    /**
+     * Angular width in degrees of each array element as a float. If non-zero then this value is used instead of the uint8_t increment field. Positive is clockwise direction, negative is counter-clockwise.
+     */
+    public float increment_f;
+      
+    /**
+     * Relative angle offset of the 0-index element in the distances array. Value of 0 corresponds to forward. Positive is clockwise direction, negative is counter-clockwise.
+     */
+    public float angle_offset;
+      
+    /**
+     * Coordinate frame of reference for the yaw rotation and offset of the sensor data. Defaults to MAV_FRAME_GLOBAL, which is North aligned. For body-mounted sensors use MAV_FRAME_BODY_FRD, which is vehicle front aligned.
+     */
+    public short frame;
     
 
     /**
@@ -79,6 +94,12 @@ public class msg_obstacle_distance extends MAVLinkMessage {
         packet.payload.putUnsignedByte(increment);
         
         if(isMavlink2) {
+            
+            packet.payload.putFloat(increment_f);
+            
+            packet.payload.putFloat(angle_offset);
+            
+            packet.payload.putUnsignedByte(frame);
             
         }
         return packet;
@@ -110,6 +131,12 @@ public class msg_obstacle_distance extends MAVLinkMessage {
         
         if(isMavlink2) {
             
+            this.increment_f = payload.getFloat();
+            
+            this.angle_offset = payload.getFloat();
+            
+            this.frame = payload.getUnsignedByte();
+            
         }
     }
 
@@ -133,12 +160,12 @@ public class msg_obstacle_distance extends MAVLinkMessage {
         unpack(mavLinkPacket.payload);        
     }
 
-                
+                      
     /**
      * Returns a string with the MSG name and data
      */
     public String toString() {
-        return "MAVLINK_MSG_ID_OBSTACLE_DISTANCE - sysid:"+sysid+" compid:"+compid+" time_usec:"+time_usec+" distances:"+distances+" min_distance:"+min_distance+" max_distance:"+max_distance+" sensor_type:"+sensor_type+" increment:"+increment+"";
+        return "MAVLINK_MSG_ID_OBSTACLE_DISTANCE - sysid:"+sysid+" compid:"+compid+" time_usec:"+time_usec+" distances:"+distances+" min_distance:"+min_distance+" max_distance:"+max_distance+" sensor_type:"+sensor_type+" increment:"+increment+" increment_f:"+increment_f+" angle_offset:"+angle_offset+" frame:"+frame+"";
     }
 }
         

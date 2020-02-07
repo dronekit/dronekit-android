@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * THIS INTERFACE IS DEPRECATED. USE MESSAGE_INTERVAL INSTEAD.
+ * Data stream status information.
  */
 public class msg_data_stream extends MAVLinkMessage {
 

@@ -22,17 +22,17 @@ public class msg_rally_fetch_point extends MAVLinkMessage {
 
       
     /**
-     * System ID
+     * System ID.
      */
     public short target_system;
       
     /**
-     * Component ID
+     * Component ID.
      */
     public short target_component;
       
     /**
-     * point index (first point is 0)
+     * Point index (first point is 0).
      */
     public short idx;
     

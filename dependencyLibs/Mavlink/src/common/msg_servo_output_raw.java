@@ -22,92 +22,92 @@ public class msg_servo_output_raw extends MAVLinkMessage {
 
       
     /**
-     * Timestamp (microseconds since system boot)
+     * Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude the number.
      */
     public long time_usec;
       
     /**
-     * Servo output 1 value, in microseconds
+     * Servo output 1 value
      */
     public int servo1_raw;
       
     /**
-     * Servo output 2 value, in microseconds
+     * Servo output 2 value
      */
     public int servo2_raw;
       
     /**
-     * Servo output 3 value, in microseconds
+     * Servo output 3 value
      */
     public int servo3_raw;
       
     /**
-     * Servo output 4 value, in microseconds
+     * Servo output 4 value
      */
     public int servo4_raw;
       
     /**
-     * Servo output 5 value, in microseconds
+     * Servo output 5 value
      */
     public int servo5_raw;
       
     /**
-     * Servo output 6 value, in microseconds
+     * Servo output 6 value
      */
     public int servo6_raw;
       
     /**
-     * Servo output 7 value, in microseconds
+     * Servo output 7 value
      */
     public int servo7_raw;
       
     /**
-     * Servo output 8 value, in microseconds
+     * Servo output 8 value
      */
     public int servo8_raw;
       
     /**
-     * Servo output port (set of 8 outputs = 1 port). Most MAVs will just use one, but this allows to encode more than 8 servos.
+     * Servo output port (set of 8 outputs = 1 port). Flight stacks running on Pixhawk should use: 0 = MAIN, 1 = AUX.
      */
     public short port;
       
     /**
-     * Servo output 9 value, in microseconds
+     * Servo output 9 value
      */
     public int servo9_raw;
       
     /**
-     * Servo output 10 value, in microseconds
+     * Servo output 10 value
      */
     public int servo10_raw;
       
     /**
-     * Servo output 11 value, in microseconds
+     * Servo output 11 value
      */
     public int servo11_raw;
       
     /**
-     * Servo output 12 value, in microseconds
+     * Servo output 12 value
      */
     public int servo12_raw;
       
     /**
-     * Servo output 13 value, in microseconds
+     * Servo output 13 value
      */
     public int servo13_raw;
       
     /**
-     * Servo output 14 value, in microseconds
+     * Servo output 14 value
      */
     public int servo14_raw;
       
     /**
-     * Servo output 15 value, in microseconds
+     * Servo output 15 value
      */
     public int servo15_raw;
       
     /**
-     * Servo output 16 value, in microseconds
+     * Servo output 16 value
      */
     public int servo16_raw;
     

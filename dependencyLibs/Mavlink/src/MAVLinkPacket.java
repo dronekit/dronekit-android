@@ -783,6 +783,9 @@ public class MAVLinkPacket implements Serializable {
             case msg_gopro_set_response.MAVLINK_MSG_ID_GOPRO_SET_RESPONSE:
                 return  new msg_gopro_set_response(this);
              
+            case msg_efi_status.MAVLINK_MSG_ID_EFI_STATUS:
+                return  new msg_efi_status(this);
+             
             case msg_rpm.MAVLINK_MSG_ID_RPM:
                 return  new msg_rpm(this);
              
@@ -902,6 +905,21 @@ public class MAVLinkPacket implements Serializable {
              
             case msg_odometry.MAVLINK_MSG_ID_ODOMETRY:
                 return  new msg_odometry(this);
+             
+            case msg_isbd_link_status.MAVLINK_MSG_ID_ISBD_LINK_STATUS:
+                return  new msg_isbd_link_status(this);
+             
+            case msg_debug_float_array.MAVLINK_MSG_ID_DEBUG_FLOAT_ARRAY:
+                return  new msg_debug_float_array(this);
+             
+            case msg_statustext_long.MAVLINK_MSG_ID_STATUSTEXT_LONG:
+                return  new msg_statustext_long(this);
+             
+            case msg_actuator_output_status.MAVLINK_MSG_ID_ACTUATOR_OUTPUT_STATUS:
+                return  new msg_actuator_output_status(this);
+             
+            case msg_wheel_distance.MAVLINK_MSG_ID_WHEEL_DISTANCE:
+                return  new msg_wheel_distance(this);
              
             case msg_uavionix_adsb_out_cfg.MAVLINK_MSG_ID_UAVIONIX_ADSB_OUT_CFG:
                 return  new msg_uavionix_adsb_out_cfg(this);

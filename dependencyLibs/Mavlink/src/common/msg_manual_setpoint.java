@@ -22,22 +22,22 @@ public class msg_manual_setpoint extends MAVLinkMessage {
 
       
     /**
-     * Timestamp in milliseconds since system boot
+     * Timestamp (time since system boot).
      */
     public long time_boot_ms;
       
     /**
-     * Desired roll rate in radians per second
+     * Desired roll rate
      */
     public float roll;
       
     /**
-     * Desired pitch rate in radians per second
+     * Desired pitch rate
      */
     public float pitch;
       
     /**
-     * Desired yaw rate in radians per second
+     * Desired yaw rate
      */
     public float yaw;
       

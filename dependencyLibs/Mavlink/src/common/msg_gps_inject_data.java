@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * data for injecting into the onboard GPS (used for DGPS)
+ * Data for injecting into the onboard GPS (used for DGPS)
  */
 public class msg_gps_inject_data extends MAVLinkMessage {
 
@@ -32,12 +32,12 @@ public class msg_gps_inject_data extends MAVLinkMessage {
     public short target_component;
       
     /**
-     * data length
+     * Data length
      */
     public short len;
       
     /**
-     * raw data (110 is enough for 12 satellites of RTCMv2)
+     * Raw data (110 is enough for 12 satellites of RTCMv2)
      */
     public short data[] = new short[110];
     

@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * The location of a landing area captured from a downward facing camera
+ * The location of a landing target. See: https://mavlink.io/en/services/landing_target.html
  */
 public class msg_landing_target extends MAVLinkMessage {
 
@@ -22,32 +22,32 @@ public class msg_landing_target extends MAVLinkMessage {
 
       
     /**
-     * Timestamp (micros since boot or Unix epoch)
+     * Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude the number.
      */
     public long time_usec;
       
     /**
-     * X-axis angular offset (in radians) of the target from the center of the image
+     * X-axis angular offset of the target from the center of the image
      */
     public float angle_x;
       
     /**
-     * Y-axis angular offset (in radians) of the target from the center of the image
+     * Y-axis angular offset of the target from the center of the image
      */
     public float angle_y;
       
     /**
-     * Distance to the target from the vehicle in meters
+     * Distance to the target from the vehicle
      */
     public float distance;
       
     /**
-     * Size in radians of target along x-axis
+     * Size of target along x-axis
      */
     public float size_x;
       
     /**
-     * Size in radians of target along y-axis
+     * Size of target along y-axis
      */
     public float size_y;
       
@@ -57,22 +57,22 @@ public class msg_landing_target extends MAVLinkMessage {
     public short target_num;
       
     /**
-     * MAV_FRAME enum specifying the whether the following feilds are earth-frame, body-frame, etc.
+     * Coordinate frame used for following fields.
      */
     public short frame;
       
     /**
-     * X Position of the landing target on MAV_FRAME
+     * X Position of the landing target in MAV_FRAME
      */
     public float x;
       
     /**
-     * Y Position of the landing target on MAV_FRAME
+     * Y Position of the landing target in MAV_FRAME
      */
     public float y;
       
     /**
-     * Z Position of the landing target on MAV_FRAME
+     * Z Position of the landing target in MAV_FRAME
      */
     public float z;
       
@@ -82,12 +82,12 @@ public class msg_landing_target extends MAVLinkMessage {
     public float q[] = new float[4];
       
     /**
-     * LANDING_TARGET_TYPE enum specifying the type of landing target
+     * Type of landing target
      */
     public short type;
       
     /**
-     * Boolean indicating known position (1) or default unkown position (0), for validation of positioning of the landing target
+     * Boolean indicating whether the position fields (x, y, z, q, type) contain valid target position information (valid: 1, invalid: 0). Default is 0 (invalid).
      */
     public short position_valid;
     

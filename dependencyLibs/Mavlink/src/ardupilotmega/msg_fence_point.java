@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * A fence point. Used to set a point when from GCS -> MAV. Also used to return a point from MAV -> GCS
+ * A fence point. Used to set a point when from GCS -> MAV. Also used to return a point from MAV -> GCS.
  */
 public class msg_fence_point extends MAVLinkMessage {
 
@@ -22,32 +22,32 @@ public class msg_fence_point extends MAVLinkMessage {
 
       
     /**
-     * Latitude of point
+     * Latitude of point.
      */
     public float lat;
       
     /**
-     * Longitude of point
+     * Longitude of point.
      */
     public float lng;
       
     /**
-     * System ID
+     * System ID.
      */
     public short target_system;
       
     /**
-     * Component ID
+     * Component ID.
      */
     public short target_component;
       
     /**
-     * point index (first point is 1, 0 is for return point)
+     * Point index (first point is 1, 0 is for return point).
      */
     public short idx;
       
     /**
-     * total number of points (for sanity checking)
+     * Total number of points (for sanity checking).
      */
     public short count;
     

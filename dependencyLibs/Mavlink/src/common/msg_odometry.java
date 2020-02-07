@@ -16,13 +16,13 @@ import com.MAVLink.Messages.MAVLinkPayload;
 public class msg_odometry extends MAVLinkMessage {
 
     public static final int MAVLINK_MSG_ID_ODOMETRY = 331;
-    public static final int MAVLINK_MSG_LENGTH = 230;
+    public static final int MAVLINK_MSG_LENGTH = 232;
     private static final long serialVersionUID = MAVLINK_MSG_ID_ODOMETRY;
 
 
       
     /**
-     * Timestamp (microseconds since system boot or since UNIX epoch).
+     * Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude the number.
      */
     public long time_usec;
       
@@ -77,24 +77,34 @@ public class msg_odometry extends MAVLinkMessage {
     public float yawspeed;
       
     /**
-     * Pose (states: x, y, z, roll, pitch, yaw) covariance matrix upper right triangle (first six entries are the first ROW, next five entries are the second ROW, etc.)
+     * Row-major representation of a 6x6 pose cross-covariance matrix upper right triangle (states: x, y, z, roll, pitch, yaw; first six entries are the first ROW, next five entries are the second ROW, etc.). If unknown, assign NaN value to first element in the array.
      */
     public float pose_covariance[] = new float[21];
       
     /**
-     * Twist (states: vx, vy, vz, rollspeed, pitchspeed, yawspeed) covariance matrix upper right triangle (first six entries are the first ROW, next five entries are the second ROW, etc.)
+     * Row-major representation of a 6x6 velocity cross-covariance matrix upper right triangle (states: vx, vy, vz, rollspeed, pitchspeed, yawspeed; first six entries are the first ROW, next five entries are the second ROW, etc.). If unknown, assign NaN value to first element in the array.
      */
-    public float twist_covariance[] = new float[21];
+    public float velocity_covariance[] = new float[21];
       
     /**
-     * Coordinate frame of reference for the pose data, as defined by MAV_FRAME enum.
+     * Coordinate frame of reference for the pose data.
      */
     public short frame_id;
       
     /**
-     * Coordinate frame of reference for the velocity in free space (twist) data, as defined by MAV_FRAME enum.
+     * Coordinate frame of reference for the velocity in free space (twist) data.
      */
     public short child_frame_id;
+      
+    /**
+     * Estimate reset counter. This should be incremented when the estimate resets in any of the dimensions (position, velocity, attitude, angular speed). This is designed to be used when e.g an external SLAM system detects a loop-closure and the estimate jumps.
+     */
+    public short reset_counter;
+      
+    /**
+     * Type of estimator that is providing the odometry.
+     */
+    public short estimator_type;
     
 
     /**
@@ -140,8 +150,8 @@ public class msg_odometry extends MAVLinkMessage {
                     
         
         
-        for (int i = 0; i < twist_covariance.length; i++) {
-            packet.payload.putFloat(twist_covariance[i]);
+        for (int i = 0; i < velocity_covariance.length; i++) {
+            packet.payload.putFloat(velocity_covariance[i]);
         }
                     
         
@@ -150,6 +160,10 @@ public class msg_odometry extends MAVLinkMessage {
         packet.payload.putUnsignedByte(child_frame_id);
         
         if(isMavlink2) {
+            
+            packet.payload.putUnsignedByte(reset_counter);
+            
+            packet.payload.putUnsignedByte(estimator_type);
             
         }
         return packet;
@@ -196,8 +210,8 @@ public class msg_odometry extends MAVLinkMessage {
                 
         
          
-        for (int i = 0; i < this.twist_covariance.length; i++) {
-            this.twist_covariance[i] = payload.getFloat();
+        for (int i = 0; i < this.velocity_covariance.length; i++) {
+            this.velocity_covariance[i] = payload.getFloat();
         }
                 
         
@@ -206,6 +220,10 @@ public class msg_odometry extends MAVLinkMessage {
         this.child_frame_id = payload.getUnsignedByte();
         
         if(isMavlink2) {
+            
+            this.reset_counter = payload.getUnsignedByte();
+            
+            this.estimator_type = payload.getUnsignedByte();
             
         }
     }
@@ -230,12 +248,12 @@ public class msg_odometry extends MAVLinkMessage {
         unpack(mavLinkPacket.payload);        
     }
 
-                                  
+                                      
     /**
      * Returns a string with the MSG name and data
      */
     public String toString() {
-        return "MAVLINK_MSG_ID_ODOMETRY - sysid:"+sysid+" compid:"+compid+" time_usec:"+time_usec+" x:"+x+" y:"+y+" z:"+z+" q:"+q+" vx:"+vx+" vy:"+vy+" vz:"+vz+" rollspeed:"+rollspeed+" pitchspeed:"+pitchspeed+" yawspeed:"+yawspeed+" pose_covariance:"+pose_covariance+" twist_covariance:"+twist_covariance+" frame_id:"+frame_id+" child_frame_id:"+child_frame_id+"";
+        return "MAVLINK_MSG_ID_ODOMETRY - sysid:"+sysid+" compid:"+compid+" time_usec:"+time_usec+" x:"+x+" y:"+y+" z:"+z+" q:"+q+" vx:"+vx+" vy:"+vy+" vz:"+vz+" rollspeed:"+rollspeed+" pitchspeed:"+pitchspeed+" yawspeed:"+yawspeed+" pose_covariance:"+pose_covariance+" velocity_covariance:"+velocity_covariance+" frame_id:"+frame_id+" child_frame_id:"+child_frame_id+" reset_counter:"+reset_counter+" estimator_type:"+estimator_type+"";
     }
 }
         

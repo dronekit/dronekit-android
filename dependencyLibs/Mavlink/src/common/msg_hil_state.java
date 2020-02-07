@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * DEPRECATED PACKET! Suffers from missing airspeed fields and singularities due to Euler angles. Please use HIL_STATE_QUATERNION instead. Sent from simulation to autopilot. This packet is useful for high throughput applications such as hardware in the loop simulations.
+ * Sent from simulation to autopilot. This packet is useful for high throughput applications such as hardware in the loop simulations.
  */
 public class msg_hil_state extends MAVLinkMessage {
 
@@ -22,82 +22,82 @@ public class msg_hil_state extends MAVLinkMessage {
 
       
     /**
-     * Timestamp (microseconds since UNIX epoch or microseconds since system boot)
+     * Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude the number.
      */
     public long time_usec;
       
     /**
-     * Roll angle (rad)
+     * Roll angle
      */
     public float roll;
       
     /**
-     * Pitch angle (rad)
+     * Pitch angle
      */
     public float pitch;
       
     /**
-     * Yaw angle (rad)
+     * Yaw angle
      */
     public float yaw;
       
     /**
-     * Body frame roll / phi angular speed (rad/s)
+     * Body frame roll / phi angular speed
      */
     public float rollspeed;
       
     /**
-     * Body frame pitch / theta angular speed (rad/s)
+     * Body frame pitch / theta angular speed
      */
     public float pitchspeed;
       
     /**
-     * Body frame yaw / psi angular speed (rad/s)
+     * Body frame yaw / psi angular speed
      */
     public float yawspeed;
       
     /**
-     * Latitude, expressed as degrees * 1E7
+     * Latitude
      */
     public int lat;
       
     /**
-     * Longitude, expressed as degrees * 1E7
+     * Longitude
      */
     public int lon;
       
     /**
-     * Altitude in meters, expressed as * 1000 (millimeters)
+     * Altitude
      */
     public int alt;
       
     /**
-     * Ground X Speed (Latitude), expressed as m/s * 100
+     * Ground X Speed (Latitude)
      */
     public short vx;
       
     /**
-     * Ground Y Speed (Longitude), expressed as m/s * 100
+     * Ground Y Speed (Longitude)
      */
     public short vy;
       
     /**
-     * Ground Z Speed (Altitude), expressed as m/s * 100
+     * Ground Z Speed (Altitude)
      */
     public short vz;
       
     /**
-     * X acceleration (mg)
+     * X acceleration
      */
     public short xacc;
       
     /**
-     * Y acceleration (mg)
+     * Y acceleration
      */
     public short yacc;
       
     /**
-     * Z acceleration (mg)
+     * Z acceleration
      */
     public short zacc;
     

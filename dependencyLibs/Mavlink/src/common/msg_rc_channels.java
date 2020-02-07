@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * The PPM values of the RC channels received. The standard PPM modulation is as follows: 1000 microseconds: 0%, 2000 microseconds: 100%. Individual receivers/transmitters might violate this specification.
+ * The PPM values of the RC channels received. The standard PPM modulation is as follows: 1000 microseconds: 0%, 2000 microseconds: 100%.  A value of UINT16_MAX implies the channel is unused. Individual receivers/transmitters might violate this specification.
  */
 public class msg_rc_channels extends MAVLinkMessage {
 
@@ -22,97 +22,97 @@ public class msg_rc_channels extends MAVLinkMessage {
 
       
     /**
-     * Timestamp (milliseconds since system boot)
+     * Timestamp (time since system boot).
      */
     public long time_boot_ms;
       
     /**
-     * RC channel 1 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+     * RC channel 1 value.
      */
     public int chan1_raw;
       
     /**
-     * RC channel 2 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+     * RC channel 2 value.
      */
     public int chan2_raw;
       
     /**
-     * RC channel 3 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+     * RC channel 3 value.
      */
     public int chan3_raw;
       
     /**
-     * RC channel 4 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+     * RC channel 4 value.
      */
     public int chan4_raw;
       
     /**
-     * RC channel 5 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+     * RC channel 5 value.
      */
     public int chan5_raw;
       
     /**
-     * RC channel 6 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+     * RC channel 6 value.
      */
     public int chan6_raw;
       
     /**
-     * RC channel 7 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+     * RC channel 7 value.
      */
     public int chan7_raw;
       
     /**
-     * RC channel 8 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+     * RC channel 8 value.
      */
     public int chan8_raw;
       
     /**
-     * RC channel 9 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+     * RC channel 9 value.
      */
     public int chan9_raw;
       
     /**
-     * RC channel 10 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+     * RC channel 10 value.
      */
     public int chan10_raw;
       
     /**
-     * RC channel 11 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+     * RC channel 11 value.
      */
     public int chan11_raw;
       
     /**
-     * RC channel 12 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+     * RC channel 12 value.
      */
     public int chan12_raw;
       
     /**
-     * RC channel 13 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+     * RC channel 13 value.
      */
     public int chan13_raw;
       
     /**
-     * RC channel 14 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+     * RC channel 14 value.
      */
     public int chan14_raw;
       
     /**
-     * RC channel 15 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+     * RC channel 15 value.
      */
     public int chan15_raw;
       
     /**
-     * RC channel 16 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+     * RC channel 16 value.
      */
     public int chan16_raw;
       
     /**
-     * RC channel 17 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+     * RC channel 17 value.
      */
     public int chan17_raw;
       
     /**
-     * RC channel 18 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+     * RC channel 18 value.
      */
     public int chan18_raw;
       
@@ -122,7 +122,7 @@ public class msg_rc_channels extends MAVLinkMessage {
     public short chancount;
       
     /**
-     * Receive signal strength indicator, 0: 0%, 100: 100%, 255: invalid/unknown.
+     * Receive signal strength indicator in device-dependent units/scale. Values: [0-254], 255: invalid/unknown.
      */
     public short rssi;
     

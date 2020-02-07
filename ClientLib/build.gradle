@@ -69,9 +69,11 @@ android {
     android.libraryVariants.all { variant ->
         variant.outputs.each { output ->
             def file = output.outputFile
+
             if (file != null && file.name.endsWith('.aar')) {
                 println "DO STUFF: ${PUBLISH_ARTIFACT_ID}.${PUBLISH_VERSION}.aar, ${file.parent}"
 //                output.outputFile = new File(file.parent, "${PUBLISH_ARTIFACT_ID}.${PUBLISH_VERSION}.aar")
+                output.outputFileName = "${PUBLISH_ARTIFACT_ID}.${PUBLISH_VERSION}.aar"
             }
         }
     }

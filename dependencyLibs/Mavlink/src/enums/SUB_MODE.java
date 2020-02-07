@@ -7,7 +7,7 @@
 package com.MAVLink.enums;
 
 /** 
- * A mapping of sub flight modes for custom_mode field of heartbeat
+ * A mapping of sub flight modes for custom_mode field of heartbeat.
  */
 public class SUB_MODE {
    public static final int SUB_MODE_STABILIZE = 0; /*  | */

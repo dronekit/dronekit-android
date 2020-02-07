@@ -22,7 +22,7 @@ public class msg_gps_rtk extends MAVLinkMessage {
 
       
     /**
-     * Time since boot of last baseline message received in ms.
+     * Time since boot of last baseline message received.
      */
     public long time_last_baseline_ms;
       
@@ -32,17 +32,17 @@ public class msg_gps_rtk extends MAVLinkMessage {
     public long tow;
       
     /**
-     * Current baseline in ECEF x or NED north component in mm.
+     * Current baseline in ECEF x or NED north component.
      */
     public int baseline_a_mm;
       
     /**
-     * Current baseline in ECEF y or NED east component in mm.
+     * Current baseline in ECEF y or NED east component.
      */
     public int baseline_b_mm;
       
     /**
-     * Current baseline in ECEF z or NED down component in mm.
+     * Current baseline in ECEF z or NED down component.
      */
     public int baseline_c_mm;
       
@@ -72,7 +72,7 @@ public class msg_gps_rtk extends MAVLinkMessage {
     public short rtk_health;
       
     /**
-     * Rate of baseline messages being received by GPS, in HZ
+     * Rate of baseline messages being received by GPS
      */
     public short rtk_rate;
       

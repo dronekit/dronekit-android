@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * Estimator status message including flags, innovation test ratios and estimated accuracies. The flags message is an integer bitmask containing information on which EKF outputs are valid. See the ESTIMATOR_STATUS_FLAGS enum definition for further information. The innovaton test ratios show the magnitude of the sensor innovation divided by the innovation check threshold. Under normal operation the innovaton test ratios should be below 0.5 with occasional values up to 1.0. Values greater than 1.0 should be rare under normal operation and indicate that a measurement has been rejected by the filter. The user should be notified if an innovation test ratio greater than 1.0 is recorded. Notifications for values in the range between 0.5 and 1.0 should be optional and controllable by the user.
+ * Estimator status message including flags, innovation test ratios and estimated accuracies. The flags message is an integer bitmask containing information on which EKF outputs are valid. See the ESTIMATOR_STATUS_FLAGS enum definition for further information. The innovation test ratios show the magnitude of the sensor innovation divided by the innovation check threshold. Under normal operation the innovation test ratios should be below 0.5 with occasional values up to 1.0. Values greater than 1.0 should be rare under normal operation and indicate that a measurement has been rejected by the filter. The user should be notified if an innovation test ratio greater than 1.0 is recorded. Notifications for values in the range between 0.5 and 1.0 should be optional and controllable by the user.
  */
 public class msg_estimator_status extends MAVLinkMessage {
 
@@ -22,7 +22,7 @@ public class msg_estimator_status extends MAVLinkMessage {
 
       
     /**
-     * Timestamp (micros since boot or Unix epoch)
+     * Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude the number.
      */
     public long time_usec;
       
@@ -57,17 +57,17 @@ public class msg_estimator_status extends MAVLinkMessage {
     public float tas_ratio;
       
     /**
-     * Horizontal position 1-STD accuracy relative to the EKF local origin (m)
+     * Horizontal position 1-STD accuracy relative to the EKF local origin
      */
     public float pos_horiz_accuracy;
       
     /**
-     * Vertical position 1-STD accuracy relative to the EKF local origin (m)
+     * Vertical position 1-STD accuracy relative to the EKF local origin
      */
     public float pos_vert_accuracy;
       
     /**
-     * Integer bitmask indicating which EKF outputs are valid. See definition for ESTIMATOR_STATUS_FLAGS.
+     * Bitmap indicating which EKF outputs are valid.
      */
     public int flags;
     

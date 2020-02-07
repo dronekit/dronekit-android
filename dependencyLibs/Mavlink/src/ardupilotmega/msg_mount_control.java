@@ -22,32 +22,32 @@ public class msg_mount_control extends MAVLinkMessage {
 
       
     /**
-     * pitch(deg*100) or lat, depending on mount mode
+     * Pitch (centi-degrees) or lat (degE7), depending on mount mode.
      */
     public int input_a;
       
     /**
-     * roll(deg*100) or lon depending on mount mode
+     * Roll (centi-degrees) or lon (degE7) depending on mount mode.
      */
     public int input_b;
       
     /**
-     * yaw(deg*100) or alt (in cm) depending on mount mode
+     * Yaw (centi-degrees) or alt (cm) depending on mount mode.
      */
     public int input_c;
       
     /**
-     * System ID
+     * System ID.
      */
     public short target_system;
       
     /**
-     * Component ID
+     * Component ID.
      */
     public short target_component;
       
     /**
-     * if "1" it will save current trimmed position on EEPROM (just valid for NEUTRAL and LANDING)
+     * If "1" it will save current trimmed position on EEPROM (just valid for NEUTRAL and LANDING).
      */
     public short save_position;
     

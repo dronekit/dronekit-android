@@ -22,12 +22,12 @@ public class msg_log_entry extends MAVLinkMessage {
 
       
     /**
-     * UTC timestamp of log in seconds since 1970, or 0 if not available
+     * UTC timestamp of log since 1970, or 0 if not available
      */
     public long time_utc;
       
     /**
-     * Size of the log (may be approximate) in bytes
+     * Size of the log (may be approximate)
      */
     public long size;
       

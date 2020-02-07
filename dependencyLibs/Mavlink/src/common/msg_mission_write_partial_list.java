@@ -22,7 +22,7 @@ public class msg_mission_write_partial_list extends MAVLinkMessage {
 
       
     /**
-     * Start index, 0 by default and smaller / equal to the largest index of the current onboard list.
+     * Start index. Must be smaller / equal to the largest index of the current onboard list.
      */
     public short start_index;
       
@@ -42,7 +42,7 @@ public class msg_mission_write_partial_list extends MAVLinkMessage {
     public short target_component;
       
     /**
-     * Mission type, see MAV_MISSION_TYPE
+     * Mission type.
      */
     public short mission_type;
     

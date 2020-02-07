@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * Message with some status from APM to GCS about camera or antenna mount
+ * Message with some status from APM to GCS about camera or antenna mount.
  */
 public class msg_mount_status extends MAVLinkMessage {
 
@@ -22,27 +22,27 @@ public class msg_mount_status extends MAVLinkMessage {
 
       
     /**
-     * pitch(deg*100)
+     * Pitch.
      */
     public int pointing_a;
       
     /**
-     * roll(deg*100)
+     * Roll.
      */
     public int pointing_b;
       
     /**
-     * yaw(deg*100)
+     * Yaw.
      */
     public int pointing_c;
       
     /**
-     * System ID
+     * System ID.
      */
     public short target_system;
       
     /**
-     * Component ID
+     * Component ID.
      */
     public short target_component;
     

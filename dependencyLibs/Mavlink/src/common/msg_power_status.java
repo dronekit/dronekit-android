@@ -22,17 +22,17 @@ public class msg_power_status extends MAVLinkMessage {
 
       
     /**
-     * 5V rail voltage in millivolts
+     * 5V rail voltage.
      */
     public int Vcc;
       
     /**
-     * servo rail voltage in millivolts
+     * Servo rail voltage.
      */
     public int Vservo;
       
     /**
-     * power supply status flags (see MAV_POWER_STATUS enum)
+     * Bitmap of power supply status flags.
      */
     public int flags;
     

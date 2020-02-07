@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * Deepstall path planning
+ * Deepstall path planning.
  */
 public class msg_deepstall extends MAVLinkMessage {
 
@@ -22,52 +22,52 @@ public class msg_deepstall extends MAVLinkMessage {
 
       
     /**
-     * Landing latitude (deg * 1E7)
+     * Landing latitude.
      */
     public int landing_lat;
       
     /**
-     * Landing longitude (deg * 1E7)
+     * Landing longitude.
      */
     public int landing_lon;
       
     /**
-     * Final heading start point, latitude (deg * 1E7)
+     * Final heading start point, latitude.
      */
     public int path_lat;
       
     /**
-     * Final heading start point, longitude (deg * 1E7)
+     * Final heading start point, longitude.
      */
     public int path_lon;
       
     /**
-     * Arc entry point, latitude (deg * 1E7)
+     * Arc entry point, latitude.
      */
     public int arc_entry_lat;
       
     /**
-     * Arc entry point, longitude (deg * 1E7)
+     * Arc entry point, longitude.
      */
     public int arc_entry_lon;
       
     /**
-     * Altitude (meters)
+     * Altitude.
      */
     public float altitude;
       
     /**
-     * Distance the aircraft expects to travel during the deepstall
+     * Distance the aircraft expects to travel during the deepstall.
      */
     public float expected_travel_distance;
       
     /**
-     * Deepstall cross track error in meters (only valid when in DEEPSTALL_STAGE_LAND)
+     * Deepstall cross track error (only valid when in DEEPSTALL_STAGE_LAND).
      */
     public float cross_track_error;
       
     /**
-     * Deepstall stage, see enum MAV_DEEPSTALL_STAGE
+     * Deepstall stage.
      */
     public short stage;
     

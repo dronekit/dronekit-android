@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * PID tuning information
+ * PID tuning information.
  */
 public class msg_pid_tuning extends MAVLinkMessage {
 
@@ -22,37 +22,37 @@ public class msg_pid_tuning extends MAVLinkMessage {
 
       
     /**
-     * desired rate (degrees/s)
+     * Desired rate.
      */
     public float desired;
       
     /**
-     * achieved rate (degrees/s)
+     * Achieved rate.
      */
     public float achieved;
       
     /**
-     * FF component
+     * FF component.
      */
     public float FF;
       
     /**
-     * P component
+     * P component.
      */
     public float P;
       
     /**
-     * I component
+     * I component.
      */
     public float I;
       
     /**
-     * D component
+     * D component.
      */
     public float D;
       
     /**
-     * axis
+     * Axis.
      */
     public short axis;
     

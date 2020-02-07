@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * Request a partial list of mission items from the system/component. https://mavlink.io/en/protocol/mission.html. If start and end index are the same, just send one waypoint.
+ * Request a partial list of mission items from the system/component. https://mavlink.io/en/services/mission.html. If start and end index are the same, just send one waypoint.
  */
 public class msg_mission_request_partial_list extends MAVLinkMessage {
 
@@ -22,7 +22,7 @@ public class msg_mission_request_partial_list extends MAVLinkMessage {
 
       
     /**
-     * Start index, 0 by default
+     * Start index
      */
     public short start_index;
       
@@ -42,7 +42,7 @@ public class msg_mission_request_partial_list extends MAVLinkMessage {
     public short target_component;
       
     /**
-     * Mission type, see MAV_MISSION_TYPE
+     * Mission type.
      */
     public short mission_type;
     

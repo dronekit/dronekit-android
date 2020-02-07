@@ -37,6 +37,7 @@ public class MAV_SYS_STATUS_SENSOR {
    public static final int MAV_SYS_STATUS_LOGGING = 16777216; /* 0x1000000 Logging | */
    public static final int MAV_SYS_STATUS_SENSOR_BATTERY = 33554432; /* 0x2000000 Battery | */
    public static final int MAV_SYS_STATUS_SENSOR_PROXIMITY = 67108864; /* 0x4000000 Proximity | */
-   public static final int MAV_SYS_STATUS_SENSOR_ENUM_END = 67108865; /*  | */
+   public static final int MAV_SYS_STATUS_SENSOR_SATCOM = 134217728; /* 0x8000000 Satellite Communication  | */
+   public static final int MAV_SYS_STATUS_SENSOR_ENUM_END = 134217729; /*  | */
 }
             

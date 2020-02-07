@@ -22,7 +22,7 @@ public class msg_raw_pressure extends MAVLinkMessage {
 
       
     /**
-     * Timestamp (microseconds since UNIX epoch or microseconds since system boot)
+     * Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude the number.
      */
     public long time_usec;
       
@@ -32,12 +32,12 @@ public class msg_raw_pressure extends MAVLinkMessage {
     public short press_abs;
       
     /**
-     * Differential pressure 1 (raw, 0 if nonexistant)
+     * Differential pressure 1 (raw, 0 if nonexistent)
      */
     public short press_diff1;
       
     /**
-     * Differential pressure 2 (raw, 0 if nonexistant)
+     * Differential pressure 2 (raw, 0 if nonexistent)
      */
     public short press_diff2;
       

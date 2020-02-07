@@ -12,7 +12,7 @@ import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
  * Message encoding a mission item. This message is emitted to announce
-                the presence of a mission item and to set a mission item on the system. The mission item can be either in x, y, z meters (type: LOCAL) or x:lat, y:lon, z:altitude. Local frame is Z-down, right handed (NED), global frame is Z-up, right handed (ENU). See also https://mavlink.io/en/protocol/mission.html.
+                the presence of a mission item and to set a mission item on the system. The mission item can be either in x, y, z meters (type: LOCAL) or x:lat, y:lon, z:altitude. Local frame is Z-down, right handed (NED), global frame is Z-up, right handed (ENU). See also https://mavlink.io/en/services/mission.html.
  */
 public class msg_mission_item_int extends MAVLinkMessage {
 
@@ -63,7 +63,7 @@ public class msg_mission_item_int extends MAVLinkMessage {
     public int seq;
       
     /**
-     * The scheduled action for the waypoint, as defined by MAV_CMD enum
+     * The scheduled action for the waypoint.
      */
     public int command;
       
@@ -78,7 +78,7 @@ public class msg_mission_item_int extends MAVLinkMessage {
     public short target_component;
       
     /**
-     * The coordinate system of the waypoint, as defined by MAV_FRAME enum
+     * The coordinate system of the waypoint.
      */
     public short frame;
       
@@ -88,12 +88,12 @@ public class msg_mission_item_int extends MAVLinkMessage {
     public short current;
       
     /**
-     * autocontinue to next wp
+     * Autocontinue to next waypoint
      */
     public short autocontinue;
       
     /**
-     * Mission type, see MAV_MISSION_TYPE
+     * Mission type.
      */
     public short mission_type;
     

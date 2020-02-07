@@ -1,6 +1,7 @@
 package org.droidplanner.services.android.impl.utils.file.IO;
 
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.util.Xml;
 
 import org.droidplanner.services.android.impl.core.drone.profiles.ParameterMetadata;
@@ -9,13 +10,18 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Map;
+
+import timber.log.Timber;
 
 /**
  * Created by fhuya on 10/29/14.
  */
 public class ParameterMetadataLoader {
+    private static final String TAG = ParameterMetadataLoader.class.getSimpleName();
 
+    private static final String PARAMS_ASSET_PATH = "Parameters";
     private static final String PARAMETERMETADATA_PATH = "Parameters/ParameterMetaData.xml";
 
     private static final String METADATA_DISPLAYNAME = "DisplayName";
@@ -26,8 +32,30 @@ public class ParameterMetadataLoader {
 
     public static void load(Context context, String metadataType, Map<String, ParameterMetadata> metadata)
             throws IOException, XmlPullParserException {
-        InputStream inputStream = context.getAssets().open(PARAMETERMETADATA_PATH);
-        open(inputStream, metadataType, metadata);
+        final AssetManager assMan = context.getAssets();
+        final String[] files = assMan.list(PARAMS_ASSET_PATH);
+
+        if(files != null) {
+            for(String file: files) {
+                final String path = String.format("%s/%s", PARAMS_ASSET_PATH, file);
+                Timber.d("Load metadata from %s for type %s", path, metadataType);
+                final InputStream input = assMan.open(path);
+
+                final Map<String, ParameterMetadata> map = new HashMap<>();
+                open(input, metadataType, map);
+                Timber.d("Read %d params", map.size());
+
+                int added = 0;
+                for(String k: map.keySet()) {
+                    if(!metadata.containsKey(k)) {
+                        metadata.put(k, map.get(k));
+                        ++added;
+                    }
+                }
+
+                Timber.d("Added %d params to map", added);
+            }
+        }
     }
 
     private static void open(InputStream inputStream, String metadataType, Map<String, ParameterMetadata> metadataMap)
@@ -51,7 +79,6 @@ public class ParameterMetadataLoader {
         String name;
         boolean parsing = false;
         ParameterMetadata metadata = null;
-        metadataMap.clear();
 
         int eventType = parser.getEventType();
         while (eventType != XmlPullParser.END_DOCUMENT) {

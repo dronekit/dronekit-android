@@ -7,7 +7,7 @@
 package com.MAVLink.enums;
 
 /** 
- * Flags in RALLY_POINT message
+ * Flags in RALLY_POINT message.
  */
 public class RALLY_FLAGS {
    public static final int FAVORABLE_WIND = 1; /* Flag set when requiring favorable winds for landing. | */

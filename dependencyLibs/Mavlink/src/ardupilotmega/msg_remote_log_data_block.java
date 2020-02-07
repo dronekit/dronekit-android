@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * Send a block of log data to remote location
+ * Send a block of log data to remote location.
  */
 public class msg_remote_log_data_block extends MAVLinkMessage {
 
@@ -22,22 +22,22 @@ public class msg_remote_log_data_block extends MAVLinkMessage {
 
       
     /**
-     * log data block sequence number
+     * Log data block sequence number.
      */
     public long seqno;
       
     /**
-     * System ID
+     * System ID.
      */
     public short target_system;
       
     /**
-     * Component ID
+     * Component ID.
      */
     public short target_component;
       
     /**
-     * log data block
+     * Log data block.
      */
     public short data[] = new short[200];
     

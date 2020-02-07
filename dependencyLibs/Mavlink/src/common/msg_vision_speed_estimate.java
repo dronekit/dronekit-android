@@ -11,18 +11,18 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * 
+ * Speed estimate from a vision source.
  */
 public class msg_vision_speed_estimate extends MAVLinkMessage {
 
     public static final int MAVLINK_MSG_ID_VISION_SPEED_ESTIMATE = 103;
-    public static final int MAVLINK_MSG_LENGTH = 56;
+    public static final int MAVLINK_MSG_LENGTH = 57;
     private static final long serialVersionUID = MAVLINK_MSG_ID_VISION_SPEED_ESTIMATE;
 
 
       
     /**
-     * Timestamp (microseconds, synced to UNIX time or since system boot)
+     * Timestamp (UNIX time or time since system boot)
      */
     public long usec;
       
@@ -42,9 +42,14 @@ public class msg_vision_speed_estimate extends MAVLinkMessage {
     public float z;
       
     /**
-     * Linear velocity covariance matrix (1st three entries - 1st row, etc.)
+     * Row-major representation of 3x3 linear velocity covariance matrix (states: vx, vy, vz; 1st three entries - 1st row, etc.). If unknown, assign NaN value to first element in the array.
      */
     public float covariance[] = new float[9];
+      
+    /**
+     * Estimate reset counter. This should be incremented when the estimate resets in any of the dimensions (position, velocity, attitude, angular speed). This is designed to be used when e.g an external SLAM system detects a loop-closure and the estimate jumps.
+     */
+    public short reset_counter;
     
 
     /**
@@ -72,6 +77,8 @@ public class msg_vision_speed_estimate extends MAVLinkMessage {
             packet.payload.putFloat(covariance[i]);
         }
                     
+            
+            packet.payload.putUnsignedByte(reset_counter);
             
         }
         return packet;
@@ -101,6 +108,8 @@ public class msg_vision_speed_estimate extends MAVLinkMessage {
         }
                 
             
+            this.reset_counter = payload.getUnsignedByte();
+            
         }
     }
 
@@ -124,12 +133,12 @@ public class msg_vision_speed_estimate extends MAVLinkMessage {
         unpack(mavLinkPacket.payload);        
     }
 
-              
+                
     /**
      * Returns a string with the MSG name and data
      */
     public String toString() {
-        return "MAVLINK_MSG_ID_VISION_SPEED_ESTIMATE - sysid:"+sysid+" compid:"+compid+" usec:"+usec+" x:"+x+" y:"+y+" z:"+z+" covariance:"+covariance+"";
+        return "MAVLINK_MSG_ID_VISION_SPEED_ESTIMATE - sysid:"+sysid+" compid:"+compid+" usec:"+usec+" x:"+x+" y:"+y+" z:"+z+" covariance:"+covariance+" reset_counter:"+reset_counter+"";
     }
 }
         

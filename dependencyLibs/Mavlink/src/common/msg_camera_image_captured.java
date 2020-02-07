@@ -22,32 +22,32 @@ public class msg_camera_image_captured extends MAVLinkMessage {
 
       
     /**
-     * Timestamp (microseconds since UNIX epoch) in UTC. 0 for unknown.
+     * Timestamp (time since UNIX epoch) in UTC. 0 for unknown.
      */
     public long time_utc;
       
     /**
-     * Timestamp (milliseconds since system boot)
+     * Timestamp (time since system boot).
      */
     public long time_boot_ms;
       
     /**
-     * Latitude, expressed as degrees * 1E7 where image was taken
+     * Latitude where image was taken
      */
     public int lat;
       
     /**
-     * Longitude, expressed as degrees * 1E7 where capture was taken
+     * Longitude where capture was taken
      */
     public int lon;
       
     /**
-     * Altitude in meters, expressed as * 1E3 (AMSL, not WGS84) where image was taken
+     * Altitude (MSL) where image was taken
      */
     public int alt;
       
     /**
-     * Altitude above ground in meters, expressed as * 1E3 where image was taken
+     * Altitude above ground
      */
     public int relative_alt;
       

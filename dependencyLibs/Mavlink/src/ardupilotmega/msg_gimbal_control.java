@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * Control message for rate gimbal
+ * Control message for rate gimbal.
  */
 public class msg_gimbal_control extends MAVLinkMessage {
 
@@ -22,27 +22,27 @@ public class msg_gimbal_control extends MAVLinkMessage {
 
       
     /**
-     * Demanded angular rate X (rad/s)
+     * Demanded angular rate X.
      */
     public float demanded_rate_x;
       
     /**
-     * Demanded angular rate Y (rad/s)
+     * Demanded angular rate Y.
      */
     public float demanded_rate_y;
       
     /**
-     * Demanded angular rate Z (rad/s)
+     * Demanded angular rate Z.
      */
     public float demanded_rate_z;
       
     /**
-     * System ID
+     * System ID.
      */
     public short target_system;
       
     /**
-     * Component ID
+     * Component ID.
      */
     public short target_component;
     

@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * Read registers for a device
+ * Read registers for a device.
  */
 public class msg_device_op_read extends MAVLinkMessage {
 
@@ -22,47 +22,47 @@ public class msg_device_op_read extends MAVLinkMessage {
 
       
     /**
-     * request ID - copied to reply
+     * Request ID - copied to reply.
      */
     public long request_id;
       
     /**
-     * System ID
+     * System ID.
      */
     public short target_system;
       
     /**
-     * Component ID
+     * Component ID.
      */
     public short target_component;
       
     /**
-     * The bus type
+     * The bus type.
      */
     public short bustype;
       
     /**
-     * Bus number
+     * Bus number.
      */
     public short bus;
       
     /**
-     * Bus address
+     * Bus address.
      */
     public short address;
       
     /**
-     * Name of device on bus (for SPI)
+     * Name of device on bus (for SPI).
      */
     public byte busname[] = new byte[40];
       
     /**
-     * First register to read
+     * First register to read.
      */
     public short regstart;
       
     /**
-     * count of registers to read
+     * Count of registers to read.
      */
     public short count;
     
