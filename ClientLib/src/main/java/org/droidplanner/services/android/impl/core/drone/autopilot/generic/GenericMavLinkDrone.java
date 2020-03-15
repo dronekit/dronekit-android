@@ -717,15 +717,10 @@ public class GenericMavLinkDrone implements MavLinkDrone {
 
     private void processHeartbeat(msg_heartbeat msg_heart) {
 //        Log.v(TAG, String.format("heartbeat: %d/%d to %d/%d", msg_heart.sysid, msg_heart.compid, this.getSysid(), this.getCompid()));
-
-        if(msg_heart.sysid == this.getSysid() && msg_heart.compid == this.getCompid()) {
-            setType(msg_heart.type);
-            checkIfFlying(msg_heart);
-            processState(msg_heart);
-            processVehicleMode(msg_heart);
-        } else {
-            Log.w(TAG, String.format("heartbeat from %d/%d ignored", msg_heart.sysid, msg_heart.compid));
-        }
+        setType(msg_heart.type);
+        checkIfFlying(msg_heart);
+        processState(msg_heart);
+        processVehicleMode(msg_heart);
     }
 
     private void updateConnectionStats() {
