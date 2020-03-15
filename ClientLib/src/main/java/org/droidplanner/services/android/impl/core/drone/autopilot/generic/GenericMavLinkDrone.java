@@ -862,7 +862,9 @@ public class GenericMavLinkDrone implements MavLinkDrone {
     }
 
     protected void setType(int type) {
-        this.type.setType(type);
+        if(Type.isVehicle(type)) {
+            this.type.setType(type);
+        }
     }
 
     @Override

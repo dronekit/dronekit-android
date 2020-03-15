@@ -41,7 +41,7 @@ public class Type extends DroneVariable<MavLinkDrone> implements DroneInterfaces
         }
 	}
 
-    public static boolean isCopter(int type){
+    public static boolean isCopter(int type) {
         switch (type) {
             case MAV_TYPE.MAV_TYPE_TRICOPTER:
             case MAV_TYPE.MAV_TYPE_QUADROTOR:
@@ -61,6 +61,10 @@ public class Type extends DroneVariable<MavLinkDrone> implements DroneInterfaces
 
     public static boolean isRover(int type){
         return type == MAV_TYPE.MAV_TYPE_GROUND_ROVER;
+    }
+
+    public static boolean isVehicle(int type) {
+	    return isCopter(type) || isPlane(type) || isRover(type);
     }
 
     @Override
