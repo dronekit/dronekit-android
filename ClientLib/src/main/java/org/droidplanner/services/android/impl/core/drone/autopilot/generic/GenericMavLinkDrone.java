@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Surface;
 
 import com.MAVLink.Messages.MAVLinkMessage;
@@ -91,6 +92,7 @@ import timber.log.Timber;
  * Created by Fredia Huya-Kouadio on 9/10/15.
  */
 public class GenericMavLinkDrone implements MavLinkDrone {
+    private static final String TAG = GenericMavLinkDrone.class.getSimpleName();
 
     private final DataLink.DataLinkProvider<MAVLinkMessage> mavClient;
 
@@ -714,10 +716,16 @@ public class GenericMavLinkDrone implements MavLinkDrone {
     }
 
     private void processHeartbeat(msg_heartbeat msg_heart) {
-        setType(msg_heart.type);
-        checkIfFlying(msg_heart);
-        processState(msg_heart);
-        processVehicleMode(msg_heart);
+//        Log.v(TAG, String.format("heartbeat: %d/%d to %d/%d", msg_heart.sysid, msg_heart.compid, this.getSysid(), this.getCompid()));
+
+        if(msg_heart.sysid == this.getSysid() && msg_heart.compid == this.getCompid()) {
+            setType(msg_heart.type);
+            checkIfFlying(msg_heart);
+            processState(msg_heart);
+            processVehicleMode(msg_heart);
+        } else {
+            Log.w(TAG, String.format("heartbeat from %d/%d ignored", msg_heart.sysid, msg_heart.compid));
+        }
     }
 
     private void updateConnectionStats() {
@@ -725,8 +733,14 @@ public class GenericMavLinkDrone implements MavLinkDrone {
     }
 
     private void processVehicleMode(msg_heartbeat msg_heart) {
-        ApmModes newMode = ApmModes.getMode(msg_heart.custom_mode, getType());
-        state.setMode(newMode);
+        final ApmModes newMode = ApmModes.getMode(msg_heart.custom_mode, msg_heart.type);
+
+        if(newMode != ApmModes.UNKNOWN) {
+//            Log.v(TAG, String.format("Got mode %s for mav type %d", newMode.getName(), msg_heart.type));
+            state.setMode(newMode);
+        } else {
+            Timber.w("Did not find mode (%d) for mav type %d", msg_heart.custom_mode, msg_heart.type);
+        }
     }
 
     private void processState(msg_heartbeat msg_heart) {
