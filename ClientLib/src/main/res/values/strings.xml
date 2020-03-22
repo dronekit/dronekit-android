@@ -76,4 +76,26 @@
 
     <string name="label_tlog_title">Telemetry Log Files</string>
     <string name="tlog_selector_label">Telemetry Logs File Selector</string>
+
+    <!-- ADSB emitter types -->
+    <string name="adsb_t_light">Light</string>
+    <string name="adsb_t_small">Small</string>
+    <string name="adsb_t_large">Large</string>
+    <string name="adsb_t_hv_large">High-vortex large</string>
+    <string name="adsb_t_heavy">Heavy</string>
+    <string name="adsb_t_highly_manuv">Highly Manuverable</string>
+    <string name="adsb_t_rotocraft">Rotocraft</string>
+    <string name="adsb_t_unassigned">Unassigned</string>
+    <string name="adsb_t_glider">Glider</string>
+    <string name="adsb_t_lighter_air">Lighter-than-air</string>
+    <string name="adsb_t_parachute">Parachute</string>
+    <string name="adsb_t_ultralight">Ultralight</string>
+    <string name="adsb_t_unassigned2">Unassigned2</string>
+    <string name="adsb_t_uav">UAV</string>
+    <string name="adsb_t_space">Space vehicle</string>
+    <string name="adsb_t_unassigned3">Unassigned3</string>
+    <string name="adsb_t_emergency_surface">Emergency Surface</string>
+    <string name="adsb_t_service_surface">Service Surface</string>
+    <string name="adsb_t_point_obstacle">Point Obstacle</string>
+
 </resources>

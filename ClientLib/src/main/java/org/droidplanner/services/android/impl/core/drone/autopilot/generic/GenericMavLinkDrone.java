@@ -9,6 +9,7 @@ import android.view.Surface;
 
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.ardupilotmega.msg_ekf_status_report;
+import com.MAVLink.common.msg_adsb_vehicle;
 import com.MAVLink.common.msg_attitude;
 import com.MAVLink.common.msg_autopilot_version;
 import com.MAVLink.common.msg_battery_status;
@@ -36,6 +37,7 @@ import com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.drone.mission.action.MissionActions;
+import com.o3dr.services.android.lib.drone.property.ADSBVehicle;
 import com.o3dr.services.android.lib.drone.property.Altitude;
 import com.o3dr.services.android.lib.drone.property.Attitude;
 import com.o3dr.services.android.lib.drone.property.AutopilotVersion;
@@ -686,7 +688,19 @@ public class GenericMavLinkDrone implements MavLinkDrone {
             case msg_autopilot_version.MAVLINK_MSG_ID_AUTOPILOT_VERSION:
                 processAutopilotVersion((msg_autopilot_version) message);
                 break;
+
+            case msg_adsb_vehicle.MAVLINK_MSG_ID_ADSB_VEHICLE:
+                processADSBVehicle((msg_adsb_vehicle)message);
+                break;
         }
+    }
+
+    protected void processADSBVehicle(msg_adsb_vehicle msg) {
+        Timber.d("processADSBVehicle(%s)", msg);
+
+        final Bundle extras = new Bundle();
+        extras.putParcelable(AttributeEventExtra.EXTRA_ADSB_VEHICLE, ADSBVehicle.populate(new ADSBVehicle(), msg));
+        notifyAttributeListener(AttributeEvent.ADSB_VEHICLE, extras);
     }
 
     protected void processAutopilotVersion(msg_autopilot_version msg) {

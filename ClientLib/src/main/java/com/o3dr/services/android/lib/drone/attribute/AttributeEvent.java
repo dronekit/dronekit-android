@@ -224,4 +224,6 @@ public class AttributeEvent {
      */
     public static final String AUTOPILOT_VERSION = PACKAGE_NAME + ".AUTOPILOT_VERSION";
 
+    public static final String ADSB_VEHICLE = PACKAGE_NAME + ".ADSB_VEHICLE";
+
 }

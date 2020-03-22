@@ -137,4 +137,7 @@ public class AttributeEventExtra {
     /** Extras for Follow status */
     public static final String EXTRA_ACCURATE = PACKAGE_NAME + ".EXTRA_ACCURATE";
     public static final String EXTRA_ACCURACY = PACKAGE_NAME + ".EXTRA_ACCURACY";
+
+    /** ADSB vehicle */
+    public static final String EXTRA_ADSB_VEHICLE = PACKAGE_NAME + ".EXTRA_ADSB_VEHICLE";
 }
