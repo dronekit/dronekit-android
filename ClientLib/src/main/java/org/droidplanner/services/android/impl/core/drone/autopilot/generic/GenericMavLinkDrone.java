@@ -731,10 +731,13 @@ public class GenericMavLinkDrone implements MavLinkDrone {
 
     private void processHeartbeat(msg_heartbeat msg_heart) {
 //        Log.v(TAG, String.format("heartbeat: %d/%d to %d/%d", msg_heart.sysid, msg_heart.compid, this.getSysid(), this.getCompid()));
-        setType(msg_heart.type);
-        checkIfFlying(msg_heart);
-        processState(msg_heart);
-        processVehicleMode(msg_heart);
+
+        if(Type.isVehicle(msg_heart.type)) {
+            setType(msg_heart.type);
+            checkIfFlying(msg_heart);
+            processState(msg_heart);
+            processVehicleMode(msg_heart);
+        }
     }
 
     private void updateConnectionStats() {
@@ -876,9 +879,7 @@ public class GenericMavLinkDrone implements MavLinkDrone {
     }
 
     protected void setType(int type) {
-        if(Type.isVehicle(type)) {
-            this.type.setType(type);
-        }
+        this.type.setType(type);
     }
 
     @Override
