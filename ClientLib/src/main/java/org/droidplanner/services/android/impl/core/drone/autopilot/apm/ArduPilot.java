@@ -637,6 +637,10 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
                         break;
                 }
 
+                if(message.toLowerCase().startsWith("prearm:")) {
+                    logLevel = Log.ERROR;
+                }
+
                 logMessage(logLevel, message);
             }
         }
