@@ -22,6 +22,7 @@ public enum VehicleMode implements DroneAttribute {
     PLANE_AUTO(10, Type.TYPE_PLANE, "Auto"),
     PLANE_RTL(11, Type.TYPE_PLANE, "RTL"),
     PLANE_LOITER(12, Type.TYPE_PLANE, "Loiter"),
+    PLANE_TAKEOFF(13, Type.TYPE_PLANE, "Takeoff"),
     PLANE_GUIDED(15, Type.TYPE_PLANE, "Guided"),
 
     COPTER_STABILIZE(0, Type.TYPE_COPTER, "Stabilize"),
