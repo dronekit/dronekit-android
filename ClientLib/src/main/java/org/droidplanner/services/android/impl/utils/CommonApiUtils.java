@@ -211,14 +211,18 @@ public class CommonApiUtils {
             case ROVER_MANUAL:
                 return VehicleMode.ROVER_MANUAL;
 
-            case ROVER_LEARNING:
-                return VehicleMode.ROVER_LEARNING;
+//            case ROVER_LEARNING:
+//                return VehicleMode.ROVER_LEARNING;
 
             case ROVER_STEERING:
                 return VehicleMode.ROVER_STEERING;
 
             case ROVER_HOLD:
                 return VehicleMode.ROVER_HOLD;
+
+            case ROVER_LOITER: return VehicleMode.ROVER_LOITER;
+            case ROVER_FOLLOW: return VehicleMode.ROVER_FOLLOW;
+            case ROVER_SIMPLE: return VehicleMode.ROVER_SIMPLE;
 
             case ROVER_AUTO:
                 return VehicleMode.ROVER_AUTO;
