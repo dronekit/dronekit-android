@@ -24,6 +24,13 @@ public enum VehicleMode implements DroneAttribute {
     PLANE_LOITER(12, Type.TYPE_PLANE, "Loiter"),
     PLANE_TAKEOFF(13, Type.TYPE_PLANE, "Takeoff"),
     PLANE_GUIDED(15, Type.TYPE_PLANE, "Guided"),
+    PLANE_QSTABILIZE(17, Type.TYPE_PLANE, "QStabilize"),
+    PLANE_QHOVER(18, Type.TYPE_PLANE, "QHover"),
+    PLANE_QLOITER(19, Type.TYPE_PLANE, "QLoiter"),
+    PLANE_QLAND(20, Type.TYPE_PLANE, "QLand"),
+    PLANE_QRTL(21, Type.TYPE_PLANE, "QRTL"),
+    PLANE_QAUTOTUNE(22, Type.TYPE_PLANE, "QAutoTune"),
+    PLANE_QACRO(23, Type.TYPE_PLANE, "QAcro"),
 
     COPTER_STABILIZE(0, Type.TYPE_COPTER, "Stabilize"),
     COPTER_ACRO(1, Type.TYPE_COPTER, "Acro"),
