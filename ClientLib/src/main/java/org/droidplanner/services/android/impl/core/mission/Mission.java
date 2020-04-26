@@ -30,6 +30,9 @@ import org.droidplanner.services.android.impl.core.mission.commands.ReturnToHome
 import org.droidplanner.services.android.impl.core.mission.commands.SetRelayImpl;
 import org.droidplanner.services.android.impl.core.mission.commands.SetServoImpl;
 import org.droidplanner.services.android.impl.core.mission.commands.TakeoffImpl;
+import org.droidplanner.services.android.impl.core.mission.commands.VTOLLandImpl;
+import org.droidplanner.services.android.impl.core.mission.commands.VTOLTakeoffImpl;
+import org.droidplanner.services.android.impl.core.mission.commands.VTOLTransitionImpl;
 import org.droidplanner.services.android.impl.core.mission.waypoints.CircleImpl;
 import org.droidplanner.services.android.impl.core.mission.waypoints.DoLandStartImpl;
 import org.droidplanner.services.android.impl.core.mission.waypoints.LandImpl;
@@ -289,6 +292,15 @@ public class Mission extends DroneVariable<GenericMavLinkDrone> {
                     break;
                 case MAV_CMD.MAV_CMD_DO_JUMP:
                     received.add(new DoJumpImpl(msg, this));
+                    break;
+                case MAV_CMD.MAV_CMD_NAV_VTOL_TAKEOFF:
+                    received.add(new VTOLTakeoffImpl(msg, this));
+                    break;
+                case MAV_CMD.MAV_CMD_NAV_VTOL_LAND:
+                    received.add(new VTOLLandImpl(msg, this));
+                    break;
+                case MAV_CMD.MAV_CMD_DO_VTOL_TRANSITION:
+                    received.add(new VTOLTransitionImpl(msg, this));
                     break;
 
                 default:

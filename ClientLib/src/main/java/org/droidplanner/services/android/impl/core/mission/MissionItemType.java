@@ -47,7 +47,10 @@ public enum MissionItemType {
     DO_JUMP("Do Jump"),
     LOITER_TO_ALT("Loiter to Alt"),
     LOITER_TIME("Loiter Time"),
-    TAKE_PICTURE("Take Picture")
+    TAKE_PICTURE("Take Picture"),
+    VTOL_TAKEOFF("VTOL Takeoff"),
+    VTOL_TRANSITION("VTOL Transition"),
+    VTOL_LAND("VTOL Land")
     ;
 
     private final String name;

@@ -17,6 +17,9 @@ import com.o3dr.services.android.lib.drone.mission.item.command.SetRelay;
 import com.o3dr.services.android.lib.drone.mission.item.command.SetServo;
 import com.o3dr.services.android.lib.drone.mission.item.command.TakePicture;
 import com.o3dr.services.android.lib.drone.mission.item.command.Takeoff;
+import com.o3dr.services.android.lib.drone.mission.item.command.VTOLLand;
+import com.o3dr.services.android.lib.drone.mission.item.command.VTOLTakeoff;
+import com.o3dr.services.android.lib.drone.mission.item.command.VTOLTransition;
 import com.o3dr.services.android.lib.drone.mission.item.command.YawCondition;
 import com.o3dr.services.android.lib.drone.mission.item.complex.SplineSurvey;
 import com.o3dr.services.android.lib.drone.mission.item.complex.StructureScanner;
@@ -304,6 +307,42 @@ public enum MissionItemType {
         @Override
         protected Creator<TakePicture> getMissionItemCreator() {
             return TakePicture.CREATOR;
+        }
+    },
+
+    VTOL_TAKEOFF("VTOL Takeoff") {
+        @Override
+        public MissionItem getNewItem() {
+            return new VTOLTakeoff();
+        }
+
+        @Override
+        protected Creator<VTOLTakeoff> getMissionItemCreator() {
+            return VTOLTakeoff.CREATOR;
+        }
+    },
+
+    VTOL_TRANSITION("VTOL Transition") {
+        @Override
+        public MissionItem getNewItem() {
+            return new VTOLTransition();
+        }
+
+        @Override
+        protected Creator<VTOLTransition> getMissionItemCreator() {
+            return VTOLTransition.CREATOR;
+        }
+    },
+
+    VTOL_LAND("VTOL Land") {
+        @Override
+        public MissionItem getNewItem() {
+            return new VTOLLand();
+        }
+
+        @Override
+        protected Creator<VTOLLand> getMissionItemCreator() {
+            return VTOLLand.CREATOR;
         }
     },
     ;
