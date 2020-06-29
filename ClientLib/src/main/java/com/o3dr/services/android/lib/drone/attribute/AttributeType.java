@@ -129,4 +129,6 @@ public class AttributeType {
      */
     public static final String AUTOPILOT_VERSION = PACKAGE_NAME + ".AUTOPILOT_VERSION";
 
+    public static final String RANGE_FINDER = PACKAGE_NAME + ".RANGE_FINDER";
+
 }

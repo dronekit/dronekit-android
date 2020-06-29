@@ -226,4 +226,6 @@ public class AttributeEvent {
 
     public static final String ADSB_VEHICLE = PACKAGE_NAME + ".ADSB_VEHICLE";
 
+    public static final String RANGE_FINDER = PACKAGE_NAME + ".RANGE_FINDER";
+
 }

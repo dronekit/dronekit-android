@@ -9,10 +9,12 @@ import android.view.Surface;
 
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.ardupilotmega.msg_ekf_status_report;
+import com.MAVLink.ardupilotmega.msg_rangefinder;
 import com.MAVLink.common.msg_adsb_vehicle;
 import com.MAVLink.common.msg_attitude;
 import com.MAVLink.common.msg_autopilot_version;
 import com.MAVLink.common.msg_battery_status;
+import com.MAVLink.common.msg_distance_sensor;
 import com.MAVLink.common.msg_global_position_int;
 import com.MAVLink.common.msg_gps2_raw;
 import com.MAVLink.common.msg_gps_raw_int;
@@ -42,6 +44,7 @@ import com.o3dr.services.android.lib.drone.property.Altitude;
 import com.o3dr.services.android.lib.drone.property.Attitude;
 import com.o3dr.services.android.lib.drone.property.AutopilotVersion;
 import com.o3dr.services.android.lib.drone.property.Battery;
+import com.o3dr.services.android.lib.drone.property.DistanceSensor;
 import com.o3dr.services.android.lib.drone.property.DroneAttribute;
 import com.o3dr.services.android.lib.drone.property.FenceStatus;
 import com.o3dr.services.android.lib.drone.property.Gps;
@@ -49,6 +52,7 @@ import com.o3dr.services.android.lib.drone.property.Home;
 import com.o3dr.services.android.lib.drone.property.MavlinkConnectionStats;
 import com.o3dr.services.android.lib.drone.property.Parameter;
 import com.o3dr.services.android.lib.drone.property.Parameters;
+import com.o3dr.services.android.lib.drone.property.RangeFinder;
 import com.o3dr.services.android.lib.drone.property.Signal;
 import com.o3dr.services.android.lib.drone.property.Speed;
 import com.o3dr.services.android.lib.drone.property.VehicleMode;
@@ -124,6 +128,7 @@ public class GenericMavLinkDrone implements MavLinkDrone {
     protected final FenceStatus fenceStatus = new FenceStatus();
     protected final AutopilotVersion apVersion = new AutopilotVersion();
     protected final MavlinkConnectionStats mavlinkStats = new MavlinkConnectionStats();
+    protected final RangeFinder rangeFinder = new RangeFinder();
 
     protected final Handler handler;
 
@@ -601,6 +606,9 @@ public class GenericMavLinkDrone implements MavLinkDrone {
 
             case AttributeType.AUTOPILOT_VERSION:
                 return apVersion;
+
+            case AttributeType.RANGE_FINDER:
+                return rangeFinder;
         }
 
         return null;
@@ -692,7 +700,35 @@ public class GenericMavLinkDrone implements MavLinkDrone {
             case msg_adsb_vehicle.MAVLINK_MSG_ID_ADSB_VEHICLE:
                 processADSBVehicle((msg_adsb_vehicle)message);
                 break;
+
+            case msg_rangefinder.MAVLINK_MSG_ID_RANGEFINDER: {
+                processRangefinder((msg_rangefinder)message);
+                break;
+            }
+
+            case msg_distance_sensor.MAVLINK_MSG_ID_DISTANCE_SENSOR: {
+                processDistanceSensor((msg_distance_sensor)message);
+                break;
+            }
         }
+    }
+
+    protected void processRangefinder(msg_rangefinder msg) {
+        rangeFinder.setDistance(msg.distance);
+        rangeFinder.setVoltage(msg.voltage);
+    }
+
+    protected void processDistanceSensor(msg_distance_sensor msg) {
+        DistanceSensor sensor = rangeFinder.getSensors().get(Integer.valueOf(msg.id));
+        if(sensor == null) {
+            sensor = new DistanceSensor();
+            rangeFinder.getSensors().put(Integer.valueOf(msg.id), sensor);
+        }
+
+        DistanceSensor.populate(sensor, msg);
+        final Bundle extras = new Bundle();
+        extras.putParcelable(AttributeEventExtra.EXTRA_RANGE_FINDER, rangeFinder);
+        notifyAttributeListener(AttributeEvent.RANGE_FINDER, extras);
     }
 
     protected void processADSBVehicle(msg_adsb_vehicle msg) {

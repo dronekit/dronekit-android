@@ -140,4 +140,7 @@ public class AttributeEventExtra {
 
     /** ADSB vehicle */
     public static final String EXTRA_ADSB_VEHICLE = PACKAGE_NAME + ".EXTRA_ADSB_VEHICLE";
+
+    /** Range finder */
+    public static final String EXTRA_RANGE_FINDER = PACKAGE_NAME + ".EXTRA_RANGE_FINDER";
 }
