@@ -31,24 +31,28 @@ public class DistanceSensor {
     }
 
     public enum Orientation {
-        Forward(0),
-        ForwardRight(1),
-        Right(2),
-        BackRight(3),
-        Back(4),
-        BackLeft(5),
-        Left(6),
-        ForwardLeft(7),
-        Up(24),
-        Down(25)
+        Forward(0, "Forward"),
+        ForwardRight(1, "Forward Right"),
+        Right(2, "Right"),
+        BackRight(3, "Back Right"),
+        Back(4, "Back"),
+        BackLeft(5, "Back Left"),
+        Left(6, "Left"),
+        ForwardLeft(7, "Forward Left"),
+        Up(24, "Up"),
+        Down(25, "Down")
         ;
 
-        private int direction;
-        Orientation(int direction) {
+        private final int direction;
+        private final String label;
+        
+        Orientation(int direction, String label) {
             this.direction = direction;
+            this.label = label;
         }
 
         public int getDirection() { return direction; }
+        public String getLabel() { return this.label; }
 
         public static Orientation from(int o) {
             for(Orientation v: values()) {
