@@ -26,6 +26,7 @@ import com.MAVLink.common.msg_nav_controller_output;
 import com.MAVLink.common.msg_radio_status;
 import com.MAVLink.common.msg_sys_status;
 import com.MAVLink.common.msg_vibration;
+import com.MAVLink.enums.MAV_COMPONENT;
 import com.MAVLink.enums.MAV_MODE_FLAG;
 import com.MAVLink.enums.MAV_STATE;
 import com.o3dr.services.android.lib.coordinate.LatLong;
@@ -99,6 +100,12 @@ import timber.log.Timber;
  */
 public class GenericMavLinkDrone implements MavLinkDrone {
     private static final String TAG = GenericMavLinkDrone.class.getSimpleName();
+
+    private static boolean isFromCameraComponent(msg_heartbeat msg) {
+        boolean isCam = (msg.compid == MAV_COMPONENT.MAV_COMP_ID_CAMERA);
+
+        return isCam;
+    }
 
     private final DataLink.DataLinkProvider<MAVLinkMessage> mavClient;
 
@@ -773,6 +780,8 @@ public class GenericMavLinkDrone implements MavLinkDrone {
             checkIfFlying(msg_heart);
             processState(msg_heart);
             processVehicleMode(msg_heart);
+        } else if(isFromCameraComponent(msg_heart)) {
+            notifyAttributeListener(AttributeEvent.CAMERA_HEARTBEAT);
         }
     }
 

@@ -59,6 +59,7 @@ public class AttributeEvent {
     /**
      * Camera attribute events.
      */
+    public static final String CAMERA_HEARTBEAT = PACKAGE_NAME + ".CAMERA_HEARTBEAT";
     public static final String CAMERA_UPDATED = PACKAGE_NAME + ".CAMERA_UPDATED";
     public static final String CAMERA_FOOTPRINTS_UPDATED = PACKAGE_NAME + ".CAMERA_FOOTPRINTS_UPDATED";
 
@@ -227,5 +228,4 @@ public class AttributeEvent {
     public static final String ADSB_VEHICLE = PACKAGE_NAME + ".ADSB_VEHICLE";
 
     public static final String RANGE_FINDER = PACKAGE_NAME + ".RANGE_FINDER";
-
 }
