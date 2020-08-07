@@ -101,8 +101,8 @@ import timber.log.Timber;
 public class GenericMavLinkDrone implements MavLinkDrone {
     private static final String TAG = GenericMavLinkDrone.class.getSimpleName();
 
-    private static boolean isFromCameraComponent(msg_heartbeat msg) {
-        boolean isCam = (msg.compid == MAV_COMPONENT.MAV_COMP_ID_CAMERA);
+    private static boolean isFromAirCommander(msg_heartbeat msg) {
+        boolean isCam = (msg.compid == 105); // Camera 6
 
         return isCam;
     }
@@ -780,8 +780,12 @@ public class GenericMavLinkDrone implements MavLinkDrone {
             checkIfFlying(msg_heart);
             processState(msg_heart);
             processVehicleMode(msg_heart);
-        } else if(isFromCameraComponent(msg_heart)) {
-            notifyAttributeListener(AttributeEvent.CAMERA_HEARTBEAT);
+        } else if(isFromAirCommander(msg_heart)) {
+            Log.v(TAG, "It's aircommander!");
+            final Bundle attrs = new Bundle();
+            attrs.putInt("sysid", msg_heart.sysid);
+            attrs.putInt("compid", msg_heart.compid);
+            notifyAttributeListener(AttributeEvent.AIRCOMMANDER_HEARTBEAT, attrs);
         }
     }
 

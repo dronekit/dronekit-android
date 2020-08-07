@@ -59,9 +59,12 @@ public class AttributeEvent {
     /**
      * Camera attribute events.
      */
-    public static final String CAMERA_HEARTBEAT = PACKAGE_NAME + ".CAMERA_HEARTBEAT";
     public static final String CAMERA_UPDATED = PACKAGE_NAME + ".CAMERA_UPDATED";
     public static final String CAMERA_FOOTPRINTS_UPDATED = PACKAGE_NAME + ".CAMERA_FOOTPRINTS_UPDATED";
+
+    // AirCommander event when onboard
+    public static final String AIRCOMMANDER_HEARTBEAT = PACKAGE_NAME + ".AIRCOMMANDER_HEARTBEAT";
+
 
     /**
      * GuidedState attribute events.
