@@ -51,6 +51,7 @@ public enum VehicleMode implements DroneAttribute {
     COPTER_AVOID_ADSB(19,Type.TYPE_COPTER,"Avoid ADSB"),
     COPTER_GUIDED_NOGPS(20,Type.TYPE_COPTER,"Guided NoGPS"),
     COPTER_SMART_RTL(21,Type.TYPE_COPTER,"Smart RTL"),
+    COPTER_ZIGZAG(24,Type.TYPE_COPTER,"Zig zag"),
 
     ROVER_MANUAL(0, Type.TYPE_ROVER, "Manual"),
     ROVER_ACRO(1, Type.TYPE_ROVER, "Acro"),
