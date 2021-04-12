@@ -989,8 +989,7 @@ public class CommonApiUtils {
 
     public static Survey buildSurvey(MavLinkDrone drone, Survey survey) {
         org.droidplanner.services.android.impl.core.mission.Mission droneMission = drone == null ? null : drone.getMission();
-        SurveyImpl updatedSurveyImpl = (SurveyImpl) ProxyUtils.getMissionItemImpl
-                (droneMission, survey);
+        SurveyImpl updatedSurveyImpl = (SurveyImpl) ProxyUtils.getMissionItemImpl(droneMission, survey);
 
         return (Survey) ProxyUtils.getProxyMissionItem(updatedSurveyImpl);
     }

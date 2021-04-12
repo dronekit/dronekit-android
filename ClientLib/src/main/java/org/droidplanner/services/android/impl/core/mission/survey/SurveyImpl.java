@@ -1,5 +1,7 @@
 package org.droidplanner.services.android.impl.core.mission.survey;
 
+import android.util.Log;
+
 import com.MAVLink.common.msg_mission_item;
 import com.MAVLink.enums.MAV_CMD;
 import com.MAVLink.enums.MAV_FRAME;
@@ -48,8 +50,8 @@ public class SurveyImpl extends MissionItemImpl {
     public double getCenterElevation() { return centerElevation; }
     public void setCenterElevation(double elevation) { centerElevation = elevation; }
 
-    public void update(double angle, double altitude, double overlap, double sidelap, boolean lockOrientation) {
-        surveyData.update(angle, altitude, overlap, sidelap, lockOrientation);
+    public void update(double angle, double altitude, double overlap, double sidelap, boolean lockOrientation, boolean lockYaw, double lockYawAngle) {
+        surveyData.update(angle, altitude, overlap, sidelap, lockOrientation, lockYaw, lockYawAngle);
     }
 
     public boolean isStartCameraBeforeFirstWaypoint() {
@@ -87,6 +89,8 @@ public class SurveyImpl extends MissionItemImpl {
     }
 
     private void packSurveyPoints(List<msg_mission_item> list) {
+        Log.v("DIPSHIT", "packSurveyPoints(): surveyData.lockYaw=" + surveyData.getLockYaw());
+
         //Generate the camera trigger
         CameraTriggerImpl camTrigger = new CameraTriggerImpl(mission, surveyData.getLongitudinalPictureDistance());
 
@@ -96,7 +100,8 @@ public class SurveyImpl extends MissionItemImpl {
         }
 
         final double altitude = surveyData.getAltitude();
-        Timber.d("centerElevation=%.2f", centerElevation);
+        Timber.d("centerElevation=%.2f lockYaw=%s lockYawAngle=%.2f", centerElevation, surveyData.getLockYaw(), surveyData.getLockYawAngle());
+        Log.v("DIPSHIT", String.format("centerElevation=%.2f lockYaw=%s lockYawAngle=%.2f", centerElevation, surveyData.getLockYaw(), surveyData.getLockYawAngle()));
 
         //Add the camera trigger after the first waypoint if it wasn't added before.
         boolean addToFirst = !startCameraBeforeFirstWaypoint;
@@ -106,6 +111,9 @@ public class SurveyImpl extends MissionItemImpl {
             list.add(mavMsg);
             if(surveyData.getLockOrientation()) {
                 msg_mission_item yawMsg = getYawCondition(surveyData.getAngle());
+                list.add(yawMsg);
+            } else if(surveyData.getLockYaw()) {
+                msg_mission_item yawMsg = getYawCondition(surveyData.getLockYawAngle());
                 list.add(yawMsg);
             }
 

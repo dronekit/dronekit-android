@@ -100,6 +100,8 @@ public class ProxyUtils {
         surveyDetail.setAngle(surveyData.getAngle());
         surveyDetail.setAltitude(surveyData.getAltitude());
         surveyDetail.setLockOrientation(surveyData.getLockOrientation());
+        surveyDetail.setLockYaw(surveyData.getLockYaw());
+        surveyDetail.setLockYawAngle(surveyData.getLockYawAngle());
         return surveyDetail;
     }
 
@@ -328,8 +330,12 @@ public class ProxyUtils {
                     if (cameraDetail != null)
                         temp.setCameraInfo(getCameraInfo(cameraDetail));
 
-                    temp.update(surveyDetail.getAngle(), (surveyDetail.getAltitude()),
-                            surveyDetail.getOverlap(), surveyDetail.getSidelap(), surveyDetail.getLockOrientation());
+                    Log.v("DIPSHIT", String.format("ProxyUtils: lockYaw=%s lockAngle=%f", surveyDetail.getLockYaw(), surveyDetail.getLockYawAngle()));
+
+                    temp.update(surveyDetail.getAngle(), surveyDetail.getAltitude(),
+                            surveyDetail.getOverlap(), surveyDetail.getSidelap(),
+                            surveyDetail.getLockOrientation(),
+                            surveyDetail.getLockYaw(), surveyDetail.getLockYawAngle());
                 }
 
                 try {
@@ -355,7 +361,8 @@ public class ProxyUtils {
                         temp.setCameraInfo(getCameraInfo(cameraDetail));
 
                     temp.update(surveyDetail.getAngle(), (surveyDetail.getAltitude()),
-                            surveyDetail.getOverlap(), surveyDetail.getSidelap(), surveyDetail.getLockOrientation());
+                            surveyDetail.getOverlap(), surveyDetail.getSidelap(), surveyDetail.getLockOrientation(),
+                            surveyDetail.getLockYaw(), surveyDetail.getLockYawAngle());
                 }
 
                 try {

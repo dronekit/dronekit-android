@@ -14,6 +14,8 @@ public class SurveyDetail implements Parcelable {
     private double sidelap;
     private boolean lockOrientation;
     private CameraDetail cameraDetail;
+    private boolean lockYaw = false;
+    private double lockYawAngle = 0;
 
     public double getAltitude() {
         return altitude;
@@ -54,6 +56,12 @@ public class SurveyDetail implements Parcelable {
     public void setCameraDetail(CameraDetail cameraDetail) {
         this.cameraDetail = cameraDetail;
     }
+
+    public boolean getLockYaw() { return lockYaw; }
+    public void setLockYaw(boolean lock) { lockYaw = lock; }
+
+    public double getLockYawAngle() { return lockYawAngle; }
+    public void setLockYawAngle(double angle) { lockYawAngle = angle; }
 
     /**
      * True if aircraft's yaw is locked to the angle of the survey
@@ -111,6 +119,8 @@ public class SurveyDetail implements Parcelable {
         dest.writeDouble(this.sidelap);
         dest.writeParcelable(this.cameraDetail, 0);
         dest.writeByte((byte)(this.lockOrientation?1:0));
+        dest.writeByte((byte)(this.lockYaw? 1: 0));
+        dest.writeDouble(this.lockYawAngle);
     }
 
     public SurveyDetail() {
@@ -122,6 +132,8 @@ public class SurveyDetail implements Parcelable {
         this.overlap = copy.overlap;
         this.sidelap = copy.sidelap;
         this.lockOrientation = copy.lockOrientation;
+        this.lockYaw = copy.lockYaw;
+        this.lockYawAngle = copy.lockYawAngle;
         this.cameraDetail = copy.cameraDetail == null ? null : new CameraDetail(copy.cameraDetail);
     }
 
@@ -132,6 +144,8 @@ public class SurveyDetail implements Parcelable {
         this.sidelap = in.readDouble();
         this.cameraDetail = in.readParcelable(CameraDetail.class.getClassLoader());
         this.lockOrientation = in.readByte() != 0;
+        this.lockYaw = in.readByte() != 0;
+        this.lockYawAngle = in.readDouble();
     }
 
     public static final Parcelable.Creator<SurveyDetail> CREATOR = new Parcelable.Creator<SurveyDetail>() {

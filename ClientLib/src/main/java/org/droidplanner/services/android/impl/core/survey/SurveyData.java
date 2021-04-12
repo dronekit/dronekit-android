@@ -1,5 +1,7 @@
 package org.droidplanner.services.android.impl.core.survey;
 
+import android.util.Log;
+
 import org.droidplanner.services.android.impl.core.helpers.units.Area;
 
 import java.util.Locale;
@@ -12,17 +14,23 @@ public class SurveyData {
     private Double sidelap;
     private boolean lockOrientation;
     private Footprint footprint;
+    private boolean lockYaw = false;
+    private double lockYawAngle = 0;
 
     public SurveyData() {
-        update(0, (50.0), 50, 60, false);
+        update(0, (50.0), 50, 60, false, false, 0);
     }
 
-    public void update(double angle, double altitude, double overlap, double sidelap, boolean lockOrientation) {
+    public void update(double angle, double altitude, double overlap, double sidelap, boolean lockOrientation, boolean lockYaw, double lockYawAngle) {
         this.angle = angle;
         this.overlap = overlap;
         this.sidelap = sidelap;
         setAltitude(altitude);
         this.lockOrientation = lockOrientation;
+        this.lockYaw = lockYaw;
+        this.lockYawAngle = lockYawAngle;
+
+        Log.v("DIPSHIT", String.format("SurveyData.update() this.lockYaw=%s this.lockYawAngle=%f", this.lockYaw, this.lockYawAngle));
     }
 
     public void setAltitude(double altitude) {
@@ -43,6 +51,10 @@ public class SurveyData {
     public void setLockOrientation(boolean lockOrientation) {
         this.lockOrientation = lockOrientation;
     }
+
+    public void setLockYaw(boolean lock) { lockYaw = lock; }
+
+    public void setLockYawAngle(double angle) { lockYawAngle = angle; }
 
     private void tryToLoadOverlapFromCamera() {
         if (camera.overlap != null) {
@@ -97,10 +109,14 @@ public class SurveyData {
         return lockOrientation;
     }
 
+    public boolean getLockYaw() { return lockYaw; }
+
+    public double getLockYawAngle() { return lockYawAngle; }
+
     @Override
     public String toString() {
-        return String.format(Locale.US, "Altitude: %f Angle %f Overlap: %f Sidelap: %f Locked Orientation: %b", altitude,
-                angle, overlap, sidelap, lockOrientation);
+        return String.format(Locale.US, "Altitude: %f Angle %f Overlap: %f Sidelap: %f Locked Orientation: %b, lockYaw=%s, lockYawAngle=%f", altitude,
+                angle, overlap, sidelap, lockOrientation, lockYaw, lockYawAngle);
     }
 
 }
