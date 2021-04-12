@@ -89,8 +89,6 @@ public class SurveyImpl extends MissionItemImpl {
     }
 
     private void packSurveyPoints(List<msg_mission_item> list) {
-        Log.v("DIPSHIT", "packSurveyPoints(): surveyData.lockYaw=" + surveyData.getLockYaw());
-
         //Generate the camera trigger
         CameraTriggerImpl camTrigger = new CameraTriggerImpl(mission, surveyData.getLongitudinalPictureDistance());
 
@@ -100,8 +98,7 @@ public class SurveyImpl extends MissionItemImpl {
         }
 
         final double altitude = surveyData.getAltitude();
-        Timber.d("centerElevation=%.2f lockYaw=%s lockYawAngle=%.2f", centerElevation, surveyData.getLockYaw(), surveyData.getLockYawAngle());
-        Log.v("DIPSHIT", String.format("centerElevation=%.2f lockYaw=%s lockYawAngle=%.2f", centerElevation, surveyData.getLockYaw(), surveyData.getLockYawAngle()));
+        Timber.d("packSurveyPoints(): centerElevation=%.2f lockYaw=%s lockYawAngle=%.2f", centerElevation, surveyData.getLockYaw(), surveyData.getLockYawAngle());
 
         //Add the camera trigger after the first waypoint if it wasn't added before.
         boolean addToFirst = !startCameraBeforeFirstWaypoint;

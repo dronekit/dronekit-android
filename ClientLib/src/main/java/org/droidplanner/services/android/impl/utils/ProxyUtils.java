@@ -330,8 +330,6 @@ public class ProxyUtils {
                     if (cameraDetail != null)
                         temp.setCameraInfo(getCameraInfo(cameraDetail));
 
-                    Log.v("DIPSHIT", String.format("ProxyUtils: lockYaw=%s lockAngle=%f", surveyDetail.getLockYaw(), surveyDetail.getLockYawAngle()));
-
                     temp.update(surveyDetail.getAngle(), surveyDetail.getAltitude(),
                             surveyDetail.getOverlap(), surveyDetail.getSidelap(),
                             surveyDetail.getLockOrientation(),

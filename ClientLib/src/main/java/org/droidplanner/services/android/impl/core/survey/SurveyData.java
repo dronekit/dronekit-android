@@ -29,8 +29,6 @@ public class SurveyData {
         this.lockOrientation = lockOrientation;
         this.lockYaw = lockYaw;
         this.lockYawAngle = lockYawAngle;
-
-        Log.v("DIPSHIT", String.format("SurveyData.update() this.lockYaw=%s this.lockYawAngle=%f", this.lockYaw, this.lockYawAngle));
     }
 
     public void setAltitude(double altitude) {
