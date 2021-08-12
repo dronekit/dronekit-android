@@ -28,6 +28,10 @@ public class ControlActions {
 
     public static final String ACTION_SEND_BRAKE_VEHICLE = PACKAGE_NAME + ".action.SEND_BRAKE_VEHICLE";
 
+    public static final String ACTION_VTOL_TRANSITION = PACKAGE_NAME + ".action.VTOL_TRANSITION";
+    public static final String EXTRA_VTOL_TARGET_STATE = "extra_vtol_state";
+
+
     /**
      * X velocity in meters per second.
      */

@@ -55,6 +55,22 @@ public class Type extends DroneVariable<MavLinkDrone> implements DroneInterfaces
         }
     }
 
+    public static boolean isVtol(int type) {
+        switch(type) {
+            case MAV_TYPE.MAV_TYPE_VTOL_DUOROTOR:
+            case MAV_TYPE.MAV_TYPE_VTOL_QUADROTOR:
+            case MAV_TYPE.MAV_TYPE_VTOL_TILTROTOR:
+            case MAV_TYPE.MAV_TYPE_VTOL_RESERVED2:
+            case MAV_TYPE.MAV_TYPE_VTOL_RESERVED3:
+            case MAV_TYPE.MAV_TYPE_VTOL_RESERVED4:
+            case MAV_TYPE.MAV_TYPE_VTOL_RESERVED5:
+                return true;
+
+            default:
+                return false;
+        }
+    }
+
     public static boolean isPlane(int type){
         return type == MAV_TYPE.MAV_TYPE_FIXED_WING;
     }
@@ -64,7 +80,7 @@ public class Type extends DroneVariable<MavLinkDrone> implements DroneInterfaces
     }
 
     public static boolean isVehicle(int type) {
-	    return isCopter(type) || isPlane(type) || isRover(type);
+	    return isCopter(type) || isPlane(type) || isRover(type) || isVtol(type);
     }
 
     @Override

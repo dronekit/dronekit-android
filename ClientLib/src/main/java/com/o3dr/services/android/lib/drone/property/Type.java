@@ -11,6 +11,7 @@ public class Type implements DroneAttribute {
     public static final int TYPE_PLANE = 1;
     public static final int TYPE_COPTER = 2;
     public static final int TYPE_ROVER = 10;
+    public static final int TYPE_VTOL = 12;
 
     public static enum Firmware {
         ARDU_PLANE("ArduPlane"),
@@ -44,6 +45,7 @@ public class Type implements DroneAttribute {
                 break;
 
             case TYPE_PLANE:
+            case TYPE_VTOL:
                 firmware = Firmware.ARDU_PLANE;
                 break;
 

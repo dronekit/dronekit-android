@@ -11,6 +11,7 @@ import com.MAVLink.common.msg_set_position_target_local_ned;
 import com.MAVLink.enums.MAV_CMD;
 import com.MAVLink.enums.MAV_FRAME;
 import com.MAVLink.enums.MAV_GOTO;
+import com.o3dr.services.android.lib.drone.mission.item.command.VTOLTransition;
 import com.o3dr.services.android.lib.model.ICommandListener;
 
 import org.droidplanner.services.android.impl.core.drone.autopilot.MavLinkDrone;
@@ -26,6 +27,16 @@ public class MavLinkCommands {
     private static final int MAVLINK_SET_POS_TYPE_MASK_POS_IGNORE = ((1 << 0) | (1 << 1) | (1 << 2));
     private static final int MAVLINK_SET_POS_TYPE_MASK_VEL_IGNORE = ((1 << 3) | (1 << 4) | (1 << 5));
     private static final int MAVLINK_SET_POS_TYPE_MASK_ACC_IGNORE = ((1 << 6) | (1 << 7) | (1 << 8));
+
+    public static void sendVTOLTransition(MavLinkDrone drone, VTOLTransition.TargetState state, ICommandListener listener) {
+        msg_command_long msg = new msg_command_long();
+        msg.target_system = drone.getSysid();
+        msg.target_component = drone.getCompid();
+        msg.command = MAV_CMD.MAV_CMD_DO_VTOL_TRANSITION;
+        msg.param1 = state.getState();
+
+        drone.getMavClient().sendMessage(msg, listener);
+    }
 
     public static void changeMissionSpeed(MavLinkDrone drone, float speed, ICommandListener listener) {
         msg_command_long msg = new msg_command_long();

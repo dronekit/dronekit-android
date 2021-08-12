@@ -242,6 +242,21 @@ public class CommonApiUtils {
             case ROVER_INITIALIZING:
                 return VehicleMode.ROVER_INITIALIZING;
 
+            case VTOL_STABILIZE:
+                return VehicleMode.VTOL_STABILIZE;
+
+            case VTOL_HOVER:
+                return VehicleMode.VTOL_HOVER;
+
+            case VTOL_LOITER:
+                return VehicleMode.VTOL_LOITER;
+
+            case VTOL_LAND:
+                return VehicleMode.VTOL_LAND;
+
+            case VTOL_RTL:
+                return VehicleMode.VTOL_RTL;
+
             default:
             case UNKNOWN:
                 return null;
@@ -264,6 +279,15 @@ public class CommonApiUtils {
             case MAV_TYPE.MAV_TYPE_GROUND_ROVER:
             case MAV_TYPE.MAV_TYPE_SURFACE_BOAT:
                 return Type.TYPE_ROVER;
+
+            case MAV_TYPE.MAV_TYPE_VTOL_DUOROTOR:
+            case MAV_TYPE.MAV_TYPE_VTOL_QUADROTOR:
+            case MAV_TYPE.MAV_TYPE_VTOL_TILTROTOR:
+            case MAV_TYPE.MAV_TYPE_VTOL_RESERVED2:
+            case MAV_TYPE.MAV_TYPE_VTOL_RESERVED3:
+            case MAV_TYPE.MAV_TYPE_VTOL_RESERVED4:
+            case MAV_TYPE.MAV_TYPE_VTOL_RESERVED5:
+                return Type.TYPE_VTOL;
 
             default:
                 return -1;

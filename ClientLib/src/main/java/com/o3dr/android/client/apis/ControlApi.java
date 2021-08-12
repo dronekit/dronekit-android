@@ -4,7 +4,9 @@ import android.os.Bundle;
 
 import com.o3dr.android.client.Drone;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
+import com.o3dr.services.android.lib.drone.action.ControlActions;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
+import com.o3dr.services.android.lib.drone.mission.item.command.VTOLTransition;
 import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
 import com.o3dr.services.android.lib.model.AbstractCommandListener;
 import com.o3dr.services.android.lib.model.action.Action;
@@ -246,6 +248,19 @@ public class ControlApi extends Api {
         Bundle params = new Bundle();
         params.putParcelable(EXTRA_MAVLINK_MESSAGE, new MavlinkMessageWrapper(msg));
         drone.performAsyncAction(new Action(ACTION_SEND_MAVLINK_MESSAGE, params));
+    }
+
+    /**
+     * Instructs the vehicle to perform a VTOL state transition.
+     *
+     * @param state
+     */
+    public void setVTOLState(VTOLTransition.TargetState state) {
+        Timber.d("setVTOLState(%s)", state);
+
+        Bundle params = new Bundle();
+        params.putInt(ControlActions.EXTRA_VTOL_TARGET_STATE, state.ordinal());
+        drone.performAsyncActionOnDroneThread(new Action(ControlActions.ACTION_VTOL_TRANSITION, params), null);
     }
 
     private static boolean isWithinBounds(float value, float lowerBound, float upperBound) {
