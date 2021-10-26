@@ -10,7 +10,8 @@ import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.common.msg_command_long;
 import com.MAVLink.enums.MAV_CMD;
-import com.o3dr.android.client.BuildConfig;
+import com.hoho.android.usbserial.BuildConfig;
+//import com.o3dr.android.client.BuildConfig;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionType;
 import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
@@ -32,7 +33,7 @@ import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
-import static android.support.v4.app.ActivityCompat.startActivity;
+//import static android.support.v4.app.ActivityCompat.startActivity;
 
 
 /**

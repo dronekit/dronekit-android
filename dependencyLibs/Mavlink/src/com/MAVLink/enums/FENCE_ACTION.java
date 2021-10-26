@@ -7,8 +7,8 @@
 package com.MAVLink.enums;
 
 /** 
-* 
-*/
+ * 
+ */
 public class FENCE_ACTION {
    public static final int FENCE_ACTION_NONE = 0; /* Disable fenced mode | */
    public static final int FENCE_ACTION_GUIDED = 1; /* Switched to guided mode to return point (fence point 0) | */

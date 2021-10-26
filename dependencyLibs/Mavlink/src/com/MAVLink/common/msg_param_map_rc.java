@@ -11,146 +11,178 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
-* Bind a RC channel to a parameter. The parameter should change accoding to the RC channel value.
-*/
-public class msg_param_map_rc extends MAVLinkMessage{
+ * Bind a RC channel to a parameter. The parameter should change according to the RC channel value.
+ */
+public class msg_param_map_rc extends MAVLinkMessage {
 
     public static final int MAVLINK_MSG_ID_PARAM_MAP_RC = 50;
     public static final int MAVLINK_MSG_LENGTH = 37;
     private static final long serialVersionUID = MAVLINK_MSG_ID_PARAM_MAP_RC;
 
-
       
     /**
-    * Initial parameter value
-    */
+     * Initial parameter value
+     */
     public float param_value0;
       
     /**
-    * Scale, maps the RC range [-1, 1] to a parameter value
-    */
+     * Scale, maps the RC range [-1, 1] to a parameter value
+     */
     public float scale;
       
     /**
-    * Minimum param value. The protocol does not define if this overwrites an onboard minimum value. (Depends on implementation)
-    */
+     * Minimum param value. The protocol does not define if this overwrites an onboard minimum value. (Depends on implementation)
+     */
     public float param_value_min;
       
     /**
-    * Maximum param value. The protocol does not define if this overwrites an onboard maximum value. (Depends on implementation)
-    */
+     * Maximum param value. The protocol does not define if this overwrites an onboard maximum value. (Depends on implementation)
+     */
     public float param_value_max;
       
     /**
-    * Parameter index. Send -1 to use the param ID field as identifier (else the param id will be ignored), send -2 to disable any existing map for this rc_channel_index.
-    */
+     * Parameter index. Send -1 to use the param ID field as identifier (else the param id will be ignored), send -2 to disable any existing map for this rc_channel_index.
+     */
     public short param_index;
       
     /**
-    * System ID
-    */
+     * System ID
+     */
     public short target_system;
       
     /**
-    * Component ID
-    */
+     * Component ID
+     */
     public short target_component;
       
     /**
-    * Onboard parameter id, terminated by NULL if the length is less than 16 human-readable chars and WITHOUT null termination (NULL) byte if the length is exactly 16 chars - applications have to provide 16+1 bytes storage if the ID is stored as string
-    */
+     * Onboard parameter id, terminated by NULL if the length is less than 16 human-readable chars and WITHOUT null termination (NULL) byte if the length is exactly 16 chars - applications have to provide 16+1 bytes storage if the ID is stored as string
+     */
     public byte param_id[] = new byte[16];
       
     /**
-    * Index of parameter RC channel. Not equal to the RC channel id. Typically correpsonds to a potentiometer-knob on the RC.
-    */
+     * Index of parameter RC channel. Not equal to the RC channel id. Typically corresponds to a potentiometer-knob on the RC.
+     */
     public short parameter_rc_channel_index;
     
 
     /**
-    * Generates the payload for a mavlink message for a message of this type
-    * @return
-    */
-    public MAVLinkPacket pack(){
-        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH);
-        packet.sysid = 255;
-        packet.compid = 190;
+     * Generates the payload for a mavlink message for a message of this type
+     * @return
+     */
+    @Override
+    public MAVLinkPacket pack() {
+        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH,isMavlink2);
+        packet.sysid = sysid;
+        packet.compid = compid;
         packet.msgid = MAVLINK_MSG_ID_PARAM_MAP_RC;
-              
+        
         packet.payload.putFloat(param_value0);
-              
         packet.payload.putFloat(scale);
-              
         packet.payload.putFloat(param_value_min);
-              
         packet.payload.putFloat(param_value_max);
-              
         packet.payload.putShort(param_index);
-              
         packet.payload.putUnsignedByte(target_system);
-              
         packet.payload.putUnsignedByte(target_component);
-              
         
         for (int i = 0; i < param_id.length; i++) {
             packet.payload.putByte(param_id[i]);
         }
                     
-              
         packet.payload.putUnsignedByte(parameter_rc_channel_index);
         
+        if (isMavlink2) {
+            
+        }
         return packet;
     }
 
     /**
-    * Decode a param_map_rc message into this class fields
-    *
-    * @param payload The message to decode
-    */
+     * Decode a param_map_rc message into this class fields
+     *
+     * @param payload The message to decode
+     */
+    @Override
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-              
+        
         this.param_value0 = payload.getFloat();
-              
         this.scale = payload.getFloat();
-              
         this.param_value_min = payload.getFloat();
-              
         this.param_value_max = payload.getFloat();
-              
         this.param_index = payload.getShort();
-              
         this.target_system = payload.getUnsignedByte();
-              
         this.target_component = payload.getUnsignedByte();
-              
          
         for (int i = 0; i < this.param_id.length; i++) {
             this.param_id[i] = payload.getByte();
         }
                 
-              
         this.parameter_rc_channel_index = payload.getUnsignedByte();
+        
+        if (isMavlink2) {
+            
+        }
+    }
+
+    /**
+     * Constructor for a new message, just initializes the msgid
+     */
+    public msg_param_map_rc() {
+        this.msgid = MAVLINK_MSG_ID_PARAM_MAP_RC;
+    }
+    
+    /**
+     * Constructor for a new message, initializes msgid and all payload variables
+     */
+    public msg_param_map_rc( float param_value0, float scale, float param_value_min, float param_value_max, short param_index, short target_system, short target_component, byte[] param_id, short parameter_rc_channel_index) {
+        this.msgid = MAVLINK_MSG_ID_PARAM_MAP_RC;
+
+        this.param_value0 = param_value0;
+        this.scale = scale;
+        this.param_value_min = param_value_min;
+        this.param_value_max = param_value_max;
+        this.param_index = param_index;
+        this.target_system = target_system;
+        this.target_component = target_component;
+        this.param_id = param_id;
+        this.parameter_rc_channel_index = parameter_rc_channel_index;
+        
+    }
+    
+    /**
+     * Constructor for a new message, initializes everything
+     */
+    public msg_param_map_rc( float param_value0, float scale, float param_value_min, float param_value_max, short param_index, short target_system, short target_component, byte[] param_id, short parameter_rc_channel_index, int sysid, int compid, boolean isMavlink2) {
+        this.msgid = MAVLINK_MSG_ID_PARAM_MAP_RC;
+        this.sysid = sysid;
+        this.compid = compid;
+        this.isMavlink2 = isMavlink2;
+
+        this.param_value0 = param_value0;
+        this.scale = scale;
+        this.param_value_min = param_value_min;
+        this.param_value_max = param_value_max;
+        this.param_index = param_index;
+        this.target_system = target_system;
+        this.target_component = target_component;
+        this.param_id = param_id;
+        this.parameter_rc_channel_index = parameter_rc_channel_index;
         
     }
 
     /**
-    * Constructor for a new message, just initializes the msgid
-    */
-    public msg_param_map_rc(){
-        msgid = MAVLINK_MSG_ID_PARAM_MAP_RC;
-    }
-
-    /**
-    * Constructor for a new message, initializes the message with the payload
-    * from a mavlink packet
-    *
-    */
-    public msg_param_map_rc(MAVLinkPacket mavLinkPacket){
+     * Constructor for a new message, initializes the message with the payload
+     * from a mavlink packet
+     *
+     */
+    public msg_param_map_rc(MAVLinkPacket mavLinkPacket) {
+        this.msgid = MAVLINK_MSG_ID_PARAM_MAP_RC;
+        
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
-        this.msgid = MAVLINK_MSG_ID_PARAM_MAP_RC;
-        unpack(mavLinkPacket.payload);        
+        this.isMavlink2 = mavLinkPacket.isMavlink2;
+        unpack(mavLinkPacket.payload);
     }
 
                    
@@ -169,7 +201,7 @@ public class msg_param_map_rc extends MAVLinkMessage{
     }
 
     /**
-    * Gets the message, formated as a string
+    * Gets the message, formatted as a string
     */
     public String getParam_Id() {
         StringBuffer buf = new StringBuffer();
@@ -184,10 +216,19 @@ public class msg_param_map_rc extends MAVLinkMessage{
     }
                            
     /**
-    * Returns a string with the MSG name and data
-    */
-    public String toString(){
+     * Returns a string with the MSG name and data
+     */
+    @Override
+    public String toString() {
         return "MAVLINK_MSG_ID_PARAM_MAP_RC - sysid:"+sysid+" compid:"+compid+" param_value0:"+param_value0+" scale:"+scale+" param_value_min:"+param_value_min+" param_value_max:"+param_value_max+" param_index:"+param_index+" target_system:"+target_system+" target_component:"+target_component+" param_id:"+param_id+" parameter_rc_channel_index:"+parameter_rc_channel_index+"";
+    }
+    
+    /**
+     * Returns a human-readable string of the name of the message
+     */
+    @Override
+    public String name() {
+        return "MAVLINK_MSG_ID_PARAM_MAP_RC";
     }
 }
         

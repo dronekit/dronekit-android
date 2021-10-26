@@ -7,8 +7,8 @@
 package com.MAVLink.enums;
 
 /** 
-* Enumeration of landed detector states
-*/
+ * Enumeration of landed detector states
+ */
 public class MAV_LANDED_STATE {
    public static final int MAV_LANDED_STATE_UNDEFINED = 0; /* MAV landed state is unknown | */
    public static final int MAV_LANDED_STATE_ON_GROUND = 1; /* MAV is landed (on ground) | */

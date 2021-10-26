@@ -23,7 +23,8 @@ public class DroneApiListener extends IApiListener.Stub {
 
     @Override
     public int getClientVersionCode() throws RemoteException {
-        return BuildConfig.VERSION_CODE;
+        //return BuildConfig.VERSION_CODE;
+        return 1;
     }
 
     @Override

@@ -7,10 +7,10 @@
 package com.MAVLink.enums;
 
 /** 
-* THIS INTERFACE IS DEPRECATED AS OF JULY 2015. Please use MESSAGE_INTERVAL instead. A data stream is not a fixed set of messages, but rather a
+ * A data stream is not a fixed set of messages, but rather a
      recommendation to the autopilot software. Individual autopilots may or may not obey
      the recommended messages.
-*/
+ */
 public class MAV_DATA_STREAM {
    public static final int MAV_DATA_STREAM_ALL = 0; /* Enable all data streams | */
    public static final int MAV_DATA_STREAM_RAW_SENSORS = 1; /* Enable IMU_RAW, GPS_RAW, GPS_STATUS packets. | */

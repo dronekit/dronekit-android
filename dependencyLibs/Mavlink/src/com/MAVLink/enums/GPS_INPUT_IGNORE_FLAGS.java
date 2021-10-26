@@ -7,8 +7,8 @@
 package com.MAVLink.enums;
 
 /** 
-* 
-*/
+ * 
+ */
 public class GPS_INPUT_IGNORE_FLAGS {
    public static final int GPS_INPUT_IGNORE_FLAG_ALT = 1; /* ignore altitude field | */
    public static final int GPS_INPUT_IGNORE_FLAG_HDOP = 2; /* ignore hdop field | */

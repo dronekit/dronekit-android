@@ -11,119 +11,160 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
-* A fence point. Used to set a point when from GCS -> MAV. Also used to return a point from MAV -> GCS
-*/
-public class msg_fence_point extends MAVLinkMessage{
+ * A fence point. Used to set a point when from GCS -> MAV. Also used to return a point from MAV -> GCS.
+ */
+public class msg_fence_point extends MAVLinkMessage {
 
     public static final int MAVLINK_MSG_ID_FENCE_POINT = 160;
     public static final int MAVLINK_MSG_LENGTH = 12;
     private static final long serialVersionUID = MAVLINK_MSG_ID_FENCE_POINT;
 
-
       
     /**
-    * Latitude of point
-    */
+     * Latitude of point.
+     */
     public float lat;
       
     /**
-    * Longitude of point
-    */
+     * Longitude of point.
+     */
     public float lng;
       
     /**
-    * System ID
-    */
+     * System ID.
+     */
     public short target_system;
       
     /**
-    * Component ID
-    */
+     * Component ID.
+     */
     public short target_component;
       
     /**
-    * point index (first point is 1, 0 is for return point)
-    */
+     * Point index (first point is 1, 0 is for return point).
+     */
     public short idx;
       
     /**
-    * total number of points (for sanity checking)
-    */
+     * Total number of points (for sanity checking).
+     */
     public short count;
     
 
     /**
-    * Generates the payload for a mavlink message for a message of this type
-    * @return
-    */
-    public MAVLinkPacket pack(){
-        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH);
-        packet.sysid = 255;
-        packet.compid = 190;
+     * Generates the payload for a mavlink message for a message of this type
+     * @return
+     */
+    @Override
+    public MAVLinkPacket pack() {
+        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH,isMavlink2);
+        packet.sysid = sysid;
+        packet.compid = compid;
         packet.msgid = MAVLINK_MSG_ID_FENCE_POINT;
-              
+        
         packet.payload.putFloat(lat);
-              
         packet.payload.putFloat(lng);
-              
         packet.payload.putUnsignedByte(target_system);
-              
         packet.payload.putUnsignedByte(target_component);
-              
         packet.payload.putUnsignedByte(idx);
-              
         packet.payload.putUnsignedByte(count);
         
+        if (isMavlink2) {
+            
+        }
         return packet;
     }
 
     /**
-    * Decode a fence_point message into this class fields
-    *
-    * @param payload The message to decode
-    */
+     * Decode a fence_point message into this class fields
+     *
+     * @param payload The message to decode
+     */
+    @Override
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-              
+        
         this.lat = payload.getFloat();
-              
         this.lng = payload.getFloat();
-              
         this.target_system = payload.getUnsignedByte();
-              
         this.target_component = payload.getUnsignedByte();
-              
         this.idx = payload.getUnsignedByte();
-              
         this.count = payload.getUnsignedByte();
+        
+        if (isMavlink2) {
+            
+        }
+    }
+
+    /**
+     * Constructor for a new message, just initializes the msgid
+     */
+    public msg_fence_point() {
+        this.msgid = MAVLINK_MSG_ID_FENCE_POINT;
+    }
+    
+    /**
+     * Constructor for a new message, initializes msgid and all payload variables
+     */
+    public msg_fence_point( float lat, float lng, short target_system, short target_component, short idx, short count) {
+        this.msgid = MAVLINK_MSG_ID_FENCE_POINT;
+
+        this.lat = lat;
+        this.lng = lng;
+        this.target_system = target_system;
+        this.target_component = target_component;
+        this.idx = idx;
+        this.count = count;
+        
+    }
+    
+    /**
+     * Constructor for a new message, initializes everything
+     */
+    public msg_fence_point( float lat, float lng, short target_system, short target_component, short idx, short count, int sysid, int compid, boolean isMavlink2) {
+        this.msgid = MAVLINK_MSG_ID_FENCE_POINT;
+        this.sysid = sysid;
+        this.compid = compid;
+        this.isMavlink2 = isMavlink2;
+
+        this.lat = lat;
+        this.lng = lng;
+        this.target_system = target_system;
+        this.target_component = target_component;
+        this.idx = idx;
+        this.count = count;
         
     }
 
     /**
-    * Constructor for a new message, just initializes the msgid
-    */
-    public msg_fence_point(){
-        msgid = MAVLINK_MSG_ID_FENCE_POINT;
-    }
-
-    /**
-    * Constructor for a new message, initializes the message with the payload
-    * from a mavlink packet
-    *
-    */
-    public msg_fence_point(MAVLinkPacket mavLinkPacket){
+     * Constructor for a new message, initializes the message with the payload
+     * from a mavlink packet
+     *
+     */
+    public msg_fence_point(MAVLinkPacket mavLinkPacket) {
+        this.msgid = MAVLINK_MSG_ID_FENCE_POINT;
+        
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
-        this.msgid = MAVLINK_MSG_ID_FENCE_POINT;
-        unpack(mavLinkPacket.payload);        
+        this.isMavlink2 = mavLinkPacket.isMavlink2;
+        unpack(mavLinkPacket.payload);
     }
 
                 
     /**
-    * Returns a string with the MSG name and data
-    */
-    public String toString(){
+     * Returns a string with the MSG name and data
+     */
+    @Override
+    public String toString() {
         return "MAVLINK_MSG_ID_FENCE_POINT - sysid:"+sysid+" compid:"+compid+" lat:"+lat+" lng:"+lng+" target_system:"+target_system+" target_component:"+target_component+" idx:"+idx+" count:"+count+"";
+    }
+    
+    /**
+     * Returns a human-readable string of the name of the message
+     */
+    @Override
+    public String name() {
+        return "MAVLINK_MSG_ID_FENCE_POINT";
     }
 }
         

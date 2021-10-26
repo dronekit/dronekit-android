@@ -1,6 +1,8 @@
 package com.o3dr.services.android.lib.drone.companion.solo.tlv;
 
-import android.support.annotation.IntDef;
+//import android.support.annotation.IntDef;
+
+import androidx.annotation.IntDef;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

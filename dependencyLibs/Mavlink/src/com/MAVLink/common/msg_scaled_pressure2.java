@@ -11,101 +11,151 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
-* Barometer readings for 2nd barometer
-*/
-public class msg_scaled_pressure2 extends MAVLinkMessage{
+ * Barometer readings for 2nd barometer
+ */
+public class msg_scaled_pressure2 extends MAVLinkMessage {
 
     public static final int MAVLINK_MSG_ID_SCALED_PRESSURE2 = 137;
-    public static final int MAVLINK_MSG_LENGTH = 14;
+    public static final int MAVLINK_MSG_LENGTH = 16;
     private static final long serialVersionUID = MAVLINK_MSG_ID_SCALED_PRESSURE2;
-
 
       
     /**
-    * Timestamp (milliseconds since system boot)
-    */
+     * Timestamp (time since system boot).
+     */
     public long time_boot_ms;
       
     /**
-    * Absolute pressure (hectopascal)
-    */
+     * Absolute pressure
+     */
     public float press_abs;
       
     /**
-    * Differential pressure 1 (hectopascal)
-    */
+     * Differential pressure
+     */
     public float press_diff;
       
     /**
-    * Temperature measurement (0.01 degrees celsius)
-    */
+     * Absolute pressure temperature
+     */
     public short temperature;
+      
+    /**
+     * Differential pressure temperature (0, if not available). Report values of 0 (or 1) as 1 cdegC.
+     */
+    public short temperature_press_diff;
     
 
     /**
-    * Generates the payload for a mavlink message for a message of this type
-    * @return
-    */
-    public MAVLinkPacket pack(){
-        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH);
-        packet.sysid = 255;
-        packet.compid = 190;
+     * Generates the payload for a mavlink message for a message of this type
+     * @return
+     */
+    @Override
+    public MAVLinkPacket pack() {
+        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH,isMavlink2);
+        packet.sysid = sysid;
+        packet.compid = compid;
         packet.msgid = MAVLINK_MSG_ID_SCALED_PRESSURE2;
-              
+        
         packet.payload.putUnsignedInt(time_boot_ms);
-              
         packet.payload.putFloat(press_abs);
-              
         packet.payload.putFloat(press_diff);
-              
         packet.payload.putShort(temperature);
         
+        if (isMavlink2) {
+             packet.payload.putShort(temperature_press_diff);
+            
+        }
         return packet;
     }
 
     /**
-    * Decode a scaled_pressure2 message into this class fields
-    *
-    * @param payload The message to decode
-    */
+     * Decode a scaled_pressure2 message into this class fields
+     *
+     * @param payload The message to decode
+     */
+    @Override
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-              
+        
         this.time_boot_ms = payload.getUnsignedInt();
-              
         this.press_abs = payload.getFloat();
-              
         this.press_diff = payload.getFloat();
-              
         this.temperature = payload.getShort();
+        
+        if (isMavlink2) {
+             this.temperature_press_diff = payload.getShort();
+            
+        }
+    }
+
+    /**
+     * Constructor for a new message, just initializes the msgid
+     */
+    public msg_scaled_pressure2() {
+        this.msgid = MAVLINK_MSG_ID_SCALED_PRESSURE2;
+    }
+    
+    /**
+     * Constructor for a new message, initializes msgid and all payload variables
+     */
+    public msg_scaled_pressure2( long time_boot_ms, float press_abs, float press_diff, short temperature, short temperature_press_diff) {
+        this.msgid = MAVLINK_MSG_ID_SCALED_PRESSURE2;
+
+        this.time_boot_ms = time_boot_ms;
+        this.press_abs = press_abs;
+        this.press_diff = press_diff;
+        this.temperature = temperature;
+        this.temperature_press_diff = temperature_press_diff;
+        
+    }
+    
+    /**
+     * Constructor for a new message, initializes everything
+     */
+    public msg_scaled_pressure2( long time_boot_ms, float press_abs, float press_diff, short temperature, short temperature_press_diff, int sysid, int compid, boolean isMavlink2) {
+        this.msgid = MAVLINK_MSG_ID_SCALED_PRESSURE2;
+        this.sysid = sysid;
+        this.compid = compid;
+        this.isMavlink2 = isMavlink2;
+
+        this.time_boot_ms = time_boot_ms;
+        this.press_abs = press_abs;
+        this.press_diff = press_diff;
+        this.temperature = temperature;
+        this.temperature_press_diff = temperature_press_diff;
         
     }
 
     /**
-    * Constructor for a new message, just initializes the msgid
-    */
-    public msg_scaled_pressure2(){
-        msgid = MAVLINK_MSG_ID_SCALED_PRESSURE2;
-    }
-
-    /**
-    * Constructor for a new message, initializes the message with the payload
-    * from a mavlink packet
-    *
-    */
-    public msg_scaled_pressure2(MAVLinkPacket mavLinkPacket){
+     * Constructor for a new message, initializes the message with the payload
+     * from a mavlink packet
+     *
+     */
+    public msg_scaled_pressure2(MAVLinkPacket mavLinkPacket) {
+        this.msgid = MAVLINK_MSG_ID_SCALED_PRESSURE2;
+        
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
-        this.msgid = MAVLINK_MSG_ID_SCALED_PRESSURE2;
-        unpack(mavLinkPacket.payload);        
+        this.isMavlink2 = mavLinkPacket.isMavlink2;
+        unpack(mavLinkPacket.payload);
     }
 
-            
+              
     /**
-    * Returns a string with the MSG name and data
-    */
-    public String toString(){
-        return "MAVLINK_MSG_ID_SCALED_PRESSURE2 - sysid:"+sysid+" compid:"+compid+" time_boot_ms:"+time_boot_ms+" press_abs:"+press_abs+" press_diff:"+press_diff+" temperature:"+temperature+"";
+     * Returns a string with the MSG name and data
+     */
+    @Override
+    public String toString() {
+        return "MAVLINK_MSG_ID_SCALED_PRESSURE2 - sysid:"+sysid+" compid:"+compid+" time_boot_ms:"+time_boot_ms+" press_abs:"+press_abs+" press_diff:"+press_diff+" temperature:"+temperature+" temperature_press_diff:"+temperature_press_diff+"";
+    }
+    
+    /**
+     * Returns a human-readable string of the name of the message
+     */
+    @Override
+    public String name() {
+        return "MAVLINK_MSG_ID_SCALED_PRESSURE2";
     }
 }
         

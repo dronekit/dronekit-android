@@ -11,173 +11,214 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
-* Offsets and calibrations values for hardware sensors. This makes it easier to debug the calibration process.
-*/
-public class msg_sensor_offsets extends MAVLinkMessage{
+ * Offsets and calibrations values for hardware sensors. This makes it easier to debug the calibration process.
+ */
+public class msg_sensor_offsets extends MAVLinkMessage {
 
     public static final int MAVLINK_MSG_ID_SENSOR_OFFSETS = 150;
     public static final int MAVLINK_MSG_LENGTH = 42;
     private static final long serialVersionUID = MAVLINK_MSG_ID_SENSOR_OFFSETS;
 
-
       
     /**
-    * magnetic declination (radians)
-    */
+     * Magnetic declination.
+     */
     public float mag_declination;
       
     /**
-    * raw pressure from barometer
-    */
+     * Raw pressure from barometer.
+     */
     public int raw_press;
       
     /**
-    * raw temperature from barometer
-    */
+     * Raw temperature from barometer.
+     */
     public int raw_temp;
       
     /**
-    * gyro X calibration
-    */
+     * Gyro X calibration.
+     */
     public float gyro_cal_x;
       
     /**
-    * gyro Y calibration
-    */
+     * Gyro Y calibration.
+     */
     public float gyro_cal_y;
       
     /**
-    * gyro Z calibration
-    */
+     * Gyro Z calibration.
+     */
     public float gyro_cal_z;
       
     /**
-    * accel X calibration
-    */
+     * Accel X calibration.
+     */
     public float accel_cal_x;
       
     /**
-    * accel Y calibration
-    */
+     * Accel Y calibration.
+     */
     public float accel_cal_y;
       
     /**
-    * accel Z calibration
-    */
+     * Accel Z calibration.
+     */
     public float accel_cal_z;
       
     /**
-    * magnetometer X offset
-    */
+     * Magnetometer X offset.
+     */
     public short mag_ofs_x;
       
     /**
-    * magnetometer Y offset
-    */
+     * Magnetometer Y offset.
+     */
     public short mag_ofs_y;
       
     /**
-    * magnetometer Z offset
-    */
+     * Magnetometer Z offset.
+     */
     public short mag_ofs_z;
     
 
     /**
-    * Generates the payload for a mavlink message for a message of this type
-    * @return
-    */
-    public MAVLinkPacket pack(){
-        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH);
-        packet.sysid = 255;
-        packet.compid = 190;
+     * Generates the payload for a mavlink message for a message of this type
+     * @return
+     */
+    @Override
+    public MAVLinkPacket pack() {
+        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH,isMavlink2);
+        packet.sysid = sysid;
+        packet.compid = compid;
         packet.msgid = MAVLINK_MSG_ID_SENSOR_OFFSETS;
-              
+        
         packet.payload.putFloat(mag_declination);
-              
         packet.payload.putInt(raw_press);
-              
         packet.payload.putInt(raw_temp);
-              
         packet.payload.putFloat(gyro_cal_x);
-              
         packet.payload.putFloat(gyro_cal_y);
-              
         packet.payload.putFloat(gyro_cal_z);
-              
         packet.payload.putFloat(accel_cal_x);
-              
         packet.payload.putFloat(accel_cal_y);
-              
         packet.payload.putFloat(accel_cal_z);
-              
         packet.payload.putShort(mag_ofs_x);
-              
         packet.payload.putShort(mag_ofs_y);
-              
         packet.payload.putShort(mag_ofs_z);
         
+        if (isMavlink2) {
+            
+        }
         return packet;
     }
 
     /**
-    * Decode a sensor_offsets message into this class fields
-    *
-    * @param payload The message to decode
-    */
+     * Decode a sensor_offsets message into this class fields
+     *
+     * @param payload The message to decode
+     */
+    @Override
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-              
+        
         this.mag_declination = payload.getFloat();
-              
         this.raw_press = payload.getInt();
-              
         this.raw_temp = payload.getInt();
-              
         this.gyro_cal_x = payload.getFloat();
-              
         this.gyro_cal_y = payload.getFloat();
-              
         this.gyro_cal_z = payload.getFloat();
-              
         this.accel_cal_x = payload.getFloat();
-              
         this.accel_cal_y = payload.getFloat();
-              
         this.accel_cal_z = payload.getFloat();
-              
         this.mag_ofs_x = payload.getShort();
-              
         this.mag_ofs_y = payload.getShort();
-              
         this.mag_ofs_z = payload.getShort();
+        
+        if (isMavlink2) {
+            
+        }
+    }
+
+    /**
+     * Constructor for a new message, just initializes the msgid
+     */
+    public msg_sensor_offsets() {
+        this.msgid = MAVLINK_MSG_ID_SENSOR_OFFSETS;
+    }
+    
+    /**
+     * Constructor for a new message, initializes msgid and all payload variables
+     */
+    public msg_sensor_offsets( float mag_declination, int raw_press, int raw_temp, float gyro_cal_x, float gyro_cal_y, float gyro_cal_z, float accel_cal_x, float accel_cal_y, float accel_cal_z, short mag_ofs_x, short mag_ofs_y, short mag_ofs_z) {
+        this.msgid = MAVLINK_MSG_ID_SENSOR_OFFSETS;
+
+        this.mag_declination = mag_declination;
+        this.raw_press = raw_press;
+        this.raw_temp = raw_temp;
+        this.gyro_cal_x = gyro_cal_x;
+        this.gyro_cal_y = gyro_cal_y;
+        this.gyro_cal_z = gyro_cal_z;
+        this.accel_cal_x = accel_cal_x;
+        this.accel_cal_y = accel_cal_y;
+        this.accel_cal_z = accel_cal_z;
+        this.mag_ofs_x = mag_ofs_x;
+        this.mag_ofs_y = mag_ofs_y;
+        this.mag_ofs_z = mag_ofs_z;
+        
+    }
+    
+    /**
+     * Constructor for a new message, initializes everything
+     */
+    public msg_sensor_offsets( float mag_declination, int raw_press, int raw_temp, float gyro_cal_x, float gyro_cal_y, float gyro_cal_z, float accel_cal_x, float accel_cal_y, float accel_cal_z, short mag_ofs_x, short mag_ofs_y, short mag_ofs_z, int sysid, int compid, boolean isMavlink2) {
+        this.msgid = MAVLINK_MSG_ID_SENSOR_OFFSETS;
+        this.sysid = sysid;
+        this.compid = compid;
+        this.isMavlink2 = isMavlink2;
+
+        this.mag_declination = mag_declination;
+        this.raw_press = raw_press;
+        this.raw_temp = raw_temp;
+        this.gyro_cal_x = gyro_cal_x;
+        this.gyro_cal_y = gyro_cal_y;
+        this.gyro_cal_z = gyro_cal_z;
+        this.accel_cal_x = accel_cal_x;
+        this.accel_cal_y = accel_cal_y;
+        this.accel_cal_z = accel_cal_z;
+        this.mag_ofs_x = mag_ofs_x;
+        this.mag_ofs_y = mag_ofs_y;
+        this.mag_ofs_z = mag_ofs_z;
         
     }
 
     /**
-    * Constructor for a new message, just initializes the msgid
-    */
-    public msg_sensor_offsets(){
-        msgid = MAVLINK_MSG_ID_SENSOR_OFFSETS;
-    }
-
-    /**
-    * Constructor for a new message, initializes the message with the payload
-    * from a mavlink packet
-    *
-    */
-    public msg_sensor_offsets(MAVLinkPacket mavLinkPacket){
+     * Constructor for a new message, initializes the message with the payload
+     * from a mavlink packet
+     *
+     */
+    public msg_sensor_offsets(MAVLinkPacket mavLinkPacket) {
+        this.msgid = MAVLINK_MSG_ID_SENSOR_OFFSETS;
+        
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
-        this.msgid = MAVLINK_MSG_ID_SENSOR_OFFSETS;
-        unpack(mavLinkPacket.payload);        
+        this.isMavlink2 = mavLinkPacket.isMavlink2;
+        unpack(mavLinkPacket.payload);
     }
 
                             
     /**
-    * Returns a string with the MSG name and data
-    */
-    public String toString(){
+     * Returns a string with the MSG name and data
+     */
+    @Override
+    public String toString() {
         return "MAVLINK_MSG_ID_SENSOR_OFFSETS - sysid:"+sysid+" compid:"+compid+" mag_declination:"+mag_declination+" raw_press:"+raw_press+" raw_temp:"+raw_temp+" gyro_cal_x:"+gyro_cal_x+" gyro_cal_y:"+gyro_cal_y+" gyro_cal_z:"+gyro_cal_z+" accel_cal_x:"+accel_cal_x+" accel_cal_y:"+accel_cal_y+" accel_cal_z:"+accel_cal_z+" mag_ofs_x:"+mag_ofs_x+" mag_ofs_y:"+mag_ofs_y+" mag_ofs_z:"+mag_ofs_z+"";
+    }
+    
+    /**
+     * Returns a human-readable string of the name of the message
+     */
+    @Override
+    public String name() {
+        return "MAVLINK_MSG_ID_SENSOR_OFFSETS";
     }
 }
         

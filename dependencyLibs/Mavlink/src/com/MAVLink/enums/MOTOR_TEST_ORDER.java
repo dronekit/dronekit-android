@@ -7,8 +7,8 @@
 package com.MAVLink.enums;
 
 /** 
-* 
-*/
+ * 
+ */
 public class MOTOR_TEST_ORDER {
    public static final int MOTOR_TEST_ORDER_DEFAULT = 0; /* default autopilot motor test method | */
    public static final int MOTOR_TEST_ORDER_SEQUENCE = 1; /* motor numbers are specified as their index in a predefined vehicle-specific sequence | */

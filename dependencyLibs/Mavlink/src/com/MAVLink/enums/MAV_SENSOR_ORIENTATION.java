@@ -7,8 +7,8 @@
 package com.MAVLink.enums;
 
 /** 
-* Enumeration of sensor orientation, according to its rotations
-*/
+ * Enumeration of sensor orientation, according to its rotations
+ */
 public class MAV_SENSOR_ORIENTATION {
    public static final int MAV_SENSOR_ROTATION_NONE = 0; /* Roll: 0, Pitch: 0, Yaw: 0 | */
    public static final int MAV_SENSOR_ROTATION_YAW_45 = 1; /* Roll: 0, Pitch: 0, Yaw: 45 | */
@@ -48,7 +48,10 @@ public class MAV_SENSOR_ORIENTATION {
    public static final int MAV_SENSOR_ROTATION_ROLL_270_PITCH_270 = 35; /* Roll: 270, Pitch: 270, Yaw: 0 | */
    public static final int MAV_SENSOR_ROTATION_ROLL_90_PITCH_180_YAW_90 = 36; /* Roll: 90, Pitch: 180, Yaw: 90 | */
    public static final int MAV_SENSOR_ROTATION_ROLL_90_YAW_270 = 37; /* Roll: 90, Pitch: 0, Yaw: 270 | */
-   public static final int MAV_SENSOR_ROTATION_ROLL_315_PITCH_315_YAW_315 = 38; /* Roll: 315, Pitch: 315, Yaw: 315 | */
-   public static final int MAV_SENSOR_ORIENTATION_ENUM_END = 39; /*  | */
+   public static final int MAV_SENSOR_ROTATION_ROLL_90_PITCH_68_YAW_293 = 38; /* Roll: 90, Pitch: 68, Yaw: 293 | */
+   public static final int MAV_SENSOR_ROTATION_PITCH_315 = 39; /* Pitch: 315 | */
+   public static final int MAV_SENSOR_ROTATION_ROLL_90_PITCH_315 = 40; /* Roll: 90, Pitch: 315 | */
+   public static final int MAV_SENSOR_ROTATION_CUSTOM = 100; /* Custom orientation | */
+   public static final int MAV_SENSOR_ORIENTATION_ENUM_END = 101; /*  | */
 }
             

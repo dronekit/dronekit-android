@@ -7,8 +7,8 @@
 package com.MAVLink.enums;
 
 /** 
-* These values define the type of firmware release.  These values indicate the first version or release of this type.  For example the first alpha release would be 64, the second would be 65.
-*/
+ * These values define the type of firmware release.  These values indicate the first version or release of this type.  For example the first alpha release would be 64, the second would be 65.
+ */
 public class FIRMWARE_VERSION_TYPE {
    public static final int FIRMWARE_VERSION_TYPE_DEV = 0; /* development release | */
    public static final int FIRMWARE_VERSION_TYPE_ALPHA = 64; /* alpha release | */

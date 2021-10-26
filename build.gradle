@@ -2,23 +2,26 @@
 buildscript {
 
     ext {
-        play_services_version = '8.4.0'
+        play_services_version = '17.6.0'
 
-        android_build_sdk_version = 28
-        android_build_tools_version = '23.0.2'
-        android_build_target_sdk_version = 22
-        android_build_min_sdk_version = 14
+        android_build_sdk_version = 30
+        android_build_tools_version = '31.0.0'
+        android_build_target_sdk_version = 28
+        android_build_min_sdk_version = 28
     }
 
     repositories {
+        google()
+        mavenCentral()
         jcenter()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.2'
+        classpath 'com.android.tools.build:gradle:7.0.2'
 
         //Dexcount gradle plugin
-        classpath 'com.getkeepsafe.dexcount:dexcount-gradle-plugin:0.4.4'
+        //classpath 'com.getkeepsafe.dexcount:dexcount-gradle-plugin:0.4.4'
+        classpath 'com.getkeepsafe.dexcount:dexcount-gradle-plugin:3.0.0'
     }
 }
 
@@ -93,9 +96,9 @@ project.ext.preDexLibs = !project.hasProperty('disablePreDex')
 
 subprojects {
     project.plugins.whenPluginAdded { plugin ->
-        if ("com.android.build.gradle.AppPlugin".equals(plugin.class.name)) {
+        if ("com.android.build.gradle.AppPlugin" == plugin.class.name) {
             project.android.dexOptions.preDexLibraries = rootProject.ext.preDexLibs
-        } else if ("com.android.build.gradle.LibraryPlugin".equals(plugin.class.name)) {
+        } else if ("com.android.build.gradle.LibraryPlugin" == plugin.class.name) {
             project.android.dexOptions.preDexLibraries = rootProject.ext.preDexLibs
         }
     }
@@ -104,14 +107,15 @@ subprojects {
 
 allprojects {
     repositories {
+        google()
+        mavenLocal()
         jcenter()
-
-        maven {
-            url getMavenRepoUrl()
-            credentials {
-                username getMavenUsername()
-                password getMavenApiKey()
-            }
-        }
+//        maven {
+//            url getMavenRepoUrl()
+//            credentials {
+//                username getMavenUsername()
+//                password getMavenApiKey()
+//            }
+//        }
     }
 }

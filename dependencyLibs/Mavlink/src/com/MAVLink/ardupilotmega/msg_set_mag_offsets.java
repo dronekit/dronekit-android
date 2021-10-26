@@ -11,110 +11,151 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
-* Deprecated. Use MAV_CMD_PREFLIGHT_SET_SENSOR_OFFSETS instead. Set the magnetometer offsets
-*/
-public class msg_set_mag_offsets extends MAVLinkMessage{
+ * Set the magnetometer offsets
+ */
+public class msg_set_mag_offsets extends MAVLinkMessage {
 
     public static final int MAVLINK_MSG_ID_SET_MAG_OFFSETS = 151;
     public static final int MAVLINK_MSG_LENGTH = 8;
     private static final long serialVersionUID = MAVLINK_MSG_ID_SET_MAG_OFFSETS;
 
-
       
     /**
-    * magnetometer X offset
-    */
+     * Magnetometer X offset.
+     */
     public short mag_ofs_x;
       
     /**
-    * magnetometer Y offset
-    */
+     * Magnetometer Y offset.
+     */
     public short mag_ofs_y;
       
     /**
-    * magnetometer Z offset
-    */
+     * Magnetometer Z offset.
+     */
     public short mag_ofs_z;
       
     /**
-    * System ID
-    */
+     * System ID.
+     */
     public short target_system;
       
     /**
-    * Component ID
-    */
+     * Component ID.
+     */
     public short target_component;
     
 
     /**
-    * Generates the payload for a mavlink message for a message of this type
-    * @return
-    */
-    public MAVLinkPacket pack(){
-        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH);
-        packet.sysid = 255;
-        packet.compid = 190;
+     * Generates the payload for a mavlink message for a message of this type
+     * @return
+     */
+    @Override
+    public MAVLinkPacket pack() {
+        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH,isMavlink2);
+        packet.sysid = sysid;
+        packet.compid = compid;
         packet.msgid = MAVLINK_MSG_ID_SET_MAG_OFFSETS;
-              
+        
         packet.payload.putShort(mag_ofs_x);
-              
         packet.payload.putShort(mag_ofs_y);
-              
         packet.payload.putShort(mag_ofs_z);
-              
         packet.payload.putUnsignedByte(target_system);
-              
         packet.payload.putUnsignedByte(target_component);
         
+        if (isMavlink2) {
+            
+        }
         return packet;
     }
 
     /**
-    * Decode a set_mag_offsets message into this class fields
-    *
-    * @param payload The message to decode
-    */
+     * Decode a set_mag_offsets message into this class fields
+     *
+     * @param payload The message to decode
+     */
+    @Override
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-              
+        
         this.mag_ofs_x = payload.getShort();
-              
         this.mag_ofs_y = payload.getShort();
-              
         this.mag_ofs_z = payload.getShort();
-              
         this.target_system = payload.getUnsignedByte();
-              
         this.target_component = payload.getUnsignedByte();
+        
+        if (isMavlink2) {
+            
+        }
+    }
+
+    /**
+     * Constructor for a new message, just initializes the msgid
+     */
+    public msg_set_mag_offsets() {
+        this.msgid = MAVLINK_MSG_ID_SET_MAG_OFFSETS;
+    }
+    
+    /**
+     * Constructor for a new message, initializes msgid and all payload variables
+     */
+    public msg_set_mag_offsets( short mag_ofs_x, short mag_ofs_y, short mag_ofs_z, short target_system, short target_component) {
+        this.msgid = MAVLINK_MSG_ID_SET_MAG_OFFSETS;
+
+        this.mag_ofs_x = mag_ofs_x;
+        this.mag_ofs_y = mag_ofs_y;
+        this.mag_ofs_z = mag_ofs_z;
+        this.target_system = target_system;
+        this.target_component = target_component;
+        
+    }
+    
+    /**
+     * Constructor for a new message, initializes everything
+     */
+    public msg_set_mag_offsets( short mag_ofs_x, short mag_ofs_y, short mag_ofs_z, short target_system, short target_component, int sysid, int compid, boolean isMavlink2) {
+        this.msgid = MAVLINK_MSG_ID_SET_MAG_OFFSETS;
+        this.sysid = sysid;
+        this.compid = compid;
+        this.isMavlink2 = isMavlink2;
+
+        this.mag_ofs_x = mag_ofs_x;
+        this.mag_ofs_y = mag_ofs_y;
+        this.mag_ofs_z = mag_ofs_z;
+        this.target_system = target_system;
+        this.target_component = target_component;
         
     }
 
     /**
-    * Constructor for a new message, just initializes the msgid
-    */
-    public msg_set_mag_offsets(){
-        msgid = MAVLINK_MSG_ID_SET_MAG_OFFSETS;
-    }
-
-    /**
-    * Constructor for a new message, initializes the message with the payload
-    * from a mavlink packet
-    *
-    */
-    public msg_set_mag_offsets(MAVLinkPacket mavLinkPacket){
+     * Constructor for a new message, initializes the message with the payload
+     * from a mavlink packet
+     *
+     */
+    public msg_set_mag_offsets(MAVLinkPacket mavLinkPacket) {
+        this.msgid = MAVLINK_MSG_ID_SET_MAG_OFFSETS;
+        
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
-        this.msgid = MAVLINK_MSG_ID_SET_MAG_OFFSETS;
-        unpack(mavLinkPacket.payload);        
+        this.isMavlink2 = mavLinkPacket.isMavlink2;
+        unpack(mavLinkPacket.payload);
     }
 
               
     /**
-    * Returns a string with the MSG name and data
-    */
-    public String toString(){
+     * Returns a string with the MSG name and data
+     */
+    @Override
+    public String toString() {
         return "MAVLINK_MSG_ID_SET_MAG_OFFSETS - sysid:"+sysid+" compid:"+compid+" mag_ofs_x:"+mag_ofs_x+" mag_ofs_y:"+mag_ofs_y+" mag_ofs_z:"+mag_ofs_z+" target_system:"+target_system+" target_component:"+target_component+"";
+    }
+    
+    /**
+     * Returns a human-readable string of the name of the message
+     */
+    @Override
+    public String name() {
+        return "MAVLINK_MSG_ID_SET_MAG_OFFSETS";
     }
 }
         

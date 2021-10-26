@@ -1,7 +1,7 @@
 package com.o3dr.android.client.apis;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
+//import android.support.annotation.NonNull;
 
 import com.MAVLink.enums.MAV_MOUNT_MODE;
 import com.o3dr.android.client.Drone;
@@ -23,6 +23,8 @@ import static com.o3dr.services.android.lib.drone.action.GimbalActions.GIMBAL_MO
 import static com.o3dr.services.android.lib.drone.action.GimbalActions.GIMBAL_PITCH;
 import static com.o3dr.services.android.lib.drone.action.GimbalActions.GIMBAL_ROLL;
 import static com.o3dr.services.android.lib.drone.action.GimbalActions.GIMBAL_YAW;
+
+import androidx.annotation.NonNull;
 
 public final class GimbalApi extends Api implements DroneListener {
 

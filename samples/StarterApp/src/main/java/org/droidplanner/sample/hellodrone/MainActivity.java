@@ -5,8 +5,8 @@ import android.graphics.SurfaceTexture;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
+//import android.support.annotation.NonNull;
+//import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Surface;
 import android.view.TextureView;
@@ -52,6 +52,9 @@ import java.io.IOException;
 import java.util.List;
 
 import static com.o3dr.android.client.apis.ExperimentalApi.getApi;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity implements DroneListener, TowerListener, LinkListener {
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -233,6 +236,7 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
 
     @Override
     public void onDroneEvent(String event, Bundle extras) {
+        System.out.println(event);
         switch (event) {
             case AttributeEvent.STATE_CONNECTED:
                 alertUser("Drone Connected");
@@ -302,6 +306,7 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
 
     public void onBtnConnectTap(View view) {
         if (this.drone.isConnected()) {
+            alertUser("Drone already connected!");
             this.drone.disconnect();
         } else {
             Spinner connectionSelector = (Spinner) findViewById(R.id.selectConnectionType);
@@ -311,6 +316,7 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
                 ? ConnectionParameter.newUsbConnection(null)
                 : ConnectionParameter.newUdpConnection(null);
 
+            alertUser("Let's connect!");
             this.drone.connect(connectionParams);
         }
 
@@ -476,7 +482,7 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
     // ==========================================================
 
     protected void alertUser(String message) {
-        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
         Log.d(TAG, message);
     }
 
