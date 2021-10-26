@@ -9,6 +9,7 @@ import org.droidplanner.services.android.impl.core.mission.commands.DoJumpImpl;
 import org.droidplanner.services.android.impl.core.mission.commands.EpmGripperImpl;
 import org.droidplanner.services.android.impl.core.mission.commands.LoiterTimeImpl;
 import org.droidplanner.services.android.impl.core.mission.commands.LoiterToAltImpl;
+import org.droidplanner.services.android.impl.core.mission.commands.RawMissionCommandImpl;
 import org.droidplanner.services.android.impl.core.mission.commands.ReturnToHomeImpl;
 import org.droidplanner.services.android.impl.core.mission.commands.SetRelayImpl;
 import org.droidplanner.services.android.impl.core.mission.commands.SetServoImpl;
@@ -50,7 +51,8 @@ public enum MissionItemType {
     TAKE_PICTURE("Take Picture"),
     VTOL_TAKEOFF("VTOL Takeoff"),
     VTOL_TRANSITION("VTOL Transition"),
-    VTOL_LAND("VTOL Land")
+    VTOL_LAND("VTOL Land"),
+    RAW_COMMAND("Raw Command")
     ;
 
     private final String name;
@@ -107,6 +109,8 @@ public enum MissionItemType {
                 return new DoLandStartImpl(referenceItem);
             case DO_JUMP:
                 return new DoJumpImpl(referenceItem);
+            case RAW_COMMAND:
+                return new RawMissionCommandImpl(referenceItem);
             default:
                 throw new IllegalArgumentException("Unrecognized mission item type (" + name + ")" + "");
         }

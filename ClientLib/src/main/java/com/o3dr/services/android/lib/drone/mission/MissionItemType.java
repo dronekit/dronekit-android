@@ -11,6 +11,7 @@ import com.o3dr.services.android.lib.drone.mission.item.command.DoJump;
 import com.o3dr.services.android.lib.drone.mission.item.command.EpmGripper;
 import com.o3dr.services.android.lib.drone.mission.item.command.LoiterTime;
 import com.o3dr.services.android.lib.drone.mission.item.command.LoiterToAlt;
+import com.o3dr.services.android.lib.drone.mission.item.command.RawMissionCommand;
 import com.o3dr.services.android.lib.drone.mission.item.command.ResetROI;
 import com.o3dr.services.android.lib.drone.mission.item.command.ReturnToLaunch;
 import com.o3dr.services.android.lib.drone.mission.item.command.SetRelay;
@@ -343,6 +344,17 @@ public enum MissionItemType {
         @Override
         protected Creator<VTOLLand> getMissionItemCreator() {
             return VTOLLand.CREATOR;
+        }
+    },
+    RAW_COMMAND("Raw Command") {
+        @Override
+        public MissionItem getNewItem() {
+            return new RawMissionCommand();
+        }
+
+        @Override
+        protected Creator<RawMissionCommand> getMissionItemCreator() {
+            return RawMissionCommand.CREATOR;
         }
     },
     ;
