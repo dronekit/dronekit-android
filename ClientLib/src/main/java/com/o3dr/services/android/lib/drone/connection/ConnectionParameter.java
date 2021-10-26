@@ -170,6 +170,13 @@ public class ConnectionParameter implements Parcelable {
         return new ConnectionParameter(ConnectionType.TYPE_CUSTOM, paramsBundle, null, connection);
     }
 
+    public static ConnectionParameter newCustomConnection(AndroidMavLinkConnection connection, String connectionId, @Nullable Uri tlogUri) {
+        Bundle paramsBundle = new Bundle(1);
+        paramsBundle.putString(ConnectionType.EXTRA_CUSTOM_CONNECTION_ID, connectionId);
+
+        return new ConnectionParameter(ConnectionType.TYPE_CUSTOM, paramsBundle, tlogUri, connection);
+    }
+
     /**
      *
      * @param ssid Wifi SSID of the solo vehicle link. This will remove a leading and/or trailing quotation.
