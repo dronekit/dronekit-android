@@ -24,9 +24,9 @@ public class AttributeType {
 
     /**
      * Used to access the vehicle's battery state.
-     * @see {@link com.o3dr.services.android.lib.drone.property.Speed}
      */
     public static final String BATTERY = PACKAGE_NAME + ".BATTERY";
+    public static final String BATTERY2 = PACKAGE_NAME + ".BATTERY2";
 
     /**
      * Used to access the set of camera information available for the connected drone.

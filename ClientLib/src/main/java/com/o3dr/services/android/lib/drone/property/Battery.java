@@ -19,6 +19,7 @@ public class Battery implements DroneAttribute {
     private Double batteryDischarge;
     private int currentConsumed;
     private short temperature;
+    private short batteryFunction;
     private int[] voltages;
 
     private boolean mHasCellVoltages;
@@ -88,6 +89,9 @@ public class Battery implements DroneAttribute {
     public int[] getCellVoltages() { return voltages; }
     public boolean hasCellVoltages() { return mHasCellVoltages; }
 
+    public short getBatteryFunction() { return batteryFunction; }
+    public void setBatteryFunction(short func) { batteryFunction = func; }
+
     public List<Integer> getValidCellVoltages() {
         final List<Integer> list = new ArrayList<>();
 
@@ -116,6 +120,7 @@ public class Battery implements DroneAttribute {
 
         dest.writeInt(this.currentConsumed);
         dest.writeInt(this.temperature);
+        dest.writeInt(this.batteryFunction);
 
         int len = (this.voltages != null)? this.voltages.length: 0;
         dest.writeInt(len);
@@ -129,6 +134,7 @@ public class Battery implements DroneAttribute {
         this.batteryDischarge = (Double) in.readValue(Double.class.getClassLoader());
         this.currentConsumed = in.readInt();
         this.temperature = (short)in.readInt();
+        this.batteryFunction = (short)in.readInt();
 
         this.voltages = new int[in.readInt()];
         in.readIntArray(this.voltages);
@@ -153,6 +159,7 @@ public class Battery implements DroneAttribute {
                 ", batteryDischarge=" + batteryDischarge +
                 ", currentConsumed=" + currentConsumed +
                 ", temperature=" + temperature +
+                ", batteryFunction=" + batteryFunction +
                 ", voltages=" + Arrays.toString(voltages) +
                 '}';
     }
