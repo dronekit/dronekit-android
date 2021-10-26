@@ -36,7 +36,8 @@ final class DPServices extends IDroidPlannerServices.Stub {
 
     @Override
     public int getServiceVersionCode() throws RemoteException {
-        return BuildConfig.VERSION_CODE;
+        //return BuildConfig.VERSION_CODE;
+        return 1;
     }
 
     @Override

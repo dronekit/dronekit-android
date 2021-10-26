@@ -1,9 +1,10 @@
 package org.droidplanner.services.android.impl.core.gcs;
 
 import com.MAVLink.Messages.MAVLinkMessage;
-import com.MAVLink.common.msg_heartbeat;
+//import com.MAVLink.common.msg_heartbeat;
 import com.MAVLink.enums.MAV_AUTOPILOT;
 import com.MAVLink.enums.MAV_TYPE;
+import com.MAVLink.minimal.msg_heartbeat;
 
 import org.droidplanner.services.android.impl.communication.model.DataLink;
 

@@ -7,8 +7,8 @@
 package com.MAVLink.enums;
 
 /** 
-* GPS lataral offset encoding
-*/
+ * GPS lataral offset encoding
+ */
 public class UAVIONIX_ADSB_OUT_CFG_GPS_OFFSET_LAT {
    public static final int UAVIONIX_ADSB_OUT_CFG_GPS_OFFSET_LAT_NO_DATA = 0; /*  | */
    public static final int UAVIONIX_ADSB_OUT_CFG_GPS_OFFSET_LAT_LEFT_2M = 1; /*  | */

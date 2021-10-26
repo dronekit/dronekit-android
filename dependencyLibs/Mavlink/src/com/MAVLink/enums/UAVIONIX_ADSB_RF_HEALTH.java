@@ -7,8 +7,8 @@
 package com.MAVLink.enums;
 
 /** 
-* Status flags for ADS-B transponder dynamic output
-*/
+ * Status flags for ADS-B transponder dynamic output
+ */
 public class UAVIONIX_ADSB_RF_HEALTH {
    public static final int UAVIONIX_ADSB_RF_HEALTH_INITIALIZING = 0; /*  | */
    public static final int UAVIONIX_ADSB_RF_HEALTH_OK = 1; /*  | */

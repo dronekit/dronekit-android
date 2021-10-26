@@ -14,9 +14,12 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.LocalBroadcastManager;
+//import android.support.v4.app.NotificationCompat;
+//import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
+
+import androidx.core.app.NotificationCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.o3dr.android.client.R;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;

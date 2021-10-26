@@ -11,182 +11,214 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
-* The location and information of an ADSB vehicle
-*/
-public class msg_adsb_vehicle extends MAVLinkMessage{
+ * The location and information of an ADSB vehicle
+ */
+public class msg_adsb_vehicle extends MAVLinkMessage {
 
     public static final int MAVLINK_MSG_ID_ADSB_VEHICLE = 246;
     public static final int MAVLINK_MSG_LENGTH = 38;
     private static final long serialVersionUID = MAVLINK_MSG_ID_ADSB_VEHICLE;
 
-
       
     /**
-    * ICAO address
-    */
+     * ICAO address
+     */
     public long ICAO_address;
       
     /**
-    * Latitude, expressed as degrees * 1E7
-    */
+     * Latitude
+     */
     public int lat;
       
     /**
-    * Longitude, expressed as degrees * 1E7
-    */
+     * Longitude
+     */
     public int lon;
       
     /**
-    * Altitude(ASL) in millimeters
-    */
+     * Altitude(ASL)
+     */
     public int altitude;
       
     /**
-    * Course over ground in centidegrees
-    */
+     * Course over ground
+     */
     public int heading;
       
     /**
-    * The horizontal velocity in centimeters/second
-    */
+     * The horizontal velocity
+     */
     public int hor_velocity;
       
     /**
-    * The vertical velocity in centimeters/second, positive is up
-    */
+     * The vertical velocity. Positive is up
+     */
     public short ver_velocity;
       
     /**
-    * Flags to indicate various statuses including valid data fields
-    */
+     * Bitmap to indicate various statuses including valid data fields
+     */
     public int flags;
       
     /**
-    * Squawk code
-    */
+     * Squawk code
+     */
     public int squawk;
       
     /**
-    * Type from ADSB_ALTITUDE_TYPE enum
-    */
+     * ADSB altitude type.
+     */
     public short altitude_type;
       
     /**
-    * The callsign, 8+null
-    */
+     * The callsign, 8+null
+     */
     public byte callsign[] = new byte[9];
       
     /**
-    * Type from ADSB_EMITTER_TYPE enum
-    */
+     * ADSB emitter type.
+     */
     public short emitter_type;
       
     /**
-    * Time since last communication in seconds
-    */
+     * Time since last communication in seconds
+     */
     public short tslc;
     
 
     /**
-    * Generates the payload for a mavlink message for a message of this type
-    * @return
-    */
-    public MAVLinkPacket pack(){
-        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH);
-        packet.sysid = 255;
-        packet.compid = 190;
+     * Generates the payload for a mavlink message for a message of this type
+     * @return
+     */
+    @Override
+    public MAVLinkPacket pack() {
+        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH,isMavlink2);
+        packet.sysid = sysid;
+        packet.compid = compid;
         packet.msgid = MAVLINK_MSG_ID_ADSB_VEHICLE;
-              
+        
         packet.payload.putUnsignedInt(ICAO_address);
-              
         packet.payload.putInt(lat);
-              
         packet.payload.putInt(lon);
-              
         packet.payload.putInt(altitude);
-              
         packet.payload.putUnsignedShort(heading);
-              
         packet.payload.putUnsignedShort(hor_velocity);
-              
         packet.payload.putShort(ver_velocity);
-              
         packet.payload.putUnsignedShort(flags);
-              
         packet.payload.putUnsignedShort(squawk);
-              
         packet.payload.putUnsignedByte(altitude_type);
-              
         
         for (int i = 0; i < callsign.length; i++) {
             packet.payload.putByte(callsign[i]);
         }
                     
-              
         packet.payload.putUnsignedByte(emitter_type);
-              
         packet.payload.putUnsignedByte(tslc);
         
+        if (isMavlink2) {
+            
+        }
         return packet;
     }
 
     /**
-    * Decode a adsb_vehicle message into this class fields
-    *
-    * @param payload The message to decode
-    */
+     * Decode a adsb_vehicle message into this class fields
+     *
+     * @param payload The message to decode
+     */
+    @Override
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-              
+        
         this.ICAO_address = payload.getUnsignedInt();
-              
         this.lat = payload.getInt();
-              
         this.lon = payload.getInt();
-              
         this.altitude = payload.getInt();
-              
         this.heading = payload.getUnsignedShort();
-              
         this.hor_velocity = payload.getUnsignedShort();
-              
         this.ver_velocity = payload.getShort();
-              
         this.flags = payload.getUnsignedShort();
-              
         this.squawk = payload.getUnsignedShort();
-              
         this.altitude_type = payload.getUnsignedByte();
-              
          
         for (int i = 0; i < this.callsign.length; i++) {
             this.callsign[i] = payload.getByte();
         }
                 
-              
         this.emitter_type = payload.getUnsignedByte();
-              
         this.tslc = payload.getUnsignedByte();
+        
+        if (isMavlink2) {
+            
+        }
+    }
+
+    /**
+     * Constructor for a new message, just initializes the msgid
+     */
+    public msg_adsb_vehicle() {
+        this.msgid = MAVLINK_MSG_ID_ADSB_VEHICLE;
+    }
+    
+    /**
+     * Constructor for a new message, initializes msgid and all payload variables
+     */
+    public msg_adsb_vehicle( long ICAO_address, int lat, int lon, int altitude, int heading, int hor_velocity, short ver_velocity, int flags, int squawk, short altitude_type, byte[] callsign, short emitter_type, short tslc) {
+        this.msgid = MAVLINK_MSG_ID_ADSB_VEHICLE;
+
+        this.ICAO_address = ICAO_address;
+        this.lat = lat;
+        this.lon = lon;
+        this.altitude = altitude;
+        this.heading = heading;
+        this.hor_velocity = hor_velocity;
+        this.ver_velocity = ver_velocity;
+        this.flags = flags;
+        this.squawk = squawk;
+        this.altitude_type = altitude_type;
+        this.callsign = callsign;
+        this.emitter_type = emitter_type;
+        this.tslc = tslc;
+        
+    }
+    
+    /**
+     * Constructor for a new message, initializes everything
+     */
+    public msg_adsb_vehicle( long ICAO_address, int lat, int lon, int altitude, int heading, int hor_velocity, short ver_velocity, int flags, int squawk, short altitude_type, byte[] callsign, short emitter_type, short tslc, int sysid, int compid, boolean isMavlink2) {
+        this.msgid = MAVLINK_MSG_ID_ADSB_VEHICLE;
+        this.sysid = sysid;
+        this.compid = compid;
+        this.isMavlink2 = isMavlink2;
+
+        this.ICAO_address = ICAO_address;
+        this.lat = lat;
+        this.lon = lon;
+        this.altitude = altitude;
+        this.heading = heading;
+        this.hor_velocity = hor_velocity;
+        this.ver_velocity = ver_velocity;
+        this.flags = flags;
+        this.squawk = squawk;
+        this.altitude_type = altitude_type;
+        this.callsign = callsign;
+        this.emitter_type = emitter_type;
+        this.tslc = tslc;
         
     }
 
     /**
-    * Constructor for a new message, just initializes the msgid
-    */
-    public msg_adsb_vehicle(){
-        msgid = MAVLINK_MSG_ID_ADSB_VEHICLE;
-    }
-
-    /**
-    * Constructor for a new message, initializes the message with the payload
-    * from a mavlink packet
-    *
-    */
-    public msg_adsb_vehicle(MAVLinkPacket mavLinkPacket){
+     * Constructor for a new message, initializes the message with the payload
+     * from a mavlink packet
+     *
+     */
+    public msg_adsb_vehicle(MAVLinkPacket mavLinkPacket) {
+        this.msgid = MAVLINK_MSG_ID_ADSB_VEHICLE;
+        
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
-        this.msgid = MAVLINK_MSG_ID_ADSB_VEHICLE;
-        unpack(mavLinkPacket.payload);        
+        this.isMavlink2 = mavLinkPacket.isMavlink2;
+        unpack(mavLinkPacket.payload);
     }
 
                          
@@ -205,7 +237,7 @@ public class msg_adsb_vehicle extends MAVLinkMessage{
     }
 
     /**
-    * Gets the message, formated as a string
+    * Gets the message, formatted as a string
     */
     public String getCallsign() {
         StringBuffer buf = new StringBuffer();
@@ -220,10 +252,19 @@ public class msg_adsb_vehicle extends MAVLinkMessage{
     }
                              
     /**
-    * Returns a string with the MSG name and data
-    */
-    public String toString(){
+     * Returns a string with the MSG name and data
+     */
+    @Override
+    public String toString() {
         return "MAVLINK_MSG_ID_ADSB_VEHICLE - sysid:"+sysid+" compid:"+compid+" ICAO_address:"+ICAO_address+" lat:"+lat+" lon:"+lon+" altitude:"+altitude+" heading:"+heading+" hor_velocity:"+hor_velocity+" ver_velocity:"+ver_velocity+" flags:"+flags+" squawk:"+squawk+" altitude_type:"+altitude_type+" callsign:"+callsign+" emitter_type:"+emitter_type+" tslc:"+tslc+"";
+    }
+    
+    /**
+     * Returns a human-readable string of the name of the message
+     */
+    @Override
+    public String name() {
+        return "MAVLINK_MSG_ID_ADSB_VEHICLE";
     }
 }
         

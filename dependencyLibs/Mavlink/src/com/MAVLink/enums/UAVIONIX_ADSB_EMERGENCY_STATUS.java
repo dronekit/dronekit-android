@@ -7,8 +7,8 @@
 package com.MAVLink.enums;
 
 /** 
-* Emergency status encoding
-*/
+ * Emergency status encoding
+ */
 public class UAVIONIX_ADSB_EMERGENCY_STATUS {
    public static final int UAVIONIX_ADSB_OUT_NO_EMERGENCY = 0; /*  | */
    public static final int UAVIONIX_ADSB_OUT_GENERAL_EMERGENCY = 1; /*  | */

@@ -1,7 +1,7 @@
 package com.o3dr.android.client.apis;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
+//import android.support.annotation.NonNull;
 import android.view.Surface;
 
 import com.o3dr.android.client.Drone;
@@ -19,6 +19,8 @@ import static com.o3dr.services.android.lib.drone.action.CameraActions.EXTRA_VID
 import static com.o3dr.services.android.lib.drone.action.CameraActions.EXTRA_VIDEO_PROPS_UDP_PORT;
 import static com.o3dr.services.android.lib.drone.action.CameraActions.EXTRA_VIDEO_TAG;
 import static com.o3dr.services.android.lib.drone.action.CameraActions.EXTRA_VIDEO_PROPERTIES;
+
+import androidx.annotation.NonNull;
 
 /**
  * Provides support to control generic camera functionality

@@ -7,8 +7,8 @@
 package com.MAVLink.enums;
 
 /** 
-* Power supply status flags (bitmask)
-*/
+ * Power supply status flags (bitmask)
+ */
 public class MAV_POWER_STATUS {
    public static final int MAV_POWER_STATUS_BRICK_VALID = 1; /* main brick power supply valid | */
    public static final int MAV_POWER_STATUS_SERVO_VALID = 2; /* main servo power supply valid for FMU | */

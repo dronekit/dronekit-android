@@ -7,8 +7,8 @@
 package com.MAVLink.enums;
 
 /** 
-* 
-*/
+ * 
+ */
 public class ACCELCAL_VEHICLE_POS {
    public static final int ACCELCAL_VEHICLE_POS_LEVEL = 1; /*  | */
    public static final int ACCELCAL_VEHICLE_POS_LEFT = 2; /*  | */

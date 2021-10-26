@@ -7,8 +7,8 @@
 package com.MAVLink.enums;
 
 /** 
-* SERIAL_CONTROL flags (bitmask)
-*/
+ * SERIAL_CONTROL flags (bitmask)
+ */
 public class SERIAL_CONTROL_FLAG {
    public static final int SERIAL_CONTROL_FLAG_REPLY = 1; /* Set if this is a reply | */
    public static final int SERIAL_CONTROL_FLAG_RESPOND = 2; /* Set if the sender wants the receiver to send a response as another SERIAL_CONTROL message | */

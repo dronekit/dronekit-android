@@ -7,8 +7,8 @@
 package com.MAVLink.enums;
 
 /** 
-* Enumeration of battery functions
-*/
+ * Enumeration of battery functions
+ */
 public class MAV_BATTERY_FUNCTION {
    public static final int MAV_BATTERY_FUNCTION_UNKNOWN = 0; /* Battery function is unknown | */
    public static final int MAV_BATTERY_FUNCTION_ALL = 1; /* Battery supports all flight systems | */

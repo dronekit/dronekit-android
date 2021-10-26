@@ -7,8 +7,8 @@ import android.os.Handler;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.ardupilotmega.msg_mag_cal_progress;
-import com.MAVLink.ardupilotmega.msg_mag_cal_report;
 import com.MAVLink.common.msg_command_ack;
+import com.MAVLink.common.msg_mag_cal_report;
 import com.google.android.gms.location.LocationRequest;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.drone.action.GimbalActions;
@@ -417,7 +417,6 @@ public class MavLinkDroneManager extends DroneManager<MavLinkDrone, MAVLinkPacke
             listener.onCalibrationProgress(progress);
     }
 
-    @Override
     public void onCalibrationCompleted(msg_mag_cal_report report) {
         if (connectedApps.isEmpty())
             return;

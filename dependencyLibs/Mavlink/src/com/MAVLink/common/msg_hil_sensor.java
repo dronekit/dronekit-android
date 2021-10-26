@@ -11,200 +11,250 @@ import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
-* The IMU readings in SI units in NED body frame
-*/
-public class msg_hil_sensor extends MAVLinkMessage{
+ * The IMU readings in SI units in NED body frame
+ */
+public class msg_hil_sensor extends MAVLinkMessage {
 
     public static final int MAVLINK_MSG_ID_HIL_SENSOR = 107;
-    public static final int MAVLINK_MSG_LENGTH = 64;
+    public static final int MAVLINK_MSG_LENGTH = 65;
     private static final long serialVersionUID = MAVLINK_MSG_ID_HIL_SENSOR;
-
 
       
     /**
-    * Timestamp (microseconds, synced to UNIX time or since system boot)
-    */
+     * Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude of the number.
+     */
     public long time_usec;
       
     /**
-    * X acceleration (m/s^2)
-    */
+     * X acceleration
+     */
     public float xacc;
       
     /**
-    * Y acceleration (m/s^2)
-    */
+     * Y acceleration
+     */
     public float yacc;
       
     /**
-    * Z acceleration (m/s^2)
-    */
+     * Z acceleration
+     */
     public float zacc;
       
     /**
-    * Angular speed around X axis in body frame (rad / sec)
-    */
+     * Angular speed around X axis in body frame
+     */
     public float xgyro;
       
     /**
-    * Angular speed around Y axis in body frame (rad / sec)
-    */
+     * Angular speed around Y axis in body frame
+     */
     public float ygyro;
       
     /**
-    * Angular speed around Z axis in body frame (rad / sec)
-    */
+     * Angular speed around Z axis in body frame
+     */
     public float zgyro;
       
     /**
-    * X Magnetic field (Gauss)
-    */
+     * X Magnetic field
+     */
     public float xmag;
       
     /**
-    * Y Magnetic field (Gauss)
-    */
+     * Y Magnetic field
+     */
     public float ymag;
       
     /**
-    * Z Magnetic field (Gauss)
-    */
+     * Z Magnetic field
+     */
     public float zmag;
       
     /**
-    * Absolute pressure in millibar
-    */
+     * Absolute pressure
+     */
     public float abs_pressure;
       
     /**
-    * Differential pressure (airspeed) in millibar
-    */
+     * Differential pressure (airspeed)
+     */
     public float diff_pressure;
       
     /**
-    * Altitude calculated from pressure
-    */
+     * Altitude calculated from pressure
+     */
     public float pressure_alt;
       
     /**
-    * Temperature in degrees celsius
-    */
+     * Temperature
+     */
     public float temperature;
       
     /**
-    * Bitmask for fields that have updated since last message, bit 0 = xacc, bit 12: temperature, bit 31: full reset of attitude/position/velocities/etc was performed in sim.
-    */
+     * Bitmap for fields that have updated since last message, bit 0 = xacc, bit 12: temperature, bit 31: full reset of attitude/position/velocities/etc was performed in sim.
+     */
     public long fields_updated;
+      
+    /**
+     * Sensor ID (zero indexed). Used for multiple sensor inputs
+     */
+    public short id;
     
 
     /**
-    * Generates the payload for a mavlink message for a message of this type
-    * @return
-    */
-    public MAVLinkPacket pack(){
-        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH);
-        packet.sysid = 255;
-        packet.compid = 190;
+     * Generates the payload for a mavlink message for a message of this type
+     * @return
+     */
+    @Override
+    public MAVLinkPacket pack() {
+        MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH,isMavlink2);
+        packet.sysid = sysid;
+        packet.compid = compid;
         packet.msgid = MAVLINK_MSG_ID_HIL_SENSOR;
-              
+        
         packet.payload.putUnsignedLong(time_usec);
-              
         packet.payload.putFloat(xacc);
-              
         packet.payload.putFloat(yacc);
-              
         packet.payload.putFloat(zacc);
-              
         packet.payload.putFloat(xgyro);
-              
         packet.payload.putFloat(ygyro);
-              
         packet.payload.putFloat(zgyro);
-              
         packet.payload.putFloat(xmag);
-              
         packet.payload.putFloat(ymag);
-              
         packet.payload.putFloat(zmag);
-              
         packet.payload.putFloat(abs_pressure);
-              
         packet.payload.putFloat(diff_pressure);
-              
         packet.payload.putFloat(pressure_alt);
-              
         packet.payload.putFloat(temperature);
-              
         packet.payload.putUnsignedInt(fields_updated);
         
+        if (isMavlink2) {
+             packet.payload.putUnsignedByte(id);
+            
+        }
         return packet;
     }
 
     /**
-    * Decode a hil_sensor message into this class fields
-    *
-    * @param payload The message to decode
-    */
+     * Decode a hil_sensor message into this class fields
+     *
+     * @param payload The message to decode
+     */
+    @Override
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
-              
+        
         this.time_usec = payload.getUnsignedLong();
-              
         this.xacc = payload.getFloat();
-              
         this.yacc = payload.getFloat();
-              
         this.zacc = payload.getFloat();
-              
         this.xgyro = payload.getFloat();
-              
         this.ygyro = payload.getFloat();
-              
         this.zgyro = payload.getFloat();
-              
         this.xmag = payload.getFloat();
-              
         this.ymag = payload.getFloat();
-              
         this.zmag = payload.getFloat();
-              
         this.abs_pressure = payload.getFloat();
-              
         this.diff_pressure = payload.getFloat();
-              
         this.pressure_alt = payload.getFloat();
-              
         this.temperature = payload.getFloat();
-              
         this.fields_updated = payload.getUnsignedInt();
+        
+        if (isMavlink2) {
+             this.id = payload.getUnsignedByte();
+            
+        }
+    }
+
+    /**
+     * Constructor for a new message, just initializes the msgid
+     */
+    public msg_hil_sensor() {
+        this.msgid = MAVLINK_MSG_ID_HIL_SENSOR;
+    }
+    
+    /**
+     * Constructor for a new message, initializes msgid and all payload variables
+     */
+    public msg_hil_sensor( long time_usec, float xacc, float yacc, float zacc, float xgyro, float ygyro, float zgyro, float xmag, float ymag, float zmag, float abs_pressure, float diff_pressure, float pressure_alt, float temperature, long fields_updated, short id) {
+        this.msgid = MAVLINK_MSG_ID_HIL_SENSOR;
+
+        this.time_usec = time_usec;
+        this.xacc = xacc;
+        this.yacc = yacc;
+        this.zacc = zacc;
+        this.xgyro = xgyro;
+        this.ygyro = ygyro;
+        this.zgyro = zgyro;
+        this.xmag = xmag;
+        this.ymag = ymag;
+        this.zmag = zmag;
+        this.abs_pressure = abs_pressure;
+        this.diff_pressure = diff_pressure;
+        this.pressure_alt = pressure_alt;
+        this.temperature = temperature;
+        this.fields_updated = fields_updated;
+        this.id = id;
+        
+    }
+    
+    /**
+     * Constructor for a new message, initializes everything
+     */
+    public msg_hil_sensor( long time_usec, float xacc, float yacc, float zacc, float xgyro, float ygyro, float zgyro, float xmag, float ymag, float zmag, float abs_pressure, float diff_pressure, float pressure_alt, float temperature, long fields_updated, short id, int sysid, int compid, boolean isMavlink2) {
+        this.msgid = MAVLINK_MSG_ID_HIL_SENSOR;
+        this.sysid = sysid;
+        this.compid = compid;
+        this.isMavlink2 = isMavlink2;
+
+        this.time_usec = time_usec;
+        this.xacc = xacc;
+        this.yacc = yacc;
+        this.zacc = zacc;
+        this.xgyro = xgyro;
+        this.ygyro = ygyro;
+        this.zgyro = zgyro;
+        this.xmag = xmag;
+        this.ymag = ymag;
+        this.zmag = zmag;
+        this.abs_pressure = abs_pressure;
+        this.diff_pressure = diff_pressure;
+        this.pressure_alt = pressure_alt;
+        this.temperature = temperature;
+        this.fields_updated = fields_updated;
+        this.id = id;
         
     }
 
     /**
-    * Constructor for a new message, just initializes the msgid
-    */
-    public msg_hil_sensor(){
-        msgid = MAVLINK_MSG_ID_HIL_SENSOR;
-    }
-
-    /**
-    * Constructor for a new message, initializes the message with the payload
-    * from a mavlink packet
-    *
-    */
-    public msg_hil_sensor(MAVLinkPacket mavLinkPacket){
+     * Constructor for a new message, initializes the message with the payload
+     * from a mavlink packet
+     *
+     */
+    public msg_hil_sensor(MAVLinkPacket mavLinkPacket) {
+        this.msgid = MAVLINK_MSG_ID_HIL_SENSOR;
+        
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
-        this.msgid = MAVLINK_MSG_ID_HIL_SENSOR;
-        unpack(mavLinkPacket.payload);        
+        this.isMavlink2 = mavLinkPacket.isMavlink2;
+        unpack(mavLinkPacket.payload);
     }
 
-                                  
+                                    
     /**
-    * Returns a string with the MSG name and data
-    */
-    public String toString(){
-        return "MAVLINK_MSG_ID_HIL_SENSOR - sysid:"+sysid+" compid:"+compid+" time_usec:"+time_usec+" xacc:"+xacc+" yacc:"+yacc+" zacc:"+zacc+" xgyro:"+xgyro+" ygyro:"+ygyro+" zgyro:"+zgyro+" xmag:"+xmag+" ymag:"+ymag+" zmag:"+zmag+" abs_pressure:"+abs_pressure+" diff_pressure:"+diff_pressure+" pressure_alt:"+pressure_alt+" temperature:"+temperature+" fields_updated:"+fields_updated+"";
+     * Returns a string with the MSG name and data
+     */
+    @Override
+    public String toString() {
+        return "MAVLINK_MSG_ID_HIL_SENSOR - sysid:"+sysid+" compid:"+compid+" time_usec:"+time_usec+" xacc:"+xacc+" yacc:"+yacc+" zacc:"+zacc+" xgyro:"+xgyro+" ygyro:"+ygyro+" zgyro:"+zgyro+" xmag:"+xmag+" ymag:"+ymag+" zmag:"+zmag+" abs_pressure:"+abs_pressure+" diff_pressure:"+diff_pressure+" pressure_alt:"+pressure_alt+" temperature:"+temperature+" fields_updated:"+fields_updated+" id:"+id+"";
+    }
+    
+    /**
+     * Returns a human-readable string of the name of the message
+     */
+    @Override
+    public String name() {
+        return "MAVLINK_MSG_ID_HIL_SENSOR";
     }
 }
         
