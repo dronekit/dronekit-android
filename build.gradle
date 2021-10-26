@@ -17,7 +17,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.0.2'
+        classpath 'com.android.tools.build:gradle:7.0.3'
 
         //Dexcount gradle plugin
         //classpath 'com.getkeepsafe.dexcount:dexcount-gradle-plugin:0.4.4'
