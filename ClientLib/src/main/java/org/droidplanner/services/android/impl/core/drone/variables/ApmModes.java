@@ -87,7 +87,9 @@ public enum ApmModes {
 	public static ApmModes getMode(long i, int type) {
         if (isCopter(type)) {
             type = MAV_TYPE.MAV_TYPE_QUADROTOR;
-        }
+        } else if (isVtol(type)) {
+			type = MAV_TYPE.MAV_TYPE_VTOL_DUOROTOR;
+		}
 
 		for (ApmModes mode : ApmModes.values()) {
 			if (i == mode.getNumber() && type == mode.getType()) {
@@ -100,7 +102,9 @@ public enum ApmModes {
 	public static ApmModes getMode(String str, int type) {
         if (isCopter(type)) {
             type = MAV_TYPE.MAV_TYPE_QUADROTOR;
-        }
+        } else if (isVtol(type)) {
+			type = MAV_TYPE.MAV_TYPE_VTOL_DUOROTOR;
+		}
 
 		for (ApmModes mode : ApmModes.values()) {
 			if (str.equals(mode.getName()) && type == mode.getType()) {
@@ -111,12 +115,14 @@ public enum ApmModes {
 	}
 
 	public static List<ApmModes> getModeList(int type) {
-		List<ApmModes> modeList = new ArrayList<ApmModes>();
 
 		if (isCopter(type)) {
 			type = MAV_TYPE.MAV_TYPE_QUADROTOR;
+		} else if (isVtol(type)) {
+			type = MAV_TYPE.MAV_TYPE_VTOL_DUOROTOR;
 		}
 
+		List<ApmModes> modeList = new ArrayList<ApmModes>();
 		for (ApmModes mode : ApmModes.values()) {
 			if (mode.getType() == type) {
 				modeList.add(mode);
@@ -128,7 +134,6 @@ public enum ApmModes {
 	public static boolean isValid(ApmModes mode) {
 		return mode!=ApmModes.UNKNOWN;
 	}
-
 
 	public static boolean isCopter(int type){
 		switch (type) {
@@ -142,6 +147,10 @@ public enum ApmModes {
 		default:
 			return false;
 		}
+	}
+
+	public static boolean isVtol(int type) {
+		return Type.isVtol(type);
 	}
 
 }
