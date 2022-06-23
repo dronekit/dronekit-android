@@ -30,6 +30,7 @@ public class MAV_AUTOPILOT {
    public static final int MAV_AUTOPILOT_ASLUAV = 17; /* ASLUAV autopilot -- http://www.asl.ethz.ch | */
    public static final int MAV_AUTOPILOT_SMARTAP = 18; /* SmartAP Autopilot - http://sky-drones.com | */
    public static final int MAV_AUTOPILOT_AIRRAILS = 19; /* AirRails - http://uaventure.com | */
-   public static final int MAV_AUTOPILOT_ENUM_END = 20; /*  | */
+   public static final int MAV_AUTOPILOT_REFLEX = 20; /* Fusion Reflex - https://fusion.engineering | */
+   public static final int MAV_AUTOPILOT_ENUM_END = 21; /*  | */
 }
             

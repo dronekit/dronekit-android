@@ -46,6 +46,13 @@ public class MAV_TYPE {
    public static final int MAV_TYPE_SERVO = 33; /* Servo | */
    public static final int MAV_TYPE_ODID = 34; /* Open Drone ID. See https://mavlink.io/en/services/opendroneid.html. | */
    public static final int MAV_TYPE_DECAROTOR = 35; /* Decarotor | */
-   public static final int MAV_TYPE_ENUM_END = 36; /*  | */
+   public static final int MAV_TYPE_BATTERY = 36; /* Battery | */
+   public static final int MAV_TYPE_PARACHUTE = 37; /* Parachute | */
+   public static final int MAV_TYPE_LOG = 38; /* Log | */
+   public static final int MAV_TYPE_OSD = 39; /* OSD | */
+   public static final int MAV_TYPE_IMU = 40; /* IMU | */
+   public static final int MAV_TYPE_GPS = 41; /* GPS | */
+   public static final int MAV_TYPE_WINCH = 42; /* Winch | */
+   public static final int MAV_TYPE_ENUM_END = 43; /*  | */
 }
             

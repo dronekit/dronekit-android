@@ -16,7 +16,7 @@ import com.MAVLink.Messages.MAVLinkPayload;
 public class msg_efi_status extends MAVLinkMessage {
 
     public static final int MAVLINK_MSG_ID_EFI_STATUS = 225;
-    public static final int MAVLINK_MSG_LENGTH = 65;
+    public static final int MAVLINK_MSG_LENGTH = 69;
     private static final long serialVersionUID = MAVLINK_MSG_ID_EFI_STATUS;
 
       
@@ -104,6 +104,11 @@ public class msg_efi_status extends MAVLinkMessage {
      * EFI health status
      */
     public short health;
+      
+    /**
+     * Supply voltage to EFI sparking system.  Zero in this value means "unknown", so if the supply voltage really is zero volts use 0.0001 instead.
+     */
+    public float ignition_voltage;
     
 
     /**
@@ -136,6 +141,7 @@ public class msg_efi_status extends MAVLinkMessage {
         packet.payload.putUnsignedByte(health);
         
         if (isMavlink2) {
+             packet.payload.putFloat(ignition_voltage);
             
         }
         return packet;
@@ -169,6 +175,7 @@ public class msg_efi_status extends MAVLinkMessage {
         this.health = payload.getUnsignedByte();
         
         if (isMavlink2) {
+             this.ignition_voltage = payload.getFloat();
             
         }
     }
@@ -183,7 +190,7 @@ public class msg_efi_status extends MAVLinkMessage {
     /**
      * Constructor for a new message, initializes msgid and all payload variables
      */
-    public msg_efi_status( float ecu_index, float rpm, float fuel_consumed, float fuel_flow, float engine_load, float throttle_position, float spark_dwell_time, float barometric_pressure, float intake_manifold_pressure, float intake_manifold_temperature, float cylinder_head_temperature, float ignition_timing, float injection_time, float exhaust_gas_temperature, float throttle_out, float pt_compensation, short health) {
+    public msg_efi_status( float ecu_index, float rpm, float fuel_consumed, float fuel_flow, float engine_load, float throttle_position, float spark_dwell_time, float barometric_pressure, float intake_manifold_pressure, float intake_manifold_temperature, float cylinder_head_temperature, float ignition_timing, float injection_time, float exhaust_gas_temperature, float throttle_out, float pt_compensation, short health, float ignition_voltage) {
         this.msgid = MAVLINK_MSG_ID_EFI_STATUS;
 
         this.ecu_index = ecu_index;
@@ -203,13 +210,14 @@ public class msg_efi_status extends MAVLinkMessage {
         this.throttle_out = throttle_out;
         this.pt_compensation = pt_compensation;
         this.health = health;
+        this.ignition_voltage = ignition_voltage;
         
     }
     
     /**
      * Constructor for a new message, initializes everything
      */
-    public msg_efi_status( float ecu_index, float rpm, float fuel_consumed, float fuel_flow, float engine_load, float throttle_position, float spark_dwell_time, float barometric_pressure, float intake_manifold_pressure, float intake_manifold_temperature, float cylinder_head_temperature, float ignition_timing, float injection_time, float exhaust_gas_temperature, float throttle_out, float pt_compensation, short health, int sysid, int compid, boolean isMavlink2) {
+    public msg_efi_status( float ecu_index, float rpm, float fuel_consumed, float fuel_flow, float engine_load, float throttle_position, float spark_dwell_time, float barometric_pressure, float intake_manifold_pressure, float intake_manifold_temperature, float cylinder_head_temperature, float ignition_timing, float injection_time, float exhaust_gas_temperature, float throttle_out, float pt_compensation, short health, float ignition_voltage, int sysid, int compid, boolean isMavlink2) {
         this.msgid = MAVLINK_MSG_ID_EFI_STATUS;
         this.sysid = sysid;
         this.compid = compid;
@@ -232,6 +240,7 @@ public class msg_efi_status extends MAVLinkMessage {
         this.throttle_out = throttle_out;
         this.pt_compensation = pt_compensation;
         this.health = health;
+        this.ignition_voltage = ignition_voltage;
         
     }
 
@@ -249,13 +258,13 @@ public class msg_efi_status extends MAVLinkMessage {
         unpack(mavLinkPacket.payload);
     }
 
-                                      
+                                        
     /**
      * Returns a string with the MSG name and data
      */
     @Override
     public String toString() {
-        return "MAVLINK_MSG_ID_EFI_STATUS - sysid:"+sysid+" compid:"+compid+" ecu_index:"+ecu_index+" rpm:"+rpm+" fuel_consumed:"+fuel_consumed+" fuel_flow:"+fuel_flow+" engine_load:"+engine_load+" throttle_position:"+throttle_position+" spark_dwell_time:"+spark_dwell_time+" barometric_pressure:"+barometric_pressure+" intake_manifold_pressure:"+intake_manifold_pressure+" intake_manifold_temperature:"+intake_manifold_temperature+" cylinder_head_temperature:"+cylinder_head_temperature+" ignition_timing:"+ignition_timing+" injection_time:"+injection_time+" exhaust_gas_temperature:"+exhaust_gas_temperature+" throttle_out:"+throttle_out+" pt_compensation:"+pt_compensation+" health:"+health+"";
+        return "MAVLINK_MSG_ID_EFI_STATUS - sysid:"+sysid+" compid:"+compid+" ecu_index:"+ecu_index+" rpm:"+rpm+" fuel_consumed:"+fuel_consumed+" fuel_flow:"+fuel_flow+" engine_load:"+engine_load+" throttle_position:"+throttle_position+" spark_dwell_time:"+spark_dwell_time+" barometric_pressure:"+barometric_pressure+" intake_manifold_pressure:"+intake_manifold_pressure+" intake_manifold_temperature:"+intake_manifold_temperature+" cylinder_head_temperature:"+cylinder_head_temperature+" ignition_timing:"+ignition_timing+" injection_time:"+injection_time+" exhaust_gas_temperature:"+exhaust_gas_temperature+" throttle_out:"+throttle_out+" pt_compensation:"+pt_compensation+" health:"+health+" ignition_voltage:"+ignition_voltage+"";
     }
     
     /**

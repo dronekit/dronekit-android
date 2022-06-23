@@ -8,8 +8,8 @@ package com.MAVLink.enums;
 
 /** 
  * A data stream is not a fixed set of messages, but rather a
-     recommendation to the autopilot software. Individual autopilots may or may not obey
-     the recommended messages.
+        recommendation to the autopilot software. Individual autopilots may or may not obey
+        the recommended messages.
  */
 public class MAV_DATA_STREAM {
    public static final int MAV_DATA_STREAM_ALL = 0; /* Enable all data streams | */

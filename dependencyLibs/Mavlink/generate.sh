@@ -2,6 +2,7 @@
 # script to re-generate mavlink C code for APM
 
 mavdir="$(dirname $0)"
+echo $mavdir
 
 if ! which mavgen.py > /dev/null; then
     echo "mavgen.py must be in your PATH. Get it from http://github.com/mavlink/mavlink in the pymavlink/generator directory"
@@ -9,4 +10,4 @@ if ! which mavgen.py > /dev/null; then
 fi
 
 echo "Generating Java code"
-mavgen.py --lang=Java --wire-protocol=1.0 --output=$mavdir/src/com/MAVLink $mavdir/message_definitions/ardupilotmega.xml
+mavgen.py --lang=Java --wire-protocol=2.0 --output=$mavdir/src/com/MAVLink $mavdir/message_definitions/ardupilotmega.xml
