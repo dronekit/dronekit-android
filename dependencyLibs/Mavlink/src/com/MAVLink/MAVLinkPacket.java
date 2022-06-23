@@ -875,6 +875,12 @@ public class MAVLinkPacket implements Serializable {
             case msg_gimbal_device_information.MAVLINK_MSG_ID_GIMBAL_DEVICE_INFORMATION:
                 return  new msg_gimbal_device_information(this);
              
+            case msg_gimbal_device_set_attitude.MAVLINK_MSG_ID_GIMBAL_DEVICE_SET_ATTITUDE:
+                return  new msg_gimbal_device_set_attitude(this);
+             
+            case msg_gimbal_device_attitude_status.MAVLINK_MSG_ID_GIMBAL_DEVICE_ATTITUDE_STATUS:
+                return  new msg_gimbal_device_attitude_status(this);
+             
             case msg_autopilot_state_for_gimbal_device.MAVLINK_MSG_ID_AUTOPILOT_STATE_FOR_GIMBAL_DEVICE:
                 return  new msg_autopilot_state_for_gimbal_device(this);
              
@@ -934,6 +940,15 @@ public class MAVLinkPacket implements Serializable {
              
             case msg_tunnel.MAVLINK_MSG_ID_TUNNEL:
                 return  new msg_tunnel(this);
+             
+            case msg_can_frame.MAVLINK_MSG_ID_CAN_FRAME:
+                return  new msg_can_frame(this);
+             
+            case msg_canfd_frame.MAVLINK_MSG_ID_CANFD_FRAME:
+                return  new msg_canfd_frame(this);
+             
+            case msg_can_filter_modify.MAVLINK_MSG_ID_CAN_FILTER_MODIFY:
+                return  new msg_can_filter_modify(this);
              
             case msg_wheel_distance.MAVLINK_MSG_ID_WHEEL_DISTANCE:
                 return  new msg_wheel_distance(this);
@@ -1015,6 +1030,21 @@ public class MAVLinkPacket implements Serializable {
              
             case msg_mcu_status.MAVLINK_MSG_ID_MCU_STATUS:
                 return  new msg_mcu_status(this);
+             
+            case msg_esc_telemetry_13_to_16.MAVLINK_MSG_ID_ESC_TELEMETRY_13_TO_16:
+                return  new msg_esc_telemetry_13_to_16(this);
+             
+            case msg_esc_telemetry_17_to_20.MAVLINK_MSG_ID_ESC_TELEMETRY_17_TO_20:
+                return  new msg_esc_telemetry_17_to_20(this);
+             
+            case msg_esc_telemetry_21_to_24.MAVLINK_MSG_ID_ESC_TELEMETRY_21_TO_24:
+                return  new msg_esc_telemetry_21_to_24(this);
+             
+            case msg_esc_telemetry_25_to_28.MAVLINK_MSG_ID_ESC_TELEMETRY_25_TO_28:
+                return  new msg_esc_telemetry_25_to_28(this);
+             
+            case msg_esc_telemetry_29_to_32.MAVLINK_MSG_ID_ESC_TELEMETRY_29_TO_32:
+                return  new msg_esc_telemetry_29_to_32(this);
              
             case msg_hygrometer_sensor.MAVLINK_MSG_ID_HYGROMETER_SENSOR:
                 return  new msg_hygrometer_sensor(this);

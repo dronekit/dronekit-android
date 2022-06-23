@@ -46,7 +46,7 @@ public class msg_autopilot_version extends MAVLinkMessage {
     public long os_sw_version;
       
     /**
-     * HW / board version (last 8 bytes should be silicon ID, if any)
+     * HW / board version (last 8 bits should be silicon ID, if any). The first 16 bits of this field specify https://github.com/PX4/PX4-Bootloader/blob/master/board_types.txt
      */
     public long board_version;
       

@@ -4,36 +4,26 @@
  * java mavlink generator tool. It should not be modified by hand.
  */
 
-// MESSAGE MOUNT_STATUS PACKING
-package com.MAVLink.ardupilotmega;
+// MESSAGE CANFD_FRAME PACKING
+package com.MAVLink.common;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
         
 /**
- * Message with some status from autopilot to GCS about camera or antenna mount.
+ * A forwarded CANFD frame as requested by MAV_CMD_CAN_FORWARD. These are separated from CAN_FRAME as they need different handling (eg. TAO handling)
  */
-public class msg_mount_status extends MAVLinkMessage {
+public class msg_canfd_frame extends MAVLinkMessage {
 
-    public static final int MAVLINK_MSG_ID_MOUNT_STATUS = 158;
-    public static final int MAVLINK_MSG_LENGTH = 15;
-    private static final long serialVersionUID = MAVLINK_MSG_ID_MOUNT_STATUS;
+    public static final int MAVLINK_MSG_ID_CANFD_FRAME = 387;
+    public static final int MAVLINK_MSG_LENGTH = 72;
+    private static final long serialVersionUID = MAVLINK_MSG_ID_CANFD_FRAME;
 
       
     /**
-     * Pitch.
+     * Frame ID
      */
-    public int pointing_a;
-      
-    /**
-     * Roll.
-     */
-    public int pointing_b;
-      
-    /**
-     * Yaw.
-     */
-    public int pointing_c;
+    public long id;
       
     /**
      * System ID.
@@ -46,9 +36,19 @@ public class msg_mount_status extends MAVLinkMessage {
     public short target_component;
       
     /**
-     * Mount operating mode.
+     * bus number
      */
-    public short mount_mode;
+    public short bus;
+      
+    /**
+     * Frame length
+     */
+    public short len;
+      
+    /**
+     * Frame data
+     */
+    public short data[] = new short[64];
     
 
     /**
@@ -60,23 +60,27 @@ public class msg_mount_status extends MAVLinkMessage {
         MAVLinkPacket packet = new MAVLinkPacket(MAVLINK_MSG_LENGTH,isMavlink2);
         packet.sysid = sysid;
         packet.compid = compid;
-        packet.msgid = MAVLINK_MSG_ID_MOUNT_STATUS;
+        packet.msgid = MAVLINK_MSG_ID_CANFD_FRAME;
         
-        packet.payload.putInt(pointing_a);
-        packet.payload.putInt(pointing_b);
-        packet.payload.putInt(pointing_c);
+        packet.payload.putUnsignedInt(id);
         packet.payload.putUnsignedByte(target_system);
         packet.payload.putUnsignedByte(target_component);
+        packet.payload.putUnsignedByte(bus);
+        packet.payload.putUnsignedByte(len);
+        
+        for (int i = 0; i < data.length; i++) {
+            packet.payload.putUnsignedByte(data[i]);
+        }
+                    
         
         if (isMavlink2) {
-             packet.payload.putUnsignedByte(mount_mode);
             
         }
         return packet;
     }
 
     /**
-     * Decode a mount_status message into this class fields
+     * Decode a canfd_frame message into this class fields
      *
      * @param payload The message to decode
      */
@@ -84,14 +88,18 @@ public class msg_mount_status extends MAVLinkMessage {
     public void unpack(MAVLinkPayload payload) {
         payload.resetIndex();
         
-        this.pointing_a = payload.getInt();
-        this.pointing_b = payload.getInt();
-        this.pointing_c = payload.getInt();
+        this.id = payload.getUnsignedInt();
         this.target_system = payload.getUnsignedByte();
         this.target_component = payload.getUnsignedByte();
+        this.bus = payload.getUnsignedByte();
+        this.len = payload.getUnsignedByte();
+         
+        for (int i = 0; i < this.data.length; i++) {
+            this.data[i] = payload.getUnsignedByte();
+        }
+                
         
         if (isMavlink2) {
-             this.mount_mode = payload.getUnsignedByte();
             
         }
     }
@@ -99,40 +107,40 @@ public class msg_mount_status extends MAVLinkMessage {
     /**
      * Constructor for a new message, just initializes the msgid
      */
-    public msg_mount_status() {
-        this.msgid = MAVLINK_MSG_ID_MOUNT_STATUS;
+    public msg_canfd_frame() {
+        this.msgid = MAVLINK_MSG_ID_CANFD_FRAME;
     }
     
     /**
      * Constructor for a new message, initializes msgid and all payload variables
      */
-    public msg_mount_status( int pointing_a, int pointing_b, int pointing_c, short target_system, short target_component, short mount_mode) {
-        this.msgid = MAVLINK_MSG_ID_MOUNT_STATUS;
+    public msg_canfd_frame( long id, short target_system, short target_component, short bus, short len, short[] data) {
+        this.msgid = MAVLINK_MSG_ID_CANFD_FRAME;
 
-        this.pointing_a = pointing_a;
-        this.pointing_b = pointing_b;
-        this.pointing_c = pointing_c;
+        this.id = id;
         this.target_system = target_system;
         this.target_component = target_component;
-        this.mount_mode = mount_mode;
+        this.bus = bus;
+        this.len = len;
+        this.data = data;
         
     }
     
     /**
      * Constructor for a new message, initializes everything
      */
-    public msg_mount_status( int pointing_a, int pointing_b, int pointing_c, short target_system, short target_component, short mount_mode, int sysid, int compid, boolean isMavlink2) {
-        this.msgid = MAVLINK_MSG_ID_MOUNT_STATUS;
+    public msg_canfd_frame( long id, short target_system, short target_component, short bus, short len, short[] data, int sysid, int compid, boolean isMavlink2) {
+        this.msgid = MAVLINK_MSG_ID_CANFD_FRAME;
         this.sysid = sysid;
         this.compid = compid;
         this.isMavlink2 = isMavlink2;
 
-        this.pointing_a = pointing_a;
-        this.pointing_b = pointing_b;
-        this.pointing_c = pointing_c;
+        this.id = id;
         this.target_system = target_system;
         this.target_component = target_component;
-        this.mount_mode = mount_mode;
+        this.bus = bus;
+        this.len = len;
+        this.data = data;
         
     }
 
@@ -141,8 +149,8 @@ public class msg_mount_status extends MAVLinkMessage {
      * from a mavlink packet
      *
      */
-    public msg_mount_status(MAVLinkPacket mavLinkPacket) {
-        this.msgid = MAVLINK_MSG_ID_MOUNT_STATUS;
+    public msg_canfd_frame(MAVLinkPacket mavLinkPacket) {
+        this.msgid = MAVLINK_MSG_ID_CANFD_FRAME;
         
         this.sysid = mavLinkPacket.sysid;
         this.compid = mavLinkPacket.compid;
@@ -156,7 +164,7 @@ public class msg_mount_status extends MAVLinkMessage {
      */
     @Override
     public String toString() {
-        return "MAVLINK_MSG_ID_MOUNT_STATUS - sysid:"+sysid+" compid:"+compid+" pointing_a:"+pointing_a+" pointing_b:"+pointing_b+" pointing_c:"+pointing_c+" target_system:"+target_system+" target_component:"+target_component+" mount_mode:"+mount_mode+"";
+        return "MAVLINK_MSG_ID_CANFD_FRAME - sysid:"+sysid+" compid:"+compid+" id:"+id+" target_system:"+target_system+" target_component:"+target_component+" bus:"+bus+" len:"+len+" data:"+data+"";
     }
     
     /**
@@ -164,7 +172,7 @@ public class msg_mount_status extends MAVLinkMessage {
      */
     @Override
     public String name() {
-        return "MAVLINK_MSG_ID_MOUNT_STATUS";
+        return "MAVLINK_MSG_ID_CANFD_FRAME";
     }
 }
         
