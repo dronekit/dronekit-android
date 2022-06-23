@@ -11,6 +11,7 @@ public class Type implements DroneAttribute {
     public static final int TYPE_PLANE = 1;
     public static final int TYPE_COPTER = 2;
     public static final int TYPE_ROVER = 10;
+    public static final int TYPE_QUADPLANE = 20;
 
     public static enum Firmware {
         ARDU_PLANE("ArduPlane"),
@@ -46,6 +47,7 @@ public class Type implements DroneAttribute {
                 return Firmware.ARDU_COPTER;
 
             case TYPE_PLANE:
+            case TYPE_QUADPLANE:
                 return Firmware.ARDU_PLANE;
 
             case TYPE_ROVER:
