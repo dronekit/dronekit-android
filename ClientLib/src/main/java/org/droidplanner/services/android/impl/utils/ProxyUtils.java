@@ -13,6 +13,7 @@ import com.o3dr.services.android.lib.drone.mission.item.command.ReturnToLaunch;
 import com.o3dr.services.android.lib.drone.mission.item.command.SetRelay;
 import com.o3dr.services.android.lib.drone.mission.item.command.SetServo;
 import com.o3dr.services.android.lib.drone.mission.item.command.Takeoff;
+import com.o3dr.services.android.lib.drone.mission.item.command.VtolTakeoff;
 import com.o3dr.services.android.lib.drone.mission.item.command.YawCondition;
 import com.o3dr.services.android.lib.drone.mission.item.complex.CameraDetail;
 import com.o3dr.services.android.lib.drone.mission.item.complex.SplineSurvey;
@@ -24,6 +25,7 @@ import com.o3dr.services.android.lib.drone.mission.item.spatial.DoLandStart;
 import com.o3dr.services.android.lib.drone.mission.item.spatial.Land;
 import com.o3dr.services.android.lib.drone.mission.item.spatial.RegionOfInterest;
 import com.o3dr.services.android.lib.drone.mission.item.spatial.SplineWaypoint;
+import com.o3dr.services.android.lib.drone.mission.item.spatial.VtolLand;
 import com.o3dr.services.android.lib.drone.mission.item.spatial.Waypoint;
 
 import org.droidplanner.services.android.impl.core.mission.MissionImpl;
@@ -37,6 +39,7 @@ import org.droidplanner.services.android.impl.core.mission.commands.ReturnToHome
 import org.droidplanner.services.android.impl.core.mission.commands.SetRelayImpl;
 import org.droidplanner.services.android.impl.core.mission.commands.SetServoImpl;
 import org.droidplanner.services.android.impl.core.mission.commands.TakeoffImpl;
+import org.droidplanner.services.android.impl.core.mission.commands.VtolTakeoffImpl;
 import org.droidplanner.services.android.impl.core.mission.survey.SplineSurveyImpl;
 import org.droidplanner.services.android.impl.core.mission.survey.SurveyImpl;
 import org.droidplanner.services.android.impl.core.mission.waypoints.CircleImpl;
@@ -45,6 +48,7 @@ import org.droidplanner.services.android.impl.core.mission.waypoints.LandImpl;
 import org.droidplanner.services.android.impl.core.mission.waypoints.RegionOfInterestImpl;
 import org.droidplanner.services.android.impl.core.mission.waypoints.SplineWaypointImpl;
 import org.droidplanner.services.android.impl.core.mission.waypoints.StructureScannerImpl;
+import org.droidplanner.services.android.impl.core.mission.waypoints.VtolLandImpl;
 import org.droidplanner.services.android.impl.core.mission.waypoints.WaypointImpl;
 import org.droidplanner.services.android.impl.core.survey.CameraInfo;
 import org.droidplanner.services.android.impl.core.survey.SurveyData;
@@ -147,6 +151,14 @@ public class ProxyUtils {
                 missionItemImpl = temp;
                 break;
             }
+            case VTOL_TAKEOFF: {
+                VtolTakeoff proxy = (VtolTakeoff) proxyItem;
+
+                VtolTakeoffImpl temp = new VtolTakeoffImpl(missionImpl, proxy.getTakeoffAltitude());
+
+                missionItemImpl = temp;
+                break;
+            }
             case CIRCLE: {
                 Circle proxy = (Circle) proxyItem;
 
@@ -161,6 +173,14 @@ public class ProxyUtils {
                 Land proxy = (Land) proxyItem;
 
                 LandImpl temp = new LandImpl(missionImpl, (proxy.getCoordinate()));
+
+                missionItemImpl = temp;
+                break;
+            }
+            case VTOL_LAND: {
+                VtolLand proxy = (VtolLand) proxyItem;
+
+                VtolLandImpl temp = new VtolLandImpl(missionImpl, (proxy.getCoordinate()));
 
                 missionItemImpl = temp;
                 break;
@@ -225,6 +245,7 @@ public class ProxyUtils {
                 temp.setOrbitCCW(proxy.isOrbitCCW());
                 temp.setOrbitalRadius(proxy.getOrbitalRadius());
                 temp.setYawAngle(proxy.getYawAngle());
+                temp.setFrame(proxy.getFrame());
 
                 missionItemImpl = temp;
                 break;
@@ -325,6 +346,7 @@ public class ProxyUtils {
                 temp.setOrbitalRadius(source.getOrbitalRadius());
                 temp.setOrbitCCW(source.isOrbitCCW());
                 temp.setYawAngle(source.getYawAngle());
+                temp.setFrame(source.getFrame());
 
                 proxyMissionItem = temp;
                 break;
@@ -351,6 +373,15 @@ public class ProxyUtils {
                 proxyMissionItem = temp;
                 break;
             }
+            case VTOL_TAKEOFF: {
+                VtolTakeoffImpl source = (VtolTakeoffImpl) itemImpl;
+
+                VtolTakeoff temp = new VtolTakeoff();
+                temp.setTakeoffAltitude(source.getFinishedAlt());
+
+                proxyMissionItem = temp;
+                break;
+            }
             case RTL: {
                 ReturnToHomeImpl source = (ReturnToHomeImpl) itemImpl;
 
@@ -365,6 +396,15 @@ public class ProxyUtils {
 
                 Land temp = new Land();
                 temp.setCoordinate((source.getCoordinate()));
+
+                proxyMissionItem = temp;
+                break;
+            }
+            case VTOL_LAND: {
+                VtolLandImpl source = (VtolLandImpl) itemImpl;
+
+                VtolLand temp = new VtolLand();
+                temp.setCoordinate(source.getCoordinate());
 
                 proxyMissionItem = temp;
                 break;

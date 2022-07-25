@@ -17,6 +17,7 @@ public class WaypointImpl extends SpatialCoordItem {
 	private double yawAngle;
 	private double orbitalRadius;
 	private boolean orbitCCW;
+	private byte frame;
 
 	public WaypointImpl(MissionItemImpl item) {
 		super(item);
@@ -40,6 +41,7 @@ public class WaypointImpl extends SpatialCoordItem {
 		mavMsg.param2 = (float) getAcceptanceRadius();
 		mavMsg.param3 = (float) (isOrbitCCW() ? getOrbitalRadius() * -1.0 : getOrbitalRadius());
 		mavMsg.param4 = (float) getYawAngle();
+		mavMsg.frame = getFrame();
 		return list;
 	}
 
@@ -51,6 +53,7 @@ public class WaypointImpl extends SpatialCoordItem {
 		setOrbitCCW(mavMsg.param3 < 0);
 		setOrbitalRadius(Math.abs(mavMsg.param3));
 		setYawAngle(mavMsg.param4);
+		setFrame((byte) mavMsg.frame);
 	}
 
 	@Override
@@ -98,4 +101,7 @@ public class WaypointImpl extends SpatialCoordItem {
 		this.orbitCCW = orbitCCW;
 	}
 
+	public byte getFrame() { return frame; }
+
+	public void setFrame(byte frame) { this.frame = frame; }
 }

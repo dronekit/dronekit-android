@@ -14,6 +14,7 @@ import com.o3dr.services.android.lib.drone.mission.item.command.ReturnToLaunch;
 import com.o3dr.services.android.lib.drone.mission.item.command.SetRelay;
 import com.o3dr.services.android.lib.drone.mission.item.command.SetServo;
 import com.o3dr.services.android.lib.drone.mission.item.command.Takeoff;
+import com.o3dr.services.android.lib.drone.mission.item.command.VtolTakeoff;
 import com.o3dr.services.android.lib.drone.mission.item.command.YawCondition;
 import com.o3dr.services.android.lib.drone.mission.item.complex.SplineSurvey;
 import com.o3dr.services.android.lib.drone.mission.item.complex.StructureScanner;
@@ -23,6 +24,7 @@ import com.o3dr.services.android.lib.drone.mission.item.spatial.DoLandStart;
 import com.o3dr.services.android.lib.drone.mission.item.spatial.Land;
 import com.o3dr.services.android.lib.drone.mission.item.spatial.RegionOfInterest;
 import com.o3dr.services.android.lib.drone.mission.item.spatial.SplineWaypoint;
+import com.o3dr.services.android.lib.drone.mission.item.spatial.VtolLand;
 import com.o3dr.services.android.lib.drone.mission.item.spatial.Waypoint;
 import com.o3dr.services.android.lib.drone.property.Type;
 import com.o3dr.services.android.lib.util.ParcelableUtils;
@@ -66,6 +68,18 @@ public enum MissionItemType {
         @Override
         protected Parcelable.Creator<Takeoff> getMissionItemCreator() {
             return Takeoff.CREATOR;
+        }
+    },
+
+    VTOL_TAKEOFF("Vtol Takeoff") {
+        @Override
+        public MissionItem getNewItem() {
+            return new VtolTakeoff();
+        }
+
+        @Override
+        protected Parcelable.Creator<VtolTakeoff> getMissionItemCreator() {
+            return VtolTakeoff.CREATOR;
         }
     },
 
@@ -127,6 +141,18 @@ public enum MissionItemType {
         @Override
         protected Creator<Land> getMissionItemCreator() {
             return Land.CREATOR;
+        }
+    },
+
+    VTOL_LAND("Vtol Land") {
+        @Override
+        public MissionItem getNewItem() {
+            return new VtolLand();
+        }
+
+        @Override
+        protected Creator<VtolLand> getMissionItemCreator() {
+            return VtolLand.CREATOR;
         }
     },
 

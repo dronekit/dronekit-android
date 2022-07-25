@@ -15,6 +15,7 @@ public class Waypoint extends BaseSpatialItem implements android.os.Parcelable {
     private double yawAngle;
     private double orbitalRadius;
     private boolean orbitCCW;
+    private byte frame;
 
     public Waypoint(){
         super(MissionItemType.WAYPOINT);
@@ -27,6 +28,7 @@ public class Waypoint extends BaseSpatialItem implements android.os.Parcelable {
         yawAngle = copy.yawAngle;
         orbitalRadius = copy.orbitalRadius;
         orbitCCW = copy.orbitCCW;
+        frame = copy.frame;
     }
 
     public double getDelay() {
@@ -69,6 +71,10 @@ public class Waypoint extends BaseSpatialItem implements android.os.Parcelable {
         this.orbitCCW = orbitCCW;
     }
 
+    public byte getFrame() { return frame; }
+
+    public void setFrame(byte frame) { this.frame = frame; }
+
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         super.writeToParcel(dest, flags);
@@ -77,6 +83,7 @@ public class Waypoint extends BaseSpatialItem implements android.os.Parcelable {
         dest.writeDouble(this.yawAngle);
         dest.writeDouble(this.orbitalRadius);
         dest.writeByte(orbitCCW ? (byte) 1 : (byte) 0);
+        dest.writeInt(this.frame);
     }
 
     private Waypoint(Parcel in) {
@@ -86,6 +93,7 @@ public class Waypoint extends BaseSpatialItem implements android.os.Parcelable {
         this.yawAngle = in.readDouble();
         this.orbitalRadius = in.readDouble();
         this.orbitCCW = in.readByte() != 0;
+        this.frame = in.readByte();
     }
 
     @Override
@@ -96,6 +104,7 @@ public class Waypoint extends BaseSpatialItem implements android.os.Parcelable {
                 ", yawAngle=" + yawAngle +
                 ", orbitalRadius=" + orbitalRadius +
                 ", orbitCCW=" + orbitCCW +
+                ", frame=" + frame +
                 ", " + super.toString() +
                 '}';
     }
@@ -112,8 +121,8 @@ public class Waypoint extends BaseSpatialItem implements android.os.Parcelable {
         if (Double.compare(waypoint.acceptanceRadius, acceptanceRadius) != 0) return false;
         if (Double.compare(waypoint.yawAngle, yawAngle) != 0) return false;
         if (Double.compare(waypoint.orbitalRadius, orbitalRadius) != 0) return false;
-        return orbitCCW == waypoint.orbitCCW;
-
+        if (orbitCCW != waypoint.orbitCCW) return false;
+        return frame == waypoint.frame;
     }
 
     @Override
@@ -129,6 +138,7 @@ public class Waypoint extends BaseSpatialItem implements android.os.Parcelable {
         temp = Double.doubleToLongBits(orbitalRadius);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         result = 31 * result + (orbitCCW ? 1 : 0);
+        result = 31 * result + frame;
         return result;
     }
 
