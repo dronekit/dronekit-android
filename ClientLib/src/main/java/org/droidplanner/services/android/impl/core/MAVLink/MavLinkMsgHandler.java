@@ -44,6 +44,7 @@ public class MavLinkMsgHandler {
                 switch (heartbeat.type) {
 
                     case MAV_TYPE.MAV_TYPE_FIXED_WING:
+                    case MAV_TYPE.MAV_TYPE_VTOL_QUADROTOR:
                         droneMgr.onVehicleTypeReceived(FirmwareType.ARDU_PLANE);
                         break;
 

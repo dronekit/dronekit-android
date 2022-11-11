@@ -228,4 +228,15 @@ public class MavLinkCommands {
 
         drone.getMavClient().sendMessage(msg, listener);
     }
+
+    public static void sendReboot(MavLinkDrone drone, ICommandListener listener) {
+        msg_command_long msg = new msg_command_long();
+        msg.target_system = drone.getSysid();
+        msg.target_component = drone.getCompid();
+
+        msg.command = MAV_CMD.MAV_CMD_PREFLIGHT_REBOOT_SHUTDOWN;
+        msg.param1 = 1; // Reboot autopilot
+
+        drone.getMavClient().sendMessage(msg, listener);
+    }
 }

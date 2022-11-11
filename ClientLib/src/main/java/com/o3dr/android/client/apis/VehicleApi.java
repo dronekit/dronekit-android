@@ -20,6 +20,7 @@ import static com.o3dr.services.android.lib.drone.action.ParameterActions.ACTION
 import static com.o3dr.services.android.lib.drone.action.ParameterActions.EXTRA_PARAMETERS;
 import static com.o3dr.services.android.lib.drone.action.StateActions.ACTION_ARM;
 import static com.o3dr.services.android.lib.drone.action.StateActions.ACTION_ENABLE_RETURN_TO_ME;
+import static com.o3dr.services.android.lib.drone.action.StateActions.ACTION_REBOOT;
 import static com.o3dr.services.android.lib.drone.action.StateActions.ACTION_SET_VEHICLE_HOME;
 import static com.o3dr.services.android.lib.drone.action.StateActions.ACTION_SET_VEHICLE_MODE;
 import static com.o3dr.services.android.lib.drone.action.StateActions.ACTION_UPDATE_VEHICLE_DATA_STREAM_RATE;
@@ -189,5 +190,9 @@ public class VehicleApi extends Api {
         Bundle params = new Bundle();
         params.putInt(EXTRA_VEHICLE_DATA_STREAM_RATE, rate);
         drone.performAsyncActionOnDroneThread(new Action(ACTION_UPDATE_VEHICLE_DATA_STREAM_RATE, params), listener);
+    }
+
+    public void reboot(final AbstractCommandListener listener) {
+        drone.performAsyncActionOnDroneThread(new Action(ACTION_REBOOT), listener);
     }
 }

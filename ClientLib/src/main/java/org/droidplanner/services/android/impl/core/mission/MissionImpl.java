@@ -278,11 +278,9 @@ public class MissionImpl extends DroneVariable<GenericMavLinkDrone> {
 
         int size = items.size();
         for (int i = 0; i < size; i++) {
-            System.out.println("item size:" + i);
             MissionItemImpl item = items.get(i);
             for(msg_mission_item msg_item: item.packMissionItem()){
                 msg_item.seq = waypointCount++;
-                System.out.println("msg frame >> " + msg_item.frame);
                 data.add(msg_item);
             }
         }
