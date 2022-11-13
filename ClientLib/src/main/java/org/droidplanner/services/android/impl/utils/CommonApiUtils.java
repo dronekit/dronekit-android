@@ -223,9 +223,6 @@ public class CommonApiUtils {
             case ROVER_ACRO:
                 return VehicleMode.ROVER_ACRO;
 
-            case ROVER_LEARNING:
-                return VehicleMode.ROVER_LEARNING;
-
             case ROVER_STEERING:
                 return VehicleMode.ROVER_STEERING;
 
@@ -703,7 +700,7 @@ public class CommonApiUtils {
         if (drone == null)
             return -1;
 
-        return (float) drone.getMission().makeAndUploadDronie();
+        return (float) drone.getMission().makeAndUploadDrone();
     }
 
     public static void arm(ArduPilot drone, boolean arm, ICommandListener listener) {

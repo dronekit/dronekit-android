@@ -8,6 +8,7 @@ import com.MAVLink.enums.MAV_CMD;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
 import com.o3dr.services.android.lib.drone.mission.Mission;
 import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
+import com.o3dr.services.android.lib.drone.mission.item.command.VtolTakeoff;
 import com.o3dr.services.android.lib.model.ICommandListener;
 import com.o3dr.services.android.lib.util.ParcelableUtils;
 import com.o3dr.services.android.lib.util.UriUtils;
@@ -23,11 +24,13 @@ import org.droidplanner.services.android.impl.core.mission.commands.ReturnToHome
 import org.droidplanner.services.android.impl.core.mission.commands.SetRelayImpl;
 import org.droidplanner.services.android.impl.core.mission.commands.SetServoImpl;
 import org.droidplanner.services.android.impl.core.mission.commands.TakeoffImpl;
+import org.droidplanner.services.android.impl.core.mission.commands.VtolTakeoffImpl;
 import org.droidplanner.services.android.impl.core.mission.waypoints.CircleImpl;
 import org.droidplanner.services.android.impl.core.mission.waypoints.DoLandStartImpl;
 import org.droidplanner.services.android.impl.core.mission.waypoints.LandImpl;
 import org.droidplanner.services.android.impl.core.mission.waypoints.RegionOfInterestImpl;
 import org.droidplanner.services.android.impl.core.mission.waypoints.SplineWaypointImpl;
+import org.droidplanner.services.android.impl.core.mission.waypoints.VtolLandImpl;
 import org.droidplanner.services.android.impl.core.mission.waypoints.WaypointImpl;
 
 import java.io.BufferedReader;
@@ -190,6 +193,12 @@ public class MissionUtils {
                     msg.z = (Float.parseFloat(rowData[10]));
 
                     msg.autocontinue = (Byte.parseByte(rowData[11]));
+                    System.out.println("file mis frame:" + msg.frame);
+
+                    // TODO ホームが書き込めれてしまう
+                    if (msg.current == 1) {
+                        continue;
+                    }
 
                     rawMissionItems.add(msg);
                 }
@@ -255,11 +264,17 @@ public class MissionUtils {
                 case MAV_CMD.MAV_CMD_NAV_LAND:
                     received.add(new LandImpl(msg, missionImpl));
                     break;
+                case MAV_CMD.MAV_CMD_NAV_VTOL_LAND:
+                    received.add(new VtolLandImpl(msg, missionImpl));
+                    break;
                 case MAV_CMD.MAV_CMD_DO_LAND_START:
                     received.add(new DoLandStartImpl(msg, missionImpl));
                     break;
                 case MAV_CMD.MAV_CMD_NAV_TAKEOFF:
                     received.add(new TakeoffImpl(msg, missionImpl));
+                    break;
+                case MAV_CMD.MAV_CMD_NAV_VTOL_TAKEOFF:
+                    received.add(new VtolTakeoffImpl(msg, missionImpl));
                     break;
                 case MAV_CMD.MAV_CMD_DO_CHANGE_SPEED:
                     received.add(new ChangeSpeedImpl(msg, missionImpl));

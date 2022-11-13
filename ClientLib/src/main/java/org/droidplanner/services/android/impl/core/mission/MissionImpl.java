@@ -288,11 +288,11 @@ public class MissionImpl extends DroneVariable<GenericMavLinkDrone> {
     }
 
     /**
-     * Create and upload a dronie mission to the drone
+     * Create and upload a drone mission to the drone
      *
      * @return the bearing in degrees the drone trajectory will take.
      */
-    public double makeAndUploadDronie() {
+    public double makeAndUploadDrone() {
         final Gps droneGps = (Gps) myDrone.getAttribute(AttributeType.GPS);
         LatLong currentPosition = droneGps.getPosition();
         if (currentPosition == null || droneGps.getSatellitesCount() <= 5) {
@@ -303,7 +303,7 @@ public class MissionImpl extends DroneVariable<GenericMavLinkDrone> {
         final Attitude attitude = (Attitude) myDrone.getAttribute(AttributeType.ATTITUDE);
         final double bearing = 180 + attitude.getYaw();
         items.clear();
-        items.addAll(createDronie(currentPosition,
+        items.addAll(createDrone(currentPosition,
                 GeoTools.newCoordFromBearingAndDistance(currentPosition, bearing, 50.0)));
         sendMissionToAPM();
         notifyMissionUpdate();
@@ -321,7 +321,7 @@ public class MissionImpl extends DroneVariable<GenericMavLinkDrone> {
 
     }
 
-    public List<MissionItemImpl> createDronie(LatLong start, LatLong end) {
+    public List<MissionItemImpl> createDrone(LatLong start, LatLong end) {
         final int startAltitude = 4;
         final int roiDistance = -8;
         LatLong slowDownPoint = GeoTools.pointAlongTheLine(start, end, 5);

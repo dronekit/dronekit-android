@@ -366,6 +366,9 @@ public class GenericMavLinkDrone implements MavLinkDrone {
             case StateActions.ACTION_UPDATE_VEHICLE_DATA_STREAM_RATE:
                 return updateVehicleDataStreamRate(data, listener);
 
+            case StateActions.ACTION_REBOOT:
+                return reboot(listener);
+
             // CONTROL ACTIONS
             case ControlActions.ACTION_DO_GUIDED_TAKEOFF:
                 return performTakeoff(data, listener);
@@ -476,6 +479,11 @@ public class GenericMavLinkDrone implements MavLinkDrone {
         } else {
             MavLinkCommands.sendArmMessage(this, doArm, false, listener);
         }
+        return true;
+    }
+
+    protected boolean reboot(ICommandListener listener) {
+        MavLinkCommands.sendReboot(this, listener);
         return true;
     }
 
