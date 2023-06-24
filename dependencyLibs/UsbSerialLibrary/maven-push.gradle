@@ -1,0 +1,90 @@
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+def projectGroupId = 'org.droidplanner.android'
+def projectArtifactId = project.PUBLISH_ARTIFACT_ID
+def projectVersion = project.PUBLISH_VERSION
+def projectDescription = project.PROJECT_DESCRIPTION
+def projectLicense = project.PROJECT_LICENSE
+def projectLicenseUrl = project.PROJECT_LICENSE_URL
+def projectLicenseDistribution = project.PROJECT_LICENSE_DISTRIBUTION
+
+afterEvaluate { project ->
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+                pom.groupId = projectGroupId
+                pom.artifactId = projectArtifactId
+                pom.version = projectVersion
+
+                repository(url: getMavenPublishUrl(projectArtifactId)) {
+                    authentication(userName: getMavenUsername(), password: getMavenApiKey())
+                }
+
+                pom.project {
+                    name projectArtifactId
+                    packaging getMavenPomPackaging()
+                    description projectDescription
+
+                    //TODO: replace the values below
+                    url 'https://github.com/DroidPlanner/usb-serial-for-android'
+                    scm {
+                        url 'https://github.com/DroidPlanner/usb-serial-for-android'
+                        connection 'scm:git:git@github.com:DroidPlanner/usb-serial-for-android.git'
+                        developerConnection 'scm:git:git@github.com:DroidPlanner/usb-serial-for-android.git'
+                    }
+
+                    licenses {
+                        license {
+                            name projectLicense
+                            url projectLicenseUrl
+                            distribution projectLicenseDistribution
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            id getDeveloperId()
+                            name getDeveloperName()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    signing {
+        required { gradle.taskGraph.hasTask("uploadArchives") }
+        sign configurations.archives
+    }
+
+    task androidJavadocs(type: Javadoc) {
+        failOnError false
+
+        //Add the project java source directory.
+        def files = [android.sourceSets.main.java.srcDirs]
+
+        source = files
+        title = projectDescription
+        classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+        options.links("http://docs.oracle.com/javase/7/docs/api/")
+        options.links("https://developer.android.com/reference")
+    }
+
+    task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs){
+        classifier = 'javadoc'
+        from androidJavadocs.destinationDir
+    }
+
+    task androidSourcesJar(type: Jar){
+        classifier = 'sources'
+        from android.sourceSets.main.java.srcDirs
+    }
+
+    artifacts {
+        archives androidSourcesJar
+        archives androidJavadocsJar
+    }
+}

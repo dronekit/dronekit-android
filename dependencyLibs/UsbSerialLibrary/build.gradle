@@ -1,0 +1,145 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.1.0'
+    }
+}
+
+/**
+ * Improve build server performance by allowing disabling of pre-dexing
+ * (see http://tools.android.com/tech-docs/new-build-system/tips#TOC-Improving-Build-Server-performance.)
+ */
+project.ext.preDexLibs = !project.hasProperty('disablePreDex')
+
+project.plugins.whenPluginAdded { plugin ->
+    if ("com.android.build.gradle.AppPlugin".equals(plugin.class.name)) {
+        project.android.dexOptions.preDexLibraries = rootProject.ext.preDexLibs
+    } else if ("com.android.build.gradle.LibraryPlugin".equals(plugin.class.name)) {
+        project.android.dexOptions.preDexLibraries = rootProject.ext.preDexLibs
+    }
+}
+
+
+repositories {
+    jcenter()
+}
+
+apply plugin: 'com.android.library'
+
+ext {
+    VERSION_MAJOR = 0
+    VERSION_MINOR = 1
+    VERSION_PATCH = 0
+    VERSION_SUFFIX = "release"
+
+    PUBLISH_ARTIFACT_ID = 'usb-serial-android'
+    PUBLISH_VERSION = generateVersionName("", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH, VERSION_SUFFIX)
+    PUBLISH_VERSION_CODE = computeVersionCode(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH)
+    PROJECT_DESCRIPTION = "This is a driver library for communication with Arduinos and " +
+            "other USB serial hardware on Android, using the Android USB Host API available on Android 3.1+"
+    PROJECT_LICENSE = 'GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1'
+    PROJECT_LICENSE_URL = 'https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html'
+    PROJECT_LICENSE_DISTRIBUTION = 'repo'
+}
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion "19.1.0"
+
+    defaultConfig {
+        minSdkVersion 12
+
+        versionCode PUBLISH_VERSION_CODE
+        versionName PUBLISH_VERSION
+    }
+
+    sourceSets {
+        main {
+            manifest.srcFile 'AndroidManifest.xml'
+            java.srcDirs = ['src']
+            resources.srcDirs = ['src']
+            aidl.srcDirs = ['src']
+            renderscript.srcDirs = ['src']
+            res.srcDirs = ['res']
+            assets.srcDirs = ['assets']
+        }
+
+        // Move the tests to tests/java, tests/res, etc...
+        androidTest.setRoot('test')
+    }
+}
+
+def computeVersionCode(int versionMajor, int versionMinor, int versionPatch, int versionBuild = 0){
+    return versionMajor * 100000 + versionMinor * 1000 + versionPatch * 100 + versionBuild
+}
+
+def generateVersionName(String versionPrefix, int versionMajor, int versionMinor, int versionPatch, String versionSuffix = ""){
+    def versionName = "${versionPrefix}${versionMajor}.${versionMinor}.${versionPatch}"
+
+    if(versionSuffix != null && !versionSuffix.isEmpty() && versionSuffix != "release"){
+        versionName += "-${versionSuffix}"
+    }
+
+    return versionName
+}
+
+def generateVersionNameSuffix(int versionBuild, String releaseType, boolean includeHash = false){
+    def versionNameSuffix = "${releaseType}.${versionBuild}"
+    if(includeHash){
+        versionNameSuffix += " (${getGitShortHash()})"
+    }
+    return versionNameSuffix
+}
+
+def getGitShortHash(){
+    def cmd = "git rev-parse --short HEAD"
+    try{
+        def proc = cmd.execute()
+        return proc.text.trim()
+    } catch(IOException e){
+        //Unable to find git
+        return ""
+    }
+}
+
+def getMavenUsername(){
+    return hasProperty('DROIDPLANNER_MAVEN_USERNAME') ? DROIDPLANNER_MAVEN_USERNAME : ''
+}
+
+def getMavenApiKey(){
+    return hasProperty('DROIDPLANNER_MAVEN_APIKEY') ? DROIDPLANNER_MAVEN_APIKEY : ''
+}
+
+def getMavenRepo(){
+    return hasProperty('DROIDPLANNER_MAVEN_REPO') ? DROIDPLANNER_MAVEN_REPO : ''
+}
+
+def getMavenRepoUrl(){
+    return hasProperty('DROIDPLANNER_MAVEN_REPO_URL') ? DROIDPLANNER_MAVEN_REPO_URL : ''
+}
+
+def getMavenPublishUrl(String artifactId){
+    def prefix = hasProperty('DROIDPLANNER_MAVEN_PUBLISH_URL_PREFIX') ? DROIDPLANNER_MAVEN_PUBLISH_URL_PREFIX : null
+    if(prefix == null)
+        return null
+
+    return "$prefix/$artifactId/;publish=1"
+}
+
+def getMavenPomPackaging(){
+    return hasProperty('DROIDPLANNER_MAVEN_POM_PACKAGING') ? DROIDPLANNER_MAVEN_POM_PACKAGING : 'aar'
+}
+
+def getDeveloperId(){
+    return hasProperty('DEVELOPER_ID') ? DEVELOPER_ID : ''
+}
+
+def getDeveloperName(){
+    return hasProperty('DEVELOPER_NAME') ? DEVELOPER_NAME : ''
+}
+
+//apply from: "maven-push.gradle"
