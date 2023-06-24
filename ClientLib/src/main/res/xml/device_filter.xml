@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- 0x0403 / 0x6001: FTDI FT232R UART -->
+    <usb-device vendor-id="1155" product-id="22336" /><!-- TypeC-MicroB -->
 	<usb-device vendor-id="1027" product-id="24577" /> <!-- FT232RL -->
 	<usb-device vendor-id="1027" product-id="24596" /> <!-- FT232H -->
 	<usb-device vendor-id="1027" product-id="24597" /> <!-- FT231X 0x0403 / 0x6015 -->
